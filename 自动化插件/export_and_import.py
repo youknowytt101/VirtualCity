@@ -56,7 +56,7 @@ print("\n[2/2] 通知 UE5 导入 FBX...")
 TRIGGER = r"F:/VirtualCity/.ue5_trigger"
 IMPORT_SCRIPT = r"F:/VirtualCity/自动化插件/ue5_import_fbx.py"
 
-with open(TRIGGER, "w", encoding="utf-8") as f:
+with open(TRIGGER, "w", encoding="utf-8", newline="\n") as f:
     f.write(IMPORT_SCRIPT)
 
 print(f"  触发文件已写入: {TRIGGER}")
