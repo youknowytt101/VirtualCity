@@ -1,0 +1,16 @@
+{
+    "FileVersion": 3,
+    "EngineAssociation": "5.6",
+    "Category": "",
+    "Description": "VirtualCity MVP - Pattaya procedural city generation",
+    "Plugins": [
+        {
+            "Name": "PythonScriptPlugin",
+            "Enabled": true
+        },
+        {
+            "Name": "EditorScriptingUtilities",
+            "Enabled": true
+        }
+    ]
+}
