@@ -38,7 +38,11 @@ BUILDING_RESOLUTION = 4  # metres (effective resolution of Open Buildings 2.5D)
 
 def parse_args():
     p = argparse.ArgumentParser(description="Download building heights from Google Open Buildings 2.5D")
-    p.add_argument("--area", default="pattaya_sai6_mvp", choices=list(AREAS.keys()))
+    p.add_argument("--area", default=None, choices=list(AREAS.keys()),
+                   help="预设区域名（与 --bbox 二选一）")
+    p.add_argument("--bbox", nargs=4, type=float, metavar=("WEST","SOUTH","EAST","NORTH"),
+                   help="直接输入坐标，不用预设区域")
+    p.add_argument("--output", default=None, help="输出 GeoJSON 路径（与 --bbox 配合使用）")
     p.add_argument("--year", type=int, default=EE_YEAR)
     p.add_argument("--reauth", action="store_true", help="Force re-authentication")
     return p.parse_args()
@@ -136,9 +140,20 @@ def download_geojson(fc, out_path):
 
 def main():
     args = parse_args()
-    cfg  = AREAS[args.area]
 
-    print(f"[download_building_heights] area={args.area}, year={args.year}")
+    if args.bbox:
+        west, south, east, north = args.bbox
+        out = args.output or f"F:/VirtualCity/原始数据/Overture/custom_{west:.3f}_{south:.3f}_buildings.geojson"
+        cfg = {"bbox": [west, south, east, north], "output": out}
+        area_label = f"bbox [{west},{south},{east},{north}]"
+    elif args.area:
+        cfg = AREAS[args.area]
+        area_label = args.area
+    else:
+        cfg = AREAS["pattaya_sai6_mvp"]
+        area_label = "pattaya_sai6_mvp"
+
+    print(f"[download_building_heights] area={area_label}, year={args.year}")
     print("  Authenticating with Google Earth Engine...")
     authenticate(reauth=args.reauth)
 
