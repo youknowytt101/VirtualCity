@@ -114,6 +114,37 @@ elif snap_old:
     snap_old.parm('snippet').set(ROAD_SNAP_VEX)
     print('  snap_roads_to_terrain1 class=2 + VEX 已校验更新')
 
+# ── 1b2. 道路分级宽度（road_width attribwrangle）──────────────────────────
+ROAD_WIDTH_VEX = """
+string hw = s@highway;
+float hw_val;
+if      (hw == "motorway")                                    hw_val = 5.0;
+else if (hw == "motorway_link")                               hw_val = 3.5;
+else if (hw == "trunk")                                       hw_val = 4.5;
+else if (hw == "trunk_link")                                  hw_val = 3.0;
+else if (hw == "primary")                                     hw_val = 4.0;
+else if (hw == "primary_link")                                hw_val = 2.5;
+else if (hw == "secondary")                                   hw_val = 3.5;
+else if (hw == "secondary_link")                              hw_val = 2.0;
+else if (hw == "tertiary")                                    hw_val = 2.5;
+else if (hw == "tertiary_link")                               hw_val = 1.5;
+else if (hw == "residential" || hw == "living_street")        hw_val = 2.0;
+else if (hw == "unclassified")                                hw_val = 2.0;
+else if (hw == "service")                                     hw_val = 1.5;
+else if (hw == "track")                                       hw_val = 1.5;
+else if (hw == "pedestrian")                                  hw_val = 2.5;
+else if (hw == "footway" || hw == "path" || hw == "bridleway") hw_val = 0.75;
+else if (hw == "cycleway")                                    hw_val = 0.75;
+else if (hw == "steps")                                       hw_val = 0.6;
+else                                                          hw_val = 1.5;
+f@half_width = hw_val;
+"""
+_rw = hou.node('/obj/pattaya_osm/road_width')
+if _rw:
+    _rw.parm('snippet').set(ROAD_WIDTH_VEX)
+    _rw.parm('class').set(1)  # Primitive
+    print('  road_width VEX 已更新（14 级分级宽度）')
+
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = """
 // 对每栋楼逐顶点查询地形高度，取 MAX 作为底面 Y
@@ -267,7 +298,7 @@ int hit_prim;
 vector uvw;
 xyzdist(1, @P, hit_prim, uvw);
 vector tp = primuv(1, "P", hit_prim, uvw);
-@P.y = tp.y + 0.15;  // +0.15m 防止 z-fighting
+@P.y = max(tp.y, 0.0) + 0.15;  // 浮起 0.15m，且不低于海平面(Y=0)
 """
 old_drape = hou.node('/obj/pattaya_osm/snap_road_strips')
 if old_drape:
