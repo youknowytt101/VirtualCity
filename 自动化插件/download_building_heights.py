@@ -85,15 +85,15 @@ def fetch_buildings(bbox, year, presence_threshold, resolution):
         tileScale=16,
     ).filter(ee.Filter.gt("building_presence", presence_threshold))
 
-    # Reproject + select fields
-    exported = (
-        with_height
-        .map(lambda f: f.transform(proj=projection, maxError=0.1))
-        .select(
-            ["area_in_meters", "building_height", "building_presence"],
-            ["area", "height", "presence"],
-        )
-    )
+    # Select and rename fields (no transform - keep WGS84 for geometry)
+    exported = with_height.map(lambda f: ee.Feature(
+        f.geometry(),
+        {
+            'area':     f.get('area_in_meters'),
+            'height':   f.get('building_height'),
+            'presence': f.get('building_presence'),
+        }
+    ))
 
     print(f"  Building count: {exported.size().getInfo()}")
     return exported
@@ -103,7 +103,7 @@ def download_geojson(fc, out_path):
     """直接从 EE 下载 FeatureCollection 为 GeoJSON，无需 Google Drive。"""
     import ee
 
-    url = fc.getDownloadURL(filetype="GeoJSON", selectors=["area", "height", "presence"])
+    url = fc.getDownloadURL(filetype="GeoJSON")
     print(f"  Downloading from EE direct URL...")
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
 
@@ -128,7 +128,10 @@ def download_geojson(fc, out_path):
         fc_local = json.load(f)
     n = len(fc_local.get("features", []))
     has_h = sum(1 for feat in fc_local["features"] if feat["properties"].get("height") not in (None, ""))
-    print(f"  Saved {n} features, {has_h} with height ({100*has_h//n}%) → {out_path}")
+    has_g = sum(1 for feat in fc_local["features"] if feat.get("geometry") is not None)
+    print(f"  Saved {n} features, {has_h} with height ({100*has_h//n}%), {has_g} with geometry → {out_path}")
+    if has_g == 0:
+        raise RuntimeError("All features have null geometry! Check EE export settings.")
 
 
 def main():
