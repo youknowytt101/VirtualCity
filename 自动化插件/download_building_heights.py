@@ -24,6 +24,10 @@ AREAS = {
         "bbox": [100.866, 12.922, 100.882, 12.938],
         "output": r"F:/VirtualCity/原始数据/Overture/pattaya_sai6_buildings_height_v001.geojson",
     },
+    "pattaya_sai6_mvp_v2": {
+        "bbox": [100.860, 12.916, 100.888, 12.944],  # 3km × 3km
+        "output": r"F:/VirtualCity/原始数据/Overture/pattaya_sai6_mvp_v2_buildings_height_v001.geojson",
+    },
 }
 
 EE_PROJECT = "pty-zone"
