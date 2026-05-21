@@ -1,0 +1,34 @@
+"""
+VirtualCity — UE5 Python 初始化脚本
+=====================================
+UE5 启动时自动执行（放在 Content/Python/ 目录下即可）。
+轮询触发文件，外部脚本写入触发文件后自动执行导入。
+
+触发文件路径：F:/VirtualCity/.ue5_trigger
+文件内容：要执行的 Python 脚本绝对路径
+"""
+import unreal, os
+
+TRIGGER_FILE = r"F:/VirtualCity/.ue5_trigger"
+
+def _check_trigger():
+    if not os.path.exists(TRIGGER_FILE):
+        return
+    try:
+        with open(TRIGGER_FILE, encoding="utf-8") as f:
+            script_path = f.read().strip()
+        os.remove(TRIGGER_FILE)
+        if script_path and os.path.exists(script_path):
+            unreal.log(f"[VirtualCity] 执行触发脚本: {script_path}")
+            import runpy
+            runpy.run_path(script_path)
+            unreal.log("[VirtualCity] 触发脚本执行完毕")
+    except Exception as e:
+        unreal.log_warning(f"[VirtualCity] 触发脚本执行失败: {e}")
+
+# 注册 tick 回调，每 2 秒检查一次
+_ticker_handle = unreal.register_slate_post_tick_callback(
+    lambda dt: _check_trigger() if int(unreal.get_editor_subsystem(
+        unreal.UnrealEditorSubsystem).get_editor_world().get_time_seconds()) % 2 == 0 else None
+)
+unreal.log("[VirtualCity] 触发文件监听已启动，路径: " + TRIGGER_FILE)

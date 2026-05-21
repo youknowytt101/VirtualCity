@@ -51,14 +51,13 @@ for label, (sop_path, fbx_path) in exports.items():
 hou.hipFile.save()
 conn.close()
 
-# ── 2. UE5 导入 FBX ──────────────────────────────────
-print("\n[2/2] UE5 导入 FBX...")
-sys.path.insert(0, str(__import__('pathlib').Path(__file__).parent))
-from ue5_remote_control import run_script
+# ── 2. 写触发文件，通知 UE5 执行导入 ────────────────
+print("\n[2/2] 通知 UE5 导入 FBX...")
+TRIGGER = r"F:/VirtualCity/.ue5_trigger"
+IMPORT_SCRIPT = r"F:/VirtualCity/自动化插件/ue5_import_fbx.py"
 
-result = run_script(r'F:/VirtualCity/自动化插件/ue5_import_fbx.py')
-if result and 'errorMessage' in result:
-    print(f"  ❌ UE5 执行失败: {result['errorMessage']}")
-    print("  → 请重启 UE5（需加载新 DefaultEngine.ini 才能解锁 Python 白名单）")
-else:
-    print("  ✅ UE5 导入完成")
+with open(TRIGGER, "w", encoding="utf-8") as f:
+    f.write(IMPORT_SCRIPT)
+
+print(f"  触发文件已写入: {TRIGGER}")
+print("  UE5 将在 2 秒内自动执行导入（请查看 UE5 Output Log）")
