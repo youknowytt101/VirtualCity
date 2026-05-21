@@ -14,6 +14,15 @@ PASS = '[OK]'
 FAIL = '[FAIL]'
 errors = []
 
+# ══════════════════════════════════════════
+# 颜色配置 — 修改这里即可独立控制三类颜色
+COLORS = {
+    'roads':     (1.00, 1.00, 1.00),  # 道路：纯白
+    'buildings': (0.55, 0.55, 0.55),  # 建筑：中灰
+    'terrain':   (0.25, 0.25, 0.25),  # 地形：深灰
+}
+# ══════════════════════════════════════════
+
 conn = rpyc.classic.connect('localhost', 18811)
 hou  = conn.modules.hou
 
@@ -279,14 +288,28 @@ print('  snap_road_strips: pts={} Y_min={:.2f}m'.format(_rs_pts, _rs_ymin))
 bld_clip  = remake_clip('post_normals',    'bld_clip_mark',  'bld_clipped')
 road_clip = remake_clip('snap_road_strips','road_clip_mark', 'road_clipped')
 
+# ── 4c. 颜色节点（三类独立，来自 COLORS 配置）────────────────────────
+def make_color_node(name, src_node, rgb):
+    old = hou.node('/obj/pattaya_osm/' + name)
+    if old: old.destroy()
+    w = net.createNode('attribwrangle', name)
+    w.setInput(0, src_node)
+    w.parm('class').set(2)  # Point
+    w.parm('snippet').set('@Cd = set({:.4f}, {:.4f}, {:.4f});'.format(*rgb))
+    w.cook(force=True)
+    return w
+
+_dem_sd = hou.node('/obj/pattaya_osm/dem_subdivide') or hou.node('/obj/pattaya_osm/dem_terrain')
+road_colored    = make_color_node('road_color',    road_clip, COLORS['roads'])
+bld_colored     = make_color_node('bld_color',     bld_clip,  COLORS['buildings'])
+terrain_colored = make_color_node('terrain_color', _dem_sd,   COLORS['terrain'])
+
 # ── 5. 重连 merge_all + 保存 ────────────────────────
-if bld_clip and road_clip:
-    merge = hou.node('/obj/pattaya_osm/merge_all')
-    if merge:
-        merge.setInput(0, bld_clip)
-        merge.setInput(1, road_clip)
-        _dem_sd = hou.node('/obj/pattaya_osm/dem_subdivide')
-        merge.setInput(2, _dem_sd if _dem_sd else hou.node('/obj/pattaya_osm/dem_terrain'))
+merge = hou.node('/obj/pattaya_osm/merge_all')
+if merge and bld_clip and road_clip:
+    merge.setInput(0, bld_colored)
+    merge.setInput(1, road_colored)
+    merge.setInput(2, terrain_colored)
 
 net.layoutChildren()
 hou.hipFile.save()
@@ -305,7 +328,7 @@ FULL_CHAIN = [
     'osm_import', 'dem_terrain',
     'extract_buildings', 'snap_bld_to_terrain', 'extrude_buildings', 'post_normals',
     'snap_roads_to_terrain1', 'road_width', 'road_strips',
-    'bld_clipped', 'road_clipped', 'merge_all', 'OUT_city',
+    'bld_clipped', 'road_clipped', 'road_color', 'bld_color', 'terrain_color', 'merge_all', 'OUT_city',
 ]
 for _cn in FULL_CHAIN:
     _n = hou.node('/obj/pattaya_osm/' + _cn)
