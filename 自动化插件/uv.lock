@@ -1,0 +1,48 @@
+version = 1
+revision = 3
+requires-python = ">=3.14"
+
+[[package]]
+name = "plumbum"
+version = "1.10.0"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }
+dependencies = [
+    { name = "pywin32", marker = "platform_python_implementation != 'PyPy' and sys_platform == 'win32'" },
+]
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/dc/c8/11a5f792704b70f071a3dbc329105a98e9cc8d25daaf09f733c44eb0ef8e/plumbum-1.10.0.tar.gz", hash = "sha256:f8cbf0ecec0b73ff4e349398b65112a9e3f9300e7dc019001217dcc148d5c97c" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/79/ad/45312df6b63ba64ea35b8d8f5f0c577aac16e6b416eafe8e1cb34e03f9a7/plumbum-1.10.0-py3-none-any.whl", hash = "sha256:9583d737ac901c474d99d030e4d5eec4c4e6d2d7417b1cf49728cf3be34f6dc8" },
+]
+
+[[package]]
+name = "pywin32"
+version = "311"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/c9/31/097f2e132c4f16d99a22bfb777e0fd88bd8e1c634304e102f313af69ace5/pywin32-311-cp314-cp314-win32.whl", hash = "sha256:b7a2c10b93f8986666d0c803ee19b5990885872a7de910fc460f9b0c2fbf92ee" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/90/4b/07c77d8ba0e01349358082713400435347df8426208171ce297da32c313d/pywin32-311-cp314-cp314-win_amd64.whl", hash = "sha256:3aca44c046bd2ed8c90de9cb8427f581c479e594e99b5c0bb19b29c10fd6cb87" },
+    { url = "https://mirrors.aliyun.com/pypi/packages/c0/d2/21af5c535501a7233e734b8af901574572da66fcc254cb35d0609c9080dd/pywin32-311-cp314-cp314-win_arm64.whl", hash = "sha256:a508e2d9025764a8270f93111a970e1d0fbfc33f4153b388bb649b7eec4f9b42" },
+]
+
+[[package]]
+name = "rpyc"
+version = "4.1.0"
+source = { registry = "https://mirrors.aliyun.com/pypi/simple/" }
+dependencies = [
+    { name = "plumbum" },
+]
+sdist = { url = "https://mirrors.aliyun.com/pypi/packages/99/d3/3d6ab7c551b4be55ad38e0599a49d96b3e186db3293a956811df59f172e6/rpyc-4.1.0.tar.gz", hash = "sha256:05e704c0502932571960812f5cfaac3ae69149edcd96ce4644961c170404e9df" }
+wheels = [
+    { url = "https://mirrors.aliyun.com/pypi/packages/d3/91/f10c78cbfe89130ee149fd2cab54dc2763aff825b658ff8366bb0cc0f1e2/rpyc-4.1.0-py3-none-any.whl", hash = "sha256:aa361fd5f2a95560571777069cca9691701e2e5676eee07dbc0fe97f995b0109" },
+]
+
+[[package]]
+name = "virtualcity"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "rpyc" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "rpyc", specifier = "==4.1.0" }]

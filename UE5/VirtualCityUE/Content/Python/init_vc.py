@@ -26,11 +26,14 @@ def _check_trigger():
     except Exception as e:
         unreal.log_warning(f"[VirtualCity] 触发脚本执行失败: {e}")
 
-# 用低频定时器检查触发文件（每 3 秒一次，不影响帧率）
-def _start_timer():
-    _check_trigger()
-    unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem)  # keep alive
-    unreal.call_later(3.0, _start_timer)
+import time as _time
+_last_check = [0.0]
 
-unreal.call_later(3.0, _start_timer)
+def _tick(dt):
+    now = _time.time()
+    if now - _last_check[0] >= 3.0:
+        _last_check[0] = now
+        _check_trigger()
+
+_ticker_handle = unreal.register_slate_post_tick_callback(_tick)
 unreal.log("[VirtualCity] 触发文件监听已启动，路径: " + TRIGGER_FILE)
