@@ -70,6 +70,22 @@ def spawn_actor(asset_path, location=None, label=None):
                  "SpawnLocation": loc})
 
 
+def run_script(script_path):
+    """在运行中的 UE5 Editor 里执行 Python 脚本文件。
+    需要 DefaultEngine.ini 已开启 PythonScriptLibrary 白名单。
+    """
+    return _request("PUT", "/remote/object/call", {
+        "objectPath": "/Script/PythonScriptPlugin.Default__PythonScriptLibrary",
+        "functionName": "ExecutePythonCommandEx",
+        "parameters": {
+            "PythonCommand": script_path,
+            "ExecutionMode": "ExecuteFile",
+            "FileExecutionScope": "Private",
+        },
+        "generateTransaction": False,
+    })
+
+
 if __name__ == "__main__":
     # 快速测试：搜索已导入的资产
     print("=== 搜索建筑资产 ===")
