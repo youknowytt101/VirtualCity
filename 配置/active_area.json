@@ -1,0 +1,9 @@
+{
+  "area_id": "pattaya_sai6_mvp",
+  "osm_file":       "F:/VirtualCity/原始数据/OSM/pattaya_sai6_mvp_osm_v001.osm",
+  "buildings_file": "F:/VirtualCity/原始数据/Overture/pattaya_sai6_buildings_height_v001.geojson",
+  "dem_csv":        "F:/VirtualCity/原始数据/DEM/pattaya_sai6_mvp_v2_dem_v001.csv",
+  "origin_lon": 100.874,
+  "origin_lat":  12.930,
+  "_note": "切换区域只改此文件，不改 Houdini 节点代码"
+}
