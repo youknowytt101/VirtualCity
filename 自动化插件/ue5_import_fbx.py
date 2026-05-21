@@ -20,6 +20,11 @@ IMPORTS = [
         "dest": "/Game/City/Roads",
         "name": "SM_Roads_v001",
     },
+    {
+        "fbx":  r"F:/VirtualCity/Houdini/Export/terrain_v001.fbx",
+        "dest": "/Game/City/Terrain",
+        "name": "SM_Terrain_v001",
+    },
 ]
 
 
