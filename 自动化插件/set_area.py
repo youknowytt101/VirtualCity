@@ -51,7 +51,7 @@ print(f"  尺寸: {bbox_w/1000:.1f} km × {bbox_h/1000:.1f} km")
 print(f"{'='*50}\n")
 
 osm_path       = str(DATA_ROOT / f"OSM/{area_name}_osm_v001.osm")
-buildings_path = str(DATA_ROOT / f"Overture/{area_name}_buildings_height_v001.geojson")
+buildings_path = str(DATA_ROOT / f"Overture/{area_name}_buildings_overture_v001.geojson")
 dem_tif_path   = str(DATA_ROOT / f"DEM/{area_name}_dem_v001.tif")
 dem_csv_path   = str(DATA_ROOT / f"DEM/{area_name}_dem_v001.csv")
 
@@ -68,54 +68,69 @@ cfg = {
 CFG_PATH.write_text(json.dumps(cfg, indent=2, ensure_ascii=False), encoding="utf-8")
 print(f"[1/5] ✅ active_area.json 已更新: {area_name}")
 
-# ── 2. 下载 OSM ──────────────────────────────────────
-print(f"\n[2/5] 下载 OSM 数据...")
+# ── 2. OSM：优先本地缓存裁剪 → 备用 Overpass 下载 ──
+print(f"\n[2/5] 获取 OSM 数据...")
 import urllib.request, urllib.parse
+sys.path.insert(0, str(SCRIPTS))
+import _tile_cache as _tc
 
-OVERPASS_SERVERS = [
-    "https://overpass-api.de/api/interpreter",
-    "https://overpass.kumi.systems/api/interpreter",
-]
-s, w, n, e = south, west, north, east
-query = (
-    f"[out:xml][timeout:180];\n"
-    f"(\n"
-    f'  way["building"]({s},{w},{n},{e});\n'
-    f'  way["highway"]({s},{w},{n},{e});\n'
-    f'  relation["building"]({s},{w},{n},{e});\n'
-    f");\n"
-    f"out body;\n>;\nout skel qt;\n"
-)
-Path(osm_path).parent.mkdir(parents=True, exist_ok=True)
-osm_ok = False
-for server in OVERPASS_SERVERS:
-    try:
-        data = urllib.parse.urlencode({"data": query}).encode()
-        req  = urllib.request.Request(server, data=data,
-                                      headers={"User-Agent": "VirtualCity/1.0"})
-        with urllib.request.urlopen(req, timeout=180) as resp:
-            content = resp.read()
-        with open(osm_path, "wb") as f:
-            f.write(content)
-        print(f"  ✅ OSM: {len(content)//1024} KB → {osm_path}")
-        osm_ok = True
-        break
-    except Exception as ex:
-        print(f"  ⚠ {server}: {ex}")
-        time.sleep(3)
-if not osm_ok:
-    print("  ❌ OSM 下载失败，请检查网络后重试")
-    sys.exit(1)
+bbox_req = [west, south, east, north]
+_tile = _tc.find_covering_tile(bbox_req)
+if _tile:
+    print(f"  [本地缓存] 命中, 裁剪 OSM...")
+    if not _tc.filter_osm(_tile, bbox_req, osm_path):
+        _tile = None
 
-# ── 3. 下载 DEM ──────────────────────────────────────
-print(f"\n[3/5] 下载 DEM 数据...")
+if not _tile:
+    OVERPASS_SERVERS = [
+        "https://overpass-api.de/api/interpreter",
+        "https://overpass.kumi.systems/api/interpreter",
+    ]
+    s, w, n, e = south, west, north, east
+    query = (
+        f"[out:xml][timeout:180];\n"
+        f"(\n"
+        f'  way["highway"]({s},{w},{n},{e});\n'
+        f");\n"
+        f"out body;\n>;\nout skel qt;\n"
+    )
+    Path(osm_path).parent.mkdir(parents=True, exist_ok=True)
+    osm_ok = False
+    for server in OVERPASS_SERVERS:
+        try:
+            data = urllib.parse.urlencode({"data": query}).encode()
+            req  = urllib.request.Request(server, data=data,
+                                          headers={"User-Agent": "VirtualCity/1.0"})
+            with urllib.request.urlopen(req, timeout=180) as resp:
+                content = resp.read()
+            with open(osm_path, "wb") as f:
+                f.write(content)
+            print(f"  ✅ OSM: {len(content)//1024} KB → {osm_path}")
+            osm_ok = True
+            break
+        except Exception as ex:
+            print(f"  ⚠ {server}: {ex}")
+            time.sleep(3)
+    if not osm_ok:
+        print("  ❌ OSM 下载失败，请先运行 cache_city_data.py 预缓存后重试")
+        sys.exit(1)
+
+# ── 3. DEM：优先本地缓存裁剪 → 备用 GEE 下载 ─────────
+print(f"\n[3/5] 获取 DEM 数据...")
 try:
-    sys.path.insert(0, str(SCRIPTS))
     import download_dem as _dem
     Path(dem_csv_path).parent.mkdir(parents=True, exist_ok=True)
     bbox = [west, south, east, north]
-    ok = _dem.download_copernicus_10m(bbox, dem_tif_path, dem_csv_path)
-    if not ok:
+    dem_ok = False
+
+    _tile2 = _tc.find_covering_tile(bbox)
+    if _tile2:
+        print(f"  [本地缓存] 命中, 裁剪 DEM...")
+        dem_ok = _tc.crop_dem(_tile2, bbox, dem_tif_path, dem_csv_path)
+        if dem_ok:
+            _dem.convert_to_csv(dem_tif_path, dem_csv_path, bbox)
+
+    if not dem_ok:
         _dem.download_gee({"bbox": bbox, "output_tif": dem_tif_path,
                            "output_csv": dem_csv_path}, source="nasadem")
     print(f"  ✅ DEM 完成")
@@ -123,20 +138,27 @@ except Exception as ex:
     print(f"  ❌ DEM 下载失败: {ex}")
     sys.exit(1)
 
-# ── 4. 下载建筑高度 ──────────────────────────────────
-print(f"\n[4/5] 下载建筑高度（Google Open Buildings，需 GEE 认证）...")
+# ── 4. 建筑：优先本地缓存过滤→备用 Overture 下载 ──
+print(f"\n[4/5] 获取建筑数据...")
 Path(buildings_path).parent.mkdir(parents=True, exist_ok=True)
-bld_script = str(SCRIPTS / "download_building_heights.py")
-bld_cmd = [
-    sys.executable, bld_script,
-    "--bbox", str(west), str(south), str(east), str(north),
-    "--output", buildings_path,
-]
-result = subprocess.run(bld_cmd, capture_output=False)
-if result.returncode != 0 or not Path(buildings_path).exists():
-    print(f"  ❌ 建筑高度下载失败（returncode={result.returncode}）")
-    sys.exit(1)
-print(f"  ✅ 建筑高度完成")
+bld_ok = False
+
+_tile3 = _tc.find_covering_tile([west, south, east, north])
+if _tile3:
+    print(f"  [本地缓存] 命中, 过滤建筑...")
+    bld_ok = _tc.filter_buildings(_tile3, [west, south, east, north], buildings_path)
+
+if not bld_ok:
+    bld_cmd = [
+        "uv", "run", "python", "download_overture_buildings.py",
+        "--bbox", str(west), str(south), str(east), str(north),
+        "--output", buildings_path,
+    ]
+    result = subprocess.run(bld_cmd, capture_output=False, cwd=str(SCRIPTS))
+    if result.returncode != 0 or not Path(buildings_path).exists():
+        print(f"  ❌ Overture 建筑下载失败（returncode={result.returncode}）")
+        sys.exit(1)
+print(f"  ✅ 建筑完成")
 
 # ── 5. 验证 + Houdini recook ─────────────────────────
 print(f"\n[5/5] 数据验证 + Houdini 重算...")

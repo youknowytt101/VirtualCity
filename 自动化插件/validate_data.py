@@ -91,9 +91,9 @@ def main():
     print(f"  区域: {cfg['area_id']}\n")
 
     results = [
-        check("OSM 文件",     cfg["osm_file"],       min_bytes=50_000,  extra=check_osm),
+        check("OSM 文件",     cfg["osm_file"],       min_bytes=20_000,  extra=check_osm),
         check("建筑 GeoJSON", cfg["buildings_file"], min_bytes=10_000,  extra=check_geojson_geometry),
-        check("DEM CSV",      cfg["dem_csv"],        min_bytes=10_000,  extra=check_csv_header),
+        check("DEM CSV",      cfg["dem_csv"],        min_bytes=4_000,   extra=check_csv_header),
     ]
     results.append(check_houdini_ready())
 

@@ -1,0 +1,13 @@
+{
+  "pattaya": {
+    "bbox": [
+      100.84,
+      12.89,
+      100.92,
+      12.97
+    ],
+    "dem_tif": "F:\\VirtualCity\\原始数据\\_tiles\\pattaya_dem.tif",
+    "osm_xml": "F:\\VirtualCity\\原始数据\\_tiles\\pattaya_osm.osm",
+    "bld_geojson": "F:\\VirtualCity\\原始数据\\_tiles\\pattaya_bld.geojson"
+  }
+}
