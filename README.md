@@ -1,5 +1,8 @@
 # VirtualCity 工程根目录
 
+> **Git 仓库**：`https://github.com/youknowytt101/VirtualCity.git`  
+> 新机器首次使用：`git clone https://github.com/youknowytt101/VirtualCity.git`
+
 > AI / 新成员接手项目时，优先阅读：`项目管理/00_AI接手指南.md`。  
 > 当前状态和下一步见：`项目管理/02_当前状态与下一步.md`。
 
@@ -106,11 +109,10 @@ UE5/ (Houdini Engine → Bake → Nanite/Lumen/PCG)
 
 ## 当前项目阶段
 
-当前阶段：**MVP 前准备阶段**。
+当前阶段：**Houdini MVP 节点网络已完成，切换建筑数据源进行中**。
 
-下一步优先级：
+下一步优先级（详见 `项目管理/02_当前状态与下一步.md`）：
 
-1. 确定 `200m × 200m` 到 `500m × 500m` 的 MVP 测试区域 bbox。
-2. 下载第一份 OSM 数据。
-3. 建立 Houdini MVP 节点网络。
-4. 导入 UE5 并完成 Bake 验证。
+1. 切换建筑数据源：OSM → Overture Maps（已下载 GeoJSON，更新 Houdini SOP）
+2. FBX 分组导出（buildings + roads）
+3. 创建 UE5 项目，导入 FBX 验证比例与位置
