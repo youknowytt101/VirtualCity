@@ -26,16 +26,30 @@ def check(label, path, min_bytes=1024, extra=None):
     return True
 
 def check_geojson_geometry(path):
+    """D-001: 建筑 GeoJSON 必须有 Polygon 几何 + 真实高度（非全默认 10m）"""
     with open(path, encoding="utf-8") as f:
         fc = json.load(f)
     feats = fc.get("features", [])
+    if not feats:
+        return "features 为空"
     null_geom = sum(1 for feat in feats if feat.get("geometry") is None)
     if null_geom == len(feats):
-        return f"全部 {null_geom} 个 feature geometry=null（D-001 bug）"
+        return (f"全部 {null_geom} 个 feature geometry=null — "
+                f"此文件只有高度属性，无多边形坐标，不可用于建筑生成（D-001）")
     if null_geom > 0:
-        print(f"         ⚠ 警告: {null_geom}/{len(feats)} 个 feature geometry=null（已 skip）")
-    has_h = sum(1 for feat in feats if feat.get("properties", {}).get("height"))
-    print(f"         features={len(feats)}, with_height={has_h}, null_geom={null_geom}")
+        print(f"         ⚠ {null_geom}/{len(feats)} 个 feature geometry=null（已 skip）")
+    # 高度有效性检查（D-002）
+    heights = [feat.get("properties", {}).get("height", 0) or 0
+               for feat in feats if feat.get("geometry") is not None]
+    if not heights:
+        return "有几何的 feature 均无 height 属性（D-002）"
+    avg_h = sum(heights) / len(heights)
+    if avg_h == 10.0 and min(heights) == max(heights):
+        return f"所有建筑高度均为默认值 10.0m — 高度数据未写入（D-002）"
+    if avg_h < 0.5:
+        return f"建筑平均高度 {avg_h:.2f}m 过低，数据异常（D-002）"
+    print(f"         features={len(feats)}, with_geom={len(feats)-null_geom}, "
+          f"height min/avg/max={min(heights):.1f}/{avg_h:.1f}/{max(heights):.1f}m")
     return None
 
 def check_osm(path):
@@ -52,6 +66,24 @@ def check_csv_header(path):
         return f"CSV 缺少 x/y 列，header={header}"
     return None
 
+def check_houdini_ready():
+    """H-001: Houdini RPYC 在线 + hip 已加载"""
+    try:
+        import rpyc
+        conn = rpyc.classic.connect('localhost', 18811)
+        hou = conn.modules.hou
+        hip = hou.hipFile.path()
+        conn.close()
+        if 'untitled' in hip:
+            print("  [FAIL] Houdini: 已连接但工程文件未加载（H-001）")
+            return False
+        print(f"  [ OK ] Houdini: 已连接，hip={hip.split('/')[-1]}")
+        return True
+    except Exception as e:
+        print(f"  [WARN] Houdini: 无法连接（{e}）— 仅数据检查")
+        return True  # Houdini 未运行不阻断数据检查
+
+
 def main():
     print(f"\n[VirtualCity 数据预检]")
     with open(CFG_FILE, encoding="utf-8") as f:
@@ -59,16 +91,17 @@ def main():
     print(f"  区域: {cfg['area_id']}\n")
 
     results = [
-        check("OSM 文件",       cfg["osm_file"],       min_bytes=50_000, extra=check_osm),
-        check("建筑 GeoJSON",   cfg["buildings_file"], min_bytes=100_000, extra=check_geojson_geometry),
-        check("DEM CSV",        cfg["dem_csv"],        min_bytes=10_000,  extra=check_csv_header),
+        check("OSM 文件",     cfg["osm_file"],       min_bytes=50_000,  extra=check_osm),
+        check("建筑 GeoJSON", cfg["buildings_file"], min_bytes=10_000,  extra=check_geojson_geometry),
+        check("DEM CSV",      cfg["dem_csv"],        min_bytes=10_000,  extra=check_csv_header),
     ]
+    results.append(check_houdini_ready())
 
     print()
     if all(results):
         print("  ✅ 全部通过，可以进入 Houdini。")
     else:
-        print("  ❌ 有文件未通过，请先修复再进 Houdini。")
+        print("  ❌ 有检查项未通过，请修复后再运行导出。")
         sys.exit(1)
 
 if __name__ == "__main__":

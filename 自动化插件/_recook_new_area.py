@@ -1,0 +1,331 @@
+"""
+Houdini 换区重算脚本
+====================
+每次 set_area.py 换区后自动执行：
+  1. 修复 dem_import / dem_terrain Python SOP（防止硬编码/sqrt 格网 bug）
+  2. 强制 recook 数据源
+  3. 验证全链路节点（几何非空 + 高度范围合理）
+  4. 重建裁剪节点（基于新 DEM 边界）
+  5. 重连 merge_all + 保存 hip
+"""
+import sys, rpyc
+
+PASS = '[OK]'
+FAIL = '[FAIL]'
+errors = []
+
+conn = rpyc.classic.connect('localhost', 18811)
+hou  = conn.modules.hou
+
+# ── 0. 确保 hip 已加载 ───────────────────────────────
+HIP = 'F:/VirtualCity/Houdini/Hip/VC_pattaya_sai6_mvp_citygen_v001.hip'
+if 'untitled' in hou.hipFile.path():
+    hou.hipFile.load(HIP, suppress_save_prompt=True)
+    print('  hip 已加载: ' + HIP)
+else:
+    print('  hip: ' + hou.hipFile.path().split('/')[-1])
+
+net = hou.node('/obj/pattaya_osm')
+
+# ── 1. 修复 dem_import Python SOP（H-006：硬编码路径）────
+DEM_IMPORT_CODE = """
+import hou, csv, json as _json
+with open(r'F:/VirtualCity/配置/active_area.json', encoding='utf-8') as _f:
+    CSV_FILE = _json.load(_f)['dem_csv']
+geo = hou.pwd().geometry()
+with open(CSV_FILE, newline='') as f:
+    for row in csv.DictReader(f):
+        p = geo.createPoint()
+        p.setPosition(hou.Vector3(float(row['x']), float(row['y']), float(row['z'])))
+"""
+
+DEM_TERRAIN_CODE = """
+import hou, csv, json as _json
+with open(r'F:/VirtualCity/配置/active_area.json', encoding='utf-8') as _f:
+    CSV_FILE = _json.load(_f)['dem_csv']
+geo = hou.pwd().geometry()
+rows = []
+with open(CSV_FILE, newline='') as f:
+    for row in csv.DictReader(f):
+        rows.append((float(row['x']), float(row['y']), float(row['z'])))
+# H-005: 从坐标推断格网尺寸（不用 sqrt，支持非正方形）
+xs    = sorted(set(round(r[0], 1) for r in rows))
+zs    = sorted(set(round(r[2], 1) for r in rows))
+ncols = len(xs)
+nrows = len(zs)
+pts   = []
+for x, y, z in rows:
+    p = geo.createPoint()
+    p.setPosition(hou.Vector3(x, y, z))
+    pts.append(p)
+for ri in range(nrows - 1):
+    for ci in range(ncols - 1):
+        i0, i1 = ri * ncols + ci, ri * ncols + ci + 1
+        i2, i3 = (ri + 1) * ncols + ci + 1, (ri + 1) * ncols + ci
+        if max(i0, i1, i2, i3) < len(pts):
+            poly = geo.createPolygon()
+            for idx in [i0, i1, i2, i3]:
+                poly.addVertex(pts[idx])
+"""
+
+for node_path, code in [
+    ('/obj/pattaya_osm/dem_import',   DEM_IMPORT_CODE),
+    ('/obj/pattaya_osm/dem_terrain',  DEM_TERRAIN_CODE),
+]:
+    n = hou.node(node_path)
+    if n:
+        n.parm('python').set(code)
+        print('  SOP 修复: ' + node_path.split('/')[-1])
+
+# ── 1b. 修复道路地形吸附（H-007：Ray SOP direction=0，改用 xyzdist）──
+ROAD_SNAP_VEX = """
+// 点级别：每个道路点独立吸附到最近地形
+int hit_prim;
+vector uvw;
+xyzdist(1, @P, hit_prim, uvw);
+vector terrain_pos = primuv(1, "P", hit_prim, uvw);
+@P.y = terrain_pos.y;
+"""
+snap_old = hou.node('/obj/pattaya_osm/snap_roads_to_terrain1')
+if snap_old and snap_old.type().name() == 'ray':
+    road_w = hou.node('/obj/pattaya_osm/road_width')
+    resample = hou.node('/obj/pattaya_osm/resample_roads')
+    dem_t    = hou.node('/obj/pattaya_osm/dem_terrain')
+    snap_old.destroy()
+    snap_new = net.createNode('attribwrangle', 'snap_roads_to_terrain1')
+    snap_new.setInput(0, resample)
+    snap_new.setInput(1, dem_t)
+    snap_new.parm('class').set(2)  # 2 = Point
+    snap_new.parm('snippet').set(ROAD_SNAP_VEX)
+    if road_w:
+        road_w.setInput(0, snap_new)
+    print('  SOP 修复: snap_roads_to_terrain1 (Ray→xyzdist attribwrangle)')
+elif snap_old:
+    snap_old.parm('class').set(2)
+    snap_old.parm('snippet').set(ROAD_SNAP_VEX)
+    print('  snap_roads_to_terrain1 class=2 + VEX 已校验更新')
+
+# ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
+BLD_SNAP_VEX = """
+// 对每栋楼逐顶点查询地形高度，取 MAX 作为底面 Y
+// 防止坡面上坡侧顶点被地形埋没（H-011）
+float max_y = -1e9;
+int verts[] = primvertices(0, @primnum);
+foreach(int v; verts) {
+    int pt = vertexpoint(0, v);
+    vector p = point(0, "P", pt);
+    int hit_prim;
+    vector uvw;
+    xyzdist(1, p, hit_prim, uvw);
+    vector tp = primuv(1, "P", hit_prim, uvw);
+    if (tp.y > max_y) max_y = tp.y;
+}
+foreach(int v; verts) {
+    int pt = vertexpoint(0, v);
+    vector p = point(0, "P", pt);
+    p.y = max_y;
+    setpointattrib(0, "P", pt, p, "set");
+}
+"""
+snap_bld = hou.node('/obj/pattaya_osm/snap_bld_to_terrain')
+if snap_bld:
+    snap_bld.parm('class').set(1)   # Primitive
+    snap_bld.parm('snippet').set(BLD_SNAP_VEX)
+    print('  SOP 修复: snap_bld_to_terrain (逐顶点 MAX 高度)')
+
+# ── 2. 强制 recook 数据源 ────────────────────────────
+print('\n[recook 数据源]')
+for path in ['/obj/pattaya_osm/osm_import', '/obj/pattaya_osm/dem_import',
+             '/obj/pattaya_osm/dem_terrain']:
+    n = hou.node(path)
+    if not n:
+        continue
+    n.cook(force=True)
+    geo  = n.geometry()
+    pts  = geo.intrinsicValue('pointcount')
+    prm  = geo.intrinsicValue('primitivecount')
+    print('  {:<20s} pts={:6d}  prims={:6d}'.format(n.name(), pts, prm))
+    if pts == 0:
+        errors.append(n.name() + ' geometry empty after recook')
+
+# ── 2b. 地形加密（Subdivide Bilinear × 2）───────────────────────────
+old_subdiv = hou.node('/obj/pattaya_osm/dem_subdivide')
+if old_subdiv:
+    old_subdiv.destroy()
+dem_subdiv = net.createNode('subdivide', 'dem_subdivide')
+dem_subdiv.setInput(0, hou.node('/obj/pattaya_osm/dem_terrain'))
+dem_subdiv.parm('algorithm').set(4)   # 4 = OpenSubdiv Bilinear（线性插值，不改变已有高程）
+dem_subdiv.parm('iterations').set(2)  # 2轮细分 = ×16 面片密度（30m→~7.5m等效）
+dem_subdiv.cook(force=True)
+_sd_geo  = dem_subdiv.geometry()
+_sd_pts  = _sd_geo.intrinsicValue('pointcount')
+_sd_prms = _sd_geo.intrinsicValue('primitivecount')
+print('  dem_subdivide: pts={} prims={} (原 {} 面片 → 加密 ×16)'.format(
+    _sd_pts, _sd_prms, _sd_prms // 16))
+
+# 更新吸附节点 input1 → dem_subdivide（更密地形 = 更精确贴合）
+for _sn_name in ['snap_bld_to_terrain', 'snap_roads_to_terrain1']:
+    _sn = hou.node('/obj/pattaya_osm/' + _sn_name)
+    if _sn:
+        _sn.setInput(1, dem_subdiv)
+
+# ── 3. 验证全链路节点 ────────────────────────────────
+print('\n[全链路验证]')
+CHECKS = [
+    ('extract_buildings',    50,   None,  'buildings extracted from OSM'),
+    ('snap_bld_to_terrain',  50,   None,  'buildings snapped to terrain'),
+    ('extrude_buildings',    50,   None,  'buildings extruded'),
+    ('post_normals',         50,   None,  'normals computed'),
+    ('road_strips',          100,  None,  'roads generated'),
+]
+for name, min_pts, max_y, desc in CHECKS:
+    n = hou.node('/obj/pattaya_osm/' + name)
+    if not n:
+        print('  SKIP  {:<22s} (node not found)'.format(name))
+        continue
+    n.cook(force=False)
+    geo  = n.geometry()
+    pts  = geo.intrinsicValue('pointcount')
+    bb   = geo.boundingBox()
+    mn_y = bb.minvec()[1]
+    mx_y = bb.maxvec()[1]
+    ok   = pts >= min_pts
+    tag  = PASS if ok else FAIL
+    print('  {}  {:<22s} pts={:6d}  Y[{:.1f}~{:.1f}]  {}'.format(
+        tag, name, pts, mn_y, mx_y, desc))
+    if not ok:
+        errors.append('{} pts={} < {}'.format(name, pts, min_pts))
+
+# ── 4. 重建裁剪节点 ──────────────────────────────────
+print('\n[裁剪节点重建]')
+dem = hou.node('/obj/pattaya_osm/dem_terrain')
+dem.cook(force=False)
+bb  = dem.geometry().boundingBox()
+mn, mx = bb.minvec(), bb.maxvec()
+MARGIN = 50
+XMIN = mn[0] - MARGIN
+XMAX = mx[0] + MARGIN
+ZMIN = mn[2] - MARGIN
+ZMAX = mx[2] + MARGIN
+print('  DEM 边界: X[{:.0f}~{:.0f}] Z[{:.0f}~{:.0f}]'.format(XMIN, XMAX, ZMIN, ZMAX))
+
+VEX = (  # noqa: E741
+    'int ps[] = primpoints(0, @primnum);\n'
+    'int n = len(ps);\n'
+    'if (n == 0) { i@del = 1; return; }\n'
+    'vector sum = {0,0,0};\n'
+    'for(int i=0; i<n; i++) sum += point(0,"P",ps[i]);\n'
+    'vector c = sum / n;\n'
+    'i@del = (c.x < XMIN || c.x > XMAX || c.z < ZMIN || c.z > ZMAX) ? 1 : 0;\n'
+).replace('XMIN', str(XMIN)).replace('XMAX', str(XMAX)) \
+ .replace('ZMIN', str(ZMIN)).replace('ZMAX', str(ZMAX))
+
+
+def remake_clip(src_name, mark_name, out_name):
+    for nm in [out_name, mark_name]:
+        old = hou.node('/obj/pattaya_osm/' + nm)
+        if old:
+            old.destroy()
+    src = hou.node('/obj/pattaya_osm/' + src_name)
+    if not src:
+        errors.append('source node not found: ' + src_name)
+        return None
+    w = net.createNode('attribwrangle', mark_name)
+    w.setInput(0, src)
+    w.parm('class').set(1)
+    w.parm('snippet').set(VEX)
+    b = net.createNode('blast', out_name)
+    b.setInput(0, w)
+    b.parm('group').set('@del==1')
+    b.parm('grouptype').set(4)
+    b.parm('negate').set(0)
+    b.cook(force=True)
+    geo  = b.geometry()
+    pts  = geo.intrinsicValue('pointcount')
+    bb2  = geo.boundingBox()
+    tag  = PASS if pts > 0 else FAIL
+    print('  {}  {:<20s} pts={:6d}  Y[{:.1f}~{:.1f}]'.format(
+        tag, out_name, pts, bb2.minvec()[1], bb2.maxvec()[1]))
+    if pts == 0:
+        errors.append(out_name + ' empty after clip')
+    return b
+
+
+# ── 4b. road_strips 二次地形吸附（修复侧边点埋入地形）────────────────
+ROAD_DRAPE_VEX = """
+// 对每个道路条带顶点重新吸附到地形，防止宽度扩展后侧边点埋入坡面
+int hit_prim;
+vector uvw;
+xyzdist(1, @P, hit_prim, uvw);
+vector tp = primuv(1, "P", hit_prim, uvw);
+@P.y = tp.y + 0.15;  // +0.15m 防止 z-fighting
+"""
+old_drape = hou.node('/obj/pattaya_osm/snap_road_strips')
+if old_drape:
+    old_drape.destroy()
+road_strips_node = hou.node('/obj/pattaya_osm/road_strips')
+snap_road_strips = net.createNode('attribwrangle', 'snap_road_strips')
+snap_road_strips.setInput(0, road_strips_node)
+snap_road_strips.setInput(1, dem_subdiv)
+snap_road_strips.parm('class').set(2)   # Point
+snap_road_strips.parm('snippet').set(ROAD_DRAPE_VEX)
+snap_road_strips.cook(force=True)
+_rs_geo  = snap_road_strips.geometry()
+_rs_pts  = _rs_geo.intrinsicValue('pointcount')
+_rs_bb   = _rs_geo.boundingBox()
+_rs_ymin = _rs_bb.minvec()[1]
+print('  snap_road_strips: pts={} Y_min={:.2f}m'.format(_rs_pts, _rs_ymin))
+
+bld_clip  = remake_clip('post_normals',    'bld_clip_mark',  'bld_clipped')
+road_clip = remake_clip('snap_road_strips','road_clip_mark', 'road_clipped')
+
+# ── 5. 重连 merge_all + 保存 ────────────────────────
+if bld_clip and road_clip:
+    merge = hou.node('/obj/pattaya_osm/merge_all')
+    if merge:
+        merge.setInput(0, bld_clip)
+        merge.setInput(1, road_clip)
+        _dem_sd = hou.node('/obj/pattaya_osm/dem_subdivide')
+        merge.setInput(2, _dem_sd if _dem_sd else hou.node('/obj/pattaya_osm/dem_terrain'))
+
+net.layoutChildren()
+hou.hipFile.save()
+
+# ── 5b. Hip 按区域存档 ────────────────────────────────
+import shutil as _shutil, json as _json_arc
+with open(r'F:/VirtualCity/配置/active_area.json', encoding='utf-8') as _af:
+    _area_id = _json_arc.load(_af)['area_id']
+ARCHIVE_HIP = 'F:/VirtualCity/Houdini/Hip/VC_{}_citygen_v001.hip'.format(_area_id)
+if ARCHIVE_HIP != HIP:
+    _shutil.copy2(HIP, ARCHIVE_HIP)
+    print('  hip 存档: VC_{}_citygen_v001.hip'.format(_area_id))
+
+# ── 6. 强制刷新整条输出链（视口同步）────────────────────
+FULL_CHAIN = [
+    'osm_import', 'dem_terrain',
+    'extract_buildings', 'snap_bld_to_terrain', 'extrude_buildings', 'post_normals',
+    'snap_roads_to_terrain1', 'road_width', 'road_strips',
+    'bld_clipped', 'road_clipped', 'merge_all', 'OUT_city',
+]
+for _cn in FULL_CHAIN:
+    _n = hou.node('/obj/pattaya_osm/' + _cn)
+    if _n:
+        _n.cook(force=True)
+_out = hou.node('/obj/pattaya_osm/OUT_city')
+if _out:
+    _out.setDisplayFlag(True)
+    _out.setRenderFlag(True)
+print('  [OK] 视口链已强制刷新')
+
+# ── 结果汇报 ─────────────────────────────────────────
+print()
+if errors:
+    print('[FAIL] 发现 {} 个错误:'.format(len(errors)))
+    for e in errors:
+        print('  - ' + e)
+    sys.exit(1)
+else:
+    print('[OK] 全部通过，hip 已保存')
+    print('     请在 Houdini 视口选中 OUT_city 按 D 确认效果')
+
+conn.close()

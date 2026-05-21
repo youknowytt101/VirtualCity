@@ -58,6 +58,9 @@ Houdini/Export/*.usdz
 原始数据/DEM/*.img
 原始数据/DEM/*.hgt
 
+# ===== 临时结果文件 =====
+配置/_*.txt
+
 # ===== Python =====
 __pycache__/
 *.py[cod]
