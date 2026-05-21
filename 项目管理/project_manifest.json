@@ -1,0 +1,101 @@
+{
+  "project_name": "VirtualCity",
+  "project_root": "D:/VirtualCity",
+  "current_stage": "mvp_preparation",
+  "primary_goal": "形成稳定、可复现、可持续迭代的地图数据到 Houdini 再到 UE5 的虚拟城市生成流程",
+  "current_priority": [
+    "建立 Houdini MVP 节点网络（导入 OSM，生成道路+建筑）",
+    "封装第一版 HDA",
+    "导入 UE5 并完成 Bake 验证"
+  ],
+  "active_area": {
+    "area_id": "pattaya_sai6_mvp",
+    "display_name": "Pattaya Sai 6 MVP Area",
+    "status": "osm_downloaded",
+    "bbox_accuracy": "estimated",
+    "bbox": { "west": 100.866, "south": 12.922, "east": 100.882, "north": 12.938 },
+    "area_record": "项目管理/区域记录/pattaya_sai6_mvp.md",
+    "area_config": "配置/pattaya_sai6_mvp.area.json",
+    "overpass_query": "配置/pattaya_sai6_mvp.overpass.txt",
+    "osm_target": "原始数据/OSM/pattaya_sai6_mvp_osm_v001.osm"
+  },
+  "ai_entry_files": [
+    "项目管理/00_AI接手指南.md",
+    "项目管理/02_当前状态与下一步.md",
+    "项目管理/01_资料地图.md",
+    "VirtualCity完整执行计划.md",
+    "项目管理/03_迭代日志.md",
+    "项目管理/05_自动迭代协议.md"
+  ],
+  "core_documents": {
+    "full_plan": "VirtualCity完整执行计划.md",
+    "execution_plan": "执行方案.md",
+    "research_index": "调研文档/README.md",
+    "automation_index": "自动化插件/README.md",
+    "stable_workflow": "项目管理/04_稳定流程规范.md",
+    "auto_iteration_protocol": "项目管理/05_自动迭代协议.md",
+    "task_template": "项目管理/06_任务记录模板.md",
+    "mvp_qa_checklist": "项目管理/07_MVP_QA检查清单.md",
+    "task_board": "项目管理/08_任务看板.md",
+    "decision_records": "项目管理/09_决策记录.md",
+    "ai_startup_checklist": "项目管理/10_AI启动自检清单.md",
+    "version_roadmap": "项目管理/11_版本路线图.md",
+    "document_index": "项目管理/document_index.json",
+    "area_record_template": "项目管理/区域记录/_template.md",
+    "config_index": "配置/README.md"
+  },
+  "configuration_templates": {
+    "area_config": "配置/area_config.template.json",
+    "pipeline_config": "配置/pipeline_config.template.json",
+    "qa_checklist": "配置/qa_checklist.template.json"
+  },
+  "research_documents": [
+    "调研文档/地图API-Houdini-UE流程/01_地图数据获取与API对比.md",
+    "调研文档/地图API-Houdini-UE流程/02_Houdini处理流程.md",
+    "调研文档/地图API-Houdini-UE流程/03_UE5整合方案.md",
+    "调研文档/地图API-Houdini-UE流程/04_完整流程速查表.md",
+    "调研文档/地图API-Houdini-UE流程/05_虚拟城市主流技术方案.md",
+    "调研文档/地图API-Houdini-UE流程/06_路线一详细拆解_Houdini+UE5城市管线.md",
+    "调研文档/地图API-Houdini-UE流程/07_补充优化建议_2026版.md"
+  ],
+  "main_pipeline": [
+    "OSM / DEM 数据获取",
+    "GIS 预处理与坐标统一",
+    "Houdini 道路、建筑、地形生成",
+    "HDA 或静态导出",
+    "UE5 Houdini Engine 导入",
+    "Bake 为 Static Mesh / Landscape",
+    "Nanite / Lumen / PCG 扩展"
+  ],
+  "mvp_scope": {
+    "area_size": "200m x 200m 到 500m x 500m",
+    "data_source": "OpenStreetMap + optional DEM",
+    "first_result": "白盒城市区块 + UE5 Bake 验证"
+  },
+  "do_not_prioritize_in_mvp": [
+    "完整 City Sample 复刻",
+    "大型自研插件平台",
+    "全国或整城级数据",
+    "Google Photorealistic 3D Tiles 作为离线资产来源",
+    "Mass AI 和复杂交通系统",
+    "高精度真实建筑复原"
+  ],
+  "standard_directories": {
+    "raw_data": "原始数据/",
+    "osm": "原始数据/OSM/",
+    "dem": "原始数据/DEM/",
+    "reference": "原始数据/Reference/",
+    "gis_processed": "原始数据/GIS_Processed/",
+    "houdini": "Houdini/",
+    "houdini_hip": "Houdini/Hip/",
+    "houdini_hda": "Houdini/HDA/",
+    "houdini_export": "Houdini/Export/",
+    "houdini_pdg_output": "Houdini/PDG_Output/",
+    "ue5": "UE5/",
+    "project_management": "项目管理/",
+    "area_records": "项目管理/区域记录/",
+    "config": "配置/",
+    "windsurf_workflow": ".windsurf/workflows/"
+  },
+  "last_updated": "2026-05-21"
+}

@@ -1,0 +1,80 @@
+{
+  "area_id": "pattaya_sai6_mvp",
+  "display_name": "Pattaya Sai 6 MVP Area",
+  "purpose": "mvp_test",
+  "status": "osm_downloaded",
+  "bbox_accuracy": "estimated",
+  "bbox_accuracy_note": "Corrected after empty dataset: original lat estimate was ~1.5km north. Revised to 12.922-12.938 N.",
+  "location": {
+    "city": "Pattaya",
+    "district_or_street": "Pattaya Soi 5 / Soi 6",
+    "province": "Chon Buri",
+    "country": "Thailand",
+    "source_note": "Estimated from user-provided map screenshot via landmark inference"
+  },
+  "bbox": {
+    "west": 100.866,
+    "south": 12.922,
+    "east": 100.882,
+    "north": 12.938,
+    "coordinate_system": "WGS84",
+    "needs_confirmation": false,
+    "estimated": true,
+    "approx_size_m": "~1600m x ~1800m"
+  },
+  "local_origin": {
+    "strategy": "bbox_center",
+    "longitude": 100.874,
+    "latitude": 12.930,
+    "height_m": 0.0,
+    "needs_calculation_after_bbox": false
+  },
+  "recommended_area_size": {
+    "min_meters": 200,
+    "max_meters": 500,
+    "note": "Keep first MVP area small to validate OSM to Houdini to UE5 pipeline"
+  },
+  "data_sources": {
+    "osm": {
+      "enabled": true,
+      "source": "Overpass Turbo",
+      "path": "原始数据/OSM/pattaya_sai6_mvp_osm_v001.osm",
+      "downloaded_at": "2026-05-21",
+      "license_note": "OpenStreetMap data; verify attribution requirements"
+    },
+    "dem": {
+      "enabled": false,
+      "source": "",
+      "path": "",
+      "downloaded_at": "",
+      "note": "DEM is skipped for first MVP pass"
+    },
+    "reference": {
+      "enabled": true,
+      "paths": [],
+      "note": "User uploaded a map screenshot in chat; save a local reference image later if needed"
+    }
+  },
+  "processed_outputs": {
+    "buildings": "原始数据/GIS_Processed/pattaya_sai6_mvp_buildings_v001.geojson",
+    "roads": "原始数据/GIS_Processed/pattaya_sai6_mvp_roads_v001.geojson",
+    "landuse": "原始数据/GIS_Processed/pattaya_sai6_mvp_landuse_v001.geojson",
+    "water": "原始数据/GIS_Processed/pattaya_sai6_mvp_water_v001.geojson",
+    "metadata": "原始数据/GIS_Processed/pattaya_sai6_mvp_metadata_v001.json"
+  },
+  "houdini_outputs": {
+    "hip": "Houdini/Hip/VC_pattaya_sai6_mvp_citygen_v001.hip",
+    "hda": "Houdini/HDA/VC_pattaya_sai6_mvp_cityblock_v001.hda",
+    "buildings_fbx": "Houdini/Export/VC_pattaya_sai6_mvp_buildings_v001.fbx",
+    "roads_fbx": "Houdini/Export/VC_pattaya_sai6_mvp_roads_v001.fbx"
+  },
+  "ue5_outputs": {
+    "project": "UE5/VirtualCityUE/VirtualCityUE.uproject",
+    "level": "LV_pattaya_sai6_mvp_MVP"
+  },
+  "notes": [
+    "Area selected from Pattaya Sai 6 screenshot.",
+    "Exact bbox is required before OSM export.",
+    "Use bboxfinder or Overpass Turbo to copy west,south,east,north."
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "project": "VirtualCity",
+  "purpose": "AI-readable document index for fast handoff and task routing",
+  "entry_points": {
+    "first_read": "项目管理/00_AI接手指南.md",
+    "current_status": "项目管理/02_当前状态与下一步.md",
+    "task_board": "项目管理/08_任务看板.md",
+    "decision_records": "项目管理/09_决策记录.md",
+    "manifest": "项目管理/project_manifest.json"
+  },
+  "by_task": {
+    "understand_project": [
+      "README.md",
+      "项目管理/00_AI接手指南.md",
+      "项目管理/01_资料地图.md",
+      "VirtualCity完整执行计划.md"
+    ],
+    "find_next_step": [
+      "项目管理/02_当前状态与下一步.md",
+      "项目管理/08_任务看板.md",
+      "项目管理/10_AI启动自检清单.md"
+    ],
+    "continue_iteration": [
+      "项目管理/05_自动迭代协议.md",
+      "项目管理/03_迭代日志.md",
+      "项目管理/08_任务看板.md"
+    ],
+    "check_decisions": [
+      "项目管理/09_决策记录.md",
+      "项目管理/03_迭代日志.md"
+    ],
+    "plan_mvp": [
+      "VirtualCity完整执行计划.md",
+      "项目管理/07_MVP_QA检查清单.md",
+      "配置/pipeline_config.template.json"
+    ],
+    "create_new_area": [
+      "项目管理/区域记录/_template.md",
+      "配置/area_config.template.json",
+      "原始数据/README.md"
+    ],
+    "work_on_houdini": [
+      "Houdini/README.md",
+      "调研文档/地图API-Houdini-UE流程/02_Houdini处理流程.md",
+      "配置/pipeline_config.template.json"
+    ],
+    "work_on_ue5": [
+      "UE5/README.md",
+      "调研文档/地图API-Houdini-UE流程/03_UE5整合方案.md",
+      "项目管理/07_MVP_QA检查清单.md"
+    ],
+    "research_pipeline": [
+      "调研文档/README.md",
+      "调研文档/地图API-Houdini-UE流程/04_完整流程速查表.md",
+      "调研文档/地图API-Houdini-UE流程/07_补充优化建议_2026版.md"
+    ],
+    "automation_tools": [
+      "自动化插件/README.md",
+      "自动化插件/插件清单.md",
+      "自动化插件/工具开发规范.md",
+      "配置/README.md"
+    ]
+  },
+  "version_roadmap": "项目管理/11_版本路线图.md",
+  "last_updated": "2026-05-21"
+}

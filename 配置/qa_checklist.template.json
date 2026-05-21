@@ -1,0 +1,61 @@
+{
+  "checklist_id": "mvp_city_block_qa",
+  "version": "0.1.0",
+  "area_id": "mvp_area",
+  "items": [
+    {
+      "id": "bbox_recorded",
+      "title": "bbox 已记录",
+      "status": "not_checked",
+      "pass_condition": "区域记录和 area config 中都有 west/south/east/north"
+    },
+    {
+      "id": "osm_exists",
+      "title": "OSM 文件存在",
+      "status": "not_checked",
+      "pass_condition": "原始数据/OSM 下存在对应 .osm 文件"
+    },
+    {
+      "id": "coordinate_system_known",
+      "title": "坐标系已确认",
+      "status": "not_checked",
+      "pass_condition": "明确为 WGS84 / GCJ-02 / BD-09 / CGCS2000 或标记待转换"
+    },
+    {
+      "id": "roads_visible",
+      "title": "道路可见",
+      "status": "not_checked",
+      "pass_condition": "Houdini 或 UE5 中能看到主要道路"
+    },
+    {
+      "id": "buildings_visible",
+      "title": "建筑体量可见",
+      "status": "not_checked",
+      "pass_condition": "建筑轮廓已拉伸为可见体量"
+    },
+    {
+      "id": "no_major_alignment_error",
+      "title": "无明显坐标错位",
+      "status": "not_checked",
+      "pass_condition": "道路、建筑、地形或参考图之间无明显整体偏移"
+    },
+    {
+      "id": "ue_scale_correct",
+      "title": "UE5 比例正确",
+      "status": "not_checked",
+      "pass_condition": "道路宽度、建筑高度、人车尺度合理"
+    },
+    {
+      "id": "bake_success",
+      "title": "UE5 Bake 成功",
+      "status": "not_checked",
+      "pass_condition": "Bake 后不依赖 Houdini Engine 也能打开场景"
+    },
+    {
+      "id": "documentation_updated",
+      "title": "文档已更新",
+      "status": "not_checked",
+      "pass_condition": "当前状态、迭代日志、区域记录已更新"
+    }
+  ]
+}

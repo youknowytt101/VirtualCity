@@ -1,0 +1,46 @@
+{
+  "area_id": "mvp_area",
+  "display_name": "MVP 测试区域",
+  "purpose": "mvp_test",
+  "status": "planned",
+  "bbox": {
+    "west": 0.0,
+    "south": 0.0,
+    "east": 0.0,
+    "north": 0.0,
+    "coordinate_system": "WGS84"
+  },
+  "local_origin": {
+    "strategy": "bbox_center",
+    "longitude": 0.0,
+    "latitude": 0.0,
+    "height_m": 0.0
+  },
+  "data_sources": {
+    "osm": {
+      "enabled": true,
+      "source": "Overpass Turbo",
+      "path": "原始数据/OSM/mvp_area_osm_v001.osm",
+      "downloaded_at": "",
+      "license_note": "OpenStreetMap data; verify attribution requirements"
+    },
+    "dem": {
+      "enabled": false,
+      "source": "Copernicus / SRTM / USGS",
+      "path": "原始数据/DEM/mvp_area_dem_v001.tif",
+      "downloaded_at": ""
+    },
+    "reference": {
+      "enabled": false,
+      "paths": []
+    }
+  },
+  "processed_outputs": {
+    "buildings": "原始数据/GIS_Processed/mvp_area_buildings_v001.geojson",
+    "roads": "原始数据/GIS_Processed/mvp_area_roads_v001.geojson",
+    "landuse": "原始数据/GIS_Processed/mvp_area_landuse_v001.geojson",
+    "water": "原始数据/GIS_Processed/mvp_area_water_v001.geojson",
+    "metadata": "原始数据/GIS_Processed/mvp_area_metadata_v001.json"
+  },
+  "notes": []
+}

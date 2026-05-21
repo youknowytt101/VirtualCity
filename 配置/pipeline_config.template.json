@@ -1,0 +1,66 @@
+{
+  "pipeline_id": "osm_houdini_ue5_mvp",
+  "pipeline_name": "OSM + Houdini + UE5 MVP 管线",
+  "version": "0.1.0",
+  "stage": "mvp",
+  "unit_policy": {
+    "houdini_unit": "1 unit = 1 meter",
+    "ue_unit": "1 Unreal unit = 1 centimeter",
+    "houdini_to_ue_scale": 100.0,
+    "scale_location": "HDA output or UE import settings"
+  },
+  "houdini": {
+    "hip_template": "Houdini/Hip/VC_{area_id}_citygen_v001.hip",
+    "hda_output": "Houdini/HDA/VC_{area_id}_cityblock_v001.hda",
+    "export_dir": "Houdini/Export/",
+    "parameters": {
+      "building_height_multiplier": 1.0,
+      "default_floor_height": 3.0,
+      "default_levels_min": 2,
+      "default_levels_max": 8,
+      "road_width_multiplier": 1.0,
+      "terrain_resolution": 2048,
+      "preview_lod": 1,
+      "random_seed": 1001
+    },
+    "outputs": [
+      "OUT_buildings",
+      "OUT_roads",
+      "OUT_landscape",
+      "OUT_points",
+      "OUT_debug"
+    ]
+  },
+  "ue5": {
+    "project_path": "UE5/VirtualCityUE/VirtualCityUE.uproject",
+    "content_root": "Content/VirtualCity/",
+    "map_name_template": "LV_{area_id}_MVP",
+    "data_layers": [
+      "DL_Terrain",
+      "DL_Roads",
+      "DL_Buildings",
+      "DL_Foliage",
+      "DL_Props",
+      "DL_Debug"
+    ],
+    "features": {
+      "lumen": true,
+      "virtual_shadow_maps": true,
+      "nanite_for_static_meshes": true,
+      "world_partition": false,
+      "mass_ai": false,
+      "pcg_basic_props": true
+    }
+  },
+  "automation_policy": {
+    "develop_custom_tools_in_mvp": false,
+    "script_after_repetition_count": 3,
+    "first_automation_targets": [
+      "area metadata validation",
+      "bbox and path checking",
+      "coordinate system check",
+      "houdini batch cook",
+      "ue asset organization"
+    ]
+  }
+}

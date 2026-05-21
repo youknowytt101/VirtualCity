@@ -1,0 +1,49 @@
+{
+  "project": "VirtualCity",
+  "directory": "自动化插件",
+  "policy": {
+    "include_official_plugins": false,
+    "allowed_content": [
+      "custom_scripts",
+      "custom_hdas",
+      "editor_utility_tools",
+      "automation_configs",
+      "non_official_open_source_notes"
+    ],
+    "excluded_content": [
+      "SideFX Labs",
+      "Houdini Engine for Unreal",
+      "Cesium for Unreal",
+      "Unreal Engine official plugins",
+      "City Sample official assets"
+    ]
+  },
+  "mvp_required_custom_tools": [],
+  "mvp_policy": "Run the first city-block prototype manually. Add custom scripts only after repeated production pain points appear.",
+  "deferred_tools": [
+    {
+      "id": "osm_bbox_downloader",
+      "area": "data",
+      "trigger": "needed only when many bbox areas must be downloaded repeatedly",
+      "status": "deferred"
+    },
+    {
+      "id": "coordinate_alignment_checker",
+      "area": "data",
+      "trigger": "needed when OSM, DEM and UE coordinates frequently drift",
+      "status": "deferred"
+    },
+    {
+      "id": "houdini_batch_exporter",
+      "area": "houdini",
+      "trigger": "needed when the same HDA must cook many areas or export many formats",
+      "status": "deferred"
+    },
+    {
+      "id": "ue_asset_organizer",
+      "area": "ue5",
+      "trigger": "needed when imported asset counts become too large for manual cleanup",
+      "status": "deferred"
+    }
+  ]
+}

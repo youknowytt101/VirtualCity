@@ -1,0 +1,80 @@
+# ===== Windows =====
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ===== Houdini =====
+# 缓存和模拟数据（体积大，不提交）
+Houdini/PDG_Output/
+*.sim
+*.simdata
+*.bgeo.sc
+*.bgeo
+*.pc
+*.geo
+*.vdb
+*.rat
+
+# Houdini 备份文件
+*.hip.bak
+*.hip[0-9]
+*.hiplc.bak
+*.hipnc.bak
+backup/
+
+# Houdini 临时目录
+houdini.env
+houdini[0-9]*/
+
+# ===== UE5 =====
+# UE5 编译和缓存（体积极大，不提交）
+UE5/*/Binaries/
+UE5/*/Build/
+UE5/*/DerivedDataCache/
+UE5/*/Intermediate/
+UE5/*/Saved/
+UE5/*/.vs/
+UE5/*/Plugins/*/Binaries/
+UE5/*/Plugins/*/Intermediate/
+
+# ===== 大型导出文件 =====
+# FBX / OBJ / ABC 先不提交，体积可能很大
+# 如需提交，删掉对应行
+Houdini/Export/*.fbx
+Houdini/Export/*.obj
+Houdini/Export/*.abc
+Houdini/Export/*.usd
+Houdini/Export/*.usdc
+Houdini/Export/*.usdz
+
+# ===== GIS 处理输出 =====
+# GeoJSON 和处理过的 GIS 文件可能很大
+原始数据/GIS_Processed/*.geojson
+原始数据/GIS_Processed/*.shp
+原始数据/GIS_Processed/*.tif
+原始数据/GIS_Processed/*.tiff
+原始数据/DEM/*.tif
+原始数据/DEM/*.tiff
+原始数据/DEM/*.img
+原始数据/DEM/*.hgt
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.venv/
+venv/
+
+# ===== 编辑器 =====
+.vscode/
+*.swp
+*.swo
+*~
+
+# ===== 不排除以下内容（明确保留）=====
+# .windsurf/workflows/ - 工作流文件
+# 原始数据/OSM/*.osm - OSM 数据文件（通常 <10MB）
+# Houdini/Hip/*.hip - Hip 工程文件
+# 项目管理/ - 所有项目文档
+# 配置/ - 所有配置文件
