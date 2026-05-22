@@ -1,9 +1,10 @@
 import rpyc, json
+from vc_paths import load_active_area
 
 conn = rpyc.classic.connect('localhost', 18811)
 hou = conn.modules.hou
 
-cfg = json.loads(open('F:/VirtualCity/配置/active_area.json', encoding='utf-8').read())
+cfg = load_active_area(absolute=True)
 print('当前区域:', cfg['area_id'])
 print('OSM:', cfg['osm_file'])
 print('建筑:', cfg['buildings_file'])

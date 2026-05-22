@@ -1,5 +1,8 @@
 """强制 recook 整条输出链，刷新 Houdini 视口"""
 import rpyc
+from vc_paths import CONFIG
+
+RESULT_FILE = (CONFIG / "_refresh_result.txt").as_posix()
 
 conn = rpyc.classic.connect('localhost', 18811)
 hou  = conn.modules.hou
@@ -26,7 +29,7 @@ FULL_CHAIN = [
     'OUT_city',
 ]
 
-OUT = r'F:/VirtualCity/配置/_refresh_result.txt'
+OUT = r'__RESULT_FILE__'
 lines = []
 
 for name in FULL_CHAIN:
@@ -50,14 +53,14 @@ if out_city:
 
 with open(OUT, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))
-"""
+""".replace('__RESULT_FILE__', RESULT_FILE)
 
 conn.execute(CODE)
 conn.close()
 
 import time, pathlib
 time.sleep(5)
-result = pathlib.Path(r'F:/VirtualCity/配置/_refresh_result.txt')
+result = pathlib.Path(RESULT_FILE)
 if result.exists():
     print(result.read_text(encoding='utf-8'))
 else:

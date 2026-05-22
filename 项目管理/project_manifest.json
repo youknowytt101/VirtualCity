@@ -1,6 +1,6 @@
 {
   "project_name": "VirtualCity",
-  "project_root": "D:/VirtualCity",
+  "project_root": "<repo-root>",
   "current_stage": "mvp_preparation",
   "primary_goal": "形成稳定、可复现、可持续迭代的地图数据到 Houdini 再到 UE5 的虚拟城市生成流程",
   "current_priority": [

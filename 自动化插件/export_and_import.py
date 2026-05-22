@@ -8,9 +8,10 @@ Houdini 必须已运行（RPYC 端口 18811）。
     uv run python 自动化插件/export_and_import.py
 """
 import sys, os, time
+from vc_paths import HIP, EXPORT, TRIGGER, SCRIPTS
 
-HIP    = 'F:/VirtualCity/Houdini/Hip/VC_pattaya_sai6_mvp_citygen_v001.hip'
-EXPORT = 'F:/VirtualCity/Houdini/Export'
+HIP = HIP.as_posix()
+EXPORT = EXPORT.as_posix()
 
 # label, 首选SOP, 备用SOP, 输出FBX
 EXPORTS = [
@@ -100,8 +101,8 @@ else:
 
 # ── 2. 写触发文件，通知 UE5 执行导入 ────────────────
 print("\n[2/2] 通知 UE5 导入 FBX...")
-TRIGGER = r"F:/VirtualCity/.ue5_trigger"
-IMPORT_SCRIPT = r"F:/VirtualCity/自动化插件/ue5_import_fbx.py"
+TRIGGER = TRIGGER.as_posix()
+IMPORT_SCRIPT = (SCRIPTS / "ue5_import_fbx.py").as_posix()
 
 with open(TRIGGER, "w", encoding="utf-8", newline="\n") as f:
     f.write(IMPORT_SCRIPT)

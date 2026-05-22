@@ -5,10 +5,12 @@
   3. 保存 hip 文件，供视口验证 + 导出
 """
 import rpyc
+from vc_paths import HIP as MASTER_HIP
+
 conn = rpyc.classic.connect('localhost', 18811)
 hou = conn.modules.hou
 
-HIP = 'F:/VirtualCity/Houdini/Hip/VC_pattaya_sai6_mvp_citygen_v001.hip'
+HIP = MASTER_HIP.as_posix()
 if 'untitled' in hou.hipFile.path():
     hou.hipFile.load(HIP, suppress_save_prompt=True)
     print('hip 已加载')

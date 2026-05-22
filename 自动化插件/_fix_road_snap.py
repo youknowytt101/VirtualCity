@@ -3,6 +3,9 @@
 所有统计计算在 Houdini 内部执行（避免 rpyc 大量传输超时）
 """
 import rpyc
+from vc_paths import CONFIG
+
+RESULT_FILE = (CONFIG / "_road_snap_result.txt").as_posix()
 
 conn = rpyc.classic.connect('localhost', 18811)
 hou  = conn.modules.hou
@@ -10,12 +13,10 @@ hou  = conn.modules.hou
 # 在 Houdini Python 环境内执行完整修复+验证代码
 result = hou.session.hscriptExpression if False else None
 
-RESULT_FILE = r'F:/VirtualCity/配置/_road_snap_result.txt'
-
 CODE = r"""
 import hou, json
 
-OUT = r'F:/VirtualCity/配置/_road_snap_result.txt'
+OUT = r'__RESULT_FILE__'
 lines = []
 
 net = hou.node('/obj/pattaya_osm')
@@ -101,7 +102,7 @@ else:
 
 with open(OUT, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines))
-"""
+""".replace('__RESULT_FILE__', RESULT_FILE)
 
 conn.execute(CODE)
 conn.close()

@@ -9,6 +9,7 @@ Houdini 换区重算脚本
   5. 重连 merge_all + 保存 hip
 """
 import sys, rpyc
+from vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area
 
 PASS = '[OK]'
 FAIL = '[FAIL]'
@@ -25,9 +26,11 @@ COLORS = {
 
 conn = rpyc.classic.connect('localhost', 18811)
 hou  = conn.modules.hou
+ROOT_STR = ROOT.as_posix()
+CFG_FILE = ACTIVE_AREA.as_posix()
 
 # ── 0. 确保 hip 已加载 ───────────────────────────────
-HIP = 'F:/VirtualCity/Houdini/Hip/VC_pattaya_sai6_mvp_citygen_v001.hip'
+HIP = MASTER_HIP.as_posix()
 if 'untitled' in hou.hipFile.path():
     hou.hipFile.load(HIP, suppress_save_prompt=True)
     print('  hip 已加载: ' + HIP)
@@ -36,22 +39,65 @@ else:
 
 net = hou.node('/obj/pattaya_osm')
 
+for _node in net.allSubChildren():
+    if _node.type().name() != 'python':
+        continue
+    _parm = _node.parm('python')
+    if not _parm:
+        continue
+    _code = _parm.eval()
+    _new_code = (_code
+                 .replace('F:/VirtualCity', ROOT_STR)
+                 .replace('D:/VirtualCity', ROOT_STR)
+                 .replace('d:/VirtualCity', ROOT_STR))
+    if _new_code != _code:
+        _parm.set(_new_code)
+        print('  Python SOP 路径已适配: ' + _node.name())
+
 # ── 1. 修复 dem_import Python SOP（H-006：硬编码路径）────
 DEM_IMPORT_CODE = """
 import hou, csv, json as _json
-with open(r'F:/VirtualCity/配置/active_area.json', encoding='utf-8') as _f:
-    CSV_FILE = _json.load(_f)['dem_csv']
+ROOT_DIR = r'__ROOT__'
+CFG_FILE = r'__CFG__'
+def _resolve_project_path(value):
+    raw = str(value).replace('\\\\', '/')
+    low = raw.lower()
+    marker = '/virtualcity/'
+    idx = low.find(marker)
+    if idx >= 0:
+        return ROOT_DIR + '/' + raw[idx + len(marker):]
+    if low.endswith('/virtualcity'):
+        return ROOT_DIR
+    if ':' in raw[:3] or raw.startswith('/'):
+        return raw
+    return ROOT_DIR + '/' + raw
+with open(CFG_FILE, encoding='utf-8') as _f:
+    CSV_FILE = _resolve_project_path(_json.load(_f)['dem_csv'])
 geo = hou.pwd().geometry()
 with open(CSV_FILE, newline='') as f:
     for row in csv.DictReader(f):
         p = geo.createPoint()
         p.setPosition(hou.Vector3(float(row['x']), float(row['y']), float(row['z'])))
-"""
+""".replace('__ROOT__', ROOT_STR).replace('__CFG__', CFG_FILE)
 
 DEM_TERRAIN_CODE = """
 import hou, csv, json as _json
-with open(r'F:/VirtualCity/配置/active_area.json', encoding='utf-8') as _f:
-    CSV_FILE = _json.load(_f)['dem_csv']
+ROOT_DIR = r'__ROOT__'
+CFG_FILE = r'__CFG__'
+def _resolve_project_path(value):
+    raw = str(value).replace('\\\\', '/')
+    low = raw.lower()
+    marker = '/virtualcity/'
+    idx = low.find(marker)
+    if idx >= 0:
+        return ROOT_DIR + '/' + raw[idx + len(marker):]
+    if low.endswith('/virtualcity'):
+        return ROOT_DIR
+    if ':' in raw[:3] or raw.startswith('/'):
+        return raw
+    return ROOT_DIR + '/' + raw
+with open(CFG_FILE, encoding='utf-8') as _f:
+    CSV_FILE = _resolve_project_path(_json.load(_f)['dem_csv'])
 geo = hou.pwd().geometry()
 rows = []
 with open(CSV_FILE, newline='') as f:
@@ -347,9 +393,8 @@ hou.hipFile.save()
 
 # ── 5b. Hip 按区域存档 ────────────────────────────────
 import shutil as _shutil, json as _json_arc
-with open(r'F:/VirtualCity/配置/active_area.json', encoding='utf-8') as _af:
-    _area_id = _json_arc.load(_af)['area_id']
-ARCHIVE_HIP = 'F:/VirtualCity/Houdini/Hip/VC_{}_citygen_v001.hip'.format(_area_id)
+_area_id = load_active_area(absolute=False)['area_id']
+ARCHIVE_HIP = (HOUDINI / 'Hip' / 'VC_{}_citygen_v001.hip'.format(_area_id)).as_posix()
 if ARCHIVE_HIP != HIP:
     _shutil.copy2(HIP, ARCHIVE_HIP)
     print('  hip 存档: VC_{}_citygen_v001.hip'.format(_area_id))

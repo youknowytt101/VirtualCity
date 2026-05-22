@@ -2,18 +2,19 @@
 VirtualCity — DEM CSV → UE5 Landscape 16-bit 高度图 PNG
 =========================================================
 输出:
-  - F:/VirtualCity/Houdini/Export/terrain_heightmap.png  (16-bit 灰度)
+  - <项目根目录>/Houdini/Export/terrain_heightmap.png  (16-bit 灰度)
   - 控制台打印 UE5 Landscape 导入参数
 """
 import json, csv, struct, zlib, math
 from pathlib import Path
 import numpy as np
 from PIL import Image
+from vc_paths import EXPORT, load_active_area
 
 # ── 读取配置 ──────────────────────────────────────────
-CFG = json.loads(Path(r"F:/VirtualCity/配置/active_area.json").read_text(encoding="utf-8"))
+CFG = load_active_area(absolute=True)
 CSV_FILE = CFG["dem_csv"]
-OUT_PNG  = r"F:/VirtualCity/Houdini/Export/terrain_heightmap.png"
+OUT_PNG  = (EXPORT / "terrain_heightmap.png").as_posix()
 
 # ── 读取 DEM CSV ──────────────────────────────────────
 rows = []

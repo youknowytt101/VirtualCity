@@ -3,8 +3,8 @@ VirtualCity — 本地 Tile 缓存工具
 ===================================
 供 download_dem.py / download_overture_buildings.py / set_area.py 调用。
 
-缓存目录: F:/VirtualCity/原始数据/_tiles/
-索引文件: F:/VirtualCity/原始数据/_tiles/_index.json
+缓存目录: <项目根目录>/原始数据/_tiles/
+索引文件: <项目根目录>/原始数据/_tiles/_index.json
 
 索引格式:
 {
@@ -18,8 +18,9 @@ VirtualCity — 本地 Tile 缓存工具
 """
 import json, math, os, tempfile
 from pathlib import Path
+from vc_paths import DATA_ROOT, resolve_project_path
 
-TILES_DIR  = Path(r"F:/VirtualCity/原始数据/_tiles")
+TILES_DIR  = DATA_ROOT / "_tiles"
 INDEX_FILE = TILES_DIR / "_index.json"
 
 
@@ -44,7 +45,7 @@ def find_covering_tile(bbox):
         if tw <= w and ts <= s and te >= e and tn >= n:
             # 验证文件存在
             keys = ["dem_tif", "osm_xml", "bld_geojson"]
-            if all(Path(entry.get(k, "")).exists() for k in keys):
+            if all(resolve_project_path(entry.get(k, "")).exists() for k in keys):
                 return entry
     return None
 
@@ -59,7 +60,7 @@ def crop_dem(tile_entry, bbox, output_tif, output_csv):
     except ImportError:
         return False
 
-    src_tif = tile_entry["dem_tif"]
+    src_tif = resolve_project_path(tile_entry["dem_tif"])
     if not Path(src_tif).exists():
         return False
 
@@ -93,7 +94,7 @@ def filter_osm(tile_entry, bbox, output_osm, margin=0.001):
     """从缓存 OSM XML 按 bbox 过滤 highway ways。返回 True/False。"""
     import xml.etree.ElementTree as ET
 
-    src_osm = tile_entry["osm_xml"]
+    src_osm = resolve_project_path(tile_entry["osm_xml"])
     if not Path(src_osm).exists():
         return False
 
@@ -153,7 +154,7 @@ def filter_buildings(tile_entry, bbox, output_geojson):
     except ImportError:
         return False
 
-    src = tile_entry["bld_geojson"]
+    src = resolve_project_path(tile_entry["bld_geojson"])
     if not Path(src).exists():
         return False
 

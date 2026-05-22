@@ -4,12 +4,23 @@ VirtualCity — UE5 Python 初始化脚本
 UE5 启动时自动执行（放在 Content/Python/ 目录下即可）。
 轮询触发文件，外部脚本写入触发文件后自动执行导入。
 
-触发文件路径：F:/VirtualCity/.ue5_trigger
+触发文件路径：自动从当前 UE5 工程向上查找 VirtualCity 根目录
 文件内容：要执行的 Python 脚本绝对路径
 """
 import unreal, os
 
-TRIGGER_FILE = r"F:/VirtualCity/.ue5_trigger"
+def _find_virtualcity_root():
+    project_dir = unreal.Paths.project_dir()
+    current = os.path.abspath(project_dir)
+    while True:
+        if os.path.exists(os.path.join(current, "README.md")) and os.path.exists(os.path.join(current, "自动化插件")):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            return os.path.abspath(os.path.join(project_dir, "..", ".."))
+        current = parent
+
+TRIGGER_FILE = os.path.join(_find_virtualcity_root(), ".ue5_trigger")
 
 def _check_trigger():
     if not os.path.exists(TRIGGER_FILE):

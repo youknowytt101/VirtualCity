@@ -9,7 +9,7 @@ VirtualCity - Google Open Buildings 高度数据一键下载脚本
 首次运行会打开浏览器做一次性 OAuth 授权，授权后凭据本地缓存，后续无需再次登录。
 
 用法：
-    cd F:\\VirtualCity
+    cd <项目根目录>
     uv run --with earthengine-api python 自动化插件/download_building_heights.py
 
     # 指定区域和年份（可选）
@@ -17,16 +17,17 @@ VirtualCity - Google Open Buildings 高度数据一键下载脚本
 """
 
 import argparse, json, os, sys, urllib.request
+from vc_paths import DATA_ROOT
 
 # ── 区域配置 ──────────────────────────────────────────────────────────────────
 AREAS = {
     "pattaya_sai6_mvp": {
         "bbox": [100.866, 12.922, 100.882, 12.938],
-        "output": r"F:/VirtualCity/原始数据/Overture/pattaya_sai6_buildings_height_v001.geojson",
+        "output": (DATA_ROOT / "Overture/pattaya_sai6_buildings_height_v001.geojson").as_posix(),
     },
     "pattaya_sai6_mvp_v2": {
         "bbox": [100.860, 12.916, 100.888, 12.944],  # 3km × 3km
-        "output": r"F:/VirtualCity/原始数据/Overture/pattaya_sai6_mvp_v2_buildings_height_v001.geojson",
+        "output": (DATA_ROOT / "Overture/pattaya_sai6_mvp_v2_buildings_height_v001.geojson").as_posix(),
     },
 }
 
@@ -143,7 +144,7 @@ def main():
 
     if args.bbox:
         west, south, east, north = args.bbox
-        out = args.output or f"F:/VirtualCity/原始数据/Overture/custom_{west:.3f}_{south:.3f}_buildings.geojson"
+        out = args.output or (DATA_ROOT / f"Overture/custom_{west:.3f}_{south:.3f}_buildings.geojson").as_posix()
         cfg = {"bbox": [west, south, east, north], "output": out}
         area_label = f"bbox [{west},{south},{east},{north}]"
     elif args.area:

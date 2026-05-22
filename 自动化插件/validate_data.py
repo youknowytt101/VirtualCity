@@ -6,23 +6,26 @@ VirtualCity — 数据预检脚本
     uv run python 自动化插件/validate_data.py
 """
 import json, os, sys
+from vc_paths import load_active_area
 
-CFG_FILE = r"F:/VirtualCity/配置/active_area.json"
+OK = "[OK]"
+FAIL = "[FAIL]"
+WARN = "[WARN]"
 
 def check(label, path, min_bytes=1024, extra=None):
     if not os.path.exists(path):
-        print(f"  [FAIL] {label}: 文件不存在 → {path}")
+        print(f"  {FAIL} {label}: 文件不存在 -> {path}")
         return False
     size = os.path.getsize(path)
     if size < min_bytes:
-        print(f"  [FAIL] {label}: 文件过小 ({size} bytes) → {path}")
+        print(f"  {FAIL} {label}: 文件过小 ({size} bytes) -> {path}")
         return False
     if extra:
         msg = extra(path)
         if msg:
-            print(f"  [FAIL] {label}: {msg}")
+            print(f"  {FAIL} {label}: {msg}")
             return False
-    print(f"  [ OK ] {label}: {size/1024:.1f} KB")
+    print(f"  {OK} {label}: {size/1024:.1f} KB")
     return True
 
 def check_geojson_geometry(path):
@@ -37,7 +40,7 @@ def check_geojson_geometry(path):
         return (f"全部 {null_geom} 个 feature geometry=null — "
                 f"此文件只有高度属性，无多边形坐标，不可用于建筑生成（D-001）")
     if null_geom > 0:
-        print(f"         ⚠ {null_geom}/{len(feats)} 个 feature geometry=null（已 skip）")
+        print(f"         {WARN} {null_geom}/{len(feats)} 个 feature geometry=null（已 skip）")
     # 高度有效性检查（D-002）
     heights = [feat.get("properties", {}).get("height", 0) or 0
                for feat in feats if feat.get("geometry") is not None]
@@ -75,19 +78,18 @@ def check_houdini_ready():
         hip = hou.hipFile.path()
         conn.close()
         if 'untitled' in hip:
-            print("  [FAIL] Houdini: 已连接但工程文件未加载（H-001）")
+            print(f"  {FAIL} Houdini: 已连接但工程文件未加载（H-001）")
             return False
-        print(f"  [ OK ] Houdini: 已连接，hip={hip.split('/')[-1]}")
+        print(f"  {OK} Houdini: 已连接，hip={hip.split('/')[-1]}")
         return True
     except Exception as e:
-        print(f"  [WARN] Houdini: 无法连接（{e}）— 仅数据检查")
+        print(f"  {WARN} Houdini: 无法连接（{e}）— 仅数据检查")
         return True  # Houdini 未运行不阻断数据检查
 
 
 def main():
     print(f"\n[VirtualCity 数据预检]")
-    with open(CFG_FILE, encoding="utf-8") as f:
-        cfg = json.load(f)
+    cfg = load_active_area(absolute=True)
     print(f"  区域: {cfg['area_id']}\n")
 
     results = [
@@ -99,9 +101,9 @@ def main():
 
     print()
     if all(results):
-        print("  ✅ 全部通过，可以进入 Houdini。")
+        print(f"  {OK} 全部通过，可以进入 Houdini。")
     else:
-        print("  ❌ 有检查项未通过，请修复后再运行导出。")
+        print(f"  {FAIL} 有检查项未通过，请修复后再运行导出。")
         sys.exit(1)
 
 if __name__ == "__main__":

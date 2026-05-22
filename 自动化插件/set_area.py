@@ -22,12 +22,9 @@ Houdini 必须已打开。UE5 可稍后打开。
 
 import sys, os, json, math, subprocess, time
 from pathlib import Path
+from vc_paths import ROOT, CFG_PATH, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
 
-ROOT      = Path(r"F:/VirtualCity")
-CFG_PATH  = ROOT / "配置/active_area.json"
-DATA_ROOT = ROOT / "原始数据"
-SCRIPTS   = ROOT / "自动化插件"
-HIP       = str(ROOT / "Houdini/Hip/VC_pattaya_sai6_mvp_citygen_v001.hip")
+HIP = str(HIP)
 
 # ── 0. 解析参数 ───────────────────────────────────────
 if len(sys.argv) < 5:
@@ -58,14 +55,14 @@ dem_csv_path   = str(DATA_ROOT / f"DEM/{area_name}_dem_v001.csv")
 # ── 1. 更新 active_area.json ─────────────────────────
 cfg = {
     "area_id":        area_name,
-    "osm_file":       osm_path.replace("\\", "/"),
-    "buildings_file": buildings_path.replace("\\", "/"),
-    "dem_csv":        dem_csv_path.replace("\\", "/"),
+    "osm_file":       project_relative(osm_path),
+    "buildings_file": project_relative(buildings_path),
+    "dem_csv":        project_relative(dem_csv_path),
     "origin_lon":     origin_lon,
     "origin_lat":     origin_lat,
     "_note":          "切换区域只改此文件，不改 Houdini 节点代码"
 }
-CFG_PATH.write_text(json.dumps(cfg, indent=2, ensure_ascii=False), encoding="utf-8")
+write_active_area(cfg, relative=True)
 print(f"[1/5] ✅ active_area.json 已更新: {area_name}")
 
 # ── 2. OSM：优先本地缓存裁剪 → 备用 Overpass 下载 ──

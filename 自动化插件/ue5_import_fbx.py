@@ -7,21 +7,25 @@ VirtualCity - UE5 FBX 批量导入脚本
     UnrealEditor-Cmd.exe <project.uproject> -run=pythonscript -script=<this_file>
 """
 
+from pathlib import Path
 import unreal
+
+ROOT = Path(__file__).resolve().parents[1]
+EXPORT = ROOT / "Houdini" / "Export"
 
 IMPORTS = [
     {
-        "fbx":  r"F:/VirtualCity/Houdini/Export/buildings_v001.fbx",
+        "fbx":  (EXPORT / "buildings_v001.fbx").as_posix(),
         "dest": "/Game/City/Buildings",
         "name": "SM_Buildings_v001",
     },
     {
-        "fbx":  r"F:/VirtualCity/Houdini/Export/roads_v001.fbx",
+        "fbx":  (EXPORT / "roads_v001.fbx").as_posix(),
         "dest": "/Game/City/Roads",
         "name": "SM_Roads_v001",
     },
     {
-        "fbx":  r"F:/VirtualCity/Houdini/Export/terrain_v001.fbx",
+        "fbx":  (EXPORT / "terrain_v001.fbx").as_posix(),
         "dest": "/Game/City/Terrain",
         "name": "SM_Terrain_v001",
     },
