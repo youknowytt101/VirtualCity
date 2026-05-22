@@ -60,6 +60,12 @@ Houdini/Export/*.usdz
 
 # ===== 临时结果文件 =====
 配置/_*.txt
+配置/_*.py
+
+# ===== 大型测试数据（>5MB，不提交）=====
+原始数据/Overture/*stress_test*
+原始数据/OSM/*stress_test*
+原始数据/DEM/*stress_test*
 
 # ===== Python =====
 __pycache__/
