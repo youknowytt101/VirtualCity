@@ -1,9 +1,9 @@
 {
-  "area_id": "pattaya_quality_test",
-  "osm_file": "F:/VirtualCity/RawData/OSM/pattaya_quality_test_osm_v001.osm",
-  "buildings_file": "F:/VirtualCity/RawData/Overture/pattaya_quality_test_buildings_overture_v001.geojson",
-  "dem_csv": "F:/VirtualCity/RawData/DEM/pattaya_quality_test_dem_v001.csv",
-  "origin_lon": 100.8878405,
-  "origin_lat": 12.9413835,
+  "area_id": "jomtien_thappraya",
+  "osm_file": "RawData/OSM/jomtien_thappraya_osm_v001.osm",
+  "buildings_file": "RawData/Overture/jomtien_thappraya_buildings_overture_v001.geojson",
+  "dem_csv": "RawData/DEM/jomtien_thappraya_dem_v001.csv",
+  "origin_lon": 100.88,
+  "origin_lat": 12.906,
   "_note": "切换区域只改此文件，不改 Houdini 节点代码"
 }

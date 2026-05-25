@@ -14,8 +14,8 @@ VirtualCity — Overture Maps 建筑下载脚本（混合模式）
 import argparse, json, subprocess, sys, tempfile
 from pathlib import Path
 
-DEFAULT_HEIGHT   = 8.0   # Overture 和 Google 均未知时的属层备用默认
-FLOOR_HEIGHT     = 3.0   # num_floors → height 换算系数
+DEFAULT_HEIGHT   = 0.0   # Overture 和 Google 均未知时的属层备用默认
+FLOOR_HEIGHT     = 3.5   # num_floors → height 换算系数
 HEIGHT_THRESHOLD = 0.80  # Overture 覆盖率低于此就执行 Google 高度 join
 JOIN_MAX_DIST    = 50.0   # 空间 join 最大匹配距离（米）
 

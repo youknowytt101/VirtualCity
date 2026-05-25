@@ -107,7 +107,7 @@ def download_gee(cfg, source="nasadem"):
         f.write(tif_data)
     print(f"GeoTIFF 已保存: {cfg['output_tif']} ({len(tif_data)/1024:.0f} KB)")
     convert_to_csv(cfg["output_tif"], cfg["output_csv"], bbox)
-    print("完成 ✅")
+    print("完成 [OK]")
 
 
 def run(area_name, source="copernicus"):
@@ -169,7 +169,7 @@ def convert_to_csv(tif_path, csv_path, bbox):
                 x, z = to_local(lon, lat)
                 f.write(f"{x:.2f},{elev:.2f},{-z:.2f}\n")
                 count += 1
-    print(f"  ✅ CSV 已保存: {csv_path}  ({rows_n}×{cols_n}={count} 点)")
+    print(f"  [OK] CSV 已保存: {csv_path}  ({rows_n}×{cols_n}={count} 点)")
 
 
 if __name__ == "__main__":

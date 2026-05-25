@@ -118,7 +118,7 @@ def filter_osm(tile_entry, bbox, output_osm, margin=0.001):
         used_nodes = set()
         for way in root.findall("way"):
             tags = {t.get("k"): t.get("v") for t in way.findall("tag")}
-            if not tags.get("highway"):
+            if not tags.get("highway") and not tags.get("building"):
                 continue
             refs = [nr.get("ref") for nr in way.findall("nd")]
             if any(r in node_coords for r in refs):

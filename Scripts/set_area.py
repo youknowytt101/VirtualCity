@@ -15,7 +15,7 @@ VirtualCity — 一键换区/扩区脚本
     3. 下载 DEM 数据
     4. 下载建筑高度（Google Open Buildings，需 GEE 登录）
     5. validate_data.py 验证 → Houdini recook + 更新裁剪节点
-    ⚠ 导出（export_and_import.py）需用户确认视口后手动运行
+    [WARN] 导出（export_and_import.py）需用户确认视口后手动运行
 
 Houdini 必须已打开。UE5 可稍后打开。
 """
@@ -63,7 +63,7 @@ cfg = {
     "_note":          "切换区域只改此文件，不改 Houdini 节点代码"
 }
 write_active_area(cfg, relative=True)
-print(f"[1/5] ✅ active_area.json 已更新: {area_name}")
+print(f"[1/5] [OK] active_area.json 已更新: {area_name}")
 
 # ── 2. OSM：优先本地缓存裁剪 → 备用 Overpass 下载 ──
 print(f"\n[2/5] 获取 OSM 数据...")
@@ -88,6 +88,7 @@ if not _tile:
         f"[out:xml][timeout:180];\n"
         f"(\n"
         f'  way["highway"]({s},{w},{n},{e});\n'
+        f'  way["building"]({s},{w},{n},{e});\n'
         f");\n"
         f"out body;\n>;\nout skel qt;\n"
     )
@@ -102,14 +103,14 @@ if not _tile:
                 content = resp.read()
             with open(osm_path, "wb") as f:
                 f.write(content)
-            print(f"  ✅ OSM: {len(content)//1024} KB → {osm_path}")
+            print(f"  [OK] OSM: {len(content)//1024} KB → {osm_path}")
             osm_ok = True
             break
         except Exception as ex:
-            print(f"  ⚠ {server}: {ex}")
+            print(f"  [WARN] {server}: {ex}")
             time.sleep(3)
     if not osm_ok:
-        print("  ❌ OSM 下载失败，请先运行 cache_city_data.py 预缓存后重试")
+        print("  [ERR] OSM 下载失败，请先运行 cache_city_data.py 预缓存后重试")
         sys.exit(1)
 
 # ── 3. DEM：优先本地缓存裁剪 → 备用 GEE 下载 ─────────
@@ -130,9 +131,9 @@ try:
     if not dem_ok:
         _dem.download_gee({"bbox": bbox, "output_tif": dem_tif_path,
                            "output_csv": dem_csv_path}, source="nasadem")
-    print(f"  ✅ DEM 完成")
+    print(f"  [OK] DEM 完成")
 except Exception as ex:
-    print(f"  ❌ DEM 下载失败: {ex}")
+    print(f"  [ERR] DEM 下载失败: {ex}")
     sys.exit(1)
 
 # ── 4. 建筑：优先本地缓存过滤→备用 Overture 下载 ──
@@ -153,9 +154,9 @@ if not bld_ok:
     ]
     result = subprocess.run(bld_cmd, capture_output=False, cwd=str(SCRIPTS))
     if result.returncode != 0 or not Path(buildings_path).exists():
-        print(f"  ❌ Overture 建筑下载失败（returncode={result.returncode}）")
+        print(f"  [ERR] Overture 建筑下载失败（returncode={result.returncode}）")
         sys.exit(1)
-print(f"  ✅ 建筑完成")
+print(f"  [OK] 建筑完成")
 
 # ── 5. 验证 + Houdini recook ─────────────────────────
 print(f"\n[5/5] 数据验证 + Houdini 重算...")
@@ -164,28 +165,28 @@ print(f"\n[5/5] 数据验证 + Houdini 重算...")
 vld = subprocess.run([sys.executable, str(SCRIPTS / "validate_data.py")],
                      capture_output=False)
 if vld.returncode != 0:
-    print("\n  ❌ 数据验证未通过，中止流程，请修复后重新运行")
+    print("\n  [ERR] 数据验证未通过，中止流程，请修复后重新运行")
     sys.exit(1)
 
 # 5b. Houdini recook + 修复 SOP + 重建裁剪节点
 # 注意：必须从 SCRIPTS 目录运行（pyproject.toml 在那里，rpyc==4.1.0 才可用）
-print("\n  ♻ Houdini 重算中（_recook_new_area.py）...")
+print("\n  [RECOOK] Houdini 重算中（_recook_new_area.py）...")
 recook = subprocess.run(
     ["uv", "run", "python", "_recook_new_area.py"],
     cwd=str(SCRIPTS),
     capture_output=False,
 )
 if recook.returncode != 0:
-    print("\n  ❌ Houdini 重算失败，中止流程")
+    print("\n  [ERR] Houdini 重算失败，中止流程")
     sys.exit(1)
 
 # ── 完成：等待用户确认 ────────────────────────────────
 print(f"""
 {'='*50}
-✅ 数据下载和 Houdini 重算完成: {area_name}
+[OK] 数据下载和 Houdini 重算完成: {area_name}
 {'='*50}
 
-⚠  下一步（需人工确认）：
+[WARN]  下一步（需人工确认）：
    1. 在 Houdini 视口选中 OUT_city，按 D 检查：
       - 建筑是否在地形上
       - 道路是否正常

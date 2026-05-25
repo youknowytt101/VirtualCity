@@ -14,10 +14,11 @@ SCRIPTS = ROOT / "Scripts"
 CONFIG = ROOT / "Config"
 DATA_ROOT = ROOT / "RawData"
 HOUDINI = ROOT / "Houdini"
-HIP = HOUDINI / "Hip" / "VC_pattaya_sai6_mvp_citygen_v001.hip"
+HIP = HOUDINI / "Hip" / "VC_pattaya_quality_test_citygen_v001.hip"
 EXPORT = HOUDINI / "Export"
 UE5_PROJECT = ROOT / "UE5" / "VirtualCityUE" / "VirtualCityUE.uproject"
 ACTIVE_AREA = CONFIG / "active_area.json"
+CFG_PATH = ACTIVE_AREA  # backward-compat alias
 TRIGGER = ROOT / ".ue5_trigger"
 
 _PATH_KEYS = {"osm_file", "buildings_file", "dem_csv", "dem_tif", "output", "output_tif", "output_csv"}

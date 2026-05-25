@@ -8,12 +8,49 @@ Houdini 换区重算脚本
   4. 重建裁剪节点（基于新 DEM 边界）
   5. 重连 merge_all + 保存 hip
 """
-import sys, rpyc
+import sys, rpyc, subprocess
+from pathlib import Path
 from vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area
 
 PASS = '[OK]'
 FAIL = '[FAIL]'
 errors = []
+
+# ── 前置：原始数据清洗（GeoJSON 几何/高度 + OSM 道路）──────────────
+print('[数据清洗]')
+_clean_result = subprocess.run(
+    [sys.executable, str(ROOT / 'Scripts' / 'clean_raw_data.py'), '--report'],
+    capture_output=True, text=True, encoding='utf-8', errors='replace'
+)
+for _line in _clean_result.stdout.splitlines():
+    sys.stdout.buffer.write(('  ' + _line + '\n').encode('utf-8', errors='replace'))
+if _clean_result.returncode != 0:
+    print('  [WARN] clean_raw_data 退出码非 0，继续执行...')
+    print(_clean_result.stderr[:400])
+
+# ── 前置：OSM building:levels 高度补全 ─────────────────────────────
+print('[heights] OSM building:levels enrichment...')
+try:
+    sys.path.insert(0, str(ROOT / 'Scripts'))
+    from enrich_building_levels import enrich_levels as _enrich_levels
+    _lvl_cfg = load_active_area()
+    _lvl_stats = _enrich_levels(_lvl_cfg, verbose=False)
+    print(f'  [heights] OSM levels matched: {_lvl_stats["updated"]} buildings updated')
+except Exception as _e:
+    print(f'  [WARN] enrich_building_levels failed: {_e}')
+
+# ── 前置：DEM DSM -> DTM 修正（建筑掩码插值）────────────────────────
+print('[dem] DTM correction (building mask)...')
+try:
+    from correct_dem_dtm import correct_dtm as _correct_dtm
+    _dtm_cfg = load_active_area()
+    _dtm_ok = _correct_dtm(_dtm_cfg, verbose=False)
+    if _dtm_ok:
+        print('  [dem] DTM correction applied')
+    else:
+        print('  [dem] DTM correction skipped (no cells masked)')
+except Exception as _e:
+    print(f'  [WARN] correct_dem_dtm failed: {_e}')
 
 # ══════════════════════════════════════════
 # 颜色配置 — 修改这里即可独立控制三类颜色
@@ -57,33 +94,15 @@ for _node in net.allSubChildren():
         _parm.set(_new_code)
         print('  Python SOP 路径已适配: ' + _node.name())
 
+# ── osm_import: canonical code (Fix 2+5: single resolver, OSM bld fallback) ──
+_OSM_IMPORT_CODE = open(
+    str(Path(ROOT_STR) / 'Scripts' / '_osm_import_canonical.py'),
+    encoding='utf-8'
+).read().replace('__ROOT__', ROOT_STR).replace('__CFG__', CFG_FILE)
 osm = hou.node('/obj/pattaya_osm/osm_import')
 if osm and osm.parm('python'):
-    _code = osm.parm('python').eval()
-    _insert = """
-def _resolve_project_path(value):
-    raw = str(value).replace(chr(92), '/')
-    low = raw.lower()
-    marker = '/virtualcity/'
-    idx = low.find(marker)
-    if idx >= 0:
-        return r'__ROOT__' + '/' + raw[idx + len(marker):]
-    if low.endswith('/virtualcity'):
-        return r'__ROOT__'
-    if ':' in raw[:3] or raw.startswith('/'):
-        return raw
-    return r'__ROOT__' + '/' + raw
-""".replace('__ROOT__', ROOT_STR)
-    _resolver_pos = _code.find('def _resolve_project_path(value):')
-    _osm_pos = _code.find('OSM_FILE       =')
-    if _resolver_pos < 0:
-        _code = _code.replace('def wgs84_to_local(lon, lat):', _insert + '\ndef wgs84_to_local(lon, lat):')
-    elif _osm_pos >= 0 and _resolver_pos > _osm_pos:
-        _code = _code.replace('OSM_FILE       =', _insert + '\nOSM_FILE       =', 1)
-    _code = _code.replace('OSM_FILE       = _cfg["osm_file"]', 'OSM_FILE       = _resolve_project_path(_cfg["osm_file"])')
-    _code = _code.replace('BUILDINGS_FILE = _cfg["buildings_file"]', 'BUILDINGS_FILE = _resolve_project_path(_cfg["buildings_file"])')
-    osm.parm('python').set(_code)
-    print('  SOP 修复: osm_import path resolver')
+    osm.parm('python').set(_OSM_IMPORT_CODE)
+    print('  SOP 修复: osm_import (canonical: single resolver + OSM bld fallback)')
 
 # ── 1. 修复 dem_import Python SOP（H-006：硬编码路径）────
 DEM_IMPORT_CODE = """
@@ -232,23 +251,37 @@ if _rw:
 
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = """
-// 对每栋楼逐顶点查询地形高度，取 MAX 作为底面 Y
-// 防止坡面上坡侧顶点被地形埋没（H-011）
-float max_y = -1e9;
+// snap_bld_to_terrain v3: 质心两步精化 xyzdist
+//   Step1: 从 Y=0 查询质心 -> 近海/平原建筑直接命中正下方
+//   Step2: 从 Step1 结果 Y 再查一次 -> 坡地建筑消除残差
+//   下沉 0.2m 消除底部可见缝隙
 int verts[] = primvertices(0, @primnum);
+int n = len(verts);
+
+// 质心 XZ
+vector ctr = {0,0,0};
+foreach(int v; verts) { ctr += point(0, "P", vertexpoint(0, v)); }
+ctr /= n;
+
+// Step 1: 从 Y=0 查询（低位点 -> 正下方地形最近）
+vector q1 = set(ctr.x, 0.0, ctr.z);
+int hp1; vector uvw1;
+xyzdist(1, q1, hp1, uvw1);
+vector tp1 = primuv(1, "P", hp1, uvw1);
+
+// Step 2: 从 Step1 高度再查一次（消除坡面偏差）
+vector q2 = set(ctr.x, tp1.y, ctr.z);
+int hp2; vector uvw2;
+xyzdist(1, q2, hp2, uvw2);
+vector tp2 = primuv(1, "P", hp2, uvw2);
+
+float base_y = tp2.y - 0.2;
+
+// 所有顶点统一到 base_y
 foreach(int v; verts) {
     int pt = vertexpoint(0, v);
     vector p = point(0, "P", pt);
-    int hit_prim;
-    vector uvw;
-    xyzdist(1, p, hit_prim, uvw);
-    vector tp = primuv(1, "P", hit_prim, uvw);
-    if (tp.y > max_y) max_y = tp.y;
-}
-foreach(int v; verts) {
-    int pt = vertexpoint(0, v);
-    vector p = point(0, "P", pt);
-    p.y = max_y;
+    p.y = base_y;
     setpointattrib(0, "P", pt, p, "set");
 }
 """
@@ -257,6 +290,46 @@ if snap_bld:
     snap_bld.parm('class').set(1)   # Primitive
     snap_bld.parm('snippet').set(BLD_SNAP_VEX)
     print('  SOP 修复: snap_bld_to_terrain (逐顶点 MAX 高度)')
+
+# ── P0: procedural_height VEX —— 同时处理 height_m<=0 和 ~10m 两种缺失情况 ──
+PROC_HEIGHT_VEX = r"""// P0: 推算高度的触发条件:
+//   1. height_m ~= 10.0  -> OSM/Overture 默认值，没有真实数据
+//   2. height_m <= 0      -> 明确缺失或数据错误
+// 触发条件: ~10.0 (OSM default), ~8.0 (Overture DEFAULT_HEIGHT), <=0 (missing)
+int needs_estimate = (abs(f@height_m - 10.0) < 0.1)
+                  || (abs(f@height_m -  8.0) < 0.1)
+                  || (f@height_m <= 0);
+if (!needs_estimate) return;
+
+int pts[] = primpoints(0, @primnum);
+int n = len(pts);
+float area = 0;
+for (int i = 0; i < n; i++) {
+    vector p0 = point(0, "P", pts[i]);
+    vector p1 = point(0, "P", pts[(i+1)%n]);
+    area += p0.x * p1.z - p1.x * p0.z;
+}
+area = abs(area) * 0.5;
+
+float base_floors;
+if      (area < 60)   base_floors = 1;
+else if (area < 150)  base_floors = 2;
+else if (area < 400)  base_floors = 3;
+else if (area < 1000) base_floors = 4;
+else if (area < 3000) base_floors = 6;
+else                  base_floors = 8;
+
+vector ctr = {0,0,0};
+for (int i = 0; i < n; i++) ctr += point(0,"P",pts[i]);
+ctr /= n;
+float noise_val = fit(noise(ctr * 0.003), 0, 1, -1.5, 1.5);
+float floors = clamp(base_floors + noise_val, 1, 15);
+f@height_m = floors * 3.5;
+"""
+_ph = hou.node('/obj/pattaya_osm/procedural_height')
+if _ph:
+    _ph.parm('snippet').set(PROC_HEIGHT_VEX)
+    print('  SOP 修复: procedural_height (P0: height_m<=0 fallback)')
 
 # ── 2. 强制 recook 数据源 ────────────────────────────
 print('\n[recook 数据源]')

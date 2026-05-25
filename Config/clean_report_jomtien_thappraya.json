@@ -1,0 +1,30 @@
+{
+  "area_id": "jomtien_thappraya",
+  "buildings": {
+    "total_in": 12535,
+    "removed_null": 0,
+    "removed_degenerate": 0,
+    "removed_tiny": 0,
+    "removed_duplicate": 0,
+    "fixed_height": 0,
+    "clamped_height": 0,
+    "total_out": 12535
+  },
+  "osm": {
+    "total_nodes": 8643,
+    "ways_in": 1781,
+    "ways_removed_short": 0,
+    "ways_removed_orphan": 0,
+    "ways_removed_type": 0,
+    "ways_out": 1781,
+    "highway_types": {
+      "trunk_link": 12,
+      "residential": 993,
+      "tertiary": 20,
+      "trunk": 24,
+      "secondary": 52,
+      "service": 663,
+      "unclassified": 17
+    }
+  }
+}
