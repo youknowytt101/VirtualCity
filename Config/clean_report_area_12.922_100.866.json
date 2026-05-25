@@ -1,0 +1,34 @@
+{
+  "area_id": "area_12.922_100.866",
+  "buildings": {
+    "total_in": 5206,
+    "removed_null": 0,
+    "removed_degenerate": 0,
+    "removed_tiny": 0,
+    "removed_duplicate": 3,
+    "fixed_height": 0,
+    "clamped_height": 0,
+    "total_out": 5203
+  },
+  "osm": {
+    "total_nodes": 4790,
+    "ways_in": 1111,
+    "ways_removed_short": 0,
+    "ways_removed_orphan": 0,
+    "ways_removed_type": 67,
+    "ways_out": 1044,
+    "highway_types": {
+      "residential": 430,
+      "service": 364,
+      "tertiary": 19,
+      "path": 11,
+      "footway": 144,
+      "pedestrian": 7,
+      "secondary": 44,
+      "secondary_link": 12,
+      "tertiary_link": 6,
+      "unclassified": 1,
+      "track": 6
+    }
+  }
+}

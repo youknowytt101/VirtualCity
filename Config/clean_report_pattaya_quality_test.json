@@ -1,0 +1,27 @@
+{
+  "area_id": "pattaya_quality_test",
+  "buildings": {
+    "total_in": 499,
+    "removed_null": 0,
+    "removed_degenerate": 0,
+    "removed_tiny": 0,
+    "removed_duplicate": 0,
+    "fixed_height": 0,
+    "clamped_height": 0,
+    "total_out": 499
+  },
+  "osm": {
+    "total_nodes": 649,
+    "ways_in": 129,
+    "ways_removed_short": 0,
+    "ways_removed_orphan": 0,
+    "ways_removed_type": 0,
+    "ways_out": 129,
+    "highway_types": {
+      "residential": 33,
+      "service": 86,
+      "tertiary": 1,
+      "secondary": 9
+    }
+  }
+}

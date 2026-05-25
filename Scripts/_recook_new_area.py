@@ -249,35 +249,55 @@ if _rw:
     _rw.parm('class').set(1)  # Primitive
     print('  road_width VEX 已更新（14 级分级宽度）')
 
+# ── 1d. road_strips v2: 路段修剪 + 路口凸包填充 ──────────────────────
+import pathlib as _pl
+_rs_v2_path = ROOT / 'Scripts' / '_road_strips_v2.py'
+_rs_v2_code = _rs_v2_path.read_text(encoding='utf-8')
+_rs_node = hou.node('/obj/pattaya_osm/road_strips')
+_rwf_node = hou.node('/obj/pattaya_osm/road_width_flat')
+if _rs_node and _rwf_node:
+    _rs_node.parm('python').set(_rs_v2_code)
+    _rs_node.setInput(0, _rwf_node, 0)
+    print('  road_strips v2 已更新（路口凸包填充）')
+elif _rs_node:
+    # road_width_flat 不存在时自动创建
+    _rwf_node = hou.node('/obj/pattaya_osm').createNode('attribwrangle', 'road_width_flat')
+    _rwf_node.setInput(0, hou.node('/obj/pattaya_osm/resample_roads'), 0)
+    _rwf_node.parm('class').set(1)
+    _rwf_node.parm('snippet').set(hou.node('/obj/pattaya_osm/road_width').parm('snippet').eval())
+    _rs_node.parm('python').set(_rs_v2_code)
+    _rs_node.setInput(0, _rwf_node, 0)
+    print('  road_width_flat 已创建 + road_strips v2 已更新')
+
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = """
-// snap_bld_to_terrain v3: 质心两步精化 xyzdist
-//   Step1: 从 Y=0 查询质心 -> 近海/平原建筑直接命中正下方
-//   Step2: 从 Step1 结果 Y 再查一次 -> 坡地建筑消除残差
-//   下沉 0.2m 消除底部可见缝隙
+// snap_bld_to_terrain v4: 逐角点查询 + 取最低值
+// 对每个角点分别查询地形高度，取 MIN 作为底面 Y
+// 斜坡建筑：低侧贴地，高侧嵌入地形（符合真实建筑行为，无悬空）
 int verts[] = primvertices(0, @primnum);
 int n = len(verts);
+if (n == 0) return;
 
-// 质心 XZ
-vector ctr = {0,0,0};
-foreach(int v; verts) { ctr += point(0, "P", vertexpoint(0, v)); }
-ctr /= n;
+float min_terrain_y = 1e10;
 
-// Step 1: 从 Y=0 查询（低位点 -> 正下方地形最近）
-vector q1 = set(ctr.x, 0.0, ctr.z);
-int hp1; vector uvw1;
-xyzdist(1, q1, hp1, uvw1);
-vector tp1 = primuv(1, "P", hp1, uvw1);
+foreach(int v; verts) {
+    int pt = vertexpoint(0, v);
+    vector p = point(0, "P", pt);
 
-// Step 2: 从 Step1 高度再查一次（消除坡面偏差）
-vector q2 = set(ctr.x, tp1.y, ctr.z);
-int hp2; vector uvw2;
-xyzdist(1, q2, hp2, uvw2);
-vector tp2 = primuv(1, "P", hp2, uvw2);
+    // Step 1: query from Y=0 (finds terrain directly below for flat/coastal)
+    int hp; vector uvw;
+    xyzdist(1, set(p.x, 0.0, p.z), hp, uvw);
+    vector tp = primuv(1, "P", hp, uvw);
 
-float base_y = tp2.y - 0.2;
+    // Step 2: refine from Step1 Y (removes slope residual)
+    xyzdist(1, set(p.x, tp.y, p.z), hp, uvw);
+    tp = primuv(1, "P", hp, uvw);
 
-// 所有顶点统一到 base_y
+    min_terrain_y = min(min_terrain_y, tp.y);
+}
+
+float base_y = min_terrain_y - 0.2;  // sink 0.2m to hide base gap
+
 foreach(int v; verts) {
     int pt = vertexpoint(0, v);
     vector p = point(0, "P", pt);
@@ -493,11 +513,27 @@ road_colored    = make_color_node('road_color',    road_clip, COLORS['roads'])
 bld_colored     = make_color_node('bld_color',     bld_clip,  COLORS['buildings'])
 terrain_colored = make_color_node('terrain_color', _dem_sd,   COLORS['terrain'])
 
+# ── 4d. 道路挤出（road_extrude：0.18m 侧面 + 顶面）────────────────────
+old_ext = hou.node('/obj/pattaya_osm/road_extrude')
+if old_ext:
+    old_ext.destroy()
+road_extrude = net.createNode('polyextrude::2.0', 'road_extrude')
+road_extrude.setInput(0, road_colored)
+road_extrude.parm('dist').set(0.18)
+road_extrude.parm('outputback').set(0)
+road_extrude.parm('outputfront').set(1)
+road_extrude.parm('outputside').set(1)
+road_extrude.parm('xformspace').set(0)  # Local (along prim normal)
+road_extrude.cook(force=True)
+print('  road_extrude: pts={} prims={}'.format(
+    road_extrude.geometry().intrinsicValue('pointcount'),
+    road_extrude.geometry().intrinsicValue('primitivecount')))
+
 # ── 5. 重连 merge_all + 保存 ────────────────────────
 merge = hou.node('/obj/pattaya_osm/merge_all')
 if merge and bld_clip and road_clip:
     merge.setInput(0, bld_colored)
-    merge.setInput(1, road_colored)
+    merge.setInput(1, road_extrude)
     merge.setInput(2, terrain_colored)
 
 net.layoutChildren()
@@ -516,7 +552,7 @@ FULL_CHAIN = [
     'osm_import', 'dem_terrain',
     'extract_buildings', 'snap_bld_to_terrain', 'extrude_buildings', 'post_normals',
     'snap_roads_to_terrain1', 'road_width', 'road_strips',
-    'bld_clipped', 'road_clipped', 'road_color', 'bld_color', 'terrain_color', 'merge_all', 'OUT_city',
+    'bld_clipped', 'road_clipped', 'road_color', 'road_extrude', 'bld_color', 'terrain_color', 'merge_all', 'OUT_city',
 ]
 for _cn in FULL_CHAIN:
     _n = hou.node('/obj/pattaya_osm/' + _cn)

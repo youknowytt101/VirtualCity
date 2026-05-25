@@ -3,37 +3,102 @@ VirtualCity — 一键换区/扩区脚本
 =================================
 从 bbox 坐标开始，完整跑通整条数据管线。
 
-用法:
+用法 A — 完整 bbox（bboxfinder.com 框选后复制）:
     uv run python Scripts/set_area.py <west> <south> <east> <north> [area_name]
+    例: uv run python Scripts/set_area.py 100.840 12.900 100.930 12.970 pattaya_new
 
-示例（在 bboxfinder.com 框选后复制坐标）:
-    uv run python Scripts/set_area.py 100.840 12.900 100.930 12.970 pattaya_new
+用法 B — 中心点 + 半径（Google Maps 截图 → 复制 URL 中心坐标）:
+    uv run python Scripts/set_area.py --center <lon> <lat> <radius_km> [area_name]
+    例: uv run python Scripts/set_area.py --center 100.889 12.942 3.0 north_pattaya
+
+用法 C — 直接粘贴 Google Maps URL（自动解析中心 + 用默认 3km 半径）:
+    uv run python Scripts/set_area.py --url "https://www.google.com/maps/@12.942,100.889,14z" [area_name]
+    例: uv run python Scripts/set_area.py --url "https://maps.google.com/maps/@12.955,100.877,15z" north_pattaya
+
+Google Maps URL 获取方式:
+    在 Google Maps 浏览到目标区域 → 复制浏览器地址栏 URL → 粘贴到 --url 参数
+    URL 格式: .../@<lat>,<lon>,<zoom>z...
 
 步骤（5 步）:
     1. 更新 active_area.json
     2. 下载 OSM 数据
     3. 下载 DEM 数据
-    4. 下载建筑高度（Google Open Buildings，需 GEE 登录）
+    4. 下载建筑高度
     5. validate_data.py 验证 → Houdini recook + 更新裁剪节点
     [WARN] 导出（export_and_import.py）需用户确认视口后手动运行
 
 Houdini 必须已打开。UE5 可稍后打开。
 """
 
-import sys, os, json, math, subprocess, time
+import sys, os, json, math, subprocess, time, re
 from pathlib import Path
 from vc_paths import ROOT, CFG_PATH, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
 
 HIP = str(HIP)
 
-# ── 0. 解析参数 ───────────────────────────────────────
-if len(sys.argv) < 5:
-    print("用法: uv run python Scripts/set_area.py <west> <south> <east> <north> [area_name]")
-    print("示例: uv run python Scripts/set_area.py 100.840 12.900 100.930 12.970 pattaya_new")
+# ── 0. 解析参数（支持三种用法）─────────────────────────
+def _center_to_bbox(lon: float, lat: float, radius_km: float):
+    """从中心点和半径(km)计算 bbox [west, south, east, north]。"""
+    delta_lat = radius_km / 111.32
+    delta_lon = radius_km / (111.32 * math.cos(math.radians(lat)))
+    return lon - delta_lon, lat - delta_lat, lon + delta_lon, lat + delta_lat
+
+def _parse_google_maps_url(url: str):
+    """从 Google Maps URL 解析中心坐标，返回 (lat, lon, zoom) 或 None。"""
+    # 匹配 /@lat,lon,zoom z 格式
+    m = re.search(r'/@(-?\d+\.\d+),(-?\d+\.\d+),([\d.]+)z', url)
+    if m:
+        return float(m.group(1)), float(m.group(2)), float(m.group(3))
+    # 匹配 ?ll=lat,lon 格式
+    m = re.search(r'[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)', url)
+    if m:
+        return float(m.group(1)), float(m.group(2)), 14.0
+    # 匹配 ?q=lat,lon 格式
+    m = re.search(r'[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)', url)
+    if m:
+        return float(m.group(1)), float(m.group(2)), 14.0
+    return None
+
+def _zoom_to_radius_km(zoom: float) -> float:
+    """根据 Google Maps zoom 级别估算合理的区域半径(km)。"""
+    # zoom 15 ≈ 1km, zoom 14 ≈ 2km, zoom 13 ≈ 4km, zoom 12 ≈ 8km
+    return max(1.0, min(10.0, 2 ** (15 - zoom)))
+
+if len(sys.argv) < 2:
+    print(__doc__)
     sys.exit(1)
 
-west, south, east, north = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
-area_name = sys.argv[5] if len(sys.argv) > 5 else f"area_{west:.3f}_{south:.3f}"
+if sys.argv[1] == '--center':
+    if len(sys.argv) < 5:
+        print("用法: set_area.py --center <lon> <lat> <radius_km> [area_name]")
+        sys.exit(1)
+    _lon, _lat, _r = float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
+    west, south, east, north = _center_to_bbox(_lon, _lat, _r)
+    area_name = sys.argv[5] if len(sys.argv) > 5 else f"area_{_lon:.3f}_{_lat:.3f}"
+    print(f"  [--center] lon={_lon} lat={_lat} radius={_r}km → bbox=[{west:.4f},{south:.4f},{east:.4f},{north:.4f}]")
+
+elif sys.argv[1] == '--url':
+    if len(sys.argv) < 3:
+        print("用法: set_area.py --url \"<google_maps_url>\" [area_name]")
+        sys.exit(1)
+    _parsed = _parse_google_maps_url(sys.argv[2])
+    if not _parsed:
+        print(f"  [ERR] 无法从 URL 解析坐标: {sys.argv[2]}")
+        print("  URL 应包含 /@lat,lon,zoomz 格式，例如: https://www.google.com/maps/@12.942,100.889,14z")
+        sys.exit(1)
+    _lat, _lon, _zoom = _parsed
+    _r = _zoom_to_radius_km(_zoom)
+    west, south, east, north = _center_to_bbox(_lon, _lat, _r)
+    area_name = sys.argv[3] if len(sys.argv) > 3 else f"area_{_lon:.3f}_{_lat:.3f}"
+    print(f"  [--url] lat={_lat} lon={_lon} zoom={_zoom} → radius={_r:.1f}km → bbox=[{west:.4f},{south:.4f},{east:.4f},{north:.4f}]")
+
+elif len(sys.argv) >= 5 and sys.argv[1] not in ('--help', '-h'):
+    west, south, east, north = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
+    area_name = sys.argv[5] if len(sys.argv) > 5 else f"area_{west:.3f}_{south:.3f}"
+
+else:
+    print(__doc__)
+    sys.exit(1)
 
 origin_lon = (west + east) / 2
 origin_lat = (south + north) / 2

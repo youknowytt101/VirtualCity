@@ -1,0 +1,36 @@
+{
+  "area_id": "north_pattaya_sukhumvit",
+  "buildings": {
+    "total_in": 22896,
+    "removed_null": 0,
+    "removed_degenerate": 0,
+    "removed_tiny": 9,
+    "removed_duplicate": 13,
+    "fixed_height": 0,
+    "clamped_height": 0,
+    "total_out": 22874
+  },
+  "osm": {
+    "total_nodes": 14186,
+    "ways_in": 3684,
+    "ways_removed_short": 0,
+    "ways_removed_orphan": 0,
+    "ways_removed_type": 51,
+    "ways_out": 3633,
+    "highway_types": {
+      "residential": 1638,
+      "service": 1367,
+      "footway": 292,
+      "tertiary": 61,
+      "path": 7,
+      "pedestrian": 5,
+      "secondary": 86,
+      "secondary_link": 12,
+      "tertiary_link": 6,
+      "unclassified": 17,
+      "trunk": 92,
+      "track": 11,
+      "trunk_link": 39
+    }
+  }
+}
