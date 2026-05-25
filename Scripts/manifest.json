@@ -1,6 +1,6 @@
 {
   "project": "VirtualCity",
-  "directory": "自动化插件",
+  "directory": "Scripts",
   "policy": {
     "include_official_plugins": false,
     "allowed_content": [

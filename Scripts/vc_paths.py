@@ -10,9 +10,9 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS = ROOT / "自动化插件"
-CONFIG = ROOT / "配置"
-DATA_ROOT = ROOT / "原始数据"
+SCRIPTS = ROOT / "Scripts"
+CONFIG = ROOT / "Config"
+DATA_ROOT = ROOT / "RawData"
 HOUDINI = ROOT / "Houdini"
 HIP = HOUDINI / "Hip" / "VC_pattaya_sai6_mvp_citygen_v001.hip"
 EXPORT = HOUDINI / "Export"

@@ -32,17 +32,17 @@
     "plan_mvp": [
       "VirtualCity完整执行计划.md",
       "项目管理/07_MVP_QA检查清单.md",
-      "配置/pipeline_config.template.json"
+      "Config/pipeline_config.template.json"
     ],
     "create_new_area": [
       "项目管理/区域记录/_template.md",
-      "配置/area_config.template.json",
-      "原始数据/README.md"
+      "Config/area_config.template.json",
+      "RawData/README.md"
     ],
     "work_on_houdini": [
       "Houdini/README.md",
       "调研文档/地图API-Houdini-UE流程/02_Houdini处理流程.md",
-      "配置/pipeline_config.template.json"
+      "Config/pipeline_config.template.json"
     ],
     "work_on_ue5": [
       "UE5/README.md",
@@ -55,10 +55,10 @@
       "调研文档/地图API-Houdini-UE流程/07_补充优化建议_2026版.md"
     ],
     "automation_tools": [
-      "自动化插件/README.md",
-      "自动化插件/插件清单.md",
-      "自动化插件/工具开发规范.md",
-      "配置/README.md"
+      "Scripts/README.md",
+      "Scripts/插件清单.md",
+      "Scripts/工具开发规范.md",
+      "Config/README.md"
     ]
   },
   "version_roadmap": "项目管理/11_版本路线图.md",

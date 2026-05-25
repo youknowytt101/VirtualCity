@@ -3,8 +3,8 @@ VirtualCity — 本地 Tile 缓存工具
 ===================================
 供 download_dem.py / download_overture_buildings.py / set_area.py 调用。
 
-缓存目录: <项目根目录>/原始数据/_tiles/
-索引文件: <项目根目录>/原始数据/_tiles/_index.json
+缓存目录: <项目根目录>/RawData/_tiles/
+索引文件: <项目根目录>/RawData/_tiles/_index.json
 
 索引格式:
 {

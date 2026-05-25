@@ -4,7 +4,7 @@ REM 首次运行会编译 Shader，需要等待较长时间（5~15 分钟）
 
 set UE5_CMD="C:\Program Files\Epic Games\UE_5.6\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
 set PROJECT="F:\VirtualCity\UE5\VirtualCityUE\VirtualCityUE.uproject"
-set SCRIPT="F:\VirtualCity\自动化插件\ue5_import_fbx.py"
+set SCRIPT="F:\VirtualCity\Scripts\ue5_import_fbx.py"
 
 echo [VirtualCity] 正在启动 UE5 并导入 FBX...
 echo 首次运行需要编译 Shader，请耐心等待...

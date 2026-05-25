@@ -49,10 +49,41 @@ for _node in net.allSubChildren():
     _new_code = (_code
                  .replace('F:/VirtualCity', ROOT_STR)
                  .replace('D:/VirtualCity', ROOT_STR)
-                 .replace('d:/VirtualCity', ROOT_STR))
+                 .replace('d:/VirtualCity', ROOT_STR)
+                 .replace('/原始数据/', '/RawData/')
+                 .replace('/自动化插件/', '/Scripts/')
+                 .replace('/配置/', '/Config/'))
     if _new_code != _code:
         _parm.set(_new_code)
         print('  Python SOP 路径已适配: ' + _node.name())
+
+osm = hou.node('/obj/pattaya_osm/osm_import')
+if osm and osm.parm('python'):
+    _code = osm.parm('python').eval()
+    _insert = """
+def _resolve_project_path(value):
+    raw = str(value).replace(chr(92), '/')
+    low = raw.lower()
+    marker = '/virtualcity/'
+    idx = low.find(marker)
+    if idx >= 0:
+        return r'__ROOT__' + '/' + raw[idx + len(marker):]
+    if low.endswith('/virtualcity'):
+        return r'__ROOT__'
+    if ':' in raw[:3] or raw.startswith('/'):
+        return raw
+    return r'__ROOT__' + '/' + raw
+""".replace('__ROOT__', ROOT_STR)
+    _resolver_pos = _code.find('def _resolve_project_path(value):')
+    _osm_pos = _code.find('OSM_FILE       =')
+    if _resolver_pos < 0:
+        _code = _code.replace('def wgs84_to_local(lon, lat):', _insert + '\ndef wgs84_to_local(lon, lat):')
+    elif _osm_pos >= 0 and _resolver_pos > _osm_pos:
+        _code = _code.replace('OSM_FILE       =', _insert + '\nOSM_FILE       =', 1)
+    _code = _code.replace('OSM_FILE       = _cfg["osm_file"]', 'OSM_FILE       = _resolve_project_path(_cfg["osm_file"])')
+    _code = _code.replace('BUILDINGS_FILE = _cfg["buildings_file"]', 'BUILDINGS_FILE = _resolve_project_path(_cfg["buildings_file"])')
+    osm.parm('python').set(_code)
+    print('  SOP 修复: osm_import path resolver')
 
 # ── 1. 修复 dem_import Python SOP（H-006：硬编码路径）────
 DEM_IMPORT_CODE = """
@@ -60,7 +91,7 @@ import hou, csv, json as _json
 ROOT_DIR = r'__ROOT__'
 CFG_FILE = r'__CFG__'
 def _resolve_project_path(value):
-    raw = str(value).replace('\\\\', '/')
+    raw = str(value).replace(chr(92), '/')
     low = raw.lower()
     marker = '/virtualcity/'
     idx = low.find(marker)
@@ -85,7 +116,7 @@ import hou, csv, json as _json
 ROOT_DIR = r'__ROOT__'
 CFG_FILE = r'__CFG__'
 def _resolve_project_path(value):
-    raw = str(value).replace('\\\\', '/')
+    raw = str(value).replace(chr(92), '/')
     low = raw.lower()
     marker = '/virtualcity/'
     idx = low.find(marker)
@@ -122,6 +153,7 @@ for ri in range(nrows - 1):
             for idx in [i0, i1, i2, i3]:
                 poly.addVertex(pts[idx])
 """
+DEM_TERRAIN_CODE = DEM_TERRAIN_CODE.replace('__ROOT__', ROOT_STR).replace('__CFG__', CFG_FILE)
 
 for node_path, code in [
     ('/obj/pattaya_osm/dem_import',   DEM_IMPORT_CODE),
@@ -131,6 +163,13 @@ for node_path, code in [
     if n:
         n.parm('python').set(code)
         print('  SOP 修复: ' + node_path.split('/')[-1])
+
+# ── 1a. 修复 divide_bld（Q-001：convex+numsides=3 强制三角化建筑 footprint）──
+_div_bld = hou.node('/obj/pattaya_osm/divide_bld')
+if _div_bld:
+    _div_bld.parm('convex').set(0)
+    _div_bld.parm('usemaxsides').set(0)
+    print('  SOP 修复: divide_bld (Q-001: 关闭 convex+numsides → 保留 n-gon footprint)')
 
 # ── 1b. 修复道路地形吸附（H-007：Ray SOP direction=0，改用 xyzdist）──
 ROAD_SNAP_VEX = """

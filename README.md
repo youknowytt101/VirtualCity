@@ -31,7 +31,7 @@ VirtualCity/
 │   ├── document_index.json
 │   └── 区域记录/
 │
-├── 配置/                       ← 机器可读配置模板
+├── Config/                       ← 机器可读配置模板
 │   ├── area_config.template.json
 │   ├── pipeline_config.template.json
 │   └── qa_checklist.template.json
@@ -47,14 +47,14 @@ VirtualCity/
 │       ├── 06_路线一详细拆解_Houdini+UE5城市管线.md
 │       └── 07_补充优化建议_2026版.md
 │
-├── 原始数据/                   ← 地图原始数据
+├── RawData/                   ← 地图RawData
 │   ├── OSM/                   ← 从 overpass-turbo.eu 导出的 .osm 文件
 │   └── DEM/                   ← 高程数据 GeoTIFF
 │
 ├── Houdini/                   ← Houdini 工程文件
 │   └── （.hip 文件 / HDA 资产）
 │
-├── 自动化插件/                 ← 自动化预留位与后续工具规划
+├── Scripts/                 ← 自动化预留位与后续工具规划
 │   ├── 插件清单.md
 │   ├── 工具开发规范.md
 │   ├── 数据处理自动化/
@@ -68,7 +68,7 @@ VirtualCity/
 ## 核心流程
 
 ```
-原始数据/ (OSM + DEM + Reference)
+RawData/ (OSM + DEM + Reference)
     ↓
 GIS 预处理 / 坐标统一
     ↓
@@ -95,14 +95,14 @@ UE5/ (Houdini Engine → Bake → Nanite/Lumen/PCG)
 - 版本路线图：`项目管理/11_版本路线图.md`
 - 机器可读项目清单：`项目管理/project_manifest.json`
 - 机器可读文档索引：`项目管理/document_index.json`
-- 配置模板目录：`配置/README.md`
+- 配置模板目录：`Config/README.md`
 
 ## 计划与调研快速入口
 
 - 完整执行计划：`VirtualCity完整执行计划.md`
 - 早期可执行方案：`执行方案.md`
-- 自动化预留规划：`自动化插件/README.md`
-- 自动化必要性判断：`自动化插件/插件清单.md`
+- 自动化预留规划：`Scripts/README.md`
+- 自动化必要性判断：`Scripts/插件清单.md`
 - 完整流程速查：`调研文档/地图API-Houdini-UE流程/04_完整流程速查表.md`
 - 管线详细拆解：`调研文档/地图API-Houdini-UE流程/06_路线一详细拆解_Houdini+UE5城市管线.md`
 - 2026 版补充优化：`调研文档/地图API-Houdini-UE流程/07_补充优化建议_2026版.md`

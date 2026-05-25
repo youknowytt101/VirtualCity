@@ -1,7 +1,7 @@
 # 07 MVP QA 检查清单
 
 > 本文件用于检查第一个城市 MVP 区块是否真的跑通。  
-> 对应机器可读模板：`配置/qa_checklist.template.json`。
+> 对应机器可读模板：`Config/qa_checklist.template.json`。
 
 ---
 
@@ -10,7 +10,7 @@
 | 检查项 | 通过标准 | 状态 |
 |---|---|---|
 | bbox 已记录 | 有 west / south / east / north | 未检查 |
-| OSM 文件存在 | `原始数据/OSM/` 下有对应 `.osm` | 未检查 |
+| OSM 文件存在 | `RawData/OSM/` 下有对应 `.osm` | 未检查 |
 | DEM 文件状态明确 | 有 DEM 或明确本轮暂不使用 | 未检查 |
 | 数据来源记录 | 记录来源和下载时间 | 未检查 |
 | 坐标系明确 | WGS84 / GCJ-02 / BD-09 / CGCS2000 / 待转换 | 未检查 |

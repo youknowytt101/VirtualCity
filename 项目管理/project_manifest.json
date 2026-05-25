@@ -15,9 +15,9 @@
     "bbox_accuracy": "estimated",
     "bbox": { "west": 100.866, "south": 12.922, "east": 100.882, "north": 12.938 },
     "area_record": "项目管理/区域记录/pattaya_sai6_mvp.md",
-    "area_config": "配置/pattaya_sai6_mvp.area.json",
-    "overpass_query": "配置/pattaya_sai6_mvp.overpass.txt",
-    "osm_target": "原始数据/OSM/pattaya_sai6_mvp_osm_v001.osm"
+    "area_config": "Config/pattaya_sai6_mvp.area.json",
+    "overpass_query": "Config/pattaya_sai6_mvp.overpass.txt",
+    "osm_target": "RawData/OSM/pattaya_sai6_mvp_osm_v001.osm"
   },
   "ai_entry_files": [
     "项目管理/00_AI接手指南.md",
@@ -31,7 +31,7 @@
     "full_plan": "VirtualCity完整执行计划.md",
     "execution_plan": "执行方案.md",
     "research_index": "调研文档/README.md",
-    "automation_index": "自动化插件/README.md",
+    "automation_index": "Scripts/README.md",
     "stable_workflow": "项目管理/04_稳定流程规范.md",
     "auto_iteration_protocol": "项目管理/05_自动迭代协议.md",
     "task_template": "项目管理/06_任务记录模板.md",
@@ -42,12 +42,12 @@
     "version_roadmap": "项目管理/11_版本路线图.md",
     "document_index": "项目管理/document_index.json",
     "area_record_template": "项目管理/区域记录/_template.md",
-    "config_index": "配置/README.md"
+    "config_index": "Config/README.md"
   },
   "configuration_templates": {
-    "area_config": "配置/area_config.template.json",
-    "pipeline_config": "配置/pipeline_config.template.json",
-    "qa_checklist": "配置/qa_checklist.template.json"
+    "area_config": "Config/area_config.template.json",
+    "pipeline_config": "Config/pipeline_config.template.json",
+    "qa_checklist": "Config/qa_checklist.template.json"
   },
   "research_documents": [
     "调研文档/地图API-Houdini-UE流程/01_地图数据获取与API对比.md",
@@ -81,11 +81,11 @@
     "高精度真实建筑复原"
   ],
   "standard_directories": {
-    "raw_data": "原始数据/",
-    "osm": "原始数据/OSM/",
-    "dem": "原始数据/DEM/",
-    "reference": "原始数据/Reference/",
-    "gis_processed": "原始数据/GIS_Processed/",
+    "raw_data": "RawData/",
+    "osm": "RawData/OSM/",
+    "dem": "RawData/DEM/",
+    "reference": "RawData/Reference/",
+    "gis_processed": "RawData/GIS_Processed/",
     "houdini": "Houdini/",
     "houdini_hip": "Houdini/Hip/",
     "houdini_hda": "Houdini/HDA/",
@@ -94,7 +94,7 @@
     "ue5": "UE5/",
     "project_management": "项目管理/",
     "area_records": "项目管理/区域记录/",
-    "config": "配置/",
+    "config": "Config/",
     "windsurf_workflow": ".windsurf/workflows/"
   },
   "last_updated": "2026-05-21"

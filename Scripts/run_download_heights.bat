@@ -9,11 +9,11 @@ cd /d F:\VirtualCity
 
 echo [VirtualCity] 正在下载建筑高度数据...
 uv run --with earthengine-api --index-url https://mirrors.aliyun.com/pypi/simple/ ^
-    python 自动化插件/download_building_heights.py %*
+    python Scripts/download_building_heights.py %*
 
 if %ERRORLEVEL% EQU 0 (
     echo.
-    echo [完成] 数据已更新至 原始数据\Overture\
+    echo [完成] 数据已更新至 RawData\Overture\
 ) else (
     echo.
     echo [错误] 下载失败，请检查网络或重新授权：

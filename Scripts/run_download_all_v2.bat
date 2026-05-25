@@ -2,7 +2,7 @@
 REM VirtualCity - 一键下载 v2 区域全套数据（OSM + 建筑高度 + DEM）
 REM 区域: pattaya_sai6_mvp_v2  bbox: 100.860/12.916/100.888/12.944 (3km x 3km)
 
-set SCRIPTS=F:\VirtualCity\自动化插件
+set SCRIPTS=F:\VirtualCity\Scripts
 set MIRROR=https://mirrors.aliyun.com/pypi/simple/
 
 echo ============================================
@@ -27,8 +27,8 @@ echo.
 
 echo ============================================
 echo  全部完成！
-echo  OSM:  原始数据\OSM\pattaya_sai6_mvp_v2_osm_v001.osm
-echo  建筑: 原始数据\Overture\pattaya_sai6_mvp_v2_buildings_height_v001.geojson
-echo  DEM:  原始数据\DEM\pattaya_sai6_mvp_v2_dem_v001.tif
+echo  OSM:  RawData\OSM\pattaya_sai6_mvp_v2_osm_v001.osm
+echo  建筑: RawData\Overture\pattaya_sai6_mvp_v2_buildings_height_v001.geojson
+echo  DEM:  RawData\DEM\pattaya_sai6_mvp_v2_dem_v001.tif
 echo ============================================
 pause

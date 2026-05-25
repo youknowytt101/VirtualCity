@@ -1,4 +1,4 @@
-# 自动化插件
+# Scripts
 
 > 本目录是 VirtualCity 管线的自动化预留位，用于后续存放确有必要的自研脚本、非官方工具配置与接入说明。  
 > 不存放 Houdini、SideFX Labs、Houdini Engine for Unreal、Cesium for Unreal、UE 官方插件等官方插件本体。
@@ -34,7 +34,7 @@ UE5 导入 / Bake / 手动整理
 ## 推荐目录结构
 
 ```text
-自动化插件/
+Scripts/
 ├── README.md
 ├── 插件清单.md
 ├── manifest.json

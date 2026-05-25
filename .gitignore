@@ -49,23 +49,23 @@ Houdini/Export/*.usdz
 
 # ===== GIS 处理输出 =====
 # GeoJSON 和处理过的 GIS 文件可能很大
-原始数据/GIS_Processed/*.geojson
-原始数据/GIS_Processed/*.shp
-原始数据/GIS_Processed/*.tif
-原始数据/GIS_Processed/*.tiff
-原始数据/DEM/*.tif
-原始数据/DEM/*.tiff
-原始数据/DEM/*.img
-原始数据/DEM/*.hgt
+RawData/GIS_Processed/*.geojson
+RawData/GIS_Processed/*.shp
+RawData/GIS_Processed/*.tif
+RawData/GIS_Processed/*.tiff
+RawData/DEM/*.tif
+RawData/DEM/*.tiff
+RawData/DEM/*.img
+RawData/DEM/*.hgt
 
 # ===== 临时结果文件 =====
-配置/_*.txt
-配置/_*.py
+Config/_*.txt
+Config/_*.py
 
 # ===== 大型测试数据（>5MB，不提交）=====
-原始数据/Overture/*stress_test*
-原始数据/OSM/*stress_test*
-原始数据/DEM/*stress_test*
+RawData/Overture/*stress_test*
+RawData/OSM/*stress_test*
+RawData/DEM/*stress_test*
 
 # ===== Python =====
 __pycache__/
@@ -83,7 +83,7 @@ venv/
 
 # ===== 不排除以下内容（明确保留）=====
 # .windsurf/workflows/ - 工作流文件
-# 原始数据/OSM/*.osm - OSM 数据文件（通常 <10MB）
+# RawData/OSM/*.osm - OSM 数据文件（通常 <10MB）
 # Houdini/Hip/*.hip - Hip 工程文件
 # 项目管理/ - 所有项目文档
-# 配置/ - 所有配置文件
+# Config/ - 所有配置文件

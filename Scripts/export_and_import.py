@@ -5,7 +5,7 @@ UE5 Editor 必须已运行（端口 30010）。
 Houdini 必须已运行（RPYC 端口 18811）。
 
 用法:
-    uv run python 自动化插件/export_and_import.py
+    uv run python Scripts/export_and_import.py
 """
 import sys, os, time
 from vc_paths import HIP, EXPORT, TRIGGER, SCRIPTS

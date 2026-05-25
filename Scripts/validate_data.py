@@ -3,7 +3,7 @@ VirtualCity — 数据预检脚本
 在进入 Houdini 之前运行，确认所有数据文件完整且无已知问题。
 
 用法:
-    uv run python 自动化插件/validate_data.py
+    uv run python Scripts/validate_data.py
 """
 import json, os, sys
 from vc_paths import load_active_area

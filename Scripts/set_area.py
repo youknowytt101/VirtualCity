@@ -4,10 +4,10 @@ VirtualCity — 一键换区/扩区脚本
 从 bbox 坐标开始，完整跑通整条数据管线。
 
 用法:
-    uv run python 自动化插件/set_area.py <west> <south> <east> <north> [area_name]
+    uv run python Scripts/set_area.py <west> <south> <east> <north> [area_name]
 
 示例（在 bboxfinder.com 框选后复制坐标）:
-    uv run python 自动化插件/set_area.py 100.840 12.900 100.930 12.970 pattaya_new
+    uv run python Scripts/set_area.py 100.840 12.900 100.930 12.970 pattaya_new
 
 步骤（5 步）:
     1. 更新 active_area.json
@@ -28,8 +28,8 @@ HIP = str(HIP)
 
 # ── 0. 解析参数 ───────────────────────────────────────
 if len(sys.argv) < 5:
-    print("用法: uv run python 自动化插件/set_area.py <west> <south> <east> <north> [area_name]")
-    print("示例: uv run python 自动化插件/set_area.py 100.840 12.900 100.930 12.970 pattaya_new")
+    print("用法: uv run python Scripts/set_area.py <west> <south> <east> <north> [area_name]")
+    print("示例: uv run python Scripts/set_area.py 100.840 12.900 100.930 12.970 pattaya_new")
     sys.exit(1)
 
 west, south, east, north = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
@@ -191,5 +191,5 @@ print(f"""
       - 道路是否正常
       - 无异常水片或空洞
    2. 确认视口正常后，运行导出：
-      uv run python 自动化插件/export_and_import.py
+      uv run python Scripts/export_and_import.py
 """)

@@ -15,7 +15,7 @@ VirtualCity — 城市级数据预缓存脚本
     OSM    : Overpass API highways (一次性, ~200KB)
     建筑   : Overture Maps + Google Open Buildings 合并 (含高度)
 
-缓存位置: <项目根目录>/原始数据/_tiles/
+缓存位置: <项目根目录>/RawData/_tiles/
 """
 import argparse, json, subprocess, sys, urllib.parse, urllib.request
 from pathlib import Path

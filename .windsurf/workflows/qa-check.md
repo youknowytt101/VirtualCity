@@ -13,8 +13,8 @@ description: 根据 VirtualCity MVP QA 清单检查数据、Houdini、UE5 和文
 1. `项目管理/project_manifest.json`
 2. `项目管理/04_稳定流程规范.md`
 3. `项目管理/07_MVP_QA检查清单.md`
-4. `配置/qa_checklist.template.json`
-5. `配置/pipeline_config.template.json`
+4. `Config/qa_checklist.template.json`
+5. `Config/pipeline_config.template.json`
 6. 对应的 `项目管理/区域记录/{area_id}.md`，如果已存在
 7. `项目管理/02_当前状态与下一步.md`
 8. `项目管理/03_迭代日志.md`

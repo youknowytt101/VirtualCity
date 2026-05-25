@@ -13,7 +13,7 @@
       "id": "osm_exists",
       "title": "OSM 文件存在",
       "status": "not_checked",
-      "pass_condition": "原始数据/OSM 下存在对应 .osm 文件"
+      "pass_condition": "RawData/OSM 下存在对应 .osm 文件"
     },
     {
       "id": "coordinate_system_known",

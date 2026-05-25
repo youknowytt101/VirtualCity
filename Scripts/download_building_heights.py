@@ -10,10 +10,10 @@ VirtualCity - Google Open Buildings 高度数据一键下载脚本
 
 用法：
     cd <项目根目录>
-    uv run --with earthengine-api python 自动化插件/download_building_heights.py
+    uv run --with earthengine-api python Scripts/download_building_heights.py
 
     # 指定区域和年份（可选）
-    uv run --with earthengine-api python 自动化插件/download_building_heights.py --area pattaya_sai6_mvp --year 2023
+    uv run --with earthengine-api python Scripts/download_building_heights.py --area pattaya_sai6_mvp --year 2023
 """
 
 import argparse, json, os, sys, urllib.request

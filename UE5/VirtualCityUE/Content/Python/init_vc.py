@@ -13,7 +13,7 @@ def _find_virtualcity_root():
     project_dir = unreal.Paths.project_dir()
     current = os.path.abspath(project_dir)
     while True:
-        if os.path.exists(os.path.join(current, "README.md")) and os.path.exists(os.path.join(current, "自动化插件")):
+        if os.path.exists(os.path.join(current, "README.md")) and os.path.exists(os.path.join(current, "Scripts")):
             return current
         parent = os.path.dirname(current)
         if parent == current:

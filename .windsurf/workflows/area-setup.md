@@ -15,7 +15,7 @@ description: 创建和记录 VirtualCity MVP 测试区域
 1. `项目管理/project_manifest.json`
 2. `项目管理/04_稳定流程规范.md`
 3. `项目管理/区域记录/_template.md`
-4. `配置/area_config.template.json`
+4. `Config/area_config.template.json`
 5. `项目管理/02_当前状态与下一步.md`
 
 ## 2. 适用阶段
@@ -71,22 +71,22 @@ AI 需要负责：
 
 3. 在 `项目管理/区域记录/` 下创建或更新 `{area_id}.md`。
 
-4. 从 `配置/area_config.template.json` 派生或更新真实区域配置：
+4. 从 `Config/area_config.template.json` 派生或更新真实区域配置：
 
 ```text
-配置/{area_id}.area.json
+Config/{area_id}.area.json
 ```
 
 5. 创建或更新 Overpass Turbo 查询模板：
 
 ```text
-配置/{area_id}.overpass.txt
+Config/{area_id}.overpass.txt
 ```
 
 6. 写入推荐 OSM 保存路径：
 
 ```text
-原始数据/OSM/{area_id}_osm_v001.osm
+RawData/OSM/{area_id}_osm_v001.osm
 ```
 
 7. 更新：
@@ -111,7 +111,7 @@ bbox_pending
 
 - 不得伪造 bbox。
 - 不得伪造坐标系。
-- 不得删除 `原始数据/` 下任何文件。
+- 不得删除 `RawData/` 下任何文件。
 - 不得覆盖已有区域记录，除非用户明确确认。
 - 不得把过大区域直接作为第一轮 MVP。
 - 不得把本应由 AI 完成的区域记录、配置、状态、日志整理工作再交给用户手动完成。

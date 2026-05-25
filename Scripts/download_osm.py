@@ -13,11 +13,11 @@ import sys, os, urllib.request, urllib.parse, time
 AREAS = {
     "pattaya_sai6_mvp": {
         "bbox": (12.922, 100.866, 12.938, 100.882),  # s,w,n,e (Overpass 格式)
-        "output": r"F:\VirtualCity\原始数据\OSM\pattaya_sai6_mvp_osm_v001.osm",
+        "output": r"F:\VirtualCity\RawData\OSM\pattaya_sai6_mvp_osm_v001.osm",
     },
     "pattaya_sai6_mvp_v2": {
         "bbox": (12.916, 100.860, 12.944, 100.888),  # 3km × 3km
-        "output": r"F:\VirtualCity\原始数据\OSM\pattaya_sai6_mvp_v2_osm_v001.osm",
+        "output": r"F:\VirtualCity\RawData\OSM\pattaya_sai6_mvp_v2_osm_v001.osm",
     },
 }
 

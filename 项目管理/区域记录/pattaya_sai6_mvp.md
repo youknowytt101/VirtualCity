@@ -48,10 +48,10 @@
 
 | 数据 | 路径 | 来源 | 下载时间 |
 |---|---|---|---|
-| OSM | `原始数据/OSM/pattaya_sai6_mvp_osm_v001.osm` | Overpass Turbo，待下载 | 待填写 |
+| OSM | `RawData/OSM/pattaya_sai6_mvp_osm_v001.osm` | Overpass Turbo，待下载 | 待填写 |
 | DEM | 暂不使用 | MVP 第一版可跳过 | - |
 | 参考截图 | 用户已提供地图截图，尚未保存为项目文件 | 用户上传 | 2026-05-21 |
-| 处理后 GIS | `原始数据/GIS_Processed/` | 后续可选 | 待处理 |
+| 处理后 GIS | `RawData/GIS_Processed/` | 后续可选 | 待处理 |
 
 ---
 
@@ -105,8 +105,8 @@
 
 ## 9. 下一步
 
-1. 打开 `配置/pattaya_sai6_mvp.overpass.txt`，复制查询内容。
+1. 打开 `Config/pattaya_sai6_mvp.overpass.txt`，复制查询内容。
 2. 粘贴到 [overpass-turbo.eu](https://overpass-turbo.eu/) 并执行。
 3. 导出 → Download as OSM (XML)。
-4. 保存为 `原始数据/OSM/pattaya_sai6_mvp_osm_v001.osm`。
+4. 保存为 `RawData/OSM/pattaya_sai6_mvp_osm_v001.osm`。
 5. 开始创建 Houdini MVP 工程：`Houdini/Hip/VC_pattaya_sai6_mvp_citygen_v001.hip`。

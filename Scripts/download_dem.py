@@ -19,13 +19,13 @@ import urllib.request
 AREAS = {
     "pattaya_sai6_mvp": {
         "bbox": [100.866, 12.922, 100.882, 12.938],
-        "output_tif": r"F:\VirtualCity\原始数据\DEM\pattaya_sai6_mvp_dem_v001.tif",
-        "output_csv": r"F:\VirtualCity\原始数据\DEM\pattaya_sai6_mvp_dem_v001.csv",
+        "output_tif": r"F:\VirtualCity\RawData\DEM\pattaya_sai6_mvp_dem_v001.tif",
+        "output_csv": r"F:\VirtualCity\RawData\DEM\pattaya_sai6_mvp_dem_v001.csv",
     },
     "pattaya_sai6_mvp_v2": {
         "bbox": [100.860, 12.916, 100.888, 12.944],
-        "output_tif": r"F:\VirtualCity\原始数据\DEM\pattaya_sai6_mvp_v2_dem_v001.tif",
-        "output_csv": r"F:\VirtualCity\原始数据\DEM\pattaya_sai6_mvp_v2_dem_v001.csv",
+        "output_tif": r"F:\VirtualCity\RawData\DEM\pattaya_sai6_mvp_v2_dem_v001.tif",
+        "output_csv": r"F:\VirtualCity\RawData\DEM\pattaya_sai6_mvp_v2_dem_v001.csv",
     },
 }
 

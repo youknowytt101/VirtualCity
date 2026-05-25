@@ -38,7 +38,7 @@
     "osm": {
       "enabled": true,
       "source": "Overpass Turbo",
-      "path": "原始数据/OSM/pattaya_sai6_mvp_osm_v001.osm",
+      "path": "RawData/OSM/pattaya_sai6_mvp_osm_v001.osm",
       "downloaded_at": "2026-05-21",
       "license_note": "OpenStreetMap data; verify attribution requirements"
     },
@@ -56,11 +56,11 @@
     }
   },
   "processed_outputs": {
-    "buildings": "原始数据/GIS_Processed/pattaya_sai6_mvp_buildings_v001.geojson",
-    "roads": "原始数据/GIS_Processed/pattaya_sai6_mvp_roads_v001.geojson",
-    "landuse": "原始数据/GIS_Processed/pattaya_sai6_mvp_landuse_v001.geojson",
-    "water": "原始数据/GIS_Processed/pattaya_sai6_mvp_water_v001.geojson",
-    "metadata": "原始数据/GIS_Processed/pattaya_sai6_mvp_metadata_v001.json"
+    "buildings": "RawData/GIS_Processed/pattaya_sai6_mvp_buildings_v001.geojson",
+    "roads": "RawData/GIS_Processed/pattaya_sai6_mvp_roads_v001.geojson",
+    "landuse": "RawData/GIS_Processed/pattaya_sai6_mvp_landuse_v001.geojson",
+    "water": "RawData/GIS_Processed/pattaya_sai6_mvp_water_v001.geojson",
+    "metadata": "RawData/GIS_Processed/pattaya_sai6_mvp_metadata_v001.json"
   },
   "houdini_outputs": {
     "hip": "Houdini/Hip/VC_pattaya_sai6_mvp_citygen_v001.hip",

@@ -8,7 +8,7 @@
 ## 目录内容
 
 ```text
-配置/
+Config/
 ├── README.md
 ├── area_config.template.json       ← 区域配置模板
 ├── pipeline_config.template.json   ← 管线配置模板

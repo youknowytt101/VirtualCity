@@ -1,4 +1,4 @@
-# 原始数据
+# RawData
 
 > 本目录存放 VirtualCity 管线输入数据。  
 > AI 判断项目是否进入实施阶段时，优先检查这里是否已有 OSM / DEM / Reference 数据。
@@ -8,7 +8,7 @@
 ## 目录职责
 
 ```text
-原始数据/
+RawData/
 ├── OSM/              ← OpenStreetMap .osm 原始导出
 ├── DEM/              ← GeoTIFF / 高程数据
 ├── Reference/        ← 参考截图、卫星图、Cesium 截图
