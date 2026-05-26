@@ -1,21 +1,21 @@
 {
   "area_id": "area_12.922_100.866",
   "buildings": {
-    "total_in": 5206,
+    "total_in": 5203,
     "removed_null": 0,
     "removed_degenerate": 0,
     "removed_tiny": 0,
-    "removed_duplicate": 3,
+    "removed_duplicate": 0,
     "fixed_height": 0,
     "clamped_height": 0,
     "total_out": 5203
   },
   "osm": {
     "total_nodes": 4790,
-    "ways_in": 1111,
+    "ways_in": 1044,
     "ways_removed_short": 0,
     "ways_removed_orphan": 0,
-    "ways_removed_type": 67,
+    "ways_removed_type": 0,
     "ways_out": 1044,
     "highway_types": {
       "residential": 430,
