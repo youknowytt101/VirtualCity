@@ -62,6 +62,7 @@ RawData/DEM/*.hgt
 Config/_*.txt
 Config/_*.py
 Config/houdini_build_status.json
+Reports/model_qa/*.json
 
 # ===== 数据精炼管线缓存（体积大，不提交）=====
 RawData/_downloads/

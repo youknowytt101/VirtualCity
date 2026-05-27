@@ -17,7 +17,7 @@ FAIL = '[FAIL]'
 errors = []
 
 
-def _write_build_status(area_id, status, hip_path=None, message=''):
+def _write_build_status(area_id, status, hip_path=None, message='', qa_status='', qa_report=''):
     status_file = ROOT / 'Config' / 'houdini_build_status.json'
     payload = {
         'area_id': area_id,
@@ -26,6 +26,10 @@ def _write_build_status(area_id, status, hip_path=None, message=''):
         'message': message,
         'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
     }
+    if qa_status:
+        payload['qa_status'] = qa_status
+    if qa_report:
+        payload['qa_report'] = qa_report
     status_file.parent.mkdir(parents=True, exist_ok=True)
     with open(status_file, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(payload, f, indent=2, ensure_ascii=False)
@@ -302,9 +306,9 @@ if _rs_node:
 
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = """
-// snap_bld_to_terrain v5: 逐角点查询 + 取最高值（修复精度审核 #3）
-// 对每个角点分别查询地形高度，取 MAX 作为底面 Y
-// 坡面建筑：高侧贴地，低侧露出地基（防止被地形埋没，符合 H-011 坑点记录）
+// snap_bld_to_terrain v6: XZ 垂直采样地形 + 逐角点取最高值
+// 3D 最近点在山地会吸到旁边低坡，导致建筑局部埋地；必须垂直射线取高。
+// 坡面建筑：底面保持水平，略高于最高地形点；下坡侧由 bld_foundation 补裙边。
 int verts[] = primvertices(0, @primnum);
 int n = len(verts);
 if (n == 0) return;
@@ -315,19 +319,21 @@ foreach(int v; verts) {
     int pt = vertexpoint(0, v);
     vector p = point(0, "P", pt);
 
-    // Step 1: query from Y=0 (finds terrain directly below for flat/coastal)
-    int hp; vector uvw;
-    xyzdist(1, set(p.x, 0.0, p.z), hp, uvw);
-    vector tp = primuv(1, "P", hp, uvw);
-
-    // Step 2: refine from Step1 Y (removes slope residual)
-    xyzdist(1, set(p.x, tp.y, p.z), hp, uvw);
-    tp = primuv(1, "P", hp, uvw);
-
-    max_terrain_y = max(max_terrain_y, tp.y);
+    vector hitp;
+    vector uvw;
+    int hp = intersect(1, set(p.x, 10000.0, p.z), set(0.0, -20000.0, 0.0), hitp, uvw);
+    if (hp >= 0) {
+        max_terrain_y = max(max_terrain_y, hitp.y);
+    } else {
+        int near_prim;
+        vector near_uvw;
+        xyzdist(1, set(p.x, p.y, p.z), near_prim, near_uvw);
+        vector tp = primuv(1, "P", near_prim, near_uvw);
+        max_terrain_y = max(max_terrain_y, tp.y);
+    }
 }
 
-float base_y = max_terrain_y - 0.2;  // sink 0.2m to hide base gap
+float base_y = max_terrain_y + 0.05;  // keep the flat base above terrain; skirt hides downhill gap
 
 foreach(int v; verts) {
     int pt = vertexpoint(0, v);
@@ -682,6 +688,99 @@ print('  snap_road_clipped: pts={} Y_min={:.2f}m'.format(
 bld_clip  = remake_clip('post_normals',    'bld_clip_mark',  'bld_clipped')
 road_clip = remake_clip('snap_road_clipped','road_clip_mark', 'road_clipped')
 
+# ── 4b3. 建筑地基 / 裙边（坡地建筑下坡侧补空）──────────────────────
+BUILDING_FOUNDATION_CODE = r"""
+import hou
+
+MIN_DEPTH = 0.12
+MAX_DEPTH = 25.0
+TERRAIN_EPS = 0.03
+
+foot_geo = hou.pwd().inputs()[0].geometry()
+terrain_geo = hou.pwd().inputs()[1].geometry()
+geo = hou.pwd().geometry()
+geo.clear()
+
+is_foundation_a = geo.addAttrib(hou.attribType.Prim, "is_foundation", 0)
+
+def terrain_y_at(x, z):
+    pos = hou.Vector3()
+    normal = hou.Vector3()
+    uvw = hou.Vector3()
+    hit = terrain_geo.intersect(
+        hou.Vector3(x, 10000.0, z),
+        hou.Vector3(0.0, -1.0, 0.0),
+        pos,
+        normal,
+        uvw,
+        min_hit=0.01,
+        max_hit=20000.0,
+        tolerance=0.01,
+    )
+    if hit >= 0:
+        return pos.y()
+    return None
+
+def add_quad(a, b, c, d):
+    pts = []
+    for p in (a, b, c, d):
+        pt = geo.createPoint()
+        pt.setPosition(p)
+        pts.append(pt)
+    prim = geo.createPolygon()
+    for pt in pts:
+        prim.addVertex(pt)
+    prim.setAttribValue(is_foundation_a, 1)
+
+for prim in foot_geo.prims():
+    try:
+        if not prim.isClosed():
+            continue
+    except Exception:
+        pass
+    verts = list(prim.vertices())
+    if len(verts) < 3:
+        continue
+
+    positions = [v.point().position() for v in verts]
+    base_y = sum(p.y() for p in positions) / len(positions)
+    bottoms = []
+    for p in positions:
+        ty = terrain_y_at(p.x(), p.z())
+        if ty is None:
+            bottom_y = base_y
+        else:
+            bottom_y = min(ty + TERRAIN_EPS, base_y)
+        if base_y - bottom_y > MAX_DEPTH:
+            bottom_y = base_y - MAX_DEPTH
+        bottoms.append(hou.Vector3(p.x(), bottom_y, p.z()))
+
+    n = len(positions)
+    for i in range(n):
+        j = (i + 1) % n
+        top_a = positions[i]
+        top_b = positions[j]
+        bot_a = bottoms[i]
+        bot_b = bottoms[j]
+        if max(base_y - bot_a.y(), base_y - bot_b.y()) < MIN_DEPTH:
+            continue
+        add_quad(top_b, top_a, bot_a, bot_b)
+"""
+
+old_foundation = hou.node(OBJ_PATH + '/bld_foundation')
+if old_foundation:
+    old_foundation.destroy()
+bld_foundation = net.createNode('python', 'bld_foundation')
+bld_foundation.setInput(0, hou.node(OBJ_PATH + '/snap_bld_to_terrain'))
+bld_foundation.setInput(1, snap_target)
+bld_foundation.parm('python').set(BUILDING_FOUNDATION_CODE)
+bld_foundation.cook(force=True)
+print('  bld_foundation: pts={} prims={}'.format(
+    bld_foundation.geometry().intrinsicValue('pointcount'),
+    bld_foundation.geometry().intrinsicValue('primitivecount')))
+
+foundation_clip = remake_clip('bld_foundation', 'bld_foundation_clip_mark', 'bld_foundation_clipped')
+
 # ── 4c. 颜色节点（三类独立，来自 COLORS 配置）────────────────────────
 def make_color_node(name, src_node, rgb):
     old = hou.node(OBJ_PATH + '/' + name)
@@ -695,7 +794,35 @@ def make_color_node(name, src_node, rgb):
 
 road_colored    = make_color_node('road_color',    road_clip,   COLORS['roads'])
 bld_colored     = make_color_node('bld_color',     bld_clip,    COLORS['buildings'])
+foundation_colored = None
+if foundation_clip:
+    foundation_colored = make_color_node('bld_foundation_color', foundation_clip, COLORS['buildings'])
 terrain_colored = make_color_node('terrain_color', snap_target, COLORS['terrain'])
+
+old_bld_final = hou.node(OBJ_PATH + '/bld_with_foundation')
+if old_bld_final:
+    old_bld_final.destroy()
+old_bld_merge = hou.node(OBJ_PATH + '/bld_with_foundation_merge')
+if old_bld_merge:
+    old_bld_merge.destroy()
+bld_merge = net.createNode('merge', 'bld_with_foundation_merge')
+bld_merge.setInput(0, bld_colored)
+if foundation_colored:
+    bld_merge.setInput(1, foundation_colored)
+bld_merge.cook(force=True)
+
+bld_final = net.createNode('normal', 'bld_with_foundation')
+bld_final.setInput(0, bld_merge)
+if bld_final.parm('type'):
+    bld_final.parm('type').set(1)  # Vertex normals
+if bld_final.parm('cuspangle'):
+    bld_final.parm('cuspangle').set(0.0)  # hard building edges, no wall smoothing
+if bld_final.parm('normalize'):
+    bld_final.parm('normalize').set(1)
+bld_final.cook(force=True)
+print('  bld_with_foundation: pts={} prims={}'.format(
+    bld_final.geometry().intrinsicValue('pointcount'),
+    bld_final.geometry().intrinsicValue('primitivecount')))
 
 # ── 4d. 道路挤出（road_extrude：0.18m 侧面 + 顶面）────────────────────
 old_ext = hou.node(OBJ_PATH + '/road_extrude')
@@ -742,7 +869,7 @@ for _ in range(2):
 # ── 5. 重连 merge_all + 保存 ────────────────────────
 merge = hou.node(OBJ_PATH + '/merge_all')
 if merge and bld_clip and road_clip:
-    merge.setInput(0, bld_colored)
+    merge.setInput(0, bld_final)
     merge.setInput(1, road_extrude)
     merge.setInput(2, terrain_colored)
 
@@ -763,7 +890,10 @@ FULL_CHAIN = [
     'extract_buildings', 'snap_bld_to_terrain', 'extrude_buildings', 'post_normals',
     'snap_roads_to_terrain1', 'road_width_flat', 'road_strips',
     'snap_road_strips', 'road_bbox_clip', 'snap_road_clipped',
-    'bld_clipped', 'road_clipped', 'road_color', 'road_extrude', 'bld_color', 'terrain_color', 'merge_all', 'OUT_city',
+    'bld_clipped', 'bld_foundation', 'bld_foundation_clipped',
+    'road_clipped', 'road_color', 'road_extrude',
+    'bld_color', 'bld_foundation_color', 'bld_with_foundation_merge', 'bld_with_foundation',
+    'terrain_color', 'merge_all', 'OUT_city',
 ]
 for _cn in FULL_CHAIN:
     _n = hou.node(OBJ_PATH + '/' + _cn)
@@ -775,16 +905,38 @@ if _out:
     _out.setRenderFlag(True)
 print('  [OK] 视口链已强制刷新')
 
+# -- 6b. Quick model QA (fast regression gate) ---------------------------
+qa_status = ''
+qa_report = ''
+if not errors:
+    print('\n[Model QA]')
+    _qa_cmd = [sys.executable, str(ROOT / 'Scripts' / 'houdini_model_qa.py'), '--mode', 'quick']
+    _qa_result = subprocess.run(_qa_cmd, cwd=str(ROOT), capture_output=False)
+    _qa_latest = ROOT / 'Reports' / 'model_qa' / 'latest.json'
+    if _qa_latest.exists():
+        qa_report = project_relative(_qa_latest)
+        try:
+            with open(_qa_latest, encoding='utf-8') as _f:
+                qa_status = json.load(_f).get('status', '')
+        except Exception as _exc:
+            qa_status = 'unreadable'
+            print('  [WARN] Model QA report unreadable: {}'.format(_exc))
+    if _qa_result.returncode != 0:
+        errors.append('model QA failed (see {})'.format(qa_report or 'Reports/model_qa/latest.json'))
+
 # ── 结果汇报 ─────────────────────────────────────────
 print()
 if errors:
     print('[FAIL] 发现 {} 个错误:'.format(len(errors)))
     for e in errors:
         print('  - ' + e)
-    _write_build_status(_area_id, 'failed', ARCHIVE_HIP, '; '.join(errors))
+    _write_build_status(_area_id, 'failed', ARCHIVE_HIP, '; '.join(errors), qa_status, qa_report)
     sys.exit(1)
 else:
-    _write_build_status(_area_id, 'completed', ARCHIVE_HIP, 'Houdini build completed')
+    _msg = 'Houdini build completed'
+    if qa_status:
+        _msg += '; model QA quick {}'.format(qa_status)
+    _write_build_status(_area_id, 'completed', ARCHIVE_HIP, _msg, qa_status, qa_report)
     print('[OK] 全部通过，hip 已保存')
     print('     Houdini 构建完成标记: Config/houdini_build_status.json')
     print('     请在 Houdini 视口选中 OUT_city 按 D 确认效果')
