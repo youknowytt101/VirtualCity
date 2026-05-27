@@ -55,6 +55,18 @@
       "fingerprint": "ffce85aa4870e046936edfa14106d8ac1072333a77e926d8edeac099547060e8",
       "manifest": "RawData/_cleaned/area_12.917_100.868/_manifest.json",
       "updated": "2026-05-28T03:12:20"
+    },
+    "refine_ff34338ce270337a": {
+      "area_id": "area_12.918_100.865",
+      "bbox": [
+        100.859385,
+        12.912967,
+        100.870199,
+        12.92334
+      ],
+      "fingerprint": "ff34338ce270337aeb8e45fe840d8c2d3437cb24c1a4f6f46b5c5bfc9aef7dc5",
+      "manifest": "RawData/_cleaned/area_12.918_100.865/_manifest.json",
+      "updated": "2026-05-28T03:17:31"
     }
   }
 }
