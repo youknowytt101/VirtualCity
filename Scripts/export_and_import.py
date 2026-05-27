@@ -8,16 +8,20 @@ Houdini 必须已运行（RPYC 端口 18811）。
     uv run python Scripts/export_and_import.py
 """
 import sys, os, time
-from vc_paths import HIP, EXPORT, TRIGGER, SCRIPTS
+from vc_paths import HIP, EXPORT, TRIGGER, SCRIPTS, load_active_area
 
 HIP = HIP.as_posix()
 EXPORT = EXPORT.as_posix()
 
+# OBJ 网络名：从 active_area.json 读取
+_cfg = load_active_area()
+_OBJ = '/obj/' + _cfg.get('obj_network', 'pattaya_osm')
+
 # label, 首选SOP, 备用SOP, 输出FBX
 EXPORTS = [
-    ('buildings', '/obj/pattaya_osm/bld_clipped',  '/obj/pattaya_osm/post_normals', 'buildings_v001.fbx'),
-    ('roads',     '/obj/pattaya_osm/road_clipped', '/obj/pattaya_osm/road_strips',  'roads_v001.fbx'),
-    ('terrain',   '/obj/pattaya_osm/dem_terrain',  '/obj/pattaya_osm/dem_terrain',  'terrain_v001.fbx'),
+    ('buildings', f'{_OBJ}/bld_clipped',  f'{_OBJ}/post_normals', 'buildings_v001.fbx'),
+    ('roads',     f'{_OBJ}/road_clipped', f'{_OBJ}/road_strips',  'roads_v001.fbx'),
+    ('terrain',   f'{_OBJ}/dem_terrain',  f'{_OBJ}/dem_terrain',  'terrain_v001.fbx'),
 ]
 
 
@@ -95,9 +99,9 @@ for label, primary, fallback, fbx in EXPORTS:
     time.sleep(1)
 
 if failed:
-    print(f'  ⚠ 失败: {failed}，其余已导出')
+    print(f'  [WARN] 失败: {failed}，其余已导出')
 else:
-    print('  ✅ 全部 FBX 导出完成')
+    print('  [OK] 全部 FBX 导出完成')
 
 # ── 2. 写触发文件，通知 UE5 执行导入 ────────────────
 print("\n[2/2] 通知 UE5 导入 FBX...")
