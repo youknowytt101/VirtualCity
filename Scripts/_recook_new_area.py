@@ -8,13 +8,28 @@ Houdini 换区重算脚本
   4. 重建裁剪节点（基于新 DEM 边界）
   5. 重连 merge_all + 保存 hip
 """
-import sys, rpyc, subprocess
+import sys, rpyc, subprocess, json, time
 from pathlib import Path
 from vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area
 
 PASS = '[OK]'
 FAIL = '[FAIL]'
 errors = []
+
+
+def _write_build_status(area_id, status, hip_path=None, message=''):
+    status_file = ROOT / 'Config' / 'houdini_build_status.json'
+    payload = {
+        'area_id': area_id,
+        'status': status,
+        'hip_path': hip_path or '',
+        'message': message,
+        'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
+    }
+    status_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(status_file, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+        f.write('\n')
 
 # ── 前置：数据精炼（由 refine_data.py 统一处理）──────────────────────
 # 如果从 set_area.py 调用，refine_data.py 已提前运行完毕。
@@ -243,31 +258,25 @@ if (osm_w > 0) {
     f@half_width = hw_val;
 }
 """
-_rw = hou.node(OBJ_PATH + '/road_width')
-if _rw:
-    _rw.parm('snippet').set(ROAD_WIDTH_VEX)
-    _rw.parm('class').set(1)  # Primitive
-    print('  road_width VEX 已更新（14 级分级宽度）')
+# road_width_flat 是真正喂入 road_strips 的节点，直接写 ROAD_WIDTH_VEX
+# （旧版 road_width 节点已 deprecated，统一在 cleanup 段删除）
+_rwf_node = hou.node(OBJ_PATH + '/road_width_flat')
+if _rwf_node is None:
+    _rwf_node = net.createNode('attribwrangle', 'road_width_flat')
+    _rwf_node.setInput(0, hou.node(OBJ_PATH + '/resample_roads'), 0)
+_rwf_node.parm('class').set(1)  # Primitive
+_rwf_node.parm('snippet').set(ROAD_WIDTH_VEX)
+print('  road_width_flat VEX 已更新（osm_width > lanes > 14 级分类表）')
 
 # ── 1d. road_strips v2: 路段修剪 + 路口凸包填充 ──────────────────────
 import pathlib as _pl
 _rs_v2_path = ROOT / 'Scripts' / '_road_strips_v2.py'
 _rs_v2_code = _rs_v2_path.read_text(encoding='utf-8')
 _rs_node = hou.node(OBJ_PATH + '/road_strips')
-_rwf_node = hou.node(OBJ_PATH + '/road_width_flat')
-if _rs_node and _rwf_node:
+if _rs_node:
     _rs_node.parm('python').set(_rs_v2_code)
     _rs_node.setInput(0, _rwf_node, 0)
     print('  road_strips v2 已更新（路口凸包填充）')
-elif _rs_node:
-    # road_width_flat 不存在时自动创建
-    _rwf_node = net.createNode('attribwrangle', 'road_width_flat')
-    _rwf_node.setInput(0, hou.node(OBJ_PATH + '/resample_roads'), 0)
-    _rwf_node.parm('class').set(1)
-    _rwf_node.parm('snippet').set(hou.node(OBJ_PATH + '/road_width').parm('snippet').eval())
-    _rs_node.parm('python').set(_rs_v2_code)
-    _rs_node.setInput(0, _rwf_node, 0)
-    print('  road_width_flat 已创建 + road_strips v2 已更新')
 
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = """
@@ -346,12 +355,40 @@ float noise_val = fit(noise(ctr * 0.003), 0, 1, -1.5, 1.5);
 float floors = clamp(base_floors + noise_val, 1, 15);
 
 // 精度审核 #5：按建筑类型差异化层高（泰国实测参考值）
+// Overture subtype/class 实际取值远多于 3 类，按家族归并：
 string cls = s@bld_class;
 float floor_h;
-if      (cls == "residential")  floor_h = 2.9;   // 泰国住宅
-else if (cls == "commercial")   floor_h = 3.5;   // 商业
-else if (cls == "industrial")   floor_h = 4.5;   // 工业
-else                            floor_h = 3.2;   // 默认
+// — 住宅类（泰国实测 2.8~3.0m/层）—
+if      (cls == "residential")   floor_h = 2.9;
+else if (cls == "apartments")    floor_h = 2.9;
+else if (cls == "house")         floor_h = 2.9;
+else if (cls == "terrace")       floor_h = 2.9;
+else if (cls == "dormitory")     floor_h = 2.9;
+// — 商业 / 服务类（3.3~3.8m/层）—
+else if (cls == "commercial")    floor_h = 3.5;
+else if (cls == "retail")        floor_h = 3.5;
+else if (cls == "office")        floor_h = 3.5;
+else if (cls == "hotel")         floor_h = 3.4;
+else if (cls == "hospital")      floor_h = 3.6;
+else if (cls == "school" ||
+         cls == "education")     floor_h = 3.5;
+else if (cls == "civic" ||
+         cls == "government" ||
+         cls == "public")        floor_h = 3.6;
+// — 工业 / 仓储（4.0~5.0m/层）—
+else if (cls == "industrial")    floor_h = 4.5;
+else if (cls == "warehouse")     floor_h = 4.5;
+// — 低矮辅助结构（车棚 / 屋顶部件，强制 1 层）—
+else if (cls == "carport" ||
+         cls == "garage" ||
+         cls == "shed" ||
+         cls == "roof")          { floor_h = 2.5; floors = 1; }
+// — 未识别（"building" 兜底或异类）按面积启发 —
+else {
+    if      (area > 2000) floor_h = 4.5;   // 工业级 footprint
+    else if (area > 500)  floor_h = 3.5;   // 商业级
+    else                  floor_h = 2.9;   // 住宅级（Pattaya 主流）
+}
 
 f@height_m = floors * floor_h;
 """
@@ -375,26 +412,17 @@ for path in [OBJ_PATH + '/osm_import', OBJ_PATH + '/dem_import',
     if pts == 0:
         errors.append(n.name() + ' geometry empty after recook')
 
-# ── 2b. 地形加密（Subdivide Bilinear × 2）───────────────────────────
-old_subdiv = hou.node(OBJ_PATH + '/dem_subdivide')
-if old_subdiv:
-    old_subdiv.destroy()
-dem_subdiv = net.createNode('subdivide', 'dem_subdivide')
-dem_subdiv.setInput(0, hou.node(OBJ_PATH + '/dem_terrain'))
-dem_subdiv.parm('algorithm').set(4)   # 4 = OpenSubdiv Bilinear（线性插值，不改变已有高程）
-dem_subdiv.parm('iterations').set(2)  # 2轮细分 = ×16 面片密度（30m→~7.5m等效）
-dem_subdiv.cook(force=True)
-_sd_geo  = dem_subdiv.geometry()
-_sd_pts  = _sd_geo.intrinsicValue('pointcount')
-_sd_prms = _sd_geo.intrinsicValue('primitivecount')
-print('  dem_subdivide: pts={} prims={} (原 {} 面片 → 加密 ×16)'.format(
-    _sd_pts, _sd_prms, _sd_prms // 16))
-
-# 更新吸附节点 input1 → dem_subdivide（更密地形 = 更精确贴合）
+# ── 2b. 地形 snap target = dem_terrain ────────────────────────────────
+# （旧 dem_subdivide Bilinear×2 仅做共面线性插值，对 xyzdist 投影零增益，
+#   却让下游 4 个节点处理 16× prim → 已删除，改用 dem_terrain 原网格）
+_old_sd = hou.node(OBJ_PATH + '/dem_subdivide')
+if _old_sd:
+    _old_sd.destroy()
+snap_target = hou.node(OBJ_PATH + '/dem_terrain')
 for _sn_name in ['snap_bld_to_terrain', 'snap_roads_to_terrain1']:
     _sn = hou.node(OBJ_PATH + '/' + _sn_name)
     if _sn:
-        _sn.setInput(1, dem_subdiv)
+        _sn.setInput(1, snap_target)
 
 # ── 3. 验证全链路节点 ────────────────────────────────
 print('\n[全链路验证]')
@@ -493,7 +521,7 @@ if old_drape:
 road_strips_node = hou.node(OBJ_PATH + '/road_strips')
 snap_road_strips = net.createNode('attribwrangle', 'snap_road_strips')
 snap_road_strips.setInput(0, road_strips_node)
-snap_road_strips.setInput(1, dem_subdiv)
+snap_road_strips.setInput(1, snap_target)
 snap_road_strips.parm('class').set(2)   # Point
 snap_road_strips.parm('snippet').set(ROAD_DRAPE_VEX)
 snap_road_strips.cook(force=True)
@@ -517,10 +545,9 @@ def make_color_node(name, src_node, rgb):
     w.cook(force=True)
     return w
 
-_dem_sd = hou.node(OBJ_PATH + '/dem_subdivide') or hou.node(OBJ_PATH + '/dem_terrain')
-road_colored    = make_color_node('road_color',    road_clip, COLORS['roads'])
-bld_colored     = make_color_node('bld_color',     bld_clip,  COLORS['buildings'])
-terrain_colored = make_color_node('terrain_color', _dem_sd,   COLORS['terrain'])
+road_colored    = make_color_node('road_color',    road_clip,   COLORS['roads'])
+bld_colored     = make_color_node('bld_color',     bld_clip,    COLORS['buildings'])
+terrain_colored = make_color_node('terrain_color', snap_target, COLORS['terrain'])
 
 # ── 4d. 道路挤出（road_extrude：0.18m 侧面 + 顶面）────────────────────
 old_ext = hou.node(OBJ_PATH + '/road_extrude')
@@ -537,6 +564,32 @@ road_extrude.cook(force=True)
 print('  road_extrude: pts={} prims={}'.format(
     road_extrude.geometry().intrinsicValue('pointcount'),
     road_extrude.geometry().intrinsicValue('primitivecount')))
+
+# ── 4e. promote_height / restore_height: method=First 防跨建筑高度污染 ─
+# fuse_bld 焊接邻近建筑角点后，Average 模式会让相邻建筑高度互相稀释。
+# 改用 First（method=1）保留任一原值，量级误差 1~3m → 0m。
+for _ph_name in ['promote_height', 'restore_height']:
+    _ph = hou.node(OBJ_PATH + '/' + _ph_name)
+    if _ph and _ph.parm('method'):
+        _ph.parm('method').set(1)  # 1 = First
+
+# ── 4f. 死节点清理 ─────────────────────────────────────
+_dead_nodes = [
+    'bld_height_vary',       # 早期实验残留
+    'dem_triangulate',       # 已被 dem_terrain 替代
+    'dem_import',            # 仅喂 dem_triangulate（须在其后删）
+    'dem_hf_import1',        # 孤立空节点
+    '__tmp_subdivide',       # 临时残留
+    'snap_roads_to_terrain', # 旧 Ray 实现，已被 _terrain1 替代
+    'road_width',            # 已被 road_width_flat 替代
+]
+# 两遍清理，避免下游先于上游的依赖残留阻塞
+for _ in range(2):
+    for _dn in _dead_nodes:
+        _n = hou.node(OBJ_PATH + '/' + _dn)
+        if _n and len(_n.outputs()) == 0:
+            _n.destroy()
+            print('  死节点清理: ' + _dn)
 
 # ── 5. 重连 merge_all + 保存 ────────────────────────
 merge = hou.node(OBJ_PATH + '/merge_all')
@@ -560,7 +613,7 @@ if ARCHIVE_HIP != HIP:
 FULL_CHAIN = [
     'osm_import', 'dem_terrain',
     'extract_buildings', 'snap_bld_to_terrain', 'extrude_buildings', 'post_normals',
-    'snap_roads_to_terrain1', 'road_width', 'road_strips',
+    'snap_roads_to_terrain1', 'road_width_flat', 'road_strips',
     'bld_clipped', 'road_clipped', 'road_color', 'road_extrude', 'bld_color', 'terrain_color', 'merge_all', 'OUT_city',
 ]
 for _cn in FULL_CHAIN:
@@ -579,9 +632,12 @@ if errors:
     print('[FAIL] 发现 {} 个错误:'.format(len(errors)))
     for e in errors:
         print('  - ' + e)
+    _write_build_status(_area_id, 'failed', ARCHIVE_HIP, '; '.join(errors))
     sys.exit(1)
 else:
+    _write_build_status(_area_id, 'completed', ARCHIVE_HIP, 'Houdini build completed')
     print('[OK] 全部通过，hip 已保存')
+    print('     Houdini 构建完成标记: Config/houdini_build_status.json')
     print('     请在 Houdini 视口选中 OUT_city 按 D 确认效果')
 
 conn.close()

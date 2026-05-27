@@ -113,8 +113,10 @@ def correct_dtm(area_cfg: dict, verbose: bool = True) -> bool:
     # ── 1. 读取 DEM CSV → numpy 数组 ──────────────────────────────────────────
     with open(dem_csv_path, encoding='utf-8') as f:
         reader = csv.reader(f)
-        header = next(reader)           # ['x', 'y', 'z']
-        pts = [(float(r[0]), float(r[1]), float(r[2])) for r in reader]
+        header = next(reader)           # ['x', 'y', 'z'] or ['x', 'y', 'z', 'row', 'col']
+        raw_rows = list(reader)
+    pts = [(float(r[0]), float(r[1]), float(r[2])) for r in raw_rows]
+    extra_cols = [r[3:] for r in raw_rows]  # preserve row, col etc.
 
     xs  = sorted(set(round(p[0], 2) for p in pts))
     zs  = sorted(set(round(p[2], 2) for p in pts))
@@ -203,14 +205,14 @@ def correct_dtm(area_cfg: dict, verbose: bool = True) -> bool:
     with open(tmp_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(header)
-        for px, py, pz in pts:
+        for i, (px, py, pz) in enumerate(pts):
             xi = x_idx.get(round(px, 2))
             zi = z_idx.get(round(pz, 2))
             if xi is not None and zi is not None and not np.isnan(elev_corrected[zi, xi]):
                 new_y = float(elev_corrected[zi, xi])
             else:
                 new_y = py
-            writer.writerow([f'{px:.2f}', f'{new_y:.2f}', f'{pz:.2f}'])
+            writer.writerow([f'{px:.2f}', f'{new_y:.2f}', f'{pz:.2f}'] + extra_cols[i])
 
     tmp_path.replace(dem_csv_path)
     if verbose:

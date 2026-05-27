@@ -158,7 +158,11 @@ def clean_buildings(path: Path, dry_run: bool) -> dict[str, Any]:
             h = None
 
         if h is None or h <= 0:
-            h = _area_based_height(area)
+            # 写 0 让 Houdini procedural_height VEX 唯一负责推算
+            # （含 noise 抖动 + bld_class 差异化层高 + 面积启发，比清洗层粗略推算更准）。
+            # 此前清洗层用 _area_based_height 填 3.5/7.0/10.5...，会与 Houdini VEX 互相覆盖
+            # （VEX 只对 ~10/~8/<=0 触发推算，其它值保留 → 高度来源不可预测）。
+            h = 0.0
             stats["fixed_height"] += 1
         elif h > MAX_HEIGHT_M:
             h = min(h, MAX_HEIGHT_M)

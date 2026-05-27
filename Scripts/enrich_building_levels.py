@@ -100,7 +100,7 @@ def _parse_osm_buildings(osm_json, origin_lon, origin_lat):
                 except ValueError:
                     pass
 
-        if height is None or height <= 0:
+        if height is None or height < 2.5:
             continue
 
         nd_ids = el.get('nodes', [])
@@ -197,7 +197,7 @@ def enrich_levels(area_cfg: dict, verbose: bool = True) -> dict:
         for coord in ring:
             lx, lz = _wgs84_to_local(coord[0], coord[1], origin_lon, origin_lat)
             lx_list.append(lx)
-            lz_list.append(-lz)     # Houdini -z convention
+            lz_list.append(lz)
         if not lx_list:
             skipped += 1
             continue

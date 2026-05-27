@@ -1,10 +1,10 @@
 {
-  "area_id": "area_100.877_12.918",
-  "osm_file": "RawData/OSM/area_100.877_12.918_osm_v001.osm",
-  "buildings_file": "RawData/Overture/area_100.877_12.918_buildings_overture_v001.geojson",
-  "dem_csv": "RawData/DEM/area_100.877_12.918_dem_v001.csv",
+  "area_id": "area_12.922_100.873",
+  "osm_file": "RawData/OSM/area_12.922_100.873_osm_v001.osm",
+  "buildings_file": "RawData/Overture/area_12.922_100.873_buildings_overture_v001.geojson",
+  "dem_csv": "RawData/DEM/area_12.922_100.873_dem_v001.csv",
   "dem_source": "fabdem",
-  "origin_lon": 100.88685050000001,
-  "origin_lat": 12.927774,
+  "origin_lon": 100.87268850000001,
+  "origin_lat": 12.922462,
   "_note": "切换区域只改此文件，不改 Houdini 节点代码"
 }

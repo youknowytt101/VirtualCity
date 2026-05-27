@@ -51,12 +51,21 @@ def _fetch_overture(bbox):
             else:
                 height, real = DEFAULT_HEIGHT, False
 
+            # Overture schema: 顶层是 'subtype'（residential/commercial/...），
+            # 'class' 是更细分类（apartments/office/...）。两者皆可缺。
+            # 优先 subtype，其次 class，最后 'building' 兜底。
+            subtype_arr = d.get('subtype', [None] * n)
+            class_arr   = d.get('class',   [None] * n)
+            sub_v = subtype_arr[i] if i < len(subtype_arr) else None
+            cls_v = class_arr[i]   if i < len(class_arr)   else None
+            bld_class = sub_v or cls_v or 'building'
+
             features.append({
                 'geom':    geom,
                 'geom_dict': geom_dict,
                 'height':  height,
                 'real':    real,
-                'class':   d.get('class', [None] * n)[i] or 'building',
+                'class':   bld_class,
             })
     return features
 
@@ -96,19 +105,20 @@ def _spatial_join_heights(overture_feats, google_feats):
     tree = STRtree(g_geoms)
 
     joined = 0
+    candidates = sum(1 for f in overture_feats if not f['real'])
     for feat in overture_feats:
         if feat['real']:
             continue  # 已有真实高度，跳过
         centroid = feat['geom'].centroid
         idx = tree.nearest(centroid)
         dist = centroid.distance(g_geoms[idx])
-        # distance 是度，转为米（简化：1度 ≈ 111319m，对亚热带小區域足够）
+        # distance 是度，转为米（简化：1度 ≈ 111319m，对亚热带小区域足够）
         dist_m = dist * 111319.0
         if dist_m <= JOIN_MAX_DIST:
             feat['height'] = g_heights[idx]
             feat['real']   = True
             joined += 1
-    print(f'  空间 join: {joined}/{sum(1 for f in overture_feats if not f["real"] or True)} 栈建筑匹配到 Google 高度')
+    print(f'  空间 join: {joined}/{candidates} 栋无高度建筑匹配到 Google 高度')
 
 
 def download(bbox, output_path, scripts_dir=None):

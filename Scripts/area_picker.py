@@ -20,12 +20,29 @@ from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 # Global pipeline state
-_state = {'running': False, 'done': False, 'ok': False, 'returncode': None, 'name': '', 'start': 0.0}
+_state = {'running': False, 'done': False, 'ok': False, 'returncode': None, 'name': '', 'start': 0.0,
+          'houdini_done': False, 'houdini_status': '', 'houdini_message': ''}
 _server_ref = [None]  # mutable ref so _run thread can call shutdown()
 
 SCRIPTS = Path(__file__).resolve().parent
 ROOT    = SCRIPTS.parent
 PORT    = 8765
+
+
+def _read_houdini_status(expected_area: str):
+    status_file = ROOT / 'Config' / 'houdini_build_status.json'
+    if not status_file.exists():
+        return False, '', 'status file missing'
+    try:
+        data = json.loads(status_file.read_text(encoding='utf-8'))
+    except Exception as exc:
+        return False, '', f'status file unreadable: {exc}'
+    area_id = data.get('area_id', '')
+    status = data.get('status', '')
+    message = data.get('message', '')
+    if area_id != expected_area:
+        return False, status, f'area mismatch: {area_id} != {expected_area}'
+    return status == 'completed', status, message
 
 def _get_initial_center():
     try:
@@ -176,6 +193,11 @@ function pollStatus() {
       _pollTimer = null;
       if (d.ok) {
         log('[OK] 生成完成！区域: ' + d.name, 'ok');
+        if (d.houdini_done) {
+          log('[OK] Houdini 构建完成已确认: ' + d.houdini_status, 'ok');
+        } else {
+          log('[WARN] 未确认 Houdini 构建完成: ' + d.houdini_message, 'err');
+        }
         log('3 秒后自动关闭此页面...', 'dim');
         setTimeout(function() { window.close(); }, 3000);
       } else {
@@ -235,6 +257,9 @@ class _Handler(BaseHTTPRequestHandler):
                 'returncode': _state['returncode'],
                 'name':       _state['name'],
                 'elapsed':    elapsed,
+                'houdini_done':    _state['houdini_done'],
+                'houdini_status':  _state['houdini_status'],
+                'houdini_message': _state['houdini_message'],
             })
             return
         lat, lon = _get_initial_center()
@@ -270,16 +295,26 @@ class _Handler(BaseHTTPRequestHandler):
         ]
         print(f"\n[area_picker] 启动管线: {' '.join(cmd)}")
         _state.update({'running': True, 'done': False, 'ok': False,
-                       'returncode': None, 'name': name, 'start': time.time()})
+                       'returncode': None, 'name': name, 'start': time.time(),
+                       'houdini_done': False, 'houdini_status': '', 'houdini_message': ''})
 
         def _run():
             result = subprocess.run(cmd, cwd=str(SCRIPTS))
+            houdini_done, houdini_status, houdini_message = _read_houdini_status(name)
+            ok = result.returncode == 0 and houdini_done
             _state.update({'running': False, 'done': True,
-                           'ok': result.returncode == 0,
-                           'returncode': result.returncode})
-            status = 'OK' if result.returncode == 0 else f'FAIL(exit={result.returncode})'
+                           'ok': ok,
+                           'returncode': result.returncode,
+                           'houdini_done': houdini_done,
+                           'houdini_status': houdini_status,
+                           'houdini_message': houdini_message})
+            status = 'OK' if ok else f'FAIL(exit={result.returncode}, houdini={houdini_status})'
             print(f'[area_picker] 管线结束: {status}')
-            if result.returncode == 0:
+            if houdini_done:
+                print('[area_picker] Houdini 构建完成已确认')
+            else:
+                print(f'[area_picker] Houdini 构建完成未确认: {houdini_message}')
+            if ok:
                 print('[area_picker] 5 秒后自动退出服务器...')
                 time.sleep(5)
                 _server_ref[0].shutdown()

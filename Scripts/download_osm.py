@@ -9,15 +9,20 @@ VirtualCity - OSM 数据自动下载脚本
 """
 
 import sys, os, urllib.request, urllib.parse, time
+from pathlib import Path
+
+# A-001 合规：从 vc_paths 推导根目录，禁止硬编码盘符
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from vc_paths import DATA_ROOT
 
 AREAS = {
     "pattaya_sai6_mvp": {
         "bbox": (12.922, 100.866, 12.938, 100.882),  # s,w,n,e (Overpass 格式)
-        "output": r"F:\VirtualCity\RawData\OSM\pattaya_sai6_mvp_osm_v001.osm",
+        "output": str(DATA_ROOT / "OSM" / "pattaya_sai6_mvp_osm_v001.osm"),
     },
     "pattaya_sai6_mvp_v2": {
         "bbox": (12.916, 100.860, 12.944, 100.888),  # 3km × 3km
-        "output": r"F:\VirtualCity\RawData\OSM\pattaya_sai6_mvp_v2_osm_v001.osm",
+        "output": str(DATA_ROOT / "OSM" / "pattaya_sai6_mvp_v2_osm_v001.osm"),
     },
 }
 
