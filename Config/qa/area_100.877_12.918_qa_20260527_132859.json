@@ -1,0 +1,57 @@
+{
+  "area_id": "area_100.877_12.918",
+  "time": "2026-05-27T13:28:59",
+  "passed": true,
+  "summary": {
+    "pass": 8,
+    "warn": 1,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "name": "buildings_exists",
+      "status": "pass",
+      "message": "1564 KB"
+    },
+    {
+      "name": "roads_exists",
+      "status": "pass",
+      "message": "569 KB"
+    },
+    {
+      "name": "dem_exists",
+      "status": "pass",
+      "message": "127 KB"
+    },
+    {
+      "name": "bld_retention",
+      "status": "warn",
+      "message": "保留率 100%，清洗几乎无效"
+    },
+    {
+      "name": "dem_correction",
+      "status": "pass",
+      "message": "applied=True"
+    },
+    {
+      "name": "output_buildings.geojson",
+      "status": "pass",
+      "message": "1439 KB"
+    },
+    {
+      "name": "output_roads.osm",
+      "status": "pass",
+      "message": "568 KB"
+    },
+    {
+      "name": "output_dem.csv",
+      "status": "pass",
+      "message": "105 KB"
+    },
+    {
+      "name": "bld_sample",
+      "status": "pass",
+      "message": "10/10 建筑有效"
+    }
+  ]
+}

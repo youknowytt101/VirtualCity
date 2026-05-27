@@ -38,19 +38,23 @@ HIGHWAY_WHITELIST = {      # 只保留这些道路类型（空 = 保留全部）
 # ── 几何工具（纯 Python，无需 shapely）───────────────────────
 
 def _ring_area_m2(coords: list[tuple[float, float]]) -> float:
-    """Shoelace 公式计算多边形面积（经纬度坐标 → 近似 m²）。"""
-    n = len(coords)
+    """Shoelace 公式计算多边形面积（经纬度坐标 → UTM m²）。"""
+    from _utm_lite import wgs84_to_utm, zone_number
+    lat_avg = sum(c[1] for c in coords) / len(coords)
+    lon_avg = sum(c[0] for c in coords) / len(coords)
+    z = zone_number(lon_avg)
+    ox, oy, _ = wgs84_to_utm(lat_avg, lon_avg, force_zone=z)
+    local = []
+    for lon, lat in coords:
+        x, y, _ = wgs84_to_utm(lat, lon, force_zone=z)
+        local.append((x - ox, y - oy))
+    n = len(local)
     area = 0.0
     for i in range(n):
         j = (i + 1) % n
-        area += coords[i][0] * coords[j][1]
-        area -= coords[j][0] * coords[i][1]
-    area = abs(area) * 0.5
-    # 经纬度 → m²（赤道附近近似）
-    lat = sum(c[1] for c in coords) / n
-    m_per_deg_lon = math.cos(math.radians(lat)) * 111319.9
-    m_per_deg_lat = 111319.9
-    return area * m_per_deg_lon * m_per_deg_lat
+        area += local[i][0] * local[j][1]
+        area -= local[j][0] * local[i][1]
+    return abs(area) * 0.5
 
 
 def _ring_centroid(coords: list[tuple[float, float]]) -> tuple[float, float]:
@@ -59,10 +63,12 @@ def _ring_centroid(coords: list[tuple[float, float]]) -> tuple[float, float]:
 
 
 def _dist_deg(a: tuple[float, float], b: tuple[float, float]) -> float:
-    """两点之间的近似距离（m）。"""
-    dlat = (a[1] - b[1]) * 111319.9
-    dlon = (a[0] - b[0]) * math.cos(math.radians((a[1] + b[1]) / 2)) * 111319.9
-    return math.sqrt(dlat**2 + dlon**2)
+    """两点之间的距离（m），使用 UTM 投影。"""
+    from _utm_lite import wgs84_to_utm, zone_number
+    z = zone_number((a[0] + b[0]) / 2)
+    x1, y1, _ = wgs84_to_utm(a[1], a[0], force_zone=z)
+    x2, y2, _ = wgs84_to_utm(b[1], b[0], force_zone=z)
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 
 def _area_based_height(area_m2: float) -> float:

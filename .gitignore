@@ -62,6 +62,11 @@ RawData/DEM/*.hgt
 Config/_*.txt
 Config/_*.py
 
+# ===== 数据精炼管线缓存（体积大，不提交）=====
+RawData/_downloads/
+RawData/_cleaned/
+RawData/_houdini_ready/
+
 # ===== 大型测试数据（>5MB，不提交）=====
 RawData/Overture/*stress_test*
 RawData/OSM/*stress_test*

@@ -123,6 +123,7 @@ cfg = {
     "osm_file":       project_relative(osm_path),
     "buildings_file": project_relative(buildings_path),
     "dem_csv":        project_relative(dem_csv_path),
+    "dem_source":     "fabdem",
     "origin_lon":     origin_lon,
     "origin_lat":     origin_lat,
     "_note":          "切换区域只改此文件，不改 Houdini 节点代码"
@@ -178,25 +179,43 @@ if not _tile:
         print("  [ERR] OSM 下载失败，请先运行 cache_city_data.py 预缓存后重试")
         sys.exit(1)
 
-# ── 3. DEM：优先本地缓存裁剪 → 备用 GEE 下载 ─────────
+# ── 3. DEM：优先 FABDEM DTM → 本地缓存 → NASADEM 兜底 ─────────
 print(f"\n[3/5] 获取 DEM 数据...")
 try:
     import download_dem as _dem
     Path(dem_csv_path).parent.mkdir(parents=True, exist_ok=True)
     bbox = [west, south, east, north]
+    dem_cfg = {"bbox": bbox, "output_tif": dem_tif_path, "output_csv": dem_csv_path}
     dem_ok = False
+    dem_source = "fabdem"
 
-    _tile2 = _tc.find_covering_tile(bbox)
-    if _tile2:
-        print(f"  [本地缓存] 命中, 裁剪 DEM...")
-        dem_ok = _tc.crop_dem(_tile2, bbox, dem_tif_path, dem_csv_path)
-        if dem_ok:
-            _dem.convert_to_csv(dem_tif_path, dem_csv_path, bbox)
+    # 优先尝试 FABDEM DTM（真正裸地，无需 correct_dem_dtm.py）
+    try:
+        _dem.download_fabdem(dem_cfg)
+        dem_ok = True
+    except Exception as e:
+        print(f"  [WARN] FABDEM 失败: {e}")
 
+    # 兜底：本地缓存裁剪
     if not dem_ok:
-        _dem.download_gee({"bbox": bbox, "output_tif": dem_tif_path,
-                           "output_csv": dem_csv_path}, source="nasadem")
-    print(f"  [OK] DEM 完成")
+        _tile2 = _tc.find_covering_tile(bbox)
+        if _tile2:
+            print(f"  [本地缓存] 命中, 裁剪 DEM...")
+            dem_ok = _tc.crop_dem(_tile2, bbox, dem_tif_path, dem_csv_path)
+            if dem_ok:
+                _dem.convert_to_csv(dem_tif_path, dem_csv_path, bbox)
+                dem_source = "nasadem"  # 本地缓存通常是 NASADEM
+
+    # 兜底：GEE NASADEM
+    if not dem_ok:
+        _dem.download_gee(dem_cfg, source="nasadem")
+        dem_source = "nasadem"
+
+    # 记录 DEM 来源，供下游决定是否需要 DTM 修正
+    cfg["dem_source"] = dem_source
+    with open(CFG_PATH, "w", encoding="utf-8") as f:
+        json.dump(cfg, f, indent=2, ensure_ascii=False)
+    print(f"  [OK] DEM 完成 (source={dem_source})")
 except Exception as ex:
     print(f"  [ERR] DEM 下载失败: {ex}")
     sys.exit(1)
@@ -223,17 +242,22 @@ if not bld_ok:
         sys.exit(1)
 print(f"  [OK] 建筑完成")
 
-# ── 5. 验证 + Houdini recook ─────────────────────────
-print(f"\n[5/5] 数据验证 + Houdini 重算...")
+# ── 5. 数据精炼 + 验证 + Houdini recook ──────────────
+print(f"\n[5/6] 数据精炼（清洗 + 补全 + QA）...")
 
-# 5a. validate_data.py
-vld = subprocess.run([sys.executable, str(SCRIPTS / "validate_data.py")],
-                     capture_output=False)
-if vld.returncode != 0:
-    print("\n  [ERR] 数据验证未通过，中止流程，请修复后重新运行")
+# 5a. refine_data.py — 统一数据精炼管线
+refine_result = subprocess.run(
+    [sys.executable, str(SCRIPTS / "refine_data.py"), "--skip-probe"],
+    cwd=str(SCRIPTS),
+    capture_output=False,
+)
+if refine_result.returncode != 0:
+    print("\n  [ERR] 数据精炼未通过，中止流程")
     sys.exit(1)
 
-# 5b. Houdini recook + 修复 SOP + 重建裁剪节点
+# ── 6. Houdini recook ────────────────────────────────
+print(f"\n[6/6] Houdini 重算...")
+
 # 注意：必须从 SCRIPTS 目录运行（pyproject.toml 在那里，rpyc==4.1.0 才可用）
 print("\n  [RECOOK] Houdini 重算中（_recook_new_area.py）...")
 recook = subprocess.run(

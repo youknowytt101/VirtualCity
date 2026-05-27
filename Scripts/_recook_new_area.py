@@ -16,41 +16,20 @@ PASS = '[OK]'
 FAIL = '[FAIL]'
 errors = []
 
-# ── 前置：原始数据清洗（GeoJSON 几何/高度 + OSM 道路）──────────────
-print('[数据清洗]')
-_clean_result = subprocess.run(
-    [sys.executable, str(ROOT / 'Scripts' / 'clean_raw_data.py'), '--report'],
-    capture_output=True, text=True, encoding='utf-8', errors='replace'
-)
-for _line in _clean_result.stdout.splitlines():
-    sys.stdout.buffer.write(('  ' + _line + '\n').encode('utf-8', errors='replace'))
-if _clean_result.returncode != 0:
-    print('  [WARN] clean_raw_data 退出码非 0，继续执行...')
-    print(_clean_result.stderr[:400])
-
-# ── 前置：OSM building:levels 高度补全 ─────────────────────────────
-print('[heights] OSM building:levels enrichment...')
-try:
-    sys.path.insert(0, str(ROOT / 'Scripts'))
-    from enrich_building_levels import enrich_levels as _enrich_levels
-    _lvl_cfg = load_active_area()
-    _lvl_stats = _enrich_levels(_lvl_cfg, verbose=False)
-    print(f'  [heights] OSM levels matched: {_lvl_stats["updated"]} buildings updated')
-except Exception as _e:
-    print(f'  [WARN] enrich_building_levels failed: {_e}')
-
-# ── 前置：DEM DSM -> DTM 修正（建筑掩码插值）────────────────────────
-print('[dem] DTM correction (building mask)...')
-try:
-    from correct_dem_dtm import correct_dtm as _correct_dtm
-    _dtm_cfg = load_active_area()
-    _dtm_ok = _correct_dtm(_dtm_cfg, verbose=False)
-    if _dtm_ok:
-        print('  [dem] DTM correction applied')
-    else:
-        print('  [dem] DTM correction skipped (no cells masked)')
-except Exception as _e:
-    print(f'  [WARN] correct_dem_dtm failed: {_e}')
+# ── 前置：数据精炼（由 refine_data.py 统一处理）──────────────────────
+# 如果从 set_area.py 调用，refine_data.py 已提前运行完毕。
+# 如果直接调用本脚本，检查 _houdini_ready 是否已有数据：
+_hr_dir = ROOT / 'RawData' / '_houdini_ready' / load_active_area(absolute=False).get('area_id', '')
+if not _hr_dir.exists() or not any(_hr_dir.iterdir()):
+    print('[数据精炼] _houdini_ready 为空，运行 refine_data.py...')
+    _refine_result = subprocess.run(
+        [sys.executable, str(ROOT / 'Scripts' / 'refine_data.py'), '--skip-probe'],
+        capture_output=False, cwd=str(ROOT / 'Scripts')
+    )
+    if _refine_result.returncode != 0:
+        print('  [WARN] refine_data.py 退出码非 0，继续执行...')
+else:
+    print('[数据精炼] _houdini_ready 已就绪，跳过')
 
 # ══════════════════════════════════════════
 # 颜色配置 — 修改这里即可独立控制三类颜色
@@ -157,25 +136,28 @@ geo = hou.pwd().geometry()
 rows = []
 with open(CSV_FILE, newline='') as f:
     for row in csv.DictReader(f):
-        rows.append((float(row['x']), float(row['y']), float(row['z'])))
-# H-005: 从坐标推断格网尺寸（不用 sqrt，支持非正方形）
-xs    = sorted(set(round(r[0], 1) for r in rows))
-zs    = sorted(set(round(r[2], 1) for r in rows))
-ncols = len(xs)
-nrows = len(zs)
-pts   = []
-for x, y, z in rows:
+        rows.append((float(row['x']), float(row['y']), float(row['z']),
+                     int(row.get('row', 0)), int(row.get('col', 0))))
+# H-005: 用 CSV 的 row/col 列直接构建网格（兼容 UTM 投影坐标）
+grid = {}
+for row in rows:
+    x, y, z = row[0], row[1], row[2]
+    ri, ci  = int(row[3]), int(row[4])
     p = geo.createPoint()
     p.setPosition(hou.Vector3(x, y, z))
-    pts.append(p)
-for ri in range(nrows - 1):
-    for ci in range(ncols - 1):
-        i0, i1 = ri * ncols + ci, ri * ncols + ci + 1
-        i2, i3 = (ri + 1) * ncols + ci + 1, (ri + 1) * ncols + ci
-        if max(i0, i1, i2, i3) < len(pts):
+    grid[(ri, ci)] = p
+all_ri = sorted(set(k[0] for k in grid))
+all_ci = sorted(set(k[1] for k in grid))
+for i in range(len(all_ri) - 1):
+    for j in range(len(all_ci) - 1):
+        r0, r1 = all_ri[i], all_ri[i+1]
+        c0, c1 = all_ci[j], all_ci[j+1]
+        corners = [grid.get((r0,c0)), grid.get((r0,c1)),
+                   grid.get((r1,c1)), grid.get((r1,c0))]
+        if all(corners):
             poly = geo.createPolygon()
-            for idx in [i0, i1, i2, i3]:
-                poly.addVertex(pts[idx])
+            for pt in corners:
+                poly.addVertex(pt)
 """
 DEM_TERRAIN_CODE = DEM_TERRAIN_CODE.replace('__ROOT__', ROOT_STR).replace('__CFG__', CFG_FILE)
 
@@ -225,28 +207,41 @@ elif snap_old:
 
 # ── 1b2. 道路分级宽度（road_width attribwrangle）──────────────────────────
 ROAD_WIDTH_VEX = """
-string hw = s@highway;
-float hw_val;
-if      (hw == "motorway")                                    hw_val = 5.0;
-else if (hw == "motorway_link")                               hw_val = 3.5;
-else if (hw == "trunk")                                       hw_val = 4.5;
-else if (hw == "trunk_link")                                  hw_val = 3.0;
-else if (hw == "primary")                                     hw_val = 4.0;
-else if (hw == "primary_link")                                hw_val = 2.5;
-else if (hw == "secondary")                                   hw_val = 3.5;
-else if (hw == "secondary_link")                              hw_val = 2.0;
-else if (hw == "tertiary")                                    hw_val = 2.5;
-else if (hw == "tertiary_link")                               hw_val = 1.5;
-else if (hw == "residential" || hw == "living_street")        hw_val = 2.0;
-else if (hw == "unclassified")                                hw_val = 2.0;
-else if (hw == "service")                                     hw_val = 1.5;
-else if (hw == "track")                                       hw_val = 1.5;
-else if (hw == "pedestrian")                                  hw_val = 2.5;
-else if (hw == "footway" || hw == "path" || hw == "bridleway") hw_val = 0.75;
-else if (hw == "cycleway")                                    hw_val = 0.75;
-else if (hw == "steps")                                       hw_val = 0.6;
-else                                                          hw_val = 1.5;
-f@half_width = hw_val;
+// 道路宽度优先级（精度审核 #4）：OSM 实测宽度 > lanes 推算 > 分类表 fallback
+float osm_w = f@osm_width;
+int   lanes = i@lanes;
+
+if (osm_w > 0) {
+    // OSM width 标签有实测数据
+    f@half_width = osm_w * 0.5;
+} else if (lanes > 0) {
+    // lanes 标签推算（单车道 3.5m 标准）
+    f@half_width = lanes * 1.75;
+} else {
+    // 分类表 fallback（14 级）
+    string hw = s@highway;
+    float hw_val;
+    if      (hw == "motorway")                                    hw_val = 5.0;
+    else if (hw == "motorway_link")                               hw_val = 3.5;
+    else if (hw == "trunk")                                       hw_val = 4.5;
+    else if (hw == "trunk_link")                                  hw_val = 3.0;
+    else if (hw == "primary")                                     hw_val = 4.0;
+    else if (hw == "primary_link")                                hw_val = 2.5;
+    else if (hw == "secondary")                                   hw_val = 3.5;
+    else if (hw == "secondary_link")                              hw_val = 2.0;
+    else if (hw == "tertiary")                                    hw_val = 2.5;
+    else if (hw == "tertiary_link")                               hw_val = 1.5;
+    else if (hw == "residential" || hw == "living_street")        hw_val = 2.0;
+    else if (hw == "unclassified")                                hw_val = 2.0;
+    else if (hw == "service")                                     hw_val = 1.5;
+    else if (hw == "track")                                       hw_val = 1.5;
+    else if (hw == "pedestrian")                                  hw_val = 2.5;
+    else if (hw == "footway" || hw == "path" || hw == "bridleway") hw_val = 0.75;
+    else if (hw == "cycleway")                                    hw_val = 0.75;
+    else if (hw == "steps")                                       hw_val = 0.6;
+    else                                                          hw_val = 1.5;
+    f@half_width = hw_val;
+}
 """
 _rw = hou.node(OBJ_PATH + '/road_width')
 if _rw:
@@ -276,14 +271,14 @@ elif _rs_node:
 
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = """
-// snap_bld_to_terrain v4: 逐角点查询 + 取最低值
-// 对每个角点分别查询地形高度，取 MIN 作为底面 Y
-// 斜坡建筑：低侧贴地，高侧嵌入地形（符合真实建筑行为，无悬空）
+// snap_bld_to_terrain v5: 逐角点查询 + 取最高值（修复精度审核 #3）
+// 对每个角点分别查询地形高度，取 MAX 作为底面 Y
+// 坡面建筑：高侧贴地，低侧露出地基（防止被地形埋没，符合 H-011 坑点记录）
 int verts[] = primvertices(0, @primnum);
 int n = len(verts);
 if (n == 0) return;
 
-float min_terrain_y = 1e10;
+float max_terrain_y = -1e10;
 
 foreach(int v; verts) {
     int pt = vertexpoint(0, v);
@@ -298,10 +293,10 @@ foreach(int v; verts) {
     xyzdist(1, set(p.x, tp.y, p.z), hp, uvw);
     tp = primuv(1, "P", hp, uvw);
 
-    min_terrain_y = min(min_terrain_y, tp.y);
+    max_terrain_y = max(max_terrain_y, tp.y);
 }
 
-float base_y = min_terrain_y - 0.2;  // sink 0.2m to hide base gap
+float base_y = max_terrain_y - 0.2;  // sink 0.2m to hide base gap
 
 foreach(int v; verts) {
     int pt = vertexpoint(0, v);
@@ -349,7 +344,16 @@ for (int i = 0; i < n; i++) ctr += point(0,"P",pts[i]);
 ctr /= n;
 float noise_val = fit(noise(ctr * 0.003), 0, 1, -1.5, 1.5);
 float floors = clamp(base_floors + noise_val, 1, 15);
-f@height_m = floors * 3.5;
+
+// 精度审核 #5：按建筑类型差异化层高（泰国实测参考值）
+string cls = s@bld_class;
+float floor_h;
+if      (cls == "residential")  floor_h = 2.9;   // 泰国住宅
+else if (cls == "commercial")   floor_h = 3.5;   // 商业
+else if (cls == "industrial")   floor_h = 4.5;   // 工业
+else                            floor_h = 3.2;   // 默认
+
+f@height_m = floors * floor_h;
 """
 _ph = hou.node(OBJ_PATH + '/procedural_height')
 if _ph:

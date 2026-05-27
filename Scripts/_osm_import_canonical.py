@@ -23,10 +23,30 @@ BUILDINGS_FILE = _resolve_project_path(_cfg["buildings_file"])
 ORIGIN_LON     = _cfg["origin_lon"]
 ORIGIN_LAT     = _cfg["origin_lat"]
 
+# ── UTM 投影（内嵌，无外部依赖）─────────────────────────────────────
+_A=6378137.0;_E=0.00669437999014;_E2=_E*_E;_E3=_E2*_E;_EP2=_E/(1-_E)
+_K0=0.9996;_FE=500000.0;_FN=10000000.0
+_M1=1-_E/4-3*_E2/64-5*_E3/256;_M2=3*_E/8+3*_E2/32+45*_E3/1024
+_M3=15*_E2/256+45*_E3/1024;_M4=35*_E3/3072
+
+def _utm_forward(lat, lon, force_zone=0):
+    lr=math.radians(lat);sl=math.sin(lr);cl=math.cos(lr);tl=math.tan(lr)
+    z=force_zone or int((lon+180)/6)+1
+    dl=math.radians(lon-((z-1)*6-177))
+    n=_A/math.sqrt(1-_E*sl*sl);t=tl*tl;c=_EP2*cl*cl;a=cl*dl
+    m=_A*(_M1*lr-_M2*math.sin(2*lr)+_M3*math.sin(4*lr)-_M4*math.sin(6*lr))
+    a2=a*a;a4=a2*a2;a6=a4*a2;t2=t*t
+    x=_K0*n*(a+(1-t+c)*a2*a/6+(5-18*t+t2+72*c-58*_EP2)*a4*a/120)+_FE
+    y=_K0*(m+n*tl*(a2/2+(5-t+9*c+4*c*c)*a4/24+(61-58*t+t2+600*c-330*_EP2)*a6/720))
+    if lat<0:y+=_FN
+    return x,y,z
+
+_UTM_ZONE = int((ORIGIN_LON + 180) / 6) + 1
+_OX, _OY, _ = _utm_forward(ORIGIN_LAT, ORIGIN_LON, _UTM_ZONE)
+
 def wgs84_to_local(lon, lat):
-    dx = (lon - ORIGIN_LON) * math.cos(math.radians(ORIGIN_LAT)) * 111319.9
-    dy = (lat - ORIGIN_LAT) * 111319.9
-    return dx, dy
+    x, y, _ = _utm_forward(lat, lon, force_zone=_UTM_ZONE)
+    return x - _OX, y - _OY
 
 def signed_area_xz(pts):
     n = len(pts)
@@ -55,9 +75,12 @@ def _parse_height(h_raw, levels_raw=None):
 
 geo = hou.pwd().geometry()
 
-bld_tag_attrib = geo.addAttrib(hou.attribType.Prim, 'bld_type', 'yes')
-height_attrib  = geo.addAttrib(hou.attribType.Prim, 'height_m', 0.0)
-hw_attrib      = geo.addAttrib(hou.attribType.Prim, 'highway', '')
+bld_tag_attrib  = geo.addAttrib(hou.attribType.Prim, 'bld_type', 'yes')
+height_attrib   = geo.addAttrib(hou.attribType.Prim, 'height_m', 0.0)
+hw_attrib       = geo.addAttrib(hou.attribType.Prim, 'highway', '')
+lanes_attrib    = geo.addAttrib(hou.attribType.Prim, 'lanes', 0)
+width_attrib    = geo.addAttrib(hou.attribType.Prim, 'osm_width', 0.0)
+bld_class_attrib = geo.addAttrib(hou.attribType.Prim, 'bld_class', '')
 bld_group  = geo.createPrimGroup('buildings')
 road_group = geo.createPrimGroup('roads')
 
@@ -96,6 +119,7 @@ for feature in fc['features']:
             poly.addVertex(p)
         poly.setAttribValue(bld_tag_attrib, 'yes')
         poly.setAttribValue(height_attrib, h)
+        poly.setAttribValue(bld_class_attrib, str(props.get('class', 'building') or 'building'))
         bld_group.add(poly)
         cx = sum(p[0] for p in local_pts) / len(local_pts)
         cz = sum(p[1] for p in local_pts) / len(local_pts)
@@ -135,6 +159,15 @@ for way in root.findall('way'):
             for p in pts:
                 poly.addVertex(p)
             poly.setAttribValue(hw_attrib, hw)
+            # OSM lanes + width 标签（精度审核 #4：减少宽度误差）
+            _lanes = 0
+            _osm_w = 0.0
+            try: _lanes = int(tags.get('lanes', '0') or '0')
+            except (TypeError, ValueError): pass
+            try: _osm_w = float(str(tags.get('width', '0') or '0').replace('m','').strip())
+            except (TypeError, ValueError): pass
+            poly.setAttribValue(lanes_attrib, _lanes)
+            poly.setAttribValue(width_attrib, _osm_w)
             road_group.add(poly)
 
     elif is_bld:

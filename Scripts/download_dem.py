@@ -2,30 +2,43 @@
 VirtualCity - DEM 地形数据自动下载脚本
 ========================================
 支持多种数据源（按质量排序）：
-  1. Copernicus GLO-10 (10m) —— AWS S3 公开桶，最高精度
-  2. NASADEM (30m)           —— Google Earth Engine，质量远超 SRTM
-  3. SRTM GL1 (30m)          —— Google Earth Engine，后备
+  1. FABDEM 30m (DTM，已移除建筑和植被) —— GEE，精度最佳
+  2. Copernicus GLO-30 (30m DSM)       —— GEE / AWS S3
+  3. NASADEM (30m DSM)                 —— GEE
+  4. SRTM GL1 (30m DSM)                —— GEE，后备
+
+注意：Copernicus EEA-10 仅覆盖欧洲，东南亚不可用。
 
 用法:
-    uv run python download_dem.py [area_name] [--source copernicus|nasadem|srtm]
+    uv run python download_dem.py [area_name] [--source fabdem|copernicus|nasadem|srtm]
 
 依赖（自动安装）:
-    earthengine-api (仅 nasadem/srtm 需要), gdal (可选)
+    earthengine-api (GEE 数据源需要)
 """
 
 import sys, os, json, zipfile, io, time, math, struct, zlib, csv
 import urllib.request
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'Scripts'))
+try:
+    import vc_paths
+except ImportError:
+    vc_paths = None
+
+DATA_ROOT = vc_paths.DATA_ROOT if vc_paths else ROOT / 'RawData'
 
 AREAS = {
     "pattaya_sai6_mvp": {
         "bbox": [100.866, 12.922, 100.882, 12.938],
-        "output_tif": r"F:\VirtualCity\RawData\DEM\pattaya_sai6_mvp_dem_v001.tif",
-        "output_csv": r"F:\VirtualCity\RawData\DEM\pattaya_sai6_mvp_dem_v001.csv",
+        "output_tif": str(DATA_ROOT / "DEM" / "pattaya_sai6_mvp_dem_v001.tif"),
+        "output_csv": str(DATA_ROOT / "DEM" / "pattaya_sai6_mvp_dem_v001.csv"),
     },
     "pattaya_sai6_mvp_v2": {
         "bbox": [100.860, 12.916, 100.888, 12.944],
-        "output_tif": r"F:\VirtualCity\RawData\DEM\pattaya_sai6_mvp_v2_dem_v001.tif",
-        "output_csv": r"F:\VirtualCity\RawData\DEM\pattaya_sai6_mvp_v2_dem_v001.csv",
+        "output_tif": str(DATA_ROOT / "DEM" / "pattaya_sai6_mvp_v2_dem_v001.tif"),
+        "output_csv": str(DATA_ROOT / "DEM" / "pattaya_sai6_mvp_v2_dem_v001.csv"),
     },
 }
 
@@ -66,8 +79,8 @@ def download_copernicus_10m(bbox, output_tif, output_csv):
     return True
 
 
-def download_gee(cfg, source="nasadem"):
-    """Google Earth Engine 下载 NASADEM 或 SRTM"""
+def _init_ee():
+    """初始化 Earth Engine，自动安装 + 认证"""
     try:
         import ee
     except ImportError:
@@ -75,22 +88,67 @@ def download_gee(cfg, source="nasadem"):
         os.system('uv pip install earthengine-api '
                   '--index-url https://mirrors.aliyun.com/pypi/simple/')
         import ee
-
     print("Earth Engine 认证...")
     try:
         ee.Initialize(project=EE_PROJECT)
     except Exception:
         ee.Authenticate()
         ee.Initialize(project=EE_PROJECT)
+    return ee
+
+
+def download_fabdem(cfg):
+    """
+    FABDEM V1-2: 全球 30m DTM（已通过 ML 移除建筑和树木高度）
+    来源: University of Bristol
+    许可: CC BY-NC-SA 4.0（非商用免费，商用需联系 fathom.global）
+    GEE: projects/sat-io/open-datasets/FABDEM
+    精度: 建成区垂直误差比 COP-GLO-30 好 ~33%，比 NASADEM 好 ~50%
+    """
+    ee = _init_ee()
+    bbox = cfg["bbox"]
+    region = ee.Geometry.Rectangle(bbox)
+
+    print("获取 FABDEM 30m DTM（真正裸地高程，已移除建筑和植被）...")
+    fabdem = (ee.ImageCollection("projects/sat-io/open-datasets/FABDEM")
+              .filterBounds(region)
+              .mosaic()
+              .clip(region))
+
+    url = fabdem.getDownloadURL({
+        "name": "fabdem",
+        "bands": ["b1"],
+        "region": region,
+        "scale": 30,
+        "format": "GEO_TIFF",
+        "filePerBand": False,
+    })
+
+    print("下载中...")
+    with urllib.request.urlopen(url, timeout=120) as resp:
+        tif_data = resp.read()
+
+    os.makedirs(os.path.dirname(cfg["output_tif"]), exist_ok=True)
+    with open(cfg["output_tif"], "wb") as f:
+        f.write(tif_data)
+    print(f"GeoTIFF 已保存: {cfg['output_tif']} ({len(tif_data)/1024:.0f} KB)")
+    convert_to_csv(cfg["output_tif"], cfg["output_csv"], cfg["bbox"])
+    print("完成 [OK] — DTM，无需 correct_dem_dtm.py 修正")
+    return True
+
+
+def download_gee(cfg, source="nasadem"):
+    """Google Earth Engine 下载 NASADEM 或 SRTM（均为 DSM，需后续 DTM 修正）"""
+    ee = _init_ee()
 
     bbox = cfg["bbox"]
     region = ee.Geometry.Rectangle(bbox)
 
     if source == "nasadem":
-        print("获取 NASADEM 30m DEM（质量远超 SRTM）...")
+        print("获取 NASADEM 30m DEM（DSM，含建筑和植被高度）...")
         dem = ee.Image("NASA/NASADEM_HGT/001").select("elevation").clip(region)
     else:
-        print("获取 SRTM 30m DEM...")
+        print("获取 SRTM 30m DEM（DSM）...")
         dem = ee.Image("USGS/SRTMGL1_003").clip(region)
 
     url = dem.getDownloadURL({
@@ -110,7 +168,7 @@ def download_gee(cfg, source="nasadem"):
     print("完成 [OK]")
 
 
-def run(area_name, source="copernicus"):
+def run(area_name, source="fabdem"):
     cfg = AREAS.get(area_name)
     if not cfg:
         print(f"未知区域: {area_name}，可用: {list(AREAS.keys())}")
@@ -118,7 +176,13 @@ def run(area_name, source="copernicus"):
 
     print(f"[VirtualCity] 下载 DEM: {area_name}  source={source}")
 
-    if source == "copernicus":
+    if source == "fabdem":
+        try:
+            download_fabdem(cfg)
+        except Exception as e:
+            print(f"  FABDEM 失败: {e}，回退到 NASADEM...")
+            download_gee(cfg, source="nasadem")
+    elif source == "copernicus":
         ok = download_copernicus_10m(cfg["bbox"], cfg["output_tif"], cfg["output_csv"])
         if not ok:
             print("  Copernicus 失败，回退到 NASADEM...")
@@ -144,10 +208,13 @@ def convert_to_csv(tif_path, csv_path, bbox):
     ORIGIN_LON = (bbox[0] + bbox[2]) / 2
     ORIGIN_LAT = (bbox[1] + bbox[3]) / 2
 
+    from _utm_lite import wgs84_to_utm, zone_number
+    _zone = zone_number(ORIGIN_LON)
+    _ox, _oy, _ = wgs84_to_utm(ORIGIN_LAT, ORIGIN_LON, force_zone=_zone)
+
     def to_local(lon, lat):
-        dx = (lon - ORIGIN_LON) * math.cos(math.radians(ORIGIN_LAT)) * 111319.9
-        dy = (lat - ORIGIN_LAT) * 111319.9
-        return dx, dy
+        x, y, _ = wgs84_to_utm(lat, lon, force_zone=_zone)
+        return x - _ox, y - _oy
 
     print(f"  转换 {tif_path} → CSV...")
     with rasterio.open(tif_path) as ds:
@@ -158,7 +225,7 @@ def convert_to_csv(tif_path, csv_path, bbox):
     os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     count = 0
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
-        f.write("x,y,z\n")
+        f.write("x,y,z,row,col\n")
         for r in range(rows_n):
             for c in range(cols_n):
                 elev = data[r, c]
@@ -167,12 +234,12 @@ def convert_to_csv(tif_path, csv_path, bbox):
                 lon = transform.c + c * transform.a
                 lat = transform.f + r * transform.e
                 x, z = to_local(lon, lat)
-                f.write(f"{x:.2f},{elev:.2f},{-z:.2f}\n")
+                f.write(f"{x:.2f},{elev:.2f},{-z:.2f},{r},{c}\n")
                 count += 1
     print(f"  [OK] CSV 已保存: {csv_path}  ({rows_n}×{cols_n}={count} 点)")
 
 
 if __name__ == "__main__":
     area   = sys.argv[1] if len(sys.argv) > 1 else "pattaya_sai6_mvp_v2"
-    source = sys.argv[2] if len(sys.argv) > 2 else "copernicus"
+    source = sys.argv[2] if len(sys.argv) > 2 else "fabdem"
     run(area, source)

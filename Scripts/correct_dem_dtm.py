@@ -31,10 +31,17 @@ import vc_paths
 
 # ── 几何工具 ─────────────────────────────────────────────────────────────────
 
-def _wgs84_to_local(lon, lat, origin_lon, origin_lat):
-    dx = (lon - origin_lon) * math.cos(math.radians(origin_lat)) * 111319.9
-    dy = (lat - origin_lat) * 111319.9
-    return dx, dy
+def _wgs84_to_local(lon, lat, origin_lon, origin_lat,
+                    _cache={}):
+    from _utm_lite import wgs84_to_utm, zone_number
+    key = (origin_lon, origin_lat)
+    if key not in _cache:
+        z = zone_number(origin_lon)
+        ox, oy, _ = wgs84_to_utm(origin_lat, origin_lon, force_zone=z)
+        _cache[key] = (ox, oy, z)
+    ox, oy, z = _cache[key]
+    x, y, _ = wgs84_to_utm(lat, lon, force_zone=z)
+    return x - ox, y - oy
 
 
 def _point_in_polygon(px, pz, poly_xz):

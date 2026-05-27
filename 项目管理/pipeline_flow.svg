@@ -1,0 +1,372 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 2200" font-family="Microsoft YaHei, PingFang SC, Consolas, sans-serif" font-size="12">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#333"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#c0392b"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#27ae60"/>
+    </marker>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8f9fa"/>
+      <stop offset="100%" style="stop-color:#e9ecef"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="2200" fill="url(#bg)" rx="8"/>
+
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">VirtualCity 全流程管线：数据获取 → 数据精炼 → Houdini 资产生成 → UE5 导入</text>
+  <text x="700" y="62" text-anchor="middle" font-size="13" fill="#7f8c8d">set_area.py → refine_data.py → _recook_new_area.py → export_and_import.py</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 阶段一：数据获取 -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <rect x="30" y="85" width="1340" height="420" rx="6" fill="none" stroke="#3498db" stroke-width="2" stroke-dasharray="8,4"/>
+  <rect x="30" y="85" width="260" height="24" rx="4" fill="#3498db"/>
+  <text x="40" y="101" fill="white" font-size="12" font-weight="bold">阶段一：数据获取（下载）</text>
+  <text x="300" y="101" fill="#3498db" font-size="11">set_area.py 步骤 1-4</text>
+
+  <!-- 用户输入 -->
+  <rect x="520" y="120" width="360" height="50" rx="25" fill="#ecf0f1" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="700" y="140" text-anchor="middle" font-size="12" font-weight="bold" fill="#2c3e50">用户输入</text>
+  <text x="700" y="155" text-anchor="middle" font-size="10" fill="#7f8c8d">bbox 坐标 | --center 经纬度+半径 | --url Google地图链接</text>
+
+  <!-- 向下箭头 -->
+  <line x1="700" y1="170" x2="700" y2="195" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 步骤1：配置 -->
+  <rect x="560" y="198" width="280" height="40" rx="4" fill="#fff" stroke="#3498db" stroke-width="1.5"/>
+  <text x="580" y="213" font-size="10" fill="#3498db" font-weight="bold">[1/6]</text>
+  <text x="614" y="213" font-size="11" fill="#2c3e50">更新 active_area.json</text>
+  <text x="580" y="228" font-size="9" fill="#7f8c8d">area_id、原点坐标、数据路径 → Config/</text>
+
+  <line x1="700" y1="238" x2="700" y2="258" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 步骤2-4：三路数据下载 -->
+  <!-- OSM -->
+  <rect x="80" y="262" width="320" height="70" rx="4" fill="#fff" stroke="#3498db" stroke-width="1.5"/>
+  <text x="100" y="280" font-size="10" fill="#3498db" font-weight="bold">[2/6] OSM 道路 + 建筑</text>
+  <text x="100" y="296" font-size="9" fill="#2c3e50">优先：本地瓦片缓存裁剪 (_tile_cache)</text>
+  <text x="100" y="310" font-size="9" fill="#2c3e50">兜底：Overpass API 在线查询</text>
+  <text x="100" y="324" font-size="9" fill="#7f8c8d">→ RawData/OSM/{area}_osm_v001.osm</text>
+
+  <!-- DEM -->
+  <rect x="430" y="262" width="320" height="70" rx="4" fill="#fff" stroke="#3498db" stroke-width="1.5"/>
+  <text x="450" y="280" font-size="10" fill="#3498db" font-weight="bold">[3/6] DEM 地形高程</text>
+  <text x="450" y="296" font-size="9" fill="#2c3e50">★ 优先：FABDEM 30m DTM（真正裸地，GEE）</text>
+  <text x="450" y="310" font-size="9" fill="#2c3e50">兜底：本地缓存 → NASADEM 30m DSM</text>
+  <text x="450" y="324" font-size="9" fill="#7f8c8d">→ RawData/DEM/{area}_dem_v001.csv (UTM 投影坐标)</text>
+
+  <!-- 建筑 -->
+  <rect x="780" y="262" width="320" height="70" rx="4" fill="#fff" stroke="#3498db" stroke-width="1.5"/>
+  <text x="800" y="280" font-size="10" fill="#3498db" font-weight="bold">[4/6] 建筑轮廓 (Overture)</text>
+  <text x="800" y="296" font-size="9" fill="#2c3e50">优先：本地缓存过滤</text>
+  <text x="800" y="310" font-size="9" fill="#2c3e50">兜底：Overture Maps CLI (GeoJSON)</text>
+  <text x="800" y="324" font-size="9" fill="#7f8c8d">→ RawData/Overture/{area}_buildings_v001.geojson</text>
+
+  <!-- 瓦片缓存标注 -->
+  <rect x="1140" y="350" width="200" height="55" rx="4" fill="#fef9e7" stroke="#f39c12" stroke-width="1"/>
+  <text x="1155" y="367" font-size="9" fill="#f39c12" font-weight="bold">_tile_cache.py</text>
+  <text x="1155" y="381" font-size="9" fill="#7f8c8d">城市级预缓存机制</text>
+  <text x="1155" y="395" font-size="9" fill="#7f8c8d">由 cache_city_data.py 预填充</text>
+
+  <!-- 三路汇合箭头 -->
+  <line x1="240" y1="332" x2="240" y2="370" stroke="#333" stroke-width="1"/>
+  <line x1="590" y1="332" x2="590" y2="370" stroke="#333" stroke-width="1"/>
+  <line x1="940" y1="332" x2="940" y2="370" stroke="#333" stroke-width="1"/>
+  <line x1="240" y1="370" x2="700" y2="400" stroke="#333" stroke-width="1"/>
+  <line x1="590" y1="370" x2="700" y2="400" stroke="#333" stroke-width="1"/>
+  <line x1="940" y1="370" x2="700" y2="400" stroke="#333" stroke-width="1"/>
+
+  <!-- 原始备份 -->
+  <rect x="560" y="405" width="280" height="35" rx="4" fill="#eafaf1" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="580" y="422" font-size="10" fill="#27ae60" font-weight="bold">自动备份（首次）</text>
+  <text x="710" y="422" font-size="9" fill="#2c3e50">→ _downloads/{area}/ 不可变副本</text>
+  <text x="580" y="434" font-size="8" fill="#7f8c8d">仅首次执行，原始数据永不丢失</text>
+
+  <line x1="700" y1="440" x2="700" y2="470" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- active_area.json 浮动标注 -->
+  <rect x="1140" y="198" width="200" height="50" rx="4" fill="#fff3cd" stroke="#f39c12" stroke-width="1"/>
+  <text x="1155" y="216" font-size="10" fill="#f39c12" font-weight="bold">active_area.json</text>
+  <text x="1155" y="230" font-size="9" fill="#7f8c8d">area_id, osm_file, buildings_file</text>
+  <text x="1155" y="242" font-size="9" fill="#7f8c8d">dem_csv, dem_source, origin_lon/lat</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 阶段二：数据精炼 -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <rect x="30" y="475" width="1340" height="580" rx="6" fill="none" stroke="#27ae60" stroke-width="2" stroke-dasharray="8,4"/>
+  <rect x="30" y="475" width="260" height="24" rx="4" fill="#27ae60"/>
+  <text x="40" y="491" fill="white" font-size="12" font-weight="bold">阶段二：数据精炼（清洗）</text>
+  <text x="300" y="491" fill="#27ae60" font-size="11">refine_data.py [5/6]</text>
+
+  <!-- 数据源探测 -->
+  <rect x="520" y="510" width="360" height="45" rx="4" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+  <text x="540" y="528" font-size="10" fill="#f39c12" font-weight="bold">数据源更新探测（可选）</text>
+  <text x="540" y="543" font-size="9" fill="#7f8c8d">查询远端版本 → 提示用户是否更新 → 24h 缓存</text>
+
+  <line x1="700" y1="555" x2="700" y2="575" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 输入QA -->
+  <rect x="520" y="578" width="360" height="40" rx="4" fill="#fdedec" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="540" y="594" font-size="10" fill="#c0392b" font-weight="bold">输入 QA 门禁</text>
+  <text x="540" y="609" font-size="9" fill="#2c3e50">文件存在？尺寸合理？格式合法？高度非全默认？</text>
+  <!-- 失败路径 -->
+  <line x1="880" y1="598" x2="950" y2="598" stroke="#c0392b" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+  <text x="960" y="602" font-size="10" fill="#c0392b" font-weight="bold">失败 → 中止</text>
+
+  <line x1="700" y1="618" x2="700" y2="638" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- L1：建筑 -->
+  <rect x="80" y="642" width="370" height="75" rx="4" fill="#fff" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="100" y="660" font-size="10" fill="#27ae60" font-weight="bold">建筑 L1：标准化 + 基础过滤</text>
+  <text x="100" y="676" font-size="9" fill="#2c3e50">1. 删除 null/非多边形几何体</text>
+  <text x="100" y="690" font-size="9" fill="#2c3e50">2. 删除退化多边形（唯一顶点&lt;3）</text>
+  <text x="100" y="704" font-size="9" fill="#2c3e50">3. 面积&lt;5m² 删除 + 3m去重 + 高度修复</text>
+
+  <!-- L1：道路 -->
+  <rect x="480" y="642" width="370" height="75" rx="4" fill="#fff" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="500" y="660" font-size="10" fill="#27ae60" font-weight="bold">道路 L1：过滤 + 白名单</text>
+  <text x="500" y="676" font-size="9" fill="#2c3e50">1. 删除过短路段（节点&lt;2）</text>
+  <text x="500" y="690" font-size="9" fill="#2c3e50">2. 删除孤儿节点引用</text>
+  <text x="500" y="704" font-size="9" fill="#2c3e50">3. highway 类型白名单（15种）</text>
+
+  <!-- L1：DEM -->
+  <rect x="880" y="642" width="370" height="75" rx="4" fill="#fff" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="900" y="660" font-size="10" fill="#27ae60" font-weight="bold">DEM L1：格网验证</text>
+  <text x="900" y="676" font-size="9" fill="#2c3e50">1. CSV 格式检查（x,y,z 表头）</text>
+  <text x="900" y="690" font-size="9" fill="#2c3e50">2. NaN 空值检测与计数</text>
+  <text x="900" y="704" font-size="9" fill="#2c3e50">3. 格网维度自动推断</text>
+
+  <!-- L2 行 -->
+  <line x1="265" y1="717" x2="265" y2="740" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="665" y1="717" x2="665" y2="740" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="1065" y1="717" x2="1065" y2="740" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="80" y="743" width="370" height="55" rx="4" fill="#fff" stroke="#27ae60" stroke-width="1.2"/>
+  <text x="100" y="762" font-size="10" fill="#27ae60" font-weight="bold">建筑 L2：（预留）</text>
+  <text x="100" y="778" font-size="9" fill="#7f8c8d">未来：形态语法验证、面积分组</text>
+  <text x="100" y="792" font-size="9" fill="#7f8c8d">当前：直通（L1 已含深度清洗）</text>
+
+  <rect x="480" y="743" width="370" height="55" rx="4" fill="#fff" stroke="#27ae60" stroke-width="1.2"/>
+  <text x="500" y="762" font-size="10" fill="#27ae60" font-weight="bold">道路 L2：端点焊接 + 链式合并</text>
+  <text x="500" y="778" font-size="9" fill="#2c3e50">1. 端点焊接（1m 容差）</text>
+  <text x="500" y="792" font-size="9" fill="#2c3e50">2. 同类型连通路段合并</text>
+
+  <rect x="880" y="743" width="370" height="55" rx="4" fill="#fff" stroke="#27ae60" stroke-width="1.2"/>
+  <text x="900" y="762" font-size="10" fill="#27ae60" font-weight="bold">DEM L2：DTM 修正（条件性）</text>
+  <text x="900" y="778" font-size="9" fill="#2c3e50">FABDEM → 跳过（已是 DTM）</text>
+  <text x="900" y="792" font-size="9" fill="#2c3e50">NASADEM → 建筑掩码 + IDW 插值填充</text>
+
+  <!-- L3 行（仅建筑） -->
+  <line x1="265" y1="798" x2="265" y2="818" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="80" y="822" width="370" height="55" rx="4" fill="#fff" stroke="#27ae60" stroke-width="1.2"/>
+  <text x="100" y="840" font-size="10" fill="#27ae60" font-weight="bold">建筑 L3：高度补全</text>
+  <text x="100" y="856" font-size="9" fill="#2c3e50">1. Overpass 查询 OSM building:levels + height</text>
+  <text x="100" y="870" font-size="9" fill="#2c3e50">2. 空间连接（8m 网格哈希）→ 更新 Overture 高度</text>
+
+  <!-- Manifest 标注 -->
+  <rect x="1140" y="830" width="200" height="50" rx="4" fill="#eafaf1" stroke="#27ae60" stroke-width="1"/>
+  <text x="1155" y="848" font-size="9" fill="#27ae60" font-weight="bold">_manifest.json</text>
+  <text x="1155" y="862" font-size="9" fill="#7f8c8d">记录各数据类型当前等级</text>
+  <text x="1155" y="876" font-size="9" fill="#7f8c8d">已达标则跳过（缓存机制）</text>
+
+  <!-- 三路汇合到导出 -->
+  <line x1="265" y1="877" x2="265" y2="910" stroke="#333" stroke-width="1"/>
+  <line x1="665" y1="798" x2="665" y2="910" stroke="#333" stroke-width="1"/>
+  <line x1="1065" y1="798" x2="1065" y2="910" stroke="#333" stroke-width="1"/>
+  <line x1="265" y1="910" x2="700" y2="930" stroke="#333" stroke-width="1"/>
+  <line x1="665" y1="910" x2="700" y2="930" stroke="#333" stroke-width="1"/>
+  <line x1="1065" y1="910" x2="700" y2="930" stroke="#333" stroke-width="1"/>
+
+  <!-- 导出到 houdini_ready -->
+  <rect x="520" y="935" width="360" height="40" rx="4" fill="#d5f5e3" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="540" y="952" font-size="10" fill="#27ae60" font-weight="bold">导出 → _houdini_ready/{area}/</text>
+  <text x="540" y="966" font-size="9" fill="#2c3e50">buildings.geojson + roads.osm + dem.csv + meta.json</text>
+
+  <line x1="700" y1="975" x2="700" y2="995" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 过程QA + 输出QA -->
+  <rect x="520" y="998" width="360" height="50" rx="4" fill="#fdedec" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="540" y="1016" font-size="10" fill="#c0392b" font-weight="bold">过程 QA + 输出 QA 门禁</text>
+  <text x="540" y="1030" font-size="9" fill="#2c3e50">保留率50-99%？DEM修正&lt;30m？</text>
+  <text x="540" y="1042" font-size="9" fill="#2c3e50">输出文件齐全？抽样合格？坐标范围正常？</text>
+
+  <line x1="700" y1="1048" x2="700" y2="1075" stroke="#27ae60" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="710" y="1065" font-size="9" fill="#27ae60">通过</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 阶段三：Houdini 资产生成 -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <rect x="30" y="1080" width="1340" height="820" rx="6" fill="none" stroke="#8e44ad" stroke-width="2" stroke-dasharray="8,4"/>
+  <rect x="30" y="1080" width="310" height="24" rx="4" fill="#8e44ad"/>
+  <text x="40" y="1096" fill="white" font-size="12" font-weight="bold">阶段三：Houdini 程序化生成</text>
+  <text x="355" y="1096" fill="#8e44ad" font-size="11">_recook_new_area.py [6/6]</text>
+
+  <!-- RPYC 连接 -->
+  <rect x="520" y="1115" width="360" height="35" rx="4" fill="#f4ecf7" stroke="#8e44ad" stroke-width="1.5"/>
+  <text x="540" y="1136" font-size="10" fill="#8e44ad" font-weight="bold">RPYC 连接 → Houdini（端口 18811）</text>
+  <text x="795" y="1136" font-size="9" fill="#7f8c8d">无 HIP 时自动加载</text>
+
+  <line x1="700" y1="1150" x2="700" y2="1170" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- SOP 修复：路径适配 -->
+  <rect x="80" y="1173" width="560" height="35" rx="4" fill="#fff" stroke="#8e44ad" stroke-width="1.2"/>
+  <text x="100" y="1194" font-size="10" fill="#8e44ad" font-weight="bold">路径适配 + UTM 投影</text>
+  <text x="250" y="1194" font-size="9" fill="#2c3e50">动态 ROOT + 内嵌 UTM Zone 47N（精度 &lt;0.01m @5km）</text>
+
+  <!-- SOP 修复：代码注入 -->
+  <rect x="80" y="1218" width="560" height="90" rx="4" fill="#fff" stroke="#8e44ad" stroke-width="1.2"/>
+  <text x="100" y="1238" font-size="10" fill="#8e44ad" font-weight="bold">SOP 代码注入（Python + VEX）</text>
+  <text x="100" y="1254" font-size="9" fill="#2c3e50">osm_import → 标准解析代码（Overture 优先 + OSM 建筑兜底）</text>
+  <text x="100" y="1268" font-size="9" fill="#2c3e50">dem_import / dem_terrain → 动态 CSV 读取（修复 H-005/H-006）</text>
+  <text x="100" y="1282" font-size="9" fill="#2c3e50">道路贴地 → xyzdist VEX 重投影（修复 H-007，替代 Ray SOP）</text>
+  <text x="100" y="1296" font-size="9" fill="#2c3e50">建筑贴地 → 逐顶点最高高度 MAX VEX（修复 H-011，防埋没）</text>
+
+  <!-- 道路宽度 + 面片 -->
+  <rect x="680" y="1218" width="560" height="90" rx="4" fill="#fff" stroke="#8e44ad" stroke-width="1.2"/>
+  <text x="700" y="1238" font-size="10" fill="#8e44ad" font-weight="bold">道路 + 建筑 VEX 逻辑</text>
+  <text x="700" y="1254" font-size="9" fill="#2c3e50">道路宽度 → 三级优先: osm_width &gt; lanes×1.75 &gt; 14级分类表</text>
+  <text x="700" y="1268" font-size="9" fill="#2c3e50">道路面片 → v2 Python SOP（修剪 + 交叉口凸包）</text>
+  <text x="700" y="1282" font-size="9" fill="#2c3e50">程序化高度 → 面积推算楼层 + bld_class 差异化层高</text>
+  <text x="700" y="1296" font-size="9" fill="#2c3e50">建筑分割 → 禁用 convex 保留原始轮廓（修复 Q-001）</text>
+
+  <line x1="400" y1="1308" x2="400" y2="1330" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="960" y1="1308" x2="960" y2="1330" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="400" y1="1330" x2="700" y2="1345" stroke="#333" stroke-width="1"/>
+  <line x1="960" y1="1330" x2="700" y2="1345" stroke="#333" stroke-width="1"/>
+
+  <!-- 强制重算 -->
+  <rect x="520" y="1348" width="360" height="40" rx="4" fill="#f4ecf7" stroke="#8e44ad" stroke-width="1.5"/>
+  <text x="540" y="1366" font-size="10" fill="#8e44ad" font-weight="bold">强制重算数据源节点</text>
+  <text x="540" y="1382" font-size="9" fill="#2c3e50">osm_import + dem_import + dem_terrain → cook(force=True)</text>
+
+  <line x1="700" y1="1388" x2="700" y2="1413" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 地形细分 -->
+  <rect x="520" y="1416" width="360" height="35" rx="4" fill="#fff" stroke="#8e44ad" stroke-width="1.2"/>
+  <text x="540" y="1437" font-size="10" fill="#8e44ad" font-weight="bold">地形细分 dem_subdivide</text>
+  <text x="730" y="1437" font-size="9" fill="#2c3e50">双线性 ×2 迭代（30m → ~7.5m）H-010</text>
+
+  <line x1="700" y1="1451" x2="700" y2="1471" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 全链路验证 -->
+  <rect x="520" y="1474" width="360" height="55" rx="4" fill="#fdedec" stroke="#c0392b" stroke-width="1.2"/>
+  <text x="540" y="1492" font-size="10" fill="#c0392b" font-weight="bold">全链路节点验证</text>
+  <text x="540" y="1506" font-size="9" fill="#2c3e50">建筑提取 ≥50点？贴地 ≥50点？拉伸 ≥50点？</text>
+  <text x="540" y="1520" font-size="9" fill="#2c3e50">道路面片 ≥100点？高度范围合理？</text>
+
+  <line x1="700" y1="1529" x2="700" y2="1549" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 裁剪 + 着色 + 合并 -->
+  <rect x="80" y="1552" width="380" height="80" rx="4" fill="#fff" stroke="#8e44ad" stroke-width="1.2"/>
+  <text x="100" y="1572" font-size="10" fill="#8e44ad" font-weight="bold">裁剪 + 贴地 + 着色</text>
+  <text x="100" y="1588" font-size="9" fill="#2c3e50">建筑裁剪：VEX 质心在 DEM 范围内（50m 余量）</text>
+  <text x="100" y="1602" font-size="9" fill="#2c3e50">道路裁剪：同上 + 道路面片贴地重投影</text>
+  <text x="100" y="1616" font-size="9" fill="#2c3e50">道路拉伸：PolyExtrude 0.18m（侧面+顶面）</text>
+  <text x="100" y="1630" font-size="9" fill="#7f8c8d">颜色：道路=白色, 建筑=灰色, 地形=深灰</text>
+
+  <rect x="520" y="1552" width="360" height="80" rx="4" fill="#fff" stroke="#8e44ad" stroke-width="1.2"/>
+  <text x="540" y="1572" font-size="10" fill="#8e44ad" font-weight="bold">合并 + 保存</text>
+  <text x="540" y="1588" font-size="9" fill="#2c3e50">merge_all：建筑+道路拉伸+地形 三合一</text>
+  <text x="540" y="1602" font-size="9" fill="#2c3e50">自动布局 → hou.hipFile.save()</text>
+  <text x="540" y="1616" font-size="9" fill="#2c3e50">归档：VC_{area_id}_citygen_v001.hip</text>
+  <text x="540" y="1630" font-size="9" fill="#7f8c8d">全链路强制 cook → OUT_city 显示标志</text>
+
+  <!-- Houdini 节点网络 -->
+  <rect x="940" y="1552" width="400" height="80" rx="4" fill="#f4ecf7" stroke="#8e44ad" stroke-width="1"/>
+  <text x="960" y="1570" font-size="9" fill="#8e44ad" font-weight="bold">Houdini 节点网络 (/obj/{obj_network})</text>
+  <text x="960" y="1586" font-size="8" fill="#2c3e50">osm_import → extract_buildings → divide_bld → snap_bld →</text>
+  <text x="960" y="1599" font-size="8" fill="#2c3e50">  extrude_buildings → post_normals → bld_clipped → bld_color</text>
+  <text x="960" y="1612" font-size="8" fill="#2c3e50">osm_import → resample_roads → snap_roads → road_width →</text>
+  <text x="960" y="1625" font-size="8" fill="#2c3e50">  road_strips → snap_road_strips → road_clipped → road_extrude</text>
+
+  <!-- 输出箭头 -->
+  <line x1="700" y1="1632" x2="700" y2="1660" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Houdini 输出 -->
+  <rect x="480" y="1665" width="440" height="45" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+  <text x="510" y="1684" font-size="11" fill="#27ae60" font-weight="bold">Houdini 产出：OUT_city（显示+渲染标志）</text>
+  <text x="510" y="1700" font-size="9" fill="#2c3e50">建筑（拉伸体）+ 道路（拉伸面片）+ 地形（细分网格）</text>
+
+  <!-- 导出箭头 -->
+  <line x1="700" y1="1710" x2="700" y2="1740" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 用户确认 -->
+  <rect x="520" y="1745" width="360" height="40" rx="20" fill="#fef9e7" stroke="#f39c12" stroke-width="2"/>
+  <text x="700" y="1768" text-anchor="middle" font-size="11" fill="#f39c12" font-weight="bold">用户视口确认（人工检查 Houdini 视口）</text>
+
+  <line x1="700" y1="1785" x2="700" y2="1815" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 阶段四：导出 + UE5 -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <rect x="30" y="1820" width="1340" height="220" rx="6" fill="none" stroke="#e67e22" stroke-width="2" stroke-dasharray="8,4"/>
+  <rect x="30" y="1820" width="310" height="24" rx="4" fill="#e67e22"/>
+  <text x="40" y="1836" fill="white" font-size="12" font-weight="bold">阶段四：FBX 导出 + UE5 导入</text>
+  <text x="350" y="1836" fill="#e67e22" font-size="11">export_and_import.py（手动触发）</text>
+
+  <!-- FBX 导出 -->
+  <rect x="80" y="1860" width="400" height="70" rx="4" fill="#fff" stroke="#e67e22" stroke-width="1.5"/>
+  <text x="100" y="1878" font-size="10" fill="#e67e22" font-weight="bold">FBX 分类导出</text>
+  <text x="100" y="1894" font-size="9" fill="#2c3e50">buildings_v001.fbx ← bld_clipped（兜底: post_normals）</text>
+  <text x="100" y="1908" font-size="9" fill="#2c3e50">roads_v001.fbx ← road_clipped（兜底: road_strips）</text>
+  <text x="100" y="1922" font-size="9" fill="#2c3e50">terrain_v001.fbx ← dem_terrain</text>
+
+  <text x="500" y="1878" font-size="9" fill="#c0392b" font-weight="bold">convertunits=1</text>
+  <text x="500" y="1893" font-size="8" fill="#7f8c8d">(H-008: Houdini 米 → UE 厘米 ×100)</text>
+
+  <!-- 箭头 -->
+  <line x1="480" y1="1910" x2="560" y2="1910" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- UE5 触发 -->
+  <rect x="570" y="1860" width="400" height="70" rx="4" fill="#fff" stroke="#e67e22" stroke-width="1.5"/>
+  <text x="590" y="1878" font-size="10" fill="#e67e22" font-weight="bold">UE5 自动导入触发</text>
+  <text x="590" y="1894" font-size="9" fill="#2c3e50">写入 .ue5_trigger → ue5_import_fbx.py 路径</text>
+  <text x="590" y="1908" font-size="9" fill="#2c3e50">UE5 编辑器监听到后自动执行导入脚本</text>
+  <text x="590" y="1922" font-size="9" fill="#2c3e50">Remote Control API → 放置网格体到关卡</text>
+
+  <!-- 最终箭头 -->
+  <line x1="770" y1="1930" x2="770" y2="1960" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 最终产出 -->
+  <rect x="520" y="1963" width="500" height="40" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+  <text x="770" y="1983" text-anchor="middle" font-size="12" fill="#27ae60" font-weight="bold">UE5 场景：白盒城市（建筑 + 道路 + 地形）</text>
+  <text x="770" y="1997" text-anchor="middle" font-size="9" fill="#7f8c8d">VirtualCityUE.uproject — Nanite/Lumen 就绪</text>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 图例 -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <rect x="30" y="2060" width="1340" height="120" rx="6" fill="#fff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="50" y="2082" font-size="11" font-weight="bold" fill="#2c3e50">图例</text>
+
+  <!-- 颜色图例 -->
+  <rect x="50" y="2092" width="14" height="14" rx="2" fill="#3498db"/>
+  <text x="72" y="2103" font-size="10" fill="#2c3e50">数据获取</text>
+
+  <rect x="160" y="2092" width="14" height="14" rx="2" fill="#27ae60"/>
+  <text x="182" y="2103" font-size="10" fill="#2c3e50">数据精炼（可缓存、可跳过）</text>
+
+  <rect x="380" y="2092" width="14" height="14" rx="2" fill="#8e44ad"/>
+  <text x="402" y="2103" font-size="10" fill="#2c3e50">Houdini 程序化生成 (RPYC)</text>
+
+  <rect x="610" y="2092" width="14" height="14" rx="2" fill="#e67e22"/>
+  <text x="632" y="2103" font-size="10" fill="#2c3e50">导出 + UE5</text>
+
+  <rect x="740" y="2092" width="14" height="14" rx="2" fill="#c0392b"/>
+  <text x="762" y="2103" font-size="10" fill="#2c3e50">QA 门禁（失败则阻断）</text>
+
+  <rect x="940" y="2092" width="14" height="14" rx="2" fill="#f39c12"/>
+  <text x="962" y="2103" font-size="10" fill="#2c3e50">用户决策 / 配置</text>
+
+  <!-- 关键文件 -->
+  <text x="50" y="2130" font-size="9" fill="#7f8c8d">核心脚本：set_area.py → refine_data.py → _recook_new_area.py → export_and_import.py</text>
+  <text x="50" y="2145" font-size="9" fill="#7f8c8d">配置文件：active_area.json (dem_source) | 精炼清单：_manifest.json | QA报告：Config/qa/</text>
+  <text x="50" y="2160" font-size="9" fill="#7f8c8d">缓存目录：_downloads/ | _cleaned/ | _houdini_ready/ | _tiles/ | 投影：_utm_lite.py（零依赖 UTM）</text>
+  <text x="50" y="2175" font-size="9" fill="#7f8c8d">精度审核修复：#1 FABDEM DTM | #2 UTM | #3 snap MAX | #4 lanes/width | #5 bld_class 层高 | #6 匹配8m</text>
+</svg>

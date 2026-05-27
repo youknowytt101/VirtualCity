@@ -4073,6 +4073,11 @@
     <tag k="oneway" v="yes" />
     <tag k="surface" v="asphalt" />
   </way>
+  <way id="27622059">
+    <nd ref="6770362443" />
+    <nd ref="303340682" />
+    <tag k="highway" v="steps" />
+  </way>
   <way id="27670504">
     <nd ref="303894233" />
     <nd ref="303896248" />
@@ -8958,6 +8963,11 @@
     <tag k="highway" v="footway" />
     <tag k="layer" v="1" />
   </way>
+  <way id="328588349">
+    <nd ref="303340683" />
+    <nd ref="6770746567" />
+    <tag k="highway" v="steps" />
+  </way>
   <way id="331327945">
     <nd ref="3383901515" />
     <nd ref="3383901511" />
@@ -9649,6 +9659,11 @@
     <tag k="oneway" v="yes" />
     <tag k="service" v="driveway" />
     <tag k="surface" v="paving_stones" />
+  </way>
+  <way id="683336209">
+    <nd ref="6400424934" />
+    <nd ref="6400424935" />
+    <tag k="highway" v="steps" />
   </way>
   <way id="683336210">
     <nd ref="6400424935" />
@@ -12509,6 +12524,15 @@
     <nd ref="11155775986" />
     <tag k="highway" v="footway" />
   </way>
+  <way id="1203462382">
+    <nd ref="11155775986" />
+    <nd ref="11155775987" />
+    <tag k="handrail" v="no" />
+    <tag k="highway" v="steps" />
+    <tag k="step_count" v="2" />
+    <tag k="surface" v="concrete" />
+    <tag k="tactile_paving" v="no" />
+  </way>
   <way id="1203761190">
     <nd ref="11157618017" />
     <nd ref="11157618020" />
@@ -12519,6 +12543,14 @@
     <nd ref="11157618018" />
     <nd ref="11157618019" />
     <tag k="highway" v="footway" />
+  </way>
+  <way id="1203761192">
+    <nd ref="11157618020" />
+    <nd ref="11157618021" />
+    <tag k="handrail" v="yes" />
+    <tag k="highway" v="steps" />
+    <tag k="step_count" v="4" />
+    <tag k="surface" v="concrete" />
   </way>
   <way id="1203761193">
     <nd ref="11157618025" />
@@ -12648,6 +12680,14 @@
     <nd ref="11181063734" />
     <tag k="highway" v="service" />
     <tag k="service" v="driveway" />
+  </way>
+  <way id="1206620178">
+    <nd ref="11181174757" />
+    <nd ref="11181174758" />
+    <nd ref="11181174759" />
+    <nd ref="11181174760" />
+    <nd ref="11181174757" />
+    <tag k="highway" v="services" />
   </way>
   <way id="1206659812">
     <nd ref="11181453392" />
@@ -13039,6 +13079,18 @@
     <nd ref="11211480579" />
     <tag k="highway" v="service" />
     <tag k="service" v="driveway" />
+  </way>
+  <way id="1210222511">
+    <nd ref="11211847384" />
+    <nd ref="11189652013" />
+    <nd ref="11211847385" />
+    <nd ref="11211847386" />
+    <nd ref="11211847387" />
+    <nd ref="11211847388" />
+    <nd ref="11189672621" />
+    <nd ref="11211847389" />
+    <nd ref="11211847384" />
+    <tag k="highway" v="services" />
   </way>
   <way id="1210263307">
     <nd ref="11212172516" />
