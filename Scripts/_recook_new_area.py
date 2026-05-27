@@ -274,7 +274,7 @@ _rs_node = hou.node(OBJ_PATH + '/road_strips')
 if _rs_node:
     _rs_node.parm('python').set(_rs_v2_code)
     _rs_node.setInput(0, _rwf_node, 0)
-    print('  road_strips v4 已更新（调试属性 + 自交保护 + 凸包填充）')
+    print('  road_strips v5 已更新（复杂路口降级 + 调试属性 + 自交保护）')
 
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = """

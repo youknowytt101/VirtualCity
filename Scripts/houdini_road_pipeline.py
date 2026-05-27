@@ -115,6 +115,7 @@ if (hit_prim >= 0) {
 
 ROAD_BBOX_CLIP_TEMPLATE = r"""
 import hou
+import math
 
 XMIN = __XMIN__
 XMAX = __XMAX__
@@ -141,6 +142,17 @@ for attrib in geo_in.globalAttribs():
         global_attribs.append(attrib.name())
     except Exception:
         pass
+
+def ensure_global(name, default):
+    try:
+        if geo.findGlobalAttrib(name) is None:
+            geo.addAttrib(hou.attribType.Global, name, default)
+    except Exception:
+        pass
+
+ensure_global("road_bbox_triangulated_count", 0)
+ensure_global("road_bbox_clipped_ngon_count", 0)
+ensure_global("road_bbox_preserved_ngon_count", 0)
 
 def inside(p, axis, value, keep_greater):
     return p[axis] >= value if keep_greater else p[axis] <= value
@@ -179,7 +191,88 @@ def clip_poly(poly):
     poly = clip_boundary(poly, 0, XMAX, False)
     poly = clip_boundary(poly, 2, ZMIN, True)
     poly = clip_boundary(poly, 2, ZMAX, False)
-    return poly
+    return clean_poly(poly)
+
+def dist_xz(a, b):
+    dx = a[0] - b[0]
+    dz = a[2] - b[2]
+    return (dx * dx + dz * dz) ** 0.5
+
+def clean_poly(poly, eps=0.05):
+    out = []
+    for pos in poly:
+        if out and dist_xz(out[-1], pos) < eps:
+            continue
+        out.append(pos)
+    if len(out) > 1 and dist_xz(out[0], out[-1]) < eps:
+        out.pop()
+    return out
+
+def poly_area_xz(poly):
+    if len(poly) < 3:
+        return 0.0
+    area = 0.0
+    for idx, p in enumerate(poly):
+        q = poly[(idx + 1) % len(poly)]
+        area += p[0] * q[2] - q[0] * p[2]
+    return abs(area) * 0.5
+
+def poly_min_angle_xz(poly):
+    if len(poly) < 3:
+        return None
+    angles = []
+    for idx, cur in enumerate(poly):
+        prev = poly[(idx - 1) % len(poly)]
+        nxt = poly[(idx + 1) % len(poly)]
+        ax, az = prev[0] - cur[0], prev[2] - cur[2]
+        bx, bz = nxt[0] - cur[0], nxt[2] - cur[2]
+        al = (ax * ax + az * az) ** 0.5
+        bl = (bx * bx + bz * bz) ** 0.5
+        if al <= 0.05 or bl <= 0.05:
+            continue
+        dot = max(-1.0, min(1.0, (ax * bx + az * bz) / (al * bl)))
+        angles.append(math.degrees(math.acos(dot)))
+    return min(angles) if angles else None
+
+def centroid(poly):
+    return hou.Vector3(
+        sum(p[0] for p in poly) / len(poly),
+        sum(p[1] for p in poly) / len(poly),
+        sum(p[2] for p in poly) / len(poly),
+    )
+
+def copy_prim_attrs(src_prim, out_prim, out_poly):
+    for name in prim_attribs:
+        try:
+            if name == "road_face_area":
+                out_prim.setAttribValue(name, float(poly_area_xz(out_poly)))
+            elif name == "junction_fill_strategy" and len(out_poly) == 3 and len(src_prim.vertices()) > 4:
+                out_prim.setAttribValue(name, "bbox_fan_triangulated")
+            else:
+                out_prim.setAttribValue(name, src_prim.attribValue(name))
+        except Exception:
+            pass
+
+def emit_polygon(src_prim, out_poly):
+    if poly_area_xz(out_poly) <= 1e-5:
+        return None
+    angle = poly_min_angle_xz(out_poly)
+    if angle is not None and angle < 5.0:
+        return None
+    hpts = []
+    for pos in out_poly:
+        p = geo.createPoint()
+        p.setPosition(pos)
+        hpts.append(p)
+    out_prim = geo.createPolygon()
+    for p in hpts:
+        out_prim.addVertex(p)
+    copy_prim_attrs(src_prim, out_prim, out_poly)
+    return out_prim
+
+road_bbox_triangulated_count = 0
+road_bbox_clipped_ngon_count = 0
+road_bbox_preserved_ngon_count = 0
 
 for prim in geo_in.prims():
     try:
@@ -193,19 +286,20 @@ for prim in geo_in.prims():
     clipped = clip_poly(pts)
     if len(clipped) < 3:
         continue
-    hpts = []
-    for pos in clipped:
-        p = geo.createPoint()
-        p.setPosition(pos)
-        hpts.append(p)
-    out_prim = geo.createPolygon()
-    for p in hpts:
-        out_prim.addVertex(p)
-    for name in prim_attribs:
-        try:
-            out_prim.setAttribValue(name, prim.attribValue(name))
-        except Exception:
-            pass
+    if len(clipped) > 4:
+        road_bbox_clipped_ngon_count += 1
+        center = centroid(clipped)
+        for idx, pos in enumerate(clipped):
+            tri = [center, pos, clipped[(idx + 1) % len(clipped)]]
+            if emit_polygon(prim, tri) is not None:
+                road_bbox_triangulated_count += 1
+    else:
+        if emit_polygon(prim, clipped) is None:
+            continue
+
+geo.setGlobalAttribValue("road_bbox_triangulated_count", int(road_bbox_triangulated_count))
+geo.setGlobalAttribValue("road_bbox_clipped_ngon_count", int(road_bbox_clipped_ngon_count))
+geo.setGlobalAttribValue("road_bbox_preserved_ngon_count", int(road_bbox_preserved_ngon_count))
 """
 
 

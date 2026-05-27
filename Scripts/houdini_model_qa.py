@@ -217,12 +217,18 @@ def _vc_model_qa_road_faces(node_path):
     self_intersection_count = 0
     self_intersecting_prim_count = 0
     junction_fill_count = 0
+    max_junction_edge_count = 0
+    max_junction_approach_count = 0
+    junction_strategy_counts = {}
+    ngon_count = 0
     max_segment_len = 0.0
     max_face_area_attr = 0.0
 
     for prim in geo.prims():
         verts = len(prim.vertices())
         max_vertices = max(max_vertices, verts)
+        if verts > 4:
+            ngon_count += 1
         try:
             if not prim.isClosed():
                 open_prims += 1
@@ -260,6 +266,11 @@ def _vc_model_qa_road_faces(node_path):
 
         if int(prim_attr(prim, "is_junction", 0) or 0) == 1:
             junction_fill_count += 1
+            max_junction_edge_count = max(max_junction_edge_count, int(prim_attr(prim, "junction_edge_count", 0) or 0))
+            max_junction_approach_count = max(max_junction_approach_count, int(prim_attr(prim, "junction_approach_count", 0) or 0))
+            strategy = str(prim_attr(prim, "junction_fill_strategy", "") or "")
+            if strategy:
+                junction_strategy_counts[strategy] = junction_strategy_counts.get(strategy, 0) + 1
         try:
             max_segment_len = max(max_segment_len, float(prim_attr(prim, "road_segment_len", 0.0) or 0.0))
             max_face_area_attr = max(max_face_area_attr, float(prim_attr(prim, "road_face_area", 0.0) or 0.0))
@@ -269,13 +280,18 @@ def _vc_model_qa_road_faces(node_path):
     rejected_small = int(global_attr("junction_rejected_small_count", 0) or 0)
     rejected_radius = int(global_attr("junction_rejected_radius_count", 0) or 0)
     rejected_area = int(global_attr("junction_rejected_area_count", 0) or 0)
-    rejected_total = int(global_attr("junction_rejected_total_count", rejected_small + rejected_radius + rejected_area) or 0)
+    rejected_complex = int(global_attr("junction_rejected_complex_count", 0) or 0)
+    rejected_total = int(global_attr("junction_rejected_total_count", rejected_small + rejected_radius + rejected_area + rejected_complex) or 0)
+    bbox_triangulated = int(global_attr("road_bbox_triangulated_count", 0) or 0)
+    bbox_clipped_ngon = int(global_attr("road_bbox_clipped_ngon_count", 0) or 0)
+    bbox_preserved_ngon = int(global_attr("road_bbox_preserved_ngon_count", 0) or 0)
 
     return json.dumps({
         "missing": False,
         "prims": int(geo.intrinsicValue("primitivecount")),
         "open_prims": open_prims,
         "max_vertices": max_vertices,
+        "ngon_count": ngon_count,
         "max_area_xz": max_area,
         "area_warn_threshold": area_warn,
         "area_fail_threshold": area_fail,
@@ -295,10 +311,17 @@ def _vc_model_qa_road_faces(node_path):
         "self_intersection_count": self_intersection_count,
         "self_intersecting_prim_count": self_intersecting_prim_count,
         "junction_fill_count": junction_fill_count,
+        "max_junction_edge_count": max_junction_edge_count,
+        "max_junction_approach_count": max_junction_approach_count,
+        "junction_strategy_counts": junction_strategy_counts,
         "junction_rejected_small_count": rejected_small,
         "junction_rejected_radius_count": rejected_radius,
         "junction_rejected_area_count": rejected_area,
+        "junction_rejected_complex_count": rejected_complex,
         "junction_rejected_total_count": rejected_total,
+        "road_bbox_triangulated_count": bbox_triangulated,
+        "road_bbox_clipped_ngon_count": bbox_clipped_ngon,
+        "road_bbox_preserved_ngon_count": bbox_preserved_ngon,
         "max_road_segment_len": max_segment_len,
         "max_road_face_area_attr": max_face_area_attr,
     })
@@ -1099,13 +1122,13 @@ class QA:
         else:
             self.add(label, PASS, f"{node_name} terrain placement is within threshold", **stats)
 
-    def check_road_faces(self) -> None:
-        node_path = f"{self.obj_path}/road_strips"
+    def _add_road_face_check(self, label: str, node_name: str, missing_message: str) -> None:
+        node_path = f"{self.obj_path}/{node_name}"
         detail = json.loads(self.conn.eval("_vc_model_qa_road_faces({})".format(json.dumps(node_path))))
         if detail.get("missing"):
-            self.add("road_faces", FAIL, "road_strips is missing")
+            self.add(label, FAIL, missing_message)
             return
-        self.metrics["road_faces"] = detail
+        self.metrics[label] = detail
         hard_fail = (
             detail["open_prims"]
             or detail["large_area_fail_count"]
@@ -1120,11 +1143,17 @@ class QA:
             or detail.get("small_angle_warn_count", 0)
         )
         if hard_fail:
-            self.add("road_faces", FAIL, "road strip geometry has invalid faces", **detail)
+            self.add(label, FAIL, f"{node_name} geometry has invalid faces", **detail)
         elif soft_warn:
-            self.add("road_faces", WARN, "road strip geometry has unusual face shapes", **detail)
+            self.add(label, WARN, f"{node_name} geometry has unusual face shapes", **detail)
         else:
-            self.add("road_faces", PASS, "road strip faces look bounded", **detail)
+            self.add(label, PASS, f"{node_name} faces look bounded", **detail)
+
+    def check_road_faces(self) -> None:
+        self._add_road_face_check("road_faces", "road_strips", "road_strips is missing")
+
+    def check_road_clipped_faces(self) -> None:
+        self._add_road_face_check("road_clipped_faces", "road_clipped", "road_clipped is missing")
 
     def check_terrain_density(self) -> None:
         dem = self.geo("dem_terrain")
@@ -1151,6 +1180,7 @@ class QA:
         self.check_building_bundle()
         self.terrain_delta_stats("bld_with_foundation", "dem_subdivide", "building_terrain_fit", -0.05)
         self.check_road_faces()
+        self.check_road_clipped_faces()
         self.terrain_delta_stats("road_clipped", "dem_subdivide", "road_terrain_fit", -0.05, miss_warn_ratio=0.35)
 
 

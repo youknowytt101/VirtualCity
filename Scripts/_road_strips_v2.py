@@ -1,6 +1,6 @@
 """
-road_strips v4 - full-vertex junction detection, segment trimming, junction fill,
-and debug attributes.
+road_strips v5 - full-vertex junction detection, segment trimming, bounded
+junction fill, complex-junction downgrade, and debug attributes.
 
 Input 0: road_width_flat (resampled centerlines + half_width/highway attrs)
 Output: road quads + bounded junction fill polygons.
@@ -20,6 +20,7 @@ MAX_JUNCTION_RADIUS_FACTOR = 2.8
 MAX_JUNCTION_RADIUS = 18.0
 MAX_JUNCTION_AREA_FACTOR = 10.0
 MAX_JUNCTION_AREA = 450.0
+MAX_CONVEX_FILL_EDGE_POINTS = 8
 
 
 # -- Attribute definitions ----------------------------------------------------
@@ -41,11 +42,15 @@ road_hw_a = prim_attrib("road_half_width", 0.0)
 seg_len_a = prim_attrib("road_segment_len", 0.0)
 face_area_a = prim_attrib("road_face_area", 0.0)
 reject_reason_a = prim_attrib("junction_rejected_reason", "")
+junction_edge_count_a = prim_attrib("junction_edge_count", 0)
+junction_approach_count_a = prim_attrib("junction_approach_count", 0)
+junction_fill_strategy_a = prim_attrib("junction_fill_strategy", "")
 
 global_attrib("junction_fill_count", 0)
 global_attrib("junction_rejected_small_count", 0)
 global_attrib("junction_rejected_radius_count", 0)
 global_attrib("junction_rejected_area_count", 0)
+global_attrib("junction_rejected_complex_count", 0)
 global_attrib("junction_rejected_total_count", 0)
 
 
@@ -200,7 +205,17 @@ def prim_highway(prim):
     return str(value)
 
 
-def set_road_attrs(poly, road, is_junction, segment_len, face_area, reason=""):
+def set_road_attrs(
+    poly,
+    road,
+    is_junction,
+    segment_len,
+    face_area,
+    reason="",
+    edge_count=0,
+    approach_count=0,
+    fill_strategy="",
+):
     hw = float(road.get("hw", 0.0))
     poly.setAttribValue(hw_attrib, hw)
     poly.setAttribValue(is_junc_a, int(is_junction))
@@ -210,6 +225,9 @@ def set_road_attrs(poly, road, is_junction, segment_len, face_area, reason=""):
     poly.setAttribValue(seg_len_a, float(segment_len))
     poly.setAttribValue(face_area_a, float(face_area))
     poly.setAttribValue(reject_reason_a, str(reason))
+    poly.setAttribValue(junction_edge_count_a, int(edge_count))
+    poly.setAttribValue(junction_approach_count_a, int(approach_count))
+    poly.setAttribValue(junction_fill_strategy_a, str(fill_strategy))
 
 
 # -- 1. Read roads ------------------------------------------------------------
@@ -429,10 +447,17 @@ junction_fill_count = 0
 junction_rejected_small_count = 0
 junction_rejected_radius_count = 0
 junction_rejected_area_count = 0
+junction_rejected_complex_count = 0
 
 for _jk, edge_data in junction_pts.items():
     if len(edge_data) < 3:
         junction_rejected_small_count += 1
+        continue
+
+    source_ids = {int(item.get("src_id", -1)) for item in edge_data}
+    approach_count = max(1, int(round(len(edge_data) * 0.5)))
+    if len(edge_data) > MAX_CONVEX_FILL_EDGE_POINTS:
+        junction_rejected_complex_count += 1
         continue
 
     edge_pts = [item["pos"] for item in edge_data]
@@ -466,20 +491,34 @@ for _jk, edge_data in junction_pts.items():
     for point in hpts:
         poly.addVertex(point)
 
-    source_ids = [int(item.get("src_id", -1)) for item in edge_data]
     road = {
         "src_id": min(source_ids) if source_ids else -1,
         "highway": "junction",
         "hw": max_hw,
     }
-    set_road_attrs(poly, road, 1, 0.0, hull_area)
+    set_road_attrs(
+        poly,
+        road,
+        1,
+        0.0,
+        hull_area,
+        edge_count=len(edge_data),
+        approach_count=approach_count,
+        fill_strategy="convex_hull",
+    )
     junction_fill_count += 1
 
 geo.setGlobalAttribValue("junction_fill_count", int(junction_fill_count))
 geo.setGlobalAttribValue("junction_rejected_small_count", int(junction_rejected_small_count))
 geo.setGlobalAttribValue("junction_rejected_radius_count", int(junction_rejected_radius_count))
 geo.setGlobalAttribValue("junction_rejected_area_count", int(junction_rejected_area_count))
+geo.setGlobalAttribValue("junction_rejected_complex_count", int(junction_rejected_complex_count))
 geo.setGlobalAttribValue(
     "junction_rejected_total_count",
-    int(junction_rejected_small_count + junction_rejected_radius_count + junction_rejected_area_count),
+    int(
+        junction_rejected_small_count
+        + junction_rejected_radius_count
+        + junction_rejected_area_count
+        + junction_rejected_complex_count
+    ),
 )
