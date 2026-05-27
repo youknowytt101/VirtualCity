@@ -1094,6 +1094,15 @@ if _out:
     _out.setRenderFlag(True)
 print('  [OK] 视口链已强制刷新')
 
+# Release the recook RPYC connection before the standalone QA subprocess opens
+# its own connection. Houdini's lightweight RPYC server can drop one stream when
+# two long-lived clients inspect geometry at the same time.
+try:
+    conn.close()
+except Exception:
+    pass
+conn = None
+
 # -- 6b. Quick model QA (fast regression gate) ---------------------------
 qa_status = ''
 qa_report = ''
@@ -1130,4 +1139,5 @@ else:
     print('     Houdini 构建完成标记: Config/houdini_build_status.json')
     print('     请在 Houdini 视口选中 OUT_city 按 D 确认效果')
 
-conn.close()
+if conn:
+    conn.close()

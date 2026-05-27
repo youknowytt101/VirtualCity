@@ -7,6 +7,18 @@
       "fingerprint": "c022ecaaa98ab5ff4939451e1588274f1b030e3367cbdabf23cf963b3fa615fd",
       "manifest": "RawData/_cleaned/area_12.921_100.867/_manifest.json",
       "updated": "2026-05-28T02:29:40"
+    },
+    "refine_33d5cd26150bf8b9": {
+      "area_id": "area_12.921_100.867",
+      "bbox": [
+        100.862989,
+        12.916731,
+        100.870543,
+        12.924344
+      ],
+      "fingerprint": "33d5cd26150bf8b9448138bad777c3d2bdfff6a4e7788d7d10fffc74f2216d24",
+      "manifest": "RawData/_cleaned/area_12.921_100.867/_manifest.json",
+      "updated": "2026-05-28T02:54:04"
     }
   }
 }
