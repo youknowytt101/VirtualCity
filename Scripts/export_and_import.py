@@ -15,7 +15,8 @@ EXPORT = EXPORT.as_posix()
 
 # OBJ 网络名：从 active_area.json 读取
 _cfg = load_active_area()
-_OBJ = '/obj/' + _cfg.get('obj_network', 'pattaya_osm')
+_OBJ_NET = _cfg.get('obj_network', 'city_gen')
+_OBJ = '/obj/' + _OBJ_NET
 
 # label, 首选SOP, 备用SOP, 输出FBX
 EXPORTS = [
@@ -37,11 +38,23 @@ def connect_hou():
     return conn, hou
 
 
+def resolve_sop_path(hou, path):
+    if hou.node(path):
+        return path
+    if _OBJ_NET == 'city_gen' and path.startswith('/obj/city_gen/'):
+        legacy_path = path.replace('/obj/city_gen/', '/obj/pattaya_osm/', 1)
+        if hou.node(legacy_path):
+            return legacy_path
+    return path
+
+
 def export_one(label, sop_primary, sop_fallback, fbx_name):
     """E-001: 每个 FBX 独立连接导出，崩溃不传染其他项目"""
     fbx_path = os.path.join(EXPORT, fbx_name).replace('\\', '/')
     conn, hou = connect_hou()
     try:
+        sop_primary = resolve_sop_path(hou, sop_primary)
+        sop_fallback = resolve_sop_path(hou, sop_fallback)
         sop_path = sop_primary if hou.node(sop_primary) else sop_fallback
         src = hou.node(sop_path)
         if src is None:

@@ -62,7 +62,7 @@ CFG_FILE = ACTIVE_AREA.as_posix()
 
 # OBJ 网络名：从 active_area.json 读取，可在换城市时修改
 _cfg = load_active_area()
-OBJ_NET = _cfg.get('obj_network', 'pattaya_osm')
+OBJ_NET = _cfg.get('obj_network', 'city_gen')
 OBJ_PATH = f'/obj/{OBJ_NET}'
 
 # ── 0. 确保 hip 已加载 ───────────────────────────────
@@ -74,6 +74,12 @@ else:
     print('  hip: ' + hou.hipFile.path().split('/')[-1])
 
 net = hou.node(OBJ_PATH)
+if net is None and OBJ_NET == 'city_gen':
+    legacy_net = hou.node('/obj/pattaya_osm')
+    if legacy_net is not None:
+        net = legacy_net
+        OBJ_NET = 'pattaya_osm'
+        OBJ_PATH = f'/obj/{OBJ_NET}'
 
 for _node in net.allSubChildren():
     if _node.type().name() != 'python':
