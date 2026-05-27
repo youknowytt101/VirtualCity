@@ -361,6 +361,11 @@ class _Handler(BaseHTTPRequestHandler):
             self._json({'ok': False, 'message': 'bbox 参数不完整'})
             return
 
+        with _state_lock:
+            if _state.get('running'):
+                self._json({'ok': False, 'message': '已有管线正在运行，请等待当前流程结束'})
+                return
+
         cmd = [
             'uv', 'run', 'python', '-u', 'set_area.py',
             str(bbox['west']), str(bbox['south']),
@@ -416,7 +421,7 @@ class _Handler(BaseHTTPRequestHandler):
                 proc.wait()
                 returncode = proc.returncode
                 houdini_done, houdini_status, houdini_message = _read_houdini_status(name)
-                ok = returncode == 0
+                ok = returncode == 0 and houdini_done
             except Exception as exc:
                 returncode = proc.returncode if proc is not None else -1
                 houdini_done, houdini_status, houdini_message = False, 'exception', str(exc)

@@ -60,6 +60,7 @@ COLORS = {
 # ══════════════════════════════════════════
 
 conn = rpyc.classic.connect('localhost', 18811)
+conn._config['sync_request_timeout'] = 600
 hou  = conn.modules.hou
 ROOT_STR = ROOT.as_posix()
 CFG_FILE = ACTIVE_AREA.as_posix()
@@ -84,6 +85,29 @@ if net is None and OBJ_NET == 'city_gen':
         net = legacy_net
         OBJ_NET = 'pattaya_osm'
         OBJ_PATH = f'/obj/{OBJ_NET}'
+
+
+def cooked_geometry(node_path, force=False, retries=3):
+    """Fetch geometry after cook, retrying stale Houdini node proxies."""
+    last_exc = None
+    for attempt in range(retries):
+        try:
+            node = hou.node(node_path)
+            if node is None:
+                return None
+            node.cook(force=force)
+            node = hou.node(node_path)
+            if node is None:
+                return None
+            return node.geometry()
+        except Exception as exc:
+            last_exc = exc
+            text = '{} {}'.format(type(exc), exc)
+            if 'ObjectWasDeleted' not in text and 'no longer exists' not in text:
+                raise
+            time.sleep(0.15 * (attempt + 1))
+    raise last_exc
+
 
 for _node in net.allSubChildren():
     if _node.type().name() != 'python':
@@ -636,20 +660,28 @@ CHECKS = [
     ('road_strips',          100,  None,  'roads generated'),
 ]
 for name, min_pts, max_y, desc in CHECKS:
-    n = hou.node(OBJ_PATH + '/' + name)
+    node_path = OBJ_PATH + '/' + name
+    n = hou.node(node_path)
     if not n:
         print('  SKIP  {:<22s} (node not found)'.format(name))
         continue
-    n.cook(force=False)
-    geo  = n.geometry()
-    pts  = geo.intrinsicValue('pointcount')
-    bb   = geo.boundingBox()
-    mn_y = bb.minvec()[1]
-    mx_y = bb.maxvec()[1]
-    ok   = pts >= min_pts
-    tag  = PASS if ok else FAIL
-    print('  {}  {:<22s} pts={:6d}  Y[{:.1f}~{:.1f}]  {}'.format(
-        tag, name, pts, mn_y, mx_y, desc))
+    try:
+        geo = cooked_geometry(node_path, force=False)
+        if geo is None:
+            raise RuntimeError('node disappeared during cook')
+        pts  = geo.intrinsicValue('pointcount')
+        bb   = geo.boundingBox()
+        mn_y = bb.minvec()[1]
+        mx_y = bb.maxvec()[1]
+        ok   = pts >= min_pts
+        tag  = PASS if ok else FAIL
+        print('  {}  {:<22s} pts={:6d}  Y[{:.1f}~{:.1f}]  {}'.format(
+            tag, name, pts, mn_y, mx_y, desc))
+    except Exception as exc:
+        ok = False
+        print('  {}  {:<22s} geometry unavailable: {}'.format(FAIL, name, exc))
+        errors.append('{} geometry unavailable: {}'.format(name, exc))
+        continue
     if not ok:
         errors.append('{} pts={} < {}'.format(name, pts, min_pts))
 

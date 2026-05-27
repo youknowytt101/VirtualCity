@@ -141,6 +141,291 @@ def _vc_model_qa_road_faces(node_path):
         "large_area_fail_count": large_fail,
         "too_many_vertices_count": too_many_vertices,
     })
+
+def _vc_model_qa_building_bundle(obj_path):
+    def node(name):
+        return hou.node(obj_path.rstrip("/") + "/" + name)
+
+    def vec_len(v):
+        return math.sqrt(sum(x * x for x in v))
+
+    def vec_norm(v):
+        l = vec_len(v)
+        if l <= 1e-9:
+            return (0.0, 0.0, 0.0)
+        return (v[0] / l, v[1] / l, v[2] / l)
+
+    def vec_dot(a, b):
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+
+    def pos3(p):
+        return (float(p.x()), float(p.y()), float(p.z()))
+
+    def xz_dist(a, b):
+        return math.hypot(a[0] - b[0], a[2] - b[2])
+
+    def grid_key(p, cell):
+        return (int(math.floor(p[0] / cell)), int(math.floor(p[2] / cell)))
+
+    def build_xz_grid(items, cell):
+        grid = {}
+        for item in items:
+            p = item[0]
+            key = grid_key(p, cell)
+            grid.setdefault(key, []).append(item)
+        return grid
+
+    def iter_xz_grid(grid, p, cell, radius):
+        cx, cz = grid_key(p, cell)
+        for dz in range(-radius, radius + 1):
+            for dx in range(-radius, radius + 1):
+                for item in grid.get((cx + dx, cz + dz), ()):
+                    yield item
+
+    def prim_normal(prim):
+        n = prim.normal()
+        return (float(n.x()), float(n.y()), float(n.z()))
+
+    def prim_center(prim):
+        pts = [v.point().position() for v in prim.vertices()]
+        if not pts:
+            return (0.0, 0.0, 0.0)
+        return (
+            sum(p.x() for p in pts) / len(pts),
+            sum(p.y() for p in pts) / len(pts),
+            sum(p.z() for p in pts) / len(pts),
+        )
+
+    def percentile(values, q):
+        if not values:
+            return None
+        values = sorted(values)
+        idx = int(round((len(values) - 1) * q))
+        idx = max(0, min(idx, len(values) - 1))
+        return values[idx]
+
+    def unique_cd(name):
+        n = node(name)
+        if n is None:
+            return []
+        geo = n.geometry()
+        if not geo.findPointAttrib("Cd"):
+            return []
+        vals = []
+        seen = set()
+        for point in geo.points():
+            cd = tuple(round(float(x), 4) for x in point.attribValue("Cd"))
+            if cd not in seen:
+                vals.append(cd)
+                seen.add(cd)
+            if len(vals) >= 8:
+                break
+        return vals
+
+    def avg_stored_normal(prim, geo):
+        if geo.findVertexAttrib("N"):
+            vals = []
+            for vert in prim.vertices():
+                try:
+                    vals.append(tuple(float(x) for x in vert.attribValue("N")))
+                except Exception:
+                    pass
+            if vals:
+                return vec_norm(tuple(sum(v[i] for v in vals) / len(vals) for i in range(3)))
+        if geo.findPointAttrib("N"):
+            vals = []
+            for point in prim.points():
+                try:
+                    vals.append(tuple(float(x) for x in point.attribValue("N")))
+                except Exception:
+                    pass
+            if vals:
+                return vec_norm(tuple(sum(v[i] for v in vals) / len(vals) for i in range(3)))
+        if geo.findPrimAttrib("N"):
+            try:
+                return vec_norm(tuple(float(x) for x in prim.attribValue("N")))
+            except Exception:
+                return None
+        return None
+
+    result = {"missing_nodes": []}
+
+    # Colors
+    result["building_colors"] = {
+        "bld_color": unique_cd("bld_color"),
+        "bld_foundation_color": unique_cd("bld_foundation_color"),
+        "bld_with_foundation": unique_cd("bld_with_foundation"),
+    }
+
+    # Footprint bevel
+    bevel_node = node("bld_footprint_bevel")
+    if bevel_node is None:
+        result["missing_nodes"].append("bld_footprint_bevel")
+        result["footprint_bevel"] = {"missing": True}
+    else:
+        geo = bevel_node.geometry()
+        bevel_attr = geo.findPrimAttrib("footprint_bevel_count")
+        total = 0
+        buildings = 0
+        short_edges = 0
+        min_edge = None
+        short_threshold = 0.08
+        if bevel_attr is not None:
+            for prim in geo.prims():
+                count = int(prim.attribValue(bevel_attr))
+                total += count
+                if count > 0:
+                    buildings += 1
+                pts = [pos3(v.point().position()) for v in prim.vertices()]
+                if len(pts) < 2:
+                    continue
+                for i, p in enumerate(pts):
+                    q = pts[(i + 1) % len(pts)]
+                    edge_len = xz_dist(p, q)
+                    min_edge = edge_len if min_edge is None else min(min_edge, edge_len)
+                    if edge_len < short_threshold:
+                        short_edges += 1
+        result["footprint_bevel"] = {
+            "missing": False,
+            "has_attr": bevel_attr is not None,
+            "prims": int(geo.intrinsicValue("primitivecount")),
+            "points": int(geo.intrinsicValue("pointcount")),
+            "beveled_buildings": buildings,
+            "total_beveled_corners": total,
+            "min_edge": min_edge,
+            "short_edges": short_edges,
+            "short_threshold": short_threshold,
+        }
+
+    final_node = node("bld_with_foundation")
+    body_node = node("bld_color")
+    foundation_node = node("bld_foundation_color")
+    if final_node is None:
+        result["missing_nodes"].append("bld_with_foundation")
+        return json.dumps(result)
+    final_geo = final_node.geometry()
+    body_geo = body_node.geometry() if body_node else None
+    foundation_geo = foundation_node.geometry() if foundation_node else None
+
+    # Normals
+    has_n = bool(final_geo.findVertexAttrib("N") or final_geo.findPointAttrib("N") or final_geo.findPrimAttrib("N"))
+    missing = zero = mismatch = degenerate = 0
+    up = side = down = 0
+    if has_n:
+        for prim in final_geo.prims():
+            face_n = prim_normal(prim)
+            if vec_len(face_n) < 0.5:
+                degenerate += 1
+            elif face_n[1] > 0.65:
+                up += 1
+            elif face_n[1] < -0.65:
+                down += 1
+            else:
+                side += 1
+            stored = avg_stored_normal(prim, final_geo)
+            if stored is None:
+                missing += 1
+            elif vec_len(stored) < 0.1:
+                zero += 1
+            elif vec_dot(vec_norm(face_n), stored) < 0.8:
+                mismatch += 1
+    result["building_normals"] = {
+        "has_n": has_n,
+        "prims": int(final_geo.intrinsicValue("primitivecount")),
+        "up": up,
+        "side": side,
+        "down": down,
+        "degenerate": degenerate,
+        "storedN_missing": missing,
+        "storedN_zero": zero,
+        "storedN_mismatch": mismatch,
+    }
+
+    # Foundation tags, normals, and top-edge alignment.
+    tag_attr = final_geo.findPrimAttrib("is_foundation")
+    vals = [prim.attribValue(tag_attr) for prim in final_geo.prims()] if tag_attr else []
+    body_count = int(body_geo.intrinsicValue("primitivecount")) if body_geo else 0
+    foundation_count = int(foundation_geo.intrinsicValue("primitivecount")) if foundation_geo else 0
+    result["foundation_tags"] = {
+        "has_attr": tag_attr is not None,
+        "body_expected": body_count,
+        "foundation_expected": foundation_count,
+        "tag_0": sum(1 for v in vals if v == 0),
+        "tag_1": sum(1 for v in vals if v == 1),
+        "other": sum(1 for v in vals if v not in (0, 1)),
+    }
+
+    body_sides = []
+    foundation_sides = []
+    body_bottom = []
+    foundation_top = []
+    if tag_attr is not None:
+        for prim in final_geo.prims():
+            face_n = prim_normal(prim)
+            if abs(face_n[1]) >= 0.2:
+                continue
+            points = [pos3(v.point().position()) for v in prim.vertices()]
+            is_foundation = prim.attribValue(tag_attr) == 1
+            row = (prim_center(prim), face_n)
+            if is_foundation:
+                foundation_sides.append(row)
+                max_y = max(p[1] for p in points)
+                foundation_top.extend(p for p in points if abs(p[1] - max_y) <= 0.01)
+            else:
+                body_sides.append(row)
+                min_y = min(p[1] for p in points)
+                body_bottom.extend(p for p in points if abs(p[1] - min_y) <= 0.01)
+
+    no_near = normal_mismatch = aligned = 0
+    worst_dot = 1.0
+    match_radius = 0.35
+    body_side_grid = build_xz_grid(body_sides, match_radius) if body_sides else {}
+    for f_center, f_normal in foundation_sides:
+        candidates = []
+        for b_center, b_normal in iter_xz_grid(body_side_grid, f_center, match_radius, 1):
+            if xz_dist(f_center, b_center) <= match_radius:
+                candidates.append(vec_dot(f_normal, b_normal))
+        if not candidates:
+            no_near += 1
+            continue
+        best = max(candidates)
+        worst_dot = min(worst_dot, best)
+        if best > 0.8:
+            aligned += 1
+        else:
+            normal_mismatch += 1
+    result["foundation_normals"] = {
+        "body_side_count": len(body_sides),
+        "foundation_side_count": len(foundation_sides),
+        "aligned": aligned,
+        "mismatch": normal_mismatch,
+        "no_near_match": no_near,
+        "worst_best_dot": worst_dot,
+        "match_radius_m": match_radius,
+    }
+
+    distances = []
+    align_search_radius = 0.05
+    body_bottom_grid = build_xz_grid([(p,) for p in body_bottom], align_search_radius) if body_bottom else {}
+    for p in foundation_top:
+        if body_bottom_grid:
+            candidates = [item[0] for item in iter_xz_grid(body_bottom_grid, p, align_search_radius, 1)]
+            if not candidates:
+                candidates = [item[0] for item in iter_xz_grid(body_bottom_grid, p, align_search_radius, 2)]
+            if candidates:
+                distances.append(min(xz_dist(p, q) for q in candidates))
+    distances.sort()
+    align_threshold = 0.005
+    result["foundation_alignment"] = {
+        "foundation_top_points": len(foundation_top),
+        "body_bottom_points": len(body_bottom),
+        "max_distance": max(distances) if distances else None,
+        "p95_distance": percentile(distances, 0.95),
+        "over_threshold": sum(1 for d in distances if d > align_threshold),
+        "threshold_m": align_threshold,
+    }
+
+    return json.dumps(result)
 '''
 
 
@@ -557,6 +842,74 @@ class QA:
         else:
             self.add("foundation_alignment", PASS, "foundation top edge matches building bottom edge", **align_detail)
 
+    def check_building_bundle(self) -> None:
+        bundle = json.loads(self.conn.eval("_vc_model_qa_building_bundle({})".format(json.dumps(self.obj_path))))
+
+        colors = bundle.get("building_colors", {})
+        self.metrics["building_colors"] = colors
+        body_cd = colors.get("bld_color", [])
+        foundation_cd = colors.get("bld_foundation_color", [])
+        final_cd = colors.get("bld_with_foundation", [])
+        if not body_cd:
+            self.add("building_color", FAIL, "bld_color has no Cd attribute")
+        elif not foundation_cd:
+            self.add("foundation_color", WARN, "bld_foundation_color is missing or has no Cd")
+        elif body_cd != foundation_cd:
+            self.add("foundation_color_match", FAIL, "foundation Cd differs from building Cd", body_cd=body_cd, foundation_cd=foundation_cd)
+        elif final_cd and final_cd != body_cd:
+            self.add("building_final_color", FAIL, "final building Cd differs from source building Cd", body_cd=body_cd, final_cd=final_cd)
+        else:
+            self.add("building_color", PASS, "building body and foundation colors match", cd=body_cd)
+
+        bevel = bundle.get("footprint_bevel", {"missing": True})
+        self.metrics["footprint_bevel"] = bevel
+        if bevel.get("missing"):
+            self.add("footprint_bevel", FAIL, "bld_footprint_bevel is missing", **bevel)
+        elif not bevel.get("has_attr"):
+            self.add("footprint_bevel", FAIL, "bld_footprint_bevel lacks footprint_bevel_count", **bevel)
+        elif bevel.get("short_edges", 0):
+            self.add("footprint_bevel", FAIL, "footprint bevel produced too-short edges", **bevel)
+        elif bevel.get("total_beveled_corners", 0) <= 0:
+            self.add("footprint_bevel", WARN, "no eligible footprint corners were beveled", **bevel)
+        else:
+            self.add("footprint_bevel", PASS, "eligible footprint corners were beveled", **bevel)
+
+        normals = bundle.get("building_normals", {})
+        self.metrics["building_normals"] = normals
+        if not normals.get("has_n"):
+            self.add("building_normals", FAIL, "bld_with_foundation has no N attribute", **normals)
+        elif any(normals.get(k, 0) for k in ("storedN_missing", "storedN_zero", "storedN_mismatch", "degenerate")):
+            self.add("building_normals", FAIL, "building final normals are invalid", **normals)
+        else:
+            self.add("building_normals", PASS, "building final normals are valid", **normals)
+
+        tags = bundle.get("foundation_tags", {})
+        self.metrics["foundation_tags"] = tags
+        if not tags.get("has_attr"):
+            self.add("foundation_tags", FAIL, "final building geometry lacks is_foundation", **tags)
+        elif tags.get("tag_0") != tags.get("body_expected") or tags.get("tag_1") != tags.get("foundation_expected") or tags.get("other"):
+            self.add("foundation_tags", FAIL, "is_foundation tag counts do not match merged geometry", **tags)
+        else:
+            self.add("foundation_tags", PASS, "is_foundation tags match body/foundation counts", **tags)
+
+        fnormals = bundle.get("foundation_normals", {})
+        self.metrics["foundation_vs_body_normals"] = fnormals
+        if fnormals.get("mismatch", 0):
+            self.add("foundation_normals", FAIL, "foundation side normals disagree with nearby building sides", **fnormals)
+        elif fnormals.get("no_near_match", 0):
+            self.add("foundation_normals", WARN, "some foundation sides have no nearby building side match", **fnormals)
+        else:
+            self.add("foundation_normals", PASS, "foundation side normals align with building sides", **fnormals)
+
+        align = bundle.get("foundation_alignment", {})
+        self.metrics["foundation_alignment"] = align
+        if not align.get("foundation_top_points"):
+            self.add("foundation_alignment", WARN, "no foundation top points found", **align)
+        elif align.get("over_threshold", 0):
+            self.add("foundation_alignment", FAIL, "foundation top edge is offset from building bottom edge", **align)
+        else:
+            self.add("foundation_alignment", PASS, "foundation top edge matches building bottom edge", **align)
+
     def terrain_delta_stats(
         self,
         node_name: str,
@@ -621,10 +974,7 @@ class QA:
     def run(self) -> None:
         self.check_required_nodes()
         self.check_terrain_density()
-        self.check_building_color()
-        self.check_footprint_bevel()
-        self.check_building_normals()
-        self.check_foundation_tags_and_normals()
+        self.check_building_bundle()
         self.terrain_delta_stats("bld_with_foundation", "dem_subdivide", "building_terrain_fit", -0.05)
         self.check_road_faces()
         self.terrain_delta_stats("road_clipped", "dem_subdivide", "road_terrain_fit", -0.05, miss_warn_ratio=0.35)
@@ -672,6 +1022,7 @@ def main() -> int:
     obj_path = args.obj_path or f"/obj/{cfg.get('obj_network', 'city_gen')}"
     conn = rpyc.classic.connect("localhost", 18811)
     try:
+        conn._config["sync_request_timeout"] = 600
         conn.execute("import hou")
         conn.execute(REMOTE_HELPERS)
         hou = conn.modules.hou

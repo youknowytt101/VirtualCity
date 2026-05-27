@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "key": "bbox_466d3cf0fbc90e09",
+  "bbox": [
+    100.861874,
+    12.913385,
+    100.87213,
+    12.923215
+  ],
+  "area_id": "area_12.918_100.867",
+  "origin_lon": 100.867002,
+  "origin_lat": 12.9183,
+  "dem_source": "fabdem",
+  "source_signature": {
+    "schema": 1,
+    "roads": "tile_cache_osm_else_overpass_v1",
+    "buildings": "tile_cache_overture_else_overture_api_v1",
+    "dem": "fabdem_else_tile_cache_else_nasadem_v1"
+  },
+  "source_note": "set_area acquisition",
+  "files": {
+    "buildings": {
+      "path": "RawData/_clip_cache/bbox_466d3cf0fbc90e09/buildings.geojson",
+      "exists": true,
+      "size": 286326,
+      "sha256": "54830eff2c1c07710558c79b9ec7e9f2edb706ccae82a2e8f2621ec344ed4ab8"
+    },
+    "roads": {
+      "path": "RawData/_clip_cache/bbox_466d3cf0fbc90e09/roads.osm",
+      "exists": true,
+      "size": 216037,
+      "sha256": "03a65d1584ef07addbd402f23b312767f69cf28b068fb314f3ae54822252bcd8"
+    },
+    "dem": {
+      "path": "RawData/_clip_cache/bbox_466d3cf0fbc90e09/dem.csv",
+      "exists": true,
+      "size": 37500,
+      "sha256": "30195f6556b6392ba95311f7bc4c2d2618724a9ae005d8133773d655d47d96cd"
+    }
+  },
+  "created": "2026-05-28T03:07:28"
+}

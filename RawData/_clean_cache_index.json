@@ -19,6 +19,42 @@
       "fingerprint": "33d5cd26150bf8b9448138bad777c3d2bdfff6a4e7788d7d10fffc74f2216d24",
       "manifest": "RawData/_cleaned/area_12.921_100.867/_manifest.json",
       "updated": "2026-05-28T02:54:04"
+    },
+    "refine_0079e7e6d98e271f": {
+      "area_id": "area_12.916_100.863",
+      "bbox": [
+        100.854836,
+        12.907947,
+        100.871572,
+        12.924093
+      ],
+      "fingerprint": "0079e7e6d98e271f3931034eba6e0afd8c30e6157b70489fff2e0cc2213935f2",
+      "manifest": "RawData/_cleaned/area_12.916_100.863/_manifest.json",
+      "updated": "2026-05-28T02:58:03"
+    },
+    "refine_d37002c084f76170": {
+      "area_id": "area_12.918_100.867",
+      "bbox": [
+        100.861874,
+        12.913385,
+        100.87213,
+        12.923215
+      ],
+      "fingerprint": "d37002c084f76170eeaa9cd7b4b85cc3e52768007487c7e04eb64733fa8d41dc",
+      "manifest": "RawData/_cleaned/area_12.918_100.867/_manifest.json",
+      "updated": "2026-05-28T03:10:47"
+    },
+    "refine_ffce85aa4870e046": {
+      "area_id": "area_12.917_100.868",
+      "bbox": [
+        100.860415,
+        12.90962,
+        100.875349,
+        12.923759
+      ],
+      "fingerprint": "ffce85aa4870e046936edfa14106d8ac1072333a77e926d8edeac099547060e8",
+      "manifest": "RawData/_cleaned/area_12.917_100.868/_manifest.json",
+      "updated": "2026-05-28T03:12:20"
     }
   }
 }
