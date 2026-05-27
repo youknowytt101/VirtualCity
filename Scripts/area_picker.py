@@ -15,14 +15,24 @@ VirtualCity — 交互式区域选择器
     5. 在终端窗口查看管线进度
 """
 
-import sys, json, subprocess, threading, webbrowser, time
+import sys, json, subprocess, threading, webbrowser, time, os
 from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 # Global pipeline state
 _state = {'running': False, 'done': False, 'ok': False, 'returncode': None, 'name': '', 'start': 0.0,
-          'houdini_done': False, 'houdini_status': '', 'houdini_message': ''}
+          'houdini_done': False, 'houdini_status': '', 'houdini_message': '',
+          'step': 0, 'total_steps': 6, 'step_label': '', 'log_lines': [], 'pct': 0}
+_state_lock = threading.Lock()
 _server_ref = [None]  # mutable ref so _run thread can call shutdown()
+_MAX_LOG_LINES = 80
+
+
+def _safe_print(msg):
+    try:
+        print(msg)
+    except UnicodeEncodeError:
+        print(str(msg).encode('ascii', errors='backslashreplace').decode('ascii'))
 
 SCRIPTS = Path(__file__).resolve().parent
 ROOT    = SCRIPTS.parent
@@ -87,15 +97,35 @@ body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; display:flex; flex-
 #run-btn:disabled { background:#3a3a5a; color:#666; cursor:not-allowed; }
 #run-btn:hover:not(:disabled) { background:#81d4fa; }
 #map { flex:1; }
+#progress-container {
+  display:none; padding:8px 16px; background:#0f0f22;
+  border-top:1px solid #1e1e3a;
+}
+#progress-bar-wrap {
+  background:#1a1a2e; border-radius:6px; height:22px; overflow:hidden;
+  border:1px solid #2a2a4a; position:relative;
+}
+#progress-bar {
+  height:100%; background: linear-gradient(90deg, #1565c0, #4fc3f7);
+  border-radius:6px; transition: width 0.4s ease;
+  box-shadow: 0 0 8px rgba(79,195,247,0.4);
+}
+#progress-text {
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:bold; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,0.5);
+}
+#step-label { color:#4fc3f7; font-size:12px; margin-top:5px; }
 #log-panel {
-  height:140px; background:#080812; color:#80cbc4;
-  font-family: monospace; font-size:12px;
+  height:160px; background:#080812; color:#80cbc4;
+  font-family: monospace; font-size:11.5px;
   padding:8px 14px; overflow-y:auto;
   border-top:2px solid #1e1e3a; white-space:pre-wrap;
 }
 .ok  { color:#a5d6a7; }
 .err { color:#ef9a9a; }
 .dim { color:#546e7a; }
+.step { color:#4fc3f7; font-weight:bold; }
 </style>
 </head>
 <body>
@@ -108,6 +138,13 @@ body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; display:flex; flex-
   <button id="run-btn" disabled onclick="runPipeline()">▶ 开始生成</button>
 </div>
 <div id="map"></div>
+<div id="progress-container">
+  <div id="progress-bar-wrap">
+    <div id="progress-bar" style="width:0%"></div>
+    <div id="progress-text">0%</div>
+  </div>
+  <div id="step-label">准备中...</div>
+</div>
 <div id="log-panel">等待框选区域...</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -183,29 +220,53 @@ function log(msg, cls) {
 }
 
 var _pollTimer = null;
+var _lastLogLen = 0;
 
 function pollStatus() {
   fetch('/status')
   .then(r => r.json())
   .then(d => {
+    // Update progress bar
+    var pct = d.pct || 0;
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = pct + '%';
+    document.getElementById('step-label').textContent = d.step_label || '运行中...';
+
+    // Append new log lines
+    if (d.log_lines && d.log_lines.length > _lastLogLen) {
+      var newLines = d.log_lines.slice(_lastLogLen);
+      for (var i = 0; i < newLines.length; i++) {
+        var line = newLines[i];
+        var cls = 'dim';
+        if (line.indexOf('[OK]') >= 0) cls = 'ok';
+        else if (line.indexOf('[ERR]') >= 0 || line.indexOf('[FAIL]') >= 0) cls = 'err';
+        else if (line.match(/^\[\d+\/\d+\]/)) cls = 'step';
+        log(line, cls);
+      }
+      _lastLogLen = d.log_lines.length;
+    }
+
     if (d.done) {
       clearInterval(_pollTimer);
       _pollTimer = null;
+      document.getElementById('progress-bar').style.width = '100%';
+      document.getElementById('progress-text').textContent = '100%';
       if (d.ok) {
+        document.getElementById('progress-bar').style.background = 'linear-gradient(90deg, #2e7d32, #a5d6a7)';
+        document.getElementById('step-label').textContent = '✅ 生成完成！';
         log('[OK] 生成完成！区域: ' + d.name, 'ok');
-        if (d.houdini_done) {
-          log('[OK] Houdini 构建完成已确认: ' + d.houdini_status, 'ok');
-        } else {
-          log('[WARN] 未确认 Houdini 构建完成: ' + d.houdini_message, 'err');
-        }
-        log('3 秒后自动关闭此页面...', 'dim');
-        setTimeout(function() { window.close(); }, 3000);
+        log('3 秒后自动关闭页面，5 秒后停止本地服务...', 'dim');
+        setTimeout(function() {
+          window.open('', '_self');
+          window.close();
+          document.body.innerHTML = '<div style="font-family:Segoe UI,Arial,sans-serif;background:#0d0d1a;color:#a5d6a7;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;"><h2>✅ VirtualCity 生成完成</h2><p>本地服务已自动停止，可以关闭此页面。</p></div>';
+        }, 3000);
       } else {
-        log('[FAIL] 管线出错 (exit=' + d.returncode + ')，请查看终端', 'err');
+        document.getElementById('progress-bar').style.background = 'linear-gradient(90deg, #c62828, #ef9a9a)';
+        document.getElementById('step-label').textContent = '❌ 管线出错';
+        log('[FAIL] 管线出错 (exit=' + d.returncode + ')', 'err');
         document.getElementById('run-btn').disabled = false;
       }
-    } else {
-      log('运行中... (' + d.elapsed + 's)', 'dim');
     }
   })
   .catch(function() { /* server may be restarting */ });
@@ -216,6 +277,12 @@ function runPipeline() {
   var name = document.getElementById('area-name').value.trim().replace(/\s+/g, '_') || 'area_custom';
   document.getElementById('run-btn').disabled = true;
   document.getElementById('log-panel').innerHTML = '';
+  _lastLogLen = 0;
+  document.getElementById('progress-container').style.display = 'block';
+  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('progress-bar').style.background = 'linear-gradient(90deg, #1565c0, #4fc3f7)';
+  document.getElementById('progress-text').textContent = '0%';
+  document.getElementById('step-label').textContent = '准备中...';
   log('[' + new Date().toLocaleTimeString() + '] 提交任务: ' + name, 'ok');
   log('bbox = [' + bbox.west+', '+bbox.south+', '+bbox.east+', '+bbox.north+']', 'dim');
 
@@ -227,8 +294,8 @@ function runPipeline() {
   .then(r => r.json())
   .then(d => {
     if (d.ok) {
-      log('管线已启动，每 3 秒轮询状态...', 'dim');
-      _pollTimer = setInterval(pollStatus, 3000);
+      log('管线已启动...', 'dim');
+      _pollTimer = setInterval(pollStatus, 1000);
     } else {
       log('[错误] ' + d.message, 'err');
       document.getElementById('run-btn').disabled = false;
@@ -250,17 +317,24 @@ class _Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == '/status':
-            elapsed = int(time.time() - _state['start']) if _state['running'] or _state['done'] else 0
-            self._json({
-                'done':       _state['done'],
-                'ok':         _state['ok'],
-                'returncode': _state['returncode'],
-                'name':       _state['name'],
-                'elapsed':    elapsed,
-                'houdini_done':    _state['houdini_done'],
-                'houdini_status':  _state['houdini_status'],
-                'houdini_message': _state['houdini_message'],
-            })
+            with _state_lock:
+                elapsed = int(time.time() - _state['start']) if _state['running'] or _state['done'] else 0
+                resp = {
+                    'done':       _state['done'],
+                    'ok':         _state['ok'],
+                    'returncode': _state['returncode'],
+                    'name':       _state['name'],
+                    'elapsed':    elapsed,
+                    'step':       _state['step'],
+                    'total_steps': _state['total_steps'],
+                    'step_label': _state['step_label'],
+                    'pct':        _state['pct'],
+                    'log_lines':  list(_state['log_lines']),
+                    'houdini_done':    _state['houdini_done'],
+                    'houdini_status':  _state['houdini_status'],
+                    'houdini_message': _state['houdini_message'],
+                }
+            self._json(resp)
             return
         lat, lon = _get_initial_center()
         html = (_HTML
@@ -288,34 +362,89 @@ class _Handler(BaseHTTPRequestHandler):
             return
 
         cmd = [
-            'uv', 'run', 'python', 'set_area.py',
+            'uv', 'run', 'python', '-u', 'set_area.py',
             str(bbox['west']), str(bbox['south']),
             str(bbox['east']), str(bbox['north']),
             name,
         ]
-        print(f"\n[area_picker] 启动管线: {' '.join(cmd)}")
+        _safe_print(f"\n[area_picker] 启动管线: {' '.join(cmd)}")
         _state.update({'running': True, 'done': False, 'ok': False,
                        'returncode': None, 'name': name, 'start': time.time(),
+                       'step': 0, 'total_steps': 6, 'step_label': '启动中...', 'pct': 0,
+                       'log_lines': [],
                        'houdini_done': False, 'houdini_status': '', 'houdini_message': ''})
 
+        import re as _re
+
+        def _parse_step(line):
+            """Parse [N/M] step markers from pipeline output."""
+            m = _re.match(r'\[(\d+)/(\d+)\]', line)
+            if m:
+                return int(m.group(1)), int(m.group(2))
+            return None, None
+
         def _run():
-            result = subprocess.run(cmd, cwd=str(SCRIPTS))
-            houdini_done, houdini_status, houdini_message = _read_houdini_status(name)
-            ok = result.returncode == 0 and houdini_done
-            _state.update({'running': False, 'done': True,
-                           'ok': ok,
-                           'returncode': result.returncode,
-                           'houdini_done': houdini_done,
-                           'houdini_status': houdini_status,
-                           'houdini_message': houdini_message})
-            status = 'OK' if ok else f'FAIL(exit={result.returncode}, houdini={houdini_status})'
-            print(f'[area_picker] 管线结束: {status}')
+            proc = None
+            try:
+                env = os.environ.copy()
+                env['PYTHONIOENCODING'] = 'utf-8'
+                proc = subprocess.Popen(
+                    cmd, cwd=str(SCRIPTS),
+                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    text=True, encoding='utf-8', errors='replace',
+                    bufsize=1,
+                    env=env,
+                )
+                for raw_line in proc.stdout:
+                    line = raw_line.rstrip('\n\r')
+                    if not line:
+                        continue
+                    _safe_print(line)  # echo to terminal
+                    with _state_lock:
+                        _state['log_lines'].append(line)
+                        if len(_state['log_lines']) > _MAX_LOG_LINES:
+                            _state['log_lines'] = _state['log_lines'][-_MAX_LOG_LINES:]
+                        step_n, step_total = _parse_step(line)
+                        if step_n is not None:
+                            _state['step'] = step_n
+                            _state['total_steps'] = step_total
+                            _state['step_label'] = f'[{step_n}/{step_total}] {line.split("]", 1)[-1].strip()}'
+                            _state['pct'] = min(95, int(step_n / step_total * 100))
+                        elif '[OK]' in line and _state['pct'] < 95:
+                            _state['pct'] = min(95, _state['pct'] + 3)
+
+                proc.wait()
+                returncode = proc.returncode
+                houdini_done, houdini_status, houdini_message = _read_houdini_status(name)
+                ok = returncode == 0
+            except Exception as exc:
+                returncode = proc.returncode if proc is not None else -1
+                houdini_done, houdini_status, houdini_message = False, 'exception', str(exc)
+                ok = False
+                try:
+                    _safe_print(f'[area_picker] 管线线程异常: {exc}')
+                except Exception:
+                    _safe_print('[area_picker] pipeline thread exception')
+
+            with _state_lock:
+                if ok and not houdini_done:
+                    _state['log_lines'].append(f'[WARN] Houdini 状态文件未确认，但 set_area.py 已成功退出: {houdini_message}')
+                _state.update({'running': False, 'done': True,
+                               'ok': ok,
+                               'returncode': returncode,
+                               'pct': 100 if ok else _state['pct'],
+                               'step_label': '✅ 完成' if ok else '❌ 失败',
+                               'houdini_done': houdini_done,
+                               'houdini_status': houdini_status,
+                               'houdini_message': houdini_message})
+            status = 'OK' if ok else f'FAIL(exit={returncode}, houdini={houdini_status})'
+            _safe_print(f'[area_picker] 管线结束: {status}')
             if houdini_done:
-                print('[area_picker] Houdini 构建完成已确认')
+                _safe_print('[area_picker] Houdini 构建完成已确认')
             else:
-                print(f'[area_picker] Houdini 构建完成未确认: {houdini_message}')
+                _safe_print(f'[area_picker] Houdini 构建完成未确认: {houdini_message}')
             if ok:
-                print('[area_picker] 5 秒后自动退出服务器...')
+                _safe_print('[area_picker] 5 秒后自动退出服务器...')
                 time.sleep(5)
                 _server_ref[0].shutdown()
 
