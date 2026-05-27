@@ -3,7 +3,8 @@
 > **Git 仓库**：`https://github.com/youknowytt101/VirtualCity.git`  
 > 新机器首次使用：`git clone https://github.com/youknowytt101/VirtualCity.git`
 
-> AI / 新成员接手项目时，优先阅读：`项目管理/00_AI接手指南.md`。  
+> AI / 新成员接手项目时，先阅读根目录：`AI_HANDOFF.md`。  
+> 然后阅读：`项目管理/00_AI接手指南.md`。  
 > 当前状态和下一步见：`项目管理/02_当前状态与下一步.md`。
 
 ## 目录结构
@@ -11,6 +12,7 @@
 ```
 VirtualCity/
 ├── README.md                  ← 本文件
+├── AI_HANDOFF.md              ← AI / 人类接手第一入口
 ├── VirtualCity完整执行计划.md   ← 当前完整执行计划
 ├── 执行方案.md                  ← 早期可执行方案
 │
