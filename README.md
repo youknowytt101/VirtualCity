@@ -47,14 +47,19 @@ VirtualCity/
 │       ├── 06_路线一详细拆解_Houdini+UE5城市管线.md
 │       └── 07_补充优化建议_2026版.md
 │
-├── RawData/                   ← 地图RawData
-│   ├── OSM/                   ← 从 overpass-turbo.eu 导出的 .osm 文件
-│   └── DEM/                   ← 高程数据 GeoTIFF
+├── RawData/                   ← OSM / DEM / Overture 原始与缓存数据
+│   ├── OSM/                   ← 区域道路与兜底建筑 .osm
+│   ├── DEM/                   ← FABDEM / NASADEM CSV 与 GeoTIFF
+│   ├── Overture/              ← Overture 建筑轮廓 GeoJSON
+│   ├── _clip_cache/           ← 区域裁切缓存
+│   └── _houdini_ready/        ← Houdini 输入中间结果（不提交）
 │
-├── Houdini/                   ← Houdini 工程文件
-│   └── （.hip 文件 / HDA 资产）
+├── Houdini/                   ← Houdini 工程、区域 hip、导出资产
+│   ├── Hip/
+│   ├── HDA/
+│   └── Export/
 │
-├── Scripts/                 ← 自动化预留位与后续工具规划
+├── Scripts/                 ← 数据获取、清洗、Houdini recook、QA 自动化
 │   ├── 插件清单.md
 │   ├── 工具开发规范.md
 │   ├── 数据处理自动化/
@@ -68,15 +73,19 @@ VirtualCity/
 ## 核心流程
 
 ```
-RawData/ (OSM + DEM + Reference)
+area_picker.py (Leaflet 网页框选 / 用户级入口)
     ↓
-GIS 预处理 / 坐标统一
+set_area.py (区域状态 + 数据获取)
     ↓
-Houdini/ (道路、建筑、地形、点位生成)
+refine_data.py (数据清洗 + 数据 QA)
     ↓
-HDA / 静态资产导出
+_recook_new_area.py (Houdini 自动构建)
     ↓
-UE5/ (Houdini Engine → Bake → Nanite/Lumen/PCG)
+houdini_model_qa.py (模型 QA)
+    ↓
+人工审核 Houdini OUT_city
+    ↓
+export_and_import.py (审核后再进入 UE5)
 ```
 
 ## AI 快速入口
@@ -109,10 +118,19 @@ UE5/ (Houdini Engine → Bake → Nanite/Lumen/PCG)
 
 ## 当前项目阶段
 
-当前阶段：**Houdini MVP 节点网络已完成，切换建筑数据源进行中**。
+当前阶段：**Houdini 资产质量快速迭代**。
 
-下一步优先级（详见 `项目管理/02_当前状态与下一步.md`）：
+最终目标是俯视角虚拟城市构建。当前重点不是最终整合输出，而是稳定并优化：
 
-1. 切换建筑数据源：OSM → Overture Maps（已下载 GeoJSON，更新 Houdini SOP）
-2. FBX 分组导出（buildings + roads）
-3. 创建 UE5 项目，导入 FBX 验证比例与位置
+```text
+数据获取 → 数据清洗 → Houdini 自动构建 → Model QA → 人工视口审核
+```
+
+最新稳定主入口：
+
+```bash
+cd Scripts
+uv run python area_picker.py
+```
+
+“重新测试 / 从头测试 / 全流程测试”必须从 `area_picker.py` 网页入口开始，并以 Houdini build status + Model QA 通过作为结束条件。当前 UE5 导出导入仍放在 Houdini 视口审核之后手动触发。

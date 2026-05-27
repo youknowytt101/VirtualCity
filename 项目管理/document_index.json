@@ -5,6 +5,7 @@
     "first_read": "项目管理/00_AI接手指南.md",
     "current_status": "项目管理/02_当前状态与下一步.md",
     "task_board": "项目管理/08_任务看板.md",
+    "known_issues": "项目管理/12_已知坑点与解决方案.md",
     "decision_records": "项目管理/09_决策记录.md",
     "manifest": "项目管理/project_manifest.json"
   },
@@ -25,6 +26,37 @@
       "项目管理/03_迭代日志.md",
       "项目管理/08_任务看板.md"
     ],
+    "run_full_pipeline_test": [
+      "项目管理/10_AI启动自检清单.md",
+      "项目管理/04_稳定流程规范.md",
+      "Scripts/README.md",
+      "Scripts/area_picker.py"
+    ],
+    "work_on_houdini_quality": [
+      "项目管理/02_当前状态与下一步.md",
+      "项目管理/12_已知坑点与解决方案.md",
+      "Houdini/README.md",
+      "Scripts/_recook_new_area.py",
+      "Scripts/houdini_model_qa.py"
+    ],
+    "work_on_roads": [
+      "项目管理/12_已知坑点与解决方案.md",
+      "Scripts/_road_strips_v2.py",
+      "Scripts/_recook_new_area.py",
+      "Reports/model_qa/latest.json"
+    ],
+    "work_on_buildings": [
+      "项目管理/12_已知坑点与解决方案.md",
+      "Scripts/_recook_new_area.py",
+      "Scripts/houdini_model_qa.py",
+      "Reports/model_qa/latest.json"
+    ],
+    "work_on_data_cleaning": [
+      "Scripts/refine_data.py",
+      "Scripts/clean_raw_data.py",
+      "Scripts/data_cleaning_cache.py",
+      "Config/qa/"
+    ],
     "check_decisions": [
       "项目管理/09_决策记录.md",
       "项目管理/03_迭代日志.md"
@@ -39,15 +71,10 @@
       "Config/area_config.template.json",
       "RawData/README.md"
     ],
-    "work_on_houdini": [
-      "Houdini/README.md",
-      "调研文档/地图API-Houdini-UE流程/02_Houdini处理流程.md",
-      "Config/pipeline_config.template.json"
-    ],
     "work_on_ue5": [
       "UE5/README.md",
       "调研文档/地图API-Houdini-UE流程/03_UE5整合方案.md",
-      "项目管理/07_MVP_QA检查清单.md"
+      "Scripts/export_and_import.py"
     ],
     "research_pipeline": [
       "调研文档/README.md",
@@ -62,5 +89,5 @@
     ]
   },
   "version_roadmap": "项目管理/11_版本路线图.md",
-  "last_updated": "2026-05-21"
+  "last_updated": "2026-05-28"
 }

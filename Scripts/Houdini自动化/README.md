@@ -1,28 +1,58 @@
 # Houdini 自动化
 
-用于预留 Houdini 侧的非官方自动化脚本、HDA 辅助工具和批处理配置。
+> 当前 Houdini 自动化已经进入主流程，不再只是预留位。
+> 主要实现仍位于 `Scripts/` 根目录，本文用于说明职责边界。
 
-## MVP 阶段结论
+---
 
-第一阶段不建议先开发 Hython 批处理或参数管理工具。
+## 当前入口
 
-更现实的做法：
+完整用户级流程由 `area_picker.py` 触发，Houdini 阶段由：
 
-- 直接在 Houdini 中手动导入 `.osm`。
-- 手动搭建 MVP 节点网络。
-- 手动保存 `.hip` 和 `.hda`。
-- 手动导出一次 FBX / Heightmap / HDA 结果。
-- 用 Markdown 或 JSON 记录关键参数即可。
+```text
+Scripts/_recook_new_area.py
+```
 
-## 后续何时需要脚本
+负责。
 
-只有出现以下情况，才考虑开发：
+模型 QA 由：
 
-| 触发条件 | 再考虑的工具 |
-|---|---|
-| 同一套 HDA 要跑多个区域 | Hython 批量 Cook 脚本 |
-| 参数组合很多且需要复现 | HDA 参数预设文件 |
-| 每次要导出多种格式 | 导出路径管理脚本 |
-| 单次 Cook 时间过长 | PDG / TOP 分块任务 |
+```text
+Scripts/houdini_model_qa.py
+```
 
-当前目录先只作为预留位。
+负责。
+
+---
+
+## 当前 Houdini 自动化职责
+
+- 连接 Houdini RPYC server（默认端口 `18811`）。
+- 确认 master hip 已加载。
+- 动态 patch 关键 Python SOP / VEX 片段。
+- 重建或修复道路、建筑、地形链路。
+- 按当前 `active_area.json` recook。
+- 保存 `VC_master_citygen_v001.hip`。
+- 按区域归档 `VC_{area_id}_citygen_v001.hip`。
+- 调用 `houdini_model_qa.py --mode quick`。
+- 写入 `Config/houdini_build_status.json`。
+
+---
+
+## 当前质量重点
+
+- 道路：路口、异常大面片、坡地全顶点贴地。
+- 地形：`dem_subdivide` 作为所有吸附目标。
+- 建筑：坡地贴地、foundation/skirt、footprint bevel、法线。
+- QA：所有大几何统计在 Houdini 进程内部完成。
+
+---
+
+## 暂不做
+
+- 暂不做 PDG / TOPs 批处理。
+- 暂不做大规模 tile 分块。
+- 暂不默认触发 UE5 导入。
+- 暂不把当前快速实验逻辑封装为正式 HDA。
+
+这些等 Houdini 输出质量稳定后再推进。

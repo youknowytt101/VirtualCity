@@ -1,76 +1,113 @@
 # Scripts
 
-> 本目录是 VirtualCity 管线的自动化预留位，用于后续存放确有必要的自研脚本、非官方工具配置与接入说明。  
-> 不存放 Houdini、SideFX Labs、Houdini Engine for Unreal、Cesium for Unreal、UE 官方插件等官方插件本体。
+> 本目录是 VirtualCity 当前自动化管线的核心目录。
+> 这里不存放官方插件本体，只存放项目脚本、Houdini Python SOP 源码、QA 工具和 UE5 辅助脚本。
 
 ---
 
-## 目录定位
+## 当前主流程
 
-真实项目里，MVP 阶段不建议先开发自研插件。更合理的顺序是先手动跑通流程，再把反复出现的步骤脚本化。
+用户级完整测试入口：
 
-这套流程的主线是：
-
-```text
-地图数据 / OSM / DEM
-        ↓
-Houdini 手动导入 / 参数调整
-        ↓
-Houdini 批处理 / HDA Cook / 导出
-        ↓
-UE5 导入 / Bake / 手动整理
-        ↓
-展示关卡与可交付资产
+```bash
+cd Scripts
+uv run python area_picker.py
 ```
 
-本目录只作为后续自动化辅助层的预留位置：
+当前完整流程：
 
-- **MVP 阶段**：只记录流程、bbox、参数和踩坑，不开发插件。
-- **重复生产阶段**：再考虑 OSM 下载、坐标检查、Houdini 批处理。
-- **量产阶段**：再考虑 UE5 资产整理、Data Layer、World Partition、PDG。
+```text
+area_picker.py
+    ↓
+set_area.py
+    ↓
+refine_data.py
+    ↓
+_recook_new_area.py
+    ↓
+houdini_model_qa.py --mode quick
+    ↓
+人工审核 Houdini OUT_city
+    ↓
+export_and_import.py（审核后）
+```
+
+注意：
+
+- `area_picker.py` 是用户级入口。
+- `set_area.py` 是底层 bbox 命令入口。
+- `_recook_new_area.py` 是 Houdini 当前区域重构入口。
+- `houdini_model_qa.py` 是 Houdini 输出后的自动模型审查工具。
+
+当用户说“重新测试 / 从头测试 / 全流程测试”时，默认必须从 `area_picker.py` 开始，不能只运行 `_recook_new_area.py`。
 
 ---
 
-## 推荐目录结构
+## 关键脚本
+
+| 脚本 | 职责 |
+|---|---|
+| `area_picker.py` | Leaflet 网页框选区域，触发完整管线，监控流程状态 |
+| `set_area.py` | 更新 `active_area.json`，获取 / 恢复 OSM、DEM、Overture 数据 |
+| `refine_data.py` | 执行数据清洗、raw snapshot、缓存、数据 QA |
+| `clean_raw_data.py` | 建筑、道路、DEM 的清洗逻辑 |
+| `data_cleaning_cache.py` | 数据清洗 cache fingerprint 与复用 |
+| `_recook_new_area.py` | 通过 RPYC 驱动 Houdini SOP/VEX patch 与 recook |
+| `_osm_import_canonical.py` | Houdini `osm_import` Python SOP 源码 |
+| `_road_strips_v2.py` | Houdini `road_strips` Python SOP 源码 |
+| `houdini_model_qa.py` | Houdini 模型 QA quick/full |
+| `vc_paths.py` | 项目路径统一入口，禁止硬编码盘符 |
+| `export_and_import.py` | Houdini 审核后导出并触发 UE5 导入 |
+
+---
+
+## 当前 Model QA
+
+`houdini_model_qa.py --mode quick` 当前检查：
+
+- required_nodes
+- terrain_density
+- building_color
+- footprint_bevel
+- building_normals
+- foundation_tags
+- foundation_normals
+- foundation_alignment
+- building_terrain_fit
+- road_faces
+- road_terrain_fit
+
+几何统计必须在 Houdini 进程内部完成，再返回 JSON。不要通过 RPYC 在本地逐点/逐面读取大几何。
+
+---
+
+## 工作约束
+
+- 自动化脚本禁止硬编码 `F:/VirtualCity`、`D:/VirtualCity`、`E:/VirtualCity` 等机器专属路径，统一使用 `vc_paths.py`。
+- Windows 控制台关键状态优先使用 `[OK] / [WARN] / [FAIL]`，避免 emoji 导致 GBK 编码崩溃。
+- Houdini RPYC 默认端口为 `18811`。
+- 同一时间只运行一个完整管线，避免 `active_area.json` 和 Houdini status 被互相覆盖。
+- UE5 导出导入不是当前默认测试终点，必须等 Houdini 视口审核通过后再运行。
+
+---
+
+## 目录说明
 
 ```text
 Scripts/
 ├── README.md
-├── 插件清单.md
-├── manifest.json
+├── area_picker.py
+├── set_area.py
+├── refine_data.py
+├── _recook_new_area.py
+├── houdini_model_qa.py
+├── _osm_import_canonical.py
+├── _road_strips_v2.py
+├── vc_paths.py
 ├── 数据处理自动化/
-│   └── README.md
 ├── Houdini自动化/
-│   └── README.md
-└── UE5自动化/
-    └── README.md
+├── UE5自动化/
+└── _archive/
 ```
 
----
-
-## 不放入本目录的内容
-
-以下属于官方插件或官方工具，不应复制到本目录：
-
-- Houdini 安装目录。
-- SideFX Labs。
-- Houdini Engine for Unreal。
-- Cesium for Unreal。
-- Unreal Engine 官方插件。
-- City Sample 官方 HDA 或官方资产包。
-
-可以在文档中记录版本、安装位置和链接，但不要把插件本体提交进项目目录。
-
----
-
-## 使用建议
-
-第一阶段真实建议：
-
-1. **不要先开发自研插件**。
-2. **手动从 Overpass Turbo 导出 OSM**。
-3. **手动在 Houdini 中导入和调参**。
-4. **手动导入 UE5 并 Bake**。
-5. **只保留区域配置、参数记录和问题记录**。
-
-等 MVP 跑通、并且重复劳动明确出现后，再扩展脚本或工具。
+`_archive/` 中保留历史 one-off 修复和道路生成实验脚本，仅供追溯，不作为当前主流程入口。
