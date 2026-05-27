@@ -10,7 +10,7 @@ Houdini 换区重算脚本
 """
 import sys, rpyc, subprocess, json, time
 from pathlib import Path
-from vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area
+from vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area, project_relative
 
 PASS = '[OK]'
 FAIL = '[FAIL]'
@@ -22,7 +22,7 @@ def _write_build_status(area_id, status, hip_path=None, message=''):
     payload = {
         'area_id': area_id,
         'status': status,
-        'hip_path': hip_path or '',
+        'hip_path': project_relative(hip_path) if hip_path else '',
         'message': message,
         'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
     }
