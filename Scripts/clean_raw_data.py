@@ -14,6 +14,7 @@ import argparse
 import json
 import math
 import xml.etree.ElementTree as ET
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -262,6 +263,212 @@ def clean_osm(path: Path, dry_run: bool) -> dict[str, Any]:
         print(f"  [osm]       写入: {path.name}")
 
     return stats
+
+
+def merge_roads(path: Path, tolerance_m: float = 1.0, dry_run: bool = False) -> dict[str, Any]:
+    """Weld near-matching road endpoints and merge degree-2 road chains in-place.
+
+    This is intentionally conservative for the experiment stage: only roads with
+    the same important tags are chained, and chains stop at endpoints used by
+    anything other than exactly two matching road ends.
+    """
+    try:
+        tree = ET.parse(path)
+    except ET.ParseError as e:
+        return {"error": str(e), "merged": 0}
+
+    root = tree.getroot()
+    node_elems = {nd.get("id"): nd for nd in root.findall("node")}
+    nodes: dict[str, tuple[float, float]] = {}
+    for nid, elem in node_elems.items():
+        if nid is None:
+            continue
+        try:
+            nodes[nid] = (float(elem.get("lon")), float(elem.get("lat")))
+        except (TypeError, ValueError):
+            continue
+
+    def _way_tags(way: ET.Element) -> dict[str, str]:
+        return {t.get("k"): t.get("v") for t in way.findall("tag") if t.get("k")}
+
+    def _merge_key(tags: dict[str, str]) -> tuple[str, ...]:
+        return (
+            tags.get("highway", ""),
+            tags.get("lanes", ""),
+            tags.get("width", ""),
+            tags.get("oneway", ""),
+            tags.get("bridge", ""),
+            tags.get("tunnel", ""),
+            tags.get("layer", ""),
+            tags.get("surface", ""),
+        )
+
+    candidates: list[dict[str, Any]] = []
+    endpoint_records: list[tuple[str, float, float]] = []
+    for way in root.findall("way"):
+        tags = _way_tags(way)
+        if not tags.get("highway"):
+            continue
+        refs = [nr.get("ref") for nr in way.findall("nd") if nr.get("ref")]
+        if len(refs) < 2 or refs[0] not in nodes or refs[-1] not in nodes:
+            continue
+        item = {
+            "elem": way,
+            "tags": tags,
+            "key": _merge_key(tags),
+            "refs": refs,
+            "active": True,
+        }
+        candidates.append(item)
+        for ref in (refs[0], refs[-1]):
+            endpoint_records.append((ref, *nodes[ref]))
+
+    if not candidates:
+        return {"ways_in": 0, "ways_out": 0, "merged": 0, "welded_endpoints": 0}
+
+    # Endpoint clustering in local UTM metres.
+    from _utm_lite import wgs84_to_utm, zone_number
+    avg_lon = sum(p[1] for p in endpoint_records) / len(endpoint_records)
+    avg_lat = sum(p[2] for p in endpoint_records) / len(endpoint_records)
+    zone = zone_number(avg_lon)
+
+    parent = list(range(len(endpoint_records)))
+
+    def find(i: int) -> int:
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    def union(a: int, b: int) -> None:
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[rb] = ra
+
+    grid: dict[tuple[int, int], list[int]] = defaultdict(list)
+    cell = max(tolerance_m, 0.01)
+    xy: list[tuple[float, float]] = []
+    for i, (_nid, lon, lat) in enumerate(endpoint_records):
+        x, y, _ = wgs84_to_utm(lat, lon, force_zone=zone)
+        xy.append((x, y))
+        gx, gy = int(math.floor(x / cell)), int(math.floor(y / cell))
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                for j in grid.get((gx + dx, gy + dy), []):
+                    ox, oy = xy[j]
+                    if math.hypot(x - ox, y - oy) <= tolerance_m:
+                        union(i, j)
+        grid[(gx, gy)].append(i)
+
+    cluster_members: dict[int, list[int]] = defaultdict(list)
+    for i in range(len(endpoint_records)):
+        cluster_members[find(i)].append(i)
+
+    endpoint_repr: dict[str, str] = {}
+    for members in cluster_members.values():
+        # Prefer the lowest numeric id if possible; otherwise first seen.
+        ids = [endpoint_records[i][0] for i in members]
+        try:
+            rep = min(ids, key=lambda v: int(v))
+        except ValueError:
+            rep = ids[0]
+        for nid in ids:
+            endpoint_repr[nid] = rep
+
+    welded = 0
+    for item in candidates:
+        refs = list(item["refs"])
+        for idx in (0, len(refs) - 1):
+            rep = endpoint_repr.get(refs[idx], refs[idx])
+            if rep != refs[idx]:
+                welded += 1
+                refs[idx] = rep
+        item["refs"] = refs
+
+    groups: dict[tuple[str, ...], list[int]] = defaultdict(list)
+    for i, item in enumerate(candidates):
+        groups[item["key"]].append(i)
+
+    def _oneway(tags: dict[str, str]) -> bool:
+        return str(tags.get("oneway", "")).lower() in {"yes", "1", "true", "-1"}
+
+    def _concat_refs(a: list[str], b: list[str], side_a: str, side_b: str,
+                     can_reverse_b: bool) -> list[str] | None:
+        if side_a == "end" and side_b == "start":
+            return a + b[1:]
+        if side_a == "start" and side_b == "end":
+            return b + a[1:]
+        if side_a == "end" and side_b == "end" and can_reverse_b:
+            return a + list(reversed(b[:-1]))
+        if side_a == "start" and side_b == "start" and can_reverse_b:
+            return list(reversed(b)) + a[1:]
+        return None
+
+    merged = 0
+    for idxs in groups.values():
+        changed = True
+        while changed:
+            changed = False
+            endpoint_map: dict[str, list[tuple[int, str]]] = defaultdict(list)
+            for idx in idxs:
+                item = candidates[idx]
+                if not item["active"]:
+                    continue
+                refs = item["refs"]
+                if len(refs) < 2 or refs[0] == refs[-1]:
+                    continue
+                endpoint_map[refs[0]].append((idx, "start"))
+                endpoint_map[refs[-1]].append((idx, "end"))
+
+            for endpoint, uses in endpoint_map.items():
+                if len(uses) != 2:
+                    continue
+                (ai, aside), (bi, bside) = uses
+                if ai == bi:
+                    continue
+                a = candidates[ai]
+                b = candidates[bi]
+                if not a["active"] or not b["active"]:
+                    continue
+                can_reverse_b = not _oneway(a["tags"]) and not _oneway(b["tags"])
+                new_refs = _concat_refs(a["refs"], b["refs"], aside, bside, can_reverse_b)
+                if not new_refs or len(new_refs) < 2:
+                    continue
+                a["refs"] = new_refs
+                b["active"] = False
+                merged += 1
+                changed = True
+                break
+
+    inactive_elems = {item["elem"] for item in candidates if not item["active"]}
+    for item in candidates:
+        if not item["active"]:
+            continue
+        way = item["elem"]
+        for nd in list(way.findall("nd")):
+            way.remove(nd)
+        for offset, ref in enumerate(item["refs"]):
+            way.insert(offset, ET.Element("nd", {"ref": ref}))
+
+    if not dry_run:
+        for elem in inactive_elems:
+            root.remove(elem)
+        import tempfile, os
+        tmp_fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp")
+        os.close(tmp_fd)
+        tree.write(tmp_path, encoding="unicode", xml_declaration=True)
+        Path(tmp_path).replace(path)
+
+    ways_in = len(candidates)
+    ways_out = ways_in - len(inactive_elems)
+    return {
+        "ways_in": ways_in,
+        "ways_out": ways_out,
+        "merged": merged,
+        "welded_endpoints": welded,
+        "endpoint_clusters": len(cluster_members),
+        "tolerance_m": tolerance_m,
+    }
 
 
 # ── 主函数 ───────────────────────────────────────────────────

@@ -111,7 +111,7 @@ if osm and osm.parm('python'):
 
 # ── 1. 修复 dem_import Python SOP（H-006：硬编码路径）────
 DEM_IMPORT_CODE = """
-import hou, csv, json as _json
+import hou, csv, json as _json, os
 ROOT_DIR = r'__ROOT__'
 CFG_FILE = r'__CFG__'
 def _resolve_project_path(value):
@@ -127,7 +127,9 @@ def _resolve_project_path(value):
         return raw
     return ROOT_DIR + '/' + raw
 with open(CFG_FILE, encoding='utf-8') as _f:
-    CSV_FILE = _resolve_project_path(_json.load(_f)['dem_csv'])
+    _cfg = _json.load(_f)
+    _ready = ROOT_DIR + '/RawData/_houdini_ready/' + _cfg.get('area_id', '') + '/dem.csv'
+    CSV_FILE = _ready if os.path.exists(_ready) else _resolve_project_path(_cfg['dem_csv'])
 geo = hou.pwd().geometry()
 with open(CSV_FILE, newline='') as f:
     for row in csv.DictReader(f):
@@ -136,7 +138,7 @@ with open(CSV_FILE, newline='') as f:
 """.replace('__ROOT__', ROOT_STR).replace('__CFG__', CFG_FILE)
 
 DEM_TERRAIN_CODE = """
-import hou, csv, json as _json
+import hou, csv, json as _json, os
 ROOT_DIR = r'__ROOT__'
 CFG_FILE = r'__CFG__'
 def _resolve_project_path(value):
@@ -152,7 +154,9 @@ def _resolve_project_path(value):
         return raw
     return ROOT_DIR + '/' + raw
 with open(CFG_FILE, encoding='utf-8') as _f:
-    CSV_FILE = _resolve_project_path(_json.load(_f)['dem_csv'])
+    _cfg = _json.load(_f)
+    _ready = ROOT_DIR + '/RawData/_houdini_ready/' + _cfg.get('area_id', '') + '/dem.csv'
+    CSV_FILE = _ready if os.path.exists(_ready) else _resolve_project_path(_cfg['dem_csv'])
 geo = hou.pwd().geometry()
 rows = []
 with open(CSV_FILE, newline='') as f:
@@ -267,12 +271,16 @@ if (osm_w > 0) {
 # road_width_flat 是真正喂入 road_strips 的节点，直接写 ROAD_WIDTH_VEX
 # （旧版 road_width 节点已 deprecated，统一在 cleanup 段删除）
 _rwf_node = hou.node(OBJ_PATH + '/road_width_flat')
+_resample_roads = hou.node(OBJ_PATH + '/resample_roads')
 if _rwf_node is None:
     _rwf_node = net.createNode('attribwrangle', 'road_width_flat')
-    _rwf_node.setInput(0, hou.node(OBJ_PATH + '/resample_roads'), 0)
+if _resample_roads:
+    # Always repair the input. Existing HIPs may preserve a stale/miswired input,
+    # which can make road_strips generate oversized quads from sparse road lines.
+    _rwf_node.setInput(0, _resample_roads, 0)
 _rwf_node.parm('class').set(1)  # Primitive
 _rwf_node.parm('snippet').set(ROAD_WIDTH_VEX)
-print('  road_width_flat VEX 已更新（osm_width > lanes > 14 级分类表）')
+print('  road_width_flat VEX + 输入已更新（resample_roads → road_width_flat）')
 
 # ── 1d. road_strips v2: 路段修剪 + 路口凸包填充 ──────────────────────
 import pathlib as _pl
@@ -282,7 +290,7 @@ _rs_node = hou.node(OBJ_PATH + '/road_strips')
 if _rs_node:
     _rs_node.parm('python').set(_rs_v2_code)
     _rs_node.setInput(0, _rwf_node, 0)
-    print('  road_strips v2 已更新（路口凸包填充）')
+    print('  road_strips v3 已更新（全顶点路口 + 交叉插点 + 凸包填充）')
 
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = """
@@ -537,8 +545,107 @@ _rs_bb   = _rs_geo.boundingBox()
 _rs_ymin = _rs_bb.minvec()[1]
 print('  snap_road_strips: pts={} Y_min={:.2f}m'.format(_rs_pts, _rs_ymin))
 
+# ── 4b2. 道路几何级 bbox 裁剪（不再只按 primitive 中心点删除）──────────────
+ROAD_BBOX_CLIP_CODE = r"""
+import hou
+
+XMIN = __XMIN__
+XMAX = __XMAX__
+ZMIN = __ZMIN__
+ZMAX = __ZMAX__
+
+geo_in = hou.pwd().inputs()[0].geometry()
+geo = hou.pwd().geometry()
+geo.clear()
+
+prim_attribs = []
+for attrib in geo_in.primAttribs():
+    try:
+        geo.addAttrib(hou.attribType.Prim, attrib.name(), attrib.defaultValue())
+        prim_attribs.append(attrib.name())
+    except Exception:
+        pass
+
+def inside(p, axis, value, keep_greater):
+    return p[axis] >= value if keep_greater else p[axis] <= value
+
+def intersect(a, b, axis, value):
+    denom = b[axis] - a[axis]
+    if abs(denom) < 1e-8:
+        return hou.Vector3(a)
+    t = (value - a[axis]) / denom
+    t = max(0.0, min(1.0, t))
+    return hou.Vector3(
+        a[0] + (b[0] - a[0]) * t,
+        a[1] + (b[1] - a[1]) * t,
+        a[2] + (b[2] - a[2]) * t,
+    )
+
+def clip_boundary(poly, axis, value, keep_greater):
+    if not poly:
+        return []
+    out = []
+    prev = poly[-1]
+    prev_in = inside(prev, axis, value, keep_greater)
+    for cur in poly:
+        cur_in = inside(cur, axis, value, keep_greater)
+        if cur_in:
+            if not prev_in:
+                out.append(intersect(prev, cur, axis, value))
+            out.append(cur)
+        elif prev_in:
+            out.append(intersect(prev, cur, axis, value))
+        prev, prev_in = cur, cur_in
+    return out
+
+def clip_poly(poly):
+    poly = clip_boundary(poly, 0, XMIN, True)
+    poly = clip_boundary(poly, 0, XMAX, False)
+    poly = clip_boundary(poly, 2, ZMIN, True)
+    poly = clip_boundary(poly, 2, ZMAX, False)
+    return poly
+
+for prim in geo_in.prims():
+    try:
+        if not prim.isClosed():
+            continue
+    except Exception:
+        pass
+    pts = [v.point().position() for v in prim.vertices()]
+    if len(pts) < 3:
+        continue
+    clipped = clip_poly(pts)
+    if len(clipped) < 3:
+        continue
+    hpts = []
+    for pos in clipped:
+        p = geo.createPoint()
+        p.setPosition(pos)
+        hpts.append(p)
+    out_prim = geo.createPolygon()
+    for p in hpts:
+        out_prim.addVertex(p)
+    for name in prim_attribs:
+        try:
+            out_prim.setAttribValue(name, prim.attribValue(name))
+        except Exception:
+            pass
+""".replace('__XMIN__', str(XMIN)).replace('__XMAX__', str(XMAX)) \
+   .replace('__ZMIN__', str(ZMIN)).replace('__ZMAX__', str(ZMAX))
+
+old_bbox_clip = hou.node(OBJ_PATH + '/road_bbox_clip')
+if old_bbox_clip:
+    old_bbox_clip.destroy()
+road_bbox_clip = net.createNode('python', 'road_bbox_clip')
+road_bbox_clip.setInput(0, snap_road_strips)
+road_bbox_clip.parm('python').set(ROAD_BBOX_CLIP_CODE)
+road_bbox_clip.cook(force=True)
+print('  road_bbox_clip: pts={} prims={}'.format(
+    road_bbox_clip.geometry().intrinsicValue('pointcount'),
+    road_bbox_clip.geometry().intrinsicValue('primitivecount')))
+
 bld_clip  = remake_clip('post_normals',    'bld_clip_mark',  'bld_clipped')
-road_clip = remake_clip('snap_road_strips','road_clip_mark', 'road_clipped')
+road_clip = remake_clip('road_bbox_clip',   'road_clip_mark', 'road_clipped')
 
 # ── 4c. 颜色节点（三类独立，来自 COLORS 配置）────────────────────────
 def make_color_node(name, src_node, rgb):
@@ -620,6 +727,7 @@ FULL_CHAIN = [
     'osm_import', 'dem_terrain',
     'extract_buildings', 'snap_bld_to_terrain', 'extrude_buildings', 'post_normals',
     'snap_roads_to_terrain1', 'road_width_flat', 'road_strips',
+    'snap_road_strips', 'road_bbox_clip',
     'bld_clipped', 'road_clipped', 'road_color', 'road_extrude', 'bld_color', 'terrain_color', 'merge_all', 'OUT_city',
 ]
 for _cn in FULL_CHAIN:

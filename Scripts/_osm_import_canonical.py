@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-import json, math
+import json, math, os
 
 _CFG_FILE = r"__CFG__"
 with open(_CFG_FILE, encoding="utf-8") as _f:
@@ -18,8 +18,14 @@ def _resolve_project_path(value):
         return raw
     return r'__ROOT__' + '/' + raw
 
-OSM_FILE       = _resolve_project_path(_cfg["osm_file"])
-BUILDINGS_FILE = _resolve_project_path(_cfg["buildings_file"])
+AREA_ID = _cfg.get("area_id", "")
+READY_DIR = r'__ROOT__' + '/RawData/_houdini_ready/' + AREA_ID
+OSM_READY = READY_DIR + '/roads.osm'
+BUILDINGS_READY = READY_DIR + '/buildings.geojson'
+
+OSM_FILE = OSM_READY if os.path.exists(OSM_READY) else _resolve_project_path(_cfg["osm_file"])
+BUILDINGS_FILE = (BUILDINGS_READY if os.path.exists(BUILDINGS_READY)
+                  else _resolve_project_path(_cfg["buildings_file"]))
 ORIGIN_LON     = _cfg["origin_lon"]
 ORIGIN_LAT     = _cfg["origin_lat"]
 
