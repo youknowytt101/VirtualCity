@@ -78,8 +78,8 @@ def check_houdini_ready():
         hip = hou.hipFile.path()
         conn.close()
         if 'untitled' in hip:
-            print(f"  {FAIL} Houdini: 已连接但工程文件未加载（H-001）")
-            return False
+            print(f"  {WARN} Houdini: 已连接但工程文件未加载（recook 会自动加载）")
+            return True
         print(f"  {OK} Houdini: 已连接，hip={hip.split('/')[-1]}")
         return True
     except Exception as e:
