@@ -66,6 +66,11 @@ hou  = conn.modules.hou
 ROOT_STR = ROOT.as_posix()
 CFG_FILE = ACTIVE_AREA.as_posix()
 
+# OBJ 网络名：从 active_area.json 读取，可在换城市时修改
+_cfg = load_active_area()
+OBJ_NET = _cfg.get('obj_network', 'pattaya_osm')
+OBJ_PATH = f'/obj/{OBJ_NET}'
+
 # ── 0. 确保 hip 已加载 ───────────────────────────────
 HIP = MASTER_HIP.as_posix()
 if 'untitled' in hou.hipFile.path():
@@ -74,7 +79,7 @@ if 'untitled' in hou.hipFile.path():
 else:
     print('  hip: ' + hou.hipFile.path().split('/')[-1])
 
-net = hou.node('/obj/pattaya_osm')
+net = hou.node(OBJ_PATH)
 
 for _node in net.allSubChildren():
     if _node.type().name() != 'python':
@@ -99,7 +104,7 @@ _OSM_IMPORT_CODE = open(
     str(Path(ROOT_STR) / 'Scripts' / '_osm_import_canonical.py'),
     encoding='utf-8'
 ).read().replace('__ROOT__', ROOT_STR).replace('__CFG__', CFG_FILE)
-osm = hou.node('/obj/pattaya_osm/osm_import')
+osm = hou.node(OBJ_PATH + '/osm_import')
 if osm and osm.parm('python'):
     osm.parm('python').set(_OSM_IMPORT_CODE)
     print('  SOP 修复: osm_import (canonical: single resolver + OSM bld fallback)')
@@ -175,8 +180,8 @@ for ri in range(nrows - 1):
 DEM_TERRAIN_CODE = DEM_TERRAIN_CODE.replace('__ROOT__', ROOT_STR).replace('__CFG__', CFG_FILE)
 
 for node_path, code in [
-    ('/obj/pattaya_osm/dem_import',   DEM_IMPORT_CODE),
-    ('/obj/pattaya_osm/dem_terrain',  DEM_TERRAIN_CODE),
+    (OBJ_PATH + '/dem_import',   DEM_IMPORT_CODE),
+    (OBJ_PATH + '/dem_terrain',  DEM_TERRAIN_CODE),
 ]:
     n = hou.node(node_path)
     if n:
@@ -184,7 +189,7 @@ for node_path, code in [
         print('  SOP 修复: ' + node_path.split('/')[-1])
 
 # ── 1a. 修复 divide_bld（Q-001：convex+numsides=3 强制三角化建筑 footprint）──
-_div_bld = hou.node('/obj/pattaya_osm/divide_bld')
+_div_bld = hou.node(OBJ_PATH + '/divide_bld')
 if _div_bld:
     _div_bld.parm('convex').set(0)
     _div_bld.parm('usemaxsides').set(0)
@@ -199,11 +204,11 @@ xyzdist(1, @P, hit_prim, uvw);
 vector terrain_pos = primuv(1, "P", hit_prim, uvw);
 @P.y = terrain_pos.y;
 """
-snap_old = hou.node('/obj/pattaya_osm/snap_roads_to_terrain1')
+snap_old = hou.node(OBJ_PATH + '/snap_roads_to_terrain1')
 if snap_old and snap_old.type().name() == 'ray':
-    road_w = hou.node('/obj/pattaya_osm/road_width')
-    resample = hou.node('/obj/pattaya_osm/resample_roads')
-    dem_t    = hou.node('/obj/pattaya_osm/dem_terrain')
+    road_w = hou.node(OBJ_PATH + '/road_width')
+    resample = hou.node(OBJ_PATH + '/resample_roads')
+    dem_t    = hou.node(OBJ_PATH + '/dem_terrain')
     snap_old.destroy()
     snap_new = net.createNode('attribwrangle', 'snap_roads_to_terrain1')
     snap_new.setInput(0, resample)
@@ -243,7 +248,7 @@ else if (hw == "steps")                                       hw_val = 0.6;
 else                                                          hw_val = 1.5;
 f@half_width = hw_val;
 """
-_rw = hou.node('/obj/pattaya_osm/road_width')
+_rw = hou.node(OBJ_PATH + '/road_width')
 if _rw:
     _rw.parm('snippet').set(ROAD_WIDTH_VEX)
     _rw.parm('class').set(1)  # Primitive
@@ -253,18 +258,18 @@ if _rw:
 import pathlib as _pl
 _rs_v2_path = ROOT / 'Scripts' / '_road_strips_v2.py'
 _rs_v2_code = _rs_v2_path.read_text(encoding='utf-8')
-_rs_node = hou.node('/obj/pattaya_osm/road_strips')
-_rwf_node = hou.node('/obj/pattaya_osm/road_width_flat')
+_rs_node = hou.node(OBJ_PATH + '/road_strips')
+_rwf_node = hou.node(OBJ_PATH + '/road_width_flat')
 if _rs_node and _rwf_node:
     _rs_node.parm('python').set(_rs_v2_code)
     _rs_node.setInput(0, _rwf_node, 0)
     print('  road_strips v2 已更新（路口凸包填充）')
 elif _rs_node:
     # road_width_flat 不存在时自动创建
-    _rwf_node = hou.node('/obj/pattaya_osm').createNode('attribwrangle', 'road_width_flat')
-    _rwf_node.setInput(0, hou.node('/obj/pattaya_osm/resample_roads'), 0)
+    _rwf_node = net.createNode('attribwrangle', 'road_width_flat')
+    _rwf_node.setInput(0, hou.node(OBJ_PATH + '/resample_roads'), 0)
     _rwf_node.parm('class').set(1)
-    _rwf_node.parm('snippet').set(hou.node('/obj/pattaya_osm/road_width').parm('snippet').eval())
+    _rwf_node.parm('snippet').set(hou.node(OBJ_PATH + '/road_width').parm('snippet').eval())
     _rs_node.parm('python').set(_rs_v2_code)
     _rs_node.setInput(0, _rwf_node, 0)
     print('  road_width_flat 已创建 + road_strips v2 已更新')
@@ -305,7 +310,7 @@ foreach(int v; verts) {
     setpointattrib(0, "P", pt, p, "set");
 }
 """
-snap_bld = hou.node('/obj/pattaya_osm/snap_bld_to_terrain')
+snap_bld = hou.node(OBJ_PATH + '/snap_bld_to_terrain')
 if snap_bld:
     snap_bld.parm('class').set(1)   # Primitive
     snap_bld.parm('snippet').set(BLD_SNAP_VEX)
@@ -346,15 +351,15 @@ float noise_val = fit(noise(ctr * 0.003), 0, 1, -1.5, 1.5);
 float floors = clamp(base_floors + noise_val, 1, 15);
 f@height_m = floors * 3.5;
 """
-_ph = hou.node('/obj/pattaya_osm/procedural_height')
+_ph = hou.node(OBJ_PATH + '/procedural_height')
 if _ph:
     _ph.parm('snippet').set(PROC_HEIGHT_VEX)
     print('  SOP 修复: procedural_height (P0: height_m<=0 fallback)')
 
 # ── 2. 强制 recook 数据源 ────────────────────────────
 print('\n[recook 数据源]')
-for path in ['/obj/pattaya_osm/osm_import', '/obj/pattaya_osm/dem_import',
-             '/obj/pattaya_osm/dem_terrain']:
+for path in [OBJ_PATH + '/osm_import', OBJ_PATH + '/dem_import',
+             OBJ_PATH + '/dem_terrain']:
     n = hou.node(path)
     if not n:
         continue
@@ -367,11 +372,11 @@ for path in ['/obj/pattaya_osm/osm_import', '/obj/pattaya_osm/dem_import',
         errors.append(n.name() + ' geometry empty after recook')
 
 # ── 2b. 地形加密（Subdivide Bilinear × 2）───────────────────────────
-old_subdiv = hou.node('/obj/pattaya_osm/dem_subdivide')
+old_subdiv = hou.node(OBJ_PATH + '/dem_subdivide')
 if old_subdiv:
     old_subdiv.destroy()
 dem_subdiv = net.createNode('subdivide', 'dem_subdivide')
-dem_subdiv.setInput(0, hou.node('/obj/pattaya_osm/dem_terrain'))
+dem_subdiv.setInput(0, hou.node(OBJ_PATH + '/dem_terrain'))
 dem_subdiv.parm('algorithm').set(4)   # 4 = OpenSubdiv Bilinear（线性插值，不改变已有高程）
 dem_subdiv.parm('iterations').set(2)  # 2轮细分 = ×16 面片密度（30m→~7.5m等效）
 dem_subdiv.cook(force=True)
@@ -383,7 +388,7 @@ print('  dem_subdivide: pts={} prims={} (原 {} 面片 → 加密 ×16)'.format(
 
 # 更新吸附节点 input1 → dem_subdivide（更密地形 = 更精确贴合）
 for _sn_name in ['snap_bld_to_terrain', 'snap_roads_to_terrain1']:
-    _sn = hou.node('/obj/pattaya_osm/' + _sn_name)
+    _sn = hou.node(OBJ_PATH + '/' + _sn_name)
     if _sn:
         _sn.setInput(1, dem_subdiv)
 
@@ -397,7 +402,7 @@ CHECKS = [
     ('road_strips',          100,  None,  'roads generated'),
 ]
 for name, min_pts, max_y, desc in CHECKS:
-    n = hou.node('/obj/pattaya_osm/' + name)
+    n = hou.node(OBJ_PATH + '/' + name)
     if not n:
         print('  SKIP  {:<22s} (node not found)'.format(name))
         continue
@@ -416,7 +421,7 @@ for name, min_pts, max_y, desc in CHECKS:
 
 # ── 4. 重建裁剪节点 ──────────────────────────────────
 print('\n[裁剪节点重建]')
-dem = hou.node('/obj/pattaya_osm/dem_terrain')
+dem = hou.node(OBJ_PATH + '/dem_terrain')
 dem.cook(force=False)
 bb  = dem.geometry().boundingBox()
 mn, mx = bb.minvec(), bb.maxvec()
@@ -441,10 +446,10 @@ VEX = (  # noqa: E741
 
 def remake_clip(src_name, mark_name, out_name):
     for nm in [out_name, mark_name]:
-        old = hou.node('/obj/pattaya_osm/' + nm)
+        old = hou.node(OBJ_PATH + '/' + nm)
         if old:
             old.destroy()
-    src = hou.node('/obj/pattaya_osm/' + src_name)
+    src = hou.node(OBJ_PATH + '/' + src_name)
     if not src:
         errors.append('source node not found: ' + src_name)
         return None
@@ -478,10 +483,10 @@ xyzdist(1, @P, hit_prim, uvw);
 vector tp = primuv(1, "P", hit_prim, uvw);
 @P.y = max(tp.y, 0.0) + 0.15;  // 浮起 0.15m，且不低于海平面(Y=0)
 """
-old_drape = hou.node('/obj/pattaya_osm/snap_road_strips')
+old_drape = hou.node(OBJ_PATH + '/snap_road_strips')
 if old_drape:
     old_drape.destroy()
-road_strips_node = hou.node('/obj/pattaya_osm/road_strips')
+road_strips_node = hou.node(OBJ_PATH + '/road_strips')
 snap_road_strips = net.createNode('attribwrangle', 'snap_road_strips')
 snap_road_strips.setInput(0, road_strips_node)
 snap_road_strips.setInput(1, dem_subdiv)
@@ -499,7 +504,7 @@ road_clip = remake_clip('snap_road_strips','road_clip_mark', 'road_clipped')
 
 # ── 4c. 颜色节点（三类独立，来自 COLORS 配置）────────────────────────
 def make_color_node(name, src_node, rgb):
-    old = hou.node('/obj/pattaya_osm/' + name)
+    old = hou.node(OBJ_PATH + '/' + name)
     if old: old.destroy()
     w = net.createNode('attribwrangle', name)
     w.setInput(0, src_node)
@@ -508,13 +513,13 @@ def make_color_node(name, src_node, rgb):
     w.cook(force=True)
     return w
 
-_dem_sd = hou.node('/obj/pattaya_osm/dem_subdivide') or hou.node('/obj/pattaya_osm/dem_terrain')
+_dem_sd = hou.node(OBJ_PATH + '/dem_subdivide') or hou.node(OBJ_PATH + '/dem_terrain')
 road_colored    = make_color_node('road_color',    road_clip, COLORS['roads'])
 bld_colored     = make_color_node('bld_color',     bld_clip,  COLORS['buildings'])
 terrain_colored = make_color_node('terrain_color', _dem_sd,   COLORS['terrain'])
 
 # ── 4d. 道路挤出（road_extrude：0.18m 侧面 + 顶面）────────────────────
-old_ext = hou.node('/obj/pattaya_osm/road_extrude')
+old_ext = hou.node(OBJ_PATH + '/road_extrude')
 if old_ext:
     old_ext.destroy()
 road_extrude = net.createNode('polyextrude::2.0', 'road_extrude')
@@ -530,7 +535,7 @@ print('  road_extrude: pts={} prims={}'.format(
     road_extrude.geometry().intrinsicValue('primitivecount')))
 
 # ── 5. 重连 merge_all + 保存 ────────────────────────
-merge = hou.node('/obj/pattaya_osm/merge_all')
+merge = hou.node(OBJ_PATH + '/merge_all')
 if merge and bld_clip and road_clip:
     merge.setInput(0, bld_colored)
     merge.setInput(1, road_extrude)
@@ -555,10 +560,10 @@ FULL_CHAIN = [
     'bld_clipped', 'road_clipped', 'road_color', 'road_extrude', 'bld_color', 'terrain_color', 'merge_all', 'OUT_city',
 ]
 for _cn in FULL_CHAIN:
-    _n = hou.node('/obj/pattaya_osm/' + _cn)
+    _n = hou.node(OBJ_PATH + '/' + _cn)
     if _n:
         _n.cook(force=True)
-_out = hou.node('/obj/pattaya_osm/OUT_city')
+_out = hou.node(OBJ_PATH + '/OUT_city')
 if _out:
     _out.setDisplayFlag(True)
     _out.setRenderFlag(True)

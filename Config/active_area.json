@@ -5,5 +5,6 @@
   "dem_csv": "RawData/DEM/area_12.934_100.883_dem_v001.csv",
   "origin_lon": 100.8829235,
   "origin_lat": 12.9338495,
+  "obj_network": "pattaya_osm",
   "_note": "切换区域只改此文件，不改 Houdini 节点代码"
 }
