@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1200" font-family="Microsoft YaHei, PingFang SC, Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#34495e"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#27ae60"/>
+    </marker>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#eef3f8"/>
+    </linearGradient>
+    <style>
+      .title { font-size: 26px; font-weight: 700; fill: #1f2d3d; }
+      .subtitle { font-size: 14px; fill: #607d8b; }
+      .lane-title { font-size: 15px; font-weight: 700; fill: white; }
+      .box-title { font-size: 15px; font-weight: 700; fill: #263238; }
+      .box-text { font-size: 12px; fill: #546e7a; }
+      .small { font-size: 11px; fill: #607d8b; }
+      .code { font-family: Consolas, Cascadia Mono, monospace; font-size: 12px; fill: #37474f; }
+      .ok { fill: #27ae60; font-weight: 700; }
+      .warn { fill: #e67e22; font-weight: 700; }
+      .fail { fill: #c0392b; font-weight: 700; }
+      .line { stroke: #34495e; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .line-ok { stroke: #27ae60; stroke-width: 2.2; fill: none; marker-end: url(#arrowGreen); }
+      .dash { stroke-dasharray: 7 5; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="1200" rx="14" fill="url(#bg)"/>
+
+  <text x="700" y="42" text-anchor="middle" class="title">VirtualCity 完整自动化流程（网页框选 → Houdini 构建完成检测）</text>
+  <text x="700" y="68" text-anchor="middle" class="subtitle">默认完整测试入口：uv run python area_picker.py，不直接从 set_area.py 开始</text>
+
+  <rect x="40" y="95" width="1320" height="970" rx="16" fill="#ffffff" stroke="#d5dde5" stroke-width="2"/>
+
+  <rect x="70" y="125" width="210" height="34" rx="8" fill="#3498db"/>
+  <text x="175" y="147" text-anchor="middle" class="lane-title">1. 用户级入口</text>
+
+  <rect x="70" y="180" width="300" height="92" rx="12" fill="#eaf4ff" stroke="#3498db" stroke-width="2"/>
+  <text x="220" y="206" text-anchor="middle" class="box-title">area_picker.py</text>
+  <text x="220" y="226" text-anchor="middle" class="code">uv run python area_picker.py</text>
+  <text x="220" y="246" text-anchor="middle" class="box-text">启动 localhost:8765</text>
+  <text x="220" y="264" text-anchor="middle" class="box-text">自动打开 Leaflet 网页</text>
+
+  <line x1="370" y1="226" x2="445" y2="226" class="line"/>
+
+  <rect x="445" y="180" width="330" height="92" rx="12" fill="#f3e8ff" stroke="#8e44ad" stroke-width="2"/>
+  <text x="610" y="206" text-anchor="middle" class="box-title">网页框选 BBOX</text>
+  <text x="610" y="226" text-anchor="middle" class="box-text">用户点击矩形工具并拖拽框选</text>
+  <text x="610" y="246" text-anchor="middle" class="box-text">填写 area_name</text>
+  <text x="610" y="264" text-anchor="middle" class="box-text">点击“开始生成”</text>
+
+  <line x1="775" y1="226" x2="850" y2="226" class="line"/>
+
+  <rect x="850" y="180" width="370" height="92" rx="12" fill="#fff7e6" stroke="#f39c12" stroke-width="2"/>
+  <text x="1035" y="206" text-anchor="middle" class="box-title">POST /run</text>
+  <text x="1035" y="226" text-anchor="middle" class="code">bbox + area_name</text>
+  <text x="1035" y="246" text-anchor="middle" class="box-text">后台线程启动底层管线</text>
+  <text x="1035" y="264" text-anchor="middle" class="box-text">网页每 3 秒轮询 /status</text>
+
+  <line x1="1035" y1="272" x2="1035" y2="335" class="line"/>
+
+  <rect x="70" y="315" width="210" height="34" rx="8" fill="#16a085"/>
+  <text x="175" y="337" text-anchor="middle" class="lane-title">2. 底层管线</text>
+
+  <rect x="850" y="335" width="370" height="88" rx="12" fill="#e8f8f5" stroke="#16a085" stroke-width="2"/>
+  <text x="1035" y="360" text-anchor="middle" class="box-title">set_area.py</text>
+  <text x="1035" y="380" text-anchor="middle" class="code">uv run python set_area.py west south east north area</text>
+  <text x="1035" y="400" text-anchor="middle" class="box-text">写入 active_area.json，组织全流程</text>
+
+  <line x1="850" y1="379" x2="775" y2="379" class="line"/>
+
+  <rect x="445" y="335" width="330" height="88" rx="12" fill="#eafaf1" stroke="#27ae60" stroke-width="2"/>
+  <text x="610" y="360" text-anchor="middle" class="box-title">数据获取 / 缓存</text>
+  <text x="610" y="380" text-anchor="middle" class="box-text">OSM roads / Overture buildings / FABDEM DTM</text>
+  <text x="610" y="400" text-anchor="middle" class="box-text">优先 tile cache，缺失时远程下载</text>
+
+  <line x1="445" y1="379" x2="370" y2="379" class="line"/>
+
+  <rect x="70" y="335" width="300" height="88" rx="12" fill="#fef9e7" stroke="#f1c40f" stroke-width="2"/>
+  <text x="220" y="360" text-anchor="middle" class="box-title">原始数据落盘</text>
+  <text x="220" y="380" text-anchor="middle" class="code">RawData/OSM | DEM | Overture</text>
+  <text x="220" y="400" text-anchor="middle" class="box-text">DEM CSV 包含 x,y,z,row,col</text>
+
+  <line x1="220" y1="423" x2="220" y2="485" class="line"/>
+
+  <rect x="70" y="465" width="210" height="34" rx="8" fill="#2ecc71"/>
+  <text x="175" y="487" text-anchor="middle" class="lane-title">3. 数据精炼</text>
+
+  <rect x="70" y="515" width="300" height="104" rx="12" fill="#ecfff4" stroke="#2ecc71" stroke-width="2"/>
+  <text x="220" y="540" text-anchor="middle" class="box-title">refine_data.py</text>
+  <text x="220" y="560" text-anchor="middle" class="box-text">L1 清洗：格式、孤儿道路、退化建筑</text>
+  <text x="220" y="580" text-anchor="middle" class="box-text">L2/L3：OSM levels 高度补全、DTM 逻辑</text>
+  <text x="220" y="600" text-anchor="middle" class="box-text">输出 Houdini Ready 数据</text>
+
+  <line x1="370" y1="567" x2="445" y2="567" class="line"/>
+
+  <rect x="445" y="515" width="330" height="104" rx="12" fill="#f0fff8" stroke="#27ae60" stroke-width="2"/>
+  <text x="610" y="540" text-anchor="middle" class="box-title">分层缓存目录</text>
+  <text x="610" y="560" text-anchor="middle" class="code">RawData/_downloads/</text>
+  <text x="610" y="580" text-anchor="middle" class="code">RawData/_cleaned/</text>
+  <text x="610" y="600" text-anchor="middle" class="code">RawData/_houdini_ready/</text>
+
+  <line x1="775" y1="567" x2="850" y2="567" class="line"/>
+
+  <rect x="850" y="515" width="370" height="104" rx="12" fill="#f7fff0" stroke="#7cb342" stroke-width="2"/>
+  <text x="1035" y="540" text-anchor="middle" class="box-title">QA 检查</text>
+  <text x="1035" y="560" text-anchor="middle" class="box-text">InputQA：文件存在与大小</text>
+  <text x="1035" y="580" text-anchor="middle" class="box-text">ProcessQA：保留率、DEM 修正状态</text>
+  <text x="1035" y="600" text-anchor="middle" class="box-text">OutputQA：Houdini Ready 输出有效</text>
+
+  <line x1="1035" y1="619" x2="1035" y2="685" class="line"/>
+
+  <rect x="70" y="665" width="210" height="34" rx="8" fill="#e67e22"/>
+  <text x="175" y="687" text-anchor="middle" class="lane-title">4. Houdini 构建</text>
+
+  <rect x="850" y="685" width="370" height="104" rx="12" fill="#fff3e0" stroke="#e67e22" stroke-width="2"/>
+  <text x="1035" y="710" text-anchor="middle" class="box-title">_recook_new_area.py</text>
+  <text x="1035" y="730" text-anchor="middle" class="box-text">连接 Houdini RPYC :18811</text>
+  <text x="1035" y="750" text-anchor="middle" class="box-text">修复 SOP、注入 Python/VEX、强制 recook</text>
+  <text x="1035" y="770" text-anchor="middle" class="box-text">保存 master hip + 区域 hip 存档</text>
+
+  <line x1="850" y1="737" x2="775" y2="737" class="line"/>
+
+  <rect x="445" y="685" width="330" height="104" rx="12" fill="#fff8e1" stroke="#f39c12" stroke-width="2"/>
+  <text x="610" y="710" text-anchor="middle" class="box-title">Houdini 节点链</text>
+  <text x="610" y="730" text-anchor="middle" class="box-text">osm_import → buildings / roads</text>
+  <text x="610" y="750" text-anchor="middle" class="box-text">dem_terrain → snap_bld / snap_roads</text>
+  <text x="610" y="770" text-anchor="middle" class="box-text">road_strips → road_extrude → OUT_city</text>
+
+  <line x1="445" y1="737" x2="370" y2="737" class="line"/>
+
+  <rect x="70" y="685" width="300" height="104" rx="12" fill="#fff5f0" stroke="#d35400" stroke-width="2"/>
+  <text x="220" y="710" text-anchor="middle" class="box-title">链路验证</text>
+  <text x="220" y="730" text-anchor="middle" class="box-text">关键节点非空</text>
+  <text x="220" y="750" text-anchor="middle" class="box-text">建筑/道路/地形 Y 范围输出</text>
+  <text x="220" y="770" text-anchor="middle" class="box-text">失败则 exit 1</text>
+
+  <line x1="220" y1="789" x2="220" y2="850" class="line-ok"/>
+
+  <rect x="70" y="830" width="210" height="34" rx="8" fill="#27ae60"/>
+  <text x="175" y="852" text-anchor="middle" class="lane-title">5. 完成检测</text>
+
+  <rect x="70" y="880" width="385" height="112" rx="12" fill="#eafaf1" stroke="#27ae60" stroke-width="2"/>
+  <text x="262" y="905" text-anchor="middle" class="box-title">Houdini 构建完成标记</text>
+  <text x="262" y="925" text-anchor="middle" class="code">Config/houdini_build_status.json</text>
+  <text x="262" y="947" text-anchor="middle" class="box-text">area_id = 当前区域</text>
+  <text x="262" y="967" text-anchor="middle" class="box-text">status = completed</text>
+  <text x="262" y="987" text-anchor="middle" class="box-text">hip_path / timestamp / message</text>
+
+  <line x1="455" y1="936" x2="540" y2="936" class="line-ok"/>
+
+  <rect x="540" y="880" width="330" height="112" rx="12" fill="#e8f5e9" stroke="#2ecc71" stroke-width="2"/>
+  <text x="705" y="905" text-anchor="middle" class="box-title">area_picker.py 自动确认</text>
+  <text x="705" y="925" text-anchor="middle" class="box-text">读取完成标记文件</text>
+  <text x="705" y="947" text-anchor="middle" class="box-text">确认 area_id 匹配当前任务</text>
+  <text x="705" y="967" text-anchor="middle" class="box-text">确认 status == completed</text>
+  <text x="705" y="987" text-anchor="middle" class="ok">Houdini 构建完成已确认</text>
+
+  <line x1="870" y1="936" x2="955" y2="936" class="line-ok"/>
+
+  <rect x="955" y="880" width="265" height="112" rx="12" fill="#f0fff4" stroke="#27ae60" stroke-width="2"/>
+  <text x="1087" y="905" text-anchor="middle" class="box-title">流程成功结束</text>
+  <text x="1087" y="927" text-anchor="middle" class="box-text">网页显示生成完成</text>
+  <text x="1087" y="949" text-anchor="middle" class="box-text">5 秒后关闭本地服务器</text>
+  <text x="1087" y="971" text-anchor="middle" class="box-text">用户可在 Houdini 查看 OUT_city</text>
+
+  <rect x="70" y="1030" width="1150" height="70" rx="12" fill="#fffde7" stroke="#fbc02d" stroke-width="1.5"/>
+  <text x="90" y="1056" class="box-title">规则</text>
+  <text x="90" y="1078" class="box-text">完整流程测试必须从 area_picker.py 网页框选入口开始；只有用户明确提供 bbox 或要求跳过网页时，才直接运行 set_area.py。</text>
+
+  <rect x="1245" y="180" width="85" height="812" rx="12" fill="#f7f9fb" stroke="#cfd8dc" stroke-width="1.5"/>
+  <text x="1287" y="215" text-anchor="middle" class="small">成功条件</text>
+  <text x="1287" y="250" text-anchor="middle" class="ok">set_area=0</text>
+  <text x="1287" y="278" text-anchor="middle" class="small">AND</text>
+  <text x="1287" y="306" text-anchor="middle" class="ok">status</text>
+  <text x="1287" y="324" text-anchor="middle" class="ok">completed</text>
+  <text x="1287" y="352" text-anchor="middle" class="small">AND</text>
+  <text x="1287" y="380" text-anchor="middle" class="ok">area_id</text>
+  <text x="1287" y="398" text-anchor="middle" class="ok">match</text>
+
+  <text x="700" y="1160" text-anchor="middle" class="subtitle">Generated for VirtualCity pipeline documentation</text>
+</svg>
