@@ -10,6 +10,7 @@ Houdini 换区重算脚本
 """
 import sys, rpyc, subprocess, json, time
 from pathlib import Path
+import houdini_road_pipeline as road_pipe
 from vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area, project_relative
 
 PASS = '[OK]'
@@ -230,23 +231,8 @@ if _div_bld:
     _div_bld.parm('usemaxsides').set(0)
     print('  SOP 修复: divide_bld (Q-001: 关闭 convex+numsides → 保留 n-gon footprint)')
 
-# ── 1b. 修复道路地形吸附（H-007：Ray SOP direction=0，改用 xyzdist）──
-ROAD_SNAP_VEX = """
-// 点级别：按 XZ 垂直投射到地形，而不是用 3D 最近点。
-// 山地/丘陵上 3D 最近点会吸到旁边低坡，导致道路埋入地形。
-vector hitp;
-vector uvw;
-int hit_prim = intersect(1, set(@P.x, 10000.0, @P.z), set(0.0, -20000.0, 0.0), hitp, uvw);
-if (hit_prim >= 0) {
-    @P.y = hitp.y;
-} else {
-    int near_prim;
-    vector near_uvw;
-    xyzdist(1, set(@P.x, @P.y, @P.z), near_prim, near_uvw);
-    vector terrain_pos = primuv(1, "P", near_prim, near_uvw);
-    @P.y = terrain_pos.y;
-}
-"""
+# ── 1b. 修复道路地形吸附（H-007：Ray SOP direction=0，改用 XZ 垂直投射）──
+ROAD_SNAP_VEX = road_pipe.ROAD_SNAP_VEX
 snap_old = hou.node(OBJ_PATH + '/snap_roads_to_terrain1')
 if snap_old and snap_old.type().name() == 'ray':
     road_w = hou.node(OBJ_PATH + '/road_width')
@@ -267,43 +253,7 @@ elif snap_old:
     print('  snap_roads_to_terrain1 class=2 + VEX 已校验更新')
 
 # ── 1b2. 道路分级宽度（road_width attribwrangle）──────────────────────────
-ROAD_WIDTH_VEX = """
-// 道路宽度优先级（精度审核 #4）：OSM 实测宽度 > lanes 推算 > 分类表 fallback
-float osm_w = f@osm_width;
-int   lanes = i@lanes;
-
-if (osm_w > 0) {
-    // OSM width 标签有实测数据
-    f@half_width = osm_w * 0.5;
-} else if (lanes > 0) {
-    // lanes 标签推算（单车道 3.5m 标准）
-    f@half_width = lanes * 1.75;
-} else {
-    // 分类表 fallback（14 级）
-    string hw = s@highway;
-    float hw_val;
-    if      (hw == "motorway")                                    hw_val = 5.0;
-    else if (hw == "motorway_link")                               hw_val = 3.5;
-    else if (hw == "trunk")                                       hw_val = 4.5;
-    else if (hw == "trunk_link")                                  hw_val = 3.0;
-    else if (hw == "primary")                                     hw_val = 4.0;
-    else if (hw == "primary_link")                                hw_val = 2.5;
-    else if (hw == "secondary")                                   hw_val = 3.5;
-    else if (hw == "secondary_link")                              hw_val = 2.0;
-    else if (hw == "tertiary")                                    hw_val = 2.5;
-    else if (hw == "tertiary_link")                               hw_val = 1.5;
-    else if (hw == "residential" || hw == "living_street")        hw_val = 2.0;
-    else if (hw == "unclassified")                                hw_val = 2.0;
-    else if (hw == "service")                                     hw_val = 1.5;
-    else if (hw == "track")                                       hw_val = 1.5;
-    else if (hw == "pedestrian")                                  hw_val = 2.5;
-    else if (hw == "footway" || hw == "path" || hw == "bridleway") hw_val = 0.75;
-    else if (hw == "cycleway")                                    hw_val = 0.75;
-    else if (hw == "steps")                                       hw_val = 0.6;
-    else                                                          hw_val = 1.5;
-    f@half_width = hw_val;
-}
-"""
+ROAD_WIDTH_VEX = road_pipe.ROAD_WIDTH_VEX
 # road_width_flat 是真正喂入 road_strips 的节点，直接写 ROAD_WIDTH_VEX
 # （旧版 road_width 节点已 deprecated，统一在 cleanup 段删除）
 _rwf_node = hou.node(OBJ_PATH + '/road_width_flat')
@@ -319,14 +269,12 @@ _rwf_node.parm('snippet').set(ROAD_WIDTH_VEX)
 print('  road_width_flat VEX + 输入已更新（snap_roads_to_terrain1 → road_width_flat）')
 
 # ── 1d. road_strips v2: 路段修剪 + 路口凸包填充 ──────────────────────
-import pathlib as _pl
-_rs_v2_path = ROOT / 'Scripts' / '_road_strips_v2.py'
-_rs_v2_code = _rs_v2_path.read_text(encoding='utf-8')
+_rs_v2_code = road_pipe.load_road_strips_code(ROOT)
 _rs_node = hou.node(OBJ_PATH + '/road_strips')
 if _rs_node:
     _rs_node.parm('python').set(_rs_v2_code)
     _rs_node.setInput(0, _rwf_node, 0)
-    print('  road_strips v3 已更新（全顶点路口 + 交叉插点 + 凸包填充）')
+    print('  road_strips v4 已更新（调试属性 + 自交保护 + 凸包填充）')
 
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = """
@@ -741,21 +689,7 @@ def remake_clip(src_name, mark_name, out_name):
 
 
 # ── 4b. road_strips 二次地形吸附（修复侧边点埋入地形）────────────────
-ROAD_DRAPE_VEX = """
-// 对每个道路条带顶点按 XZ 垂直投射到地形，防止坡面道路侧边埋入地形。
-vector hitp;
-vector uvw;
-int hit_prim = intersect(1, set(@P.x, 10000.0, @P.z), set(0.0, -20000.0, 0.0), hitp, uvw);
-if (hit_prim >= 0) {
-    @P.y = max(hitp.y, 0.0) + 0.15;  // 浮起 0.15m，且不低于海平面(Y=0)
-} else {
-    int near_prim;
-    vector near_uvw;
-    xyzdist(1, set(@P.x, @P.y, @P.z), near_prim, near_uvw);
-    vector tp = primuv(1, "P", near_prim, near_uvw);
-    @P.y = max(tp.y, 0.0) + 0.15;
-}
-"""
+ROAD_DRAPE_VEX = road_pipe.ROAD_DRAPE_VEX
 old_drape = hou.node(OBJ_PATH + '/snap_road_strips')
 if old_drape:
     old_drape.destroy()
@@ -773,92 +707,7 @@ _rs_ymin = _rs_bb.minvec()[1]
 print('  snap_road_strips: pts={} Y_min={:.2f}m'.format(_rs_pts, _rs_ymin))
 
 # ── 4b2. 道路几何级 bbox 裁剪（不再只按 primitive 中心点删除）──────────────
-ROAD_BBOX_CLIP_CODE = r"""
-import hou
-
-XMIN = __XMIN__
-XMAX = __XMAX__
-ZMIN = __ZMIN__
-ZMAX = __ZMAX__
-
-geo_in = hou.pwd().inputs()[0].geometry()
-geo = hou.pwd().geometry()
-geo.clear()
-
-prim_attribs = []
-for attrib in geo_in.primAttribs():
-    try:
-        geo.addAttrib(hou.attribType.Prim, attrib.name(), attrib.defaultValue())
-        prim_attribs.append(attrib.name())
-    except Exception:
-        pass
-
-def inside(p, axis, value, keep_greater):
-    return p[axis] >= value if keep_greater else p[axis] <= value
-
-def intersect(a, b, axis, value):
-    denom = b[axis] - a[axis]
-    if abs(denom) < 1e-8:
-        return hou.Vector3(a)
-    t = (value - a[axis]) / denom
-    t = max(0.0, min(1.0, t))
-    return hou.Vector3(
-        a[0] + (b[0] - a[0]) * t,
-        a[1] + (b[1] - a[1]) * t,
-        a[2] + (b[2] - a[2]) * t,
-    )
-
-def clip_boundary(poly, axis, value, keep_greater):
-    if not poly:
-        return []
-    out = []
-    prev = poly[-1]
-    prev_in = inside(prev, axis, value, keep_greater)
-    for cur in poly:
-        cur_in = inside(cur, axis, value, keep_greater)
-        if cur_in:
-            if not prev_in:
-                out.append(intersect(prev, cur, axis, value))
-            out.append(cur)
-        elif prev_in:
-            out.append(intersect(prev, cur, axis, value))
-        prev, prev_in = cur, cur_in
-    return out
-
-def clip_poly(poly):
-    poly = clip_boundary(poly, 0, XMIN, True)
-    poly = clip_boundary(poly, 0, XMAX, False)
-    poly = clip_boundary(poly, 2, ZMIN, True)
-    poly = clip_boundary(poly, 2, ZMAX, False)
-    return poly
-
-for prim in geo_in.prims():
-    try:
-        if not prim.isClosed():
-            continue
-    except Exception:
-        pass
-    pts = [v.point().position() for v in prim.vertices()]
-    if len(pts) < 3:
-        continue
-    clipped = clip_poly(pts)
-    if len(clipped) < 3:
-        continue
-    hpts = []
-    for pos in clipped:
-        p = geo.createPoint()
-        p.setPosition(pos)
-        hpts.append(p)
-    out_prim = geo.createPolygon()
-    for p in hpts:
-        out_prim.addVertex(p)
-    for name in prim_attribs:
-        try:
-            out_prim.setAttribValue(name, prim.attribValue(name))
-        except Exception:
-            pass
-""".replace('__XMIN__', str(XMIN)).replace('__XMAX__', str(XMAX)) \
-   .replace('__ZMIN__', str(ZMIN)).replace('__ZMAX__', str(ZMAX))
+ROAD_BBOX_CLIP_CODE = road_pipe.road_bbox_clip_code(XMIN, XMAX, ZMIN, ZMAX)
 
 old_bbox_clip = hou.node(OBJ_PATH + '/road_bbox_clip')
 if old_bbox_clip:

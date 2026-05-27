@@ -80,9 +80,11 @@ def _vc_model_qa_terrain_delta(node_path, terrain_path, max_points, threshold):
         "sampled_points": len(pts),
         "misses": misses,
         "min_delta": min(deltas) if deltas else None,
+        "p01_delta": _vc_model_qa_percentile(deltas, 0.01),
         "p05_delta": _vc_model_qa_percentile(deltas, 0.05),
         "p50_delta": _vc_model_qa_percentile(deltas, 0.50),
         "p95_delta": _vc_model_qa_percentile(deltas, 0.95),
+        "p99_delta": _vc_model_qa_percentile(deltas, 0.99),
         "below_threshold": sum(1 for d in deltas if d < threshold),
         "threshold": threshold,
     }
@@ -94,25 +96,130 @@ def _vc_model_qa_road_faces(node_path):
         return json.dumps({"missing": True, "node": node_path})
     geo = node.geometry()
 
+    def prim_points(prim):
+        return [v.point().position() for v in prim.vertices()]
+
     def area_xz(prim):
-        verts = prim.vertices()
-        if len(verts) < 3:
+        pts = prim_points(prim)
+        if len(pts) < 3:
             return 0.0
         acc = 0.0
-        pts = [v.point().position() for v in verts]
         for i, p in enumerate(pts):
             q = pts[(i + 1) % len(pts)]
             acc += p.x() * q.z() - q.x() * p.z()
         return abs(acc) * 0.5
+
+    def edge_lengths_xz(pts):
+        lengths = []
+        if len(pts) < 2:
+            return lengths
+        for i, p in enumerate(pts):
+            q = pts[(i + 1) % len(pts)]
+            dx = q.x() - p.x()
+            dz = q.z() - p.z()
+            length = math.sqrt(dx * dx + dz * dz)
+            if length > 0.05:
+                lengths.append(length)
+        return lengths
+
+    def aspect_ratio_xz(pts):
+        lengths = edge_lengths_xz(pts)
+        if len(lengths) < 2:
+            return 0.0
+        return max(lengths) / max(0.05, min(lengths))
+
+    def min_angle_xz(pts):
+        if len(pts) < 3:
+            return None
+        angles = []
+        for i, cur in enumerate(pts):
+            prev = pts[(i - 1) % len(pts)]
+            nxt = pts[(i + 1) % len(pts)]
+            ax = prev.x() - cur.x()
+            az = prev.z() - cur.z()
+            bx = nxt.x() - cur.x()
+            bz = nxt.z() - cur.z()
+            al = math.sqrt(ax * ax + az * az)
+            bl = math.sqrt(bx * bx + bz * bz)
+            if al <= 0.05 or bl <= 0.05:
+                continue
+            dot = (ax * bx + az * bz) / (al * bl)
+            dot = max(-1.0, min(1.0, dot))
+            angles.append(math.degrees(math.acos(dot)))
+        return min(angles) if angles else None
+
+    def cross2(ax, az, bx, bz):
+        return ax * bz - az * bx
+
+    def segments_intersect_xz(a0, a1, b0, b1):
+        rx, rz = a1.x() - a0.x(), a1.z() - a0.z()
+        sx, sz = b1.x() - b0.x(), b1.z() - b0.z()
+        den = cross2(rx, rz, sx, sz)
+        if abs(den) < 1e-7:
+            return False
+        qpx, qpz = b0.x() - a0.x(), b0.z() - a0.z()
+        t = cross2(qpx, qpz, sx, sz) / den
+        u = cross2(qpx, qpz, rx, rz) / den
+        return 1e-4 < t < 0.9999 and 1e-4 < u < 0.9999
+
+    def self_intersections_xz(pts):
+        count = len(pts)
+        if count < 4:
+            return 0
+        hits = 0
+        for i in range(count):
+            a0, a1 = pts[i], pts[(i + 1) % count]
+            for j in range(i + 1, count):
+                if j == i or j == (i + 1) % count or i == (j + 1) % count:
+                    continue
+                if i == 0 and j == count - 1:
+                    continue
+                b0, b1 = pts[j], pts[(j + 1) % count]
+                if segments_intersect_xz(a0, a1, b0, b1):
+                    hits += 1
+        return hits
+
+    def prim_attr(prim, name, default):
+        try:
+            return prim.attribValue(name)
+        except Exception:
+            return default
+
+    def global_attr(name, default):
+        try:
+            if geo.findGlobalAttrib(name) is None:
+                return default
+            return geo.attribValue(name)
+        except Exception:
+            try:
+                return geo.globalAttribValue(name)
+            except Exception:
+                return default
 
     open_prims = 0
     max_vertices = 0
     max_area = 0.0
     area_warn = 750.0
     area_fail = 5000.0
+    aspect_warn = 150.0
+    aspect_fail = 500.0
+    angle_warn = 5.0
+    angle_fail = 2.0
     large_warn = 0
     large_fail = 0
     too_many_vertices = 0
+    max_aspect = 0.0
+    aspect_warn_count = 0
+    aspect_fail_count = 0
+    min_angle = None
+    small_angle_warn_count = 0
+    small_angle_fail_count = 0
+    self_intersection_count = 0
+    self_intersecting_prim_count = 0
+    junction_fill_count = 0
+    max_segment_len = 0.0
+    max_face_area_attr = 0.0
+
     for prim in geo.prims():
         verts = len(prim.vertices())
         max_vertices = max(max_vertices, verts)
@@ -129,6 +236,41 @@ def _vc_model_qa_road_faces(node_path):
             large_fail += 1
         if verts > 64:
             too_many_vertices += 1
+
+        pts = prim_points(prim)
+        aspect = aspect_ratio_xz(pts)
+        max_aspect = max(max_aspect, aspect)
+        if aspect > aspect_warn:
+            aspect_warn_count += 1
+        if aspect > aspect_fail:
+            aspect_fail_count += 1
+
+        angle = min_angle_xz(pts)
+        if angle is not None:
+            min_angle = angle if min_angle is None else min(min_angle, angle)
+            if angle < angle_warn:
+                small_angle_warn_count += 1
+            if angle < angle_fail:
+                small_angle_fail_count += 1
+
+        intersections = self_intersections_xz(pts)
+        if intersections:
+            self_intersection_count += intersections
+            self_intersecting_prim_count += 1
+
+        if int(prim_attr(prim, "is_junction", 0) or 0) == 1:
+            junction_fill_count += 1
+        try:
+            max_segment_len = max(max_segment_len, float(prim_attr(prim, "road_segment_len", 0.0) or 0.0))
+            max_face_area_attr = max(max_face_area_attr, float(prim_attr(prim, "road_face_area", 0.0) or 0.0))
+        except Exception:
+            pass
+
+    rejected_small = int(global_attr("junction_rejected_small_count", 0) or 0)
+    rejected_radius = int(global_attr("junction_rejected_radius_count", 0) or 0)
+    rejected_area = int(global_attr("junction_rejected_area_count", 0) or 0)
+    rejected_total = int(global_attr("junction_rejected_total_count", rejected_small + rejected_radius + rejected_area) or 0)
+
     return json.dumps({
         "missing": False,
         "prims": int(geo.intrinsicValue("primitivecount")),
@@ -140,6 +282,25 @@ def _vc_model_qa_road_faces(node_path):
         "large_area_warn_count": large_warn,
         "large_area_fail_count": large_fail,
         "too_many_vertices_count": too_many_vertices,
+        "max_aspect_ratio": max_aspect,
+        "aspect_warn_threshold": aspect_warn,
+        "aspect_fail_threshold": aspect_fail,
+        "aspect_warn_count": aspect_warn_count,
+        "aspect_fail_count": aspect_fail_count,
+        "min_angle_deg": min_angle,
+        "min_angle_warn_threshold": angle_warn,
+        "min_angle_fail_threshold": angle_fail,
+        "small_angle_warn_count": small_angle_warn_count,
+        "small_angle_fail_count": small_angle_fail_count,
+        "self_intersection_count": self_intersection_count,
+        "self_intersecting_prim_count": self_intersecting_prim_count,
+        "junction_fill_count": junction_fill_count,
+        "junction_rejected_small_count": rejected_small,
+        "junction_rejected_radius_count": rejected_radius,
+        "junction_rejected_area_count": rejected_area,
+        "junction_rejected_total_count": rejected_total,
+        "max_road_segment_len": max_segment_len,
+        "max_road_face_area_attr": max_face_area_attr,
     })
 
 def _vc_model_qa_building_bundle(obj_path):
@@ -945,10 +1106,23 @@ class QA:
             self.add("road_faces", FAIL, "road_strips is missing")
             return
         self.metrics["road_faces"] = detail
-        if detail["open_prims"] or detail["large_area_fail_count"] or detail["too_many_vertices_count"]:
+        hard_fail = (
+            detail["open_prims"]
+            or detail["large_area_fail_count"]
+            or detail["too_many_vertices_count"]
+            or detail.get("aspect_fail_count", 0)
+            or detail.get("small_angle_fail_count", 0)
+            or detail.get("self_intersection_count", 0)
+        )
+        soft_warn = (
+            detail["large_area_warn_count"]
+            or detail.get("aspect_warn_count", 0)
+            or detail.get("small_angle_warn_count", 0)
+        )
+        if hard_fail:
             self.add("road_faces", FAIL, "road strip geometry has invalid faces", **detail)
-        elif detail["large_area_warn_count"]:
-            self.add("road_faces", WARN, "road strip geometry has unusually large faces", **detail)
+        elif soft_warn:
+            self.add("road_faces", WARN, "road strip geometry has unusual face shapes", **detail)
         else:
             self.add("road_faces", PASS, "road strip faces look bounded", **detail)
 
