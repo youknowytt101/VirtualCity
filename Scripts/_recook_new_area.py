@@ -204,12 +204,20 @@ if _div_bld:
 
 # ── 1b. 修复道路地形吸附（H-007：Ray SOP direction=0，改用 xyzdist）──
 ROAD_SNAP_VEX = """
-// 点级别：每个道路点独立吸附到最近地形
-int hit_prim;
+// 点级别：按 XZ 垂直投射到地形，而不是用 3D 最近点。
+// 山地/丘陵上 3D 最近点会吸到旁边低坡，导致道路埋入地形。
+vector hitp;
 vector uvw;
-xyzdist(1, @P, hit_prim, uvw);
-vector terrain_pos = primuv(1, "P", hit_prim, uvw);
-@P.y = terrain_pos.y;
+int hit_prim = intersect(1, set(@P.x, 10000.0, @P.z), set(0.0, -20000.0, 0.0), hitp, uvw);
+if (hit_prim >= 0) {
+    @P.y = hitp.y;
+} else {
+    int near_prim;
+    vector near_uvw;
+    xyzdist(1, set(@P.x, @P.y, @P.z), near_prim, near_uvw);
+    vector terrain_pos = primuv(1, "P", near_prim, near_uvw);
+    @P.y = terrain_pos.y;
+}
 """
 snap_old = hou.node(OBJ_PATH + '/snap_roads_to_terrain1')
 if snap_old and snap_old.type().name() == 'ray':
@@ -271,16 +279,16 @@ if (osm_w > 0) {
 # road_width_flat 是真正喂入 road_strips 的节点，直接写 ROAD_WIDTH_VEX
 # （旧版 road_width 节点已 deprecated，统一在 cleanup 段删除）
 _rwf_node = hou.node(OBJ_PATH + '/road_width_flat')
-_resample_roads = hou.node(OBJ_PATH + '/resample_roads')
+_road_width_input = hou.node(OBJ_PATH + '/snap_roads_to_terrain1') or hou.node(OBJ_PATH + '/resample_roads')
 if _rwf_node is None:
     _rwf_node = net.createNode('attribwrangle', 'road_width_flat')
-if _resample_roads:
+if _road_width_input:
     # Always repair the input. Existing HIPs may preserve a stale/miswired input,
-    # which can make road_strips generate oversized quads from sparse road lines.
-    _rwf_node.setInput(0, _resample_roads, 0)
+    # and this node must consume terrain-snapped centerlines, not raw resample_roads.
+    _rwf_node.setInput(0, _road_width_input, 0)
 _rwf_node.parm('class').set(1)  # Primitive
 _rwf_node.parm('snippet').set(ROAD_WIDTH_VEX)
-print('  road_width_flat VEX + 输入已更新（resample_roads → road_width_flat）')
+print('  road_width_flat VEX + 输入已更新（snap_roads_to_terrain1 → road_width_flat）')
 
 # ── 1d. road_strips v2: 路段修剪 + 路口凸包填充 ──────────────────────
 import pathlib as _pl
@@ -426,13 +434,20 @@ for path in [OBJ_PATH + '/osm_import', OBJ_PATH + '/dem_import',
     if pts == 0:
         errors.append(n.name() + ' geometry empty after recook')
 
-# ── 2b. 地形 snap target = dem_terrain ────────────────────────────────
-# （旧 dem_subdivide Bilinear×2 仅做共面线性插值，对 xyzdist 投影零增益，
-#   却让下游 4 个节点处理 16× prim → 已删除，改用 dem_terrain 原网格）
-_old_sd = hou.node(OBJ_PATH + '/dem_subdivide')
-if _old_sd:
-    _old_sd.destroy()
-snap_target = hou.node(OBJ_PATH + '/dem_terrain')
+# ── 2b. 地形 snap target = dem_subdivide ──────────────────────────────
+# DEM 原始约 30m 网格，在山地俯视角布线过稀。Bilinear×2 只做线性插值，
+# 不增加真实高程精度，但能把显示和道路贴地目标提升到约 7.5m 网格。
+dem_terrain = hou.node(OBJ_PATH + '/dem_terrain')
+snap_target = hou.node(OBJ_PATH + '/dem_subdivide')
+if snap_target is None:
+    snap_target = net.createNode('subdivide', 'dem_subdivide')
+snap_target.setInput(0, dem_terrain)
+snap_target.parm('algorithm').set(4)   # OpenSubdiv Bilinear
+snap_target.parm('iterations').set(2)  # 30m -> ~7.5m
+snap_target.cook(force=True)
+print('  dem_subdivide: pts={} prims={} (Bilinear iterations=2)'.format(
+    snap_target.geometry().intrinsicValue('pointcount'),
+    snap_target.geometry().intrinsicValue('primitivecount')))
 for _sn_name in ['snap_bld_to_terrain', 'snap_roads_to_terrain1']:
     _sn = hou.node(OBJ_PATH + '/' + _sn_name)
     if _sn:
@@ -467,7 +482,7 @@ for name, min_pts, max_y, desc in CHECKS:
 
 # ── 4. 重建裁剪节点 ──────────────────────────────────
 print('\n[裁剪节点重建]')
-dem = hou.node(OBJ_PATH + '/dem_terrain')
+dem = snap_target
 dem.cook(force=False)
 bb  = dem.geometry().boundingBox()
 mn, mx = bb.minvec(), bb.maxvec()
@@ -522,12 +537,19 @@ def remake_clip(src_name, mark_name, out_name):
 
 # ── 4b. road_strips 二次地形吸附（修复侧边点埋入地形）────────────────
 ROAD_DRAPE_VEX = """
-// 对每个道路条带顶点重新吸附到地形，防止宽度扩展后侧边点埋入坡面
-int hit_prim;
+// 对每个道路条带顶点按 XZ 垂直投射到地形，防止坡面道路侧边埋入地形。
+vector hitp;
 vector uvw;
-xyzdist(1, @P, hit_prim, uvw);
-vector tp = primuv(1, "P", hit_prim, uvw);
-@P.y = max(tp.y, 0.0) + 0.15;  // 浮起 0.15m，且不低于海平面(Y=0)
+int hit_prim = intersect(1, set(@P.x, 10000.0, @P.z), set(0.0, -20000.0, 0.0), hitp, uvw);
+if (hit_prim >= 0) {
+    @P.y = max(hitp.y, 0.0) + 0.15;  // 浮起 0.15m，且不低于海平面(Y=0)
+} else {
+    int near_prim;
+    vector near_uvw;
+    xyzdist(1, set(@P.x, @P.y, @P.z), near_prim, near_uvw);
+    vector tp = primuv(1, "P", near_prim, near_uvw);
+    @P.y = max(tp.y, 0.0) + 0.15;
+}
 """
 old_drape = hou.node(OBJ_PATH + '/snap_road_strips')
 if old_drape:
@@ -644,8 +666,21 @@ print('  road_bbox_clip: pts={} prims={}'.format(
     road_bbox_clip.geometry().intrinsicValue('pointcount'),
     road_bbox_clip.geometry().intrinsicValue('primitivecount')))
 
+old_final_drape = hou.node(OBJ_PATH + '/snap_road_clipped')
+if old_final_drape:
+    old_final_drape.destroy()
+snap_road_clipped = net.createNode('attribwrangle', 'snap_road_clipped')
+snap_road_clipped.setInput(0, road_bbox_clip)
+snap_road_clipped.setInput(1, snap_target)
+snap_road_clipped.parm('class').set(2)   # Point
+snap_road_clipped.parm('snippet').set(ROAD_DRAPE_VEX)
+snap_road_clipped.cook(force=True)
+print('  snap_road_clipped: pts={} Y_min={:.2f}m'.format(
+    snap_road_clipped.geometry().intrinsicValue('pointcount'),
+    snap_road_clipped.geometry().boundingBox().minvec()[1]))
+
 bld_clip  = remake_clip('post_normals',    'bld_clip_mark',  'bld_clipped')
-road_clip = remake_clip('road_bbox_clip',   'road_clip_mark', 'road_clipped')
+road_clip = remake_clip('snap_road_clipped','road_clip_mark', 'road_clipped')
 
 # ── 4c. 颜色节点（三类独立，来自 COLORS 配置）────────────────────────
 def make_color_node(name, src_node, rgb):
@@ -724,10 +759,10 @@ if ARCHIVE_HIP != HIP:
 
 # ── 6. 强制刷新整条输出链（视口同步）────────────────────
 FULL_CHAIN = [
-    'osm_import', 'dem_terrain',
+    'osm_import', 'dem_terrain', 'dem_subdivide',
     'extract_buildings', 'snap_bld_to_terrain', 'extrude_buildings', 'post_normals',
     'snap_roads_to_terrain1', 'road_width_flat', 'road_strips',
-    'snap_road_strips', 'road_bbox_clip',
+    'snap_road_strips', 'road_bbox_clip', 'snap_road_clipped',
     'bld_clipped', 'road_clipped', 'road_color', 'road_extrude', 'bld_color', 'terrain_color', 'merge_all', 'OUT_city',
 ]
 for _cn in FULL_CHAIN:
