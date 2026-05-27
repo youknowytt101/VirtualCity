@@ -23,6 +23,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent))
 import vc_paths
+import data_cleaning_cache as dcc
 
 # ── 目录常量 ──────────────────────────────────────────────────────────────────
 DOWNLOADS     = vc_paths.DATA_ROOT / "_downloads"
@@ -36,30 +37,129 @@ def _area_dir(base: Path, area_id: str) -> Path:
     return d
 
 
+def _manifest_path(area_id: str) -> Path:
+    return CLEANED / area_id / "_manifest.json"
+
+
+def _same_path(a: str | Path, b: str | Path) -> bool:
+    try:
+        return Path(a).resolve() == Path(b).resolve()
+    except OSError:
+        return Path(a) == Path(b)
+
+
+def _copy_file(src: str | Path, dst: str | Path) -> None:
+    if _same_path(src, dst):
+        return
+    dst = Path(dst)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dst)
+
+
 def _load_manifest(area_id: str) -> dict:
-    mf = CLEANED / area_id / "_manifest.json"
+    mf = _manifest_path(area_id)
     if mf.exists():
         with open(mf, encoding="utf-8") as f:
-            return json.load(f)
-    return {
-        "area_id": area_id,
-        "created": datetime.now().isoformat(timespec="seconds"),
-        "sources": {},
-        "levels": {
-            "buildings": {"current": 0},
-            "roads":     {"current": 0},
-            "dem":       {"current": 0},
-        },
-    }
+            manifest = json.load(f)
+    else:
+        manifest = {
+            "area_id": area_id,
+            "created": datetime.now().isoformat(timespec="seconds"),
+            "sources": {},
+            "levels": {
+                "buildings": {"current": 0},
+                "roads":     {"current": 0},
+                "dem":       {"current": 0},
+            },
+        }
+    manifest.setdefault("area_id", area_id)
+    manifest.setdefault("created", datetime.now().isoformat(timespec="seconds"))
+    manifest.setdefault("sources", {})
+    levels = manifest.setdefault("levels", {})
+    for group in ("buildings", "roads", "dem"):
+        levels.setdefault(group, {"current": 0})
+        levels[group].setdefault("current", 0)
+    return manifest
 
 
 def _save_manifest(area_id: str, manifest: dict):
-    mf = CLEANED / area_id / "_manifest.json"
+    mf = _manifest_path(area_id)
     mf.parent.mkdir(parents=True, exist_ok=True)
     manifest["last_updated"] = datetime.now().isoformat(timespec="seconds")
     with open(mf, "w", encoding="utf-8", newline="\n") as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
         f.write("\n")
+
+
+def _target_levels(target_level: int) -> dict[str, int]:
+    return {
+        "buildings": min(target_level, 3),
+        "roads": min(target_level, 2),
+        "dem": min(target_level, 2),
+    }
+
+
+def _levels_ready(manifest: dict, target_level: int) -> bool:
+    targets = _target_levels(target_level)
+    return all(
+        manifest.get("levels", {}).get(group, {}).get("current", 0) >= level
+        for group, level in targets.items()
+    )
+
+
+def _prepare_raw_sources(area_cfg: dict, manifest: dict, dl_dir: Path) -> dict[str, Path]:
+    """Keep immutable raw inputs in _downloads and clean only working copies."""
+    specs = {
+        "buildings": ("buildings_file", "buildings.geojson"),
+        "roads": ("osm_file", "roads.osm"),
+        "dem": ("dem_csv", "dem.csv"),
+    }
+    cached_files = (
+        manifest.get("cache", {})
+        .get("sources", {})
+        .get("files", {})
+    )
+    raw_sources: dict[str, Path] = {}
+
+    for group, (cfg_key, filename) in specs.items():
+        active = vc_paths.resolve_project_path(area_cfg.get(cfg_key, ""))
+        backup = dl_dir / filename
+        if not active.exists():
+            continue
+
+        active_fp = dcc.file_fingerprint(active)
+        backup_fp = dcc.file_fingerprint(backup)
+        cached_sha = cached_files.get(group, {}).get("sha256")
+
+        should_refresh_backup = False
+        reason = "initial raw snapshot"
+        if not backup.exists():
+            should_refresh_backup = True
+        elif cached_sha:
+            active_sha = active_fp.get("sha256")
+            backup_sha = backup_fp.get("sha256")
+            if active_sha and active_sha != cached_sha and active_sha != backup_sha:
+                should_refresh_backup = True
+                reason = "active source changed"
+
+        if should_refresh_backup:
+            _copy_file(active, backup)
+            print(f"  [raw-cache] {group}: {reason} -> _downloads/{area_cfg['area_id']}/{filename}")
+            backup_fp = dcc.file_fingerprint(backup)
+        elif backup.exists():
+            print(f"  [raw-cache] {group}: using _downloads/{area_cfg['area_id']}/{filename}")
+
+        if backup.exists():
+            # Normalize active_area files back to raw inputs. Older refine runs may
+            # have modified those files in place; future source-change detection
+            # assumes active paths are raw snapshots.
+            if active_fp.get("sha256") != backup_fp.get("sha256"):
+                _copy_file(backup, active)
+            raw_sources[group] = backup
+        else:
+            raw_sources[group] = active
+
+    return raw_sources
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -71,7 +171,7 @@ def _buildings_L1(src_path: Path, out_path: Path, manifest: dict) -> dict:
     from clean_raw_data import clean_buildings
     stats = clean_buildings(src_path, dry_run=False)
     # clean_buildings 原地覆写 src_path，拷贝到 out_path
-    shutil.copy2(src_path, out_path)
+    _copy_file(src_path, out_path)
     manifest["levels"]["buildings"]["L1"] = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "in": stats["total_in"],
@@ -107,7 +207,7 @@ def _buildings_L3(cleaned_path: Path, area_cfg: dict, manifest: dict) -> dict:
     # enrich_levels 原地覆写 buildings_file，拷贝最新到 cleaned_path
     bld_file = vc_paths.resolve_project_path(area_cfg["buildings_file"])
     if bld_file != cleaned_path:
-        shutil.copy2(bld_file, cleaned_path)
+        _copy_file(bld_file, cleaned_path)
     manifest["levels"]["buildings"]["L3"] = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "osm_matched": stats.get("total", 0),
@@ -126,7 +226,7 @@ def _roads_L1(src_path: Path, out_path: Path, manifest: dict) -> dict:
     """L1: 孤儿/过短/类型白名单过滤"""
     from clean_raw_data import clean_osm
     stats = clean_osm(src_path, dry_run=False)
-    shutil.copy2(src_path, out_path)
+    _copy_file(src_path, out_path)
     manifest["levels"]["roads"]["L1"] = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "ways_in": stats.get("ways_in", 0),
@@ -171,7 +271,7 @@ def _dem_L1(src_path: Path, out_path: Path, manifest: dict) -> dict:
         reader = csv.DictReader(f)
         rows = list(reader)
     nan_count = sum(1 for r in rows if any(v in ('', 'nan', 'NaN') for v in r.values()))
-    shutil.copy2(src_path, out_path)
+    _copy_file(src_path, out_path)
     manifest["levels"]["dem"]["L1"] = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "total_points": len(rows),
@@ -189,7 +289,7 @@ def _dem_L2(cleaned_path: Path, area_cfg: dict, manifest: dict) -> dict:
     # correct_dtm 覆写 dem_csv，拷贝最新到 cleaned_path
     dem_file = vc_paths.resolve_project_path(area_cfg["dem_csv"])
     if dem_file != cleaned_path:
-        shutil.copy2(dem_file, cleaned_path)
+        _copy_file(dem_file, cleaned_path)
     manifest["levels"]["dem"]["L2"] = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "correction_applied": applied,
@@ -424,34 +524,48 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
         return False
     print("  [OK] 原始数据完整")
 
-    # ── 备份原始文件（首次） ──
     dl_dir = _area_dir(DOWNLOADS, area_id)
-    for key, name in [("buildings_file", "buildings.geojson"),
-                      ("osm_file", "roads.osm"),
-                      ("dem_csv", "dem.csv")]:
-        src = vc_paths.resolve_project_path(area_cfg.get(key, ""))
-        backup = dl_dir / name
-        if src.exists() and not backup.exists():
-            shutil.copy2(src, backup)
-            print(f"  [backup] {src.name} → _downloads/{area_id}/{name}")
+    cl_dir = _area_dir(CLEANED, area_id)
+    raw_sources = _prepare_raw_sources(area_cfg, manifest, dl_dir)
+    cache_state = dcc.refine_cache_state(area_cfg, raw_sources)
+    cache_ok, cache_reason = dcc.cache_match(manifest, cache_state)
+    restored_cache = None
+    if not force and not cache_ok:
+        restored_cache = dcc.restore_refine_cache(cache_state, cl_dir)
+        if restored_cache:
+            cached_manifest = restored_cache["manifest"]
+            manifest["levels"] = cached_manifest.get("levels", manifest["levels"])
+            cache_ok = True
+            cache_reason = "restored from clean cache index"
+            print(f"  [cache] restored: {cache_state['key']} from {restored_cache['source_dir']}")
+
+    if force:
+        print("  [cache] force refresh requested")
+        dcc.reset_levels(manifest)
+    elif not cache_ok:
+        print(f"  [cache] invalidated: {cache_reason}")
+        dcc.reset_levels(manifest)
+    elif not _levels_ready(manifest, target_level):
+        print("  [cache] fingerprint matches; missing target levels will run")
+    elif not dcc.outputs_exist(cl_dir):
+        print("  [cache] fingerprint matches, but cleaned outputs are missing")
+        dcc.reset_levels(manifest)
+    else:
+        print(f"  [cache] hit: {cache_state['key']}")
 
     # ── 精炼：建筑 ──
     print("\n[建筑精炼]")
-    cl_dir = _area_dir(CLEANED, area_id)
-    bld_src = vc_paths.resolve_project_path(area_cfg["buildings_file"])
+    bld_src = raw_sources["buildings"]
     bld_cleaned = cl_dir / "buildings.geojson"
     bld_level = manifest["levels"]["buildings"]["current"]
 
     if bld_level < 1 or force:
-        # 从备份恢复以确保可重复
-        bld_backup = dl_dir / "buildings.geojson"
-        if bld_backup.exists():
-            shutil.copy2(bld_backup, bld_src)
-        _buildings_L1(bld_src, bld_cleaned, manifest)
+        _copy_file(bld_src, bld_cleaned)
+        _buildings_L1(bld_cleaned, bld_cleaned, manifest)
     else:
         print(f"  [L1] 跳过 (已在 L{bld_level})")
         if not bld_cleaned.exists():
-            shutil.copy2(bld_src, bld_cleaned)
+            _copy_file(bld_src, bld_cleaned)
 
     if manifest["levels"]["buildings"]["current"] < 2 and target_level >= 2:
         _buildings_L2(bld_cleaned, manifest)
@@ -464,38 +578,33 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
 
     # ── 精炼：道路 ──
     print("\n[道路精炼]")
-    osm_src = vc_paths.resolve_project_path(area_cfg["osm_file"])
+    osm_src = raw_sources["roads"]
     osm_cleaned = cl_dir / "roads.osm"
     road_level = manifest["levels"]["roads"]["current"]
 
     if road_level < 1 or force:
-        osm_backup = dl_dir / "roads.osm"
-        if osm_backup.exists():
-            shutil.copy2(osm_backup, osm_src)
-        _roads_L1(osm_src, osm_cleaned, manifest)
+        _copy_file(osm_src, osm_cleaned)
+        _roads_L1(osm_cleaned, osm_cleaned, manifest)
     else:
         print(f"  [L1] 跳过 (已在 L{road_level})")
         if not osm_cleaned.exists():
-            shutil.copy2(osm_src, osm_cleaned)
+            _copy_file(osm_src, osm_cleaned)
 
     if manifest["levels"]["roads"]["current"] < 2 and target_level >= 2:
         _roads_L2(osm_cleaned, manifest)
 
     # ── 精炼：DEM ──
     print("\n[DEM 精炼]")
-    dem_src = vc_paths.resolve_project_path(area_cfg["dem_csv"])
+    dem_src = raw_sources["dem"]
     dem_cleaned = cl_dir / "dem.csv"
     dem_level = manifest["levels"]["dem"]["current"]
 
     if dem_level < 1 or force:
-        dem_backup = dl_dir / "dem.csv"
-        if dem_backup.exists():
-            shutil.copy2(dem_backup, dem_src)
         _dem_L1(dem_src, dem_cleaned, manifest)
     else:
         print(f"  [L1] 跳过 (已在 L{dem_level})")
         if not dem_cleaned.exists():
-            shutil.copy2(dem_src, dem_cleaned)
+            _copy_file(dem_src, dem_cleaned)
 
     if manifest["levels"]["dem"]["current"] < 2 and target_level >= 2:
         dem_source = area_cfg.get("dem_source", "nasadem")
@@ -521,7 +630,7 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
         src = cl_dir / name
         dst = hr_dir / name
         if src.exists():
-            shutil.copy2(src, dst)
+            _copy_file(src, dst)
     # 写 meta.json
     meta = {
         "area_id": area_id,
@@ -529,14 +638,24 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
         "origin_lat": area_cfg.get("origin_lat"),
         "exported": datetime.now().isoformat(timespec="seconds"),
         "levels": {k: v["current"] for k, v in manifest["levels"].items()},
+        "cache_key": cache_state["key"],
+        "cache_fingerprint": cache_state["fingerprint"],
     }
     with open(hr_dir / "meta.json", "w", encoding="utf-8", newline="\n") as f:
         json.dump(meta, f, indent=2, ensure_ascii=False)
     print(f"  [OK] → _houdini_ready/{area_id}/")
 
     # ── ProcessQA + OutputQA ──
+    dcc.mark_refine_cache(manifest, cache_state, cl_dir, hr_dir)
     _save_manifest(area_id, manifest)
     report = run_qa(area_id, area_cfg, manifest)
+    manifest.setdefault("cache", {})["last_qa"] = {
+        "time": report["time"],
+        "passed": report["passed"],
+        "summary": report["summary"],
+    }
+    _save_manifest(area_id, manifest)
+    dcc.update_clean_cache_index(area_id, cache_state, _manifest_path(area_id))
 
     if not report["passed"]:
         print("\n  [WARN] QA 未通过，但数据已导出。请检查警告项。")

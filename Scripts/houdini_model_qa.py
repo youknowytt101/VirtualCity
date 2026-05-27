@@ -290,6 +290,7 @@ class QA:
     def check_required_nodes(self) -> None:
         required = [
             "dem_subdivide",
+            "bld_footprint_bevel",
             "bld_with_foundation",
             "road_strips",
             "road_clipped",
@@ -398,6 +399,53 @@ class QA:
         else:
             self.add("building_normals", PASS, "building final normals are valid", **detail)
 
+    def check_footprint_bevel(self) -> None:
+        geo = self.geo("bld_footprint_bevel")
+        if geo is None:
+            self.add("footprint_bevel", FAIL, "bld_footprint_bevel is missing")
+            return
+        bevel_attr = geo.findPrimAttrib("footprint_bevel_count")
+        if bevel_attr is None:
+            self.add("footprint_bevel", FAIL, "bld_footprint_bevel lacks footprint_bevel_count")
+            return
+
+        total_beveled_corners = 0
+        beveled_buildings = 0
+        short_edges = 0
+        min_edge = None
+        short_threshold = 0.08
+        for prim in geo.prims():
+            count = int(prim.attribValue(bevel_attr))
+            total_beveled_corners += count
+            if count > 0:
+                beveled_buildings += 1
+            pts = [pos3(v.point().position()) for v in prim.vertices()]
+            if len(pts) < 2:
+                continue
+            for i, p in enumerate(pts):
+                q = pts[(i + 1) % len(pts)]
+                edge_len = xz_dist(p, q)
+                min_edge = edge_len if min_edge is None else min(min_edge, edge_len)
+                if edge_len < short_threshold:
+                    short_edges += 1
+
+        detail = {
+            "prims": int(geo.intrinsicValue("primitivecount")),
+            "points": int(geo.intrinsicValue("pointcount")),
+            "beveled_buildings": beveled_buildings,
+            "total_beveled_corners": total_beveled_corners,
+            "min_edge": min_edge,
+            "short_edges": short_edges,
+            "short_threshold": short_threshold,
+        }
+        self.metrics["footprint_bevel"] = detail
+        if short_edges:
+            self.add("footprint_bevel", FAIL, "footprint bevel produced too-short edges", **detail)
+        elif total_beveled_corners <= 0:
+            self.add("footprint_bevel", WARN, "no eligible footprint corners were beveled", **detail)
+        else:
+            self.add("footprint_bevel", PASS, "eligible footprint corners were beveled", **detail)
+
     def check_foundation_tags_and_normals(self) -> None:
         final_geo = self.geo("bld_with_foundation")
         body_geo = self.geo("bld_color")
@@ -473,6 +521,42 @@ class QA:
         else:
             self.add("foundation_normals", PASS, "foundation side normals align with building sides", **detail)
 
+        body_bottom = []
+        foundation_top = []
+        for prim in final_geo.prims():
+            face_n = prim_normal(prim)
+            if abs(face_n[1]) >= 0.2:
+                continue
+            points = [pos3(v.point().position()) for v in prim.vertices()]
+            if prim.attribValue("is_foundation") == 1:
+                max_y = max(p[1] for p in points)
+                foundation_top.extend(p for p in points if abs(p[1] - max_y) <= 0.01)
+            else:
+                min_y = min(p[1] for p in points)
+                body_bottom.extend(p for p in points if abs(p[1] - min_y) <= 0.01)
+
+        distances = []
+        for p in foundation_top:
+            if body_bottom:
+                distances.append(min(xz_dist(p, q) for q in body_bottom))
+        distances.sort()
+        align_threshold = 0.005
+        align_detail = {
+            "foundation_top_points": len(foundation_top),
+            "body_bottom_points": len(body_bottom),
+            "max_distance": max(distances) if distances else None,
+            "p95_distance": percentile(distances, 0.95),
+            "over_threshold": sum(1 for d in distances if d > align_threshold),
+            "threshold_m": align_threshold,
+        }
+        self.metrics["foundation_alignment"] = align_detail
+        if not foundation_top:
+            self.add("foundation_alignment", WARN, "no foundation top points found", **align_detail)
+        elif align_detail["over_threshold"]:
+            self.add("foundation_alignment", FAIL, "foundation top edge is offset from building bottom edge", **align_detail)
+        else:
+            self.add("foundation_alignment", PASS, "foundation top edge matches building bottom edge", **align_detail)
+
     def terrain_delta_stats(
         self,
         node_name: str,
@@ -538,6 +622,7 @@ class QA:
         self.check_required_nodes()
         self.check_terrain_density()
         self.check_building_color()
+        self.check_footprint_bevel()
         self.check_building_normals()
         self.check_foundation_tags_and_normals()
         self.terrain_delta_stats("bld_with_foundation", "dem_subdivide", "building_terrain_fit", -0.05)

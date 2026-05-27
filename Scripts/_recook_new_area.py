@@ -459,11 +459,178 @@ for _sn_name in ['snap_bld_to_terrain', 'snap_roads_to_terrain1']:
     if _sn:
         _sn.setInput(1, snap_target)
 
+# -- 2c. Building footprint chamfer: convex vertical corners only ----------
+BLD_FOOTPRINT_BEVEL_CODE = r"""
+import hou, math
+
+BEVEL_DIST = 0.60
+MAX_ANGLE_DEG = 100.0
+ANGLE_EPS_DEG = 2.0
+MAX_EDGE_FRACTION = 0.25
+MIN_CUT = 0.08
+MIN_EDGE_LEN = 0.35
+
+src_geo = hou.pwd().inputs()[0].geometry()
+geo = hou.pwd().geometry()
+geo.clear()
+
+prim_attribs = []
+for attrib in src_geo.primAttribs():
+    if attrib.name() == "P":
+        continue
+    try:
+        new_attrib = geo.addAttrib(hou.attribType.Prim, attrib.name(), attrib.defaultValue())
+        prim_attribs.append((attrib, new_attrib))
+    except Exception:
+        pass
+
+bevel_a = geo.addAttrib(hou.attribType.Prim, "footprint_bevel_count", 0)
+
+def v2(p):
+    return (float(p.x()), float(p.z()))
+
+def sub(a, b):
+    return (a[0] - b[0], a[1] - b[1])
+
+def add(a, b):
+    return (a[0] + b[0], a[1] + b[1])
+
+def mul(a, s):
+    return (a[0] * s, a[1] * s)
+
+def length(a):
+    return math.sqrt(a[0] * a[0] + a[1] * a[1])
+
+def norm(a):
+    l = length(a)
+    if l <= 1e-9:
+        return (0.0, 0.0)
+    return (a[0] / l, a[1] / l)
+
+def cross(a, b):
+    return a[0] * b[1] - a[1] * b[0]
+
+def dot(a, b):
+    return a[0] * b[0] + a[1] * b[1]
+
+def signed_area(points):
+    acc = 0.0
+    n = len(points)
+    for i, p in enumerate(points):
+        q = points[(i + 1) % n]
+        acc += p[0] * q[1] - q[0] * p[1]
+    return acc * 0.5
+
+def angle_deg(prev_p, curr_p, next_p):
+    a = norm(sub(prev_p, curr_p))
+    b = norm(sub(next_p, curr_p))
+    d = max(-1.0, min(1.0, dot(a, b)))
+    return math.degrees(math.acos(d))
+
+def make_point(xz, y):
+    pt = geo.createPoint()
+    pt.setPosition(hou.Vector3(xz[0], y, xz[1]))
+    return pt
+
+for prim in src_geo.prims():
+    try:
+        if not prim.isClosed():
+            continue
+    except Exception:
+        pass
+
+    verts = list(prim.vertices())
+    if len(verts) < 3:
+        continue
+
+    src_positions = [v.point().position() for v in verts]
+    points = [v2(p) for p in src_positions]
+    base_y = sum(p.y() for p in src_positions) / len(src_positions)
+    area = signed_area(points)
+    if abs(area) <= 1e-6:
+        continue
+    orient = 1.0 if area > 0.0 else -1.0
+
+    new_points = []
+    bevel_count = 0
+    n = len(points)
+    for i, curr in enumerate(points):
+        prev_p = points[(i - 1) % n]
+        next_p = points[(i + 1) % n]
+        prev_edge = sub(curr, prev_p)
+        next_edge = sub(next_p, curr)
+        prev_len = length(prev_edge)
+        next_len = length(next_edge)
+        turn = cross(prev_edge, next_edge)
+        convex = turn * orient > 1e-8
+        ang = angle_deg(prev_p, curr, next_p)
+
+        can_bevel = (
+            convex
+            and ang <= MAX_ANGLE_DEG + ANGLE_EPS_DEG
+            and prev_len >= MIN_EDGE_LEN
+            and next_len >= MIN_EDGE_LEN
+        )
+
+        if not can_bevel:
+            new_points.append(curr)
+            continue
+
+        cut = min(
+            BEVEL_DIST,
+            prev_len * MAX_EDGE_FRACTION,
+            next_len * MAX_EDGE_FRACTION,
+        )
+        if cut < MIN_CUT:
+            new_points.append(curr)
+            continue
+
+        into_prev = norm(sub(prev_p, curr))
+        into_next = norm(sub(next_p, curr))
+        new_points.append(add(curr, mul(into_prev, cut)))
+        new_points.append(add(curr, mul(into_next, cut)))
+        bevel_count += 1
+
+    if len(new_points) < 3:
+        continue
+
+    new_prim = geo.createPolygon()
+    for p in new_points:
+        new_prim.addVertex(make_point(p, base_y))
+    for src_attr, dst_attr in prim_attribs:
+        try:
+            new_prim.setAttribValue(dst_attr, prim.attribValue(src_attr))
+        except Exception:
+            pass
+    new_prim.setAttribValue(bevel_a, bevel_count)
+"""
+
+for _ph_name in ['promote_height', 'restore_height']:
+    _ph = hou.node(OBJ_PATH + '/' + _ph_name)
+    if _ph and _ph.parm('method'):
+        _ph.parm('method').set(1)  # 1 = First
+
+old_bld_footprint_bevel = hou.node(OBJ_PATH + '/bld_footprint_bevel')
+if old_bld_footprint_bevel:
+    old_bld_footprint_bevel.destroy()
+bld_footprint_bevel = net.createNode('python', 'bld_footprint_bevel')
+restore_height = hou.node(OBJ_PATH + '/restore_height')
+bld_footprint_bevel.setInput(0, restore_height)
+bld_footprint_bevel.parm('python').set(BLD_FOOTPRINT_BEVEL_CODE)
+bld_footprint_bevel.cook(force=True)
+extrude_buildings = hou.node(OBJ_PATH + '/extrude_buildings')
+if extrude_buildings:
+    extrude_buildings.setInput(0, bld_footprint_bevel)
+print('  bld_footprint_bevel: pts={} prims={}'.format(
+    bld_footprint_bevel.geometry().intrinsicValue('pointcount'),
+    bld_footprint_bevel.geometry().intrinsicValue('primitivecount')))
+
 # ── 3. 验证全链路节点 ────────────────────────────────
 print('\n[全链路验证]')
 CHECKS = [
     ('extract_buildings',    50,   None,  'buildings extracted from OSM'),
     ('snap_bld_to_terrain',  50,   None,  'buildings snapped to terrain'),
+    ('bld_footprint_bevel',  50,   None,  'building footprints chamfered'),
     ('extrude_buildings',    50,   None,  'buildings extruded'),
     ('post_normals',         50,   None,  'normals computed'),
     ('road_strips',          100,  None,  'roads generated'),
@@ -695,8 +862,13 @@ import hou
 MIN_DEPTH = 0.12
 MAX_DEPTH = 25.0
 TERRAIN_EPS = 0.03
+SIDE_NORMAL_Y = 0.20
+BOTTOM_Y_TOL = 0.01
 
-foot_geo = hou.pwd().inputs()[0].geometry()
+# Input 0 must be the final building body, not an earlier footprint.
+# The skirt top edge is copied from each actual wall bottom edge, so it cannot
+# drift after fuse/divide/clip changes upstream.
+body_geo = hou.pwd().inputs()[0].geometry()
 terrain_geo = hou.pwd().inputs()[1].geometry()
 geo = hou.pwd().geometry()
 geo.clear()
@@ -727,51 +899,68 @@ def add_quad(a, b, c, d):
         pt = geo.createPoint()
         pt.setPosition(p)
         pts.append(pt)
-    prim = geo.createPolygon()
-    for pt in pts:
-        prim.addVertex(pt)
-    prim.setAttribValue(is_foundation_a, 1)
 
-for prim in foot_geo.prims():
-    try:
-        if not prim.isClosed():
-            continue
-    except Exception:
-        pass
+    def make(order):
+        prim = geo.createPolygon()
+        for idx in order:
+            prim.addVertex(pts[idx])
+        prim.setAttribValue(is_foundation_a, 1)
+        return prim
+
+    prim = make([0, 1, 2, 3])
+    return prim
+
+def add_oriented_quad(top_a, top_b, bot_b, bot_a, ref_normal):
+    prim = add_quad(top_a, top_b, bot_b, bot_a)
+    if prim.normal().dot(ref_normal) >= 0:
+        return prim
+    pts = [v.point() for v in prim.vertices()]
+    geo.deletePrims([prim], True)
+    flipped = geo.createPolygon()
+    for idx in (3, 2, 1, 0):
+        flipped.addVertex(pts[idx])
+    flipped.setAttribValue(is_foundation_a, 1)
+    return flipped
+
+def bottom_y_for(p):
+    ty = terrain_y_at(p.x(), p.z())
+    if ty is None:
+        return p.y()
+    bottom_y = min(ty + TERRAIN_EPS, p.y())
+    if p.y() - bottom_y > MAX_DEPTH:
+        bottom_y = p.y() - MAX_DEPTH
+    return bottom_y
+
+for prim in body_geo.prims():
     verts = list(prim.vertices())
     if len(verts) < 3:
         continue
+    n = prim.normal()
+    if abs(n.y()) > SIDE_NORMAL_Y:
+        continue
 
     positions = [v.point().position() for v in verts]
-    base_y = sum(p.y() for p in positions) / len(positions)
-    bottoms = []
-    for p in positions:
-        ty = terrain_y_at(p.x(), p.z())
-        if ty is None:
-            bottom_y = base_y
-        else:
-            bottom_y = min(ty + TERRAIN_EPS, base_y)
-        if base_y - bottom_y > MAX_DEPTH:
-            bottom_y = base_y - MAX_DEPTH
-        bottoms.append(hou.Vector3(p.x(), bottom_y, p.z()))
+    min_y = min(p.y() for p in positions)
+    bottom_indices = [i for i, p in enumerate(positions) if abs(p.y() - min_y) <= BOTTOM_Y_TOL]
+    if len(bottom_indices) < 2:
+        continue
 
-    n = len(positions)
-    for i in range(n):
-        j = (i + 1) % n
-        top_a = positions[i]
-        top_b = positions[j]
-        bot_a = bottoms[i]
-        bot_b = bottoms[j]
-        if max(base_y - bot_a.y(), base_y - bot_b.y()) < MIN_DEPTH:
+    bottom_positions = [positions[i] for i in bottom_indices]
+    for i in range(len(bottom_positions) - 1):
+        top_a = bottom_positions[i]
+        top_b = bottom_positions[i + 1]
+        bot_a = hou.Vector3(top_a.x(), bottom_y_for(top_a), top_a.z())
+        bot_b = hou.Vector3(top_b.x(), bottom_y_for(top_b), top_b.z())
+        if max(top_a.y() - bot_a.y(), top_b.y() - bot_b.y()) < MIN_DEPTH:
             continue
-        add_quad(top_b, top_a, bot_a, bot_b)
+        add_oriented_quad(top_a, top_b, bot_b, bot_a, n)
 """
 
 old_foundation = hou.node(OBJ_PATH + '/bld_foundation')
 if old_foundation:
     old_foundation.destroy()
 bld_foundation = net.createNode('python', 'bld_foundation')
-bld_foundation.setInput(0, hou.node(OBJ_PATH + '/snap_bld_to_terrain'))
+bld_foundation.setInput(0, bld_clip)
 bld_foundation.setInput(1, snap_target)
 bld_foundation.parm('python').set(BUILDING_FOUNDATION_CODE)
 bld_foundation.cook(force=True)
@@ -887,7 +1076,7 @@ if ARCHIVE_HIP != HIP:
 # ── 6. 强制刷新整条输出链（视口同步）────────────────────
 FULL_CHAIN = [
     'osm_import', 'dem_terrain', 'dem_subdivide',
-    'extract_buildings', 'snap_bld_to_terrain', 'extrude_buildings', 'post_normals',
+    'extract_buildings', 'snap_bld_to_terrain', 'bld_footprint_bevel', 'extrude_buildings', 'post_normals',
     'snap_roads_to_terrain1', 'road_width_flat', 'road_strips',
     'snap_road_strips', 'road_bbox_clip', 'snap_road_clipped',
     'bld_clipped', 'bld_foundation', 'bld_foundation_clipped',

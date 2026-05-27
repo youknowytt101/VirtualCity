@@ -1655,6 +1655,15 @@
     <nd ref="411288169" />
     <tag k="highway" v="footway" />
   </way>
+  <way id="35069789">
+    <nd ref="411288240" />
+    <nd ref="411288241" />
+    <nd ref="411288242" />
+    <nd ref="411288243" />
+    <nd ref="411288244" />
+    <nd ref="411288245" />
+    <tag k="highway" v="steps" />
+  </way>
   <way id="35069790">
     <nd ref="411313929" />
     <nd ref="411313930" />
@@ -2004,6 +2013,11 @@
     <nd ref="1021367481" />
     <tag k="highway" v="footway" />
   </way>
+  <way id="90078572">
+    <nd ref="1044028506" />
+    <nd ref="1044028484" />
+    <tag k="highway" v="steps" />
+  </way>
   <way id="90078574">
     <nd ref="11210187162" />
     <nd ref="1021367409" />
@@ -2019,6 +2033,11 @@
     <nd ref="1044028595" />
     <nd ref="1044028511" />
     <tag k="highway" v="footway" />
+  </way>
+  <way id="90079942">
+    <nd ref="1044049780" />
+    <nd ref="9978781943" />
+    <tag k="highway" v="steps" />
   </way>
   <way id="130731661">
     <nd ref="1439035875" />
@@ -2131,6 +2150,17 @@
     <tag k="name" v="ทัพพระยา 8" />
     <tag k="name:en" v="Thap Praya 8" />
     <tag k="surface" v="concrete" />
+  </way>
+  <way id="147158187">
+    <nd ref="1603707919" />
+    <nd ref="1603707865" />
+    <nd ref="1603707979" />
+    <tag k="highway" v="steps" />
+  </way>
+  <way id="147158188">
+    <nd ref="1603707793" />
+    <nd ref="1603707914" />
+    <tag k="highway" v="steps" />
   </way>
   <way id="147158189">
     <nd ref="1603707952" />
@@ -2324,6 +2354,84 @@
     <tag k="name:th" v="ถนนเกษตรสิน 3" />
     <tag k="surface" v="concrete" />
   </way>
+  <way id="169469900">
+    <nd ref="1806316186" />
+    <nd ref="1806316273" />
+    <nd ref="1806316272" />
+    <nd ref="1806316271" />
+    <nd ref="1806316270" />
+    <nd ref="1806316269" />
+    <nd ref="1806316268" />
+    <nd ref="1806316267" />
+    <nd ref="1806316266" />
+    <nd ref="1806316265" />
+    <nd ref="1806316264" />
+    <nd ref="1806316263" />
+    <nd ref="1806316204" />
+    <nd ref="1806316199" />
+    <nd ref="1806316196" />
+    <nd ref="1806316238" />
+    <nd ref="1806316222" />
+    <nd ref="1806316205" />
+    <nd ref="1806316306" />
+    <nd ref="1806316237" />
+    <nd ref="1806316231" />
+    <nd ref="1806316168" />
+    <nd ref="1806316163" />
+    <nd ref="1806316165" />
+    <nd ref="1806316275" />
+    <nd ref="1806316224" />
+    <nd ref="1806316186" />
+    <tag k="highway" v="raceway" />
+    <tag k="sport" v="karting" />
+    <tag k="surface" v="asphalt" />
+  </way>
+  <way id="169469902">
+    <nd ref="1806316243" />
+    <nd ref="1806316260" />
+    <nd ref="11150355055" />
+    <nd ref="1806316259" />
+    <nd ref="11150355054" />
+    <nd ref="1806316251" />
+    <nd ref="1806316249" />
+    <nd ref="1806316247" />
+    <nd ref="1806316246" />
+    <nd ref="1806316244" />
+    <nd ref="1806316304" />
+    <nd ref="1806316242" />
+    <nd ref="1806316241" />
+    <nd ref="1806316197" />
+    <nd ref="1806316184" />
+    <nd ref="1806316200" />
+    <nd ref="1806316201" />
+    <nd ref="1806316198" />
+    <nd ref="1806316194" />
+    <nd ref="1806316203" />
+    <nd ref="1806316192" />
+    <nd ref="1806316202" />
+    <nd ref="1806316190" />
+    <nd ref="1806316310" />
+    <nd ref="1806316166" />
+    <nd ref="1806316235" />
+    <nd ref="1806316233" />
+    <nd ref="1806316298" />
+    <nd ref="1806316167" />
+    <nd ref="1806316302" />
+    <nd ref="1806316300" />
+    <nd ref="1806316296" />
+    <nd ref="1806316293" />
+    <nd ref="1806316291" />
+    <nd ref="1806316289" />
+    <nd ref="1806316288" />
+    <nd ref="1806316283" />
+    <nd ref="1806316314" />
+    <nd ref="1806316281" />
+    <nd ref="1806316262" />
+    <nd ref="1806316308" />
+    <tag k="highway" v="raceway" />
+    <tag k="sport" v="karting" />
+    <tag k="surface" v="asphalt" />
+  </way>
   <way id="181235212">
     <nd ref="713888151" />
     <nd ref="713888159" />
@@ -2428,6 +2536,12 @@
     <nd ref="411288246" />
     <tag k="highway" v="footway" />
   </way>
+  <way id="181736482">
+    <nd ref="411288246" />
+    <nd ref="411288247" />
+    <nd ref="411288248" />
+    <tag k="highway" v="steps" />
+  </way>
   <way id="181736647">
     <nd ref="359370928" />
     <nd ref="11210368842" />
@@ -2469,6 +2583,15 @@
     <tag k="name:th" v="ถนนเฉลิมพระเกียรติ" />
     <tag k="oneway" v="yes" />
     <tag k="surface" v="concrete" />
+  </way>
+  <way id="182107934">
+    <nd ref="1806316308" />
+    <nd ref="1806316243" />
+    <tag k="bridge" v="yes" />
+    <tag k="highway" v="raceway" />
+    <tag k="layer" v="1" />
+    <tag k="sport" v="karting" />
+    <tag k="surface" v="asphalt" />
   </way>
   <way id="238154915">
     <nd ref="2460108280" />
@@ -2521,6 +2644,12 @@
     <nd ref="3172290613" />
     <nd ref="1603707763" />
     <tag k="highway" v="footway" />
+  </way>
+  <way id="311552899">
+    <nd ref="3172290653" />
+    <nd ref="3172290647" />
+    <nd ref="1603707821" />
+    <tag k="highway" v="steps" />
   </way>
   <way id="318246209">
     <nd ref="6847884677" />
@@ -2611,6 +2740,11 @@
     <nd ref="7522070394" />
     <nd ref="3301758117" />
     <tag k="highway" v="footway" />
+  </way>
+  <way id="323469418">
+    <nd ref="6848564880" />
+    <nd ref="529139183" />
+    <tag k="highway" v="steps" />
   </way>
   <way id="325191246">
     <nd ref="3318471491" />
@@ -2767,6 +2901,18 @@
     <nd ref="1584439075" />
     <nd ref="4699430750" />
     <tag k="highway" v="residential" />
+  </way>
+  <way id="487432166">
+    <nd ref="1603707814" />
+    <nd ref="7522070425" />
+    <nd ref="7522070423" />
+    <nd ref="7522070424" />
+    <nd ref="7522070426" />
+    <nd ref="7522070422" />
+    <nd ref="4798893852" />
+    <tag k="highway" v="steps" />
+    <tag k="incline" v="down" />
+    <tag k="lit" v="no" />
   </way>
   <way id="487432167">
     <nd ref="1603707821" />
@@ -3379,6 +3525,24 @@
     <nd ref="7046130525" />
     <tag k="highway" v="footway" />
   </way>
+  <way id="804192389">
+    <nd ref="7522052045" />
+    <nd ref="7522052044" />
+    <tag k="highway" v="steps" />
+  </way>
+  <way id="804192390">
+    <nd ref="1603707953" />
+    <nd ref="7522052046" />
+    <nd ref="7522052045" />
+    <nd ref="7522052057" />
+    <tag k="highway" v="steps" />
+  </way>
+  <way id="804192391">
+    <nd ref="7522052059" />
+    <nd ref="7522052050" />
+    <nd ref="7522052049" />
+    <tag k="highway" v="steps" />
+  </way>
   <way id="804192394">
     <nd ref="7522052067" />
     <nd ref="7522052062" />
@@ -3388,10 +3552,31 @@
     <nd ref="7522052063" />
     <tag k="highway" v="footway" />
   </way>
+  <way id="804192395">
+    <nd ref="7522052069" />
+    <nd ref="7522052068" />
+    <tag k="highway" v="steps" />
+  </way>
+  <way id="804192397">
+    <nd ref="9975772920" />
+    <nd ref="7522070385" />
+    <nd ref="7522052084" />
+    <tag k="highway" v="steps" />
+  </way>
+  <way id="804192398">
+    <nd ref="7522070386" />
+    <nd ref="7522070387" />
+    <tag k="highway" v="steps" />
+  </way>
   <way id="804192399">
     <nd ref="7522070388" />
     <nd ref="7522070387" />
     <tag k="highway" v="path" />
+  </way>
+  <way id="804192400">
+    <nd ref="7522070391" />
+    <nd ref="7522070390" />
+    <tag k="highway" v="steps" />
   </way>
   <way id="804192401">
     <nd ref="7522070392" />
@@ -3447,6 +3632,11 @@
     <nd ref="3172290684" />
     <tag k="foot" v="yes" />
     <tag k="highway" v="path" />
+  </way>
+  <way id="804192406">
+    <nd ref="6400470922" />
+    <nd ref="7522070420" />
+    <tag k="highway" v="steps" />
   </way>
   <way id="913486660">
     <nd ref="8675938430" />
@@ -3768,10 +3958,21 @@
     <tag k="highway" v="service" />
     <tag k="service" v="driveway" />
   </way>
+  <way id="1218453905">
+    <nd ref="11290292917" />
+    <nd ref="11290292918" />
+    <tag k="handrail" v="yes" />
+    <tag k="highway" v="steps" />
+  </way>
   <way id="1241901674">
     <nd ref="1021367338" />
     <nd ref="11539587758" />
     <tag k="highway" v="footway" />
+  </way>
+  <way id="1241901675">
+    <nd ref="11539587758" />
+    <nd ref="1021367358" />
+    <tag k="highway" v="steps" />
   </way>
   <way id="1303849214">
     <nd ref="12074899892" />

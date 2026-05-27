@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "refine": {
+    "refine_c022ecaaa98ab5ff": {
+      "area_id": "area_12.921_100.867",
+      "bbox": null,
+      "fingerprint": "c022ecaaa98ab5ff4939451e1588274f1b030e3367cbdabf23cf963b3fa615fd",
+      "manifest": "RawData/_cleaned/area_12.921_100.867/_manifest.json",
+      "updated": "2026-05-28T02:29:40"
+    }
+  }
+}

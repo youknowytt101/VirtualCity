@@ -33,8 +33,16 @@ Houdini 必须已打开。UE5 可稍后打开。
 import sys, os, json, math, subprocess, time, re
 from pathlib import Path
 from vc_paths import ROOT, CFG_PATH, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
+import data_cleaning_cache as dcc
 
 HIP = str(HIP)
+
+ACQUISITION_PROFILE = {
+    "schema": 1,
+    "roads": "tile_cache_osm_else_overpass_v1",
+    "buildings": "tile_cache_overture_else_overture_api_v1",
+    "dem": "fabdem_else_tile_cache_else_nasadem_v1",
+}
 
 # ── 0. 解析参数（支持三种用法）─────────────────────────
 def _center_to_bbox(lon: float, lat: float, radius_km: float):
@@ -116,20 +124,47 @@ osm_path       = str(DATA_ROOT / f"OSM/{area_name}_osm_v001.osm")
 buildings_path = str(DATA_ROOT / f"Overture/{area_name}_buildings_overture_v001.geojson")
 dem_tif_path   = str(DATA_ROOT / f"DEM/{area_name}_dem_v001.tif")
 dem_csv_path   = str(DATA_ROOT / f"DEM/{area_name}_dem_v001.csv")
+bbox_req       = [west, south, east, north]
 
 # ── 1. 更新 active_area.json ─────────────────────────
 cfg = {
     "area_id":        area_name,
+    "bbox":           bbox_req,
     "osm_file":       project_relative(osm_path),
     "buildings_file": project_relative(buildings_path),
     "dem_csv":        project_relative(dem_csv_path),
     "dem_source":     "fabdem",
+    "sources":        ACQUISITION_PROFILE,
     "origin_lon":     origin_lon,
     "origin_lat":     origin_lat,
+    "bbox_size_m":    {"width": bbox_w, "height": bbox_h},
     "_note":          "切换区域只改此文件，不改 Houdini 节点代码"
 }
 write_active_area(cfg, relative=True)
 print(f"[1/5] [OK] active_area.json 已更新: {area_name}")
+
+raw_outputs = {
+    "roads": osm_path,
+    "dem": dem_csv_path,
+    "buildings": buildings_path,
+}
+clip_manifest = dcc.restore_clip_cache(
+    bbox_req,
+    raw_outputs,
+    source_signature=ACQUISITION_PROFILE,
+)
+if clip_manifest:
+    cfg["dem_source"] = clip_manifest.get("dem_source", cfg.get("dem_source", "fabdem"))
+    cfg["cache"] = {
+        "clip": {
+            "status": "hit",
+            "key": clip_manifest.get("key"),
+            "bbox": clip_manifest.get("bbox"),
+            "restored_at": clip_manifest.get("restored_at"),
+        }
+    }
+    write_active_area(cfg, relative=True)
+    print(f"  [clip-cache] 命中 {clip_manifest.get('key')}，已恢复 OSM/DEM/建筑原始裁切")
 
 # ── 2. OSM：优先本地缓存裁剪 → 备用 Overpass 下载 ──
 print(f"\n[2/5] 获取 OSM 数据...")
@@ -137,9 +172,12 @@ import urllib.request, urllib.parse
 sys.path.insert(0, str(SCRIPTS))
 import _tile_cache as _tc
 
-bbox_req = [west, south, east, north]
-_tile = _tc.find_covering_tile(bbox_req)
-if _tile:
+if clip_manifest:
+    print(f"  [clip-cache] OSM 已恢复，跳过 Overpass")
+    _tile = {"clip_cache": clip_manifest.get("key")}
+else:
+    _tile = _tc.find_covering_tile(bbox_req)
+if _tile and not clip_manifest:
     print(f"  [本地缓存] 命中, 裁剪 OSM...")
     if not _tc.filter_osm(_tile, bbox_req, osm_path):
         _tile = None
@@ -186,15 +224,18 @@ try:
     Path(dem_csv_path).parent.mkdir(parents=True, exist_ok=True)
     bbox = [west, south, east, north]
     dem_cfg = {"bbox": bbox, "output_tif": dem_tif_path, "output_csv": dem_csv_path}
-    dem_ok = False
-    dem_source = "fabdem"
+    dem_ok = bool(clip_manifest)
+    dem_source = clip_manifest.get("dem_source", "fabdem") if clip_manifest else "fabdem"
+    if clip_manifest:
+        print(f"  [clip-cache] DEM 已恢复，跳过 FABDEM/GEE")
 
     # 优先尝试 FABDEM DTM（真正裸地，无需 correct_dem_dtm.py）
-    try:
-        _dem.download_fabdem(dem_cfg)
-        dem_ok = True
-    except Exception as e:
-        print(f"  [WARN] FABDEM 失败: {e}")
+    if not dem_ok:
+        try:
+            _dem.download_fabdem(dem_cfg)
+            dem_ok = True
+        except Exception as e:
+            print(f"  [WARN] FABDEM 失败: {e}")
 
     # 兜底：本地缓存裁剪
     if not dem_ok:
@@ -223,9 +264,11 @@ except Exception as ex:
 # ── 4. 建筑：优先本地缓存过滤→备用 Overture 下载 ──
 print(f"\n[4/5] 获取建筑数据...")
 Path(buildings_path).parent.mkdir(parents=True, exist_ok=True)
-bld_ok = False
+bld_ok = bool(clip_manifest)
+if clip_manifest:
+    print(f"  [clip-cache] 建筑已恢复，跳过 Overture")
 
-_tile3 = _tc.find_covering_tile([west, south, east, north])
+_tile3 = None if clip_manifest else _tc.find_covering_tile([west, south, east, north])
 if _tile3:
     print(f"  [本地缓存] 命中, 过滤建筑...")
     bld_ok = _tc.filter_buildings(_tile3, [west, south, east, north], buildings_path)
@@ -241,6 +284,25 @@ if not bld_ok:
         print(f"  [ERR] Overture 建筑下载失败（returncode={result.returncode}）")
         sys.exit(1)
 print(f"  [OK] 建筑完成")
+
+if not clip_manifest:
+    clip_manifest = dcc.write_clip_cache(
+        bbox_req,
+        cfg,
+        raw_outputs,
+        source_signature=ACQUISITION_PROFILE,
+        source_note="set_area acquisition",
+    )
+    if clip_manifest:
+        cfg["cache"] = {
+            "clip": {
+                "status": "stored",
+                "key": clip_manifest.get("key"),
+                "bbox": clip_manifest.get("bbox"),
+            }
+        }
+        write_active_area(cfg, relative=True)
+        print(f"  [clip-cache] 已写入 {clip_manifest.get('key')}")
 
 # ── 5. 数据精炼 + 验证 + Houdini recook ──────────────
 print(f"\n[5/6] 数据精炼（清洗 + 补全 + QA）...")
