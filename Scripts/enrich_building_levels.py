@@ -18,6 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'Scripts'))
 import vc_paths
+from vc_geo import LocalProjector
 
 FLOOR_H        = 3.5    # m per floor (consistent with VEX)
 DEDUP_DIST     = 8.0    # max centroid distance to match (m) — 从15m收紧，减少密集城区错误匹配
@@ -30,15 +31,12 @@ OVERPASS_URLS  = [
 
 def _wgs84_to_local(lon, lat, origin_lon, origin_lat,
                     _cache={}):
-    from _utm_lite import wgs84_to_utm, zone_number
+    """数据域局部坐标 (x, z)，不翻 z。坐标约定集中在 vc_geo.LocalProjector。"""
     key = (origin_lon, origin_lat)
-    if key not in _cache:
-        z = zone_number(origin_lon)
-        ox, oy, _ = wgs84_to_utm(origin_lat, origin_lon, force_zone=z)
-        _cache[key] = (ox, oy, z)
-    ox, oy, z = _cache[key]
-    x, y, _ = wgs84_to_utm(lat, lon, force_zone=z)
-    return x - ox, y - oy
+    proj = _cache.get(key)
+    if proj is None:
+        proj = _cache[key] = LocalProjector(origin_lon, origin_lat)
+    return proj.to_local(lon, lat)
 
 
 def _fetch_osm_levels(bbox, timeout=60):

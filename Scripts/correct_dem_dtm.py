@@ -27,21 +27,19 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'Scripts'))
 import vc_paths
+from vc_geo import LocalProjector, local_xz_to_houdini_xz
 
 
 # ── 几何工具 ─────────────────────────────────────────────────────────────────
 
 def _wgs84_to_local(lon, lat, origin_lon, origin_lat,
                     _cache={}):
-    from _utm_lite import wgs84_to_utm, zone_number
+    """数据域局部坐标 (x, z)，不翻 z。坐标约定集中在 vc_geo.LocalProjector。"""
     key = (origin_lon, origin_lat)
-    if key not in _cache:
-        z = zone_number(origin_lon)
-        ox, oy, _ = wgs84_to_utm(origin_lat, origin_lon, force_zone=z)
-        _cache[key] = (ox, oy, z)
-    ox, oy, z = _cache[key]
-    x, y, _ = wgs84_to_utm(lat, lon, force_zone=z)
-    return x - ox, y - oy
+    proj = _cache.get(key)
+    if proj is None:
+        proj = _cache[key] = LocalProjector(origin_lon, origin_lat)
+    return proj.to_local(lon, lat)
 
 
 def _point_in_polygon(px, pz, poly_xz):
@@ -150,7 +148,7 @@ def correct_dtm(area_cfg: dict, verbose: bool = True) -> bool:
         local = []
         for coord in ring:
             lx, lz = _wgs84_to_local(coord[0], coord[1], origin_lon, origin_lat)
-            local.append((lx, -lz))     # match Houdini convention: z is negated
+            local.append(local_xz_to_houdini_xz(lx, lz))   # 唯一 z 翻转处集中在 vc_geo
         if len(local) >= 3:
             polys.append(local)
 

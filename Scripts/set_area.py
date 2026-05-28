@@ -33,6 +33,7 @@ Houdini 必须已打开。UE5 可稍后打开。
 import sys, os, json, math, subprocess, time, re
 from pathlib import Path
 from vc_paths import ROOT, CFG_PATH, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
+from vc_geo import bbox_size_m
 import data_cleaning_cache as dcc
 
 HIP = str(HIP)
@@ -110,8 +111,7 @@ else:
 
 origin_lon = (west + east) / 2
 origin_lat = (south + north) / 2
-bbox_w = (east - west) * math.cos(math.radians(origin_lat)) * 111319.9
-bbox_h = (north - south) * 111319.9
+bbox_w, bbox_h = bbox_size_m([west, south, east, north])
 
 print(f"\n{'='*50}")
 print(f"[VirtualCity] 设置区域: {area_name}")
