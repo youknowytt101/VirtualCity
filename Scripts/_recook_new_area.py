@@ -11,6 +11,7 @@ Houdini 换区重算脚本
 import sys, rpyc, subprocess, json, time
 from pathlib import Path
 import houdini_road_pipeline as road_pipe
+import houdini_sops
 from vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area, project_relative
 
 PASS = '[OK]'
@@ -139,81 +140,8 @@ if osm and osm.parm('python'):
     print('  SOP 修复: osm_import (canonical: single resolver + OSM bld fallback)')
 
 # ── 1. 修复 dem_import Python SOP（H-006：硬编码路径）────
-DEM_IMPORT_CODE = """
-import hou, csv, json as _json, os
-ROOT_DIR = r'__ROOT__'
-CFG_FILE = r'__CFG__'
-def _resolve_project_path(value):
-    raw = str(value).replace(chr(92), '/')
-    low = raw.lower()
-    marker = '/virtualcity/'
-    idx = low.find(marker)
-    if idx >= 0:
-        return ROOT_DIR + '/' + raw[idx + len(marker):]
-    if low.endswith('/virtualcity'):
-        return ROOT_DIR
-    if ':' in raw[:3] or raw.startswith('/'):
-        return raw
-    return ROOT_DIR + '/' + raw
-with open(CFG_FILE, encoding='utf-8') as _f:
-    _cfg = _json.load(_f)
-    _ready = ROOT_DIR + '/RawData/_houdini_ready/' + _cfg.get('area_id', '') + '/dem.csv'
-    CSV_FILE = _ready if os.path.exists(_ready) else _resolve_project_path(_cfg['dem_csv'])
-geo = hou.pwd().geometry()
-with open(CSV_FILE, newline='') as f:
-    for row in csv.DictReader(f):
-        p = geo.createPoint()
-        p.setPosition(hou.Vector3(float(row['x']), float(row['y']), float(row['z'])))
-""".replace('__ROOT__', ROOT_STR).replace('__CFG__', CFG_FILE)
-
-DEM_TERRAIN_CODE = """
-import hou, csv, json as _json, os
-ROOT_DIR = r'__ROOT__'
-CFG_FILE = r'__CFG__'
-def _resolve_project_path(value):
-    raw = str(value).replace(chr(92), '/')
-    low = raw.lower()
-    marker = '/virtualcity/'
-    idx = low.find(marker)
-    if idx >= 0:
-        return ROOT_DIR + '/' + raw[idx + len(marker):]
-    if low.endswith('/virtualcity'):
-        return ROOT_DIR
-    if ':' in raw[:3] or raw.startswith('/'):
-        return raw
-    return ROOT_DIR + '/' + raw
-with open(CFG_FILE, encoding='utf-8') as _f:
-    _cfg = _json.load(_f)
-    _ready = ROOT_DIR + '/RawData/_houdini_ready/' + _cfg.get('area_id', '') + '/dem.csv'
-    CSV_FILE = _ready if os.path.exists(_ready) else _resolve_project_path(_cfg['dem_csv'])
-geo = hou.pwd().geometry()
-rows = []
-with open(CSV_FILE, newline='') as f:
-    for row in csv.DictReader(f):
-        rows.append((float(row['x']), float(row['y']), float(row['z']),
-                     int(row.get('row', 0)), int(row.get('col', 0))))
-# H-005: 用 CSV 的 row/col 列直接构建网格（兼容 UTM 投影坐标）
-grid = {}
-for row in rows:
-    x, y, z = row[0], row[1], row[2]
-    ri, ci  = int(row[3]), int(row[4])
-    p = geo.createPoint()
-    p.setPosition(hou.Vector3(x, y, z))
-    grid[(ri, ci)] = p
-all_ri = sorted(set(k[0] for k in grid))
-all_ci = sorted(set(k[1] for k in grid))
-for i in range(len(all_ri) - 1):
-    for j in range(len(all_ci) - 1):
-        r0, r1 = all_ri[i], all_ri[i+1]
-        c0, c1 = all_ci[j], all_ci[j+1]
-        corners = [grid.get((r0,c0)), grid.get((r0,c1)),
-                   grid.get((r1,c1)), grid.get((r1,c0))]
-        if all(corners):
-            poly = geo.createPolygon()
-            for pt in corners:
-                poly.addVertex(pt)
-"""
-DEM_TERRAIN_CODE = DEM_TERRAIN_CODE.replace('__ROOT__', ROOT_STR).replace('__CFG__', CFG_FILE)
+DEM_IMPORT_CODE = houdini_sops.load('dem_import.py', ROOT=ROOT_STR, CFG=CFG_FILE)
+DEM_TERRAIN_CODE = houdini_sops.load('dem_terrain.py', ROOT=ROOT_STR, CFG=CFG_FILE)
 
 for node_path, code in [
     (OBJ_PATH + '/dem_import',   DEM_IMPORT_CODE),
@@ -277,43 +205,7 @@ if _rs_node:
     print('  road_strips v5 已更新（复杂路口降级 + 调试属性 + 自交保护）')
 
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
-BLD_SNAP_VEX = """
-// snap_bld_to_terrain v6: XZ 垂直采样地形 + 逐角点取最高值
-// 3D 最近点在山地会吸到旁边低坡，导致建筑局部埋地；必须垂直射线取高。
-// 坡面建筑：底面保持水平，略高于最高地形点；下坡侧由 bld_foundation 补裙边。
-int verts[] = primvertices(0, @primnum);
-int n = len(verts);
-if (n == 0) return;
-
-float max_terrain_y = -1e10;
-
-foreach(int v; verts) {
-    int pt = vertexpoint(0, v);
-    vector p = point(0, "P", pt);
-
-    vector hitp;
-    vector uvw;
-    int hp = intersect(1, set(p.x, 10000.0, p.z), set(0.0, -20000.0, 0.0), hitp, uvw);
-    if (hp >= 0) {
-        max_terrain_y = max(max_terrain_y, hitp.y);
-    } else {
-        int near_prim;
-        vector near_uvw;
-        xyzdist(1, set(p.x, p.y, p.z), near_prim, near_uvw);
-        vector tp = primuv(1, "P", near_prim, near_uvw);
-        max_terrain_y = max(max_terrain_y, tp.y);
-    }
-}
-
-float base_y = max_terrain_y + 0.05;  // keep the flat base above terrain; skirt hides downhill gap
-
-foreach(int v; verts) {
-    int pt = vertexpoint(0, v);
-    vector p = point(0, "P", pt);
-    p.y = base_y;
-    setpointattrib(0, "P", pt, p, "set");
-}
-"""
+BLD_SNAP_VEX = houdini_sops.load('bld_snap.vex')
 snap_bld = hou.node(OBJ_PATH + '/snap_bld_to_terrain')
 if snap_bld:
     snap_bld.parm('class').set(1)   # Primitive
@@ -321,77 +213,7 @@ if snap_bld:
     print('  SOP 修复: snap_bld_to_terrain (逐顶点 MAX 高度)')
 
 # ── P0: procedural_height VEX —— 同时处理 height_m<=0 和 ~10m 两种缺失情况 ──
-PROC_HEIGHT_VEX = r"""// P0: 推算高度的触发条件:
-//   1. height_m ~= 10.0  -> OSM/Overture 默认值，没有真实数据
-//   2. height_m <= 0      -> 明确缺失或数据错误
-// 触发条件: ~10.0 (OSM default), ~8.0 (Overture DEFAULT_HEIGHT), <=0 (missing)
-int needs_estimate = (abs(f@height_m - 10.0) < 0.1)
-                  || (abs(f@height_m -  8.0) < 0.1)
-                  || (f@height_m <= 0);
-if (!needs_estimate) return;
-
-int pts[] = primpoints(0, @primnum);
-int n = len(pts);
-float area = 0;
-for (int i = 0; i < n; i++) {
-    vector p0 = point(0, "P", pts[i]);
-    vector p1 = point(0, "P", pts[(i+1)%n]);
-    area += p0.x * p1.z - p1.x * p0.z;
-}
-area = abs(area) * 0.5;
-
-float base_floors;
-if      (area < 60)   base_floors = 1;
-else if (area < 150)  base_floors = 2;
-else if (area < 400)  base_floors = 3;
-else if (area < 1000) base_floors = 4;
-else if (area < 3000) base_floors = 6;
-else                  base_floors = 8;
-
-vector ctr = {0,0,0};
-for (int i = 0; i < n; i++) ctr += point(0,"P",pts[i]);
-ctr /= n;
-float noise_val = fit(noise(ctr * 0.003), 0, 1, -1.5, 1.5);
-float floors = clamp(base_floors + noise_val, 1, 15);
-
-// 精度审核 #5：按建筑类型差异化层高（泰国实测参考值）
-// Overture subtype/class 实际取值远多于 3 类，按家族归并：
-string cls = s@bld_class;
-float floor_h;
-// — 住宅类（泰国实测 2.8~3.0m/层）—
-if      (cls == "residential")   floor_h = 2.9;
-else if (cls == "apartments")    floor_h = 2.9;
-else if (cls == "house")         floor_h = 2.9;
-else if (cls == "terrace")       floor_h = 2.9;
-else if (cls == "dormitory")     floor_h = 2.9;
-// — 商业 / 服务类（3.3~3.8m/层）—
-else if (cls == "commercial")    floor_h = 3.5;
-else if (cls == "retail")        floor_h = 3.5;
-else if (cls == "office")        floor_h = 3.5;
-else if (cls == "hotel")         floor_h = 3.4;
-else if (cls == "hospital")      floor_h = 3.6;
-else if (cls == "school" ||
-         cls == "education")     floor_h = 3.5;
-else if (cls == "civic" ||
-         cls == "government" ||
-         cls == "public")        floor_h = 3.6;
-// — 工业 / 仓储（4.0~5.0m/层）—
-else if (cls == "industrial")    floor_h = 4.5;
-else if (cls == "warehouse")     floor_h = 4.5;
-// — 低矮辅助结构（车棚 / 屋顶部件，强制 1 层）—
-else if (cls == "carport" ||
-         cls == "garage" ||
-         cls == "shed" ||
-         cls == "roof")          { floor_h = 2.5; floors = 1; }
-// — 未识别（"building" 兜底或异类）按面积启发 —
-else {
-    if      (area > 2000) floor_h = 4.5;   // 工业级 footprint
-    else if (area > 500)  floor_h = 3.5;   // 商业级
-    else                  floor_h = 2.9;   // 住宅级（Pattaya 主流）
-}
-
-f@height_m = floors * floor_h;
-"""
+PROC_HEIGHT_VEX = houdini_sops.load('procedural_height.vex')
 _ph = hou.node(OBJ_PATH + '/procedural_height')
 if _ph:
     _ph.parm('snippet').set(PROC_HEIGHT_VEX)
@@ -432,150 +254,7 @@ for _sn_name in ['snap_bld_to_terrain', 'snap_roads_to_terrain1']:
         _sn.setInput(1, snap_target)
 
 # -- 2c. Building footprint chamfer: convex vertical corners only ----------
-BLD_FOOTPRINT_BEVEL_CODE = r"""
-import hou, math
-
-BEVEL_DIST = 0.60
-MAX_ANGLE_DEG = 100.0
-ANGLE_EPS_DEG = 2.0
-MAX_EDGE_FRACTION = 0.25
-MIN_CUT = 0.08
-MIN_EDGE_LEN = 0.35
-
-src_geo = hou.pwd().inputs()[0].geometry()
-geo = hou.pwd().geometry()
-geo.clear()
-
-prim_attribs = []
-for attrib in src_geo.primAttribs():
-    if attrib.name() == "P":
-        continue
-    try:
-        new_attrib = geo.addAttrib(hou.attribType.Prim, attrib.name(), attrib.defaultValue())
-        prim_attribs.append((attrib, new_attrib))
-    except Exception:
-        pass
-
-bevel_a = geo.addAttrib(hou.attribType.Prim, "footprint_bevel_count", 0)
-
-def v2(p):
-    return (float(p.x()), float(p.z()))
-
-def sub(a, b):
-    return (a[0] - b[0], a[1] - b[1])
-
-def add(a, b):
-    return (a[0] + b[0], a[1] + b[1])
-
-def mul(a, s):
-    return (a[0] * s, a[1] * s)
-
-def length(a):
-    return math.sqrt(a[0] * a[0] + a[1] * a[1])
-
-def norm(a):
-    l = length(a)
-    if l <= 1e-9:
-        return (0.0, 0.0)
-    return (a[0] / l, a[1] / l)
-
-def cross(a, b):
-    return a[0] * b[1] - a[1] * b[0]
-
-def dot(a, b):
-    return a[0] * b[0] + a[1] * b[1]
-
-def signed_area(points):
-    acc = 0.0
-    n = len(points)
-    for i, p in enumerate(points):
-        q = points[(i + 1) % n]
-        acc += p[0] * q[1] - q[0] * p[1]
-    return acc * 0.5
-
-def angle_deg(prev_p, curr_p, next_p):
-    a = norm(sub(prev_p, curr_p))
-    b = norm(sub(next_p, curr_p))
-    d = max(-1.0, min(1.0, dot(a, b)))
-    return math.degrees(math.acos(d))
-
-def make_point(xz, y):
-    pt = geo.createPoint()
-    pt.setPosition(hou.Vector3(xz[0], y, xz[1]))
-    return pt
-
-for prim in src_geo.prims():
-    try:
-        if not prim.isClosed():
-            continue
-    except Exception:
-        pass
-
-    verts = list(prim.vertices())
-    if len(verts) < 3:
-        continue
-
-    src_positions = [v.point().position() for v in verts]
-    points = [v2(p) for p in src_positions]
-    base_y = sum(p.y() for p in src_positions) / len(src_positions)
-    area = signed_area(points)
-    if abs(area) <= 1e-6:
-        continue
-    orient = 1.0 if area > 0.0 else -1.0
-
-    new_points = []
-    bevel_count = 0
-    n = len(points)
-    for i, curr in enumerate(points):
-        prev_p = points[(i - 1) % n]
-        next_p = points[(i + 1) % n]
-        prev_edge = sub(curr, prev_p)
-        next_edge = sub(next_p, curr)
-        prev_len = length(prev_edge)
-        next_len = length(next_edge)
-        turn = cross(prev_edge, next_edge)
-        convex = turn * orient > 1e-8
-        ang = angle_deg(prev_p, curr, next_p)
-
-        can_bevel = (
-            convex
-            and ang <= MAX_ANGLE_DEG + ANGLE_EPS_DEG
-            and prev_len >= MIN_EDGE_LEN
-            and next_len >= MIN_EDGE_LEN
-        )
-
-        if not can_bevel:
-            new_points.append(curr)
-            continue
-
-        cut = min(
-            BEVEL_DIST,
-            prev_len * MAX_EDGE_FRACTION,
-            next_len * MAX_EDGE_FRACTION,
-        )
-        if cut < MIN_CUT:
-            new_points.append(curr)
-            continue
-
-        into_prev = norm(sub(prev_p, curr))
-        into_next = norm(sub(next_p, curr))
-        new_points.append(add(curr, mul(into_prev, cut)))
-        new_points.append(add(curr, mul(into_next, cut)))
-        bevel_count += 1
-
-    if len(new_points) < 3:
-        continue
-
-    new_prim = geo.createPolygon()
-    for p in new_points:
-        new_prim.addVertex(make_point(p, base_y))
-    for src_attr, dst_attr in prim_attribs:
-        try:
-            new_prim.setAttribValue(dst_attr, prim.attribValue(src_attr))
-        except Exception:
-            pass
-    new_prim.setAttribValue(bevel_a, bevel_count)
-"""
+BLD_FOOTPRINT_BEVEL_CODE = houdini_sops.load('bld_footprint_bevel.py')
 
 for _ph_name in ['promote_height', 'restore_height']:
     _ph = hou.node(OBJ_PATH + '/' + _ph_name)
@@ -646,16 +325,7 @@ ZMIN = mn[2] - MARGIN
 ZMAX = mx[2] + MARGIN
 print('  DEM 边界: X[{:.0f}~{:.0f}] Z[{:.0f}~{:.0f}]'.format(XMIN, XMAX, ZMIN, ZMAX))
 
-VEX = (  # noqa: E741
-    'int ps[] = primpoints(0, @primnum);\n'
-    'int n = len(ps);\n'
-    'if (n == 0) { i@del = 1; return; }\n'
-    'vector sum = {0,0,0};\n'
-    'for(int i=0; i<n; i++) sum += point(0,"P",ps[i]);\n'
-    'vector c = sum / n;\n'
-    'i@del = (c.x < XMIN || c.x > XMAX || c.z < ZMIN || c.z > ZMAX) ? 1 : 0;\n'
-).replace('XMIN', str(XMIN)).replace('XMAX', str(XMAX)) \
- .replace('ZMIN', str(ZMIN)).replace('ZMAX', str(ZMAX))
+VEX = houdini_sops.load('dem_clip.vex', XMIN=XMIN, XMAX=XMAX, ZMIN=ZMIN, ZMAX=ZMAX)  # noqa: E741
 
 
 def remake_clip(src_name, mark_name, out_name):
@@ -737,105 +407,7 @@ bld_clip  = remake_clip('post_normals',    'bld_clip_mark',  'bld_clipped')
 road_clip = remake_clip('snap_road_clipped','road_clip_mark', 'road_clipped')
 
 # ── 4b3. 建筑地基 / 裙边（坡地建筑下坡侧补空）──────────────────────
-BUILDING_FOUNDATION_CODE = r"""
-import hou
-
-MIN_DEPTH = 0.12
-MAX_DEPTH = 25.0
-TERRAIN_EPS = 0.03
-SIDE_NORMAL_Y = 0.20
-BOTTOM_Y_TOL = 0.01
-
-# Input 0 must be the final building body, not an earlier footprint.
-# The skirt top edge is copied from each actual wall bottom edge, so it cannot
-# drift after fuse/divide/clip changes upstream.
-body_geo = hou.pwd().inputs()[0].geometry()
-terrain_geo = hou.pwd().inputs()[1].geometry()
-geo = hou.pwd().geometry()
-geo.clear()
-
-is_foundation_a = geo.addAttrib(hou.attribType.Prim, "is_foundation", 0)
-
-def terrain_y_at(x, z):
-    pos = hou.Vector3()
-    normal = hou.Vector3()
-    uvw = hou.Vector3()
-    hit = terrain_geo.intersect(
-        hou.Vector3(x, 10000.0, z),
-        hou.Vector3(0.0, -1.0, 0.0),
-        pos,
-        normal,
-        uvw,
-        min_hit=0.01,
-        max_hit=20000.0,
-        tolerance=0.01,
-    )
-    if hit >= 0:
-        return pos.y()
-    return None
-
-def add_quad(a, b, c, d):
-    pts = []
-    for p in (a, b, c, d):
-        pt = geo.createPoint()
-        pt.setPosition(p)
-        pts.append(pt)
-
-    def make(order):
-        prim = geo.createPolygon()
-        for idx in order:
-            prim.addVertex(pts[idx])
-        prim.setAttribValue(is_foundation_a, 1)
-        return prim
-
-    prim = make([0, 1, 2, 3])
-    return prim
-
-def add_oriented_quad(top_a, top_b, bot_b, bot_a, ref_normal):
-    prim = add_quad(top_a, top_b, bot_b, bot_a)
-    if prim.normal().dot(ref_normal) >= 0:
-        return prim
-    pts = [v.point() for v in prim.vertices()]
-    geo.deletePrims([prim], True)
-    flipped = geo.createPolygon()
-    for idx in (3, 2, 1, 0):
-        flipped.addVertex(pts[idx])
-    flipped.setAttribValue(is_foundation_a, 1)
-    return flipped
-
-def bottom_y_for(p):
-    ty = terrain_y_at(p.x(), p.z())
-    if ty is None:
-        return p.y()
-    bottom_y = min(ty + TERRAIN_EPS, p.y())
-    if p.y() - bottom_y > MAX_DEPTH:
-        bottom_y = p.y() - MAX_DEPTH
-    return bottom_y
-
-for prim in body_geo.prims():
-    verts = list(prim.vertices())
-    if len(verts) < 3:
-        continue
-    n = prim.normal()
-    if abs(n.y()) > SIDE_NORMAL_Y:
-        continue
-
-    positions = [v.point().position() for v in verts]
-    min_y = min(p.y() for p in positions)
-    bottom_indices = [i for i, p in enumerate(positions) if abs(p.y() - min_y) <= BOTTOM_Y_TOL]
-    if len(bottom_indices) < 2:
-        continue
-
-    bottom_positions = [positions[i] for i in bottom_indices]
-    for i in range(len(bottom_positions) - 1):
-        top_a = bottom_positions[i]
-        top_b = bottom_positions[i + 1]
-        bot_a = hou.Vector3(top_a.x(), bottom_y_for(top_a), top_a.z())
-        bot_b = hou.Vector3(top_b.x(), bottom_y_for(top_b), top_b.z())
-        if max(top_a.y() - bot_a.y(), top_b.y() - bot_b.y()) < MIN_DEPTH:
-            continue
-        add_oriented_quad(top_a, top_b, bot_b, bot_a, n)
-"""
+BUILDING_FOUNDATION_CODE = houdini_sops.load('bld_foundation.py')
 
 old_foundation = hou.node(OBJ_PATH + '/bld_foundation')
 if old_foundation:

@@ -1,0 +1,7 @@
+int ps[] = primpoints(0, @primnum);
+int n = len(ps);
+if (n == 0) { i@del = 1; return; }
+vector sum = {0,0,0};
+for(int i=0; i<n; i++) sum += point(0,"P",ps[i]);
+vector c = sum / n;
+i@del = (c.x < __XMIN__ || c.x > __XMAX__ || c.z < __ZMIN__ || c.z > __ZMAX__) ? 1 : 0;

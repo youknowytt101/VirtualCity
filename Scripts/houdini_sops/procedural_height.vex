@@ -1,0 +1,70 @@
+// P0: 推算高度的触发条件:
+//   1. height_m ~= 10.0  -> OSM/Overture 默认值，没有真实数据
+//   2. height_m <= 0      -> 明确缺失或数据错误
+// 触发条件: ~10.0 (OSM default), ~8.0 (Overture DEFAULT_HEIGHT), <=0 (missing)
+int needs_estimate = (abs(f@height_m - 10.0) < 0.1)
+                  || (abs(f@height_m -  8.0) < 0.1)
+                  || (f@height_m <= 0);
+if (!needs_estimate) return;
+
+int pts[] = primpoints(0, @primnum);
+int n = len(pts);
+float area = 0;
+for (int i = 0; i < n; i++) {
+    vector p0 = point(0, "P", pts[i]);
+    vector p1 = point(0, "P", pts[(i+1)%n]);
+    area += p0.x * p1.z - p1.x * p0.z;
+}
+area = abs(area) * 0.5;
+
+float base_floors;
+if      (area < 60)   base_floors = 1;
+else if (area < 150)  base_floors = 2;
+else if (area < 400)  base_floors = 3;
+else if (area < 1000) base_floors = 4;
+else if (area < 3000) base_floors = 6;
+else                  base_floors = 8;
+
+vector ctr = {0,0,0};
+for (int i = 0; i < n; i++) ctr += point(0,"P",pts[i]);
+ctr /= n;
+float noise_val = fit(noise(ctr * 0.003), 0, 1, -1.5, 1.5);
+float floors = clamp(base_floors + noise_val, 1, 15);
+
+// 精度审核 #5：按建筑类型差异化层高（泰国实测参考值）
+// Overture subtype/class 实际取值远多于 3 类，按家族归并：
+string cls = s@bld_class;
+float floor_h;
+// — 住宅类（泰国实测 2.8~3.0m/层）—
+if      (cls == "residential")   floor_h = 2.9;
+else if (cls == "apartments")    floor_h = 2.9;
+else if (cls == "house")         floor_h = 2.9;
+else if (cls == "terrace")       floor_h = 2.9;
+else if (cls == "dormitory")     floor_h = 2.9;
+// — 商业 / 服务类（3.3~3.8m/层）—
+else if (cls == "commercial")    floor_h = 3.5;
+else if (cls == "retail")        floor_h = 3.5;
+else if (cls == "office")        floor_h = 3.5;
+else if (cls == "hotel")         floor_h = 3.4;
+else if (cls == "hospital")      floor_h = 3.6;
+else if (cls == "school" ||
+         cls == "education")     floor_h = 3.5;
+else if (cls == "civic" ||
+         cls == "government" ||
+         cls == "public")        floor_h = 3.6;
+// — 工业 / 仓储（4.0~5.0m/层）—
+else if (cls == "industrial")    floor_h = 4.5;
+else if (cls == "warehouse")     floor_h = 4.5;
+// — 低矮辅助结构（车棚 / 屋顶部件，强制 1 层）—
+else if (cls == "carport" ||
+         cls == "garage" ||
+         cls == "shed" ||
+         cls == "roof")          { floor_h = 2.5; floors = 1; }
+// — 未识别（"building" 兜底或异类）按面积启发 —
+else {
+    if      (area > 2000) floor_h = 4.5;   // 工业级 footprint
+    else if (area > 500)  floor_h = 3.5;   // 商业级
+    else                  floor_h = 2.9;   // 住宅级（Pattaya 主流）
+}
+
+f@height_m = floors * floor_h;

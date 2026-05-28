@@ -1,0 +1,35 @@
+// snap_bld_to_terrain v6: XZ 垂直采样地形 + 逐角点取最高值
+// 3D 最近点在山地会吸到旁边低坡，导致建筑局部埋地；必须垂直射线取高。
+// 坡面建筑：底面保持水平，略高于最高地形点；下坡侧由 bld_foundation 补裙边。
+int verts[] = primvertices(0, @primnum);
+int n = len(verts);
+if (n == 0) return;
+
+float max_terrain_y = -1e10;
+
+foreach(int v; verts) {
+    int pt = vertexpoint(0, v);
+    vector p = point(0, "P", pt);
+
+    vector hitp;
+    vector uvw;
+    int hp = intersect(1, set(p.x, 10000.0, p.z), set(0.0, -20000.0, 0.0), hitp, uvw);
+    if (hp >= 0) {
+        max_terrain_y = max(max_terrain_y, hitp.y);
+    } else {
+        int near_prim;
+        vector near_uvw;
+        xyzdist(1, set(p.x, p.y, p.z), near_prim, near_uvw);
+        vector tp = primuv(1, "P", near_prim, near_uvw);
+        max_terrain_y = max(max_terrain_y, tp.y);
+    }
+}
+
+float base_y = max_terrain_y + 0.05;  // keep the flat base above terrain; skirt hides downhill gap
+
+foreach(int v; verts) {
+    int pt = vertexpoint(0, v);
+    vector p = point(0, "P", pt);
+    p.y = base_y;
+    setpointattrib(0, "P", pt, p, "set");
+}
