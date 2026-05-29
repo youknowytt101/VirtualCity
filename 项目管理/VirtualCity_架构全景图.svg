@@ -1,0 +1,249 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1340" height="1560" viewBox="0 0 1340 1560" font-family="Segoe UI, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#334155"/>
+    </marker>
+    <marker id="arrowFuture" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+    <style>
+      .t   { fill:#0f172a; }
+      .sub { fill:#475569; font-size:12px; }
+      .h1  { font-size:26px; font-weight:700; }
+      .h2  { font-size:15px; font-weight:700; }
+      .bx  { font-size:14px; font-weight:700; }
+      .sm  { font-size:11.5px; fill:#475569; }
+      .xs  { font-size:10.5px; fill:#64748b; }
+      .panelttl { font-size:13px; font-weight:700; fill:#334155; letter-spacing:1px; }
+      .flow { stroke:#334155; stroke-width:2.2; fill:none; }
+      .ref  { stroke:#0d9488; stroke-width:1.3; fill:none; stroke-dasharray:4 4; opacity:.55; }
+      .fut  { stroke:#94a3b8; stroke-width:1.8; fill:none; stroke-dasharray:6 5; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1340" height="1560" fill="#f8fafc"/>
+
+  <!-- Title -->
+  <text x="36" y="46" class="t h1">VirtualCity 架构全景图</text>
+  <text x="38" y="70" class="sub">现阶段：资产自动化构建（数据获取 → 清洗 → Houdini → Model QA → 人工审核）　·　最终目标：俯视角虚拟城市</text>
+  <text x="38" y="88" class="xs">更新 2026-05-29　·　main@7634bf6　·　红标 NEW = 本轮架构整固新增</text>
+
+  <!-- Legend -->
+  <g transform="translate(980,30)">
+    <rect x="0" y="0" width="324" height="64" rx="8" fill="#ffffff" stroke="#e2e8f0"/>
+    <text x="12" y="18" class="panelttl">图例</text>
+    <rect x="12" y="28" width="14" height="12" rx="3" fill="#dbeafe" stroke="#2563eb"/><text x="32" y="38" class="sm">获取</text>
+    <rect x="74" y="28" width="14" height="12" rx="3" fill="#dcfce7" stroke="#16a34a"/><text x="94" y="38" class="sm">清洗</text>
+    <rect x="136" y="28" width="14" height="12" rx="3" fill="#ffedd5" stroke="#ea580c"/><text x="156" y="38" class="sm">Houdini</text>
+    <rect x="214" y="28" width="14" height="12" rx="3" fill="#ede9fe" stroke="#7c3aed"/><text x="234" y="38" class="sm">QA/审核</text>
+    <rect x="12" y="46" width="14" height="12" rx="3" fill="#ccfbf1" stroke="#0d9488"/><text x="32" y="56" class="sm">权威模块</text>
+    <rect x="100" y="46" width="14" height="12" rx="3" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="4 3"/><text x="120" y="56" class="sm">未来/延后</text>
+  </g>
+
+  <!-- ===================== LEFT: data sources ===================== -->
+  <g>
+    <rect x="30" y="120" width="300" height="430" rx="12" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="46" y="146" class="panelttl">数据源 / 缓存（Overture-only 建筑策略）</text>
+
+    <rect x="48" y="160" width="264" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+    <text x="60" y="180" class="bx t">OSM 道路</text>
+    <text x="60" y="198" class="sm">Overpass（多服务器）/ 瓦片缓存裁剪</text>
+
+    <rect x="48" y="218" width="264" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+    <text x="60" y="238" class="bx t">Overture 建筑轮廓 + 高度</text>
+    <text x="60" y="256" class="sm">download_overture_buildings.py</text>
+
+    <rect x="48" y="276" width="264" height="48" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+    <text x="60" y="296" class="bx t">FABDEM DEM（裸地 DTM）</text>
+    <text x="60" y="314" class="sm">FABDEM → 瓦片缓存 → GEE NASADEM 兜底</text>
+
+    <rect x="48" y="346" width="264" height="44" rx="8" fill="#ffffff" stroke="#60a5fa"/>
+    <text x="60" y="364" class="bx t">_tile_cache.py</text>
+    <text x="60" y="381" class="sm">覆盖瓦片 → 本地裁剪，离线优先</text>
+
+    <rect x="48" y="400" width="264" height="44" rx="8" fill="#ffffff" stroke="#60a5fa"/>
+    <text x="60" y="418" class="bx t">_clip_cache（data_cleaning_cache）</text>
+    <text x="60" y="435" class="sm">按 bbox+来源签名整体恢复，跳过下载</text>
+
+    <rect x="48" y="456" width="264" height="76" rx="8" fill="#ffffff" stroke="#60a5fa"/>
+    <text x="60" y="475" class="bx t">RawData/ 分层存储</text>
+    <text x="60" y="493" class="sm">_downloads（不可变原始快照）</text>
+    <text x="60" y="509" class="sm">_cleaned（清洗中间结果）</text>
+    <text x="60" y="525" class="sm">_houdini_ready（喂 Houdini）</text>
+  </g>
+
+  <!-- ===================== CENTER: pipeline ===================== -->
+  <!-- entry -->
+  <rect x="430" y="120" width="470" height="56" rx="10" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="450" y="144" class="bx t">① area_picker.py　—　用户级主入口</text>
+  <text x="450" y="164" class="sm">Leaflet 网页框选 bbox → 防重入 → 触发完整管线（项目定义的"完整流程"起点）</text>
+
+  <line x1="665" y1="176" x2="665" y2="206" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- set_area -->
+  <rect x="430" y="208" width="470" height="92" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="450" y="232" class="bx t">② set_area.py　—　数据获取 + 区域状态</text>
+  <text x="450" y="252" class="sm">三种输入：bbox / --center / Google Maps --url</text>
+  <text x="450" y="270" class="sm">clip-cache 优先恢复 → OSM / DEM / 建筑 获取 → 写 active_area.json + clip-cache</text>
+  <text x="450" y="288" class="xs">uses: vc_paths · vc_geo（bbox_size_m）</text>
+
+  <line x1="665" y1="300" x2="665" y2="350" class="flow" marker-end="url(#arrow)"/>
+  <line x1="330" y1="300" x2="426" y2="262" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- refine_data -->
+  <rect x="430" y="352" width="470" height="186" rx="10" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="450" y="376" class="bx t">③ refine_data.py　—　分级清洗 + 缓存 + 数据 QA</text>
+  <rect x="450" y="388" width="200" height="92" rx="7" fill="#ffffff" stroke="#86efac"/>
+  <text x="462" y="406" class="sm" style="font-weight:700;fill:#166534">建筑 L1→L3</text>
+  <text x="462" y="423" class="xs">L1 过滤/高度（vc_buildings）</text>
+  <text x="462" y="438" class="xs">L2 预留（空壳）</text>
+  <text x="462" y="453" class="xs">L3 OSM levels 高度补全</text>
+  <text x="462" y="472" class="xs">道路 L1 白名单/孤儿 · L2 merge_roads</text>
+  <rect x="662" y="388" width="224" height="92" rx="7" fill="#ffffff" stroke="#86efac"/>
+  <text x="674" y="406" class="sm" style="font-weight:700;fill:#166534">DEM L1→L2</text>
+  <text x="674" y="423" class="xs">L1 CSV/NaN 校验</text>
+  <text x="674" y="438" class="xs">L2 DSM→DTM（FABDEM 跳过）</text>
+  <text x="674" y="458" class="sm" style="font-weight:700;fill:#166534">三段 QA</text>
+  <text x="674" y="474" class="xs">Input · Process · Output → Config/qa</text>
+  <text x="450" y="498" class="sm">指纹缓存（recipe 版本）→ _houdini_ready/{area}/ + meta.json</text>
+  <text x="450" y="516" class="xs">uses: vc_geo · vc_buildings　|　产物：buildings.geojson · roads.osm · dem.csv</text>
+  <text x="450" y="532" class="xs">缺口：probe_sources 为 stub · 建筑 L2 空壳 · OutputQA 仅抽样前 10</text>
+
+  <line x1="665" y1="538" x2="665" y2="576" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- recook -->
+  <rect x="430" y="578" width="470" height="226" rx="10" fill="#ffedd5" stroke="#ea580c"/>
+  <text x="450" y="602" class="bx t">④ _recook_new_area.py　—　Houdini 自动构建（rpyc 18811）</text>
+  <text x="450" y="622" class="sm">注入 SOP 代码 → recook 数据源 → dem_subdivide（Bilinear×2）</text>
+  <rect x="450" y="632" width="436" height="120" rx="7" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="462" y="650" class="xs" style="font-weight:700;fill:#9a3412">建筑链</text>
+  <text x="462" y="666" class="xs">osm_import → extract → snap_bld(MAX) → footprint_bevel</text>
+  <text x="462" y="681" class="xs">→ extrude → post_normals → clip → foundation/skirt → color</text>
+  <text x="462" y="703" class="xs" style="font-weight:700;fill:#9a3412">道路链</text>
+  <text x="462" y="719" class="xs">road_width_flat → road_strips v5 → snap_drape → bbox_clip → extrude</text>
+  <text x="462" y="741" class="xs" style="font-weight:700;fill:#9a3412">地形</text>
+  <text x="610" y="741" class="xs">dem_terrain → dem_subdivide（≈7.5m）→ merge_all → OUT_city</text>
+  <text x="450" y="770" class="sm">按区域存档 hip：VC_{area}_citygen_v001.hip</text>
+  <text x="450" y="788" class="xs">uses: vc_geo · houdini_sops（dem/bld/road SOP 文本）· _osm_import_canonical · houdini_road_pipeline · _road_strips_v2</text>
+
+  <line x1="665" y1="804" x2="665" y2="842" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- model qa -->
+  <rect x="430" y="844" width="470" height="62" rx="10" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="450" y="868" class="bx t">⑤ houdini_model_qa.py　—　Model QA quick（12 检查）</text>
+  <text x="450" y="888" class="sm">进程内统计：节点/地形/颜色/法线/裙边对齐/贴地/道路面 → Reports/model_qa/latest.json</text>
+
+  <line x1="665" y1="906" x2="665" y2="942" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- human review -->
+  <rect x="430" y="944" width="470" height="56" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-dasharray="2 0"/>
+  <text x="450" y="968" class="bx t">⑥ 人工视口审核 OUT_city（自动 QA 替代不了）</text>
+  <text x="450" y="988" class="sm">道路贴地 · 建筑裙边/倒角 · 丘陵区俯视关系</text>
+
+  <line x1="665" y1="1000" x2="665" y2="1036" class="fut" marker-end="url(#arrowFuture)"/>
+
+  <!-- ue5 deferred -->
+  <rect x="430" y="1038" width="470" height="58" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="6 5"/>
+  <text x="450" y="1062" class="bx t" style="fill:#475569">⑦ export_and_import.py　—　UE5 导出/导入（审核后手动，未并入默认流程）</text>
+  <text x="450" y="1082" class="sm">FBX → UE5 · Remote Control · Bake（延后）</text>
+
+  <!-- ===================== RIGHT: authorities / state / tests ===================== -->
+  <g>
+    <rect x="930" y="120" width="380" height="430" rx="12" fill="#f0fdfa" stroke="#99f6e4"/>
+    <text x="946" y="146" class="panelttl">核心权威模块 / 状态 / 测试</text>
+
+    <rect x="946" y="158" width="348" height="44" rx="8" fill="#ccfbf1" stroke="#0d9488"/>
+    <text x="958" y="176" class="bx t">vc_paths.py</text>
+    <text x="958" y="193" class="sm">跨机路径权威（无硬编码盘符）</text>
+
+    <rect x="946" y="208" width="348" height="48" rx="8" fill="#ccfbf1" stroke="#0d9488"/>
+    <text x="958" y="227" class="bx t">vc_geo.py　<tspan fill="#dc2626">NEW</tspan></text>
+    <text x="958" y="245" class="sm">坐标唯一权威：数据域(x,z)不翻z；翻z只在 local_to_houdini</text>
+
+    <rect x="946" y="262" width="348" height="48" rx="8" fill="#ccfbf1" stroke="#0d9488"/>
+    <text x="958" y="281" class="bx t">vc_buildings.py　<tspan fill="#dc2626">NEW</tspan></text>
+    <text x="958" y="299" class="sm">建筑清洗纯函数：MultiPolygon-aware · 网格去重</text>
+
+    <rect x="946" y="316" width="348" height="48" rx="8" fill="#ccfbf1" stroke="#0d9488"/>
+    <text x="958" y="335" class="bx t">houdini_sops/　<tspan fill="#dc2626">NEW</tspan></text>
+    <text x="958" y="353" class="sm">7 段 SOP Python/VEX 文本外置（可 diff/回滚）</text>
+
+    <rect x="946" y="370" width="348" height="48" rx="8" fill="#ffffff" stroke="#5eead4"/>
+    <text x="958" y="389" class="bx t">SOP 源码</text>
+    <text x="958" y="407" class="sm">_osm_import_canonical · houdini_road_pipeline · _road_strips_v2</text>
+
+    <rect x="946" y="424" width="348" height="58" rx="8" fill="#ffffff" stroke="#5eead4"/>
+    <text x="958" y="443" class="bx t">状态 / 报告（机器本地）</text>
+    <text x="958" y="460" class="sm">Config/active_area.json · houdini_build_status.json</text>
+    <text x="958" y="476" class="sm">Reports/model_qa/latest.json</text>
+
+    <rect x="946" y="488" width="348" height="48" rx="8" fill="#ffffff" stroke="#5eead4"/>
+    <text x="958" y="507" class="bx t">tests/　<tspan fill="#dc2626">NEW</tspan></text>
+    <text x="958" y="525" class="sm">离线 24 项：vc_geo · houdini_sops · vc_buildings</text>
+  </g>
+
+  <!-- reference dashed links (authority -> pipeline) -->
+  <path d="M946,232 C915,232 905,262 901,266" class="ref"/>
+  <path d="M946,286 C918,286 905,430 901,440" class="ref"/>
+  <path d="M946,340 C915,340 905,640 901,660" class="ref"/>
+
+  <!-- ===================== GOVERNANCE band ===================== -->
+  <rect x="930" y="566" width="380" height="118" rx="12" fill="#fffbeb" stroke="#fde68a"/>
+  <text x="946" y="592" class="panelttl">项目治理（AI 可持续接手）</text>
+  <text x="946" y="614" class="sm">AI_HANDOFF.md（第一入口）</text>
+  <text x="946" y="632" class="sm">项目管理/：迭代日志 · 当前状态 · 决策记录</text>
+  <text x="946" y="650" class="sm">　　　　　已知坑点(含A-005/A-006) · 任务看板</text>
+  <text x="946" y="668" class="sm">project_manifest.json · .windsurf/workflows</text>
+
+  <!-- ===================== FUTURE band ===================== -->
+  <rect x="30" y="1130" width="1280" height="360" rx="14" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="8 6"/>
+  <text x="50" y="1162" class="t h2" style="fill:#334155">未来：虚拟城市阶段（执行计划 Phase 6–9　·　现在不做，但现在就别丢信息）</text>
+  <text x="52" y="1184" class="sm">核心原则：白盒阶段保住 语义 / 分层 / seed / 连通性 —— 将来"加表现层"，而不是推倒重来。几何可替换，语义数据昂贵。</text>
+
+  <line x1="665" y1="1096" x2="665" y2="1128" class="fut" marker-end="url(#arrowFuture)"/>
+
+  <g>
+    <rect x="50" y="1206" width="290" height="120" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-dasharray="5 4"/>
+    <text x="66" y="1230" class="bx" style="fill:#334155">① 语义契约 vc_schema</text>
+    <text x="66" y="1250" class="sm">每层必备属性 + 类型 + 默认 + 来源</text>
+    <text x="66" y="1268" class="sm">height_source / provenance（真值 vs 推算）</text>
+    <text x="66" y="1286" class="sm">三道关卡校验：清洗输出 / 导入 / 导出</text>
+    <text x="66" y="1308" class="xs">最便宜、最高价值，防止悄悄丢数据</text>
+
+    <rect x="360" y="1206" width="290" height="120" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-dasharray="5 4"/>
+    <text x="376" y="1230" class="bx" style="fill:#334155">② 道路图化</text>
+    <text x="376" y="1250" class="sm">node / edge / lane 拓扑（非扁平条带）</text>
+    <text x="376" y="1268" class="sm">从 merge_roads → road_topology_builder</text>
+    <text x="376" y="1286" class="sm">→ UE5 ZoneGraph / Mass 交通</text>
+    <text x="376" y="1308" class="xs">扁平条带是交通的视觉死路</text>
+
+    <rect x="670" y="1206" width="290" height="120" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-dasharray="5 4"/>
+    <text x="686" y="1230" class="bx" style="fill:#334155">③ 数据分层 Data Layers</text>
+    <text x="686" y="1250" class="sm">Terrain / Roads / Buildings</text>
+    <text x="686" y="1268" class="sm">Foliage / Props / Traffic / Debug</text>
+    <text x="686" y="1286" class="sm">分组带 tag 导出，对应 UE5 DataLayer</text>
+    <text x="686" y="1308" class="xs">别为视口方便 merge 成一坨</text>
+
+    <rect x="980" y="1206" width="310" height="120" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-dasharray="5 4"/>
+    <text x="996" y="1230" class="bx" style="fill:#334155">④ 规模化 + 可复现</text>
+    <text x="996" y="1250" class="sm">Tiling / World Partition / HLOD</text>
+    <text x="996" y="1268" class="sm">全局一致原点 + tile 网格（早定）</text>
+    <text x="996" y="1286" class="sm">random_seed 串进管线（同 bbox+seed→同城）</text>
+    <text x="996" y="1308" class="xs">参数外置 pipeline_config（风格/LOD）</text>
+
+    <rect x="50" y="1342" width="600" height="78" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-dasharray="5 4"/>
+    <text x="66" y="1366" class="bx" style="fill:#334155">⑤ PCG 散布</text>
+    <text x="66" y="1386" class="sm">沿道路/地块散布树木、路灯、垃圾桶、长椅 → ISM/HISM 实例化</text>
+    <text x="66" y="1406" class="xs">依赖：道路图 + 语义分区 + 用地数据</text>
+
+    <rect x="670" y="1342" width="620" height="78" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-dasharray="5 4"/>
+    <text x="686" y="1366" class="bx" style="fill:#334155">⑥ Mass 交通 + 人群 + 昼夜光照</text>
+    <text x="686" y="1386" class="sm">车辆沿路 · 行人按密度 · 商业/住宅分区驱动人流与灯光</text>
+    <text x="686" y="1406" class="xs">依赖：道路图(车道) + 建筑功能 + 交通/人群密度属性</text>
+  </g>
+
+  <text x="50" y="1452" class="sm" style="fill:#334155">演进路径：　白盒资产（现在）　→　语义+分层+seed（低成本铺路）　→　规模化/PCG　→　动态城市（交通·人群）</text>
+
+  <!-- footer -->
+  <text x="36" y="1520" class="xs">数据策略：建筑源始终 Overture-only　|　坐标：单一 UTM zone（小区域）　|　建筑/状态文件为机器本地，不入提交　|　完整流程结束条件：build completed + Model QA pass</text>
+</svg>
