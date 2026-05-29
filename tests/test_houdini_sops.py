@@ -85,5 +85,28 @@ class TestSentinels(unittest.TestCase):
         self.assertIn("footprint_bevel_count", houdini_sops.load("bld_footprint_bevel.py"))
 
 
+class TestOsmImportCanonical(unittest.TestCase):
+    """osm_import SOP（Houdini 内运行）已接入 vc_geo，移除内嵌第 4 份 UTM 实现。"""
+
+    PATH = ROOT / "Scripts" / "_osm_import_canonical.py"
+
+    def _substituted(self):
+        text = self.PATH.read_text(encoding="utf-8")
+        return text.replace("__ROOT__", "/proj/VirtualCity").replace(
+            "__CFG__", "/proj/VirtualCity/Config/active_area.json")
+
+    def test_parses_after_substitution(self):
+        ast.parse(self._substituted())
+
+    def test_uses_vc_geo_and_drops_inline_utm(self):
+        text = self.PATH.read_text(encoding="utf-8")
+        self.assertIn("import vc_geo", text)
+        self.assertIn("vc_geo.local_to_houdini", text)
+        self.assertIn("vc_geo.needs_winding_flip", text)
+        # 内嵌 UTM 实现必须已删除
+        self.assertNotIn("_utm_forward", text)
+        self.assertNotIn("hou.Vector3(x, 0, -z)", text)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

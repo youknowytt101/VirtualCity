@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-import json, math, os
+import json, os
 
 _CFG_FILE = r"__CFG__"
 with open(_CFG_FILE, encoding="utf-8") as _f:
@@ -29,39 +29,18 @@ BUILDINGS_FILE = (BUILDINGS_READY if os.path.exists(BUILDINGS_READY)
 ORIGIN_LON     = _cfg["origin_lon"]
 ORIGIN_LAT     = _cfg["origin_lat"]
 
-# ── UTM 投影（内嵌，无外部依赖）─────────────────────────────────────
-_A=6378137.0;_E=0.00669437999014;_E2=_E*_E;_E3=_E2*_E;_EP2=_E/(1-_E)
-_K0=0.9996;_FE=500000.0;_FN=10000000.0
-_M1=1-_E/4-3*_E2/64-5*_E3/256;_M2=3*_E/8+3*_E2/32+45*_E3/1024
-_M3=15*_E2/256+45*_E3/1024;_M4=35*_E3/3072
+# ── 坐标转换：统一走 vc_geo（全项目唯一权威，见 Scripts/vc_geo.py）─────────────────────────────────────
+import sys as _sys
+_SCRIPTS_DIR = r'__ROOT__' + '/Scripts'
+if _SCRIPTS_DIR not in _sys.path:
+    _sys.path.insert(0, _SCRIPTS_DIR)
+import vc_geo
 
-def _utm_forward(lat, lon, force_zone=0):
-    lr=math.radians(lat);sl=math.sin(lr);cl=math.cos(lr);tl=math.tan(lr)
-    z=force_zone or int((lon+180)/6)+1
-    dl=math.radians(lon-((z-1)*6-177))
-    n=_A/math.sqrt(1-_E*sl*sl);t=tl*tl;c=_EP2*cl*cl;a=cl*dl
-    m=_A*(_M1*lr-_M2*math.sin(2*lr)+_M3*math.sin(4*lr)-_M4*math.sin(6*lr))
-    a2=a*a;a4=a2*a2;a6=a4*a2;t2=t*t
-    x=_K0*n*(a+(1-t+c)*a2*a/6+(5-18*t+t2+72*c-58*_EP2)*a4*a/120)+_FE
-    y=_K0*(m+n*tl*(a2/2+(5-t+9*c+4*c*c)*a4/24+(61-58*t+t2+600*c-330*_EP2)*a6/720))
-    if lat<0:y+=_FN
-    return x,y,z
-
-_UTM_ZONE = int((ORIGIN_LON + 180) / 6) + 1
-_OX, _OY, _ = _utm_forward(ORIGIN_LAT, ORIGIN_LON, _UTM_ZONE)
+_proj = vc_geo.LocalProjector(ORIGIN_LON, ORIGIN_LAT)
+signed_area_xz = vc_geo.signed_area_xz
 
 def wgs84_to_local(lon, lat):
-    x, y, _ = _utm_forward(lat, lon, force_zone=_UTM_ZONE)
-    return x - _OX, y - _OY
-
-def signed_area_xz(pts):
-    n = len(pts)
-    area = 0
-    for i in range(n):
-        j = (i + 1) % n
-        area += pts[i][0] * pts[j][1]
-        area -= pts[j][0] * pts[i][1]
-    return area / 2.0
+    return _proj.to_local(lon, lat)
 
 def _parse_height(h_raw, levels_raw=None):
     # Return height in metres. 0.0 means unknown -> procedural_height fills in.
@@ -111,13 +90,13 @@ for feature in fc['features']:
     if len(local_pts) < 3:
         continue
     sa = signed_area_xz(local_pts)
-    if sa > 0:
+    if vc_geo.needs_winding_flip(sa):
         local_pts = list(reversed(local_pts))
     h = _parse_height(props.get('height'))
     hpts = []
     for (x, z) in local_pts:
         p = geo.createPoint()
-        p.setPosition(hou.Vector3(x, 0, -z))
+        p.setPosition(hou.Vector3(*vc_geo.local_to_houdini(x, z)))
         hpts.append(p)
     if len(hpts) >= 3:
         poly = geo.createPolygon()
@@ -158,7 +137,7 @@ for way in root.findall('way'):
             if ref in nodes:
                 x, z = wgs84_to_local(*nodes[ref])
                 p = geo.createPoint()
-                p.setPosition(hou.Vector3(x, 0, -z))
+                p.setPosition(hou.Vector3(*vc_geo.local_to_houdini(x, z)))
                 pts.append(p)
         if len(pts) >= 2:
             poly = geo.createPolygon(is_closed=False)
@@ -186,13 +165,13 @@ for way in root.findall('way'):
         if _overture_covered(cx, cz):
             continue
         sa = signed_area_xz(local_pts)
-        if sa > 0:
+        if vc_geo.needs_winding_flip(sa):
             local_pts = list(reversed(local_pts))
         h = _parse_height(tags.get('height'), tags.get('building:levels'))
         hpts = []
         for (x, z) in local_pts:
             p = geo.createPoint()
-            p.setPosition(hou.Vector3(x, 0, -z))
+            p.setPosition(hou.Vector3(*vc_geo.local_to_houdini(x, z)))
             hpts.append(p)
         if len(hpts) >= 3:
             poly = geo.createPolygon()
