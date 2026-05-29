@@ -33,7 +33,8 @@ SOURCE_CONFIG_KEYS = {
 }
 
 CLEAN_RECIPE_VERSION = {
-    "buildings": "buildings_l1_l3_v2026_05_28",
+    # buildings: +height_source provenance (语义契约 vc_schema) → 2026_05_29
+    "buildings": "buildings_l1_l3_v2026_05_29",
     "roads": "roads_l1_l2_v2026_05_28",
     "dem": "dem_l1_l2_v2026_05_28",
 }

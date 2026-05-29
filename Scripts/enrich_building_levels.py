@@ -205,6 +205,7 @@ def enrich_levels(area_cfg: dict, verbose: bool = True) -> dict:
         best_h, best_dist = _find_nearest_osm(cx, cz)
         if best_h is not None and best_dist <= DEDUP_DIST:
             feat['properties']['height'] = best_h
+            feat['properties']['height_source'] = 'osm'  # provenance（语义契约）
             updated += 1
 
     if verbose:

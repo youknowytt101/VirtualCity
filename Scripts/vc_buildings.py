@@ -139,7 +139,7 @@ def transform_buildings(features: Sequence[dict]) -> tuple[list[dict], dict[str,
             stats["removed_tiny"] += 1
             continue
 
-        # 高度清洗
+        # 高度清洗 + provenance（语义契约 vc_schema.HEIGHT_SOURCES）
         h = props.get("height")
         try:
             h = float(h) if h is not None else None
@@ -148,10 +148,13 @@ def transform_buildings(features: Sequence[dict]) -> tuple[list[dict], dict[str,
         if h is None or h <= 0:
             # 写 0，让 Houdini procedural_height VEX 唯一负责推算
             h = 0.0
+            height_source = "estimated_pending"
             stats["fixed_height"] += 1
-        elif h > MAX_HEIGHT_M:
-            h = MAX_HEIGHT_M
-            stats["clamped_height"] += 1
+        else:
+            height_source = "overture"
+            if h > MAX_HEIGHT_M:
+                h = MAX_HEIGHT_M
+                stats["clamped_height"] += 1
 
         # 去重用质心：取面积最大的外环
         largest = max(outers, key=ring_area_m2)
@@ -160,7 +163,7 @@ def transform_buildings(features: Sequence[dict]) -> tuple[list[dict], dict[str,
         new_feat = {
             "type": "Feature",
             "geometry": feat["geometry"],
-            "properties": {**props, "height": h},
+            "properties": {**props, "height": h, "height_source": height_source},
         }
         prelim.append((new_feat, ctr))
 

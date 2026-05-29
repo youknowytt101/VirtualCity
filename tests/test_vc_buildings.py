@@ -67,6 +67,7 @@ class TestFiltering(unittest.TestCase):
         self.assertEqual(len(kept), 1)
         self.assertEqual(stats["total_out"], 1)
         self.assertEqual(kept[0]["properties"]["height"], 12.0)
+        self.assertEqual(kept[0]["properties"]["height_source"], "overture")
 
 
 class TestHeight(unittest.TestCase):
@@ -74,6 +75,7 @@ class TestHeight(unittest.TestCase):
         feats = [_square(_ORIGIN_LON, _ORIGIN_LAT, 10.0)]  # no height
         kept, stats = vc_buildings.transform_buildings(feats)
         self.assertEqual(kept[0]["properties"]["height"], 0.0)
+        self.assertEqual(kept[0]["properties"]["height_source"], "estimated_pending")
         self.assertEqual(stats["fixed_height"], 1)
 
     def test_nonpositive_height_set_zero(self):

@@ -390,6 +390,19 @@ def _run_output_qa(area_id: str, area_cfg: dict) -> list[dict]:
             checks.append({"name": "bld_sample", "status": "warn",
                            "message": f"{valid}/{len(sample)} 建筑有效"})
 
+    # 语义契约检查（vc_schema）：属性完整性 + 道路连通性
+    try:
+        import vc_schema
+        if bld_path.exists():
+            with open(bld_path, encoding="utf-8") as f:
+                checks.extend(vc_schema.check_buildings(json.load(f).get("features", [])))
+        road_path = hr / "roads.osm"
+        if road_path.exists():
+            checks.extend(vc_schema.check_roads(road_path))
+    except Exception as exc:
+        checks.append({"name": "semantic_contract", "status": "warn",
+                       "message": f"语义契约检查异常: {exc}"})
+
     return checks
 
 
@@ -632,12 +645,14 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
         if src.exists():
             _copy_file(src, dst)
     # 写 meta.json
+    import vc_schema
     meta = {
         "area_id": area_id,
         "origin_lon": area_cfg.get("origin_lon"),
         "origin_lat": area_cfg.get("origin_lat"),
         "exported": datetime.now().isoformat(timespec="seconds"),
         "levels": {k: v["current"] for k, v in manifest["levels"].items()},
+        "schema_version": vc_schema.CONTRACT_VERSION,
         "cache_key": cache_state["key"],
         "cache_fingerprint": cache_state["fingerprint"],
     }
