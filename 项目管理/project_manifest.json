@@ -99,10 +99,13 @@
     "houdini_hda": "Houdini/HDA/",
     "houdini_export": "Houdini/Export/",
     "scripts": "Scripts/",
+    "houdini_sop_sources": "Scripts/houdini_sops/",
+    "tests": "tests/",
     "ue5": "UE5/",
     "project_management": "项目管理/",
     "area_records": "项目管理/区域记录/",
     "config": "Config/"
   },
-  "last_updated": "2026-05-28"
+  "coordinate_authority": "Scripts/vc_geo.py",
+  "last_updated": "2026-05-29"
 }
