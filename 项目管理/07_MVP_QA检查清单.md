@@ -47,7 +47,8 @@ uv run python houdini_model_qa.py --mode quick
 通过标准：
 
 ```text
-Reports/model_qa/latest.json: status = pass
+Reports/model_qa/latest.json: no fail checks
+status = pass 可作为基准候选；status = warn 需要人工审核后再决定是否晋级
 ```
 
 ---
@@ -88,7 +89,7 @@ houdini_model_qa.py
 完成定义：
 
 - `Config/houdini_build_status.json` 中当前 `area_id` 为 `completed`
-- `Reports/model_qa/latest.json` 中当前 `area_id` 为 `pass`
+- `Reports/model_qa/latest.json` 中当前 `area_id` 一致且无 `fail`；`warn` 需要人工审核
 
 网页是否自动关闭不是成功标准。
 

@@ -36,15 +36,16 @@ For implementation work, also inspect the relevant code before changing it.
 
 ## 3. Current Git Baseline
 
-GitHub `main` and local `main` were confirmed identical at the architecture-hardening baseline:
+GitHub `main` and local `main` were confirmed identical at:
 
 ```text
-f3a5ce9 docs: add VirtualCity architecture panorama SVG
+93a359b chore: sync handoff and experimental area snapshot
 ```
 
 Key commits in the latest hardening rounds (newest first):
 
 ```text
+93a359b chore: sync handoff and experimental area snapshot
 f3a5ce9 docs: architecture panorama SVG
 ce89a53 feat(semantics): semantic contract vc_schema + height provenance + QA
 7634bf6 docs: log vc_geo/houdini_sops/vc_buildings hardening
