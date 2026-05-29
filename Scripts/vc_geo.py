@@ -125,3 +125,23 @@ def bbox_size_m(bbox: Sequence[float]) -> tuple[float, float]:
     center_lat = (south + north) / 2.0
     deg_lon, deg_lat = meters_per_degree(center_lat)
     return (east - west) * deg_lon, (north - south) * deg_lat
+
+
+def ring_area_m2(coords_lonlat: Sequence[Sequence[float]]) -> float:
+    """多边形环面积 (m²)，输入 [(lon, lat), ...]。
+
+    以环质心为投影原点、按质心经度的 UTM zone 投影后用 shoelace 计算。
+    返回非负面积；少于 3 点返回 0。
+    """
+    n = len(coords_lonlat)
+    if n < 3:
+        return 0.0
+    lon_avg = sum(c[0] for c in coords_lonlat) / n
+    lat_avg = sum(c[1] for c in coords_lonlat) / n
+    proj = LocalProjector(lon_avg, lat_avg)
+    local = [proj.to_local(c[0], c[1]) for c in coords_lonlat]
+    area = 0.0
+    for i in range(n):
+        j = (i + 1) % n
+        area += local[i][0] * local[j][1] - local[j][0] * local[i][1]
+    return abs(area) * 0.5

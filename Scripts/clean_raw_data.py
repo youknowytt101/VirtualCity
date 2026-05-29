@@ -21,6 +21,7 @@ from typing import Any
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
 import vc_paths
+import vc_buildings
 
 # ── 清洗阈值常量 ─────────────────────────────────────────────
 MIN_RING_POINTS   = 4      # 多边形最少顶点数（含重复的闭合点）
@@ -36,155 +37,16 @@ HIGHWAY_WHITELIST = {      # 只保留这些道路类型（空 = 保留全部）
 }
 
 
-# ── 几何工具（纯 Python，无需 shapely）───────────────────────
-
-def _ring_area_m2(coords: list[tuple[float, float]]) -> float:
-    """Shoelace 公式计算多边形面积（经纬度坐标 → UTM m²）。"""
-    from _utm_lite import wgs84_to_utm, zone_number
-    lat_avg = sum(c[1] for c in coords) / len(coords)
-    lon_avg = sum(c[0] for c in coords) / len(coords)
-    z = zone_number(lon_avg)
-    ox, oy, _ = wgs84_to_utm(lat_avg, lon_avg, force_zone=z)
-    local = []
-    for lon, lat in coords:
-        x, y, _ = wgs84_to_utm(lat, lon, force_zone=z)
-        local.append((x - ox, y - oy))
-    n = len(local)
-    area = 0.0
-    for i in range(n):
-        j = (i + 1) % n
-        area += local[i][0] * local[j][1]
-        area -= local[j][0] * local[i][1]
-    return abs(area) * 0.5
-
-
-def _ring_centroid(coords: list[tuple[float, float]]) -> tuple[float, float]:
-    n = len(coords)
-    return sum(c[0] for c in coords) / n, sum(c[1] for c in coords) / n
-
-
-def _dist_deg(a: tuple[float, float], b: tuple[float, float]) -> float:
-    """两点之间的距离（m），使用 UTM 投影。"""
-    from _utm_lite import wgs84_to_utm, zone_number
-    z = zone_number((a[0] + b[0]) / 2)
-    x1, y1, _ = wgs84_to_utm(a[1], a[0], force_zone=z)
-    x2, y2, _ = wgs84_to_utm(b[1], b[0], force_zone=z)
-    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-
-
-def _area_based_height(area_m2: float) -> float:
-    """基于建筑面积推算楼层高度（与 procedural_height VEX 保持一致）。"""
-    if   area_m2 < 60:    floors = 1
-    elif area_m2 < 150:   floors = 2
-    elif area_m2 < 400:   floors = 3
-    elif area_m2 < 1000:  floors = 4
-    elif area_m2 < 3000:  floors = 6
-    else:                  floors = 8
-    return floors * FLOOR_HEIGHT_M
-
-
-def _unique_points(ring: list) -> list:
-    """去除多边形首尾重复点并去重相邻重复点。"""
-    pts = [tuple(c[:2]) for c in ring]
-    if pts and pts[0] == pts[-1]:
-        pts = pts[:-1]
-    out = [pts[0]] if pts else []
-    for p in pts[1:]:
-        if p != out[-1]:
-            out.append(p)
-    return out
-
-
 # ── GeoJSON 建筑清洗 ─────────────────────────────────────────
+# 建筑清洗的纯逻辑已抽到 vc_buildings.transform_buildings（坐标走 vc_geo，
+# MultiPolygon-aware 面积、网格去重、可单测）。本文件只保留薄 IO 包装。
 
 def clean_buildings(path: Path, dry_run: bool) -> dict[str, Any]:
+    """薄 IO 包装：读取 → vc_buildings.transform_buildings（纯逻辑）→ 写回。"""
     with open(path, encoding="utf-8") as f:
         fc = json.load(f)
 
-    features_in = fc.get("features", [])
-    total_in = len(features_in)
-
-    kept: list[dict] = []
-    stats = {
-        "total_in":        total_in,
-        "removed_null":    0,
-        "removed_degenerate": 0,
-        "removed_tiny":    0,
-        "removed_duplicate": 0,
-        "fixed_height":    0,
-        "clamped_height":  0,
-        "total_out":       0,
-    }
-
-    centroids: list[tuple[float, float]] = []
-
-    for feat in features_in:
-        geom = feat.get("geometry")
-        props = feat.get("properties") or {}
-
-        # 1. null 几何体
-        if geom is None:
-            stats["removed_null"] += 1
-            continue
-
-        gtype = geom.get("type", "")
-        if gtype not in ("Polygon", "MultiPolygon"):
-            stats["removed_null"] += 1
-            continue
-
-        # 取外环
-        if gtype == "Polygon":
-            rings = geom.get("coordinates", [])
-            outer = rings[0] if rings else []
-        else:
-            outer = geom["coordinates"][0][0] if geom.get("coordinates") else []
-
-        # 2. 退化多边形（顶点不足）
-        pts = _unique_points(outer)
-        if len(pts) < 3:
-            stats["removed_degenerate"] += 1
-            continue
-
-        # 3. 面积过小
-        area = _ring_area_m2(pts)
-        if area < MIN_AREA_M2:
-            stats["removed_tiny"] += 1
-            continue
-
-        # 4. 高度清洗
-        h = props.get("height")
-        try:
-            h = float(h) if h is not None else None
-        except (TypeError, ValueError):
-            h = None
-
-        if h is None or h <= 0:
-            # 写 0 让 Houdini procedural_height VEX 唯一负责推算
-            # （含 noise 抖动 + bld_class 差异化层高 + 面积启发，比清洗层粗略推算更准）。
-            # 此前清洗层用 _area_based_height 填 3.5/7.0/10.5...，会与 Houdini VEX 互相覆盖
-            # （VEX 只对 ~10/~8/<=0 触发推算，其它值保留 → 高度来源不可预测）。
-            h = 0.0
-            stats["fixed_height"] += 1
-        elif h > MAX_HEIGHT_M:
-            h = min(h, MAX_HEIGHT_M)
-            stats["clamped_height"] += 1
-
-        # 5. 近重复去重
-        ctr = _ring_centroid(pts)
-        is_dup = any(_dist_deg(ctr, c) < DEDUP_DIST_M for c in centroids)
-        if is_dup:
-            stats["removed_duplicate"] += 1
-            continue
-
-        centroids.append(ctr)
-        new_feat = {
-            "type": "Feature",
-            "geometry": feat["geometry"],
-            "properties": {**props, "height": h},
-        }
-        kept.append(new_feat)
-
-    stats["total_out"] = len(kept)
+    kept, stats = vc_buildings.transform_buildings(fc.get("features", []))
 
     if not dry_run:
         out_fc = {"type": "FeatureCollection", "features": kept}
