@@ -208,13 +208,9 @@ def convert_to_csv(tif_path, csv_path, bbox):
     ORIGIN_LON = (bbox[0] + bbox[2]) / 2
     ORIGIN_LAT = (bbox[1] + bbox[3]) / 2
 
-    from _utm_lite import wgs84_to_utm, zone_number
-    _zone = zone_number(ORIGIN_LON)
-    _ox, _oy, _ = wgs84_to_utm(ORIGIN_LAT, ORIGIN_LON, force_zone=_zone)
-
-    def to_local(lon, lat):
-        x, y, _ = wgs84_to_utm(lat, lon, force_zone=_zone)
-        return x - _ox, y - _oy
+    # 坐标一律走 vc_geo（全项目唯一坐标权威），z 翻转也只在 vc_geo 内发生。
+    import vc_geo
+    _proj = vc_geo.LocalProjector(ORIGIN_LON, ORIGIN_LAT)
 
     print(f"  转换 {tif_path} → CSV...")
     with rasterio.open(tif_path) as ds:
@@ -233,8 +229,9 @@ def convert_to_csv(tif_path, csv_path, bbox):
                     continue
                 lon = transform.c + c * transform.a
                 lat = transform.f + r * transform.e
-                x, z = to_local(lon, lat)
-                f.write(f"{x:.2f},{elev:.2f},{-z:.2f},{r},{c}\n")
+                x, z = _proj.to_local(lon, lat)
+                hx, hz = vc_geo.local_xz_to_houdini_xz(x, z)
+                f.write(f"{hx:.2f},{elev:.2f},{hz:.2f},{r},{c}\n")
                 count += 1
     print(f"  [OK] CSV 已保存: {csv_path}  ({rows_n}×{cols_n}={count} 点)")
 

@@ -76,6 +76,29 @@ class TestWinding(unittest.TestCase):
         self.assertAlmostEqual(vc_geo.signed_area_xz(square), 1.0, places=6)
 
 
+class TestDistancePreservation(unittest.TestCase):
+    """clean_raw_data 端点焊接依赖：local 投影点间距离 == 绝对 UTM 点间距离（平移不变），
+    保证从 _utm_lite 直用迁移到 vc_geo.LocalProjector 后聚类结果不变。"""
+
+    def test_pairwise_distance_matches_absolute_utm(self):
+        avg_lon, avg_lat = 100.883, 12.931
+        pts = [(100.882, 12.930), (100.8821, 12.9301), (100.885, 12.933)]
+        proj = vc_geo.LocalProjector(avg_lon, avg_lat)
+        zone = zone_number(avg_lon)
+
+        def abs_utm(lon, lat):
+            x, y, _ = wgs84_to_utm(lat, lon, force_zone=zone)
+            return x, y
+
+        loc = [proj.to_local(lo, la) for lo, la in pts]
+        ab = [abs_utm(lo, la) for lo, la in pts]
+        for i in range(len(pts)):
+            for j in range(i + 1, len(pts)):
+                dl = math.hypot(loc[i][0] - loc[j][0], loc[i][1] - loc[j][1])
+                da = math.hypot(ab[i][0] - ab[j][0], ab[i][1] - ab[j][1])
+                self.assertAlmostEqual(dl, da, places=6)
+
+
 class TestBboxSize(unittest.TestCase):
     def test_matches_legacy_formula(self):
         w, s, e, n = 100.859, 12.912, 100.870, 12.923

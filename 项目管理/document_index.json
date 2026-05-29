@@ -2,7 +2,8 @@
   "project": "VirtualCity",
   "purpose": "AI-readable document index for fast handoff and task routing",
   "entry_points": {
-    "first_read": "项目管理/00_AI接手指南.md",
+    "first_read": "AI_HANDOFF.md",
+    "ai_startup_guide": "项目管理/00_AI接手指南.md",
     "current_status": "项目管理/02_当前状态与下一步.md",
     "task_board": "项目管理/08_任务看板.md",
     "known_issues": "项目管理/12_已知坑点与解决方案.md",
@@ -11,17 +12,20 @@
   },
   "by_task": {
     "understand_project": [
+      "AI_HANDOFF.md",
       "README.md",
       "项目管理/00_AI接手指南.md",
       "项目管理/01_资料地图.md",
       "VirtualCity完整执行计划.md"
     ],
     "find_next_step": [
+      "AI_HANDOFF.md",
       "项目管理/02_当前状态与下一步.md",
       "项目管理/08_任务看板.md",
       "项目管理/10_AI启动自检清单.md"
     ],
     "continue_iteration": [
+      "AI_HANDOFF.md",
       "项目管理/05_自动迭代协议.md",
       "项目管理/03_迭代日志.md",
       "项目管理/08_任务看板.md"
@@ -41,6 +45,7 @@
     ],
     "work_on_roads": [
       "项目管理/12_已知坑点与解决方案.md",
+      "Scripts/houdini_road_pipeline.py",
       "Scripts/_road_strips_v2.py",
       "Scripts/_recook_new_area.py",
       "Reports/model_qa/latest.json"
@@ -89,5 +94,5 @@
     ]
   },
   "version_roadmap": "项目管理/11_版本路线图.md",
-  "last_updated": "2026-05-28"
+  "last_updated": "2026-05-29"
 }

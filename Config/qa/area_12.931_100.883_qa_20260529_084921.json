@@ -1,0 +1,77 @@
+{
+  "area_id": "area_12.931_100.883",
+  "time": "2026-05-29T08:49:21",
+  "passed": true,
+  "summary": {
+    "pass": 12,
+    "warn": 1,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "name": "buildings_exists",
+      "status": "pass",
+      "message": "549 KB"
+    },
+    {
+      "name": "roads_exists",
+      "status": "pass",
+      "message": "271 KB"
+    },
+    {
+      "name": "dem_exists",
+      "status": "pass",
+      "message": "56 KB"
+    },
+    {
+      "name": "bld_retention",
+      "status": "warn",
+      "message": "保留率 100%，清洗几乎无效"
+    },
+    {
+      "name": "dem_correction",
+      "status": "pass",
+      "message": "applied=False"
+    },
+    {
+      "name": "output_buildings.geojson",
+      "status": "pass",
+      "message": "547 KB"
+    },
+    {
+      "name": "output_roads.osm",
+      "status": "pass",
+      "message": "240 KB"
+    },
+    {
+      "name": "output_dem.csv",
+      "status": "pass",
+      "message": "56 KB"
+    },
+    {
+      "name": "bld_sample",
+      "status": "pass",
+      "message": "10/10 建筑有效"
+    },
+    {
+      "name": "bld_height_present",
+      "status": "pass",
+      "message": "1666 建筑均有 height"
+    },
+    {
+      "name": "bld_height_source",
+      "status": "pass",
+      "message": "真值 1666 / 待推算 0（{'overture': 1592, 'osm': 74}）"
+    },
+    {
+      "name": "road_attr_coverage",
+      "status": "pass",
+      "message": "highway 495：lanes 127 · oneway 48 · width 1"
+    },
+    {
+      "name": "road_connectivity",
+      "status": "pass",
+      "message": "分量 6 · 最大连通占比 99% · 悬挂端点 827"
+    }
+  ]
+}

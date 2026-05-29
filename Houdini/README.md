@@ -13,10 +13,10 @@
 Houdini/Hip/VC_master_citygen_v001.hip
 ```
 
-最新通过全流程测试的区域 hip：
+最新运行区实验快照 hip：
 
 ```text
-Houdini/Hip/VC_area_12.918_100.865_citygen_v001.hip
+Houdini/Hip/VC_area_12.946_100.892_citygen_v001.hip
 ```
 
 当前主要输出节点：
@@ -70,7 +70,7 @@ OUT_city
 - `road_width_flat` 负责道路宽度和属性。
 - `road_strips` 将道路中心线生成面片，包含全顶点路口处理和凸包填充。
 - `snap_road_strips` 对道路条带所有顶点二次贴地，修复坡地侧边埋入地形。
-- `road_faces` QA 检查异常大面片、开放面和过多顶点。
+- `road_faces` / `road_clipped_faces` QA 检查异常大面片、开放面、长宽比、自交、尖角和裁剪后 n-gon 规整状态。
 
 ### 建筑
 
@@ -96,9 +96,9 @@ uv run python houdini_model_qa.py --mode quick
 Reports/model_qa/
 ```
 
-成功标准：
+完成标准：
 
-- `Reports/model_qa/latest.json` 中 `status=pass`
+- `Reports/model_qa/latest.json` 已写入且无 `fail`；`warn` 代表流程完成但需要人工审核后才能晋级为基准。
 - `Config/houdini_build_status.json` 中同一区域 `status=completed`
 
 Model QA 是自动回归护栏，不替代人工视口审核。人工审核仍需查看：

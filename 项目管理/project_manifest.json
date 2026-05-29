@@ -11,24 +11,25 @@
     "Houdini 输出确认后再触发 UE5 export_and_import.py"
   ],
   "active_area": {
-    "area_id": "area_12.918_100.865",
-    "display_name": "Pattaya quick test area 12.918 100.865",
-    "status": "houdini_model_qa_passed",
+    "area_id": "area_12.946_100.892",
+    "display_name": "Pattaya experimental snapshot area 12.946 100.892",
+    "status": "houdini_model_qa_warn_needs_human_review",
     "bbox_accuracy": "selected_from_area_picker",
     "bbox": {
-      "west": 100.859385,
-      "south": 12.912967,
-      "east": 100.870199,
-      "north": 12.92334
+      "west": 100.880671,
+      "south": 12.93455,
+      "east": 100.898094,
+      "north": 12.951615
     },
-    "osm_target": "RawData/OSM/area_12.918_100.865_osm_v001.osm",
-    "dem_target": "RawData/DEM/area_12.918_100.865_dem_v001.csv",
-    "buildings_target": "RawData/Overture/area_12.918_100.865_buildings_overture_v001.geojson",
-    "houdini_hip": "Houdini/Hip/VC_area_12.918_100.865_citygen_v001.hip",
-    "data_qa_report": "Config/qa/area_12.918_100.865_qa_20260528_031731.json",
+    "osm_target": "RawData/OSM/area_12.946_100.892_osm_v001.osm",
+    "dem_target": "RawData/DEM/area_12.946_100.892_dem_v001.csv",
+    "buildings_target": "RawData/Overture/area_12.946_100.892_buildings_overture_v001.geojson",
+    "houdini_hip": "Houdini/Hip/VC_area_12.946_100.892_citygen_v001.hip",
+    "data_qa_report": "Config/qa/area_12.946_100.892_qa_20260529_091218.json",
     "model_qa_report": "Reports/model_qa/latest.json"
   },
   "ai_entry_files": [
+    "AI_HANDOFF.md",
     "项目管理/00_AI接手指南.md",
     "项目管理/02_当前状态与下一步.md",
     "项目管理/12_已知坑点与解决方案.md",
@@ -37,6 +38,8 @@
     "Houdini/README.md"
   ],
   "core_documents": {
+    "handoff": "AI_HANDOFF.md",
+    "architecture_panorama": "项目管理/VirtualCity_架构全景图.svg",
     "full_plan": "VirtualCity完整执行计划.md",
     "execution_plan": "执行方案.md",
     "research_index": "调研文档/README.md",
@@ -75,6 +78,7 @@
     "foundation_alignment",
     "building_terrain_fit",
     "road_faces",
+    "road_clipped_faces",
     "road_terrain_fit"
   ],
   "do_not_prioritize_now": [
@@ -107,5 +111,6 @@
     "config": "Config/"
   },
   "coordinate_authority": "Scripts/vc_geo.py",
+  "semantic_contract": "Scripts/vc_schema.py",
   "last_updated": "2026-05-29"
 }

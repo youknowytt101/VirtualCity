@@ -188,11 +188,11 @@ def merge_roads(path: Path, tolerance_m: float = 1.0, dry_run: bool = False) -> 
     if not candidates:
         return {"ways_in": 0, "ways_out": 0, "merged": 0, "welded_endpoints": 0}
 
-    # Endpoint clustering in local UTM metres.
-    from _utm_lite import wgs84_to_utm, zone_number
+    # Endpoint clustering in local metres (vc_geo: 全项目唯一坐标权威).
+    import vc_geo
     avg_lon = sum(p[1] for p in endpoint_records) / len(endpoint_records)
     avg_lat = sum(p[2] for p in endpoint_records) / len(endpoint_records)
-    zone = zone_number(avg_lon)
+    _proj = vc_geo.LocalProjector(avg_lon, avg_lat)
 
     parent = list(range(len(endpoint_records)))
 
@@ -211,7 +211,7 @@ def merge_roads(path: Path, tolerance_m: float = 1.0, dry_run: bool = False) -> 
     cell = max(tolerance_m, 0.01)
     xy: list[tuple[float, float]] = []
     for i, (_nid, lon, lat) in enumerate(endpoint_records):
-        x, y, _ = wgs84_to_utm(lat, lon, force_zone=zone)
+        x, y = _proj.to_local(lon, lat)
         xy.append((x, y))
         gx, gy = int(math.floor(x / cell)), int(math.floor(y / cell))
         for dx in (-1, 0, 1):

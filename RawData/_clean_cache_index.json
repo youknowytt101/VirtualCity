@@ -67,6 +67,66 @@
       "fingerprint": "ff34338ce270337aeb8e45fe840d8c2d3437cb24c1a4f6f46b5c5bfc9aef7dc5",
       "manifest": "RawData/_cleaned/area_12.918_100.865/_manifest.json",
       "updated": "2026-05-28T03:17:31"
+    },
+    "refine_3f620a3113d015ba": {
+      "area_id": "area_12.922_100.868",
+      "bbox": [
+        100.861444,
+        12.915811,
+        100.874319,
+        12.927858
+      ],
+      "fingerprint": "3f620a3113d015bafe5a6c1a382b8eec322fd0b7dcfec668722d4ea6a9546b6b",
+      "manifest": "RawData/_cleaned/area_12.922_100.868/_manifest.json",
+      "updated": "2026-05-29T08:05:00"
+    },
+    "refine_bf6a7f421e89c5d6": {
+      "area_id": "area_12.922_100.867",
+      "bbox": [
+        100.862968,
+        12.917568,
+        100.870779,
+        12.925578
+      ],
+      "fingerprint": "bf6a7f421e89c5d67f20e210e92e3760071a59c28e5c12f940bc1c24ecce6d9e",
+      "manifest": "RawData/_cleaned/area_12.922_100.867/_manifest.json",
+      "updated": "2026-05-29T08:25:33"
+    },
+    "refine_5f41a732cb8e8202": {
+      "area_id": "area_12.922_100.867",
+      "bbox": [
+        100.862968,
+        12.917568,
+        100.870779,
+        12.925578
+      ],
+      "fingerprint": "5f41a732cb8e82026e25a6c15de5c0dba49f17aaff627275748d62624995f666",
+      "manifest": "RawData/_cleaned/area_12.922_100.867/_manifest.json",
+      "updated": "2026-05-29T08:47:51"
+    },
+    "refine_0d27f59b1b4dfcf2": {
+      "area_id": "area_12.931_100.883",
+      "bbox": [
+        100.876551,
+        12.92493,
+        100.889339,
+        12.937478
+      ],
+      "fingerprint": "0d27f59b1b4dfcf2e6c6db4257eb9ba2b612658326a31ed297b49e357b8f7b9d",
+      "manifest": "RawData/_cleaned/area_12.931_100.883/_manifest.json",
+      "updated": "2026-05-29T08:49:21"
+    },
+    "refine_b328c35a1c79e10c": {
+      "area_id": "area_12.946_100.892",
+      "bbox": [
+        100.880671,
+        12.93455,
+        100.898094,
+        12.951615
+      ],
+      "fingerprint": "b328c35a1c79e10c2bec7da69c81d57f9239412d87367cf3383f96912085cecf",
+      "manifest": "RawData/_cleaned/area_12.946_100.892/_manifest.json",
+      "updated": "2026-05-29T09:12:18"
     }
   }
 }

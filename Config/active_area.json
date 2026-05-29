@@ -1,14 +1,14 @@
 {
-  "area_id": "area_12.918_100.865",
+  "area_id": "area_12.946_100.892",
   "bbox": [
-    100.859385,
-    12.912967,
-    100.870199,
-    12.92334
+    100.880671,
+    12.93455,
+    100.898094,
+    12.951615
   ],
-  "osm_file": "RawData/OSM/area_12.918_100.865_osm_v001.osm",
-  "buildings_file": "RawData/Overture/area_12.918_100.865_buildings_overture_v001.geojson",
-  "dem_csv": "RawData/DEM/area_12.918_100.865_dem_v001.csv",
+  "osm_file": "RawData/OSM/area_12.946_100.892_osm_v001.osm",
+  "buildings_file": "RawData/Overture/area_12.946_100.892_buildings_overture_v001.geojson",
+  "dem_csv": "RawData/DEM/area_12.946_100.892_dem_v001.csv",
   "dem_source": "fabdem",
   "sources": {
     "schema": 1,
@@ -16,22 +16,22 @@
     "buildings": "tile_cache_overture_else_overture_api_v1",
     "dem": "fabdem_else_tile_cache_else_nasadem_v1"
   },
-  "origin_lon": 100.864792,
-  "origin_lat": 12.918153499999999,
+  "origin_lon": 100.88938250000001,
+  "origin_lat": 12.9430825,
   "bbox_size_m": {
-    "width": 1173.3453763308123,
-    "height": 1154.7213226999468
+    "width": 1890.2491616138245,
+    "height": 1899.6740935000614
   },
   "_note": "切换区域只改此文件，不改 Houdini 节点代码",
   "cache": {
     "clip": {
       "status": "stored",
-      "key": "bbox_1438eca53fa09089",
+      "key": "bbox_59613d8eacc0b4f2",
       "bbox": [
-        100.859385,
-        12.912967,
-        100.870199,
-        12.92334
+        100.880671,
+        12.93455,
+        100.898094,
+        12.951615
       ]
     }
   }
