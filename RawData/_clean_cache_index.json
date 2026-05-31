@@ -127,6 +127,30 @@
       "fingerprint": "b328c35a1c79e10c2bec7da69c81d57f9239412d87367cf3383f96912085cecf",
       "manifest": "RawData/_cleaned/area_12.946_100.892/_manifest.json",
       "updated": "2026-05-29T09:12:18"
+    },
+    "refine_8d1444d2f204069e": {
+      "area_id": "area_12.940_100.887",
+      "bbox": [
+        100.878782,
+        12.931957,
+        100.895863,
+        12.948018
+      ],
+      "fingerprint": "8d1444d2f204069e1c0471d67c03f5060d09d7383af0a1be2c586c504d4478b1",
+      "manifest": "RawData/_cleaned/area_12.940_100.887/_manifest.json",
+      "updated": "2026-05-31T17:18:26"
+    },
+    "refine_4c779e210456f5c3": {
+      "area_id": "area_12.935_100.890",
+      "bbox": [
+        100.843163,
+        12.888621,
+        100.937748,
+        12.98114
+      ],
+      "fingerprint": "4c779e210456f5c33d891f6f6c7dd59e42cfe27020c716dfc6a67712726d92e0",
+      "manifest": "RawData/_cleaned/area_12.935_100.890/_manifest.json",
+      "updated": "2026-05-31T17:35:02"
     }
   }
 }
