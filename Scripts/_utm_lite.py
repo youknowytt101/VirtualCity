@@ -84,6 +84,57 @@ def wgs84_to_utm(lat: float, lon: float, force_zone: int = 0):
     return x, y, zone
 
 
+def utm_to_wgs84(easting: float, northing: float, zone: int, northern: bool = True):
+    """UTM (easting, northing, zone) -> WGS84 (lat, lon)."""
+    x = float(easting) - _FE
+    y = float(northing)
+    if not northern:
+        y -= _FN
+
+    m = y / _K0
+    mu = m / (_A * _M1)
+    e1 = (1.0 - math.sqrt(1.0 - _E)) / (1.0 + math.sqrt(1.0 - _E))
+    e12 = e1 * e1
+    e13 = e12 * e1
+    e14 = e13 * e1
+
+    fp = (mu
+          + (3.0 * e1 / 2.0 - 27.0 * e13 / 32.0) * math.sin(2.0 * mu)
+          + (21.0 * e12 / 16.0 - 55.0 * e14 / 32.0) * math.sin(4.0 * mu)
+          + (151.0 * e13 / 96.0) * math.sin(6.0 * mu)
+          + (1097.0 * e14 / 512.0) * math.sin(8.0 * mu))
+
+    sin_fp = math.sin(fp)
+    cos_fp = math.cos(fp)
+    tan_fp = math.tan(fp)
+    c1 = _EP2 * cos_fp * cos_fp
+    t1 = tan_fp * tan_fp
+    n1 = _A / math.sqrt(1.0 - _E * sin_fp * sin_fp)
+    r1 = _A * (1.0 - _E) / pow(1.0 - _E * sin_fp * sin_fp, 1.5)
+    d = x / (n1 * _K0)
+
+    d2 = d * d
+    d3 = d2 * d
+    d4 = d2 * d2
+    d5 = d4 * d
+    d6 = d4 * d2
+
+    lat = fp - (n1 * tan_fp / r1) * (
+        d2 / 2.0
+        - (5.0 + 3.0 * t1 + 10.0 * c1 - 4.0 * c1 * c1 - 9.0 * _EP2) * d4 / 24.0
+        + (61.0 + 90.0 * t1 + 298.0 * c1 + 45.0 * t1 * t1
+           - 252.0 * _EP2 - 3.0 * c1 * c1) * d6 / 720.0
+    )
+    lon = (
+        d
+        - (1.0 + 2.0 * t1 + c1) * d3 / 6.0
+        + (5.0 - 2.0 * c1 + 28.0 * t1 - 3.0 * c1 * c1
+           + 8.0 * _EP2 + 24.0 * t1 * t1) * d5 / 120.0
+    ) / cos_fp
+    lon_origin = (int(zone) - 1) * 6 - 180 + 3
+    return math.degrees(lat), lon_origin + math.degrees(lon)
+
+
 def wgs84_to_local(lon: float, lat: float,
                    origin_lon: float, origin_lat: float,
                    origin_x: float = None, origin_y: float = None,

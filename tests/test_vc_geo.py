@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "Scripts"))
 
 import vc_geo
-from _utm_lite import wgs84_to_utm, zone_number
+from _utm_lite import utm_to_wgs84, wgs84_to_utm, zone_number
 
 
 class TestLocalProjector(unittest.TestCase):
@@ -54,6 +54,20 @@ class TestLocalProjector(unittest.TestCase):
         _, zn = proj.to_local(self.ORIGIN_LON, self.ORIGIN_LAT + 0.01)
         self.assertGreater(xe, 0.0)
         self.assertGreater(zn, 0.0)
+
+
+class TestUtmInverse(unittest.TestCase):
+    def test_round_trips_pattaya_coordinates(self):
+        samples = [
+            (12.918, 100.865),
+            (12.935, 100.890),
+            (12.981, 100.938),
+        ]
+        for lat, lon in samples:
+            x, y, zone = wgs84_to_utm(lat, lon)
+            out_lat, out_lon = utm_to_wgs84(x, y, zone)
+            self.assertAlmostEqual(out_lat, lat, places=7)
+            self.assertAlmostEqual(out_lon, lon, places=7)
 
 
 class TestHoudiniConvention(unittest.TestCase):

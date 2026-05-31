@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "run_id": "20260601_002749_z47n_e701000_n1428000_w2000_h3000_s1000_763eb856",
+  "area_id": "z47n_e701000_n1428000_w2000_h3000_s1000",
+  "bbox": [
+    100.8525843,
+    12.9106894,
+    100.8712131,
+    12.9379348
+  ],
+  "source": "set_area",
+  "status": "completed",
+  "phase": "houdini_completed",
+  "created": "2026-06-01T00:27:49",
+  "updated": "2026-06-01T00:39:46",
+  "events": [
+    {
+      "time": "2026-06-01T00:27:49",
+      "status": "running",
+      "phase": "created",
+      "message": "pipeline run created"
+    },
+    {
+      "time": "2026-06-01T00:27:49",
+      "status": "running",
+      "phase": "active_area_written",
+      "message": "active_area.json updated"
+    },
+    {
+      "time": "2026-06-01T00:27:51",
+      "status": "running",
+      "phase": "acquire_osm",
+      "message": "OSM acquisition completed"
+    },
+    {
+      "time": "2026-06-01T00:27:51",
+      "status": "running",
+      "phase": "acquire_dem",
+      "message": "DEM acquisition completed (source=fabdem)"
+    },
+    {
+      "time": "2026-06-01T00:27:52",
+      "status": "running",
+      "phase": "acquire_buildings",
+      "message": "building acquisition completed"
+    },
+    {
+      "time": "2026-06-01T00:27:52",
+      "status": "running",
+      "phase": "refine_data",
+      "message": "data refinement started"
+    },
+    {
+      "time": "2026-06-01T00:27:54",
+      "status": "running",
+      "phase": "refine_data_completed",
+      "message": "data refinement completed"
+    },
+    {
+      "time": "2026-06-01T00:27:54",
+      "status": "running",
+      "phase": "houdini_recook",
+      "message": "Houdini recook started"
+    },
+    {
+      "time": "2026-06-01T00:27:54",
+      "status": "running",
+      "phase": "houdini_preflight",
+      "message": "checking Houdini-ready inputs"
+    },
+    {
+      "time": "2026-06-01T00:30:59",
+      "status": "completed",
+      "phase": "houdini_completed",
+      "message": "Houdini build completed; model QA quick pass"
+    },
+    {
+      "time": "2026-06-01T00:30:59",
+      "status": "completed",
+      "phase": "pipeline_completed",
+      "message": "data acquisition, refinement, and Houdini recook completed"
+    },
+    {
+      "time": "2026-06-01T00:36:20",
+      "status": "running",
+      "phase": "houdini_preflight",
+      "message": "checking Houdini-ready inputs"
+    },
+    {
+      "time": "2026-06-01T00:39:46",
+      "status": "completed",
+      "phase": "houdini_completed",
+      "message": "Houdini build completed; model QA quick pass"
+    }
+  ],
+  "hip_path": "Houdini/Hip/VC_z47n_e701000_n1428000_w2000_h3000_s1000_citygen_v001.hip",
+  "qa_status": "pass",
+  "qa_report": "Reports/model_qa/z47n_e701000_n1428000_w2000_h3000_s1000_20260601_003946_quick.json"
+}

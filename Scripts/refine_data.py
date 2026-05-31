@@ -16,7 +16,9 @@ import argparse
 import json
 import shutil
 import sys
+import tempfile
 import time
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -54,6 +56,29 @@ def _copy_file(src: str | Path, dst: str | Path) -> None:
     dst = Path(dst)
     dst.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dst)
+
+
+def _staging_ready_dir(area_id: str) -> Path:
+    root = HOUDINI_READY / ".staging"
+    root.mkdir(parents=True, exist_ok=True)
+    safe_area = "".join(c if c.isalnum() or c in "._-" else "_" for c in area_id)
+    return Path(tempfile.mkdtemp(prefix=f"{safe_area}_", dir=str(root)))
+
+
+def _publish_ready_dir(staging_dir: Path, final_dir: Path) -> None:
+    """Replace the published ready directory while preserving it on failure."""
+    final_dir.parent.mkdir(parents=True, exist_ok=True)
+    backup_dir = staging_dir.parent / f".{final_dir.name}.previous_{uuid.uuid4().hex[:8]}"
+    if final_dir.exists():
+        final_dir.replace(backup_dir)
+    try:
+        staging_dir.replace(final_dir)
+    except Exception:
+        if backup_dir.exists() and not final_dir.exists():
+            backup_dir.replace(final_dir)
+        raise
+    if backup_dir.exists():
+        shutil.rmtree(backup_dir, ignore_errors=True)
 
 
 def _load_manifest(area_id: str) -> dict:
@@ -354,10 +379,11 @@ def _run_process_qa(manifest: dict) -> list[dict]:
     return checks
 
 
-def _run_output_qa(area_id: str, area_cfg: dict) -> list[dict]:
+def _run_output_qa(area_id: str, area_cfg: dict,
+                   ready_dir: str | Path | None = None) -> list[dict]:
     """OutputQA: Houdini 消费前最终检查"""
     checks = []
-    hr = _area_dir(HOUDINI_READY, area_id)
+    hr = Path(ready_dir) if ready_dir else HOUDINI_READY / area_id
 
     # 文件齐全
     for name in ["buildings.geojson", "roads.osm", "dem.csv"]:
@@ -406,7 +432,8 @@ def _run_output_qa(area_id: str, area_cfg: dict) -> list[dict]:
     return checks
 
 
-def run_qa(area_id: str, area_cfg: dict, manifest: dict) -> dict:
+def run_qa(area_id: str, area_cfg: dict, manifest: dict,
+           ready_dir: str | Path | None = None) -> dict:
     """执行完整 QA 流程"""
     print("\n[QA 精炼校验]")
     all_checks = []
@@ -426,7 +453,7 @@ def run_qa(area_id: str, area_cfg: dict, manifest: dict) -> dict:
         print(f'    {tag} {c["name"]}: {c["message"]}')
 
     print("  -- OutputQA --")
-    out_checks = _run_output_qa(area_id, area_cfg)
+    out_checks = _run_output_qa(area_id, area_cfg, ready_dir=ready_dir)
     all_checks.extend(out_checks)
     for c in out_checks:
         tag = "[OK]" if c["status"] == "pass" else "[WARN]" if c["status"] == "warn" else "[FAIL]"
@@ -445,6 +472,7 @@ def run_qa(area_id: str, area_cfg: dict, manifest: dict) -> dict:
 
     report = {
         "area_id": area_id,
+        "run_id": area_cfg.get("run_id", ""),
         "time": datetime.now().isoformat(timespec="seconds"),
         "passed": passed,
         "summary": {"pass": n_pass, "warn": n_warn, "fail": n_fail},
@@ -636,34 +664,53 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
             _l2_cfg["buildings_file"] = bld_cleaned.as_posix()
             _dem_L2(dem_cleaned, _l2_cfg, manifest)
 
-    # ── 导出到 _houdini_ready/ ──
-    print("\n[导出 Houdini Ready]")
-    hr_dir = _area_dir(HOUDINI_READY, area_id)
-    for name in ["buildings.geojson", "roads.osm", "dem.csv"]:
-        src = cl_dir / name
-        dst = hr_dir / name
-        if src.exists():
-            _copy_file(src, dst)
-    # 写 meta.json
-    import vc_schema
-    meta = {
-        "area_id": area_id,
-        "origin_lon": area_cfg.get("origin_lon"),
-        "origin_lat": area_cfg.get("origin_lat"),
-        "exported": datetime.now().isoformat(timespec="seconds"),
-        "levels": {k: v["current"] for k, v in manifest["levels"].items()},
-        "schema_version": vc_schema.CONTRACT_VERSION,
-        "cache_key": cache_state["key"],
-        "cache_fingerprint": cache_state["fingerprint"],
-    }
-    with open(hr_dir / "meta.json", "w", encoding="utf-8", newline="\n") as f:
-        json.dump(meta, f, indent=2, ensure_ascii=False)
-    print(f"  [OK] → _houdini_ready/{area_id}/")
+    # ── 先导出到 staging，QA 通过后再发布到 _houdini_ready/ ──
+    print("\n[导出 Houdini Ready staging]")
+    staging_dir = _staging_ready_dir(area_id)
+    hr_dir = HOUDINI_READY / area_id
+    try:
+        for name in ["buildings.geojson", "roads.osm", "dem.csv"]:
+            src = cl_dir / name
+            dst = staging_dir / name
+            if src.exists():
+                _copy_file(src, dst)
+        import vc_schema
+        meta = {
+            "area_id": area_id,
+            "run_id": area_cfg.get("run_id", ""),
+            "origin_lon": area_cfg.get("origin_lon"),
+            "origin_lat": area_cfg.get("origin_lat"),
+            "exported": datetime.now().isoformat(timespec="seconds"),
+            "levels": {k: v["current"] for k, v in manifest["levels"].items()},
+            "schema_version": vc_schema.CONTRACT_VERSION,
+            "cache_key": cache_state["key"],
+            "cache_fingerprint": cache_state["fingerprint"],
+        }
+        with open(staging_dir / "meta.json", "w", encoding="utf-8", newline="\n") as f:
+            json.dump(meta, f, indent=2, ensure_ascii=False)
+            f.write("\n")
+        print(f"  [OK] staging → {vc_paths.project_relative(staging_dir)}")
 
-    # ── ProcessQA + OutputQA ──
+        # ── ProcessQA + OutputQA ──
+        report = run_qa(area_id, area_cfg, manifest, ready_dir=staging_dir)
+        manifest.setdefault("cache", {})["last_qa"] = {
+            "time": report["time"],
+            "passed": report["passed"],
+            "summary": report["summary"],
+        }
+        _save_manifest(area_id, manifest)
+
+        if not report["passed"]:
+            print("\n  [FAIL] QA 未通过，保留上一版 Houdini-ready 数据。")
+            return False
+
+        _publish_ready_dir(staging_dir, hr_dir)
+        print(f"  [OK] 已发布 → _houdini_ready/{area_id}/")
+    finally:
+        if staging_dir.exists():
+            shutil.rmtree(staging_dir)
+
     dcc.mark_refine_cache(manifest, cache_state, cl_dir, hr_dir)
-    _save_manifest(area_id, manifest)
-    report = run_qa(area_id, area_cfg, manifest)
     manifest.setdefault("cache", {})["last_qa"] = {
         "time": report["time"],
         "passed": report["passed"],
@@ -672,10 +719,7 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
     _save_manifest(area_id, manifest)
     dcc.update_clean_cache_index(area_id, cache_state, _manifest_path(area_id))
 
-    if not report["passed"]:
-        print("\n  [WARN] QA 未通过，但数据已导出。请检查警告项。")
-
-    return report["passed"]
+    return True
 
 
 # ══════════════════════════════════════════════════════════════════════════════

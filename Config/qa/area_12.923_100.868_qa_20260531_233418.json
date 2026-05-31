@@ -1,0 +1,78 @@
+{
+  "area_id": "area_12.923_100.868",
+  "run_id": "20260531_233406_area_12.923_100.868_76cae052",
+  "time": "2026-05-31T23:34:18",
+  "passed": true,
+  "summary": {
+    "pass": 12,
+    "warn": 1,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "name": "buildings_exists",
+      "status": "pass",
+      "message": "601 KB"
+    },
+    {
+      "name": "roads_exists",
+      "status": "pass",
+      "message": "369 KB"
+    },
+    {
+      "name": "dem_exists",
+      "status": "pass",
+      "message": "85 KB"
+    },
+    {
+      "name": "bld_retention",
+      "status": "warn",
+      "message": "保留率 100%，清洗几乎无效"
+    },
+    {
+      "name": "dem_correction",
+      "status": "pass",
+      "message": "applied=False"
+    },
+    {
+      "name": "output_buildings.geojson",
+      "status": "pass",
+      "message": "604 KB"
+    },
+    {
+      "name": "output_roads.osm",
+      "status": "pass",
+      "message": "317 KB"
+    },
+    {
+      "name": "output_dem.csv",
+      "status": "pass",
+      "message": "85 KB"
+    },
+    {
+      "name": "bld_sample",
+      "status": "pass",
+      "message": "10/10 建筑有效"
+    },
+    {
+      "name": "bld_height_present",
+      "status": "pass",
+      "message": "1911 建筑均有 height"
+    },
+    {
+      "name": "bld_height_source",
+      "status": "pass",
+      "message": "真值 1911 / 待推算 0（{'overture': 1884, 'osm': 27}）"
+    },
+    {
+      "name": "road_attr_coverage",
+      "status": "pass",
+      "message": "highway 436：lanes 117 · oneway 74 · width 2"
+    },
+    {
+      "name": "road_connectivity",
+      "status": "pass",
+      "message": "分量 10 · 最大连通占比 96% · 悬挂端点 670"
+    }
+  ]
+}

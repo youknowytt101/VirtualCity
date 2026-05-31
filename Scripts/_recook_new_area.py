@@ -8,10 +8,12 @@ Houdini 换区重算脚本
   4. 重建裁剪节点（基于新 DEM 边界）
   5. 重连 merge_all + 保存 hip
 """
-import sys, rpyc, subprocess, json, time
+import sys, rpyc, subprocess, json, time, atexit
 from pathlib import Path
 import houdini_road_pipeline as road_pipe
 import houdini_sops
+import data_cleaning_cache as dcc
+import pipeline_state
 from vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area, project_relative
 
 PASS = '[OK]'
@@ -19,10 +21,12 @@ FAIL = '[FAIL]'
 errors = []
 
 
-def _write_build_status(area_id, status, hip_path=None, message='', qa_status='', qa_report=''):
+def _write_build_status(area_id, status, hip_path=None, message='', qa_status='', qa_report='',
+                        run_id=''):
     status_file = ROOT / 'Config' / 'houdini_build_status.json'
     payload = {
         'area_id': area_id,
+        'run_id': run_id,
         'status': status,
         'hip_path': project_relative(hip_path) if hip_path else '',
         'message': message,
@@ -33,24 +37,69 @@ def _write_build_status(area_id, status, hip_path=None, message='', qa_status=''
     if qa_report:
         payload['qa_report'] = qa_report
     status_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(status_file, 'w', encoding='utf-8', newline='\n') as f:
+    tmp = status_file.with_name('.{}.{}.tmp'.format(status_file.name, time.time_ns()))
+    with open(tmp, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(payload, f, indent=2, ensure_ascii=False)
         f.write('\n')
+    tmp.replace(status_file)
+
+_cfg = load_active_area()
+_area_id = _cfg.get('area_id', '')
+_run_id = _cfg.get('run_id', '')
+_RECOOK_FINALIZED = False
+
+
+def _mark_unhandled_exit():
+    if _RECOOK_FINALIZED:
+        return
+    _message = 'Houdini recook exited before completion'
+    try:
+        _write_build_status(_area_id, 'failed', message=_message, run_id=_run_id)
+        if _run_id:
+            pipeline_state.fail_run(_run_id, phase='houdini_recook', message=_message)
+    except Exception:
+        pass
+
+
+atexit.register(_mark_unhandled_exit)
+
+if _run_id:
+    pipeline_state.update_run(_run_id, status='running', phase='houdini_preflight',
+                              message='checking Houdini-ready inputs')
+_write_build_status(_area_id, 'running', message='Houdini recook started', run_id=_run_id)
 
 # ── 前置：数据精炼（由 refine_data.py 统一处理）──────────────────────
 # 如果从 set_area.py 调用，refine_data.py 已提前运行完毕。
 # 如果直接调用本脚本，检查 _houdini_ready 是否已有数据：
-_hr_dir = ROOT / 'RawData' / '_houdini_ready' / load_active_area(absolute=False).get('area_id', '')
-if not _hr_dir.exists() or not any(_hr_dir.iterdir()):
-    print('[数据精炼] _houdini_ready 为空，运行 refine_data.py...')
+_hr_dir = ROOT / 'RawData' / '_houdini_ready' / _area_id
+if not dcc.ready_outputs_exist(_hr_dir, expected_area_id=_area_id,
+                               expected_run_id=_run_id or None):
+    print('[数据精炼] _houdini_ready 未发布或不属于当前 run，运行 refine_data.py...')
     _refine_result = subprocess.run(
         [sys.executable, str(ROOT / 'Scripts' / 'refine_data.py'), '--skip-probe'],
         capture_output=False, cwd=str(ROOT / 'Scripts')
     )
     if _refine_result.returncode != 0:
-        print('  [WARN] refine_data.py 退出码非 0，继续执行...')
+        _RECOOK_FINALIZED = True
+        _message = 'refine_data.py failed; Houdini recook aborted'
+        print('  [FAIL] ' + _message)
+        _write_build_status(_area_id, 'failed', message=_message, run_id=_run_id)
+        if _run_id:
+            pipeline_state.fail_run(_run_id, phase='refine_data', message=_message)
+        sys.exit(1)
+    if not dcc.ready_outputs_exist(_hr_dir, expected_area_id=_area_id,
+                                   expected_run_id=_run_id or None):
+        _RECOOK_FINALIZED = True
+        _message = 'refine_data.py exited successfully but did not publish current Houdini-ready data'
+        print('  [FAIL] ' + _message)
+        _write_build_status(_area_id, 'failed', message=_message, run_id=_run_id)
+        if _run_id:
+            pipeline_state.fail_run(_run_id, phase='refine_data', message=_message)
+        sys.exit(1)
 else:
     print('[数据精炼] _houdini_ready 已就绪，跳过')
+
+print('[Houdini 1/7] 数据就绪，连接 Houdini...', flush=True)
 
 # ══════════════════════════════════════════
 # 颜色配置 — 修改这里即可独立控制三类颜色
@@ -68,7 +117,6 @@ ROOT_STR = ROOT.as_posix()
 CFG_FILE = ACTIVE_AREA.as_posix()
 
 # OBJ 网络名：从 active_area.json 读取，可在换城市时修改
-_cfg = load_active_area()
 OBJ_NET = _cfg.get('obj_network', 'city_gen')
 OBJ_PATH = f'/obj/{OBJ_NET}'
 
@@ -87,6 +135,8 @@ if net is None and OBJ_NET == 'city_gen':
         net = legacy_net
         OBJ_NET = 'pattaya_osm'
         OBJ_PATH = f'/obj/{OBJ_NET}'
+
+print('[Houdini 2/7] 修复 SOP 和参数...', flush=True)
 
 
 def cooked_geometry(node_path, force=False, retries=3):
@@ -220,7 +270,7 @@ if _ph:
     print('  SOP 修复: procedural_height (P0: height_m<=0 fallback)')
 
 # ── 2. 强制 recook 数据源 ────────────────────────────
-print('\n[recook 数据源]')
+print('\n[Houdini 3/7] recook 数据源')
 for path in [OBJ_PATH + '/osm_import', OBJ_PATH + '/dem_import',
              OBJ_PATH + '/dem_terrain']:
     n = hou.node(path)
@@ -277,7 +327,7 @@ print('  bld_footprint_bevel: pts={} prims={}'.format(
     bld_footprint_bevel.geometry().intrinsicValue('primitivecount')))
 
 # ── 3. 验证全链路节点 ────────────────────────────────
-print('\n[全链路验证]')
+print('\n[Houdini 4/7] 全链路验证')
 CHECKS = [
     ('extract_buildings',    50,   None,  'buildings extracted from OSM'),
     ('snap_bld_to_terrain',  50,   None,  'buildings snapped to terrain'),
@@ -313,7 +363,7 @@ for name, min_pts, max_y, desc in CHECKS:
         errors.append('{} pts={} < {}'.format(name, pts, min_pts))
 
 # ── 4. 重建裁剪节点 ──────────────────────────────────
-print('\n[裁剪节点重建]')
+print('\n[Houdini 5/7] 完整资产边界过滤节点重建')
 dem = snap_target
 dem.cook(force=False)
 bb  = dem.geometry().boundingBox()
@@ -325,10 +375,15 @@ ZMIN = mn[2] - MARGIN
 ZMAX = mx[2] + MARGIN
 print('  DEM 边界: X[{:.0f}~{:.0f}] Z[{:.0f}~{:.0f}]'.format(XMIN, XMAX, ZMIN, ZMAX))
 
-VEX = houdini_sops.load('dem_clip.vex', XMIN=XMIN, XMAX=XMAX, ZMIN=ZMIN, ZMAX=ZMAX)  # noqa: E741
+def asset_filter_code(mode):
+    return houdini_sops.load(
+        'asset_bounds_filter.py',
+        XMIN=XMIN, XMAX=XMAX, ZMIN=ZMIN, ZMAX=ZMAX,
+        MODE=mode,
+    )
 
 
-def remake_clip(src_name, mark_name, out_name):
+def remake_asset_filter(src_name, mark_name, out_name, mode):
     for nm in [out_name, mark_name]:
         old = hou.node(OBJ_PATH + '/' + nm)
         if old:
@@ -337,24 +392,25 @@ def remake_clip(src_name, mark_name, out_name):
     if not src:
         errors.append('source node not found: ' + src_name)
         return None
-    w = net.createNode('attribwrangle', mark_name)
-    w.setInput(0, src)
-    w.parm('class').set(1)
-    w.parm('snippet').set(VEX)
-    b = net.createNode('blast', out_name)
-    b.setInput(0, w)
-    b.parm('group').set('@del==1')
-    b.parm('grouptype').set(4)
-    b.parm('negate').set(0)
+    b = net.createNode('python', out_name)
+    b.setInput(0, src)
+    b.parm('python').set(asset_filter_code(mode))
     b.cook(force=True)
     geo  = b.geometry()
     pts  = geo.intrinsicValue('pointcount')
+    prims = geo.intrinsicValue('primitivecount')
     bb2  = geo.boundingBox()
     tag  = PASS if pts > 0 else FAIL
-    print('  {}  {:<20s} pts={:6d}  Y[{:.1f}~{:.1f}]'.format(
-        tag, out_name, pts, bb2.minvec()[1], bb2.maxvec()[1]))
+    try:
+        kept = geo.attribValue('asset_bounds_kept_units')
+        removed = geo.attribValue('asset_bounds_removed_units')
+        units = ' kept_units={} removed_units={}'.format(kept, removed)
+    except Exception:
+        units = ''
+    print('  {}  {:<20s} mode={:<9s} pts={:6d} prims={:6d}  Y[{:.1f}~{:.1f}]{}'.format(
+        tag, out_name, mode, pts, prims, bb2.minvec()[1], bb2.maxvec()[1], units))
     if pts == 0:
-        errors.append(out_name + ' empty after clip')
+        errors.append(out_name + ' empty after asset bounds filter')
     return b
 
 
@@ -376,19 +432,18 @@ _rs_bb   = _rs_geo.boundingBox()
 _rs_ymin = _rs_bb.minvec()[1]
 print('  snap_road_strips: pts={} Y_min={:.2f}m'.format(_rs_pts, _rs_ymin))
 
-# ── 4b2. 道路几何级 bbox 裁剪（不再只按 primitive 中心点删除）──────────────
-ROAD_BBOX_CLIP_CODE = road_pipe.road_bbox_clip_code(XMIN, XMAX, ZMIN, ZMAX)
-
+# ── 4b2. 道路完整面片边界过滤（不再几何切割边界面）──────────────
 old_bbox_clip = hou.node(OBJ_PATH + '/road_bbox_clip')
 if old_bbox_clip:
     old_bbox_clip.destroy()
 road_bbox_clip = net.createNode('python', 'road_bbox_clip')
 road_bbox_clip.setInput(0, snap_road_strips)
-road_bbox_clip.parm('python').set(ROAD_BBOX_CLIP_CODE)
+road_bbox_clip.parm('python').set(asset_filter_code('primitive'))
 road_bbox_clip.cook(force=True)
-print('  road_bbox_clip: pts={} prims={}'.format(
+print('  road_bbox_clip: pts={} prims={} preserved_prims={}'.format(
     road_bbox_clip.geometry().intrinsicValue('pointcount'),
-    road_bbox_clip.geometry().intrinsicValue('primitivecount')))
+    road_bbox_clip.geometry().intrinsicValue('primitivecount'),
+    road_bbox_clip.geometry().attribValue('road_bbox_preserved_ngon_count')))
 
 old_final_drape = hou.node(OBJ_PATH + '/snap_road_clipped')
 if old_final_drape:
@@ -403,8 +458,8 @@ print('  snap_road_clipped: pts={} Y_min={:.2f}m'.format(
     snap_road_clipped.geometry().intrinsicValue('pointcount'),
     snap_road_clipped.geometry().boundingBox().minvec()[1]))
 
-bld_clip  = remake_clip('post_normals',    'bld_clip_mark',  'bld_clipped')
-road_clip = remake_clip('snap_road_clipped','road_clip_mark', 'road_clipped')
+bld_clip  = remake_asset_filter('post_normals',     'bld_clip_mark',  'bld_clipped',  'component')
+road_clip = remake_asset_filter('snap_road_clipped', 'road_clip_mark', 'road_clipped', 'primitive')
 
 # ── 4b3. 建筑地基 / 裙边（坡地建筑下坡侧补空）──────────────────────
 BUILDING_FOUNDATION_CODE = houdini_sops.load('bld_foundation.py')
@@ -421,7 +476,7 @@ print('  bld_foundation: pts={} prims={}'.format(
     bld_foundation.geometry().intrinsicValue('pointcount'),
     bld_foundation.geometry().intrinsicValue('primitivecount')))
 
-foundation_clip = remake_clip('bld_foundation', 'bld_foundation_clip_mark', 'bld_foundation_clipped')
+foundation_clip = remake_asset_filter('bld_foundation', 'bld_foundation_clip_mark', 'bld_foundation_clipped', 'component')
 
 # ── 4c. 颜色节点（三类独立，来自 COLORS 配置）────────────────────────
 def make_color_node(name, src_node, rgb):
@@ -515,12 +570,12 @@ if merge and bld_clip and road_clip:
     merge.setInput(1, road_extrude)
     merge.setInput(2, terrain_colored)
 
+print('\n[Houdini 6/7] 刷新输出链并保存 HIP')
 net.layoutChildren()
 hou.hipFile.save()
 
 # ── 5b. Hip 按区域存档 ────────────────────────────────
 import shutil as _shutil, json as _json_arc
-_area_id = load_active_area(absolute=False)['area_id']
 ARCHIVE_HIP = (HOUDINI / 'Hip' / 'VC_{}_citygen_v001.hip'.format(_area_id)).as_posix()
 if ARCHIVE_HIP != HIP:
     _shutil.copy2(HIP, ARCHIVE_HIP)
@@ -560,17 +615,21 @@ conn = None
 qa_status = ''
 qa_report = ''
 if not errors:
-    print('\n[Model QA]')
+    print('\n[Houdini 7/7] Model QA')
     _qa_cmd = [sys.executable, str(ROOT / 'Scripts' / 'houdini_model_qa.py'), '--mode', 'quick']
     _qa_result = subprocess.run(_qa_cmd, cwd=str(ROOT), capture_output=False)
-    _qa_latest = ROOT / 'Reports' / 'model_qa' / 'latest.json'
+    _qa_latest = ROOT / 'Reports' / 'model_qa' / '{}_latest.json'.format(_area_id)
+    if not _qa_latest.exists():
+        _qa_latest = ROOT / 'Reports' / 'model_qa' / 'latest.json'
     if _qa_latest.exists():
-        qa_report = project_relative(_qa_latest)
         try:
             with open(_qa_latest, encoding='utf-8') as _f:
-                qa_status = json.load(_f).get('status', '')
+                _qa_payload = json.load(_f)
+                qa_status = _qa_payload.get('status', '')
+                qa_report = _qa_payload.get('report_path', project_relative(_qa_latest))
         except Exception as _exc:
             qa_status = 'unreadable'
+            qa_report = project_relative(_qa_latest)
             print('  [WARN] Model QA report unreadable: {}'.format(_exc))
     if _qa_result.returncode != 0:
         errors.append('model QA failed (see {})'.format(qa_report or 'Reports/model_qa/latest.json'))
@@ -578,16 +637,25 @@ if not errors:
 # ── 结果汇报 ─────────────────────────────────────────
 print()
 if errors:
+    _RECOOK_FINALIZED = True
     print('[FAIL] 发现 {} 个错误:'.format(len(errors)))
     for e in errors:
         print('  - ' + e)
-    _write_build_status(_area_id, 'failed', ARCHIVE_HIP, '; '.join(errors), qa_status, qa_report)
+    _write_build_status(_area_id, 'failed', ARCHIVE_HIP, '; '.join(errors), qa_status, qa_report, _run_id)
+    if _run_id:
+        pipeline_state.fail_run(_run_id, phase='houdini_recook', message='; '.join(errors))
     sys.exit(1)
 else:
+    _RECOOK_FINALIZED = True
     _msg = 'Houdini build completed'
     if qa_status:
         _msg += '; model QA quick {}'.format(qa_status)
-    _write_build_status(_area_id, 'completed', ARCHIVE_HIP, _msg, qa_status, qa_report)
+    _write_build_status(_area_id, 'completed', ARCHIVE_HIP, _msg, qa_status, qa_report, _run_id)
+    if _run_id:
+        pipeline_state.update_run(_run_id, status='completed', phase='houdini_completed',
+                                  message=_msg, fields={'hip_path': project_relative(ARCHIVE_HIP),
+                                                        'qa_status': qa_status,
+                                                        'qa_report': qa_report})
     print('[OK] 全部通过，hip 已保存')
     print('     Houdini 构建完成标记: Config/houdini_build_status.json')
     print('     请在 Houdini 视口选中 OUT_city 按 D 确认效果')

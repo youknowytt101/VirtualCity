@@ -64,4 +64,10 @@ PCG_{area_id}_StreetProps
 
 ## 当前状态
 
-当前目录尚未创建 UE5 项目。等 Houdini HDA 或静态导出文件准备好后，再创建 `VirtualCityUE` 项目并导入测试。
+已创建 `VirtualCityUE` 预览项目。当前阶段用于临时导入 Houdini 静态导出文件，检查地形、道路、建筑密度和俯视效果；正式 UE5 管线仍在 Houdini 资产质量迭代完成后再推进。
+
+本机 UE 5.7 的 ZenLocal 服务无法通过 IPv6 loopback `http://[::1]:8558` 完成健康检查。请用以下脚本启动项目，直接使用 G 盘文件缓存：
+
+```text
+UE5/Launch_VirtualCityUE.cmd
+```

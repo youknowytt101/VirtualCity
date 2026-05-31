@@ -6,6 +6,7 @@ All automation scripts should derive paths from this file instead of hard-coding
 from __future__ import annotations
 
 import json
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -72,6 +73,8 @@ def load_active_area(*, absolute: bool = True) -> dict[str, Any]:
 def write_active_area(cfg: dict[str, Any], *, relative: bool = True) -> None:
     ACTIVE_AREA.parent.mkdir(parents=True, exist_ok=True)
     out = normalize_config_paths(cfg, absolute=not relative)
-    with open(ACTIVE_AREA, "w", encoding="utf-8", newline="\n") as f:
+    tmp = ACTIVE_AREA.with_name(f".{ACTIVE_AREA.name}.{uuid.uuid4().hex}.tmp")
+    with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         json.dump(out, f, indent=2, ensure_ascii=False)
         f.write("\n")
+    tmp.replace(ACTIVE_AREA)

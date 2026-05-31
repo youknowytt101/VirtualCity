@@ -1,0 +1,78 @@
+{
+  "area_id": "z47n_e701000_n1428000_w2000_h3000_s1000",
+  "run_id": "20260601_002749_z47n_e701000_n1428000_w2000_h3000_s1000_763eb856",
+  "time": "2026-06-01T00:27:54",
+  "passed": true,
+  "summary": {
+    "pass": 12,
+    "warn": 1,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "name": "buildings_exists",
+      "status": "pass",
+      "message": "604 KB"
+    },
+    {
+      "name": "roads_exists",
+      "status": "pass",
+      "message": "895 KB"
+    },
+    {
+      "name": "dem_exists",
+      "status": "pass",
+      "message": "190 KB"
+    },
+    {
+      "name": "bld_retention",
+      "status": "warn",
+      "message": "保留率 100%，清洗几乎无效"
+    },
+    {
+      "name": "dem_correction",
+      "status": "pass",
+      "message": "applied=False"
+    },
+    {
+      "name": "output_buildings.geojson",
+      "status": "pass",
+      "message": "607 KB"
+    },
+    {
+      "name": "output_roads.osm",
+      "status": "pass",
+      "message": "846 KB"
+    },
+    {
+      "name": "output_dem.csv",
+      "status": "pass",
+      "message": "190 KB"
+    },
+    {
+      "name": "bld_sample",
+      "status": "pass",
+      "message": "10/10 建筑有效"
+    },
+    {
+      "name": "bld_height_present",
+      "status": "pass",
+      "message": "1903 建筑均有 height"
+    },
+    {
+      "name": "bld_height_source",
+      "status": "pass",
+      "message": "真值 1756 / 待推算 147（{'overture': 1710, 'osm': 46, 'estimated_pending': 147}）"
+    },
+    {
+      "name": "road_attr_coverage",
+      "status": "pass",
+      "message": "highway 409：lanes 105 · oneway 66 · width 2"
+    },
+    {
+      "name": "road_connectivity",
+      "status": "pass",
+      "message": "分量 18 · 最大连通占比 93% · 悬挂端点 634"
+    }
+  ]
+}

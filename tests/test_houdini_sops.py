@@ -28,6 +28,7 @@ class TestSopFilesExist(unittest.TestCase):
         "bld_snap.vex",
         "procedural_height.vex",
         "dem_clip.vex",
+        "asset_bounds_filter.py",
         "bld_footprint_bevel.py",
         "bld_foundation.py",
     ]
@@ -66,6 +67,7 @@ class TestPythonSopValidity(unittest.TestCase):
         cases = {
             "dem_import.py": dict(ROOT="/proj/VirtualCity", CFG="/proj/VirtualCity/Config/active_area.json"),
             "dem_terrain.py": dict(ROOT="/proj/VirtualCity", CFG="/proj/VirtualCity/Config/active_area.json"),
+            "asset_bounds_filter.py": dict(XMIN=-100.0, XMAX=200.0, ZMIN=-50.0, ZMAX=150.0, MODE="component"),
             "bld_footprint_bevel.py": {},
             "bld_foundation.py": {},
         }
@@ -83,6 +85,9 @@ class TestSentinels(unittest.TestCase):
         self.assertIn("f@height_m", houdini_sops.load("procedural_height.vex"))
         self.assertIn("is_foundation", houdini_sops.load("bld_foundation.py"))
         self.assertIn("footprint_bevel_count", houdini_sops.load("bld_footprint_bevel.py"))
+        self.assertIn("asset_bounds_filter_mode", houdini_sops.load(
+            "asset_bounds_filter.py",
+            XMIN=-100.0, XMAX=200.0, ZMIN=-50.0, ZMAX=150.0, MODE="component"))
 
 
 class TestOsmImportCanonical(unittest.TestCase):

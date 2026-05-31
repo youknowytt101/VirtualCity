@@ -30,20 +30,16 @@ Google Maps URL 获取方式:
 Houdini 必须已打开。UE5 可稍后打开。
 """
 
-import sys, os, json, math, subprocess, time, re
+import sys, os, json, math, subprocess, time, re, atexit
 from pathlib import Path
-from vc_paths import ROOT, CFG_PATH, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
+from vc_paths import ROOT, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
 from vc_geo import bbox_size_m
 import data_cleaning_cache as dcc
+import pipeline_state
 
 HIP = str(HIP)
 
-ACQUISITION_PROFILE = {
-    "schema": 1,
-    "roads": "tile_cache_osm_else_overpass_v1",
-    "buildings": "tile_cache_overture_else_overture_api_v1",
-    "dem": "fabdem_else_tile_cache_else_nasadem_v1",
-}
+ACQUISITION_PROFILE = dcc.CURRENT_ACQUISITION_PROFILE
 
 # ── 0. 解析参数（支持三种用法）─────────────────────────
 def _center_to_bbox(lon: float, lat: float, radius_km: float):
@@ -140,8 +136,39 @@ cfg = {
     "bbox_size_m":    {"width": bbox_w, "height": bbox_h},
     "_note":          "切换区域只改此文件，不改 Houdini 节点代码"
 }
+RUN_ID = pipeline_state.new_run_id(area_name)
+cfg["run_id"] = RUN_ID
+pipeline_state.create_run(cfg, source="set_area", run_id=RUN_ID)
 write_active_area(cfg, relative=True)
+pipeline_state.update_run(RUN_ID, phase="active_area_written", message="active_area.json updated")
 print(f"[1/5] [OK] active_area.json 已更新: {area_name}")
+print(f"[RUN] run_id={RUN_ID}")
+_RUN_FINALIZED = False
+
+
+def _mark_unhandled_exit() -> None:
+    if _RUN_FINALIZED:
+        return
+    try:
+        pipeline_state.fail_run(RUN_ID, phase="aborted",
+                                message="set_area.py exited before pipeline completion")
+    except Exception:
+        pass
+
+
+atexit.register(_mark_unhandled_exit)
+
+
+def _phase(name: str, message: str = "") -> None:
+    pipeline_state.update_run(RUN_ID, phase=name, message=message)
+
+
+def _abort(phase: str, message: str) -> None:
+    global _RUN_FINALIZED
+    pipeline_state.fail_run(RUN_ID, phase=phase, message=message)
+    _RUN_FINALIZED = True
+    print(f"  [ERR] {message}")
+    raise SystemExit(1)
 
 raw_outputs = {
     "roads": osm_path,
@@ -214,8 +241,8 @@ if not _tile:
             print(f"  [WARN] {server}: {ex}")
             time.sleep(3)
     if not osm_ok:
-        print("  [ERR] OSM 下载失败，请先运行 cache_city_data.py 预缓存后重试")
-        sys.exit(1)
+        _abort("acquire_osm", "OSM 下载失败，请先运行 cache_city_data.py 预缓存后重试")
+_phase("acquire_osm", "OSM acquisition completed")
 
 # ── 3. DEM：优先 FABDEM DTM → 本地缓存 → NASADEM 兜底 ─────────
 print(f"\n[3/5] 获取 DEM 数据...")
@@ -254,12 +281,11 @@ try:
 
     # 记录 DEM 来源，供下游决定是否需要 DTM 修正
     cfg["dem_source"] = dem_source
-    with open(CFG_PATH, "w", encoding="utf-8") as f:
-        json.dump(cfg, f, indent=2, ensure_ascii=False)
+    write_active_area(cfg, relative=True)
     print(f"  [OK] DEM 完成 (source={dem_source})")
 except Exception as ex:
-    print(f"  [ERR] DEM 下载失败: {ex}")
-    sys.exit(1)
+    _abort("acquire_dem", f"DEM 下载失败: {ex}")
+_phase("acquire_dem", f"DEM acquisition completed (source={cfg.get('dem_source', 'unknown')})")
 
 # ── 4. 建筑：优先本地缓存过滤→备用 Overture 下载 ──
 print(f"\n[4/5] 获取建筑数据...")
@@ -281,9 +307,9 @@ if not bld_ok:
     ]
     result = subprocess.run(bld_cmd, capture_output=False, cwd=str(SCRIPTS))
     if result.returncode != 0 or not Path(buildings_path).exists():
-        print(f"  [ERR] Overture 建筑下载失败（returncode={result.returncode}）")
-        sys.exit(1)
+        _abort("acquire_buildings", f"Overture 建筑下载失败（returncode={result.returncode}）")
 print(f"  [OK] 建筑完成")
+_phase("acquire_buildings", "building acquisition completed")
 
 if not clip_manifest:
     clip_manifest = dcc.write_clip_cache(
@@ -306,6 +332,7 @@ if not clip_manifest:
 
 # ── 5. 数据精炼 + 验证 + Houdini recook ──────────────
 print(f"\n[5/6] 数据精炼（清洗 + 补全 + QA）...")
+_phase("refine_data", "data refinement started")
 
 # 5a. refine_data.py — 统一数据精炼管线
 refine_result = subprocess.run(
@@ -314,22 +341,24 @@ refine_result = subprocess.run(
     capture_output=False,
 )
 if refine_result.returncode != 0:
-    print("\n  [ERR] 数据精炼未通过，中止流程")
-    sys.exit(1)
+    _abort("refine_data", "数据精炼未通过，中止流程")
+_phase("refine_data_completed", "data refinement completed")
 
 # ── 6. Houdini recook ────────────────────────────────
 print(f"\n[6/6] Houdini 重算...")
+_phase("houdini_recook", "Houdini recook started")
 
 # 注意：必须从 SCRIPTS 目录运行（pyproject.toml 在那里，rpyc==4.1.0 才可用）
 print("\n  [RECOOK] Houdini 重算中（_recook_new_area.py）...")
 recook = subprocess.run(
-    ["uv", "run", "python", "_recook_new_area.py"],
+    ["uv", "run", "python", "-u", "_recook_new_area.py"],
     cwd=str(SCRIPTS),
     capture_output=False,
 )
 if recook.returncode != 0:
-    print("\n  [ERR] Houdini 重算失败，中止流程")
-    sys.exit(1)
+    _abort("houdini_recook", "Houdini 重算失败，中止流程")
+pipeline_state.complete_run(RUN_ID, phase="pipeline_completed", message="data acquisition, refinement, and Houdini recook completed")
+_RUN_FINALIZED = True
 
 # ── 完成：等待用户确认 ────────────────────────────────
 print(f"""

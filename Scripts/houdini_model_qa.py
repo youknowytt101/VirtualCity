@@ -1197,7 +1197,9 @@ def write_report(report: dict[str, Any]) -> Path:
     area_id = report.get("area_id", "unknown")
     path = REPORT_DIR / f"{area_id}_{report['timestamp_compact']}_{report['mode']}.json"
     latest = REPORT_DIR / "latest.json"
-    for out in (path, latest):
+    area_latest = REPORT_DIR / f"{area_id}_latest.json"
+    report["report_path"] = project_relative(path)
+    for out in (path, latest, area_latest):
         with open(out, "w", encoding="utf-8", newline="\n") as f:
             json.dump(report, f, indent=2, ensure_ascii=False)
             f.write("\n")
@@ -1241,6 +1243,7 @@ def main() -> int:
             "mode": args.mode,
             "status": status,
             "area_id": cfg.get("area_id", ""),
+            "run_id": cfg.get("run_id", ""),
             "obj_path": obj_path,
             "hip_path": hou.hipFile.path(),
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),

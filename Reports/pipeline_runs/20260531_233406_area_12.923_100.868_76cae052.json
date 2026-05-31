@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "run_id": "20260531_233406_area_12.923_100.868_76cae052",
+  "area_id": "area_12.923_100.868",
+  "bbox": [
+    100.860672,
+    12.914891,
+    100.875864,
+    12.930535
+  ],
+  "source": "set_area",
+  "status": "completed",
+  "phase": "pipeline_completed",
+  "created": "2026-05-31T23:34:06",
+  "updated": "2026-05-31T23:38:21",
+  "events": [
+    {
+      "time": "2026-05-31T23:34:06",
+      "status": "running",
+      "phase": "created",
+      "message": "pipeline run created"
+    },
+    {
+      "time": "2026-05-31T23:34:06",
+      "status": "running",
+      "phase": "active_area_written",
+      "message": "active_area.json updated"
+    },
+    {
+      "time": "2026-05-31T23:34:06",
+      "status": "running",
+      "phase": "acquire_osm",
+      "message": "OSM acquisition completed"
+    },
+    {
+      "time": "2026-05-31T23:34:14",
+      "status": "running",
+      "phase": "acquire_dem",
+      "message": "DEM acquisition completed (source=fabdem)"
+    },
+    {
+      "time": "2026-05-31T23:34:16",
+      "status": "running",
+      "phase": "acquire_buildings",
+      "message": "building acquisition completed"
+    },
+    {
+      "time": "2026-05-31T23:34:16",
+      "status": "running",
+      "phase": "refine_data",
+      "message": "data refinement started"
+    },
+    {
+      "time": "2026-05-31T23:34:18",
+      "status": "running",
+      "phase": "refine_data_completed",
+      "message": "data refinement completed"
+    },
+    {
+      "time": "2026-05-31T23:34:18",
+      "status": "running",
+      "phase": "houdini_recook",
+      "message": "Houdini recook started"
+    },
+    {
+      "time": "2026-05-31T23:34:18",
+      "status": "running",
+      "phase": "houdini_preflight",
+      "message": "checking Houdini-ready inputs"
+    },
+    {
+      "time": "2026-05-31T23:38:21",
+      "status": "completed",
+      "phase": "houdini_completed",
+      "message": "Houdini build completed; model QA quick pass"
+    },
+    {
+      "time": "2026-05-31T23:38:21",
+      "status": "completed",
+      "phase": "pipeline_completed",
+      "message": "data acquisition, refinement, and Houdini recook completed"
+    }
+  ],
+  "hip_path": "Houdini/Hip/VC_area_12.923_100.868_citygen_v001.hip",
+  "qa_status": "pass",
+  "qa_report": "Reports/model_qa/area_12.923_100.868_20260531_233821_quick.json"
+}

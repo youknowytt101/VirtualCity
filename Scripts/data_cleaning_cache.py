@@ -3,12 +3,15 @@
 The goal is to keep acquisition, clipping, cleaning, and Houdini-ready export
 separable.  A paid/high-precision data source should only need a new adapter;
 the cleaning cache remains keyed by bbox, input file hashes, and recipe params.
+Larger raw clip caches can also be cropped back into smaller fixed-grid builds.
 """
 from __future__ import annotations
 
 import hashlib
+import csv
 import json
 import shutil
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -19,6 +22,12 @@ import vc_paths
 CACHE_SCHEMA_VERSION = 1
 CLIP_CACHE_DIR = vc_paths.DATA_ROOT / "_clip_cache"
 CLEAN_CACHE_INDEX = vc_paths.DATA_ROOT / "_clean_cache_index.json"
+CURRENT_ACQUISITION_PROFILE = {
+    "schema": 1,
+    "roads": "tile_cache_osm_else_overpass_v1",
+    "buildings": "tile_cache_overture_else_overture_api_v1",
+    "dem": "fabdem_else_tile_cache_else_nasadem_v1",
+}
 
 OUTPUT_NAMES = {
     "buildings": "buildings.geojson",
@@ -100,6 +109,27 @@ def outputs_exist(base_dir: str | Path, *, min_bytes: int = 128) -> bool:
     base = Path(base_dir)
     return all((base / name).exists() and (base / name).stat().st_size > min_bytes
                for name in OUTPUT_NAMES.values())
+
+
+def ready_outputs_exist(base_dir: str | Path, *, expected_area_id: str | None = None,
+                        expected_run_id: str | None = None, min_bytes: int = 1000) -> bool:
+    """Return True only for a fully published Houdini-ready directory."""
+    base = Path(base_dir)
+    if not outputs_exist(base, min_bytes=min_bytes):
+        return False
+    meta_path = base / "meta.json"
+    if not meta_path.exists():
+        return False
+    try:
+        with open(meta_path, encoding="utf-8") as f:
+            meta = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return False
+    if expected_area_id and meta.get("area_id") != expected_area_id:
+        return False
+    if expected_run_id and meta.get("run_id") != expected_run_id:
+        return False
+    return True
 
 
 def _clean_params() -> dict[str, Any]:
@@ -283,35 +313,149 @@ def clip_cache_paths(key: str) -> dict[str, Path]:
     }
 
 
+def _bbox_contains(outer: list[float], inner: list[float]) -> bool:
+    return (outer[0] <= inner[0] and outer[1] <= inner[1]
+            and outer[2] >= inner[2] and outer[3] >= inner[3])
+
+
+def find_covering_clip_cache(bbox: list[float] | tuple[float, ...] | None,
+                             *,
+                             source_signature: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    """Return the smallest valid clip cache that fully contains bbox."""
+    target = normalize_bbox(bbox)
+    if not target or not CLIP_CACHE_DIR.exists():
+        return None
+    expected = normalize_source_signature(source_signature) if source_signature else None
+    candidates = []
+    for manifest_path in CLIP_CACHE_DIR.glob("*/_manifest.json"):
+        try:
+            with open(manifest_path, encoding="utf-8") as f:
+                manifest = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+        source_bbox = normalize_bbox(manifest.get("bbox"))
+        if not source_bbox or not _bbox_contains(source_bbox, target):
+            continue
+        if expected is not None and manifest.get("source_signature", {"profile": "default_v1"}) != expected:
+            continue
+        paths = clip_cache_paths(manifest.get("key", ""))
+        if not all(paths[group].exists() for group in OUTPUT_NAMES):
+            continue
+        area = (source_bbox[2] - source_bbox[0]) * (source_bbox[3] - source_bbox[1])
+        candidates.append((area, manifest))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: item[0])
+    return candidates[0][1]
+
+
+def _crop_dem_csv(src: Path, dst: Path, parent_manifest: dict[str, Any],
+                  bbox: list[float]) -> bool:
+    """Crop parent local DEM CSV and recenter it for the child bbox."""
+    import vc_geo
+
+    parent_lon = float(parent_manifest["origin_lon"])
+    parent_lat = float(parent_manifest["origin_lat"])
+    child_lon = (bbox[0] + bbox[2]) / 2.0
+    child_lat = (bbox[1] + bbox[3]) / 2.0
+    child_proj = vc_geo.LocalProjector(child_lon, child_lat)
+    offset_x, offset_north = child_proj.to_local(parent_lon, parent_lat)
+    corner_local = [
+        child_proj.to_local(lon, lat)
+        for lon, lat in (
+            (bbox[0], bbox[1]), (bbox[2], bbox[1]),
+            (bbox[2], bbox[3]), (bbox[0], bbox[3]),
+        )
+    ]
+    x_min = min(p[0] for p in corner_local)
+    x_max = max(p[0] for p in corner_local)
+    hz_min = min(-p[1] for p in corner_local)
+    hz_max = max(-p[1] for p in corner_local)
+
+    kept = []
+    with open(src, encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            x = float(row["x"]) + offset_x
+            hz = float(row["z"]) - offset_north
+            if x_min <= x <= x_max and hz_min <= hz <= hz_max:
+                kept.append((x, float(row["y"]), hz, int(row["row"]), int(row["col"])))
+    if not kept:
+        return False
+    min_row = min(row[3] for row in kept)
+    min_col = min(row[4] for row in kept)
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    with open(dst, "w", encoding="utf-8", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["x", "y", "z", "row", "col"])
+        for x, y, hz, row, col in kept:
+            writer.writerow([f"{x:.2f}", f"{y:.2f}", f"{hz:.2f}", row - min_row, col - min_col])
+    return True
+
+
+def _restore_parent_clip_cache(manifest: dict[str, Any], bbox: list[float],
+                               outputs: dict[str, str | Path]) -> bool:
+    """Crop a larger clip cache into raw inputs for bbox."""
+    import _tile_cache
+
+    paths = clip_cache_paths(manifest["key"])
+    with tempfile.TemporaryDirectory(prefix="vc_clip_restore_") as td:
+        temp = Path(td)
+        temp_outputs = {
+            "roads": temp / OUTPUT_NAMES["roads"],
+            "buildings": temp / OUTPUT_NAMES["buildings"],
+            "dem": temp / OUTPUT_NAMES["dem"],
+        }
+        entry = {
+            "osm_xml": paths["roads"].as_posix(),
+            "bld_geojson": paths["buildings"].as_posix(),
+        }
+        if not _tile_cache.filter_osm(entry, bbox, temp_outputs["roads"]):
+            return False
+        if not _tile_cache.filter_buildings(entry, bbox, temp_outputs["buildings"]):
+            return False
+        if not _crop_dem_csv(paths["dem"], temp_outputs["dem"], manifest, bbox):
+            return False
+        for group, src in temp_outputs.items():
+            dst = vc_paths.resolve_project_path(outputs[group])
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+    return True
+
+
 def restore_clip_cache(bbox: list[float] | tuple[float, ...] | None,
                        outputs: dict[str, str | Path],
                        *,
                        source_signature: dict[str, Any] | None = None) -> dict[str, Any] | None:
     signature = normalize_source_signature(source_signature)
-    key = bbox_cache_key(bbox, signature)
-    if not key:
+    target_bbox = normalize_bbox(bbox)
+    key = bbox_cache_key(target_bbox, signature)
+    if not key or not target_bbox:
         return None
 
     paths = clip_cache_paths(key)
-    if not paths["manifest"].exists():
-        return None
-    if not all(paths[group].exists() for group in OUTPUT_NAMES):
-        return None
+    if paths["manifest"].exists() and all(paths[group].exists() for group in OUTPUT_NAMES):
+        with open(paths["manifest"], encoding="utf-8") as f:
+            manifest = json.load(f)
+        if (manifest.get("bbox") == target_bbox
+                and manifest.get("source_signature", {"profile": "default_v1"}) == signature):
+            for group, src in ((g, paths[g]) for g in OUTPUT_NAMES):
+                dst = vc_paths.resolve_project_path(outputs[group])
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+            manifest["restored_at"] = utc_now()
+            manifest["restore_mode"] = "exact"
+            return manifest
 
-    with open(paths["manifest"], encoding="utf-8") as f:
-        manifest = json.load(f)
-    if manifest.get("bbox") != normalize_bbox(bbox):
+    parent = find_covering_clip_cache(target_bbox, source_signature=signature)
+    if not parent or normalize_bbox(parent.get("bbox")) == target_bbox:
         return None
-    if manifest.get("source_signature", {"profile": "default_v1"}) != signature:
+    if not _restore_parent_clip_cache(parent, target_bbox, outputs):
         return None
-
-    for group, src in ((g, paths[g]) for g in OUTPUT_NAMES):
-        dst = vc_paths.resolve_project_path(outputs[group])
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
-
-    manifest["restored_at"] = utc_now()
-    return manifest
+    restored = dict(parent)
+    restored["restored_at"] = utc_now()
+    restored["restore_mode"] = "parent_clip"
+    restored["restored_bbox"] = target_bbox
+    return restored
 
 
 def write_clip_cache(bbox: list[float] | tuple[float, ...] | None,
