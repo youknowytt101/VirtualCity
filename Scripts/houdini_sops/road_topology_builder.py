@@ -1,21 +1,24 @@
-# Houdini Python SOP — Road Topology Builder v2
+# Houdini Python SOP — Road Topology Builder v3 (Milestone 2)
 # Input: centerline polylines with per-primitive half-width attribute ("hw" or "road_hw" or fallback)
-# Output: trimmed road strips (quads) and junction fan polygons
+# Output: trimmed road strips (quads) and watertight junction fan polygons
 #
 # Algorithm:
 #   1. Build adjacency graph from centerline endpoints (spatial hash, tolerance ~0.05m)
-#   2. Detect junctions (degree >= 3) and compute trim radius R = 1.2 * max(incident_hw)
-#   3. Trim each centerline from junction ends by R, emit corridor quads with unique vertices
-#   4. For each junction, collect trimmed boundary points, sort by angle, emit fan polygon
-#   5. Dead-end (degree=1) roads get a rounded cap
+#   2. Detect adaptive junctions (degree >= 3) and classify into: Crossing, Junction, Freeway, or Roundabout
+#   3. Calculate dynamic clipping margin Mi based on width, incident angles, and junction style
+#   4. Trim each centerline from junction ends by Mi, emit corridor quads with shared boundary points
+#   5. For each junction, gather the exact boundary points of the adjacent roads, sort radially, and emit watertight patch
+#   6. Dead-ends (degree=1) get a rounded circular cap
 #
 # Attributes emitted:
 #   road_face_area (prim)   — approximate face area in m²
 #   road_segment_len (prim) — centerline segment length in m
 #   is_junction (prim)      — 1 if this face is a junction fan, 0 otherwise
+#
 
 import math
 import hou
+from collections import defaultdict
 
 node = hou.pwd()
 geo_out = node.geometry()
@@ -118,14 +121,107 @@ for pr in prims:
     endpoints.setdefault(k0, []).append((pr, True, hw))
     endpoints.setdefault(k1, []).append((pr, False, hw))
 
-# junctions: degree >= 3
-junctions = {k: items for k, items in endpoints.items() if len(items) >= 3}
+# ── Adaptive Junction Classification & Dynamic Mi ────────────────────
 
-# trim radius per junction
-junction_R = {}
-for k, items in junctions.items():
-    R = 1.2 * max(it[2] for it in items)
-    junction_R[k] = max(2.0, min(R, 15.0))
+junction_R = {}  # (node_key, prim) -> Mi
+junction_types = {}  # node_key -> type_string
+
+# Identify junctions (degree >= 3)
+junction_keys = [k for k, items in endpoints.items() if len(items) >= 3]
+
+for k in junction_keys:
+    items = endpoints[k]
+    center_pos = hou.Vector3(k[0]*0.05, 0.0, k[1]*0.05)
+    
+    # 1. Classify Junction Type (Freeway / Junction / Crossing / Roundabout)
+    is_freeway = False
+    is_roundabout = False
+    
+    max_hw = 0.0
+    sec_hw = 0.0
+    
+    for pr, is_start, hw in items:
+        max_hw = max(max_hw, hw)
+        hw_class = pr.attribValue("highway") if pr.geometry().findPrimAttrib("highway") else "residential"
+        if hw_class in ("motorway", "trunk", "motorway_link", "trunk_link"):
+            is_freeway = True
+        if hw_class == "roundabout":
+            is_roundabout = True
+
+    # Find the second-widest road
+    hw_vals = sorted([it[2] for it in items], reverse=True)
+    if len(hw_vals) >= 2:
+        sec_hw = hw_vals[1]
+
+    # Decide type
+    if is_roundabout:
+        j_type = "Roundabout"
+    elif is_freeway:
+        j_type = "Freeway"
+    elif sec_hw > 0 and (max_hw / sec_hw) >= 1.5:
+        j_type = "Junction"  # Main-branch style
+    else:
+        j_type = "Crossing"  # Standard style
+
+    junction_types[k] = j_type
+
+    # 2. Sort incident roads radially to compute mutual angles
+    radial_items = []
+    for pr, is_start, hw in items:
+        pts = poly_pts[pr]
+        L = _poly_length(pts)
+        p = _advance_along(pts, min(3.0, L*0.49)) if is_start else _advance_along(list(reversed(pts)), min(3.0, L*0.49))
+        d = _vnorm(_vsub(_v2(p), (center_pos[0], center_pos[2])))
+        angle = math.atan2(d[1], d[0])
+        radial_items.append((angle, pr, is_start, hw, d))
+
+    radial_items.sort(key=lambda x: x[0])
+    n_inc = len(radial_items)
+
+    # 3. Calculate dynamic clipping margin Mi for each incident edge
+    # Corner radius styles
+    r_corner = 6.0
+    if j_type == "Freeway":
+        r_corner = 20.0
+    elif j_type == "Junction":
+        r_corner = 5.0
+    elif j_type == "Roundabout":
+        r_corner = 4.0
+
+    for i in range(n_inc):
+        curr_ang, pr, is_start, hw, d = radial_items[i]
+        
+        # Calculate angle with left and right neighbors
+        prev_ang, _, _, _, _ = radial_items[(i - 1) % n_inc]
+        next_ang, _, _, _, _ = radial_items[(i + 1) % n_inc]
+        
+        diff_prev = abs(curr_ang - prev_ang)
+        if diff_prev > math.pi:
+            diff_prev = 2 * math.pi - diff_prev
+            
+        diff_next = abs(next_ang - curr_ang)
+        if diff_next > math.pi:
+            diff_next = 2 * math.pi - diff_next
+            
+        theta = min(diff_prev, diff_next)
+        sin_theta = max(0.25, math.sin(theta))  # clamp to protect narrow angles
+
+        # Find max width among neighbors
+        w_max = max(hw, radial_items[(i - 1) % n_inc][3], radial_items[(i + 1) % n_inc][3])
+
+        # Dynamic clip formula
+        m_i = (w_max / (2.0 * sin_theta)) + r_corner
+
+        # Principle Street exception: if Junction style, do not over-clip the main road
+        if j_type == "Junction" and hw >= max_hw:
+            # Main road gets very tight clipping
+            m_i = (sec_hw / (2.0 * sin_theta)) + 0.5
+
+        # Safety clamp: never trim more than 45% of total road length to prevent collapse
+        L = _poly_length(poly_pts[pr])
+        m_i = max(hw * 1.5, min(m_i, L * 0.45))
+
+        junction_R[(k, pr)] = m_i
 
 # ── vertex cache for dedup ───────────────────────────────────────────
 
@@ -149,6 +245,8 @@ is_junction_attr = geo_out.addAttrib(hou.attribType.Prim, 'is_junction', 0)
 
 # ── emit corridor quads ──────────────────────────────────────────────
 
+junction_boundary_points = defaultdict(list)  # node_key -> list of (x, y, z) actual boundary points
+
 for pr, pts in poly_pts.items():
     hw = prim_hw[pr]
     L = _poly_length(pts)
@@ -157,14 +255,12 @@ for pr, pts in poly_pts.items():
 
     k0 = _key(pts[0])
     k1 = _key(pts[-1])
-    t0 = junction_R.get(k0, 0.0)
-    t1 = junction_R.get(k1, 0.0)
+    t0 = junction_R.get((k0, pr), 0.0)
+    t1 = junction_R.get((k1, pr), 0.0)
 
     # Build left/right boundary points along the original centerline,
     # sampling at each original vertex (clamped to trim range).
     acc = 0.0
-    prev_left = None
-    prev_right = None
 
     for i in range(len(pts)-1):
         p, q = pts[i], pts[i+1]
@@ -203,58 +299,121 @@ for pr, pts in poly_pts.items():
         left1 = hou.Vector3(p1[0] + n_dir[0]*hw, p1[1], p1[2] + n_dir[1]*hw)
         right1 = hou.Vector3(p1[0] - n_dir[0]*hw, p1[1], p1[2] - n_dir[1]*hw)
 
-        if prev_left is not None:
-            quad = geo_out.createPolygon()
-            for vpos in (prev_left, left0, right0, prev_right):
-                quad.addVertex(_get_pt(vpos))
-            try:
-                area = 0.5 * abs(
-                    (prev_left[0]*left0[2] - left0[0]*prev_left[2]) +
-                    (left0[0]*right0[2] - right0[0]*left0[2]) +
-                    (right0[0]*prev_right[2] - prev_right[0]*right0[2]) +
-                    (prev_right[0]*prev_left[2] - prev_left[0]*prev_right[2])
-                )
-            except Exception:
-                area = 0.0
-            quad.setAttribValue(road_face_area_attr, float(area))
-            quad.setAttribValue(road_segment_len_attr, float((left0-prev_left).length()))
-            quad.setAttribValue(is_junction_attr, 0)
+        # Collect final actual boundary points for Watertight Junction Fill
+        if t0 > 0 and math.isclose(local_start, trim_start_dist - span_start, abs_tol=1e-3):
+            junction_boundary_points[k0].append(left0)
+            junction_boundary_points[k0].append(right0)
+        if t1 > 0 and math.isclose(local_end, trim_end_dist - span_start, abs_tol=1e-3):
+            junction_boundary_points[k1].append(left1)
+            junction_boundary_points[k1].append(right1)
 
-        prev_left = left1
-        prev_right = right1
+        # Emit a clean, valid quad for this segment chunk
+        quad = geo_out.createPolygon()
+        for vpos in (left0, left1, right1, right0):
+            quad.addVertex(_get_pt(vpos))
+        try:
+            area = 0.5 * abs(
+                (left0[0]*left1[2] - left1[0]*left0[2]) +
+                (left1[0]*right1[2] - right1[0]*left1[2]) +
+                (right1[0]*right0[2] - right0[0]*right1[2]) +
+                (right0[0]*left0[2] - left0[0]*right0[2])
+            )
+        except Exception:
+            area = 0.0
+        quad.setAttribValue(road_face_area_attr, float(area))
+        quad.setAttribValue(road_segment_len_attr, float(math.hypot(left1[0]-left0[0], left1[2]-left0[2])))
+        quad.setAttribValue(is_junction_attr, 0)
 
-# ── junction fan fill ────────────────────────────────────────────────
+    # ── Dead-end (degree=1) Rounded Circular Cap ─────────────────────
+    if t0 == 0 and len(endpoints[k0]) == 1:
+        # Emit a semi-circular cap at start point k0
+        p = pts[0]
+        seg = (pts[1][0]-pts[0][0], pts[1][2]-pts[0][2])
+        t_dir = _vnorm(seg)
+        n_dir = _vperp(t_dir)
+        # Semi-circular segments
+        cap_pts = []
+        for d_ang in range(0, 181, 30):
+            rad = math.radians(d_ang)
+            # rotate n_dir around Y
+            rx = n_dir[0] * math.cos(rad) - t_dir[0] * math.sin(rad)
+            rz = n_dir[1] * math.cos(rad) - t_dir[1] * math.sin(rad)
+            cap_pt = hou.Vector3(p[0] + rx * hw, p[1], p[2] + rz * hw)
+            cap_pts.append(cap_pt)
+        # emit cap polygon
+        poly = geo_out.createPolygon()
+        for cpos in reversed(cap_pts):
+            poly.addVertex(_get_pt(cpos))
+        poly.setAttribValue(road_face_area_attr, float(math.pi * hw * hw * 0.5))
+        poly.setAttribValue(road_segment_len_attr, 0.0)
+        poly.setAttribValue(is_junction_attr, 0)
 
-for k, items in junctions.items():
+    if t1 == 0 and len(endpoints[k1]) == 1:
+        # Emit a semi-circular cap at end point k1
+        p = pts[-1]
+        seg = (pts[-1][0]-pts[-2][0], pts[-1][2]-pts[-2][2])
+        t_dir = _vnorm(seg)
+        n_dir = _vperp(t_dir)
+        cap_pts = []
+        for d_ang in range(0, 181, 30):
+            rad = math.radians(d_ang)
+            rx = n_dir[0] * math.cos(rad) + t_dir[0] * math.sin(rad)
+            rz = n_dir[1] * math.cos(rad) + t_dir[1] * math.sin(rad)
+            cap_pt = hou.Vector3(p[0] + rx * hw, p[1], p[2] + rz * hw)
+            cap_pts.append(cap_pt)
+        poly = geo_out.createPolygon()
+        for cpos in cap_pts:
+            poly.addVertex(_get_pt(cpos))
+        poly.setAttribValue(road_face_area_attr, float(math.pi * hw * hw * 0.5))
+        poly.setAttribValue(road_segment_len_attr, 0.0)
+        poly.setAttribValue(is_junction_attr, 0)
+
+# ── Watertight Junction Patch Generation ─────────────────────────────
+
+for k in junction_keys:
     center = hou.Vector3(k[0]*0.05, 0.0, k[1]*0.05)
-    rim = []
+    rim = junction_boundary_points.get(k, [])
 
-    for pr, is_start, hw in items:
-        pts = poly_pts.get(pr)
-        if pts is None:
-            continue
-        L = _poly_length(pts)
-        R = junction_R.get(k, 3.0)
-        if is_start:
-            p = _advance_along(pts, min(R, L*0.49))
-        else:
-            p = _advance_along(list(reversed(pts)), min(R, L*0.49))
-        d = _vnorm(_vsub(_v2(p), (center[0], center[2])))
-        n = _vperp(d)
-        lp = hou.Vector3(p[0] + n[0]*hw, p[1], p[2] + n[1]*hw)
-        rp = hou.Vector3(p[0] - n[0]*hw, p[1], p[2] - n[1]*hw)
-        ang_l = math.atan2(n[1], n[0])
-        ang_r = math.atan2(-n[1], -n[0])
-        rim.append((ang_l, lp))
-        rim.append((ang_r, rp))
-
-    if len(rim) < 6:
+    if len(rim) < 3:
         continue
 
-    rim.sort(key=lambda t: t[0])
+    # De-duplicate boundary points that snapped together (within 1cm)
+    unique_rim = []
+    seen = set()
+    for p in rim:
+        pt_k = _pt_key(p)
+        if pt_k not in seen:
+            seen.add(pt_k)
+            unique_rim.append(p)
+
+    if len(unique_rim) < 3:
+        continue
+
+    # Sort boundary points radially around the junction center to form watertight loop
+    sorted_rim = []
+    for p in unique_rim:
+        d = _vnorm(_vsub(_v2(p), (center[0], center[2])))
+        ang = math.atan2(d[1], d[0])
+        sorted_rim.append((ang, p))
+
+    sorted_rim.sort(key=lambda t: t[0])
+
+    # Emit the watertight patch polygon
     poly = geo_out.createPolygon()
-    for _, p in rim:
+    for _, p in sorted_rim:
         poly.addVertex(_get_pt(p))
-    poly.setAttribValue(road_face_area_attr, 0.0)
+
+    # Compute approximate patch area
+    poly_pts_2d = [_v2(p) for _, p in sorted_rim]
+    area = 0.0
+    n_p = len(poly_pts_2d)
+    for idx in range(n_p):
+        p0 = poly_pts_2d[idx]
+        p1 = poly_pts_2d[(idx + 1) % n_p]
+        area += p0[0]*p1[1] - p1[0]*p0[1]
+    area = 0.5 * abs(area)
+
+    poly.setAttribValue(road_face_area_attr, float(area))
     poly.setAttribValue(road_segment_len_attr, 0.0)
     poly.setAttribValue(is_junction_attr, 1)
+

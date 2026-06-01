@@ -113,6 +113,37 @@ if (hit_prim >= 0) {
 """
 
 
+ROAD_CUT_FILL_VEX = """
+// Terrain point level: Flatten terrain under roads and smooth out embankments
+int near_prim;
+vector near_uvw;
+float dist = xyzdist(1, @P, near_prim, near_uvw);
+
+vector road_pos = primuv(1, "P", near_prim, near_uvw);
+float hw = primuv(1, "half_width", near_prim, near_uvw);
+if (hw <= 0.0) hw = 3.0; // fallback
+
+// 2D distance on XZ plane (ignore bridge/tunnel elements using simple prim lookup)
+string bridge_attr = prim(1, "bridge", near_prim);
+string tunnel_attr = prim(1, "tunnel", near_prim);
+int is_bridge = (bridge_attr == "yes" || bridge_attr == "true" || bridge_attr == "1");
+int is_tunnel = (tunnel_attr == "yes" || tunnel_attr == "true" || tunnel_attr == "1");
+
+if (!is_bridge && !is_tunnel) {
+    float dist_xz = distance(set(@P.x, 0.0, @P.z), set(road_pos.x, 0.0, road_pos.z));
+    float margin = 6.0; // 6 meters transition
+    if (dist_xz < hw) {
+        @P.y = road_pos.y;
+    } else if (dist_xz < hw + margin) {
+        float t = (dist_xz - hw) / margin;
+        // Cubic Hermite smoothstep
+        t = t * t * (3.0 - 2.0 * t);
+        @P.y = lerp(road_pos.y, @P.y, t);
+    }
+}
+"""
+
+
 ROAD_BBOX_CLIP_TEMPLATE = r"""
 import hou
 import math

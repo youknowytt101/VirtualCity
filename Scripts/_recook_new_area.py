@@ -212,39 +212,46 @@ if _div_bld:
 # ── 1b. 修复道路地形吸附（H-007：Ray SOP direction=0，改用 XZ 垂直投射）──
 ROAD_SNAP_VEX = road_pipe.ROAD_SNAP_VEX
 snap_old = hou.node(OBJ_PATH + '/snap_roads_to_terrain1')
+dem_t    = hou.node(OBJ_PATH + '/dem_terrain')
 if snap_old and snap_old.type().name() == 'ray':
     road_w = hou.node(OBJ_PATH + '/road_width')
     resample = hou.node(OBJ_PATH + '/resample_roads')
-    dem_t    = hou.node(OBJ_PATH + '/dem_terrain')
     snap_old.destroy()
     snap_new = net.createNode('attribwrangle', 'snap_roads_to_terrain1')
     snap_new.setInput(0, resample)
     snap_new.setInput(1, dem_t)
     snap_new.parm('class').set(2)  # 2 = Point
     snap_new.parm('snippet').set(ROAD_SNAP_VEX)
-    if road_w:
-        road_w.setInput(0, snap_new)
+    snap_old = snap_new
     print('  SOP 修复: snap_roads_to_terrain1 (Ray→xyzdist attribwrangle)')
 elif snap_old:
     snap_old.parm('class').set(2)
     snap_old.parm('snippet').set(ROAD_SNAP_VEX)
+    if dem_t:
+        snap_old.setInput(1, dem_t)
     print('  snap_roads_to_terrain1 class=2 + VEX 已校验更新')
+
+# ── 1b1.5. 道路 1D 纵向高程平滑（Milestone 2 - Stage 2.5） ─────────────────────
+_smoother_code = houdini_sops.load('road_vertical_smoother.py')
+_smoother_node = hou.node(OBJ_PATH + '/road_vertical_smoother')
+if _smoother_node is None:
+    _smoother_node = net.createNode('python', 'road_vertical_smoother')
+_smoother_node.setInput(0, snap_old)
+_smoother_node.parm('python').set(_smoother_code)
+_smoother_node.cook(force=True)
+print('  road_vertical_smoother SOP 已注入并执行（Laplacian 平滑与坡度夹紧）')
 
 # ── 1b2. 道路分级宽度（road_width attribwrangle）──────────────────────────
 ROAD_WIDTH_VEX = road_pipe.ROAD_WIDTH_VEX
-# road_width_flat 是真正喂入 road_strips 的节点，直接写 ROAD_WIDTH_VEX
-# （旧版 road_width 节点已 deprecated，统一在 cleanup 段删除）
 _rwf_node = hou.node(OBJ_PATH + '/road_width_flat')
-_road_width_input = hou.node(OBJ_PATH + '/snap_roads_to_terrain1') or hou.node(OBJ_PATH + '/resample_roads')
+_road_width_input = _smoother_node
 if _rwf_node is None:
     _rwf_node = net.createNode('attribwrangle', 'road_width_flat')
 if _road_width_input:
-    # Always repair the input. Existing HIPs may preserve a stale/miswired input,
-    # and this node must consume terrain-snapped centerlines, not raw resample_roads.
     _rwf_node.setInput(0, _road_width_input, 0)
 _rwf_node.parm('class').set(1)  # Primitive
 _rwf_node.parm('snippet').set(ROAD_WIDTH_VEX)
-print('  road_width_flat VEX + 输入已更新（snap_roads_to_terrain1 → road_width_flat）')
+print('  road_width_flat VEX + 输入已更新（road_vertical_smoother → road_width_flat）')
 
 # ── 1d. road_strips v2: 路段修剪 + 路口凸包填充 ──────────────────────
 _rs_v2_code = road_pipe.load_road_strips_code(ROOT)
@@ -273,10 +280,9 @@ try:
     if rs_node_ref:
         source_switch.setInput(0, rs_node_ref, 0)
     source_switch.setInput(1, rtb_node, 0)
-    # 默认使用现有 road_strips，避免回归风险；可在网络中手动将 input 设为 1 切为新算法
-    if source_switch.parm('input').eval() not in (0, 1):
-        source_switch.parm('input').set(0)
-    print("  road_topology_builder 已注入（A/B 可选，切换节点: road_source，input=0→strips,1→builder）")
+    # 默认激活全新的 road_topology_builder 拓扑缝合引擎 (Milestone 2)
+    source_switch.parm('input').set(1)
+    print("  road_topology_builder 已注入并默认启用（A/B 切换节点: road_source，input=1 为 Builder 引擎）")
 except Exception as _e:
     print(f"  [WARN] Road Topology Builder 注入失败，保持使用 road_strips: {_e}")
 
@@ -324,20 +330,41 @@ for path in [OBJ_PATH + '/osm_import', OBJ_PATH + '/dem_import',
 # DEM 原始约 30m 网格，在山地俯视角布线过稀。Bilinear×2 只做线性插值，
 # 不增加真实高程精度，但能把显示和道路贴地目标提升到约 7.5m 网格。
 dem_terrain = hou.node(OBJ_PATH + '/dem_terrain')
+
+# ── 2b2. 道路削坡放坡地形平整（dem_cut_and_fill VEX, Milestone 2 - Stage 2.5） ──
+# 输入 0 = dem_terrain (raw 30m grid), 输入 1 = road_width_flat (smoothed road lines)
+cut_fill_target = hou.node(OBJ_PATH + '/dem_cut_and_fill')
+if cut_fill_target is None:
+    cut_fill_target = net.createNode('attribwrangle', 'dem_cut_and_fill')
+cut_fill_target.setInput(0, dem_terrain)
+cut_fill_target.setInput(1, _rwf_node)
+cut_fill_target.parm('class').set(2)  # Point level
+cut_fill_target.parm('snippet').set(road_pipe.ROAD_CUT_FILL_VEX)
+cut_fill_target.cook(force=True)
+print('  dem_cut_and_fill VEX 削坡平整完成: pts={}'.format(
+    cut_fill_target.geometry().intrinsicValue('pointcount')))
+
+# 然后将平整放坡后的 DTM 喂入 subdivide 进行高精格网重构
 snap_target = hou.node(OBJ_PATH + '/dem_subdivide')
 if snap_target is None:
     snap_target = net.createNode('subdivide', 'dem_subdivide')
-snap_target.setInput(0, dem_terrain)
+snap_target.setInput(0, cut_fill_target)
 snap_target.parm('algorithm').set(4)   # OpenSubdiv Bilinear
 snap_target.parm('iterations').set(2)  # 30m -> ~7.5m
 snap_target.cook(force=True)
-print('  dem_subdivide: pts={} prims={} (Bilinear iterations=2)'.format(
+print('  dem_subdivide (对平整放坡后的 DTM 重构): pts={} prims={}'.format(
     snap_target.geometry().intrinsicValue('pointcount'),
     snap_target.geometry().intrinsicValue('primitivecount')))
-for _sn_name in ['snap_bld_to_terrain', 'snap_roads_to_terrain1']:
-    _sn = hou.node(OBJ_PATH + '/' + _sn_name)
-    if _sn:
-        _sn.setInput(1, snap_target)
+
+# 初始道路贴地用 raw 地形，避免循环依赖
+_snap_roads = hou.node(OBJ_PATH + '/snap_roads_to_terrain1')
+if _snap_roads:
+    _snap_roads.setInput(1, dem_terrain)
+
+# 其余建筑采用高精平整后的 snap_target 地形
+_snap_bld = hou.node(OBJ_PATH + '/snap_bld_to_terrain')
+if _snap_bld:
+    _snap_bld.setInput(1, snap_target)
 
 # -- 2c. Building footprint chamfer: convex vertical corners only ----------
 BLD_FOOTPRINT_BEVEL_CODE = houdini_sops.load('bld_footprint_bevel.py')
@@ -621,9 +648,9 @@ if ARCHIVE_HIP != HIP:
 
 # ── 6. 强制刷新整条输出链（视口同步）────────────────────
 FULL_CHAIN = [
-    'osm_import', 'dem_terrain', 'dem_subdivide',
+    'osm_import', 'dem_terrain', 'dem_subdivide', 'dem_cut_and_fill',
     'extract_buildings', 'snap_bld_to_terrain', 'bld_footprint_bevel', 'extrude_buildings', 'post_normals',
-    'snap_roads_to_terrain1', 'road_width_flat', 'road_strips',
+    'snap_roads_to_terrain1', 'road_vertical_smoother', 'road_width_flat', 'road_strips', 'road_topology_builder', 'road_source',
     'snap_road_strips', 'road_bbox_clip', 'snap_road_clipped',
     'bld_clipped', 'bld_foundation', 'bld_foundation_clipped',
     'road_clipped', 'road_color', 'road_extrude',
