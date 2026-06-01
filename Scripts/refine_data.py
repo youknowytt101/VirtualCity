@@ -247,42 +247,46 @@ def _buildings_L3(cleaned_path: Path, area_cfg: dict, manifest: dict) -> dict:
 # 道路精炼
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _roads_L1(src_path: Path, out_path: Path, manifest: dict) -> dict:
-    """L1: 孤儿/过短/类型白名单过滤"""
-    from clean_raw_data import clean_osm
-    stats = clean_osm(src_path, dry_run=False)
-    _copy_file(src_path, out_path)
+def _roads_L1(src_path: Path, out_path: Path, area_cfg: dict, manifest: dict) -> dict:
+    """L1: 2.5D 格式标准化 + 交点分割 + 窄路吸附"""
+    from vc_data_cleaner import Road2D5Cleaner
+    
+    origin_lon = area_cfg["origin_lon"]
+    origin_lat = area_cfg["origin_lat"]
+    cleaner = Road2D5Cleaner(origin_lon, origin_lat)
+    
+    # 在 cleaned 目录输出 roads_clean.geojson 供后续 Graph 使用，
+    # 并且把 roads.osm 输出到 out_path (也是 cleaned 里的 roads.osm)
+    geojson_out = out_path.with_name("roads_clean.geojson")
+    
+    stats = cleaner.clean(src_path, geojson_out=geojson_out, osm_out=out_path, tolerance_m=1.0)
+    
+    from road_graph_builder import build_road_graph
+    graph_out = out_path.with_name("road_graph.json")
+    build_road_graph(geojson_out, graph_out, origin_lon, origin_lat)
+    
     manifest["levels"]["roads"]["L1"] = {
         "time": datetime.now().isoformat(timespec="seconds"),
         "ways_in": stats.get("ways_in", 0),
         "ways_out": stats.get("ways_out", 0),
+        "snapped_endpoints": stats.get("snapped_endpoints", 0),
+        "intersection_splits": stats.get("intersection_splits", 0),
+        "merged_chains": stats.get("merged_chains", 0),
     }
     manifest["levels"]["roads"]["current"] = 1
-    print(f'  [L1] 道路: {stats.get("ways_in", 0)} → {stats.get("ways_out", 0)}')
+    print(f'  [L1] 2.5D 道路清洗: {stats.get("ways_in", 0)} → {stats.get("ways_out", 0)} (吸附: {stats.get("snapped_endpoints", 0)}, 分割: {stats.get("intersection_splits", 0)}, 合并: {stats.get("merged_chains", 0)})')
     return stats
 
 
 def _roads_L2(cleaned_path: Path, manifest: dict) -> dict:
-    """L2: 端点焊接 + 链式合并（如果 merge_roads 可用）"""
-    try:
-        from clean_raw_data import merge_roads
-        stats = merge_roads(cleaned_path)
-        manifest["levels"]["roads"]["L2"] = {
-            "time": datetime.now().isoformat(timespec="seconds"),
-            "merged": stats.get("merged", 0),
-        }
-        manifest["levels"]["roads"]["current"] = 2
-        print(f'  [L2] 道路: 合并 {stats.get("merged", 0)} 段')
-        return stats
-    except (ImportError, AttributeError):
-        # merge_roads 尚未实现时直接通过
-        manifest["levels"]["roads"]["L2"] = {
-            "time": datetime.now().isoformat(timespec="seconds"),
-            "note": "merge_roads not available, skipped",
-        }
-        manifest["levels"]["roads"]["current"] = 2
-        print("  [L2] 道路: pass (merge_roads 未实现)")
-        return {}
+    """L2: 2.5D 道路拓扑焊接与吸附已在 L1 中一体化完成"""
+    manifest["levels"]["roads"]["L2"] = {
+        "time": datetime.now().isoformat(timespec="seconds"),
+        "note": "2.5D topology snapping and line merges already completed in L1",
+    }
+    manifest["levels"]["roads"]["current"] = 2
+    print("  [L2] 道路: pass (2.5D 吸附与拓扑焊接已在 L1 中一体化完成)")
+    return {}
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -665,7 +669,7 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
 
     if road_level < 1 or force:
         _copy_file(osm_src, osm_cleaned)
-        _roads_L1(osm_cleaned, osm_cleaned, manifest)
+        _roads_L1(osm_cleaned, osm_cleaned, area_cfg, manifest)
     else:
         print(f"  [L1] 跳过 (已在 L{road_level})")
         if not osm_cleaned.exists():
@@ -709,7 +713,7 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
     staging_dir = _staging_ready_dir(area_id)
     hr_dir = HOUDINI_READY / area_id
     try:
-        for name in ["buildings.geojson", "roads.osm", "dem.csv"]:
+        for name in ["buildings.geojson", "roads.osm", "roads_clean.geojson", "road_graph.json", "dem.csv"]:
             src = cl_dir / name
             dst = staging_dir / name
             if src.exists():
