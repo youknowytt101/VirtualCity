@@ -14,6 +14,8 @@ cd Scripts
 uv run python area_picker.py
 ```
 
+也可以在项目根目录双击 `启动VirtualCity操作台.cmd`。它会检查 Houdini RPYC 端口并自动打开本地网页操作台。
+
 当前完整流程：
 
 ```text
@@ -94,6 +96,10 @@ export_and_import.py（审核后）
 - `refine_data.py` 只在 QA 通过后发布 `_houdini_ready/{area_id}`；失败时保留上一版可用数据。
 - `area_picker.py` 在 `http://localhost:8765/health` 暴露服务版本。重复启动会复用同版本服务，检测到旧版服务则拒绝继续，避免误跑旧代码。
 - `area_picker.py` 默认用矩形工具框选固定 1km x 1km UTM 基础格；框选结果会吸附并补齐成连续矩形网格块，`/run` 接受 `tile_ids` 后由服务端重新计算 bbox。
+- `area_picker.py` 使用 OpenStreetMap 在线底图；数据获取仍然缓存优先，缺失时联网下载。
+- 网页支持三个主要动作：`Houdini 生成` 跑完整管线，`导出 FBX` 只导出已通过 Model QA 的当前区域，`下载数据` 只准备 OSM / DEM / 建筑原始数据并写入缓存。
+- 网页 Leaflet / Leaflet.draw 资源已本地化到 `Scripts/web_assets/`，避免依赖 CDN。
+- Houdini Model QA 通过，并且当前 Houdini 会话中视口显示节点 `OUT_city` 仍存在且几何非空时，网页才会启用“导出 FBX”按钮；该按钮只导出 `Houdini/Export/*.fbx`，不会触发 UE5 导入。
 - 网页缓存状态只保留两类：未缓存网格无填充，三类原始数据可本地恢复的网格显示半透明蓝色；“只显示已有缓存”复选框用于筛选。
 - Houdini 边界处理只做完整资产过滤：建筑/地基按连通块保留，道路按完整面片保留，禁止把边界过渡区资产切成半截。
 - 完成后区域选择器默认保留页面和 `/status` 状态接口；手动按 `Ctrl+C` 退出。仅在设置 `VC_AREA_PICKER_AUTO_SHUTDOWN=1` 时恢复自动关闭。

@@ -6,12 +6,14 @@ Houdini 必须已运行（RPYC 端口 18811）。
 
 用法:
     uv run python Scripts/export_and_import.py
+    uv run python Scripts/export_and_import.py --fbx-only
 """
 import sys, os, time
 from vc_paths import HIP, EXPORT, TRIGGER, SCRIPTS, load_active_area
 
 HIP = HIP.as_posix()
 EXPORT = EXPORT.as_posix()
+FBX_ONLY = "--fbx-only" in sys.argv
 
 # OBJ 网络名：从 active_area.json 读取
 _cfg = load_active_area()
@@ -29,8 +31,8 @@ EXPORTS = [
 def connect_hou():
     """H-001: 连接 Houdini，若 hip 未加载则自动加载"""
     import rpyc
-    conn = rpyc.classic.connect('localhost', 18811,
-                                config={'sync_request_timeout': 300})
+    conn = rpyc.classic.connect('localhost', 18811)
+    conn._config['sync_request_timeout'] = 300
     hou = conn.modules.hou
     if 'untitled' in hou.hipFile.path():
         hou.hipFile.load(HIP, suppress_save_prompt=True)
@@ -115,6 +117,12 @@ if failed:
     print(f'  [WARN] 失败: {failed}，其余已导出')
 else:
     print('  [OK] 全部 FBX 导出完成')
+
+if FBX_ONLY:
+    if failed:
+        sys.exit(1)
+    print('  [OK] FBX-only 模式完成，未触发 UE5 导入')
+    sys.exit(0)
 
 # ── 2. 写触发文件，通知 UE5 执行导入 ────────────────
 print("\n[2/2] 通知 UE5 导入 FBX...")

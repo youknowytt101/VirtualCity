@@ -166,7 +166,7 @@ def filter_buildings(tile_entry, bbox, output_geojson):
         filtered = [
             feat for feat in fc.get("features", [])
             if feat.get("geometry") and
-               shape(feat["geometry"]).centroid.within(region)
+               shape(feat["geometry"]).intersects(region)
         ]
 
         Path(output_geojson).parent.mkdir(parents=True, exist_ok=True)

@@ -27,7 +27,10 @@ Google Maps URL 获取方式:
     5. validate_data.py 验证 → Houdini recook + 更新裁剪节点
     [WARN] 导出（export_and_import.py）需用户确认视口后手动运行
 
-Houdini 必须已打开。UE5 可稍后打开。
+完整生成模式要求 Houdini 已打开。`--data-only` 不依赖 Houdini。UE5 可稍后打开。
+
+只下载数据、不触发 Houdini:
+    uv run python Scripts/set_area.py --data-only <west> <south> <east> <north> [area_name]
 """
 
 import sys, os, json, math, subprocess, time, re, atexit
@@ -40,6 +43,8 @@ import pipeline_state
 HIP = str(HIP)
 
 ACQUISITION_PROFILE = dcc.CURRENT_ACQUISITION_PROFILE
+DATA_ONLY = "--data-only" in sys.argv[1:]
+ARGS = [arg for arg in sys.argv[1:] if arg != "--data-only"]
 
 # ── 0. 解析参数（支持三种用法）─────────────────────────
 def _center_to_bbox(lon: float, lat: float, radius_km: float):
@@ -69,37 +74,37 @@ def _zoom_to_radius_km(zoom: float) -> float:
     # zoom 15 ≈ 1km, zoom 14 ≈ 2km, zoom 13 ≈ 4km, zoom 12 ≈ 8km
     return max(1.0, min(10.0, 2 ** (15 - zoom)))
 
-if len(sys.argv) < 2:
+if len(ARGS) < 1:
     print(__doc__)
     sys.exit(1)
 
-if sys.argv[1] == '--center':
-    if len(sys.argv) < 5:
+if ARGS[0] == '--center':
+    if len(ARGS) < 4:
         print("用法: set_area.py --center <lon> <lat> <radius_km> [area_name]")
         sys.exit(1)
-    _lon, _lat, _r = float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
+    _lon, _lat, _r = float(ARGS[1]), float(ARGS[2]), float(ARGS[3])
     west, south, east, north = _center_to_bbox(_lon, _lat, _r)
-    area_name = sys.argv[5] if len(sys.argv) > 5 else f"area_{_lon:.3f}_{_lat:.3f}"
+    area_name = ARGS[4] if len(ARGS) > 4 else f"area_{_lon:.3f}_{_lat:.3f}"
     print(f"  [--center] lon={_lon} lat={_lat} radius={_r}km → bbox=[{west:.4f},{south:.4f},{east:.4f},{north:.4f}]")
 
-elif sys.argv[1] == '--url':
-    if len(sys.argv) < 3:
+elif ARGS[0] == '--url':
+    if len(ARGS) < 2:
         print("用法: set_area.py --url \"<google_maps_url>\" [area_name]")
         sys.exit(1)
-    _parsed = _parse_google_maps_url(sys.argv[2])
+    _parsed = _parse_google_maps_url(ARGS[1])
     if not _parsed:
-        print(f"  [ERR] 无法从 URL 解析坐标: {sys.argv[2]}")
+        print(f"  [ERR] 无法从 URL 解析坐标: {ARGS[1]}")
         print("  URL 应包含 /@lat,lon,zoomz 格式，例如: https://www.google.com/maps/@12.942,100.889,14z")
         sys.exit(1)
     _lat, _lon, _zoom = _parsed
     _r = _zoom_to_radius_km(_zoom)
     west, south, east, north = _center_to_bbox(_lon, _lat, _r)
-    area_name = sys.argv[3] if len(sys.argv) > 3 else f"area_{_lon:.3f}_{_lat:.3f}"
+    area_name = ARGS[2] if len(ARGS) > 2 else f"area_{_lon:.3f}_{_lat:.3f}"
     print(f"  [--url] lat={_lat} lon={_lon} zoom={_zoom} → radius={_r:.1f}km → bbox=[{west:.4f},{south:.4f},{east:.4f},{north:.4f}]")
 
-elif len(sys.argv) >= 5 and sys.argv[1] not in ('--help', '-h'):
-    west, south, east, north = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
-    area_name = sys.argv[5] if len(sys.argv) > 5 else f"area_{west:.3f}_{south:.3f}"
+elif len(ARGS) >= 4 and ARGS[0] not in ('--help', '-h'):
+    west, south, east, north = float(ARGS[0]), float(ARGS[1]), float(ARGS[2]), float(ARGS[3])
+    area_name = ARGS[4] if len(ARGS) > 4 else f"area_{west:.3f}_{south:.3f}"
 
 else:
     print(__doc__)
@@ -114,6 +119,8 @@ print(f"[VirtualCity] 设置区域: {area_name}")
 print(f"  bbox: [{west}, {south}, {east}, {north}]")
 print(f"  中心: ({origin_lon:.4f}, {origin_lat:.4f})")
 print(f"  尺寸: {bbox_w/1000:.1f} km × {bbox_h/1000:.1f} km")
+if DATA_ONLY:
+    print("  模式: 仅下载数据（跳过 refine_data 与 Houdini 重算）")
 print(f"{'='*50}\n")
 
 osm_path       = str(DATA_ROOT / f"OSM/{area_name}_osm_v001.osm")
@@ -139,9 +146,14 @@ cfg = {
 RUN_ID = pipeline_state.new_run_id(area_name)
 cfg["run_id"] = RUN_ID
 pipeline_state.create_run(cfg, source="set_area", run_id=RUN_ID)
-write_active_area(cfg, relative=True)
-pipeline_state.update_run(RUN_ID, phase="active_area_written", message="active_area.json updated")
-print(f"[1/5] [OK] active_area.json 已更新: {area_name}")
+if DATA_ONLY:
+    pipeline_state.update_run(RUN_ID, phase="download_area_prepared",
+                              message="data-only area prepared without changing active_area.json")
+    print(f"[1/5] [OK] 下载区域已准备，不切换 active_area.json: {area_name}")
+else:
+    write_active_area(cfg, relative=True)
+    pipeline_state.update_run(RUN_ID, phase="active_area_written", message="active_area.json updated")
+    print(f"[1/5] [OK] active_area.json 已更新: {area_name}")
 print(f"[RUN] run_id={RUN_ID}")
 _RUN_FINALIZED = False
 
@@ -190,7 +202,8 @@ if clip_manifest:
             "restored_at": clip_manifest.get("restored_at"),
         }
     }
-    write_active_area(cfg, relative=True)
+    if not DATA_ONLY:
+        write_active_area(cfg, relative=True)
     print(f"  [clip-cache] 命中 {clip_manifest.get('key')}，已恢复 OSM/DEM/建筑原始裁切")
 
 # ── 2. OSM：优先本地缓存裁剪 → 备用 Overpass 下载 ──
@@ -281,7 +294,8 @@ try:
 
     # 记录 DEM 来源，供下游决定是否需要 DTM 修正
     cfg["dem_source"] = dem_source
-    write_active_area(cfg, relative=True)
+    if not DATA_ONLY:
+        write_active_area(cfg, relative=True)
     print(f"  [OK] DEM 完成 (source={dem_source})")
 except Exception as ex:
     _abort("acquire_dem", f"DEM 下载失败: {ex}")
@@ -327,8 +341,23 @@ if not clip_manifest:
                 "bbox": clip_manifest.get("bbox"),
             }
         }
-        write_active_area(cfg, relative=True)
+        if not DATA_ONLY:
+            write_active_area(cfg, relative=True)
         print(f"  [clip-cache] 已写入 {clip_manifest.get('key')}")
+
+if DATA_ONLY:
+    pipeline_state.complete_run(RUN_ID, phase="data_download_completed",
+                                message="raw data acquisition and clip cache completed")
+    _RUN_FINALIZED = True
+    print(f"""
+{'='*50}
+[OK] 数据下载完成: {area_name}
+{'='*50}
+
+[INFO] 已准备 OSM / DEM / 建筑原始数据，并写入缓存。
+       之后在网页中点击 [Houdini 生成] 会优先复用这些数据。
+""")
+    raise SystemExit(0)
 
 # ── 5. 数据精炼 + 验证 + Houdini recook ──────────────
 print(f"\n[5/6] 数据精炼（清洗 + 补全 + QA）...")

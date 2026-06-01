@@ -29,19 +29,6 @@ except ImportError:
 
 DATA_ROOT = vc_paths.DATA_ROOT if vc_paths else ROOT / 'RawData'
 
-AREAS = {
-    "pattaya_sai6_mvp": {
-        "bbox": [100.866, 12.922, 100.882, 12.938],
-        "output_tif": str(DATA_ROOT / "DEM" / "pattaya_sai6_mvp_dem_v001.tif"),
-        "output_csv": str(DATA_ROOT / "DEM" / "pattaya_sai6_mvp_dem_v001.csv"),
-    },
-    "pattaya_sai6_mvp_v2": {
-        "bbox": [100.860, 12.916, 100.888, 12.944],
-        "output_tif": str(DATA_ROOT / "DEM" / "pattaya_sai6_mvp_v2_dem_v001.tif"),
-        "output_csv": str(DATA_ROOT / "DEM" / "pattaya_sai6_mvp_v2_dem_v001.csv"),
-    },
-}
-
 EE_PROJECT = "pty-zone"
 
 
@@ -168,13 +155,13 @@ def download_gee(cfg, source="nasadem"):
     print("完成 [OK]")
 
 
-def run(area_name, source="fabdem"):
-    cfg = AREAS.get(area_name)
-    if not cfg:
-        print(f"未知区域: {area_name}，可用: {list(AREAS.keys())}")
+def run(cfg, source="fabdem"):
+    """Download DEM for a given cfg dict (bbox, output_tif, output_csv)."""
+    bbox = cfg.get("bbox")
+    if not bbox or len(bbox) != 4:
+        print("cfg 缺少有效的 bbox")
         sys.exit(1)
-
-    print(f"[VirtualCity] 下载 DEM: {area_name}  source={source}")
+    print(f"[VirtualCity] 下载 DEM: bbox={bbox}  source={source}")
 
     if source == "fabdem":
         try:
@@ -237,6 +224,18 @@ def convert_to_csv(tif_path, csv_path, bbox):
 
 
 if __name__ == "__main__":
-    area   = sys.argv[1] if len(sys.argv) > 1 else "pattaya_sai6_mvp_v2"
-    source = sys.argv[2] if len(sys.argv) > 2 else "fabdem"
-    run(area, source)
+    # Standalone usage: pass bbox as 4 floats + optional source
+    #   uv run python download_dem.py west south east north [source]
+    if len(sys.argv) < 5:
+        print("用法: uv run python download_dem.py <west> <south> <east> <north> [source]")
+        print("  source: fabdem (default) | copernicus | nasadem | srtm")
+        sys.exit(1)
+    west, south, east, north = map(float, sys.argv[1:5])
+    source = sys.argv[5] if len(sys.argv) > 5 else "fabdem"
+    area_slug = f"area_{west:.3f}_{south:.3f}"
+    cfg = {
+        "bbox": [west, south, east, north],
+        "output_tif": str(DATA_ROOT / "DEM" / f"{area_slug}_dem_v001.tif"),
+        "output_csv": str(DATA_ROOT / "DEM" / f"{area_slug}_dem_v001.csv"),
+    }
+    run(cfg, source)

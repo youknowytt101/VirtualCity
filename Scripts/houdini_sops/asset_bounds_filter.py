@@ -108,7 +108,7 @@ else:
 
 if drop:
     doomed = [prim for prim in geo.prims() if prim.number() in drop]
-    geo.deletePrims(doomed, True)
+    geo.deletePrims(doomed, False)
 
 set_global("asset_bounds_filter_mode", MODE)
 set_global("asset_bounds_kept_units", int(kept_units))

@@ -65,28 +65,88 @@ def _idw_fill(grid, mask, radius=3, power=2):
     power : IDW exponent
     """
     result = grid.copy()
-    rows, cols = np.where(mask)
     nrows, ncols = grid.shape
 
-    for r, c in zip(rows, cols):
-        r0 = max(0, r - radius)
-        r1 = min(nrows, r + radius + 1)
-        c0 = max(0, c - radius)
-        c1 = min(ncols, c + radius + 1)
-        patch = grid[r0:r1, c0:c1]
-        pmask = mask[r0:r1, c0:c1]
-        valid = ~pmask & ~np.isnan(patch)
-        if not valid.any():
-            continue
-        dr = np.arange(r0, r1) - r
-        dc = np.arange(c0, c1) - c
-        DC, DR = np.meshgrid(dc, dr)
-        dist = np.sqrt(DR**2 + DC**2)
-        dist[dist == 0] = 1e-6
-        w = (1.0 / dist**power) * valid
-        result[r, c] = (w * patch).sum() / w.sum()
+    try:
+        from scipy.spatial import cKDTree
+        # ── 1. Grid coordinate meshgrid ──
+        r_grid, c_grid = np.meshgrid(np.arange(nrows), np.arange(ncols), indexing='ij')
 
-    return result
+        # ── 2. Locate valid source coordinates and values ──
+        valid_mask = ~mask & ~np.isnan(grid)
+        if not valid_mask.any():
+            return result
+        valid_coords = np.column_stack((r_grid[valid_mask], c_grid[valid_mask]))
+        valid_values = grid[valid_mask]
+
+        # ── 3. Locate target coordinates to fill ──
+        masked_coords = np.column_stack((r_grid[mask], c_grid[mask]))
+        if len(masked_coords) == 0:
+            return result
+
+        # ── 4. Build spatial tree over valid points ──
+        tree = cKDTree(valid_coords)
+
+        # ── 5. Query neighbors within cell radius ──
+        k = 12
+        dists, indices = tree.query(masked_coords, k=k, distance_upper_bound=radius + 0.1)
+
+        # ── 6. Filter out-of-bounds search values and compute IDW ──
+        valid_neighbors = (dists < np.inf)
+        safe_indices = np.where(valid_neighbors, indices, 0)
+        neighbor_values = valid_values[safe_indices]
+
+        dists[dists == 0] = 1e-6
+        weights = 1.0 / (dists ** power)
+        weights[~valid_neighbors] = 0.0
+
+        weight_sum = weights.sum(axis=1)
+        has_neighbors = weight_sum > 0
+
+        weighted_sum = (weights * neighbor_values).sum(axis=1)
+        interpolated = np.zeros(len(masked_coords))
+        interpolated[has_neighbors] = weighted_sum[has_neighbors] / weight_sum[has_neighbors]
+
+        # ── 7. Vectorized write back to the result array ──
+        mask_rows = masked_coords[:, 0]
+        mask_cols = masked_coords[:, 1]
+        result[mask_rows[has_neighbors], mask_cols[has_neighbors]] = interpolated[has_neighbors]
+        return result
+
+    except ImportError:
+        # Fallback to optimized NumPy window loop if SciPy is not available
+        rows, cols = np.where(mask)
+        dr = np.arange(-radius, radius + 1)
+        dc = np.arange(-radius, radius + 1)
+        DC, DR = np.meshgrid(dc, dr)
+        dist_kernel = np.sqrt(DR**2 + DC**2)
+        dist_kernel[radius, radius] = 1e-6  # avoid division by zero at center
+        weight_kernel = 1.0 / (dist_kernel ** power)
+
+        for r, c in zip(rows, cols):
+            r0 = max(0, r - radius)
+            r1 = min(nrows, r + radius + 1)
+            c0 = max(0, c - radius)
+            c1 = min(ncols, c + radius + 1)
+
+            patch = grid[r0:r1, c0:c1]
+            pmask = mask[r0:r1, c0:c1]
+            valid = ~pmask & ~np.isnan(patch)
+            if not valid.any():
+                continue
+
+            # Get the corresponding sliced weight kernel centered relative to (r, c)
+            kr0 = r0 - r + radius
+            kr1 = r1 - r + radius
+            kc0 = c0 - c + radius
+            kc1 = c1 - c + radius
+            w = weight_kernel[kr0:kr1, kc0:kc1] * valid
+
+            w_sum = w.sum()
+            if w_sum > 0:
+                result[r, c] = (w * patch).sum() / w_sum
+
+        return result
 
 
 # ── 主修正函数 ────────────────────────────────────────────────────────────────
@@ -141,16 +201,24 @@ def correct_dtm(area_cfg: dict, verbose: bool = True) -> bool:
         geom = feat.get('geometry')
         if geom is None:
             continue
-        rings = (geom['coordinates']
-                 if geom['type'] == 'Polygon'
-                 else geom['coordinates'][0])
-        ring = rings[0]
-        local = []
-        for coord in ring:
-            lx, lz = _wgs84_to_local(coord[0], coord[1], origin_lon, origin_lat)
-            local.append(local_xz_to_houdini_xz(lx, lz))   # 唯一 z 翻转处集中在 vc_geo
-        if len(local) >= 3:
-            polys.append(local)
+        gtype = geom.get('type')
+        if gtype == 'Polygon':
+            poly_list = [geom['coordinates']]
+        elif gtype == 'MultiPolygon':
+            poly_list = geom['coordinates']
+        else:
+            continue
+
+        for poly in poly_list:
+            if not poly:
+                continue
+            ring = poly[0]
+            local = []
+            for coord in ring:
+                lx, lz = _wgs84_to_local(coord[0], coord[1], origin_lon, origin_lat)
+                local.append(local_xz_to_houdini_xz(lx, lz))   # 唯一 z 翻转处集中在 vc_geo
+            if len(local) >= 3:
+                polys.append(local)
 
     if verbose:
         print(f'[dtm] Building polygons loaded: {len(polys)}')

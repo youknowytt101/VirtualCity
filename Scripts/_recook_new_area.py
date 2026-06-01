@@ -254,6 +254,32 @@ if _rs_node:
     _rs_node.setInput(0, _rwf_node, 0)
     print('  road_strips v5 已更新（复杂路口降级 + 调试属性 + 自交保护）')
 
+# ── 1d2. Road Topology Builder（A/B 可选）────────────────────────────
+# 说明：该节点在 'road_width_flat' 之后按拓扑半径截断 + 扇面缝合生成道路面片，
+# 通过 'road_source' Switch 在现有 road_strips 与新生成之间切换，默认仍选用 road_strips。
+try:
+    RTB_CODE = houdini_sops.load('road_topology_builder.py')
+    rtb_node = hou.node(OBJ_PATH + '/road_topology_builder')
+    if rtb_node is None:
+        rtb_node = net.createNode('python', 'road_topology_builder')
+    rtb_node.setInput(0, _rwf_node, 0)
+    rtb_node.parm('python').set(RTB_CODE)
+    # 路径选择器：0=road_strips（默认），1=road_topology_builder
+    source_switch = hou.node(OBJ_PATH + '/road_source')
+    if source_switch is None:
+        source_switch = net.createNode('switch', 'road_source')
+    # 确保两路输入就绪
+    rs_node_ref = hou.node(OBJ_PATH + '/road_strips')
+    if rs_node_ref:
+        source_switch.setInput(0, rs_node_ref, 0)
+    source_switch.setInput(1, rtb_node, 0)
+    # 默认使用现有 road_strips，避免回归风险；可在网络中手动将 input 设为 1 切为新算法
+    if source_switch.parm('input').eval() not in (0, 1):
+        source_switch.parm('input').set(0)
+    print("  road_topology_builder 已注入（A/B 可选，切换节点: road_source，input=0→strips,1→builder）")
+except Exception as _e:
+    print(f"  [WARN] Road Topology Builder 注入失败，保持使用 road_strips: {_e}")
+
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
 BLD_SNAP_VEX = houdini_sops.load('bld_snap.vex')
 snap_bld = hou.node(OBJ_PATH + '/snap_bld_to_terrain')
@@ -276,7 +302,17 @@ for path in [OBJ_PATH + '/osm_import', OBJ_PATH + '/dem_import',
     n = hou.node(path)
     if not n:
         continue
-    n.cook(force=True)
+    print(f'  Cooking: {path}')
+    try:
+        n.cook(force=True)
+    except Exception as e:
+        print(f'  [ERROR] Cook failed for {path}!')
+        try:
+            print(f'  Node errors:\n{n.errors()}')
+            print(f'  Node warnings:\n{n.warnings()}')
+        except Exception as e2:
+            print(f'  Could not retrieve node errors: {e2}')
+        raise e
     geo  = n.geometry()
     pts  = geo.intrinsicValue('pointcount')
     prm  = geo.intrinsicValue('primitivecount')
@@ -420,8 +456,10 @@ old_drape = hou.node(OBJ_PATH + '/snap_road_strips')
 if old_drape:
     old_drape.destroy()
 road_strips_node = hou.node(OBJ_PATH + '/road_strips')
+road_source_switch = hou.node(OBJ_PATH + '/road_source')
+road_mesh_src = road_source_switch if road_source_switch is not None else road_strips_node
 snap_road_strips = net.createNode('attribwrangle', 'snap_road_strips')
-snap_road_strips.setInput(0, road_strips_node)
+snap_road_strips.setInput(0, road_mesh_src)
 snap_road_strips.setInput(1, snap_target)
 snap_road_strips.parm('class').set(2)   # Point
 snap_road_strips.parm('snippet').set(ROAD_DRAPE_VEX)

@@ -516,10 +516,50 @@ def probe_sources(area_cfg: dict, manifest: dict) -> list[dict]:
 
     print("  [probe] 检查数据源更新...")
 
-    # Overture: 检查远端版本（简化实现：标记为可选更新）
+    # Overture: 检查远端版本
     provider = area_cfg.get("sources", {}).get("buildings", {}).get("provider", "overture")
     local_ver = bld_source.get("version", "unknown")
-    # 实际实现中会查询远端 API，这里仅标记探测时间
+
+    # 真实实现：发送带超时和异常防护的 HTTP 请求，探测远端数据版本
+    import urllib.request
+    import urllib.error
+    import re
+
+    # 1. 探测 Overpass API 的最新数据库时间戳
+    try:
+        req = urllib.request.Request(
+            "https://overpass-api.de/api/status",
+            headers={"User-Agent": "VirtualCity/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            status_text = resp.read().decode("utf-8", errors="ignore")
+            match = re.search(r"Last database update:\s*([^\n]+)", status_text)
+            if match:
+                remote_db_time = match.group(1).strip()
+                print(f"  [probe] Overpass DB 远端最新更新时间: {remote_db_time}")
+                manifest.setdefault("sources", {}).setdefault("roads", {})["remote_db_time"] = remote_db_time
+    except Exception as e:
+        print(f"  [probe] Overpass 探测跳过 (网络连接异常/超时: {e})")
+
+    # 2. 探测 Overture Maps 的最新 Release 版本
+    try:
+        req = urllib.request.Request(
+            "https://api.github.com/repos/OvertureMaps/data/releases/latest",
+            headers={"User-Agent": "VirtualCity/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            tag_name = data.get("tag_name", "")
+            if tag_name:
+                print(f"  [probe] Overture Maps 远端最新版本: {tag_name}")
+                if local_ver != "unknown" and tag_name != local_ver:
+                    print(f"  [probe] 发现新版本建筑数据! 本地: {local_ver} -> 远端: {tag_name}")
+                    updates.append({"source": "overture", "local": local_ver, "remote": tag_name})
+                manifest.setdefault("sources", {}).setdefault("buildings", {})["remote_version"] = tag_name
+    except Exception as e:
+        print(f"  [probe] Overture 探测跳过 (网络连接异常/超时: {e})")
+
+    # 记录最后探测时间
     manifest.setdefault("sources", {}).setdefault("buildings", {})["last_probe"] = \
         datetime.now().isoformat(timespec="seconds")
 
