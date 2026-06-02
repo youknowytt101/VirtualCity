@@ -1,0 +1,49 @@
+{
+  "area_id": "pattaya_central_500m",
+  "input": "D:\\VirtualCity\\项目管理\\道路研究\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+  "input_mode": "repaired",
+  "outputs": {
+    "surface_geojson": "D:\\VirtualCity\\项目管理\\道路研究\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview_surfaces.geojson",
+    "obj": "D:\\VirtualCity\\项目管理\\道路研究\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.obj",
+    "svg": "D:\\VirtualCity\\项目管理\\道路研究\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.svg"
+  },
+  "counts": {
+    "edges": 243,
+    "endpoint_clusters": 233,
+    "junction_nodes_degree_ge_3": 49,
+    "junction_clusters": 42,
+    "road_surface_polygons": 243,
+    "road_surface_trimmed_polygons": 118,
+    "road_surface_absorbed_by_junction": 0,
+    "road_centerline_features": 243,
+    "junction_patch_polygons": 42,
+    "junction_clustered_nodes": 49,
+    "obj_vertices": 2219,
+    "obj_faces": 285,
+    "obj_centerlines": 243,
+    "obj_junction_patches": 42
+  },
+  "junction_patch_area_m2": {
+    "min_m2": 49.251,
+    "median_m2": 197.004,
+    "max_m2": 348.749,
+    "outliers_gt_4x_median": 0
+  },
+  "road_surface_extrusion": {
+    "rule": "road surface is offset from retained centerline by width_m / 2 on both sides",
+    "generated_surfaces": 243,
+    "trimmed_at_junction": 118,
+    "absorbed_by_junction": 0,
+    "max_width_error_m": 0.0,
+    "max_centering_error_m": 0.0
+  },
+  "highway_class_counts": {
+    "secondary": 93,
+    "service": 82,
+    "residential": 68
+  },
+  "notes": [
+    "V2 standalone preview uses road segment quads, retained road centerlines and clustered junction patches.",
+    "This is for continuity and junction visual testing only, not final lane-level geometry."
+  ]
+}

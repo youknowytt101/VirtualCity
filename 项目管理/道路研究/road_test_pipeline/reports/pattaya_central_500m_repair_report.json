@@ -1,0 +1,48 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "topology_repair_v2",
+  "input": "D:\\VirtualCity\\项目管理\\道路研究\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
+  "output": "D:\\VirtualCity\\项目管理\\道路研究\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+  "parameters": {
+    "snap_endpoint_m": 4.0,
+    "snap_edge_m": 5.0,
+    "node_eps_m": 0.25,
+    "short_edge_m": 3.0,
+    "bbox_edge_margin_m": 5.0
+  },
+  "counts": {
+    "input_features": 44,
+    "output_edges": 243,
+    "duplicate_points_removed": 0,
+    "endpoint_snaps": 2,
+    "endpoint_to_edge_snaps": 0,
+    "intersection_split_insertions": 0,
+    "short_edges_before_cleanup": 23,
+    "short_edge_threshold_m": 3,
+    "short_edge_collapse_passes": 1,
+    "short_edge_points_removed": 15,
+    "short_edges_remaining_under_threshold_pre_output": 1,
+    "short_edges_remaining_under_threshold": 0
+  },
+  "endpoint_stats_before": {
+    "endpoint_clusters": 84,
+    "dangling_endpoint_clusters": 80,
+    "dangling_endpoint_ratio": 0.952
+  },
+  "endpoint_stats_after_parent_roads": {
+    "endpoint_clusters": 83,
+    "dangling_endpoint_clusters": 78,
+    "dangling_endpoint_ratio": 0.94
+  },
+  "endpoint_stats_after_output_edges": {
+    "endpoint_clusters": 233,
+    "dangling_endpoint_clusters": 31,
+    "dangling_endpoint_ratio": 0.133
+  },
+  "notes": [
+    "V2 solves road continuity, planar junction insertion and conservative short-edge cleanup.",
+    "Bridge, tunnel and layer-separated crossings are not planarized.",
+    "Short-edge cleanup preserves road endpoints, junction anchors and bbox boundary points.",
+    "Output is split into simple two-point edges for later road_graph building."
+  ]
+}

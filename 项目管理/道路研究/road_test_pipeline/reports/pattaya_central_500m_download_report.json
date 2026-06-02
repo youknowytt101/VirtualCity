@@ -1,0 +1,46 @@
+{
+  "area_id": "pattaya_central_500m",
+  "label": "Pattaya Central Beach Road / Second Road 500m test area",
+  "center": {
+    "lat": 12.93425,
+    "lon": 100.8837
+  },
+  "size_m": {
+    "width": 500,
+    "height": 500
+  },
+  "bbox": {
+    "south": 12.932004222062522,
+    "west": 100.88139575783167,
+    "north": 12.936495777937479,
+    "east": 100.88600424216834
+  },
+  "provider": "openstreetmap_overpass",
+  "endpoint_used": "https://overpass-api.de/api/interpreter",
+  "endpoint_errors": [],
+  "outputs": {
+    "osm_xml": "D:\\VirtualCity\\项目管理\\道路研究\\road_test_pipeline\\data\\raw\\pattaya_central_500m_roads.osm",
+    "roads_raw_geojson": "D:\\VirtualCity\\项目管理\\道路研究\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson"
+  },
+  "counts": {
+    "nodes": 268,
+    "highway_ways": 44,
+    "turn_restriction_relations": 1,
+    "ways_with_lanes": 16,
+    "ways_with_turn_lanes": 0,
+    "ways_with_width": 0,
+    "ways_with_oneway": 10,
+    "ways_with_maxspeed": 1,
+    "ways_with_bridge_or_tunnel_or_layer": 0
+  },
+  "highway_class_counts": {
+    "service": 27,
+    "residential": 14,
+    "secondary": 3
+  },
+  "notes": [
+    "This sample is isolated from the main VirtualCity pipeline.",
+    "Lane-level data is expected to be partial in free OSM data; lane_graph must be inferred later.",
+    "Topology repair, endpoint snapping and junction clustering are intentionally not performed in this downloader."
+  ]
+}
