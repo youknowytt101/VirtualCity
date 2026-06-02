@@ -1,0 +1,50 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "optimized_centerlines_v1",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+  "movement_debug_output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_movements_debug.geojson",
+  "counts": {
+    "input_edges": 243,
+    "optimized_approaches": 243,
+    "dropped_short_edges": 0,
+    "junction_nodes": 49,
+    "junction_connectors": 149,
+    "t_junctions": 47,
+    "t_junction_connectors": 141,
+    "junction_movement_debug": 153,
+    "junction_through_movements": 51,
+    "junction_turn_movements": 102,
+    "corner_fillet_nodes": 21,
+    "corner_fillets": 21,
+    "output_features": 413,
+    "t_branch_trim_adjustments": 42,
+    "t_branch_trim_max_delta_m": 3.379,
+    "t_branch_trim_avg_delta_m": 2.555
+  },
+  "junction_degree_counts": {
+    "3": 47,
+    "4": 2
+  },
+  "junction_connector_style_counts": {
+    "adjacent_fallback": 8,
+    "t_through": 47,
+    "t_turn": 94
+  },
+  "corner_fillet_metrics": {
+    "min_turn_deg": 20.983,
+    "max_turn_deg": 93.36,
+    "avg_turn_deg": 71.099,
+    "max_cut_m": 12.0,
+    "width_factor": 0.85,
+    "edge_length_factor": 0.38,
+    "samples": 9
+  },
+  "notes": [
+    "This stage optimizes centerlines before road width extrusion, matching the sketch-driven junction approach.",
+    "Approach lines are clipped near junctions; visible junction connectors stay in the centerline skeleton.",
+    "Road-level through/turn movement curves are exported to a separate debug layer so they do not visually cross the road skeleton.",
+    "Degree-2 connector bends are locally filleted with stronger tangent-continuous cubic corner curves; endpoints and junction nodes are preserved.",
+    "Surface builders should consume this optimized centerline output before using any fan fallback."
+  ]
+}

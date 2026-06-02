@@ -1,0 +1,23 @@
+{
+  "area_id": "pattaya_central_500m",
+  "mode": "open_houdini_session",
+  "timestamp": "2026-06-03 02:48:45",
+  "refresh_behavior": "replace_existing_road_test_object",
+  "obj_node": "/obj/road_test_pattaya_central_500m",
+  "display_node": "/obj/road_test_pattaya_central_500m/OUT_roads_centerlines",
+  "geojson_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+  "geojson_mode": "optimized_centerlines",
+  "preview_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_road_preview_report.json",
+  "qa_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_topology_repair_qa_report.json",
+  "input_features": 413,
+  "centerline_prims": 413,
+  "preview_output_prims": 413,
+  "preview_output_points": 2282,
+  "lane_debug_node": "/obj/road_test_pattaya_central_500m/OUT_lane_connections_debug",
+  "lane_debug_prims": 1814,
+  "lane_debug_points": 13011,
+  "lane_surface_node": "/obj/road_test_pattaya_central_500m/OUT_lane_surfaces_v1",
+  "lane_surface_prims": 907,
+  "lane_surface_points": 8674,
+  "note": "This cook did not clear or save the current HIP scene."
+}

@@ -1,0 +1,48 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "lane_geometry_debug_v1",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+  "outputs": {
+    "geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.geojson",
+    "obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.obj",
+    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.svg"
+  },
+  "counts": {
+    "lanes": 612,
+    "lane_links": 253,
+    "continuity_links": 42,
+    "lane_ribbons": 612,
+    "lane_centerlines": 612,
+    "lane_link_ribbons": 253,
+    "lane_link_curves": 253,
+    "lane_continuity_ribbons": 42,
+    "lane_continuity_curves": 42,
+    "obj_vertices": 13011,
+    "obj_lines": 907,
+    "obj_faces": 907
+  },
+  "turn_counts": {
+    "left": 60,
+    "right": 44,
+    "through": 149
+  },
+  "metrics": {
+    "empty_lane_link_curves": 0,
+    "empty_continuity_curves": 0,
+    "avg_lane_link_curve_length_m": 7.499,
+    "max_lane_link_curve_length_m": 10.391,
+    "avg_continuity_curve_length_m": 5.229,
+    "max_continuity_curve_length_m": 5.868,
+    "avg_lane_width_m": 3.2,
+    "min_lane_width_m": 3.2,
+    "max_lane_width_m": 3.2,
+    "avg_width_confidence": 0.45,
+    "lane_ribbon_width_m": 0.7,
+    "lane_link_ribbon_width_m": 1.0
+  },
+  "notes": [
+    "Debug ribbons are intentionally narrow and are not final lane surfaces.",
+    "This layer verifies lane direction and laneLink turn paths before junction surface generation.",
+    "Continuity links preserve optimized road-level corner fillets when inspecting lane-level geometry."
+  ]
+}

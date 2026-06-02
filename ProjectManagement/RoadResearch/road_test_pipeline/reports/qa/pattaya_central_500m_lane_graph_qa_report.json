@@ -1,0 +1,128 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "lane_graph",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "lanes",
+      "status": "pass",
+      "value": 612,
+      "threshold": 40,
+      "message": "Lane graph should expose enough lane centerlines for junction connection research."
+    },
+    {
+      "id": "junctions",
+      "status": "pass",
+      "value": 49,
+      "threshold": 1,
+      "message": "Lane graph should include junction models derived from road_graph junction nodes."
+    },
+    {
+      "id": "connections",
+      "status": "pass",
+      "value": 164,
+      "threshold": 1,
+      "message": "Semantic junctions should infer at least one road-level movement."
+    },
+    {
+      "id": "lane_links",
+      "status": "pass",
+      "value": 253,
+      "threshold": 1,
+      "message": "Allowed movements should produce laneLinks for downstream Houdini connection surfaces."
+    },
+    {
+      "id": "lane_link_reference_errors",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Every laneLink from_lane and to_lane should reference an existing lane."
+    },
+    {
+      "id": "blocked_lane_links",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Blocked or disallowed semantic movements must not produce laneLinks."
+    },
+    {
+      "id": "empty_connection_curves",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Every lane-level connection should carry a usable connecting curve."
+    },
+    {
+      "id": "fan_fallback_ratio",
+      "status": "pass",
+      "value": 0.0,
+      "threshold": 0.95,
+      "message": "Layer 3 should avoid junction fan fallback; lane-boundary envelopes belong to the later geometry layer."
+    },
+    {
+      "id": "avg_lane_links_per_junction",
+      "status": "pass",
+      "value": 5.163,
+      "threshold": 1.0,
+      "message": "LaneLink density is low; review oneway, lane count and movement inference."
+    }
+  ],
+  "metrics": {
+    "counts": {
+      "lanes": 612,
+      "junctions": 49,
+      "approach_lane_records": 149,
+      "connections": 164,
+      "lane_links": 253,
+      "continuity_links": 42,
+      "optimized_approach_centerlines": 243,
+      "optimized_junction_connectors": 149,
+      "optimized_junction_connector_lane_links": 245,
+      "optimized_corner_fillet_links": 42,
+      "fan_fallback_junctions": 0
+    },
+    "turn_counts": {
+      "left": 60,
+      "right": 44,
+      "through": 60
+    },
+    "lane_source_counts": {
+      "default": 180,
+      "tag": 432
+    },
+    "connection_source_counts": {
+      "geometry_inferred_from_osm": 164
+    },
+    "lane_link_source_counts": {
+      "junction_semantics": 253
+    },
+    "fallback_counts": {
+      "not_generated_layer3_lane_graph_only": 49
+    },
+    "lane_graph_metrics": {
+      "junctions_with_connections_ratio": 1.0,
+      "fan_fallback_ratio": 0.0,
+      "avg_lane_links_per_junction": 5.163,
+      "lane_link_reference_errors": 0,
+      "blocked_lane_links": 0,
+      "empty_connection_curves": 0,
+      "avg_lane_link_confidence": 0.82,
+      "min_lane_link_confidence": 0.82,
+      "avg_curve_length_m": 7.499,
+      "max_curve_length_m": 10.391,
+      "avg_continuity_curve_length_m": 5.229,
+      "max_continuity_curve_length_m": 5.868,
+      "avg_lane_width_m": 3.2,
+      "min_lane_width_m": 3.2,
+      "max_lane_width_m": 3.2,
+      "avg_lane_width_confidence": 0.45,
+      "max_lane_width_start_end_delta_m": 0.0
+    }
+  },
+  "inputs": {
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "lane_graph_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
+    "rules": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+  },
+  "next_action": "Use optimized centerlines first, then use lane_graph connections for lane-level junction surfaces."
+}

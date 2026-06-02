@@ -1,0 +1,47 @@
+{
+  "raw_roads": {
+    "min_feature_count": 20,
+    "max_empty_geometry": 0,
+    "max_duplicate_point_features": 0,
+    "max_too_short_features": 0,
+    "too_short_m": 2.0,
+    "warn_lanes_coverage_pct_below": 35.0,
+    "warn_width_coverage_pct_below": 20.0,
+    "warn_turn_lanes_coverage_pct_below": 5.0,
+    "warn_oneway_coverage_pct_below": 10.0,
+    "warn_dangling_endpoint_ratio_above": 0.45,
+    "warn_possible_unsplit_crossings_above": 0,
+    "warn_low_confidence_endpoint_clusters_above": 0
+  },
+  "topology_repair": {
+    "min_output_edges": 40,
+    "max_empty_geometry": 0,
+    "max_duplicate_point_features": 0,
+    "max_too_short_features": 2,
+    "warn_dangling_endpoint_ratio_above": 0.15,
+    "warn_possible_unsplit_crossings_above": 0,
+    "warn_no_repair_ops_if_dangling_above": 0.50
+  },
+  "road_graph": {
+    "min_nodes": 40,
+    "min_edges": 40,
+    "min_junction_nodes": 1,
+    "max_skipped_empty_geometry": 0,
+    "max_zero_length_edges": 0,
+    "max_orphan_edges": 0,
+    "warn_dead_end_ratio_above": 0.12,
+    "warn_width_fallback_ratio_above": 0.80,
+    "warn_lanes_fallback_ratio_above": 0.60
+  },
+  "lane_graph": {
+    "min_lanes": 40,
+    "min_junctions": 1,
+    "min_connections": 1,
+    "min_lane_links": 1,
+    "max_lane_link_reference_errors": 0,
+    "max_blocked_lane_links": 0,
+    "max_empty_connection_curves": 0,
+    "warn_fan_fallback_ratio_above": 0.95,
+    "warn_avg_lane_links_per_junction_below": 1.0
+  }
+}

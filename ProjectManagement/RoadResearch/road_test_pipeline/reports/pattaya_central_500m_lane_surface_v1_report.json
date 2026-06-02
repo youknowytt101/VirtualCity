@@ -1,0 +1,42 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "lane_surface_v1",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+  "outputs": {
+    "geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.geojson",
+    "obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.obj",
+    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.svg"
+  },
+  "counts": {
+    "lanes": 612,
+    "lane_links": 253,
+    "continuity_links": 42,
+    "lane_surfaces": 612,
+    "lane_turn_surfaces": 253,
+    "lane_continuity_surfaces": 42,
+    "obj_vertices": 8674,
+    "obj_faces": 907
+  },
+  "metrics": {
+    "trim_start_lane_count": 0,
+    "trim_end_lane_count": 0,
+    "junction_trim_m": 8.0,
+    "approach_centerlines_trimmed": true,
+    "corner_continuity_trimmed_lane_count": 62,
+    "avg_lane_surface_width_m": 3.2,
+    "avg_turn_surface_width_m": 3.2,
+    "avg_continuity_surface_width_m": 3.2,
+    "area_by_part_m2": {
+      "lane_surface_v1": 56380.563,
+      "lane_turn_surface_v1": 6059.443,
+      "lane_continuity_surface_v1": 700.323
+    },
+    "total_area_m2": 63140.329
+  },
+  "notes": [
+    "Approach lane surfaces use optimized trimmed centerlines when available; raw fallback still trims near junctions using laneLink membership.",
+    "LaneLink turn surfaces are generated from connector curves.",
+    "Continuity surfaces are generated from optimized corner fillet lane links for degree-2 road bends.",
+    "Junction envelope, curb, island, sidewalk and marking generation are deferred."
+  ]
+}

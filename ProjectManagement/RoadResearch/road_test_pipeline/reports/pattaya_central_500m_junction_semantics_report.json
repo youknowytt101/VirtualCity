@@ -1,0 +1,40 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "junction_semantics_v1",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
+  "counts": {
+    "junctions": 49,
+    "approaches": 149,
+    "through_pairs": 51,
+    "movements": 306,
+    "blocked_movements": 142
+  },
+  "junction_type_counts": {
+    "T": 47,
+    "cross": 2,
+    "Y": 0,
+    "offset": 0,
+    "complex": 0
+  },
+  "classification_iteration_counts": {
+    "0": 49
+  },
+  "approach_role_counts": {
+    "major_through": 98,
+    "minor_branch": 47,
+    "minor_through": 4
+  },
+  "allowed_movement_kind_counts": {
+    "left": 60,
+    "right": 44,
+    "through": 60
+  },
+  "notes": [
+    "This model classifies road-level junctions and movement intent; it does not generate geometry.",
+    "Public junction classes are restricted to T, cross, Y, offset and complex.",
+    "Adaptive classification iteratively relaxes through-pair angle thresholds for low-quality OSM geometry.",
+    "Movement permissions currently use OSM oneway data and geometry-inferred turn classes.",
+    "T and cross junctions are high-confidence; Y, offset and complex junctions remain lower-confidence inference."
+  ]
+}

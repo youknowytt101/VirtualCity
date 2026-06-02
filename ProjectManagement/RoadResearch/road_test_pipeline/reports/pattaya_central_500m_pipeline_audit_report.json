@@ -1,0 +1,294 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "pipeline_audit",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "required_outputs_exist",
+      "status": "pass",
+      "value": [],
+      "message": "All required stage outputs should exist for reproducible review."
+    },
+    {
+      "id": "road_graph_nonempty",
+      "status": "pass",
+      "value": {
+        "nodes": 233,
+        "edges": 243
+      },
+      "message": "Road graph should expose non-empty nodes and edges."
+    },
+    {
+      "id": "junction_type_contract",
+      "status": "pass",
+      "value": [
+        "T",
+        "cross"
+      ],
+      "message": "Junction semantics must stay within T/cross/Y/offset/complex."
+    },
+    {
+      "id": "allowed_movements_have_connections",
+      "status": "pass",
+      "value": {
+        "allowed": 164,
+        "connections": 164,
+        "missing": [],
+        "extra": []
+      },
+      "message": "Every allowed semantic movement should become exactly one lane-level connection."
+    },
+    {
+      "id": "blocked_movements_have_no_connections",
+      "status": "pass",
+      "value": [],
+      "message": "Blocked or one-way-disallowed movements must not create lane connections."
+    },
+    {
+      "id": "lane_link_references_valid",
+      "status": "pass",
+      "value": [],
+      "message": "Every laneLink should reference existing from/to lanes."
+    },
+    {
+      "id": "lane_link_curves_nonempty",
+      "status": "pass",
+      "value": [],
+      "message": "Every laneLink should carry a connector curve."
+    },
+    {
+      "id": "continuity_link_references_valid",
+      "status": "pass",
+      "value": [],
+      "message": "Every corner continuity link should reference existing from/to lanes."
+    },
+    {
+      "id": "continuity_link_curves_nonempty",
+      "status": "pass",
+      "value": [],
+      "message": "Every corner continuity link should carry an optimized fillet curve."
+    },
+    {
+      "id": "lane_curves_match_trimmed_lane_endpoints",
+      "status": "pass",
+      "value": {
+        "max_lane_link_start_gap_m": 0.0,
+        "max_lane_link_end_gap_m": 0.0,
+        "max_continuity_start_gap_m": 0.0,
+        "max_continuity_end_gap_m": 0.0
+      },
+      "message": "LaneLink and corner continuity curves should start/end at the same trimmed lane endpoints used by lane surfaces."
+    },
+    {
+      "id": "no_fan_fallback_in_layer3",
+      "status": "pass",
+      "value": [],
+      "message": "Layer 3 should remain semantic/lane-level and not rely on junction fan fallback."
+    },
+    {
+      "id": "optimized_centerlines_are_lines",
+      "status": "pass",
+      "value": {
+        "LineString": 413
+      },
+      "message": "Optimized centerline output should contain only LineString features."
+    },
+    {
+      "id": "preview_preserves_centerline_samples",
+      "status": "pass",
+      "value": {
+        "optimized_points": 2282,
+        "preview_points": 2282
+      },
+      "message": "Standalone preview should preserve all optimized centerline sample points."
+    },
+    {
+      "id": "preview_has_no_polygons",
+      "status": "pass",
+      "value": {
+        "LineString": 413
+      },
+      "message": "Preview GeoJSON should be centerline-only while surfaces are deferred."
+    },
+    {
+      "id": "optimized_corner_fillets_have_lane_continuity",
+      "status": "pass",
+      "value": {
+        "optimized_corner_fillets": 21,
+        "continuity_links": 42
+      },
+      "message": "Lane graph should preserve road-level rounded corner fillets as continuity links."
+    },
+    {
+      "id": "junction_connectors_feed_lane_links",
+      "status": "pass",
+      "value": {
+        "optimized_junction_connectors": 149,
+        "lane_link_curve_source_counts": {
+          "optimized_junction_connector": 245,
+          "optimized_approach_endpoint_bezier": 8
+        }
+      },
+      "message": "LaneLink curves should consume optimized T/cross connector curves when they are available, with endpoint Bezier only as fallback."
+    },
+    {
+      "id": "preview_obj_centerline_only",
+      "status": "pass",
+      "value": {
+        "vertices": 2282,
+        "line_elements": 413,
+        "faces": 0
+      },
+      "message": "Preview OBJ should contain line elements only, with no faces."
+    },
+    {
+      "id": "lane_debug_geometry_matches_lane_graph",
+      "status": "pass",
+      "value": {
+        "debug_counts": {
+          "lanes": 612,
+          "lane_links": 253,
+          "continuity_links": 42,
+          "lane_ribbons": 612,
+          "lane_centerlines": 612,
+          "lane_link_ribbons": 253,
+          "lane_link_curves": 253,
+          "lane_continuity_ribbons": 42,
+          "lane_continuity_curves": 42,
+          "obj_vertices": 13011,
+          "obj_lines": 907,
+          "obj_faces": 907
+        },
+        "lane_graph_lanes": 612,
+        "lane_graph_lane_links": 253,
+        "lane_graph_continuity_links": 42
+      },
+      "message": "Lane debug geometry should expose every lane, every laneLink and every corner continuity curve/ribbon."
+    },
+    {
+      "id": "lane_debug_curves_nonempty",
+      "status": "pass",
+      "value": {
+        "empty_lane_link_curves": 0,
+        "empty_continuity_curves": 0
+      },
+      "message": "Lane debug geometry should not contain empty laneLink or continuity curves."
+    },
+    {
+      "id": "lane_debug_obj_has_lines_and_faces",
+      "status": "pass",
+      "value": {
+        "vertices": 13011,
+        "line_elements": 907,
+        "faces": 907
+      },
+      "message": "Lane debug OBJ should contain both centerline curves and narrow debug ribbon faces."
+    },
+    {
+      "id": "lane_surface_v1_matches_lane_graph",
+      "status": "pass",
+      "value": {
+        "surface_counts": {
+          "lanes": 612,
+          "lane_links": 253,
+          "continuity_links": 42,
+          "lane_surfaces": 612,
+          "lane_turn_surfaces": 253,
+          "lane_continuity_surfaces": 42,
+          "obj_vertices": 8674,
+          "obj_faces": 907
+        },
+        "lane_graph_lanes": 612,
+        "lane_graph_lane_links": 253,
+        "lane_graph_continuity_links": 42
+      },
+      "message": "Lane surface v1 should generate one approach surface per lane, one turn surface per laneLink and one continuity surface per rounded corner link."
+    },
+    {
+      "id": "lane_surface_v1_obj_has_faces",
+      "status": "pass",
+      "value": {
+        "vertices": 8674,
+        "faces": 907
+      },
+      "message": "Lane surface v1 OBJ should contain surface faces."
+    },
+    {
+      "id": "houdini_default_output_centerline_only",
+      "status": "pass",
+      "value": true,
+      "message": "Houdini default output should import GeoJSON and display OUT_roads_centerlines from the retained centerline node."
+    },
+    {
+      "id": "qa_reports_have_no_failures",
+      "status": "pass",
+      "value": {
+        "topology_repair": "pass",
+        "road_graph": "warn",
+        "lane_graph": "pass"
+      },
+      "message": "Stage QA reports should have no failures; warnings are kept for data-quality issues."
+    }
+  ],
+  "metrics": {
+    "road_graph": {
+      "nodes": 233,
+      "edges": 243
+    },
+    "junctions": 49,
+    "allowed_movements": 164,
+    "blocked_movements": 142,
+    "lanes": 612,
+    "lane_connections": 164,
+    "lane_links": 253,
+    "continuity_links": 42,
+    "lane_curve_gap_metrics": {
+      "max_lane_link_start_gap_m": 0.0,
+      "max_lane_link_end_gap_m": 0.0,
+      "max_continuity_start_gap_m": 0.0,
+      "max_continuity_end_gap_m": 0.0
+    },
+    "lane_link_curve_source_counts": {
+      "optimized_junction_connector": 245,
+      "optimized_approach_endpoint_bezier": 8
+    },
+    "optimized_features": 413,
+    "optimized_corner_fillets": 21,
+    "optimized_junction_connectors": 149,
+    "optimized_points": 2282,
+    "preview_points": 2282,
+    "preview_obj_vertices": 2282,
+    "lane_debug_obj_vertices": 13011,
+    "lane_debug_obj_faces": 907,
+    "lane_surface_v1_obj_vertices": 8674,
+    "lane_surface_v1_obj_faces": 907,
+    "qa_statuses": {
+      "topology_repair": "pass",
+      "road_graph": "warn",
+      "lane_graph": "pass"
+    }
+  },
+  "inputs": {
+    "raw_roads": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
+    "repaired_roads": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
+    "optimized_centerlines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "preview_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview_surfaces.geojson",
+    "preview_obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.obj",
+    "preview_svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.svg",
+    "lane_geometry_debug_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.geojson",
+    "lane_geometry_debug_obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.obj",
+    "lane_geometry_debug_svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.svg",
+    "lane_geometry_debug_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_geometry_debug_report.json",
+    "lane_surface_v1_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.geojson",
+    "lane_surface_v1_obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.obj",
+    "lane_surface_v1_svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.svg",
+    "lane_surface_v1_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_surface_v1_report.json",
+    "topology_qa": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_topology_repair_qa_report.json",
+    "road_graph_qa": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_road_graph_qa_report.json",
+    "lane_graph_qa": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_lane_graph_qa_report.json"
+  },
+  "next_action": "Use this audit as the automated gate before adding lane ribbons and junction surface geometry."
+}
