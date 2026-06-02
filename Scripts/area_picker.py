@@ -174,6 +174,20 @@ def _start_page_monitor() -> None:
     threading.Thread(target=_monitor, daemon=True).start()
 
 
+def _schedule_page_close_shutdown() -> None:
+    if not SHUTDOWN_WITH_PAGE:
+        return
+
+    def _delayed_shutdown() -> None:
+        time.sleep(PAGE_CLOSE_GRACE_SECONDS + 0.5)
+        server = _server_ref[0]
+        if server is not None and _page_shutdown_due():
+            _safe_print('[area_picker] 网页已关闭，自动停止本地服务...')
+            server.shutdown()
+
+    threading.Thread(target=_delayed_shutdown, daemon=True).start()
+
+
 def _probe_houdini(timeout: float = 0.35) -> bool:
     """Return whether the local Houdini RPYC port accepts connections."""
     try:
@@ -1127,6 +1141,7 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == '/session/closed':
             _mark_page_closed()
             _start_page_monitor()
+            _schedule_page_close_shutdown()
             self._json({'ok': True})
             return
         if parsed.path == '/export':

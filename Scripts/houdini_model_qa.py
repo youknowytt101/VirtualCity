@@ -610,6 +610,82 @@ def _vc_model_qa_building_bundle(obj_path):
     }
 
     return json.dumps(result)
+
+def _vc_model_qa_junction_quality(node_path, min_angle_deg=2.0, min_edge_m=0.01, sample_limit=5000):
+    node = hou.node(node_path)
+    if node is None:
+        return json.dumps({"missing": True, "node": node_path})
+    geo = node.geometry()
+
+    def prim_points(prim):
+        return [v.point().position() for v in prim.vertices()]
+
+    def min_angle_xz(pts):
+        if len(pts) < 3:
+            return None
+        angles = []
+        for i, cur in enumerate(pts):
+            prev = pts[(i - 1) % len(pts)]
+            nxt = pts[(i + 1) % len(pts)]
+            ax = prev.x() - cur.x(); az = prev.z() - cur.z()
+            bx = nxt.x() - cur.x();  bz = nxt.z() - cur.z()
+            al = math.sqrt(ax*ax + az*az); bl = math.sqrt(bx*bx + bz*bz)
+            if al <= 1e-9 or bl <= 1e-9:
+                continue
+            dot = max(-1.0, min(1.0, (ax*bx + az*bz) / (al*bl)))
+            angles.append(math.degrees(math.acos(dot)))
+        return min(angles) if angles else None
+
+    def min_edge_xz(pts):
+        if len(pts) < 2:
+            return 0.0
+        m = None
+        for i, p in enumerate(pts):
+            q = pts[(i + 1) % len(pts)]
+            dx = q.x() - p.x(); dz = q.z() - p.z()
+            l = math.sqrt(dx*dx + dz*dz)
+            m = l if m is None else min(m, l)
+        return 0.0 if m is None else m
+
+    is_junc_attr = geo.findPrimAttrib("is_junction")
+    prims = geo.prims()
+    checked = 0
+    junc_total = 0
+    small_angle = 0
+    sliver_edge = 0
+    min_ang_global = None
+    min_edge_global = None
+    for prim in prims:
+        if is_junc_attr is None or int(prim.attribValue(is_junc_attr) or 0) != 1:
+            continue
+        junc_total += 1
+        pts = prim_points(prim)
+        ang = min_angle_xz(pts)
+        edg = min_edge_xz(pts)
+        if ang is not None:
+            min_ang_global = ang if min_ang_global is None else min(min_ang_global, ang)
+        if edg is not None:
+            min_edge_global = edg if min_edge_global is None else min(min_edge_global, edg)
+        if ang is not None and ang < float(min_angle_deg):
+            small_angle += 1
+        if edg is not None and edg < float(min_edge_m):
+            sliver_edge += 1
+        checked += 1
+        if checked >= sample_limit:
+            break
+
+    return json.dumps({
+        "missing": False,
+        "node": node_path,
+        "junction_total": junc_total,
+        "checked": checked,
+        "min_angle_deg": min_ang_global,
+        "min_edge_m": min_edge_global,
+        "small_angle_count": small_angle,
+        "sliver_edge_count": sliver_edge,
+        "angle_threshold": float(min_angle_deg),
+        "edge_threshold": float(min_edge_m),
+    })
 '''
 
 
@@ -761,9 +837,10 @@ class QA:
             "dem_subdivide",
             "bld_footprint_bevel",
             "bld_with_foundation",
+            "road_graph_filter",
             "road_strips",
             "road_clipped",
-            "road_extrude",
+            "road_color",
             "merge_all",
             "OUT_city",
         ]
@@ -1155,6 +1232,45 @@ class QA:
     def check_road_clipped_faces(self) -> None:
         self._add_road_face_check("road_clipped_faces", "road_clipped", "road_clipped is missing")
 
+    def check_road_profile_attrs(self) -> None:
+        geo = self.geo("road_profile_apply")
+        if geo is None:
+            self.add("road_profile_attrs", INFO, "road_profile_apply is disabled")
+            return
+        required = [
+            "lane_num",
+            "lane_width",
+            "sidewalk_l",
+            "sidewalk_r",
+            "curb_height",
+            "median_w",
+            "road_profile_key",
+            "road_profile_applied",
+        ]
+        missing = [name for name in required if geo.findPrimAttrib(name) is None]
+        detail = {
+            "prims": int(geo.intrinsicValue("primitivecount")),
+            "missing_attrs": missing,
+        }
+        for attr_name in (
+            "road_profile_profile_count",
+            "road_profile_applied_prims",
+            "road_profile_fallback_prims",
+            "road_profile_keys",
+        ):
+            try:
+                if geo.findGlobalAttrib(attr_name) is not None:
+                    detail[attr_name] = geo.attribValue(attr_name)
+            except Exception:
+                pass
+        self.metrics["road_profile_attrs"] = detail
+        if missing:
+            self.add("road_profile_attrs", FAIL, "road_profile_apply is missing required primitive attributes", **detail)
+        elif detail.get("road_profile_applied_prims", 0) <= 0 and detail["prims"] > 0:
+            self.add("road_profile_attrs", FAIL, "road_profile_apply did not apply any profile rows", **detail)
+        else:
+            self.add("road_profile_attrs", PASS, "road profile attributes are present", **detail)
+
     def check_terrain_density(self) -> None:
         dem = self.geo("dem_terrain")
         subdiv = self.geo("dem_subdivide")
@@ -1174,6 +1290,47 @@ class QA:
         else:
             self.add("terrain_density", PASS, "terrain snap target is subdivided", **detail)
 
+    def check_junction_quality(self) -> None:
+        try:
+            # thresholds from active area (already loaded in main)
+            cfg = load_active_area(absolute=False)
+            min_angle = float(cfg.get("junction_min_angle_deg", 2.0))
+            min_edge = float(cfg.get("sliver_edge_min_m", 0.01))
+        except Exception:
+            min_angle, min_edge = 2.0, 0.01
+
+        # Follow the actual A/B switch so auto-revert evaluates the mesh that
+        # continues downstream. Fall back to the legacy node for older HIPs.
+        used = None
+        source_switch = self.node("road_source")
+        if source_switch is not None:
+            try:
+                selected = int(source_switch.parm("input").eval())
+                inputs = source_switch.inputs()
+                if 0 <= selected < len(inputs) and inputs[selected] is not None:
+                    used = inputs[selected].name()
+            except Exception:
+                used = None
+        if used is None and self.node("road_strips") is not None:
+            used = "road_strips"
+        if used is None:
+            self.add("junction_quality", WARN, "no road mesh node to evaluate")
+            return
+
+        node_path = f"{self.obj_path}/{used}"
+        detail = json.loads(self.conn.eval("_vc_model_qa_junction_quality({}, {}, {})".format(
+            json.dumps(node_path), json.dumps(min_angle), json.dumps(min_edge)
+        )))
+        self.metrics["junction_quality"] = detail
+        if detail.get("missing"):
+            self.add("junction_quality", WARN, f"{used} is missing")
+            return
+        bad = (detail.get("small_angle_count", 0) or 0) + (detail.get("sliver_edge_count", 0) or 0)
+        if bad > 0:
+            self.add("junction_quality", WARN, f"{used} has thin/acute patches", **detail)
+        else:
+            self.add("junction_quality", PASS, f"{used} junction patches look reasonable", **detail)
+
     def run(self) -> None:
         self.check_required_nodes()
         self.check_terrain_density()
@@ -1181,7 +1338,9 @@ class QA:
         self.terrain_delta_stats("bld_with_foundation", "dem_subdivide", "building_terrain_fit", -0.05)
         self.check_road_faces()
         self.check_road_clipped_faces()
+        self.check_road_profile_attrs()
         self.terrain_delta_stats("road_clipped", "dem_subdivide", "road_terrain_fit", -0.05, miss_warn_ratio=0.35)
+        self.check_junction_quality()
 
 
 def overall_status(checks: list[dict[str, Any]]) -> str:

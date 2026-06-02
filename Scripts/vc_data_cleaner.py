@@ -469,10 +469,18 @@ class Road2D5Cleaner:
                 osm_nodes[nid] = pt
                 way_node_ids.append(nid)
 
+            # 在 OSM XML 中透传 Graph 元数据，便于 Houdini OSM Import 生成属性
+            tags2 = dict(way["tags"]) if isinstance(way.get("tags"), dict) else {}
+            tags2.update({
+                "seg_id": str(idx + 1),
+                "from_node": str(way.get("node_start", "")),
+                "to_node": str(way.get("node_end", "")),
+            })
+
             osm_ways_list.append({
                 "id": way["id"] or f"cl_way_{idx+1}",
                 "nodes": way_node_ids,
-                "tags": way["tags"]
+                "tags": tags2,
             })
 
         osm_root = ET.Element("osm", {"version": "0.6", "generator": "VirtualCity 2.5D Cleaner"})

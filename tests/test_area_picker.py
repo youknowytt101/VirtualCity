@@ -56,9 +56,19 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('var shutdownWithPage = __SHUTDOWN_WITH_PAGE__;', area_picker._HTML)
         self.assertIn("navigator.sendBeacon('/session/closed'", area_picker._HTML)
         self.assertIn("fetch('/session'", area_picker._HTML)
+        self.assertTrue(hasattr(area_picker, "_schedule_page_close_shutdown"))
         self.assertIn('exportFbx', area_picker._HTML)
         self.assertIn('id="download-btn" disabled onclick="downloadData()"', area_picker._HTML)
         self.assertIn("submitSelectedArea('/download-data'", area_picker._HTML)
+
+
+class TestRootLauncher(unittest.TestCase):
+    def test_root_launcher_starts_picker_with_page_lifecycle_shutdown(self):
+        launcher = ROOT / "启动VirtualCity操作台.cmd"
+        self.assertTrue(launcher.exists())
+        source = launcher.read_text(encoding="utf-8")
+        self.assertIn("VC_AREA_PICKER_SHUTDOWN_WITH_PAGE=1", source)
+        self.assertIn('uv --cache-dir "%~dp0Scripts\\.uv-cache" run python -u area_picker.py', source)
 
 
 class TestHoudiniStatus(unittest.TestCase):

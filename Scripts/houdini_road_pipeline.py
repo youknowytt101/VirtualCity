@@ -288,7 +288,8 @@ def emit_polygon(src_prim, out_poly):
     if poly_area_xz(out_poly) <= 1e-5:
         return None
     angle = poly_min_angle_xz(out_poly)
-    if angle is not None and angle < 5.0:
+    # Relax angle guard: keep polygons down to 2° to avoid losing near-collinear strips
+    if angle is not None and angle < 2.0:
         return None
     hpts = []
     for pos in out_poly:
@@ -317,16 +318,13 @@ for prim in geo_in.prims():
     clipped = clip_poly(pts)
     if len(clipped) < 3:
         continue
+    # 保留 N-gon 而不三角化，避免细碎片问题
+    if emit_polygon(prim, clipped) is None:
+        continue
     if len(clipped) > 4:
         road_bbox_clipped_ngon_count += 1
-        center = centroid(clipped)
-        for idx, pos in enumerate(clipped):
-            tri = [center, pos, clipped[(idx + 1) % len(clipped)]]
-            if emit_polygon(prim, tri) is not None:
-                road_bbox_triangulated_count += 1
     else:
-        if emit_polygon(prim, clipped) is None:
-            continue
+        road_bbox_preserved_ngon_count += 1
 
 geo.setGlobalAttribValue("road_bbox_triangulated_count", int(road_bbox_triangulated_count))
 geo.setGlobalAttribValue("road_bbox_clipped_ngon_count", int(road_bbox_clipped_ngon_count))

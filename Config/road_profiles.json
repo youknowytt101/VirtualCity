@@ -1,0 +1,58 @@
+{
+  "motorway": {
+    "lane_num": 4,
+    "lane_width": 3.5,
+    "sidewalk_l": 0.0,
+    "sidewalk_r": 0.0,
+    "curb_height": 0.15,
+    "median_w": 2.0
+  },
+  "primary": {
+    "lane_num": 4,
+    "lane_width": 3.5,
+    "sidewalk_l": 2.5,
+    "sidewalk_r": 2.5,
+    "curb_height": 0.15,
+    "median_w": 1.5
+  },
+  "secondary": {
+    "lane_num": 4,
+    "lane_width": 3.25,
+    "sidewalk_l": 2.0,
+    "sidewalk_r": 2.0,
+    "curb_height": 0.15,
+    "median_w": 1.0
+  },
+  "tertiary": {
+    "lane_num": 2,
+    "lane_width": 3.25,
+    "sidewalk_l": 1.8,
+    "sidewalk_r": 1.8,
+    "curb_height": 0.12,
+    "median_w": 0.5
+  },
+  "residential": {
+    "lane_num": 2,
+    "lane_width": 3.0,
+    "sidewalk_l": 1.5,
+    "sidewalk_r": 1.5,
+    "curb_height": 0.12,
+    "median_w": 0.0
+  },
+  "service": {
+    "lane_num": 2,
+    "lane_width": 2.8,
+    "sidewalk_l": 1.2,
+    "sidewalk_r": 1.2,
+    "curb_height": 0.1,
+    "median_w": 0.0
+  },
+  "footway": {
+    "lane_num": 0,
+    "lane_width": 0.0,
+    "sidewalk_l": 1.2,
+    "sidewalk_r": 1.2,
+    "curb_height": 0.05,
+    "median_w": 0.0
+  }
+}

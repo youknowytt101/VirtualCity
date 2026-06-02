@@ -678,6 +678,23 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
     if manifest["levels"]["roads"]["current"] < 2 and target_level >= 2:
         _roads_L2(osm_cleaned, manifest)
 
+    # 可选：基于 road_graph 推导城市街区（Blocks），默认关闭，仅当 area_cfg 指定时执行
+    try:
+        if area_cfg.get("build_blocks_enabled", False):
+            from pathlib import Path as _Path
+            from blocks_from_road_graph import build_blocks as _build_blocks
+            _graph = cl_dir / "road_graph.json"
+            _blocks_out = cl_dir / "blocks.geojson"
+            if _graph.exists():
+                _enable_lots = bool(area_cfg.get("build_lots_enabled", False))
+                _setback = float(area_cfg.get("lot_setback_m", 4.0))
+                _build_blocks(_graph, _blocks_out, min_area_m2=50.0, max_area_m2=0.0,
+                             enable_lot_subdivision=_enable_lots, setback_m=_setback)
+                _mode = "地块细分" if _enable_lots else "街区"
+                print(f"  [Blocks] 由 road_graph 生成{_mode} (setback={_setback}m): {vc_paths.project_relative(_blocks_out)}")
+    except Exception as _e:
+        print(f"  [Blocks] 跳过（发生异常）: {_e}")
+
     # ── 精炼：DEM ──
     print("\n[DEM 精炼]")
     dem_src = raw_sources["dem"]
@@ -713,7 +730,7 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
     staging_dir = _staging_ready_dir(area_id)
     hr_dir = HOUDINI_READY / area_id
     try:
-        for name in ["buildings.geojson", "roads.osm", "roads_clean.geojson", "road_graph.json", "dem.csv"]:
+        for name in ["buildings.geojson", "roads.osm", "roads_clean.geojson", "road_graph.json", "blocks.geojson", "dem.csv"]:
             src = cl_dir / name
             dst = staging_dir / name
             if src.exists():

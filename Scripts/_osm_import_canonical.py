@@ -65,6 +65,9 @@ height_attrib   = geo.addAttrib(hou.attribType.Prim, 'height_m', 0.0)
 hw_attrib       = geo.addAttrib(hou.attribType.Prim, 'highway', '')
 lanes_attrib    = geo.addAttrib(hou.attribType.Prim, 'lanes', 0)
 width_attrib    = geo.addAttrib(hou.attribType.Prim, 'osm_width', 0.0)
+seg_id_attrib   = geo.addAttrib(hou.attribType.Prim, 'seg_id', -1)
+from_node_attrib = geo.addAttrib(hou.attribType.Prim, 'from_node', '')
+to_node_attrib  = geo.addAttrib(hou.attribType.Prim, 'to_node', '')
 bld_class_attrib = geo.addAttrib(hou.attribType.Prim, 'bld_class', '')
 bld_group  = geo.createPrimGroup('buildings')
 road_group = geo.createPrimGroup('roads')
@@ -151,8 +154,13 @@ for way in root.findall('way'):
             except (TypeError, ValueError): pass
             try: _osm_w = float(str(tags.get('width', '0') or '0').replace('m','').strip())
             except (TypeError, ValueError): pass
+            try: _seg_id = int(tags.get('seg_id', '-1') or '-1')
+            except (TypeError, ValueError): _seg_id = -1
             poly.setAttribValue(lanes_attrib, _lanes)
             poly.setAttribValue(width_attrib, _osm_w)
+            poly.setAttribValue(seg_id_attrib, _seg_id)
+            poly.setAttribValue(from_node_attrib, str(tags.get('from_node', '') or ''))
+            poly.setAttribValue(to_node_attrib, str(tags.get('to_node', '') or ''))
             road_group.add(poly)
 
     elif is_bld:

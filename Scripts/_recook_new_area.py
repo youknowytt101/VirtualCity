@@ -46,6 +46,16 @@ def _write_build_status(area_id, status, hip_path=None, message='', qa_status=''
 _cfg = load_active_area()
 _area_id = _cfg.get('area_id', '')
 _run_id = _cfg.get('run_id', '')
+_roads_cut_fill_enabled = bool(_cfg.get('roads_cut_fill_enabled', False))
+_dev_quick_roads = bool(_cfg.get('dev_quick_roads', False))
+_roads_topology_preferred = str(_cfg.get('roads_topology_preferred', 'strips')).lower().strip()
+_qa_autorevert_topology_builder = bool(_cfg.get('qa_autorevert_topology_builder', True))
+_junction_min_angle_deg = float(_cfg.get('junction_min_angle_deg', 2.0))
+_sliver_edge_min_m = float(_cfg.get('sliver_edge_min_m', 0.01))
+_roads_topology_max_prim_ratio = float(_cfg.get('roads_topology_max_prim_ratio', 5.0))
+_roads_topology_qa_sample_prims = int(_cfg.get('roads_topology_qa_sample_prims', 500))
+_apply_road_profiles = bool(_cfg.get('apply_road_profiles', True))
+_apply_curb_variation = bool(_cfg.get('apply_curb_variation', True))
 _RECOOK_FINALIZED = False
 
 
@@ -253,13 +263,25 @@ _rwf_node.parm('class').set(1)  # Primitive
 _rwf_node.parm('snippet').set(ROAD_WIDTH_VEX)
 print('  road_width_flat VEX + 输入已更新（road_vertical_smoother → road_width_flat）')
 
+# ── 1b3. road_graph 过滤：把离线折叠掉的短冲突边同步回 Houdini ─────────────
+ROAD_GRAPH_FILTER_CODE = houdini_sops.load('road_graph_filter.py', ROOT=ROOT_STR, CFG=CFG_FILE)
+_rgf_node = hou.node(OBJ_PATH + '/road_graph_filter')
+if _rgf_node is None:
+    _rgf_node = net.createNode('python', 'road_graph_filter')
+_rgf_node.setInput(0, _rwf_node, 0)
+_rgf_node.parm('python').set(ROAD_GRAPH_FILTER_CODE)
+_road_mesh_input = _rgf_node
+print('  road_graph_filter 已接入（road_width_flat → road_graph_filter → road surface builders）')
+
+
 # ── 1d. road_strips v2: 路段修剪 + 路口凸包填充 ──────────────────────
 _rs_v2_code = road_pipe.load_road_strips_code(ROOT)
 _rs_node = hou.node(OBJ_PATH + '/road_strips')
-if _rs_node:
-    _rs_node.parm('python').set(_rs_v2_code)
-    _rs_node.setInput(0, _rwf_node, 0)
-    print('  road_strips v5 已更新（复杂路口降级 + 调试属性 + 自交保护）')
+if _rs_node is None:
+    _rs_node = net.createNode('python', 'road_strips')
+_rs_node.parm('python').set(_rs_v2_code)
+_rs_node.setInput(0, _road_mesh_input, 0)
+print('  road_strips v5 已更新（复杂路口降级 + 调试属性 + 自交保护）')
 
 # ── 1d2. Road Topology Builder（A/B 可选）────────────────────────────
 # 说明：该节点在 'road_width_flat' 之后按拓扑半径截断 + 扇面缝合生成道路面片，
@@ -269,7 +291,7 @@ try:
     rtb_node = hou.node(OBJ_PATH + '/road_topology_builder')
     if rtb_node is None:
         rtb_node = net.createNode('python', 'road_topology_builder')
-    rtb_node.setInput(0, _rwf_node, 0)
+    rtb_node.setInput(0, _road_mesh_input, 0)
     rtb_node.parm('python').set(RTB_CODE)
     # 路径选择器：0=road_strips（默认），1=road_topology_builder
     source_switch = hou.node(OBJ_PATH + '/road_source')
@@ -280,9 +302,86 @@ try:
     if rs_node_ref:
         source_switch.setInput(0, rs_node_ref, 0)
     source_switch.setInput(1, rtb_node, 0)
-    # 默认激活全新的 road_topology_builder 拓扑缝合引擎 (Milestone 2)
-    source_switch.parm('input').set(1)
-    print("  road_topology_builder 已注入并默认启用（A/B 切换节点: road_source，input=1 为 Builder 引擎）")
+    # 默认策略：auto。builder 通过轻量 QA 就使用；失败则回退 legacy road_strips。
+    _pref_mode = _roads_topology_preferred
+    _pref = 1 if _pref_mode in ('builder', 'topology', 'rtb') else 0
+
+    def _xz_min_angle(pts):
+        if len(pts) < 3:
+            return None
+        import math as _m
+        mn = None
+        for i, cur in enumerate(pts):
+            prev = pts[(i-1) % len(pts)]
+            nxt = pts[(i+1) % len(pts)]
+            ax, az = prev[0]-cur[0], prev[2]-cur[2]
+            bx, bz = nxt[0]-cur[0], nxt[2]-cur[2]
+            al = (_m.hypot(ax, az))
+            bl = (_m.hypot(bx, bz))
+            if al < 1e-9 or bl < 1e-9:
+                continue
+            dt = max(-1.0, min(1.0, (ax*bx + az*bz) / (al*bl)))
+            ang = _m.degrees(_m.acos(dt))
+            mn = ang if mn is None else min(mn, ang)
+        return mn
+
+    def _xz_min_edge(pts):
+        import math as _m
+        if len(pts) < 2:
+            return 0.0
+        mn = 1e9
+        for i, p in enumerate(pts):
+            q = pts[(i+1) % len(pts)]
+            mn = min(mn, _m.hypot(q[0]-p[0], q[2]-p[2]))
+        return 0.0 if mn == 1e9 else mn
+
+    _builder_bad = 0
+    _builder_checked = 0
+    _builder_prims = 0
+    _strips_prims = 0
+    _builder_ratio = 0.0
+    _builder_qa_ok = False
+    if _pref_mode in ('auto', 'builder', 'topology', 'rtb'):
+        try:
+            rtb_node.cook(force=True)
+            geo_b = rtb_node.geometry()
+            _builder_prims = int(geo_b.intrinsicValue('primitivecount'))
+            if rs_node_ref:
+                try:
+                    _strips_prims = int(rs_node_ref.geometry().intrinsicValue('primitivecount'))
+                except Exception:
+                    _strips_prims = 0
+            _builder_ratio = (_builder_prims / float(_strips_prims)) if _strips_prims else 0.0
+            _builder_sample_limit = max(50, min(_roads_topology_qa_sample_prims, _builder_prims))
+            for prim in geo_b.prims():
+                pts = [v.point().position() for v in prim.vertices()]
+                if len(pts) < 3:
+                    continue
+                ang = _xz_min_angle(pts)
+                edge = _xz_min_edge(pts)
+                if (ang is not None and ang < _junction_min_angle_deg) or (edge < _sliver_edge_min_m):
+                    _builder_bad += 1
+                _builder_checked += 1
+                if _builder_checked >= _builder_sample_limit:
+                    break
+            _builder_qa_ok = (
+                _builder_bad == 0
+                and _builder_prims > 0
+                and (_builder_ratio <= _roads_topology_max_prim_ratio or _strips_prims <= 0)
+            )
+        except Exception as _qe:
+            _builder_qa_ok = False
+            print(f"  [road_source] builder QA 评估失败: {_qe}")
+
+    if _pref_mode == 'auto':
+        _pref = 1 if _builder_qa_ok else 0
+    elif _pref in (1,) and _qa_autorevert_topology_builder and not _builder_qa_ok:
+        _pref = 0
+        print("  [auto-revert] road_topology_builder QA 未通过，已回退为 road_strips")
+    source_switch.parm('input').set(_pref)
+    _chosen = 'road_topology_builder' if _pref == 1 else 'road_strips'
+    print("  road_source: mode={} selected={} builder_prims={} strips_prims={} ratio={:.2f} bad={}/{}".format(
+        _pref_mode, _chosen, _builder_prims, _strips_prims, _builder_ratio, _builder_bad, _builder_checked))
 except Exception as _e:
     print(f"  [WARN] Road Topology Builder 注入失败，保持使用 road_strips: {_e}")
 
@@ -303,68 +402,68 @@ if _ph:
 
 # ── 2. 强制 recook 数据源 ────────────────────────────
 print('\n[Houdini 3/7] recook 数据源')
-for path in [OBJ_PATH + '/osm_import', OBJ_PATH + '/dem_import',
-             OBJ_PATH + '/dem_terrain']:
-    n = hou.node(path)
-    if not n:
-        continue
-    print(f'  Cooking: {path}')
-    try:
-        n.cook(force=True)
-    except Exception as e:
-        print(f'  [ERROR] Cook failed for {path}!')
+if _dev_quick_roads:
+    print('  [dev_quick_roads] 跳过数据源重算 (osm/dem)')
+else:
+    for path in [OBJ_PATH + '/osm_import', OBJ_PATH + '/dem_import',
+                 OBJ_PATH + '/dem_terrain']:
+        n = hou.node(path)
+        if not n:
+            continue
+        print(f'  Cooking: {path}')
         try:
-            print(f'  Node errors:\n{n.errors()}')
-            print(f'  Node warnings:\n{n.warnings()}')
-        except Exception as e2:
-            print(f'  Could not retrieve node errors: {e2}')
-        raise e
-    geo  = n.geometry()
-    pts  = geo.intrinsicValue('pointcount')
-    prm  = geo.intrinsicValue('primitivecount')
-    print('  {:<20s} pts={:6d}  prims={:6d}'.format(n.name(), pts, prm))
-    if pts == 0:
-        errors.append(n.name() + ' geometry empty after recook')
+            n.cook(force=True)
+        except Exception as e:
+            print(f'  [ERROR] Cook failed for {path}!')
+            try:
+                print(f'  Node errors:\n{n.errors()}')
+                print(f'  Node warnings:\n{n.warnings()}')
+            except Exception as e2:
+                print(f'  Could not retrieve node errors: {e2}')
+            raise e
+        geo  = n.geometry()
+        pts  = geo.intrinsicValue('pointcount')
+        prm  = geo.intrinsicValue('primitivecount')
+        print('  {:<20s} pts={:6d}  prims={:6d}'.format(n.name(), pts, prm))
+        if pts == 0:
+            errors.append(n.name() + ' geometry empty after recook')
 
 # ── 2b. 地形 snap target = dem_subdivide ──────────────────────────────
 # DEM 原始约 30m 网格，在山地俯视角布线过稀。Bilinear×2 只做线性插值，
 # 不增加真实高程精度，但能把显示和道路贴地目标提升到约 7.5m 网格。
 dem_terrain = hou.node(OBJ_PATH + '/dem_terrain')
 
-# ── 2b2. 道路削坡放坡地形平整（dem_cut_and_fill VEX, Milestone 2 - Stage 2.5） ──
-# 输入 0 = dem_terrain (raw 30m grid), 输入 1 = road_width_flat (smoothed road lines)
-cut_fill_target = hou.node(OBJ_PATH + '/dem_cut_and_fill')
-if cut_fill_target is None:
-    cut_fill_target = net.createNode('attribwrangle', 'dem_cut_and_fill')
-cut_fill_target.setInput(0, dem_terrain)
-cut_fill_target.setInput(1, _rwf_node)
-cut_fill_target.parm('class').set(2)  # Point level
-cut_fill_target.parm('snippet').set(road_pipe.ROAD_CUT_FILL_VEX)
-cut_fill_target.cook(force=True)
-print('  dem_cut_and_fill VEX 削坡平整完成: pts={}'.format(
-    cut_fill_target.geometry().intrinsicValue('pointcount')))
-
-# 然后将平整放坡后的 DTM 喂入 subdivide 进行高精格网重构
+# ── 2b2. 阶段2.5（可选）：Cut&Fill；默认关闭，按 active_area.json 的 roads_cut_fill_enabled 控制 ──
 snap_target = hou.node(OBJ_PATH + '/dem_subdivide')
 if snap_target is None:
     snap_target = net.createNode('subdivide', 'dem_subdivide')
-snap_target.setInput(0, cut_fill_target)
+
+if _roads_cut_fill_enabled:
+    cut_fill_target = hou.node(OBJ_PATH + '/dem_cut_and_fill')
+    if cut_fill_target is None:
+        cut_fill_target = net.createNode('attribwrangle', 'dem_cut_and_fill')
+    cut_fill_target.setInput(0, dem_terrain)
+    cut_fill_target.setInput(1, _rwf_node)
+    cut_fill_target.parm('class').set(2)  # Point level
+    cut_fill_target.parm('snippet').set(road_pipe.ROAD_CUT_FILL_VEX)
+    cut_fill_target.cook(force=True)
+    print('  dem_cut_and_fill VEX 削坡平整完成: pts={}'.format(
+        cut_fill_target.geometry().intrinsicValue('pointcount')))
+    snap_target.setInput(0, cut_fill_target)
+else:
+    # 阶段1+2：不启用 Cut&Fill，直接用 dem_terrain 进入 subdivide
+    snap_target.setInput(0, dem_terrain)
 snap_target.parm('algorithm').set(4)   # OpenSubdiv Bilinear
 snap_target.parm('iterations').set(2)  # 30m -> ~7.5m
 snap_target.cook(force=True)
-print('  dem_subdivide (对平整放坡后的 DTM 重构): pts={} prims={}'.format(
+print('  dem_subdivide: pts={} prims={} (Bilinear iterations=2)'.format(
     snap_target.geometry().intrinsicValue('pointcount'),
     snap_target.geometry().intrinsicValue('primitivecount')))
 
-# 初始道路贴地用 raw 地形，避免循环依赖
-_snap_roads = hou.node(OBJ_PATH + '/snap_roads_to_terrain1')
-if _snap_roads:
-    _snap_roads.setInput(1, dem_terrain)
-
-# 其余建筑采用高精平整后的 snap_target 地形
-_snap_bld = hou.node(OBJ_PATH + '/snap_bld_to_terrain')
-if _snap_bld:
-    _snap_bld.setInput(1, snap_target)
+for _sn_name in ['snap_bld_to_terrain', 'snap_roads_to_terrain1']:
+    _sn = hou.node(OBJ_PATH + '/' + _sn_name)
+    if _sn:
+        _sn.setInput(1, snap_target)
 
 # -- 2c. Building footprint chamfer: convex vertical corners only ----------
 BLD_FOOTPRINT_BEVEL_CODE = houdini_sops.load('bld_footprint_bevel.py')
@@ -431,7 +530,7 @@ dem = snap_target
 dem.cook(force=False)
 bb  = dem.geometry().boundingBox()
 mn, mx = bb.minvec(), bb.maxvec()
-MARGIN = 50
+MARGIN = 100  # 增加外扩距离以减少边界处的道路裁剪
 XMIN = mn[0] - MARGIN
 XMAX = mx[0] + MARGIN
 ZMIN = mn[2] - MARGIN
@@ -526,6 +625,73 @@ print('  snap_road_clipped: pts={} Y_min={:.2f}m'.format(
 bld_clip  = remake_asset_filter('post_normals',     'bld_clip_mark',  'bld_clipped',  'component')
 road_clip = remake_asset_filter('snap_road_clipped', 'road_clip_mark', 'road_clipped', 'primitive')
 
+# ── 4b2.4 道路碎片清理：移除扇形三角化产生的微小三角形 ──────────────────
+ROAD_FRAGMENT_CLEANUP_CODE = houdini_sops.load('road_fragment_cleanup.py')
+old_frag_cleanup = hou.node(OBJ_PATH + '/road_fragment_cleanup')
+if old_frag_cleanup:
+    old_frag_cleanup.destroy()
+road_frag_cleanup = net.createNode('python', 'road_fragment_cleanup')
+road_frag_cleanup.setInput(0, road_clip)
+road_frag_cleanup.parm('python').set(ROAD_FRAGMENT_CLEANUP_CODE)
+road_frag_cleanup.cook(force=True)
+_frag_tiny = road_frag_cleanup.geometry().attribValue('rfc_removed_tiny_triangles') if road_frag_cleanup.geometry().findGlobalAttrib('rfc_removed_tiny_triangles') else 0
+_frag_sliver = road_frag_cleanup.geometry().attribValue('rfc_removed_sliver_triangles') if road_frag_cleanup.geometry().findGlobalAttrib('rfc_removed_sliver_triangles') else 0
+_frag_sharp = road_frag_cleanup.geometry().attribValue('rfc_removed_sharp_triangles') if road_frag_cleanup.geometry().findGlobalAttrib('rfc_removed_sharp_triangles') else 0
+print('  road_fragment_cleanup: 移除微小={} 细长={} 尖锐={}'.format(_frag_tiny, _frag_sliver, _frag_sharp))
+road_clip = road_frag_cleanup
+
+# ── 4b2.5 可选：属性驱动截面配置注入（不改变几何，仅写入属性）──────
+road_profile_src = road_clip
+try:
+    old_prof = hou.node(OBJ_PATH + '/road_profile_apply')
+    if _apply_road_profiles and road_clip is not None:
+        if old_prof:
+            old_prof.destroy()
+        ROAD_PROFILE_APPLY_CODE = houdini_sops.load('road_profile_apply.py', ROOT=ROOT_STR)
+        road_prof = net.createNode('python', 'road_profile_apply')
+        road_prof.setInput(0, road_clip)
+        road_prof.parm('python').set(ROAD_PROFILE_APPLY_CODE)
+        road_prof.cook(force=True)
+        road_profile_src = road_prof
+        _prof_geo = road_prof.geometry()
+        try:
+            _applied = _prof_geo.attribValue('road_profile_applied_prims')
+            _fallback = _prof_geo.attribValue('road_profile_fallback_prims')
+        except Exception:
+            _applied = _prof_geo.intrinsicValue('primitivecount')
+            _fallback = 0
+        print('  road_profile_apply: 已注入 applied={} fallback={}（从 Config/road_profiles.json 读取截面参数）'.format(
+            _applied, _fallback))
+    elif old_prof:
+        old_prof.destroy()
+        print('  road_profile_apply: 已关闭并移除旧节点')
+except Exception as _e:
+    print(f'  [WARN] road_profile_apply 注入失败: {_e}')
+
+# ── 4b2.6 可选：路缘石随机起伏（Milestone 3 微细节）──────────────
+road_curb_src = road_profile_src
+try:
+    old_curb = hou.node(OBJ_PATH + '/road_curb_variation')
+    if _apply_curb_variation and road_profile_src is not None:
+        if old_curb:
+            old_curb.destroy()
+        ROAD_CURB_VARIATION_CODE = houdini_sops.load('road_curb_variation.py', ROOT=ROOT_STR)
+        road_curb = net.createNode('python', 'road_curb_variation')
+        road_curb.setInput(0, road_profile_src)
+        road_curb.parm('python').set(ROAD_CURB_VARIATION_CODE)
+        road_curb.cook(force=True)
+        road_curb_src = road_curb
+        try:
+            _curb_applied = road_curb.geometry().attribValue('road_curb_variation_applied_prims')
+        except Exception:
+            _curb_applied = road_curb.geometry().intrinsicValue('primitivecount')
+        print('  road_curb_variation: 已注入 applied={} (±2cm 随机起伏)'.format(_curb_applied))
+    elif old_curb:
+        old_curb.destroy()
+        print('  road_curb_variation: 已关闭并移除旧节点')
+except Exception as _e:
+    print(f'  [WARN] road_curb_variation 注入失败: {_e}')
+
 # ── 4b3. 建筑地基 / 裙边（坡地建筑下坡侧补空）──────────────────────
 BUILDING_FOUNDATION_CODE = houdini_sops.load('bld_foundation.py')
 
@@ -554,7 +720,7 @@ def make_color_node(name, src_node, rgb):
     w.cook(force=True)
     return w
 
-road_colored    = make_color_node('road_color',    road_clip,   COLORS['roads'])
+road_colored    = make_color_node('road_color',    road_curb_src,   COLORS['roads'])
 bld_colored     = make_color_node('bld_color',     bld_clip,    COLORS['buildings'])
 foundation_colored = None
 if foundation_clip:
@@ -586,21 +752,17 @@ print('  bld_with_foundation: pts={} prims={}'.format(
     bld_final.geometry().intrinsicValue('pointcount'),
     bld_final.geometry().intrinsicValue('primitivecount')))
 
-# ── 4d. 道路挤出（road_extrude：0.18m 侧面 + 顶面）────────────────────
-old_ext = hou.node(OBJ_PATH + '/road_extrude')
-if old_ext:
-    old_ext.destroy()
-road_extrude = net.createNode('polyextrude::2.0', 'road_extrude')
-road_extrude.setInput(0, road_colored)
-road_extrude.parm('dist').set(0.18)
-road_extrude.parm('outputback').set(0)
-road_extrude.parm('outputfront').set(1)
-road_extrude.parm('outputside').set(1)
-road_extrude.parm('xformspace').set(0)  # Local (along prim normal)
-road_extrude.cook(force=True)
-print('  road_extrude: pts={} prims={}'.format(
-    road_extrude.geometry().intrinsicValue('pointcount'),
-    road_extrude.geometry().intrinsicValue('primitivecount')))
+# ── 4d. 道路面片输出（无挤出）────────────────────────────
+# 当前道路阶段先保持为平面面片，避免 PolyExtrude 在分段道路上生成细碎侧面。
+for _old_road_node in ('road_pre_extrude_dissolve', 'road_pre_extrude_fuse', 'road_extrude'):
+    _old = hou.node(OBJ_PATH + '/' + _old_road_node)
+    if _old:
+        _old.destroy()
+        print('  道路挤出节点移除: ' + _old_road_node)
+road_surface = road_colored
+print('  road_surface: 使用平面道路面片（无挤出） pts={} prims={}'.format(
+    road_surface.geometry().intrinsicValue('pointcount'),
+    road_surface.geometry().intrinsicValue('primitivecount')))
 
 # ── 4e. promote_height / restore_height: method=First 防跨建筑高度污染 ─
 # fuse_bld 焊接邻近建筑角点后，Average 模式会让相邻建筑高度互相稀释。
@@ -632,7 +794,7 @@ for _ in range(2):
 merge = hou.node(OBJ_PATH + '/merge_all')
 if merge and bld_clip and road_clip:
     merge.setInput(0, bld_final)
-    merge.setInput(1, road_extrude)
+    merge.setInput(1, road_surface)
     merge.setInput(2, terrain_colored)
 
 print('\n[Houdini 6/7] 刷新输出链并保存 HIP')
@@ -647,16 +809,27 @@ if ARCHIVE_HIP != HIP:
     print('  hip 存档: VC_{}_citygen_v001.hip'.format(_area_id))
 
 # ── 6. 强制刷新整条输出链（视口同步）────────────────────
-FULL_CHAIN = [
-    'osm_import', 'dem_terrain', 'dem_subdivide', 'dem_cut_and_fill',
-    'extract_buildings', 'snap_bld_to_terrain', 'bld_footprint_bevel', 'extrude_buildings', 'post_normals',
-    'snap_roads_to_terrain1', 'road_vertical_smoother', 'road_width_flat', 'road_strips', 'road_topology_builder', 'road_source',
-    'snap_road_strips', 'road_bbox_clip', 'snap_road_clipped',
-    'bld_clipped', 'bld_foundation', 'bld_foundation_clipped',
-    'road_clipped', 'road_color', 'road_extrude',
-    'bld_color', 'bld_foundation_color', 'bld_with_foundation_merge', 'bld_with_foundation',
-    'terrain_color', 'merge_all', 'OUT_city',
-]
+if _dev_quick_roads:
+    FULL_CHAIN = [
+        'snap_roads_to_terrain1', 'road_vertical_smoother', 'road_width_flat',
+        'road_graph_filter',
+        'road_strips', 'road_topology_builder', 'road_source',
+        'snap_road_strips', 'road_bbox_clip', 'snap_road_clipped',
+        'road_clipped', 'road_fragment_cleanup', 'road_profile_apply', 'road_curb_variation', 'road_color', 'OUT_city',
+    ]
+else:
+    FULL_CHAIN = [
+        'osm_import', 'dem_terrain', 'dem_cut_and_fill', 'dem_subdivide',
+        'extract_buildings', 'snap_bld_to_terrain', 'bld_footprint_bevel', 'extrude_buildings', 'post_normals',
+        'snap_roads_to_terrain1', 'road_vertical_smoother', 'road_width_flat',
+        'road_graph_filter',
+        'road_strips', 'road_topology_builder', 'road_source',
+        'snap_road_strips', 'road_bbox_clip', 'snap_road_clipped',
+        'bld_clipped', 'bld_foundation', 'bld_foundation_clipped',
+        'road_clipped', 'road_fragment_cleanup', 'road_profile_apply', 'road_curb_variation', 'road_color',
+        'bld_color', 'bld_foundation_color', 'bld_with_foundation_merge', 'bld_with_foundation',
+        'terrain_color', 'merge_all', 'OUT_city',
+    ]
 for _cn in FULL_CHAIN:
     _n = hou.node(OBJ_PATH + '/' + _cn)
     if _n:

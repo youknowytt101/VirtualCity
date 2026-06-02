@@ -1,0 +1,5 @@
+{
+  "variation_amplitude_m": 0.02,
+  "variation_frequency": 2.5,
+  "noise_type": "perlin"
+}

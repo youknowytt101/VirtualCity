@@ -21,6 +21,9 @@ MAX_JUNCTION_RADIUS = 18.0
 MAX_JUNCTION_AREA_FACTOR = 10.0
 MAX_JUNCTION_AREA = 450.0
 MAX_CONVEX_FILL_EDGE_POINTS = 8
+ROAD_SIMPLIFY_EPS = 0.18
+ROAD_SIMPLIFY_MIN_STEP = 1.5
+ROAD_SIMPLIFY_MAX_STEP = 8.0
 
 
 # -- Attribute definitions ----------------------------------------------------
@@ -37,6 +40,9 @@ def global_attrib(name, default):
 hw_attrib = prim_attrib("half_width", 0.0)
 is_junc_a = prim_attrib("is_junction", 0)
 road_src_a = prim_attrib("road_src_id", -1)
+seg_id_a = prim_attrib("seg_id", -1)
+from_node_a = prim_attrib("from_node", "")
+to_node_a = prim_attrib("to_node", "")
 road_highway_a = prim_attrib("road_highway", "")
 road_hw_a = prim_attrib("road_half_width", 0.0)
 seg_len_a = prim_attrib("road_segment_len", 0.0)
@@ -191,6 +197,53 @@ def append_unique_position(out, pos, eps=0.1):
     out.append(pos)
 
 
+def point_line_distance_xz(pos, a, b):
+    ax, az = a[0], a[2]
+    bx, bz = b[0], b[2]
+    px, pz = pos[0], pos[2]
+    dx, dz = bx - ax, bz - az
+    length_sq = dx * dx + dz * dz
+    if length_sq <= 1e-9:
+        return math.hypot(px - ax, pz - az)
+    t = max(0.0, min(1.0, ((px - ax) * dx + (pz - az) * dz) / length_sq))
+    cx, cz = ax + dx * t, az + dz * t
+    return math.hypot(px - cx, pz - cz)
+
+
+def simplify_positions(positions, preserve_keys):
+    if len(positions) <= 2:
+        return positions
+
+    simplified = [positions[0]]
+    anchor = positions[0]
+    distance_from_anchor = 0.0
+
+    for i in range(1, len(positions) - 1):
+        prev_pos = positions[i - 1]
+        pos = positions[i]
+        next_pos = positions[i + 1]
+        distance_from_anchor += (pos - prev_pos).length()
+
+        lateral_error = point_line_distance_xz(pos, anchor, next_pos)
+        prev_dir = norm_vec(pos - prev_pos)
+        next_dir = norm_vec(next_pos - pos)
+        dot = max(-1.0, min(1.0, prev_dir.dot(next_dir)))
+        turn_deg = math.degrees(math.acos(dot))
+
+        keep_for_junction = jkey(pos) in preserve_keys
+        keep_for_shape = lateral_error > ROAD_SIMPLIFY_EPS or turn_deg > 4.0
+        keep_for_spacing = distance_from_anchor >= ROAD_SIMPLIFY_MAX_STEP
+        drop_tiny_straight = distance_from_anchor < ROAD_SIMPLIFY_MIN_STEP and not keep_for_shape and not keep_for_junction
+
+        if (keep_for_junction or keep_for_shape or keep_for_spacing) and not drop_tiny_straight:
+            append_unique_position(simplified, pos, eps=0.05)
+            anchor = pos
+            distance_from_anchor = 0.0
+
+    append_unique_position(simplified, positions[-1], eps=0.05)
+    return simplified if len(simplified) >= 2 else positions
+
+
 def prim_value(prim, name, default):
     try:
         return prim.attribValue(name)
@@ -220,6 +273,9 @@ def set_road_attrs(
     poly.setAttribValue(hw_attrib, hw)
     poly.setAttribValue(is_junc_a, int(is_junction))
     poly.setAttribValue(road_src_a, int(road.get("src_id", -1)))
+    poly.setAttribValue(seg_id_a, int(road.get("seg_id", -1)))
+    poly.setAttribValue(from_node_a, str(road.get("from_node", "")))
+    poly.setAttribValue(to_node_a, str(road.get("to_node", "")))
     poly.setAttribValue(road_highway_a, str(road.get("highway", "")))
     poly.setAttribValue(road_hw_a, hw)
     poly.setAttribValue(seg_len_a, float(segment_len))
@@ -244,6 +300,9 @@ for prim in geo_in.prims():
     if len(positions) >= 2:
         road_data.append({
             "src_id": int(prim.number()),
+            "seg_id": int(prim_value(prim, "seg_id", -1) or -1),
+            "from_node": str(prim_value(prim, "from_node", "") or ""),
+            "to_node": str(prim_value(prim, "to_node", "") or ""),
             "highway": prim_highway(prim),
             "hw": hw,
             "positions": positions,
@@ -307,7 +366,18 @@ if len(segments) <= MAX_INTERSECT_SEGMENTS:
             road["positions"] = rebuilt
 
 
-# -- 1c. Count shared/inserted vertices ---------------------------------------
+# -- 1c. Preserve shared/inserted vertices, simplify dense straight runs -------
+pt_usage = {}
+for road in road_data:
+    for pos in road["positions"]:
+        key = jkey(pos)
+        pt_usage[key] = pt_usage.get(key, 0) + 1
+
+preserve_junction_keys = {key for key, count in pt_usage.items() if count >= 2}
+for road in road_data:
+    road["positions"] = simplify_positions(road["positions"], preserve_junction_keys)
+
+# Recount after simplification. Preserved keys still define junctions.
 pt_usage = {}
 for road in road_data:
     for pos in road["positions"]:

@@ -123,6 +123,16 @@ class TestParentClipRestore(unittest.TestCase):
                                              [100.930, 12.970]]],
                         },
                     },
+                    {
+                        "type": "Feature",
+                        "properties": {"id": "boundary"},
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [[[100.8758, 12.920], [100.8762, 12.920],
+                                             [100.8762, 12.921], [100.8758, 12.921],
+                                             [100.8758, 12.920]]],
+                        },
+                    },
                 ],
             }), encoding="utf-8")
             with open(cache_dir / "dem.csv", "w", encoding="utf-8", newline="") as f:
@@ -155,7 +165,9 @@ class TestParentClipRestore(unittest.TestCase):
             self.assertIn('way id="10"', outputs["roads"].read_text(encoding="utf-8"))
             self.assertNotIn('way id="20"', outputs["roads"].read_text(encoding="utf-8"))
             buildings = json.loads(outputs["buildings"].read_text(encoding="utf-8"))
-            self.assertEqual([f["properties"]["id"] for f in buildings["features"]], ["inside"])
+            self.assertEqual([f["properties"]["id"] for f in buildings["features"]], ["inside", "boundary"])
+            boundary = buildings["features"][1]["geometry"]["coordinates"][0]
+            self.assertTrue(any(point[0] > child_bbox[2] for point in boundary))
             with open(outputs["dem"], encoding="utf-8", newline="") as f:
                 dem_rows = list(csv.DictReader(f))
             self.assertEqual(len(dem_rows), 2)

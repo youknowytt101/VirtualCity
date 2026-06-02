@@ -174,7 +174,43 @@
       ],
       "fingerprint": "552266307dcae8a3eccbb6efdbf670bb0c13fc4bd6e7450bed60bcc5d56e2680",
       "manifest": "RawData/_cleaned/z47n_e701000_n1428000_w2000_h3000_s1000/_manifest.json",
-      "updated": "2026-06-01T00:27:54"
+      "updated": "2026-06-02T01:34:37"
+    },
+    "refine_0f48ca6aaeeed553": {
+      "area_id": "z47n_e702000_n1429000_w1000_h1000_s1000",
+      "bbox": [
+        100.8618647,
+        12.9197274,
+        100.8711457,
+        12.9288312
+      ],
+      "fingerprint": "0f48ca6aaeeed553283b638a4e6d5d981b471b12e8a328d562eccb6055d45b55",
+      "manifest": "RawData/_cleaned/z47n_e702000_n1429000_w1000_h1000_s1000/_manifest.json",
+      "updated": "2026-06-02T03:43:48"
+    },
+    "refine_df4ab473b9fd430c": {
+      "area_id": "z47n_e703000_n1429000_w1000_h1000_s1000",
+      "bbox": [
+        100.8710784,
+        12.9196612,
+        100.8803597,
+        12.9287653
+      ],
+      "fingerprint": "df4ab473b9fd430cbb12d528ef3f2c0c679af8b16757124614cf146c81bb0729",
+      "manifest": "RawData/_cleaned/z47n_e703000_n1429000_w1000_h1000_s1000/_manifest.json",
+      "updated": "2026-06-02T04:11:30"
+    },
+    "refine_efeab863502e8b55": {
+      "area_id": "z47n_e703000_n1429000_w1000_h1000_s1000",
+      "bbox": [
+        100.8710784,
+        12.9196612,
+        100.8803597,
+        12.9287653
+      ],
+      "fingerprint": "efeab863502e8b55f24c0d8a8c3b8838cccb05e92d5f1460dd2d5a3027ecb18d",
+      "manifest": "RawData/_cleaned/z47n_e703000_n1429000_w1000_h1000_s1000/_manifest.json",
+      "updated": "2026-06-02T03:59:16"
     }
   }
 }

@@ -44,6 +44,73 @@ def _vnorm(a):
 def _vperp(a):
     return (-a[1], a[0])
 
+def _cross2(ax, az, bx, bz):
+    return ax * bz - az * bx
+
+def _poly_area_xz(pts):
+    n = len(pts)
+    if n < 3:
+        return 0.0
+    acc = 0.0
+    for i in range(n):
+        p0 = pts[i]
+        p1 = pts[(i + 1) % n]
+        acc += p0[0] * p1[1] - p1[0] * p0[1]
+    return 0.5 * abs(acc)
+
+def _segments_cross_xz(a0, a1, b0, b1):
+    rx, rz = a1[0]-a0[0], a1[1]-a0[1]
+    sx, sz = b1[0]-b0[0], b1[1]-b0[1]
+    den = _cross2(rx, rz, sx, sz)
+    if abs(den) < 1e-7:
+        return False
+    qpx, qpz = b0[0]-a0[0], b0[1]-a0[1]
+    t = _cross2(qpx, qpz, sx, sz) / den
+    u = _cross2(qpx, qpz, rx, rz) / den
+    return 1e-4 < t < 0.9999 and 1e-4 < u < 0.9999
+
+def _poly_self_intersects_xz(pts):
+    n = len(pts)
+    if n < 4:
+        return False
+    for i in range(n):
+        a0, a1 = pts[i], pts[(i + 1) % n]
+        for j in range(i + 2, n):
+            if i == 0 and j == n-1:
+                continue
+            b0, b1 = pts[j], pts[(j + 1) % n]
+            if _segments_cross_xz(a0, a1, b0, b1):
+                return True
+    return False
+
+def _min_edge_len_xz(pts):
+    if len(pts) < 2:
+        return 0.0
+    m = 1e9
+    for i in range(len(pts)):
+        p0 = pts[i]
+        p1 = pts[(i + 1) % len(pts)]
+        m = min(m, math.hypot(p1[0]-p0[0], p1[1]-p0[1]))
+    return m if m < 1e9 else 0.0
+
+def _min_angle_xz(pts):
+    if len(pts) < 3:
+        return None
+    out = None
+    for i, cur in enumerate(pts):
+        prev = pts[(i - 1) % len(pts)]
+        nxt = pts[(i + 1) % len(pts)]
+        ax, az = prev[0] - cur[0], prev[1] - cur[1]
+        bx, bz = nxt[0] - cur[0], nxt[1] - cur[1]
+        al = _vlen((ax, az))
+        bl = _vlen((bx, bz))
+        if al <= 1e-9 or bl <= 1e-9:
+            continue
+        dot = max(-1.0, min(1.0, (ax * bx + az * bz) / (al * bl)))
+        ang = math.degrees(math.acos(dot))
+        out = ang if out is None else min(out, ang)
+    return out
+
 def _poly_length(pts):
     L = 0.0
     for i in range(len(pts)-1):
@@ -242,6 +309,34 @@ def _get_pt(pos):
 road_face_area_attr = geo_out.addAttrib(hou.attribType.Prim, 'road_face_area', 0.0)
 road_segment_len_attr = geo_out.addAttrib(hou.attribType.Prim, 'road_segment_len', 0.0)
 is_junction_attr = geo_out.addAttrib(hou.attribType.Prim, 'is_junction', 0)
+half_width_attr = geo_out.addAttrib(hou.attribType.Prim, 'half_width', 0.0)
+highway_attr = geo_out.addAttrib(hou.attribType.Prim, 'highway', '')
+seg_id_attr = geo_out.addAttrib(hou.attribType.Prim, 'seg_id', -1)
+from_node_attr = geo_out.addAttrib(hou.attribType.Prim, 'from_node', '')
+to_node_attr = geo_out.addAttrib(hou.attribType.Prim, 'to_node', '')
+skipped_corridor_attr = geo_out.addAttrib(hou.attribType.Global, 'rtb_skipped_degenerate_corridors', 0)
+skipped_junction_attr = geo_out.addAttrib(hou.attribType.Global, 'rtb_skipped_degenerate_junction_tris', 0)
+
+skipped_degenerate_corridors = 0
+skipped_degenerate_junction_tris = 0
+
+def _prim_val_str(pr, name, default=''):
+    try:
+        if pr.geometry().findPrimAttrib(name):
+            v = pr.attribValue(name)
+            return str(v) if v is not None else default
+    except Exception:
+        pass
+    return default
+
+def _prim_val_int(pr, name, default=-1):
+    try:
+        if pr.geometry().findPrimAttrib(name):
+            v = pr.attribValue(name)
+            return int(v)
+    except Exception:
+        pass
+    return default
 
 # ── emit corridor quads ──────────────────────────────────────────────
 
@@ -307,22 +402,50 @@ for pr, pts in poly_pts.items():
             junction_boundary_points[k1].append(left1)
             junction_boundary_points[k1].append(right1)
 
-        # Emit a clean, valid quad for this segment chunk
-        quad = geo_out.createPolygon()
-        for vpos in (left0, left1, right1, right0):
-            quad.addVertex(_get_pt(vpos))
-        try:
-            area = 0.5 * abs(
-                (left0[0]*left1[2] - left1[0]*left0[2]) +
-                (left1[0]*right1[2] - right1[0]*left1[2]) +
-                (right1[0]*right0[2] - right0[0]*right1[2]) +
-                (right0[0]*left0[2] - left0[0]*right0[2])
-            )
-        except Exception:
-            area = 0.0
-        quad.setAttribValue(road_face_area_attr, float(area))
-        quad.setAttribValue(road_segment_len_attr, float(math.hypot(left1[0]-left0[0], left1[2]-left0[2])))
-        quad.setAttribValue(is_junction_attr, 0)
+        # Degenerate guard: microscopic trim spans are safer to skip than to
+        # triangulate into needle faces. Only real self-intersections attempt a
+        # center fan fallback.
+        quad2d = [ (left0[0], left0[2]), (left1[0], left1[2]), (right1[0], right1[2]), (right0[0], right0[2]) ]
+        q_area = _poly_area_xz(quad2d)
+        q_min_edge = _min_edge_len_xz(quad2d)
+        if q_area < 0.05 or q_min_edge < 0.05:
+            skipped_degenerate_corridors += 1
+            continue
+        if _poly_self_intersects_xz(quad2d):
+            c = hou.Vector3(
+                (left0[0]+left1[0]+right1[0]+right0[0])/4.0,
+                (left0[1]+left1[1]+right1[1]+right0[1])/4.0,
+                (left0[2]+left1[2]+right1[2]+right0[2])/4.0)
+            tris = [ (left0, left1, c), (left1, right1, c), (right1, right0, c), (right0, left0, c) ]
+            for a,b,cpos in tris:
+                tri2d = [ (a[0],a[2]), (b[0],b[2]), (cpos[0],cpos[2]) ]
+                t_area = _poly_area_xz(tri2d)
+                if t_area < 0.05 or _min_edge_len_xz(tri2d) < 0.05:
+                    skipped_degenerate_corridors += 1
+                    continue
+                tri = geo_out.createPolygon()
+                for vpos in (a,b,cpos):
+                    tri.addVertex(_get_pt(vpos))
+                tri.setAttribValue(road_face_area_attr, float(t_area))
+                tri.setAttribValue(road_segment_len_attr, 0.0)
+                tri.setAttribValue(is_junction_attr, 0)
+                tri.setAttribValue(half_width_attr, float(hw))
+                tri.setAttribValue(highway_attr, _prim_val_str(pr, 'highway', ''))
+                tri.setAttribValue(seg_id_attr, _prim_val_int(pr, 'seg_id', -1))
+                tri.setAttribValue(from_node_attr, _prim_val_str(pr, 'from_node', ''))
+                tri.setAttribValue(to_node_attr, _prim_val_str(pr, 'to_node', ''))
+        else:
+            quad = geo_out.createPolygon()
+            for vpos in (left0, left1, right1, right0):
+                quad.addVertex(_get_pt(vpos))
+            quad.setAttribValue(road_face_area_attr, float(q_area))
+            quad.setAttribValue(road_segment_len_attr, float(math.hypot(left1[0]-left0[0], left1[2]-left0[2])))
+            quad.setAttribValue(is_junction_attr, 0)
+            quad.setAttribValue(half_width_attr, float(hw))
+            quad.setAttribValue(highway_attr, _prim_val_str(pr, 'highway', ''))
+            quad.setAttribValue(seg_id_attr, _prim_val_int(pr, 'seg_id', -1))
+            quad.setAttribValue(from_node_attr, _prim_val_str(pr, 'from_node', ''))
+            quad.setAttribValue(to_node_attr, _prim_val_str(pr, 'to_node', ''))
 
     # ── Dead-end (degree=1) Rounded Circular Cap ─────────────────────
     if t0 == 0 and len(endpoints[k0]) == 1:
@@ -347,6 +470,11 @@ for pr, pts in poly_pts.items():
         poly.setAttribValue(road_face_area_attr, float(math.pi * hw * hw * 0.5))
         poly.setAttribValue(road_segment_len_attr, 0.0)
         poly.setAttribValue(is_junction_attr, 0)
+        poly.setAttribValue(half_width_attr, float(hw))
+        poly.setAttribValue(highway_attr, _prim_val_str(pr, 'highway', ''))
+        poly.setAttribValue(seg_id_attr, _prim_val_int(pr, 'seg_id', -1))
+        poly.setAttribValue(from_node_attr, _prim_val_str(pr, 'from_node', ''))
+        poly.setAttribValue(to_node_attr, _prim_val_str(pr, 'to_node', ''))
 
     if t1 == 0 and len(endpoints[k1]) == 1:
         # Emit a semi-circular cap at end point k1
@@ -367,6 +495,11 @@ for pr, pts in poly_pts.items():
         poly.setAttribValue(road_face_area_attr, float(math.pi * hw * hw * 0.5))
         poly.setAttribValue(road_segment_len_attr, 0.0)
         poly.setAttribValue(is_junction_attr, 0)
+        poly.setAttribValue(half_width_attr, float(hw))
+        poly.setAttribValue(highway_attr, _prim_val_str(pr, 'highway', ''))
+        poly.setAttribValue(seg_id_attr, _prim_val_int(pr, 'seg_id', -1))
+        poly.setAttribValue(from_node_attr, _prim_val_str(pr, 'from_node', ''))
+        poly.setAttribValue(to_node_attr, _prim_val_str(pr, 'to_node', ''))
 
 # ── Watertight Junction Patch Generation ─────────────────────────────
 
@@ -398,22 +531,48 @@ for k in junction_keys:
 
     sorted_rim.sort(key=lambda t: t[0])
 
-    # Emit the watertight patch polygon
-    poly = geo_out.createPolygon()
-    for _, p in sorted_rim:
-        poly.addVertex(_get_pt(p))
-
-    # Compute approximate patch area
+    # Emit watertight patch if valid; otherwise fan-triangulate
     poly_pts_2d = [_v2(p) for _, p in sorted_rim]
-    area = 0.0
-    n_p = len(poly_pts_2d)
-    for idx in range(n_p):
-        p0 = poly_pts_2d[idx]
-        p1 = poly_pts_2d[(idx + 1) % n_p]
-        area += p0[0]*p1[1] - p1[0]*p0[1]
-    area = 0.5 * abs(area)
+    rim_min_angle = _min_angle_xz(poly_pts_2d)
+    full_valid = (
+        (not _poly_self_intersects_xz(poly_pts_2d))
+        and (_poly_area_xz(poly_pts_2d) > 1e-5)
+        and (_min_edge_len_xz(poly_pts_2d) >= 0.05)
+        and (rim_min_angle is None or rim_min_angle >= 2.0)
+        and (len(sorted_rim) <= 8)
+    )
+    if full_valid:
+        poly = geo_out.createPolygon()
+        for _, p in sorted_rim:
+            poly.addVertex(_get_pt(p))
+        area = _poly_area_xz(poly_pts_2d)
+        poly.setAttribValue(road_face_area_attr, float(area))
+        poly.setAttribValue(road_segment_len_attr, 0.0)
+        poly.setAttribValue(is_junction_attr, 1)
+        poly.setAttribValue(half_width_attr, 0.0)
+        poly.setAttribValue(highway_attr, 'junction')
+    else:
+        center_pt = _get_pt(center)
+        m = len(sorted_rim)
+        for i in range(m):
+            p0 = sorted_rim[i][1]
+            p1 = sorted_rim[(i+1)%m][1]
+            tri2d = [ (center[0],center[2]), (p0[0],p0[2]), (p1[0],p1[2]) ]
+            t_area = _poly_area_xz(tri2d)
+            t_angle = _min_angle_xz(tri2d)
+            if t_area < 0.05 or _min_edge_len_xz(tri2d) < 0.05 or (t_angle is not None and t_angle < 2.0):
+                skipped_degenerate_junction_tris += 1
+                continue
+            tri = geo_out.createPolygon()
+            tri.addVertex(center_pt)
+            tri.addVertex(_get_pt(p0))
+            tri.addVertex(_get_pt(p1))
+            tri.setAttribValue(road_face_area_attr, float(t_area))
+            tri.setAttribValue(road_segment_len_attr, 0.0)
+            tri.setAttribValue(is_junction_attr, 1)
+            tri.setAttribValue(half_width_attr, 0.0)
+            tri.setAttribValue(highway_attr, 'junction')
 
-    poly.setAttribValue(road_face_area_attr, float(area))
-    poly.setAttribValue(road_segment_len_attr, 0.0)
-    poly.setAttribValue(is_junction_attr, 1)
+geo_out.setGlobalAttribValue('rtb_skipped_degenerate_corridors', int(skipped_degenerate_corridors))
+geo_out.setGlobalAttribValue('rtb_skipped_degenerate_junction_tris', int(skipped_degenerate_junction_tris))
 

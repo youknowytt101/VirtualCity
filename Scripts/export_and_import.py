@@ -20,11 +20,11 @@ _cfg = load_active_area()
 _OBJ_NET = _cfg.get('obj_network', 'city_gen')
 _OBJ = '/obj/' + _OBJ_NET
 
-# label, 首选SOP, 备用SOP, 输出FBX
+# label, 候选SOP（从最终输出往上游兜底）, 输出FBX
 EXPORTS = [
-    ('buildings', f'{_OBJ}/bld_clipped',  f'{_OBJ}/post_normals', 'buildings_v001.fbx'),
-    ('roads',     f'{_OBJ}/road_clipped', f'{_OBJ}/road_strips',  'roads_v001.fbx'),
-    ('terrain',   f'{_OBJ}/dem_terrain',  f'{_OBJ}/dem_terrain',  'terrain_v001.fbx'),
+    ('buildings', [f'{_OBJ}/bld_with_foundation', f'{_OBJ}/bld_clipped', f'{_OBJ}/post_normals'], 'buildings_v001.fbx'),
+    ('roads',     [f'{_OBJ}/road_color', f'{_OBJ}/road_profile_apply', f'{_OBJ}/road_clipped', f'{_OBJ}/road_strips'], 'roads_v001.fbx'),
+    ('terrain',   [f'{_OBJ}/terrain_color', f'{_OBJ}/dem_subdivide', f'{_OBJ}/dem_terrain'], 'terrain_v001.fbx'),
 ]
 
 
@@ -50,24 +50,33 @@ def resolve_sop_path(hou, path):
     return path
 
 
-def export_one(label, sop_primary, sop_fallback, fbx_name):
+def select_sop_path(hou, sop_candidates):
+    for candidate in sop_candidates:
+        resolved = resolve_sop_path(hou, candidate)
+        if hou.node(resolved):
+            return resolved
+    return resolve_sop_path(hou, sop_candidates[-1])
+
+
+def export_one(label, sop_candidates, fbx_name):
     """E-001: 每个 FBX 独立连接导出，崩溃不传染其他项目"""
     fbx_path = os.path.join(EXPORT, fbx_name).replace('\\', '/')
     conn, hou = connect_hou()
     try:
-        sop_primary = resolve_sop_path(hou, sop_primary)
-        sop_fallback = resolve_sop_path(hou, sop_fallback)
-        sop_path = sop_primary if hou.node(sop_primary) else sop_fallback
+        sop_path = select_sop_path(hou, sop_candidates)
         src = hou.node(sop_path)
         if src is None:
             print(f'  [{label}] 跳过: 节点不存在 {sop_path}')
             return False
         # E-002: 导出前确认几何非空
         src.cook(force=False)
-        pts = src.geometry().intrinsicValue('pointcount')
-        if pts == 0:
+        geo = src.geometry()
+        pts = geo.intrinsicValue('pointcount')
+        prims = geo.intrinsicValue('primitivecount')
+        if pts == 0 or prims == 0:
             print(f'  [{label}] 跳过: 几何为空 (E-002)')
             return False
+        print(f'  [{label}] source={sop_path} pts={pts} prims={prims}')
 
         geo_name = f'_export_{label}'
         obj_net  = hou.node('/obj')
@@ -107,8 +116,8 @@ def export_one(label, sop_primary, sop_fallback, fbx_name):
 print('[1/2] Houdini 导出 FBX...')
 os.makedirs(EXPORT, exist_ok=True)
 failed = []
-for label, primary, fallback, fbx in EXPORTS:
-    ok = export_one(label, primary, fallback, fbx)
+for label, candidates, fbx in EXPORTS:
+    ok = export_one(label, candidates, fbx)
     if not ok:
         failed.append(label)
     time.sleep(1)

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "run_id": "20260602_040246_z47n_e703000_n1429000_w1000_h1000_s1000_fbbc9415",
+  "run_id": "20260602_035237_z47n_e703000_n1429000_w1000_h1000_s1000_e7e089c1",
   "area_id": "z47n_e703000_n1429000_w1000_h1000_s1000",
   "bbox": [
     100.8710784,
@@ -10,90 +10,78 @@
   ],
   "source": "set_area",
   "status": "completed",
-  "phase": "houdini_completed",
-  "created": "2026-06-02T04:02:46",
-  "updated": "2026-06-02T04:12:57",
+  "phase": "pipeline_completed",
+  "created": "2026-06-02T03:52:37",
+  "updated": "2026-06-02T03:53:48",
   "events": [
     {
-      "time": "2026-06-02T04:02:46",
+      "time": "2026-06-02T03:52:37",
       "status": "running",
       "phase": "created",
       "message": "pipeline run created"
     },
     {
-      "time": "2026-06-02T04:02:46",
+      "time": "2026-06-02T03:52:37",
       "status": "running",
       "phase": "active_area_written",
       "message": "active_area.json updated"
     },
     {
-      "time": "2026-06-02T04:02:48",
+      "time": "2026-06-02T03:52:39",
       "status": "running",
       "phase": "acquire_osm",
       "message": "OSM acquisition completed"
     },
     {
-      "time": "2026-06-02T04:02:48",
+      "time": "2026-06-02T03:52:39",
       "status": "running",
       "phase": "acquire_dem",
       "message": "DEM acquisition completed (source=fabdem)"
     },
     {
-      "time": "2026-06-02T04:02:48",
+      "time": "2026-06-02T03:52:39",
       "status": "running",
       "phase": "acquire_buildings",
       "message": "building acquisition completed"
     },
     {
-      "time": "2026-06-02T04:02:48",
+      "time": "2026-06-02T03:52:39",
       "status": "running",
       "phase": "refine_data",
       "message": "data refinement started"
     },
     {
-      "time": "2026-06-02T04:02:48",
-      "status": "failed",
-      "phase": "refine_data",
-      "message": "数据精炼未通过，中止流程"
+      "time": "2026-06-02T03:52:39",
+      "status": "running",
+      "phase": "refine_data_completed",
+      "message": "data refinement completed"
     },
     {
-      "time": "2026-06-02T04:05:16",
+      "time": "2026-06-02T03:52:39",
+      "status": "running",
+      "phase": "houdini_recook",
+      "message": "Houdini recook started"
+    },
+    {
+      "time": "2026-06-02T03:52:39",
       "status": "running",
       "phase": "houdini_preflight",
       "message": "checking Houdini-ready inputs"
     },
     {
-      "time": "2026-06-02T04:05:16",
-      "status": "failed",
-      "phase": "refine_data",
-      "message": "refine_data.py failed; Houdini recook aborted"
-    },
-    {
-      "time": "2026-06-02T04:05:34",
-      "status": "running",
-      "phase": "houdini_preflight",
-      "message": "checking Houdini-ready inputs"
-    },
-    {
-      "time": "2026-06-02T04:06:51",
+      "time": "2026-06-02T03:53:48",
       "status": "completed",
       "phase": "houdini_completed",
       "message": "Houdini build completed; model QA quick warn"
     },
     {
-      "time": "2026-06-02T04:11:40",
-      "status": "running",
-      "phase": "houdini_preflight",
-      "message": "checking Houdini-ready inputs"
-    },
-    {
-      "time": "2026-06-02T04:12:57",
+      "time": "2026-06-02T03:53:48",
       "status": "completed",
-      "phase": "houdini_completed",
-      "message": "Houdini build completed; model QA quick warn"
+      "phase": "pipeline_completed",
+      "message": "data acquisition, refinement, and Houdini recook completed"
     }
   ],
   "hip_path": "Houdini/Hip/VC_z47n_e703000_n1429000_w1000_h1000_s1000_citygen_v001.hip",
   "qa_status": "warn",
-  "qa_report": "Reports/model_qa/z47n_e703000_n1429000_w1000_h1000_s1000_20260602_041257_quick.json"
+  "qa_report": "Reports/model_qa/z47n_e703000_n1429000_w1000_h1000_s1000_20260602_035348_quick.json"
 }
