@@ -11,10 +11,11 @@
     "optimized_junction_connector": 149
   },
   "arc_geometry_counts": {
-    "bezier_tangent_fallback": 91,
-    "circular_arc": 37,
+    "bezier_tangent_fallback": 52,
+    "circular_arc": 75,
+    "param_poly3_hermite": 1,
     "straight_infinite_radius": 42
   },
-  "radius_violation_features": 90,
+  "radius_violation_features": 78,
   "note": "Radius violations stay visible as skeleton diagnostics; they are not fixed in Houdini."
 }

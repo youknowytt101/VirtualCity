@@ -1,0 +1,1240 @@
+{
+  "type": "movement_anchor_gap_audit",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "road_test_pipeline.movement_anchor_gap_audit.v1",
+    "coord_domain": "local_xz_m",
+    "contract": "Non-destructive QA（非破坏式质检） for remaining capacity-limited lane-level movement anchors（车道级通行锚点）. It classifies why anchors remain close after transaction-ready short-edge absorption（事务就绪短边吸收） has been previewed as planned virtual anchors（规划虚拟锚点）.",
+    "inputs": {
+      "movement_corridors": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+      "junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+      "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+      "short_edge_absorption_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+    }
+  },
+  "remaining_anchor_records": [
+    {
+      "corridor_id": "mc_00132",
+      "lane_link_id": "ll_00132",
+      "movement_kind": "through",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_022",
+      "junction_node_id": "n_0117",
+      "edge_id": "e_0241",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_id": "n_0118",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00134",
+      "lane_link_id": "ll_00134",
+      "movement_kind": "through",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_022",
+      "junction_node_id": "n_0117",
+      "edge_id": "e_0241",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_id": "n_0118",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00135",
+      "lane_link_id": "ll_00135",
+      "movement_kind": "right",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_022",
+      "junction_node_id": "n_0117",
+      "edge_id": "e_0241",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_id": "n_0118",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00137",
+      "lane_link_id": "ll_00137",
+      "movement_kind": "left",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_022",
+      "junction_node_id": "n_0117",
+      "edge_id": "e_0241",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_id": "n_0118",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00138",
+      "lane_link_id": "ll_00138",
+      "movement_kind": "right",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_023",
+      "junction_node_id": "n_0118",
+      "edge_id": "e_0241",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_id": "n_0117",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00139",
+      "lane_link_id": "ll_00139",
+      "movement_kind": "through",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_023",
+      "junction_node_id": "n_0118",
+      "edge_id": "e_0241",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_id": "n_0117",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00140",
+      "lane_link_id": "ll_00140",
+      "movement_kind": "left",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_023",
+      "junction_node_id": "n_0118",
+      "edge_id": "e_0241",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_id": "n_0117",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00142",
+      "lane_link_id": "ll_00142",
+      "movement_kind": "through",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_023",
+      "junction_node_id": "n_0118",
+      "edge_id": "e_0241",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_id": "n_0117",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00246",
+      "lane_link_id": "ll_00246",
+      "movement_kind": "through",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_039",
+      "junction_node_id": "n_0173",
+      "edge_id": "e_0171",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_id": "n_0176",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00248",
+      "lane_link_id": "ll_00248",
+      "movement_kind": "through",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_039",
+      "junction_node_id": "n_0173",
+      "edge_id": "e_0171",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_id": "n_0176",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00249",
+      "lane_link_id": "ll_00249",
+      "movement_kind": "right",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_039",
+      "junction_node_id": "n_0173",
+      "edge_id": "e_0171",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_id": "n_0176",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00251",
+      "lane_link_id": "ll_00251",
+      "movement_kind": "left",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_039",
+      "junction_node_id": "n_0173",
+      "edge_id": "e_0171",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_id": "n_0176",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00252",
+      "lane_link_id": "ll_00252",
+      "movement_kind": "through",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_040",
+      "junction_node_id": "n_0176",
+      "edge_id": "e_0171",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_id": "n_0173",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00253",
+      "lane_link_id": "ll_00253",
+      "movement_kind": "left",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_040",
+      "junction_node_id": "n_0176",
+      "edge_id": "e_0171",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_id": "n_0173",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00254",
+      "lane_link_id": "ll_00254",
+      "movement_kind": "through",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_040",
+      "junction_node_id": "n_0176",
+      "edge_id": "e_0171",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_id": "n_0173",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00256",
+      "lane_link_id": "ll_00256",
+      "movement_kind": "right",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_040",
+      "junction_node_id": "n_0176",
+      "edge_id": "e_0171",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_id": "n_0173",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00259",
+      "lane_link_id": "ll_00259",
+      "movement_kind": "through",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_041",
+      "junction_node_id": "n_0187",
+      "edge_id": "e_0173",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_id": "n_0191",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00261",
+      "lane_link_id": "ll_00261",
+      "movement_kind": "right",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_041",
+      "junction_node_id": "n_0187",
+      "edge_id": "e_0173",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_id": "n_0191",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00262",
+      "lane_link_id": "ll_00262",
+      "movement_kind": "through",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_041",
+      "junction_node_id": "n_0187",
+      "edge_id": "e_0173",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_id": "n_0191",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00263",
+      "lane_link_id": "ll_00263",
+      "movement_kind": "left",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_041",
+      "junction_node_id": "n_0187",
+      "edge_id": "e_0173",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_id": "n_0191",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00270",
+      "lane_link_id": "ll_00270",
+      "movement_kind": "through",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_043",
+      "junction_node_id": "n_0191",
+      "edge_id": "e_0173",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_id": "n_0187",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00271",
+      "lane_link_id": "ll_00271",
+      "movement_kind": "left",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_043",
+      "junction_node_id": "n_0191",
+      "edge_id": "e_0173",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_id": "n_0187",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00272",
+      "lane_link_id": "ll_00272",
+      "movement_kind": "through",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_043",
+      "junction_node_id": "n_0191",
+      "edge_id": "e_0173",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_id": "n_0187",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00274",
+      "lane_link_id": "ll_00274",
+      "movement_kind": "right",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_043",
+      "junction_node_id": "n_0191",
+      "edge_id": "e_0173",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_id": "n_0187",
+      "other_node_kind": "junction",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "reasons": [
+        "candidate_for_compound_junction_merge",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_junction"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00114",
+      "lane_link_id": "ll_00114",
+      "movement_kind": "through",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0150",
+      "road_class": "service",
+      "edge_length_m": 6.459,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.959,
+      "trim_deficit_m": 0.341,
+      "other_node_id": "n_0111",
+      "other_node_kind": "connector",
+      "short_edge_absorption_candidate_id": "n_0108_e_0150_short_edge_absorption",
+      "short_edge_absorption_status": "qa_candidate",
+      "short_edge_absorption_issues": [
+        "low_trim_recovery"
+      ],
+      "classification": "low_value_short_edge_absorption",
+      "recommended_action": "defer",
+      "reasons": [
+        "low_trim_recovery"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited",
+        "exit_anchor_short_edge_absorption_candidate"
+      ]
+    },
+    {
+      "corridor_id": "mc_00116",
+      "lane_link_id": "ll_00116",
+      "movement_kind": "through",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0150",
+      "road_class": "service",
+      "edge_length_m": 6.459,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.959,
+      "trim_deficit_m": 0.341,
+      "other_node_id": "n_0111",
+      "other_node_kind": "connector",
+      "short_edge_absorption_candidate_id": "n_0108_e_0150_short_edge_absorption",
+      "short_edge_absorption_status": "qa_candidate",
+      "short_edge_absorption_issues": [
+        "low_trim_recovery"
+      ],
+      "classification": "low_value_short_edge_absorption",
+      "recommended_action": "defer",
+      "reasons": [
+        "low_trim_recovery"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited",
+        "entry_anchor_short_edge_absorption_candidate"
+      ]
+    },
+    {
+      "corridor_id": "mc_00117",
+      "lane_link_id": "ll_00117",
+      "movement_kind": "right",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0150",
+      "road_class": "service",
+      "edge_length_m": 6.459,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.959,
+      "trim_deficit_m": 0.341,
+      "other_node_id": "n_0111",
+      "other_node_kind": "connector",
+      "short_edge_absorption_candidate_id": "n_0108_e_0150_short_edge_absorption",
+      "short_edge_absorption_status": "qa_candidate",
+      "short_edge_absorption_issues": [
+        "low_trim_recovery"
+      ],
+      "classification": "low_value_short_edge_absorption",
+      "recommended_action": "defer",
+      "reasons": [
+        "low_trim_recovery"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited",
+        "entry_anchor_short_edge_absorption_candidate"
+      ]
+    },
+    {
+      "corridor_id": "mc_00119",
+      "lane_link_id": "ll_00119",
+      "movement_kind": "left",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0150",
+      "road_class": "service",
+      "edge_length_m": 6.459,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.959,
+      "trim_deficit_m": 0.341,
+      "other_node_id": "n_0111",
+      "other_node_kind": "connector",
+      "short_edge_absorption_candidate_id": "n_0108_e_0150_short_edge_absorption",
+      "short_edge_absorption_status": "qa_candidate",
+      "short_edge_absorption_issues": [
+        "low_trim_recovery"
+      ],
+      "classification": "low_value_short_edge_absorption",
+      "recommended_action": "defer",
+      "reasons": [
+        "low_trim_recovery"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited",
+        "exit_anchor_short_edge_absorption_candidate"
+      ]
+    },
+    {
+      "corridor_id": "mc_00115",
+      "lane_link_id": "ll_00115",
+      "movement_kind": "left",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0151",
+      "road_class": "service",
+      "edge_length_m": 4.009,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.509,
+      "trim_deficit_m": 2.791,
+      "other_node_id": "n_0106",
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "reasons": [
+        "do_not_invent_extension_for_dead_end_stub",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_dead_end"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00117",
+      "lane_link_id": "ll_00117",
+      "movement_kind": "right",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0151",
+      "road_class": "service",
+      "edge_length_m": 4.009,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.509,
+      "trim_deficit_m": 2.791,
+      "other_node_id": "n_0106",
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "reasons": [
+        "do_not_invent_extension_for_dead_end_stub",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_dead_end"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00118",
+      "lane_link_id": "ll_00118",
+      "movement_kind": "right",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0151",
+      "road_class": "service",
+      "edge_length_m": 4.009,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.509,
+      "trim_deficit_m": 2.791,
+      "other_node_id": "n_0106",
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "reasons": [
+        "do_not_invent_extension_for_dead_end_stub",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_dead_end"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00119",
+      "lane_link_id": "ll_00119",
+      "movement_kind": "left",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0151",
+      "road_class": "service",
+      "edge_length_m": 4.009,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.509,
+      "trim_deficit_m": 2.791,
+      "other_node_id": "n_0106",
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "reasons": [
+        "do_not_invent_extension_for_dead_end_stub",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_dead_end"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00126",
+      "lane_link_id": "ll_00126",
+      "movement_kind": "right",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_021",
+      "junction_node_id": "n_0112",
+      "edge_id": "e_0208",
+      "road_class": "service",
+      "edge_length_m": 4.255,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.755,
+      "trim_deficit_m": 2.545,
+      "other_node_id": "n_0115",
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "reasons": [
+        "do_not_invent_extension_for_dead_end_stub",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_dead_end"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00128",
+      "lane_link_id": "ll_00128",
+      "movement_kind": "left",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_021",
+      "junction_node_id": "n_0112",
+      "edge_id": "e_0208",
+      "road_class": "service",
+      "edge_length_m": 4.255,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.755,
+      "trim_deficit_m": 2.545,
+      "other_node_id": "n_0115",
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "reasons": [
+        "do_not_invent_extension_for_dead_end_stub",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_dead_end"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00129",
+      "lane_link_id": "ll_00129",
+      "movement_kind": "right",
+      "anchor_role": "entry",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_021",
+      "junction_node_id": "n_0112",
+      "edge_id": "e_0208",
+      "road_class": "service",
+      "edge_length_m": 4.255,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.755,
+      "trim_deficit_m": 2.545,
+      "other_node_id": "n_0115",
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "reasons": [
+        "do_not_invent_extension_for_dead_end_stub",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_dead_end"
+      ],
+      "anchor_issues": [
+        "entry_anchor_entry_trim_capacity_limited"
+      ]
+    },
+    {
+      "corridor_id": "mc_00131",
+      "lane_link_id": "ll_00131",
+      "movement_kind": "left",
+      "anchor_role": "exit",
+      "anchor_source": "engineering_entry_pose_lateral_offset",
+      "junction_id": "j_021",
+      "junction_node_id": "n_0112",
+      "edge_id": "e_0208",
+      "road_class": "service",
+      "edge_length_m": 4.255,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.755,
+      "trim_deficit_m": 2.545,
+      "other_node_id": "n_0115",
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_candidate_id": "",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "reasons": [
+        "do_not_invent_extension_for_dead_end_stub",
+        "not_short_edge_absorption_candidate",
+        "other_node_is_dead_end"
+      ],
+      "anchor_issues": [
+        "exit_anchor_entry_trim_capacity_limited"
+      ]
+    }
+  ],
+  "unique_remaining_approaches": [
+    {
+      "junction_node_id": "n_0117",
+      "edge_id": "e_0241",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0118",
+      "edge_id": "e_0241",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0173",
+      "edge_id": "e_0171",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0176",
+      "edge_id": "e_0171",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0187",
+      "edge_id": "e_0173",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0191",
+      "edge_id": "e_0173",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0150",
+      "classification": "low_value_short_edge_absorption",
+      "recommended_action": "defer",
+      "road_class": "service",
+      "edge_length_m": 6.459,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.959,
+      "trim_deficit_m": 0.341,
+      "other_node_kind": "connector",
+      "short_edge_absorption_status": "qa_candidate",
+      "short_edge_absorption_issues": [
+        "low_trim_recovery"
+      ],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0151",
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "road_class": "service",
+      "edge_length_m": 4.009,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.509,
+      "trim_deficit_m": 2.791,
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0112",
+      "edge_id": "e_0208",
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "road_class": "service",
+      "edge_length_m": 4.255,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.755,
+      "trim_deficit_m": 2.545,
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    }
+  ]
+}

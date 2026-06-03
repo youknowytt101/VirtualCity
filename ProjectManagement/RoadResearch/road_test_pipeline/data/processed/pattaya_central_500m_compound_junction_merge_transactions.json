@@ -1,0 +1,7313 @@
+{
+  "type": "compound_junction_merge_transactions",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "road_test_pipeline.compound_junction_merge_transactions.v1",
+    "coord_domain": "local_xz_m",
+    "contract": "Trial compound junction merge transaction（复合路口合并试运行事务）. It composes external lane movements across internal bridge edges（内部桥接短边） and emits compound movement corridor candidates（复合通行走廊候选） without mutating road_graph（道路图） or clean skeleton（干净道路骨架）.",
+    "inputs": {
+      "compound_junction_merge_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_candidates.json",
+      "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+      "engineering_reference_lines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
+      "short_edge_absorption_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+    }
+  },
+  "transactions": [
+    {
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "status": "accepted_for_staging",
+      "risk": "low",
+      "issues": [],
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "bridge_edge_ids": [
+        "e_0241"
+      ],
+      "generated_compound_cases": 8,
+      "expected_affected_anchor_records": 8,
+      "affected_corridor_replacement_ratio": 1.0,
+      "exposed_bridge_edge_cases": 0,
+      "capacity_limited_anchor_cases": 0,
+      "compound_case_ids": [
+        "cmc_00000",
+        "cmc_00001",
+        "cmc_00002",
+        "cmc_00003",
+        "cmc_00004",
+        "cmc_00005",
+        "cmc_00006",
+        "cmc_00007"
+      ],
+      "transaction_contract": "Accepted means accepted for staging preview（暂存预览接受）, not clean skeleton writeback（非干净骨架写回）."
+    },
+    {
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "status": "accepted_for_staging",
+      "risk": "low",
+      "issues": [],
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "bridge_edge_ids": [
+        "e_0171"
+      ],
+      "generated_compound_cases": 8,
+      "expected_affected_anchor_records": 8,
+      "affected_corridor_replacement_ratio": 1.0,
+      "exposed_bridge_edge_cases": 0,
+      "capacity_limited_anchor_cases": 0,
+      "compound_case_ids": [
+        "cmc_00008",
+        "cmc_00009",
+        "cmc_00010",
+        "cmc_00011",
+        "cmc_00012",
+        "cmc_00013",
+        "cmc_00014",
+        "cmc_00015"
+      ],
+      "transaction_contract": "Accepted means accepted for staging preview（暂存预览接受）, not clean skeleton writeback（非干净骨架写回）."
+    },
+    {
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "status": "accepted_for_staging",
+      "risk": "low",
+      "issues": [],
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "bridge_edge_ids": [
+        "e_0173"
+      ],
+      "generated_compound_cases": 8,
+      "expected_affected_anchor_records": 8,
+      "affected_corridor_replacement_ratio": 1.0,
+      "exposed_bridge_edge_cases": 0,
+      "capacity_limited_anchor_cases": 0,
+      "compound_case_ids": [
+        "cmc_00016",
+        "cmc_00017",
+        "cmc_00018",
+        "cmc_00019",
+        "cmc_00020",
+        "cmc_00021",
+        "cmc_00022",
+        "cmc_00023"
+      ],
+      "transaction_contract": "Accepted means accepted for staging preview（暂存预览接受）, not clean skeleton writeback（非干净骨架写回）."
+    }
+  ],
+  "compound_movement_corridor_cases": [
+    {
+      "compound_case_id": "cmc_00000",
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00132",
+      "exit_lane_link_id": "ll_00138",
+      "internal_bridge_lane_id": "ln_e_0241_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0241"
+      ],
+      "entry_junction_node_id": "n_0117",
+      "exit_junction_node_id": "n_0118",
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "from_lane_id": "ln_e_0240_f_00",
+      "to_lane_id": "ln_e_0041_f_00",
+      "from_edge_id": "e_0240",
+      "to_edge_id": "e_0041",
+      "movement_kind": "right",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        -24.794,
+        -214.75
+      ],
+      "end_xz": [
+        -8.976,
+        -210.607
+      ],
+      "start_tangent_xz": [
+        0.736,
+        0.677
+      ],
+      "end_tangent_xz": [
+        0.744,
+        -0.668
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0240_f_00_n_0117_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0240_f_00",
+        "edge_id": "e_0240",
+        "node_id": "n_0117",
+        "pose_id": "j_022_e_0240_entry",
+        "point_xz": [
+          -24.794,
+          -214.75
+        ],
+        "tangent_xz": [
+          0.736,
+          0.677
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0041_f_00_n_0118_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0041_f_00",
+        "edge_id": "e_0041",
+        "node_id": "n_0118",
+        "pose_id": "j_023_e_0041_entry",
+        "point_xz": [
+          -8.976,
+          -210.607
+        ],
+        "tangent_xz": [
+          0.744,
+          -0.668
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": [
+          "exit_anchor_short_edge_absorption_candidate"
+        ]
+      },
+      "chord_length_m": 16.351,
+      "tangent_delta_deg": 84.505,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 16.351,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              -24.794,
+              -214.75
+            ],
+            [
+              -8.976,
+              -210.607
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 17.758,
+          "min_radius_proxy_m": 5.79,
+          "centerline_xz": [
+            [
+              -24.794,
+              -214.75
+            ],
+            [
+              -23.969,
+              -214.023
+            ],
+            [
+              -23.08,
+              -213.303
+            ],
+            [
+              -22.135,
+              -212.602
+            ],
+            [
+              -21.144,
+              -211.931
+            ],
+            [
+              -20.117,
+              -211.303
+            ],
+            [
+              -19.061,
+              -210.729
+            ],
+            [
+              -17.987,
+              -210.222
+            ],
+            [
+              -16.903,
+              -209.793
+            ],
+            [
+              -15.818,
+              -209.454
+            ],
+            [
+              -14.742,
+              -209.217
+            ],
+            [
+              -13.684,
+              -209.094
+            ],
+            [
+              -12.652,
+              -209.097
+            ],
+            [
+              -11.657,
+              -209.238
+            ],
+            [
+              -10.706,
+              -209.529
+            ],
+            [
+              -9.81,
+              -209.981
+            ],
+            [
+              -8.976,
+              -210.607
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.79,
+          "min_radius_proxy_m": 5.604,
+          "centerline_xz": [
+            [
+              -24.794,
+              -214.75
+            ],
+            [
+              -23.692,
+              -213.732
+            ],
+            [
+              -22.636,
+              -212.759
+            ],
+            [
+              -21.621,
+              -211.845
+            ],
+            [
+              -20.639,
+              -211.0
+            ],
+            [
+              -19.684,
+              -210.237
+            ],
+            [
+              -18.749,
+              -209.568
+            ],
+            [
+              -17.827,
+              -209.003
+            ],
+            [
+              -16.91,
+              -208.556
+            ],
+            [
+              -15.993,
+              -208.237
+            ],
+            [
+              -15.069,
+              -208.059
+            ],
+            [
+              -14.129,
+              -208.034
+            ],
+            [
+              -13.169,
+              -208.173
+            ],
+            [
+              -12.18,
+              -208.488
+            ],
+            [
+              -11.156,
+              -208.991
+            ],
+            [
+              -10.091,
+              -209.693
+            ],
+            [
+              -8.976,
+              -210.607
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "exit_anchor_short_edge_absorption_candidate",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00001",
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00132",
+      "exit_lane_link_id": "ll_00139",
+      "internal_bridge_lane_id": "ln_e_0241_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0241"
+      ],
+      "entry_junction_node_id": "n_0117",
+      "exit_junction_node_id": "n_0118",
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "from_lane_id": "ln_e_0240_f_00",
+      "to_lane_id": "ln_e_0242_f_00",
+      "from_edge_id": "e_0240",
+      "to_edge_id": "e_0242",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        -24.794,
+        -214.75
+      ],
+      "end_xz": [
+        -11.198,
+        -202.136
+      ],
+      "start_tangent_xz": [
+        0.736,
+        0.677
+      ],
+      "end_tangent_xz": [
+        0.734,
+        0.679
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0240_f_00_n_0117_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0240_f_00",
+        "edge_id": "e_0240",
+        "node_id": "n_0117",
+        "pose_id": "j_022_e_0240_entry",
+        "point_xz": [
+          -24.794,
+          -214.75
+        ],
+        "tangent_xz": [
+          0.736,
+          0.677
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0242_f_00_n_0118_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0242_f_00",
+        "edge_id": "e_0242",
+        "node_id": "n_0118",
+        "pose_id": "j_023_e_0242_entry",
+        "point_xz": [
+          -11.198,
+          -202.136
+        ],
+        "tangent_xz": [
+          0.734,
+          0.679
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 18.547,
+      "tangent_delta_deg": 0.192,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.547,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              -24.794,
+              -214.75
+            ],
+            [
+              -11.198,
+              -202.136
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.547,
+          "min_radius_proxy_m": 1115.287,
+          "centerline_xz": [
+            [
+              -24.794,
+              -214.75
+            ],
+            [
+              -23.906,
+              -213.933
+            ],
+            [
+              -23.033,
+              -213.128
+            ],
+            [
+              -22.173,
+              -212.332
+            ],
+            [
+              -21.324,
+              -211.546
+            ],
+            [
+              -20.483,
+              -210.766
+            ],
+            [
+              -19.648,
+              -209.991
+            ],
+            [
+              -18.818,
+              -209.219
+            ],
+            [
+              -17.99,
+              -208.449
+            ],
+            [
+              -17.163,
+              -207.679
+            ],
+            [
+              -16.333,
+              -206.907
+            ],
+            [
+              -15.5,
+              -206.131
+            ],
+            [
+              -14.66,
+              -205.349
+            ],
+            [
+              -13.812,
+              -204.561
+            ],
+            [
+              -12.954,
+              -203.764
+            ],
+            [
+              -12.083,
+              -202.956
+            ],
+            [
+              -11.198,
+              -202.136
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.547,
+          "min_radius_proxy_m": 940.023,
+          "centerline_xz": [
+            [
+              -24.794,
+              -214.75
+            ],
+            [
+              -23.591,
+              -213.643
+            ],
+            [
+              -22.529,
+              -212.664
+            ],
+            [
+              -21.588,
+              -211.795
+            ],
+            [
+              -20.747,
+              -211.017
+            ],
+            [
+              -19.987,
+              -210.312
+            ],
+            [
+              -19.287,
+              -209.662
+            ],
+            [
+              -18.627,
+              -209.048
+            ],
+            [
+              -17.988,
+              -208.452
+            ],
+            [
+              -17.349,
+              -207.855
+            ],
+            [
+              -16.69,
+              -207.241
+            ],
+            [
+              -15.992,
+              -206.589
+            ],
+            [
+              -15.233,
+              -205.882
+            ],
+            [
+              -14.395,
+              -205.102
+            ],
+            [
+              -13.456,
+              -204.229
+            ],
+            [
+              -12.397,
+              -203.247
+            ],
+            [
+              -11.198,
+              -202.136
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00002",
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00137",
+      "exit_lane_link_id": "ll_00138",
+      "internal_bridge_lane_id": "ln_e_0241_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0241"
+      ],
+      "entry_junction_node_id": "n_0117",
+      "exit_junction_node_id": "n_0118",
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "from_lane_id": "ln_e_0149_b_00",
+      "to_lane_id": "ln_e_0041_f_00",
+      "from_edge_id": "e_0149",
+      "to_edge_id": "e_0041",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        -22.545,
+        -206.168
+      ],
+      "end_xz": [
+        -8.976,
+        -210.607
+      ],
+      "start_tangent_xz": [
+        0.726,
+        -0.688
+      ],
+      "end_tangent_xz": [
+        0.744,
+        -0.668
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0149_b_00_n_0117_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0149_b_00",
+        "edge_id": "e_0149",
+        "node_id": "n_0117",
+        "pose_id": "j_022_e_0149_entry",
+        "point_xz": [
+          -22.545,
+          -206.168
+        ],
+        "tangent_xz": [
+          0.726,
+          -0.688
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0041_f_00_n_0118_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0041_f_00",
+        "edge_id": "e_0041",
+        "node_id": "n_0118",
+        "pose_id": "j_023_e_0041_entry",
+        "point_xz": [
+          -8.976,
+          -210.607
+        ],
+        "tangent_xz": [
+          0.744,
+          -0.668
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": [
+          "exit_anchor_short_edge_absorption_candidate"
+        ]
+      },
+      "chord_length_m": 14.276,
+      "tangent_delta_deg": 1.575,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.276,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              -22.545,
+              -206.168
+            ],
+            [
+              -8.976,
+              -210.607
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.542,
+          "min_radius_proxy_m": 6.394,
+          "centerline_xz": [
+            [
+              -22.545,
+              -206.168
+            ],
+            [
+              -21.836,
+              -206.748
+            ],
+            [
+              -21.074,
+              -207.209
+            ],
+            [
+              -20.265,
+              -207.568
+            ],
+            [
+              -19.418,
+              -207.843
+            ],
+            [
+              -18.54,
+              -208.049
+            ],
+            [
+              -17.639,
+              -208.204
+            ],
+            [
+              -16.722,
+              -208.323
+            ],
+            [
+              -15.796,
+              -208.425
+            ],
+            [
+              -14.869,
+              -208.526
+            ],
+            [
+              -13.948,
+              -208.643
+            ],
+            [
+              -13.041,
+              -208.791
+            ],
+            [
+              -12.156,
+              -208.989
+            ],
+            [
+              -11.299,
+              -209.253
+            ],
+            [
+              -10.478,
+              -209.599
+            ],
+            [
+              -9.702,
+              -210.045
+            ],
+            [
+              -8.976,
+              -210.607
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.779,
+          "min_radius_proxy_m": 6.612,
+          "centerline_xz": [
+            [
+              -22.545,
+              -206.168
+            ],
+            [
+              -21.597,
+              -206.975
+            ],
+            [
+              -20.693,
+              -207.573
+            ],
+            [
+              -19.825,
+              -207.993
+            ],
+            [
+              -18.987,
+              -208.263
+            ],
+            [
+              -18.173,
+              -208.414
+            ],
+            [
+              -17.376,
+              -208.474
+            ],
+            [
+              -16.591,
+              -208.473
+            ],
+            [
+              -15.811,
+              -208.442
+            ],
+            [
+              -15.029,
+              -208.408
+            ],
+            [
+              -14.239,
+              -208.403
+            ],
+            [
+              -13.434,
+              -208.454
+            ],
+            [
+              -12.609,
+              -208.593
+            ],
+            [
+              -11.758,
+              -208.848
+            ],
+            [
+              -10.872,
+              -209.249
+            ],
+            [
+              -9.947,
+              -209.826
+            ],
+            [
+              -8.976,
+              -210.607
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "exit_anchor_short_edge_absorption_candidate",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00003",
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00137",
+      "exit_lane_link_id": "ll_00139",
+      "internal_bridge_lane_id": "ln_e_0241_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0241"
+      ],
+      "entry_junction_node_id": "n_0117",
+      "exit_junction_node_id": "n_0118",
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "from_lane_id": "ln_e_0149_b_00",
+      "to_lane_id": "ln_e_0242_f_00",
+      "from_edge_id": "e_0149",
+      "to_edge_id": "e_0242",
+      "movement_kind": "left",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        -22.545,
+        -206.168
+      ],
+      "end_xz": [
+        -11.198,
+        -202.136
+      ],
+      "start_tangent_xz": [
+        0.726,
+        -0.688
+      ],
+      "end_tangent_xz": [
+        0.734,
+        0.679
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0149_b_00_n_0117_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0149_b_00",
+        "edge_id": "e_0149",
+        "node_id": "n_0117",
+        "pose_id": "j_022_e_0149_entry",
+        "point_xz": [
+          -22.545,
+          -206.168
+        ],
+        "tangent_xz": [
+          0.726,
+          -0.688
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0242_f_00_n_0118_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0242_f_00",
+        "edge_id": "e_0242",
+        "node_id": "n_0118",
+        "pose_id": "j_023_e_0242_entry",
+        "point_xz": [
+          -11.198,
+          -202.136
+        ],
+        "tangent_xz": [
+          0.734,
+          0.679
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 12.042,
+      "tangent_delta_deg": 86.273,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 12.042,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              -22.545,
+              -206.168
+            ],
+            [
+              -11.198,
+              -202.136
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.134,
+          "min_radius_proxy_m": 3.477,
+          "centerline_xz": [
+            [
+              -22.545,
+              -206.168
+            ],
+            [
+              -21.948,
+              -206.632
+            ],
+            [
+              -21.306,
+              -206.945
+            ],
+            [
+              -20.627,
+              -207.118
+            ],
+            [
+              -19.917,
+              -207.164
+            ],
+            [
+              -19.181,
+              -207.095
+            ],
+            [
+              -18.426,
+              -206.922
+            ],
+            [
+              -17.659,
+              -206.657
+            ],
+            [
+              -16.884,
+              -206.313
+            ],
+            [
+              -16.11,
+              -205.902
+            ],
+            [
+              -15.341,
+              -205.435
+            ],
+            [
+              -14.584,
+              -204.924
+            ],
+            [
+              -13.846,
+              -204.382
+            ],
+            [
+              -13.132,
+              -203.82
+            ],
+            [
+              -12.448,
+              -203.25
+            ],
+            [
+              -11.801,
+              -202.685
+            ],
+            [
+              -11.198,
+              -202.136
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.935,
+          "min_radius_proxy_m": 3.464,
+          "centerline_xz": [
+            [
+              -22.545,
+              -206.168
+            ],
+            [
+              -21.746,
+              -206.85
+            ],
+            [
+              -20.984,
+              -207.352
+            ],
+            [
+              -20.254,
+              -207.685
+            ],
+            [
+              -19.55,
+              -207.861
+            ],
+            [
+              -18.867,
+              -207.893
+            ],
+            [
+              -18.2,
+              -207.791
+            ],
+            [
+              -17.542,
+              -207.57
+            ],
+            [
+              -16.89,
+              -207.24
+            ],
+            [
+              -16.237,
+              -206.813
+            ],
+            [
+              -15.578,
+              -206.302
+            ],
+            [
+              -14.908,
+              -205.718
+            ],
+            [
+              -14.221,
+              -205.074
+            ],
+            [
+              -13.511,
+              -204.382
+            ],
+            [
+              -12.775,
+              -203.654
+            ],
+            [
+              -12.006,
+              -202.901
+            ],
+            [
+              -11.198,
+              -202.136
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00004",
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00140",
+      "exit_lane_link_id": "ll_00134",
+      "internal_bridge_lane_id": "ln_e_0241_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0241"
+      ],
+      "entry_junction_node_id": "n_0118",
+      "exit_junction_node_id": "n_0117",
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "from_lane_id": "ln_e_0041_b_00",
+      "to_lane_id": "ln_e_0240_b_00",
+      "from_edge_id": "e_0041",
+      "to_edge_id": "e_0240",
+      "movement_kind": "left",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        -11.114,
+        -212.989
+      ],
+      "end_xz": [
+        -22.628,
+        -217.106
+      ],
+      "start_tangent_xz": [
+        -0.744,
+        0.668
+      ],
+      "end_tangent_xz": [
+        -0.736,
+        -0.677
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0041_b_00_n_0118_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0041_b_00",
+        "edge_id": "e_0041",
+        "node_id": "n_0118",
+        "pose_id": "j_023_e_0041_entry",
+        "point_xz": [
+          -11.114,
+          -212.989
+        ],
+        "tangent_xz": [
+          -0.744,
+          0.668
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": [
+          "entry_anchor_short_edge_absorption_candidate"
+        ]
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0240_b_00_n_0117_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0240_b_00",
+        "edge_id": "e_0240",
+        "node_id": "n_0117",
+        "pose_id": "j_022_e_0240_entry",
+        "point_xz": [
+          -22.628,
+          -217.106
+        ],
+        "tangent_xz": [
+          -0.736,
+          -0.677
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 12.228,
+      "tangent_delta_deg": 84.505,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 12.228,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              -11.114,
+              -212.989
+            ],
+            [
+              -22.628,
+              -217.106
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.301,
+          "min_radius_proxy_m": 3.652,
+          "centerline_xz": [
+            [
+              -11.114,
+              -212.989
+            ],
+            [
+              -11.733,
+              -212.532
+            ],
+            [
+              -12.394,
+              -212.226
+            ],
+            [
+              -13.089,
+              -212.059
+            ],
+            [
+              -13.814,
+              -212.019
+            ],
+            [
+              -14.561,
+              -212.094
+            ],
+            [
+              -15.326,
+              -212.271
+            ],
+            [
+              -16.102,
+              -212.541
+            ],
+            [
+              -16.884,
+              -212.889
+            ],
+            [
+              -17.665,
+              -213.305
+            ],
+            [
+              -18.44,
+              -213.776
+            ],
+            [
+              -19.203,
+              -214.291
+            ],
+            [
+              -19.948,
+              -214.838
+            ],
+            [
+              -20.668,
+              -215.405
+            ],
+            [
+              -21.359,
+              -215.98
+            ],
+            [
+              -22.014,
+              -216.551
+            ],
+            [
+              -22.628,
+              -217.106
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.089,
+          "min_radius_proxy_m": 3.583,
+          "centerline_xz": [
+            [
+              -11.114,
+              -212.989
+            ],
+            [
+              -11.943,
+              -212.317
+            ],
+            [
+              -12.73,
+              -211.824
+            ],
+            [
+              -13.48,
+              -211.498
+            ],
+            [
+              -14.2,
+              -211.327
+            ],
+            [
+              -14.894,
+              -211.301
+            ],
+            [
+              -15.57,
+              -211.406
+            ],
+            [
+              -16.233,
+              -211.631
+            ],
+            [
+              -16.89,
+              -211.964
+            ],
+            [
+              -17.546,
+              -212.394
+            ],
+            [
+              -18.207,
+              -212.908
+            ],
+            [
+              -18.88,
+              -213.495
+            ],
+            [
+              -19.57,
+              -214.142
+            ],
+            [
+              -20.284,
+              -214.839
+            ],
+            [
+              -21.028,
+              -215.573
+            ],
+            [
+              -21.807,
+              -216.333
+            ],
+            [
+              -22.628,
+              -217.106
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "entry_anchor_short_edge_absorption_candidate",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00005",
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00140",
+      "exit_lane_link_id": "ll_00135",
+      "internal_bridge_lane_id": "ln_e_0241_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0241"
+      ],
+      "entry_junction_node_id": "n_0118",
+      "exit_junction_node_id": "n_0117",
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "from_lane_id": "ln_e_0041_b_00",
+      "to_lane_id": "ln_e_0149_f_00",
+      "from_edge_id": "e_0041",
+      "to_edge_id": "e_0149",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        -11.114,
+        -212.989
+      ],
+      "end_xz": [
+        -24.747,
+        -208.49
+      ],
+      "start_tangent_xz": [
+        -0.744,
+        0.668
+      ],
+      "end_tangent_xz": [
+        -0.726,
+        0.688
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0041_b_00_n_0118_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0041_b_00",
+        "edge_id": "e_0041",
+        "node_id": "n_0118",
+        "pose_id": "j_023_e_0041_entry",
+        "point_xz": [
+          -11.114,
+          -212.989
+        ],
+        "tangent_xz": [
+          -0.744,
+          0.668
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": [
+          "entry_anchor_short_edge_absorption_candidate"
+        ]
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0149_f_00_n_0117_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0149_f_00",
+        "edge_id": "e_0149",
+        "node_id": "n_0117",
+        "pose_id": "j_022_e_0149_entry",
+        "point_xz": [
+          -24.747,
+          -208.49
+        ],
+        "tangent_xz": [
+          -0.726,
+          0.688
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 14.356,
+      "tangent_delta_deg": 1.575,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.356,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              -11.114,
+              -212.989
+            ],
+            [
+              -24.747,
+              -208.49
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.62,
+          "min_radius_proxy_m": 6.47,
+          "centerline_xz": [
+            [
+              -11.114,
+              -212.989
+            ],
+            [
+              -11.843,
+              -212.423
+            ],
+            [
+              -12.624,
+              -211.974
+            ],
+            [
+              -13.448,
+              -211.624
+            ],
+            [
+              -14.309,
+              -211.356
+            ],
+            [
+              -15.198,
+              -211.155
+            ],
+            [
+              -16.109,
+              -211.002
+            ],
+            [
+              -17.034,
+              -210.882
+            ],
+            [
+              -17.965,
+              -210.778
+            ],
+            [
+              -18.895,
+              -210.672
+            ],
+            [
+              -19.817,
+              -210.548
+            ],
+            [
+              -20.722,
+              -210.39
+            ],
+            [
+              -21.604,
+              -210.18
+            ],
+            [
+              -22.455,
+              -209.901
+            ],
+            [
+              -23.268,
+              -209.538
+            ],
+            [
+              -24.034,
+              -209.073
+            ],
+            [
+              -24.747,
+              -208.49
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.857,
+          "min_radius_proxy_m": 6.682,
+          "centerline_xz": [
+            [
+              -11.114,
+              -212.989
+            ],
+            [
+              -12.09,
+              -212.203
+            ],
+            [
+              -13.02,
+              -211.622
+            ],
+            [
+              -13.909,
+              -211.217
+            ],
+            [
+              -14.765,
+              -210.958
+            ],
+            [
+              -15.594,
+              -210.816
+            ],
+            [
+              -16.402,
+              -210.761
+            ],
+            [
+              -17.195,
+              -210.763
+            ],
+            [
+              -17.98,
+              -210.794
+            ],
+            [
+              -18.764,
+              -210.823
+            ],
+            [
+              -19.553,
+              -210.82
+            ],
+            [
+              -20.353,
+              -210.756
+            ],
+            [
+              -21.171,
+              -210.603
+            ],
+            [
+              -22.012,
+              -210.328
+            ],
+            [
+              -22.885,
+              -209.905
+            ],
+            [
+              -23.794,
+              -209.302
+            ],
+            [
+              -24.747,
+              -208.49
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "entry_anchor_short_edge_absorption_candidate",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00006",
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00142",
+      "exit_lane_link_id": "ll_00134",
+      "internal_bridge_lane_id": "ln_e_0241_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0241"
+      ],
+      "entry_junction_node_id": "n_0118",
+      "exit_junction_node_id": "n_0117",
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "from_lane_id": "ln_e_0242_b_00",
+      "to_lane_id": "ln_e_0240_b_00",
+      "from_edge_id": "e_0242",
+      "to_edge_id": "e_0240",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        -9.024,
+        -204.484
+      ],
+      "end_xz": [
+        -22.628,
+        -217.106
+      ],
+      "start_tangent_xz": [
+        -0.734,
+        -0.679
+      ],
+      "end_tangent_xz": [
+        -0.736,
+        -0.677
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0242_b_00_n_0118_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0242_b_00",
+        "edge_id": "e_0242",
+        "node_id": "n_0118",
+        "pose_id": "j_023_e_0242_entry",
+        "point_xz": [
+          -9.024,
+          -204.484
+        ],
+        "tangent_xz": [
+          -0.734,
+          -0.679
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0240_b_00_n_0117_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0240_b_00",
+        "edge_id": "e_0240",
+        "node_id": "n_0117",
+        "pose_id": "j_022_e_0240_entry",
+        "point_xz": [
+          -22.628,
+          -217.106
+        ],
+        "tangent_xz": [
+          -0.736,
+          -0.677
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 18.557,
+      "tangent_delta_deg": 0.192,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.557,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              -9.024,
+              -204.484
+            ],
+            [
+              -22.628,
+              -217.106
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.557,
+          "min_radius_proxy_m": 1116.466,
+          "centerline_xz": [
+            [
+              -9.024,
+              -204.484
+            ],
+            [
+              -9.91,
+              -205.305
+            ],
+            [
+              -10.781,
+              -206.113
+            ],
+            [
+              -11.64,
+              -206.911
+            ],
+            [
+              -12.488,
+              -207.699
+            ],
+            [
+              -13.328,
+              -208.481
+            ],
+            [
+              -14.162,
+              -209.258
+            ],
+            [
+              -14.992,
+              -210.03
+            ],
+            [
+              -15.82,
+              -210.801
+            ],
+            [
+              -16.649,
+              -211.571
+            ],
+            [
+              -17.479,
+              -212.344
+            ],
+            [
+              -18.314,
+              -213.119
+            ],
+            [
+              -19.156,
+              -213.899
+            ],
+            [
+              -20.006,
+              -214.686
+            ],
+            [
+              -20.866,
+              -215.482
+            ],
+            [
+              -21.74,
+              -216.288
+            ],
+            [
+              -22.628,
+              -217.106
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.557,
+          "min_radius_proxy_m": 940.97,
+          "centerline_xz": [
+            [
+              -9.024,
+              -204.484
+            ],
+            [
+              -10.224,
+              -205.596
+            ],
+            [
+              -11.283,
+              -206.579
+            ],
+            [
+              -12.222,
+              -207.451
+            ],
+            [
+              -13.062,
+              -208.232
+            ],
+            [
+              -13.821,
+              -208.94
+            ],
+            [
+              -14.52,
+              -209.592
+            ],
+            [
+              -15.179,
+              -210.207
+            ],
+            [
+              -15.818,
+              -210.803
+            ],
+            [
+              -16.458,
+              -211.4
+            ],
+            [
+              -17.117,
+              -212.014
+            ],
+            [
+              -17.818,
+              -212.665
+            ],
+            [
+              -18.578,
+              -213.37
+            ],
+            [
+              -19.42,
+              -214.149
+            ],
+            [
+              -20.362,
+              -215.019
+            ],
+            [
+              -21.424,
+              -215.998
+            ],
+            [
+              -22.628,
+              -217.106
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00007",
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00142",
+      "exit_lane_link_id": "ll_00135",
+      "internal_bridge_lane_id": "ln_e_0241_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0241"
+      ],
+      "entry_junction_node_id": "n_0118",
+      "exit_junction_node_id": "n_0117",
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "from_lane_id": "ln_e_0242_b_00",
+      "to_lane_id": "ln_e_0149_f_00",
+      "from_edge_id": "e_0242",
+      "to_edge_id": "e_0149",
+      "movement_kind": "right",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        -9.024,
+        -204.484
+      ],
+      "end_xz": [
+        -24.747,
+        -208.49
+      ],
+      "start_tangent_xz": [
+        -0.734,
+        -0.679
+      ],
+      "end_tangent_xz": [
+        -0.726,
+        0.688
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0242_b_00_n_0118_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0242_b_00",
+        "edge_id": "e_0242",
+        "node_id": "n_0118",
+        "pose_id": "j_023_e_0242_entry",
+        "point_xz": [
+          -9.024,
+          -204.484
+        ],
+        "tangent_xz": [
+          -0.734,
+          -0.679
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0149_f_00_n_0117_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0149_f_00",
+        "edge_id": "e_0149",
+        "node_id": "n_0117",
+        "pose_id": "j_022_e_0149_entry",
+        "point_xz": [
+          -24.747,
+          -208.49
+        ],
+        "tangent_xz": [
+          -0.726,
+          0.688
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 16.225,
+      "tangent_delta_deg": 86.273,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 16.225,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              -9.024,
+              -204.484
+            ],
+            [
+              -24.747,
+              -208.49
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 17.669,
+          "min_radius_proxy_m": 5.601,
+          "centerline_xz": [
+            [
+              -9.024,
+              -204.484
+            ],
+            [
+              -9.842,
+              -205.208
+            ],
+            [
+              -10.727,
+              -205.924
+            ],
+            [
+              -11.669,
+              -206.621
+            ],
+            [
+              -12.659,
+              -207.287
+            ],
+            [
+              -13.687,
+              -207.91
+            ],
+            [
+              -14.744,
+              -208.477
+            ],
+            [
+              -15.819,
+              -208.978
+            ],
+            [
+              -16.903,
+              -209.399
+            ],
+            [
+              -17.986,
+              -209.729
+            ],
+            [
+              -19.06,
+              -209.957
+            ],
+            [
+              -20.114,
+              -210.069
+            ],
+            [
+              -21.138,
+              -210.055
+            ],
+            [
+              -22.123,
+              -209.902
+            ],
+            [
+              -23.059,
+              -209.598
+            ],
+            [
+              -23.937,
+              -209.131
+            ],
+            [
+              -24.747,
+              -208.49
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.726,
+          "min_radius_proxy_m": 5.491,
+          "centerline_xz": [
+            [
+              -9.024,
+              -204.484
+            ],
+            [
+              -10.117,
+              -205.499
+            ],
+            [
+              -11.167,
+              -206.468
+            ],
+            [
+              -12.181,
+              -207.379
+            ],
+            [
+              -13.164,
+              -208.22
+            ],
+            [
+              -14.123,
+              -208.98
+            ],
+            [
+              -15.063,
+              -209.645
+            ],
+            [
+              -15.99,
+              -210.205
+            ],
+            [
+              -16.91,
+              -210.647
+            ],
+            [
+              -17.83,
+              -210.959
+            ],
+            [
+              -18.755,
+              -211.129
+            ],
+            [
+              -19.691,
+              -211.145
+            ],
+            [
+              -20.644,
+              -210.994
+            ],
+            [
+              -21.62,
+              -210.665
+            ],
+            [
+              -22.625,
+              -210.147
+            ],
+            [
+              -23.666,
+              -209.425
+            ],
+            [
+              -24.747,
+              -208.49
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00008",
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00246",
+      "exit_lane_link_id": "ll_00252",
+      "internal_bridge_lane_id": "ln_e_0171_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0171"
+      ],
+      "entry_junction_node_id": "n_0173",
+      "exit_junction_node_id": "n_0176",
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "from_lane_id": "ln_e_0170_f_00",
+      "to_lane_id": "ln_e_0172_f_00",
+      "from_edge_id": "e_0170",
+      "to_edge_id": "e_0172",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        139.313,
+        -1.97
+      ],
+      "end_xz": [
+        150.038,
+        13.169
+      ],
+      "start_tangent_xz": [
+        0.579,
+        0.815
+      ],
+      "end_tangent_xz": [
+        0.566,
+        0.825
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0170_f_00_n_0173_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0170_f_00",
+        "edge_id": "e_0170",
+        "node_id": "n_0173",
+        "pose_id": "j_039_e_0170_entry",
+        "point_xz": [
+          139.313,
+          -1.97
+        ],
+        "tangent_xz": [
+          0.579,
+          0.815
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0172_f_00_n_0176_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0172_f_00",
+        "edge_id": "e_0172",
+        "node_id": "n_0176",
+        "pose_id": "j_040_e_0172_entry",
+        "point_xz": [
+          150.038,
+          13.169
+        ],
+        "tangent_xz": [
+          0.566,
+          0.825
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 18.553,
+      "tangent_delta_deg": 0.95,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.553,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              139.313,
+              -1.97
+            ],
+            [
+              150.038,
+              13.169
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.553,
+          "min_radius_proxy_m": 387.273,
+          "centerline_xz": [
+            [
+              139.313,
+              -1.97
+            ],
+            [
+              140.013,
+              -0.987
+            ],
+            [
+              140.703,
+              -0.02
+            ],
+            [
+              141.385,
+              0.934
+            ],
+            [
+              142.059,
+              1.875
+            ],
+            [
+              142.727,
+              2.808
+            ],
+            [
+              143.391,
+              3.734
+            ],
+            [
+              144.051,
+              4.656
+            ],
+            [
+              144.708,
+              5.577
+            ],
+            [
+              145.365,
+              6.498
+            ],
+            [
+              146.022,
+              7.422
+            ],
+            [
+              146.68,
+              8.351
+            ],
+            [
+              147.341,
+              9.289
+            ],
+            [
+              148.006,
+              10.237
+            ],
+            [
+              148.676,
+              11.199
+            ],
+            [
+              149.353,
+              12.175
+            ],
+            [
+              150.038,
+              13.169
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.554,
+          "min_radius_proxy_m": 292.016,
+          "centerline_xz": [
+            [
+              139.313,
+              -1.97
+            ],
+            [
+              140.261,
+              -0.638
+            ],
+            [
+              141.102,
+              0.538
+            ],
+            [
+              141.849,
+              1.579
+            ],
+            [
+              142.518,
+              2.51
+            ],
+            [
+              143.125,
+              3.351
+            ],
+            [
+              143.684,
+              4.126
+            ],
+            [
+              144.212,
+              4.857
+            ],
+            [
+              144.723,
+              5.567
+            ],
+            [
+              145.232,
+              6.277
+            ],
+            [
+              145.755,
+              7.011
+            ],
+            [
+              146.307,
+              7.791
+            ],
+            [
+              146.904,
+              8.64
+            ],
+            [
+              147.56,
+              9.58
+            ],
+            [
+              148.29,
+              10.633
+            ],
+            [
+              149.111,
+              11.822
+            ],
+            [
+              150.038,
+              13.169
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00009",
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00246",
+      "exit_lane_link_id": "ll_00253",
+      "internal_bridge_lane_id": "ln_e_0171_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0171"
+      ],
+      "entry_junction_node_id": "n_0173",
+      "exit_junction_node_id": "n_0176",
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "from_lane_id": "ln_e_0170_f_00",
+      "to_lane_id": "ln_e_0014_b_00",
+      "from_edge_id": "e_0170",
+      "to_edge_id": "e_0014",
+      "movement_kind": "left",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        139.313,
+        -1.97
+      ],
+      "end_xz": [
+        141.656,
+        9.212
+      ],
+      "start_tangent_xz": [
+        0.579,
+        0.815
+      ],
+      "end_tangent_xz": [
+        -0.834,
+        0.552
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0170_f_00_n_0173_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0170_f_00",
+        "edge_id": "e_0170",
+        "node_id": "n_0173",
+        "pose_id": "j_039_e_0170_entry",
+        "point_xz": [
+          139.313,
+          -1.97
+        ],
+        "tangent_xz": [
+          0.579,
+          0.815
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0014_b_00_n_0176_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0014_b_00",
+        "edge_id": "e_0014",
+        "node_id": "n_0176",
+        "pose_id": "j_040_e_0014_entry",
+        "point_xz": [
+          141.656,
+          9.212
+        ],
+        "tangent_xz": [
+          -0.834,
+          0.552
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 11.425,
+      "tangent_delta_deg": 91.914,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 11.425,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              139.313,
+              -1.97
+            ],
+            [
+              141.656,
+              9.212
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 12.571,
+          "min_radius_proxy_m": 2.904,
+          "centerline_xz": [
+            [
+              139.313,
+              -1.97
+            ],
+            [
+              139.758,
+              -1.332
+            ],
+            [
+              140.215,
+              -0.644
+            ],
+            [
+              140.675,
+              0.083
+            ],
+            [
+              141.125,
+              0.842
+            ],
+            [
+              141.555,
+              1.623
+            ],
+            [
+              141.952,
+              2.418
+            ],
+            [
+              142.305,
+              3.219
+            ],
+            [
+              142.604,
+              4.016
+            ],
+            [
+              142.836,
+              4.8
+            ],
+            [
+              142.991,
+              5.563
+            ],
+            [
+              143.057,
+              6.297
+            ],
+            [
+              143.023,
+              6.992
+            ],
+            [
+              142.877,
+              7.64
+            ],
+            [
+              142.608,
+              8.231
+            ],
+            [
+              142.205,
+              8.758
+            ],
+            [
+              141.656,
+              9.212
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing",
+            "radius_proxy_below_lane_min"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.407,
+          "min_radius_proxy_m": 3.014,
+          "centerline_xz": [
+            [
+              139.313,
+              -1.97
+            ],
+            [
+              139.937,
+              -1.112
+            ],
+            [
+              140.559,
+              -0.282
+            ],
+            [
+              141.166,
+              0.521
+            ],
+            [
+              141.745,
+              1.298
+            ],
+            [
+              142.282,
+              2.052
+            ],
+            [
+              142.765,
+              2.783
+            ],
+            [
+              143.179,
+              3.493
+            ],
+            [
+              143.512,
+              4.185
+            ],
+            [
+              143.75,
+              4.858
+            ],
+            [
+              143.881,
+              5.516
+            ],
+            [
+              143.89,
+              6.159
+            ],
+            [
+              143.765,
+              6.789
+            ],
+            [
+              143.492,
+              7.408
+            ],
+            [
+              143.059,
+              8.017
+            ],
+            [
+              142.451,
+              8.618
+            ],
+            [
+              141.656,
+              9.212
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00010",
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00251",
+      "exit_lane_link_id": "ll_00252",
+      "internal_bridge_lane_id": "ln_e_0171_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0171"
+      ],
+      "entry_junction_node_id": "n_0173",
+      "exit_junction_node_id": "n_0176",
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "from_lane_id": "ln_e_0214_f_00",
+      "to_lane_id": "ln_e_0172_f_00",
+      "from_edge_id": "e_0214",
+      "to_edge_id": "e_0172",
+      "movement_kind": "left",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        139.856,
+        7.012
+      ],
+      "end_xz": [
+        150.038,
+        13.169
+      ],
+      "start_tangent_xz": [
+        0.839,
+        -0.545
+      ],
+      "end_tangent_xz": [
+        0.566,
+        0.825
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0214_f_00_n_0173_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0214_f_00",
+        "edge_id": "e_0214",
+        "node_id": "n_0173",
+        "pose_id": "j_039_e_0214_entry",
+        "point_xz": [
+          139.856,
+          7.012
+        ],
+        "tangent_xz": [
+          0.839,
+          -0.545
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0172_f_00_n_0176_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0172_f_00",
+        "edge_id": "e_0172",
+        "node_id": "n_0176",
+        "pose_id": "j_040_e_0172_entry",
+        "point_xz": [
+          150.038,
+          13.169
+        ],
+        "tangent_xz": [
+          0.566,
+          0.825
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 11.899,
+      "tangent_delta_deg": 88.553,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 11.899,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              139.856,
+              7.012
+            ],
+            [
+              150.038,
+              13.169
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.021,
+          "min_radius_proxy_m": 3.379,
+          "centerline_xz": [
+            [
+              139.856,
+              7.012
+            ],
+            [
+              140.52,
+              6.669
+            ],
+            [
+              141.199,
+              6.484
+            ],
+            [
+              141.89,
+              6.443
+            ],
+            [
+              142.589,
+              6.534
+            ],
+            [
+              143.29,
+              6.743
+            ],
+            [
+              143.991,
+              7.057
+            ],
+            [
+              144.686,
+              7.465
+            ],
+            [
+              145.373,
+              7.952
+            ],
+            [
+              146.046,
+              8.506
+            ],
+            [
+              146.701,
+              9.114
+            ],
+            [
+              147.335,
+              9.762
+            ],
+            [
+              147.944,
+              10.439
+            ],
+            [
+              148.522,
+              11.131
+            ],
+            [
+              149.067,
+              11.826
+            ],
+            [
+              149.573,
+              12.509
+            ],
+            [
+              150.038,
+              13.169
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.841,
+          "min_radius_proxy_m": 3.418,
+          "centerline_xz": [
+            [
+              139.856,
+              7.012
+            ],
+            [
+              140.755,
+              6.493
+            ],
+            [
+              141.588,
+              6.145
+            ],
+            [
+              142.36,
+              5.956
+            ],
+            [
+              143.078,
+              5.917
+            ],
+            [
+              143.75,
+              6.016
+            ],
+            [
+              144.382,
+              6.242
+            ],
+            [
+              144.982,
+              6.586
+            ],
+            [
+              145.555,
+              7.035
+            ],
+            [
+              146.11,
+              7.581
+            ],
+            [
+              146.652,
+              8.211
+            ],
+            [
+              147.189,
+              8.914
+            ],
+            [
+              147.728,
+              9.682
+            ],
+            [
+              148.276,
+              10.502
+            ],
+            [
+              148.838,
+              11.363
+            ],
+            [
+              149.423,
+              12.256
+            ],
+            [
+              150.038,
+              13.169
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00011",
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00251",
+      "exit_lane_link_id": "ll_00253",
+      "internal_bridge_lane_id": "ln_e_0171_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0171"
+      ],
+      "entry_junction_node_id": "n_0173",
+      "exit_junction_node_id": "n_0176",
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "from_lane_id": "ln_e_0214_f_00",
+      "to_lane_id": "ln_e_0014_b_00",
+      "from_edge_id": "e_0214",
+      "to_edge_id": "e_0014",
+      "movement_kind": "left",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        139.856,
+        7.012
+      ],
+      "end_xz": [
+        141.656,
+        9.212
+      ],
+      "start_tangent_xz": [
+        0.839,
+        -0.545
+      ],
+      "end_tangent_xz": [
+        -0.834,
+        0.552
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0214_f_00_n_0173_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0214_f_00",
+        "edge_id": "e_0214",
+        "node_id": "n_0173",
+        "pose_id": "j_039_e_0214_entry",
+        "point_xz": [
+          139.856,
+          7.012
+        ],
+        "tangent_xz": [
+          0.839,
+          -0.545
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0014_b_00_n_0176_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0014_b_00",
+        "edge_id": "e_0014",
+        "node_id": "n_0176",
+        "pose_id": "j_040_e_0014_entry",
+        "point_xz": [
+          141.656,
+          9.212
+        ],
+        "tangent_xz": [
+          -0.834,
+          0.552
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 2.843,
+      "tangent_delta_deg": 179.517,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 2.843,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              139.856,
+              7.012
+            ],
+            [
+              141.656,
+              9.212
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 3.508,
+          "min_radius_proxy_m": 0.455,
+          "centerline_xz": [
+            [
+              139.856,
+              7.012
+            ],
+            [
+              140.022,
+              6.941
+            ],
+            [
+              140.207,
+              6.928
+            ],
+            [
+              140.403,
+              6.966
+            ],
+            [
+              140.606,
+              7.05
+            ],
+            [
+              140.81,
+              7.171
+            ],
+            [
+              141.011,
+              7.325
+            ],
+            [
+              141.202,
+              7.504
+            ],
+            [
+              141.38,
+              7.703
+            ],
+            [
+              141.538,
+              7.914
+            ],
+            [
+              141.671,
+              8.131
+            ],
+            [
+              141.774,
+              8.349
+            ],
+            [
+              141.842,
+              8.56
+            ],
+            [
+              141.87,
+              8.758
+            ],
+            [
+              141.851,
+              8.937
+            ],
+            [
+              141.782,
+              9.091
+            ],
+            [
+              141.656,
+              9.212
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing",
+            "radius_proxy_below_lane_min"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 3.953,
+          "min_radius_proxy_m": 0.794,
+          "centerline_xz": [
+            [
+              139.856,
+              7.012
+            ],
+            [
+              140.085,
+              6.9
+            ],
+            [
+              140.324,
+              6.852
+            ],
+            [
+              140.566,
+              6.86
+            ],
+            [
+              140.807,
+              6.918
+            ],
+            [
+              141.04,
+              7.021
+            ],
+            [
+              141.262,
+              7.161
+            ],
+            [
+              141.466,
+              7.332
+            ],
+            [
+              141.647,
+              7.527
+            ],
+            [
+              141.801,
+              7.741
+            ],
+            [
+              141.922,
+              7.967
+            ],
+            [
+              142.004,
+              8.198
+            ],
+            [
+              142.042,
+              8.428
+            ],
+            [
+              142.032,
+              8.651
+            ],
+            [
+              141.968,
+              8.86
+            ],
+            [
+              141.844,
+              9.049
+            ],
+            [
+              141.656,
+              9.212
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing",
+            "radius_proxy_below_lane_min"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00012",
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00254",
+      "exit_lane_link_id": "ll_00248",
+      "internal_bridge_lane_id": "ln_e_0171_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0171"
+      ],
+      "entry_junction_node_id": "n_0176",
+      "exit_junction_node_id": "n_0173",
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "from_lane_id": "ln_e_0172_b_00",
+      "to_lane_id": "ln_e_0170_b_00",
+      "from_edge_id": "e_0172",
+      "to_edge_id": "e_0170",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        152.676,
+        11.359
+      ],
+      "end_xz": [
+        141.921,
+        -3.824
+      ],
+      "start_tangent_xz": [
+        -0.566,
+        -0.825
+      ],
+      "end_tangent_xz": [
+        -0.579,
+        -0.815
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0172_b_00_n_0176_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0172_b_00",
+        "edge_id": "e_0172",
+        "node_id": "n_0176",
+        "pose_id": "j_040_e_0172_entry",
+        "point_xz": [
+          152.676,
+          11.359
+        ],
+        "tangent_xz": [
+          -0.566,
+          -0.825
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0170_b_00_n_0173_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0170_b_00",
+        "edge_id": "e_0170",
+        "node_id": "n_0173",
+        "pose_id": "j_039_e_0170_entry",
+        "point_xz": [
+          141.921,
+          -3.824
+        ],
+        "tangent_xz": [
+          -0.579,
+          -0.815
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 18.606,
+      "tangent_delta_deg": 0.95,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.606,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              152.676,
+              11.359
+            ],
+            [
+              141.921,
+              -3.824
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.606,
+          "min_radius_proxy_m": 389.153,
+          "centerline_xz": [
+            [
+              152.676,
+              11.359
+            ],
+            [
+              151.99,
+              10.362
+            ],
+            [
+              151.311,
+              9.382
+            ],
+            [
+              150.639,
+              8.419
+            ],
+            [
+              149.972,
+              7.468
+            ],
+            [
+              149.309,
+              6.527
+            ],
+            [
+              148.649,
+              5.595
+            ],
+            [
+              147.99,
+              4.668
+            ],
+            [
+              147.332,
+              3.744
+            ],
+            [
+              146.672,
+              2.821
+            ],
+            [
+              146.011,
+              1.897
+            ],
+            [
+              145.345,
+              0.968
+            ],
+            [
+              144.675,
+              0.032
+            ],
+            [
+              143.999,
+              -0.912
+            ],
+            [
+              143.315,
+              -1.868
+            ],
+            [
+              142.623,
+              -2.838
+            ],
+            [
+              141.921,
+              -3.824
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.607,
+          "min_radius_proxy_m": 293.236,
+          "centerline_xz": [
+            [
+              152.676,
+              11.359
+            ],
+            [
+              151.747,
+              10.007
+            ],
+            [
+              150.924,
+              8.815
+            ],
+            [
+              150.191,
+              7.759
+            ],
+            [
+              149.533,
+              6.817
+            ],
+            [
+              148.935,
+              5.966
+            ],
+            [
+              148.381,
+              5.183
+            ],
+            [
+              147.857,
+              4.447
+            ],
+            [
+              147.346,
+              3.734
+            ],
+            [
+              146.834,
+              3.023
+            ],
+            [
+              146.305,
+              2.29
+            ],
+            [
+              145.744,
+              1.512
+            ],
+            [
+              145.135,
+              0.668
+            ],
+            [
+              144.464,
+              -0.265
+            ],
+            [
+              143.715,
+              -1.309
+            ],
+            [
+              142.872,
+              -2.488
+            ],
+            [
+              141.921,
+              -3.824
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00013",
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00254",
+      "exit_lane_link_id": "ll_00249",
+      "internal_bridge_lane_id": "ln_e_0171_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0171"
+      ],
+      "entry_junction_node_id": "n_0176",
+      "exit_junction_node_id": "n_0173",
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "from_lane_id": "ln_e_0172_b_00",
+      "to_lane_id": "ln_e_0214_b_00",
+      "from_edge_id": "e_0172",
+      "to_edge_id": "e_0214",
+      "movement_kind": "right",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        152.676,
+        11.359
+      ],
+      "end_xz": [
+        138.112,
+        4.328
+      ],
+      "start_tangent_xz": [
+        -0.566,
+        -0.825
+      ],
+      "end_tangent_xz": [
+        -0.839,
+        0.545
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0172_b_00_n_0176_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0172_b_00",
+        "edge_id": "e_0172",
+        "node_id": "n_0176",
+        "pose_id": "j_040_e_0172_entry",
+        "point_xz": [
+          152.676,
+          11.359
+        ],
+        "tangent_xz": [
+          -0.566,
+          -0.825
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0214_b_00_n_0173_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0214_b_00",
+        "edge_id": "e_0214",
+        "node_id": "n_0173",
+        "pose_id": "j_039_e_0214_entry",
+        "point_xz": [
+          138.112,
+          4.328
+        ],
+        "tangent_xz": [
+          -0.839,
+          0.545
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 16.172,
+      "tangent_delta_deg": 88.553,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 16.172,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              152.676,
+              11.359
+            ],
+            [
+              138.112,
+              4.328
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 17.671,
+          "min_radius_proxy_m": 5.493,
+          "centerline_xz": [
+            [
+              152.676,
+              11.359
+            ],
+            [
+              152.037,
+              10.477
+            ],
+            [
+              151.326,
+              9.59
+            ],
+            [
+              150.55,
+              8.713
+            ],
+            [
+              149.717,
+              7.858
+            ],
+            [
+              148.835,
+              7.039
+            ],
+            [
+              147.912,
+              6.27
+            ],
+            [
+              146.956,
+              5.565
+            ],
+            [
+              145.973,
+              4.937
+            ],
+            [
+              144.973,
+              4.4
+            ],
+            [
+              143.962,
+              3.967
+            ],
+            [
+              142.948,
+              3.652
+            ],
+            [
+              141.94,
+              3.47
+            ],
+            [
+              140.945,
+              3.432
+            ],
+            [
+              139.97,
+              3.554
+            ],
+            [
+              139.023,
+              3.848
+            ],
+            [
+              138.112,
+              4.328
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.765,
+          "min_radius_proxy_m": 5.483,
+          "centerline_xz": [
+            [
+              152.676,
+              11.359
+            ],
+            [
+              151.833,
+              10.133
+            ],
+            [
+              151.015,
+              8.962
+            ],
+            [
+              150.214,
+              7.857
+            ],
+            [
+              149.424,
+              6.828
+            ],
+            [
+              148.637,
+              5.886
+            ],
+            [
+              147.846,
+              5.043
+            ],
+            [
+              147.043,
+              4.307
+            ],
+            [
+              146.221,
+              3.691
+            ],
+            [
+              145.374,
+              3.205
+            ],
+            [
+              144.494,
+              2.859
+            ],
+            [
+              143.573,
+              2.664
+            ],
+            [
+              142.605,
+              2.631
+            ],
+            [
+              141.582,
+              2.77
+            ],
+            [
+              140.497,
+              3.092
+            ],
+            [
+              139.343,
+              3.608
+            ],
+            [
+              138.112,
+              4.328
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00014",
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00256",
+      "exit_lane_link_id": "ll_00248",
+      "internal_bridge_lane_id": "ln_e_0171_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0171"
+      ],
+      "entry_junction_node_id": "n_0176",
+      "exit_junction_node_id": "n_0173",
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "from_lane_id": "ln_e_0014_f_00",
+      "to_lane_id": "ln_e_0170_b_00",
+      "from_edge_id": "e_0014",
+      "to_edge_id": "e_0170",
+      "movement_kind": "right",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        143.422,
+        11.88
+      ],
+      "end_xz": [
+        141.921,
+        -3.824
+      ],
+      "start_tangent_xz": [
+        0.834,
+        -0.552
+      ],
+      "end_tangent_xz": [
+        -0.579,
+        -0.815
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0014_f_00_n_0176_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0014_f_00",
+        "edge_id": "e_0014",
+        "node_id": "n_0176",
+        "pose_id": "j_040_e_0014_entry",
+        "point_xz": [
+          143.422,
+          11.88
+        ],
+        "tangent_xz": [
+          0.834,
+          -0.552
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0170_b_00_n_0173_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0170_b_00",
+        "edge_id": "e_0170",
+        "node_id": "n_0173",
+        "pose_id": "j_039_e_0170_entry",
+        "point_xz": [
+          141.921,
+          -3.824
+        ],
+        "tangent_xz": [
+          -0.579,
+          -0.815
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 15.776,
+      "tangent_delta_deg": 91.914,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 15.776,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              143.422,
+              11.88
+            ],
+            [
+              141.921,
+              -3.824
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 17.331,
+          "min_radius_proxy_m": 4.977,
+          "centerline_xz": [
+            [
+              143.422,
+              11.88
+            ],
+            [
+              144.199,
+              11.251
+            ],
+            [
+              144.811,
+              10.515
+            ],
+            [
+              145.267,
+              9.685
+            ],
+            [
+              145.58,
+              8.774
+            ],
+            [
+              145.759,
+              7.794
+            ],
+            [
+              145.814,
+              6.759
+            ],
+            [
+              145.757,
+              5.681
+            ],
+            [
+              145.598,
+              4.573
+            ],
+            [
+              145.347,
+              3.448
+            ],
+            [
+              145.016,
+              2.319
+            ],
+            [
+              144.614,
+              1.199
+            ],
+            [
+              144.153,
+              0.1
+            ],
+            [
+              143.642,
+              -0.965
+            ],
+            [
+              143.093,
+              -1.982
+            ],
+            [
+              142.516,
+              -2.939
+            ],
+            [
+              141.921,
+              -3.824
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.462,
+          "min_radius_proxy_m": 5.083,
+          "centerline_xz": [
+            [
+              143.422,
+              11.88
+            ],
+            [
+              144.539,
+              11.057
+            ],
+            [
+              145.434,
+              10.22
+            ],
+            [
+              146.118,
+              9.366
+            ],
+            [
+              146.605,
+              8.494
+            ],
+            [
+              146.909,
+              7.604
+            ],
+            [
+              147.043,
+              6.694
+            ],
+            [
+              147.019,
+              5.762
+            ],
+            [
+              146.852,
+              4.807
+            ],
+            [
+              146.554,
+              3.828
+            ],
+            [
+              146.139,
+              2.823
+            ],
+            [
+              145.619,
+              1.79
+            ],
+            [
+              145.009,
+              0.73
+            ],
+            [
+              144.32,
+              -0.36
+            ],
+            [
+              143.568,
+              -1.482
+            ],
+            [
+              142.763,
+              -2.636
+            ],
+            [
+              141.921,
+              -3.824
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00015",
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00256",
+      "exit_lane_link_id": "ll_00249",
+      "internal_bridge_lane_id": "ln_e_0171_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0171"
+      ],
+      "entry_junction_node_id": "n_0176",
+      "exit_junction_node_id": "n_0173",
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "from_lane_id": "ln_e_0014_f_00",
+      "to_lane_id": "ln_e_0214_b_00",
+      "from_edge_id": "e_0014",
+      "to_edge_id": "e_0214",
+      "movement_kind": "right",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        143.422,
+        11.88
+      ],
+      "end_xz": [
+        138.112,
+        4.328
+      ],
+      "start_tangent_xz": [
+        0.834,
+        -0.552
+      ],
+      "end_tangent_xz": [
+        -0.839,
+        0.545
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0014_f_00_n_0176_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0014_f_00",
+        "edge_id": "e_0014",
+        "node_id": "n_0176",
+        "pose_id": "j_040_e_0014_entry",
+        "point_xz": [
+          143.422,
+          11.88
+        ],
+        "tangent_xz": [
+          0.834,
+          -0.552
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0214_b_00_n_0173_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0214_b_00",
+        "edge_id": "e_0214",
+        "node_id": "n_0173",
+        "pose_id": "j_039_e_0214_entry",
+        "point_xz": [
+          138.112,
+          4.328
+        ],
+        "tangent_xz": [
+          -0.839,
+          0.545
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 9.232,
+      "tangent_delta_deg": 179.517,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 9.232,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              143.422,
+              11.88
+            ],
+            [
+              138.112,
+              4.328
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 11.399,
+          "min_radius_proxy_m": 1.582,
+          "centerline_xz": [
+            [
+              143.422,
+              11.88
+            ],
+            [
+              143.836,
+              11.482
+            ],
+            [
+              144.079,
+              10.972
+            ],
+            [
+              144.165,
+              10.37
+            ],
+            [
+              144.11,
+              9.701
+            ],
+            [
+              143.93,
+              8.984
+            ],
+            [
+              143.641,
+              8.243
+            ],
+            [
+              143.257,
+              7.5
+            ],
+            [
+              142.794,
+              6.776
+            ],
+            [
+              142.268,
+              6.093
+            ],
+            [
+              141.694,
+              5.474
+            ],
+            [
+              141.087,
+              4.941
+            ],
+            [
+              140.464,
+              4.515
+            ],
+            [
+              139.839,
+              4.219
+            ],
+            [
+              139.229,
+              4.074
+            ],
+            [
+              138.648,
+              4.103
+            ],
+            [
+              138.112,
+              4.328
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing",
+            "radius_proxy_below_lane_min"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 12.845,
+          "min_radius_proxy_m": 2.831,
+          "centerline_xz": [
+            [
+              143.422,
+              11.88
+            ],
+            [
+              144.039,
+              11.348
+            ],
+            [
+              144.458,
+              10.721
+            ],
+            [
+              144.693,
+              10.022
+            ],
+            [
+              144.761,
+              9.272
+            ],
+            [
+              144.676,
+              8.494
+            ],
+            [
+              144.454,
+              7.708
+            ],
+            [
+              144.111,
+              6.939
+            ],
+            [
+              143.662,
+              6.206
+            ],
+            [
+              143.123,
+              5.533
+            ],
+            [
+              142.508,
+              4.941
+            ],
+            [
+              141.834,
+              4.453
+            ],
+            [
+              141.116,
+              4.089
+            ],
+            [
+              140.37,
+              3.873
+            ],
+            [
+              139.61,
+              3.826
+            ],
+            [
+              138.852,
+              3.971
+            ],
+            [
+              138.112,
+              4.328
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing",
+            "radius_proxy_below_lane_min"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00016",
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00259",
+      "exit_lane_link_id": "ll_00270",
+      "internal_bridge_lane_id": "ln_e_0173_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0173"
+      ],
+      "entry_junction_node_id": "n_0187",
+      "exit_junction_node_id": "n_0191",
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "from_lane_id": "ln_e_0172_f_00",
+      "to_lane_id": "ln_e_0174_f_00",
+      "from_edge_id": "e_0172",
+      "to_edge_id": "e_0174",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        185.288,
+        64.539
+      ],
+      "end_xz": [
+        195.725,
+        79.925
+      ],
+      "start_tangent_xz": [
+        0.566,
+        0.825
+      ],
+      "end_tangent_xz": [
+        0.55,
+        0.835
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0172_f_00_n_0187_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0172_f_00",
+        "edge_id": "e_0172",
+        "node_id": "n_0187",
+        "pose_id": "j_041_e_0172_entry",
+        "point_xz": [
+          185.288,
+          64.539
+        ],
+        "tangent_xz": [
+          0.566,
+          0.825
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0174_f_00_n_0191_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0174_f_00",
+        "edge_id": "e_0174",
+        "node_id": "n_0191",
+        "pose_id": "j_043_e_0174_entry",
+        "point_xz": [
+          195.725,
+          79.925
+        ],
+        "tangent_xz": [
+          0.55,
+          0.835
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 18.592,
+      "tangent_delta_deg": 1.112,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.592,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              185.288,
+              64.539
+            ],
+            [
+              195.725,
+              79.925
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.593,
+          "min_radius_proxy_m": 477.525,
+          "centerline_xz": [
+            [
+              185.288,
+              64.539
+            ],
+            [
+              185.972,
+              65.537
+            ],
+            [
+              186.647,
+              66.518
+            ],
+            [
+              187.312,
+              67.486
+            ],
+            [
+              187.969,
+              68.443
+            ],
+            [
+              188.62,
+              69.391
+            ],
+            [
+              189.265,
+              70.332
+            ],
+            [
+              189.907,
+              71.27
+            ],
+            [
+              190.546,
+              72.206
+            ],
+            [
+              191.184,
+              73.143
+            ],
+            [
+              191.822,
+              74.083
+            ],
+            [
+              192.461,
+              75.029
+            ],
+            [
+              193.103,
+              75.983
+            ],
+            [
+              193.749,
+              76.947
+            ],
+            [
+              194.401,
+              77.924
+            ],
+            [
+              195.059,
+              78.916
+            ],
+            [
+              195.725,
+              79.925
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.593,
+          "min_radius_proxy_m": 313.235,
+          "centerline_xz": [
+            [
+              185.288,
+              64.539
+            ],
+            [
+              186.216,
+              65.89
+            ],
+            [
+              187.037,
+              67.083
+            ],
+            [
+              187.766,
+              68.14
+            ],
+            [
+              188.419,
+              69.085
+            ],
+            [
+              189.01,
+              69.94
+            ],
+            [
+              189.554,
+              70.728
+            ],
+            [
+              190.067,
+              71.472
+            ],
+            [
+              190.563,
+              72.195
+            ],
+            [
+              191.057,
+              72.918
+            ],
+            [
+              191.564,
+              73.666
+            ],
+            [
+              192.1,
+              74.46
+            ],
+            [
+              192.678,
+              75.323
+            ],
+            [
+              193.315,
+              76.279
+            ],
+            [
+              194.026,
+              77.349
+            ],
+            [
+              194.824,
+              78.557
+            ],
+            [
+              195.725,
+              79.925
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00017",
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00259",
+      "exit_lane_link_id": "ll_00271",
+      "internal_bridge_lane_id": "ln_e_0173_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0173"
+      ],
+      "entry_junction_node_id": "n_0187",
+      "exit_junction_node_id": "n_0191",
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "from_lane_id": "ln_e_0172_f_00",
+      "to_lane_id": "ln_e_0010_b_00",
+      "from_edge_id": "e_0172",
+      "to_edge_id": "e_0010",
+      "movement_kind": "left",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        185.288,
+        64.539
+      ],
+      "end_xz": [
+        187.393,
+        75.717
+      ],
+      "start_tangent_xz": [
+        0.566,
+        0.825
+      ],
+      "end_tangent_xz": [
+        -0.852,
+        0.523
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0172_f_00_n_0187_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0172_f_00",
+        "edge_id": "e_0172",
+        "node_id": "n_0187",
+        "pose_id": "j_041_e_0172_entry",
+        "point_xz": [
+          185.288,
+          64.539
+        ],
+        "tangent_xz": [
+          0.566,
+          0.825
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0010_b_00_n_0191_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0010_b_00",
+        "edge_id": "e_0010",
+        "node_id": "n_0191",
+        "pose_id": "j_043_e_0010_entry",
+        "point_xz": [
+          187.393,
+          75.717
+        ],
+        "tangent_xz": [
+          -0.852,
+          0.523
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 11.374,
+      "tangent_delta_deg": 92.905,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 11.374,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              185.288,
+              64.539
+            ],
+            [
+              187.393,
+              75.717
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 12.534,
+          "min_radius_proxy_m": 2.844,
+          "centerline_xz": [
+            [
+              185.288,
+              64.539
+            ],
+            [
+              185.72,
+              65.183
+            ],
+            [
+              186.164,
+              65.876
+            ],
+            [
+              186.609,
+              66.611
+            ],
+            [
+              187.044,
+              67.378
+            ],
+            [
+              187.457,
+              68.167
+            ],
+            [
+              187.838,
+              68.969
+            ],
+            [
+              188.175,
+              69.776
+            ],
+            [
+              188.457,
+              70.578
+            ],
+            [
+              188.673,
+              71.365
+            ],
+            [
+              188.811,
+              72.13
+            ],
+            [
+              188.861,
+              72.862
+            ],
+            [
+              188.812,
+              73.553
+            ],
+            [
+              188.651,
+              74.193
+            ],
+            [
+              188.369,
+              74.773
+            ],
+            [
+              187.953,
+              75.284
+            ],
+            [
+              187.393,
+              75.717
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing",
+            "radius_proxy_below_lane_min"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.378,
+          "min_radius_proxy_m": 2.964,
+          "centerline_xz": [
+            [
+              185.288,
+              64.539
+            ],
+            [
+              185.895,
+              65.405
+            ],
+            [
+              186.501,
+              66.244
+            ],
+            [
+              187.092,
+              67.057
+            ],
+            [
+              187.656,
+              67.845
+            ],
+            [
+              188.178,
+              68.61
+            ],
+            [
+              188.646,
+              69.352
+            ],
+            [
+              189.045,
+              70.072
+            ],
+            [
+              189.364,
+              70.77
+            ],
+            [
+              189.588,
+              71.449
+            ],
+            [
+              189.705,
+              72.109
+            ],
+            [
+              189.7,
+              72.75
+            ],
+            [
+              189.561,
+              73.374
+            ],
+            [
+              189.274,
+              73.982
+            ],
+            [
+              188.826,
+              74.574
+            ],
+            [
+              188.203,
+              75.152
+            ],
+            [
+              187.393,
+              75.717
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing",
+            "radius_proxy_below_lane_min"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00018",
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00261",
+      "exit_lane_link_id": "ll_00270",
+      "internal_bridge_lane_id": "ln_e_0173_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0173"
+      ],
+      "entry_junction_node_id": "n_0187",
+      "exit_junction_node_id": "n_0191",
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "from_lane_id": "ln_e_0063_b_00",
+      "to_lane_id": "ln_e_0174_f_00",
+      "from_edge_id": "e_0063",
+      "to_edge_id": "e_0174",
+      "movement_kind": "right",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        194.575,
+        64.049
+      ],
+      "end_xz": [
+        195.725,
+        79.925
+      ],
+      "start_tangent_xz": [
+        -0.838,
+        0.546
+      ],
+      "end_tangent_xz": [
+        0.55,
+        0.835
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0063_b_00_n_0187_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0063_b_00",
+        "edge_id": "e_0063",
+        "node_id": "n_0187",
+        "pose_id": "j_041_e_0063_entry",
+        "point_xz": [
+          194.575,
+          64.049
+        ],
+        "tangent_xz": [
+          -0.838,
+          0.546
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": [
+          "entry_anchor_short_edge_absorption_candidate"
+        ]
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0174_f_00_n_0191_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0174_f_00",
+        "edge_id": "e_0174",
+        "node_id": "n_0191",
+        "pose_id": "j_043_e_0174_entry",
+        "point_xz": [
+          195.725,
+          79.925
+        ],
+        "tangent_xz": [
+          0.55,
+          0.835
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 15.919,
+      "tangent_delta_deg": 90.251,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 15.919,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              194.575,
+              64.049
+            ],
+            [
+              195.725,
+              79.925
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 17.444,
+          "min_radius_proxy_m": 5.107,
+          "centerline_xz": [
+            [
+              194.575,
+              64.049
+            ],
+            [
+              193.785,
+              64.677
+            ],
+            [
+              193.159,
+              65.413
+            ],
+            [
+              192.686,
+              66.245
+            ],
+            [
+              192.355,
+              67.158
+            ],
+            [
+              192.157,
+              68.141
+            ],
+            [
+              192.081,
+              69.182
+            ],
+            [
+              192.116,
+              70.266
+            ],
+            [
+              192.252,
+              71.382
+            ],
+            [
+              192.478,
+              72.517
+            ],
+            [
+              192.785,
+              73.659
+            ],
+            [
+              193.161,
+              74.793
+            ],
+            [
+              193.597,
+              75.909
+            ],
+            [
+              194.082,
+              76.993
+            ],
+            [
+              194.605,
+              78.032
+            ],
+            [
+              195.157,
+              79.014
+            ],
+            [
+              195.725,
+              79.925
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.555,
+          "min_radius_proxy_m": 5.148,
+          "centerline_xz": [
+            [
+              194.575,
+              64.049
+            ],
+            [
+              193.441,
+              64.87
+            ],
+            [
+              192.531,
+              65.706
+            ],
+            [
+              191.83,
+              66.558
+            ],
+            [
+              191.327,
+              67.428
+            ],
+            [
+              191.006,
+              68.317
+            ],
+            [
+              190.855,
+              69.229
+            ],
+            [
+              190.861,
+              70.163
+            ],
+            [
+              191.009,
+              71.123
+            ],
+            [
+              191.287,
+              72.11
+            ],
+            [
+              191.681,
+              73.126
+            ],
+            [
+              192.177,
+              74.172
+            ],
+            [
+              192.762,
+              75.251
+            ],
+            [
+              193.423,
+              76.364
+            ],
+            [
+              194.146,
+              77.513
+            ],
+            [
+              194.918,
+              78.699
+            ],
+            [
+              195.725,
+              79.925
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "entry_anchor_short_edge_absorption_candidate",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00019",
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00261",
+      "exit_lane_link_id": "ll_00271",
+      "internal_bridge_lane_id": "ln_e_0173_f_00",
+      "internal_bridge_edge_ids": [
+        "e_0173"
+      ],
+      "entry_junction_node_id": "n_0187",
+      "exit_junction_node_id": "n_0191",
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "from_lane_id": "ln_e_0063_b_00",
+      "to_lane_id": "ln_e_0010_b_00",
+      "from_edge_id": "e_0063",
+      "to_edge_id": "e_0010",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        194.575,
+        64.049
+      ],
+      "end_xz": [
+        187.393,
+        75.717
+      ],
+      "start_tangent_xz": [
+        -0.838,
+        0.546
+      ],
+      "end_tangent_xz": [
+        -0.852,
+        0.523
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0063_b_00_n_0187_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0063_b_00",
+        "edge_id": "e_0063",
+        "node_id": "n_0187",
+        "pose_id": "j_041_e_0063_entry",
+        "point_xz": [
+          194.575,
+          64.049
+        ],
+        "tangent_xz": [
+          -0.838,
+          0.546
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": [
+          "entry_anchor_short_edge_absorption_candidate"
+        ]
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0010_b_00_n_0191_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0010_b_00",
+        "edge_id": "e_0010",
+        "node_id": "n_0191",
+        "pose_id": "j_043_e_0010_entry",
+        "point_xz": [
+          187.393,
+          75.717
+        ],
+        "tangent_xz": [
+          -0.852,
+          0.523
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 13.702,
+      "tangent_delta_deg": 1.542,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.702,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              194.575,
+              64.049
+            ],
+            [
+              187.393,
+              75.717
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.986,
+          "min_radius_proxy_m": 5.772,
+          "centerline_xz": [
+            [
+              194.575,
+              64.049
+            ],
+            [
+              193.878,
+              64.584
+            ],
+            [
+              193.281,
+              65.199
+            ],
+            [
+              192.771,
+              65.883
+            ],
+            [
+              192.333,
+              66.623
+            ],
+            [
+              191.952,
+              67.41
+            ],
+            [
+              191.615,
+              68.229
+            ],
+            [
+              191.305,
+              69.071
+            ],
+            [
+              191.01,
+              69.923
+            ],
+            [
+              190.714,
+              70.774
+            ],
+            [
+              190.402,
+              71.612
+            ],
+            [
+              190.06,
+              72.426
+            ],
+            [
+              189.674,
+              73.203
+            ],
+            [
+              189.229,
+              73.932
+            ],
+            [
+              188.71,
+              74.602
+            ],
+            [
+              188.103,
+              75.201
+            ],
+            [
+              187.393,
+              75.717
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.239,
+          "min_radius_proxy_m": 6.048,
+          "centerline_xz": [
+            [
+              194.575,
+              64.049
+            ],
+            [
+              193.613,
+              64.757
+            ],
+            [
+              192.858,
+              65.477
+            ],
+            [
+              192.282,
+              66.207
+            ],
+            [
+              191.853,
+              66.946
+            ],
+            [
+              191.542,
+              67.69
+            ],
+            [
+              191.32,
+              68.439
+            ],
+            [
+              191.156,
+              69.19
+            ],
+            [
+              191.021,
+              69.941
+            ],
+            [
+              190.885,
+              70.69
+            ],
+            [
+              190.718,
+              71.436
+            ],
+            [
+              190.49,
+              72.175
+            ],
+            [
+              190.171,
+              72.907
+            ],
+            [
+              189.732,
+              73.629
+            ],
+            [
+              189.142,
+              74.339
+            ],
+            [
+              188.372,
+              75.036
+            ],
+            [
+              187.393,
+              75.717
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "entry_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "entry_anchor_short_edge_absorption_candidate",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00020",
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00272",
+      "exit_lane_link_id": "ll_00262",
+      "internal_bridge_lane_id": "ln_e_0173_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0173"
+      ],
+      "entry_junction_node_id": "n_0191",
+      "exit_junction_node_id": "n_0187",
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "from_lane_id": "ln_e_0174_b_00",
+      "to_lane_id": "ln_e_0172_b_00",
+      "from_edge_id": "e_0174",
+      "to_edge_id": "e_0172",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        198.399,
+        78.167
+      ],
+      "end_xz": [
+        187.926,
+        62.729
+      ],
+      "start_tangent_xz": [
+        -0.55,
+        -0.835
+      ],
+      "end_tangent_xz": [
+        -0.566,
+        -0.825
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0174_b_00_n_0191_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0174_b_00",
+        "edge_id": "e_0174",
+        "node_id": "n_0191",
+        "pose_id": "j_043_e_0174_entry",
+        "point_xz": [
+          198.399,
+          78.167
+        ],
+        "tangent_xz": [
+          -0.55,
+          -0.835
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0172_b_00_n_0187_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0172_b_00",
+        "edge_id": "e_0172",
+        "node_id": "n_0187",
+        "pose_id": "j_041_e_0172_entry",
+        "point_xz": [
+          187.926,
+          62.729
+        ],
+        "tangent_xz": [
+          -0.566,
+          -0.825
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 18.655,
+      "tangent_delta_deg": 1.112,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.655,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              198.399,
+              78.167
+            ],
+            [
+              187.926,
+              62.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.655,
+          "min_radius_proxy_m": 480.022,
+          "centerline_xz": [
+            [
+              198.399,
+              78.167
+            ],
+            [
+              197.73,
+              77.153
+            ],
+            [
+              197.07,
+              76.158
+            ],
+            [
+              196.416,
+              75.178
+            ],
+            [
+              195.768,
+              74.21
+            ],
+            [
+              195.123,
+              73.253
+            ],
+            [
+              194.482,
+              72.305
+            ],
+            [
+              193.842,
+              71.361
+            ],
+            [
+              193.202,
+              70.421
+            ],
+            [
+              192.561,
+              69.482
+            ],
+            [
+              191.917,
+              68.541
+            ],
+            [
+              191.269,
+              67.596
+            ],
+            [
+              190.616,
+              66.645
+            ],
+            [
+              189.957,
+              65.685
+            ],
+            [
+              189.29,
+              64.714
+            ],
+            [
+              188.613,
+              63.729
+            ],
+            [
+              187.926,
+              62.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.655,
+          "min_radius_proxy_m": 314.621,
+          "centerline_xz": [
+            [
+              198.399,
+              78.167
+            ],
+            [
+              197.494,
+              76.794
+            ],
+            [
+              196.693,
+              75.582
+            ],
+            [
+              195.981,
+              74.507
+            ],
+            [
+              195.341,
+              73.549
+            ],
+            [
+              194.761,
+              72.682
+            ],
+            [
+              194.223,
+              71.886
+            ],
+            [
+              193.715,
+              71.136
+            ],
+            [
+              193.219,
+              70.41
+            ],
+            [
+              192.721,
+              69.685
+            ],
+            [
+              192.207,
+              68.939
+            ],
+            [
+              191.661,
+              68.148
+            ],
+            [
+              191.068,
+              67.29
+            ],
+            [
+              190.413,
+              66.342
+            ],
+            [
+              189.681,
+              65.281
+            ],
+            [
+              188.857,
+              64.084
+            ],
+            [
+              187.926,
+              62.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00021",
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00272",
+      "exit_lane_link_id": "ll_00263",
+      "internal_bridge_lane_id": "ln_e_0173_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0173"
+      ],
+      "entry_junction_node_id": "n_0191",
+      "exit_junction_node_id": "n_0187",
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "from_lane_id": "ln_e_0174_b_00",
+      "to_lane_id": "ln_e_0063_f_00",
+      "from_edge_id": "e_0174",
+      "to_edge_id": "e_0063",
+      "movement_kind": "left",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        198.399,
+        78.167
+      ],
+      "end_xz": [
+        196.323,
+        66.729
+      ],
+      "start_tangent_xz": [
+        -0.55,
+        -0.835
+      ],
+      "end_tangent_xz": [
+        0.838,
+        -0.546
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0174_b_00_n_0191_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0174_b_00",
+        "edge_id": "e_0174",
+        "node_id": "n_0191",
+        "pose_id": "j_043_e_0174_entry",
+        "point_xz": [
+          198.399,
+          78.167
+        ],
+        "tangent_xz": [
+          -0.55,
+          -0.835
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0063_f_00_n_0187_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0063_f_00",
+        "edge_id": "e_0063",
+        "node_id": "n_0187",
+        "pose_id": "j_041_e_0063_entry",
+        "point_xz": [
+          196.323,
+          66.729
+        ],
+        "tangent_xz": [
+          0.838,
+          -0.546
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": [
+          "exit_anchor_short_edge_absorption_candidate"
+        ]
+      },
+      "chord_length_m": 11.624,
+      "tangent_delta_deg": 90.251,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 11.624,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              198.399,
+              78.167
+            ],
+            [
+              196.323,
+              66.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 12.759,
+          "min_radius_proxy_m": 3.023,
+          "centerline_xz": [
+            [
+              198.399,
+              78.167
+            ],
+            [
+              197.969,
+              77.502
+            ],
+            [
+              197.528,
+              76.79
+            ],
+            [
+              197.085,
+              76.039
+            ],
+            [
+              196.651,
+              75.258
+            ],
+            [
+              196.24,
+              74.455
+            ],
+            [
+              195.86,
+              73.64
+            ],
+            [
+              195.525,
+              72.821
+            ],
+            [
+              195.244,
+              72.007
+            ],
+            [
+              195.029,
+              71.206
+            ],
+            [
+              194.892,
+              70.428
+            ],
+            [
+              194.843,
+              69.682
+            ],
+            [
+              194.895,
+              68.976
+            ],
+            [
+              195.057,
+              68.319
+            ],
+            [
+              195.341,
+              67.719
+            ],
+            [
+              195.76,
+              67.187
+            ],
+            [
+              196.323,
+              66.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.588,
+          "min_radius_proxy_m": 3.114,
+          "centerline_xz": [
+            [
+              198.399,
+              78.167
+            ],
+            [
+              197.795,
+              77.273
+            ],
+            [
+              197.192,
+              76.411
+            ],
+            [
+              196.603,
+              75.58
+            ],
+            [
+              196.042,
+              74.777
+            ],
+            [
+              195.521,
+              74.002
+            ],
+            [
+              195.054,
+              73.251
+            ],
+            [
+              194.655,
+              72.523
+            ],
+            [
+              194.337,
+              71.817
+            ],
+            [
+              194.113,
+              71.131
+            ],
+            [
+              193.997,
+              70.463
+            ],
+            [
+              194.003,
+              69.81
+            ],
+            [
+              194.144,
+              69.172
+            ],
+            [
+              194.432,
+              68.547
+            ],
+            [
+              194.883,
+              67.933
+            ],
+            [
+              195.508,
+              67.328
+            ],
+            [
+              196.323,
+              66.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "exit_anchor_short_edge_absorption_candidate",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00022",
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00274",
+      "exit_lane_link_id": "ll_00262",
+      "internal_bridge_lane_id": "ln_e_0173_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0173"
+      ],
+      "entry_junction_node_id": "n_0191",
+      "exit_junction_node_id": "n_0187",
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "from_lane_id": "ln_e_0010_f_00",
+      "to_lane_id": "ln_e_0172_b_00",
+      "from_edge_id": "e_0010",
+      "to_edge_id": "e_0172",
+      "movement_kind": "right",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        189.067,
+        78.443
+      ],
+      "end_xz": [
+        187.926,
+        62.729
+      ],
+      "start_tangent_xz": [
+        0.852,
+        -0.523
+      ],
+      "end_tangent_xz": [
+        -0.566,
+        -0.825
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0010_f_00_n_0191_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0010_f_00",
+        "edge_id": "e_0010",
+        "node_id": "n_0191",
+        "pose_id": "j_043_e_0010_entry",
+        "point_xz": [
+          189.067,
+          78.443
+        ],
+        "tangent_xz": [
+          0.852,
+          -0.523
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0172_b_00_n_0187_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0172_b_00",
+        "edge_id": "e_0172",
+        "node_id": "n_0187",
+        "pose_id": "j_041_e_0172_entry",
+        "point_xz": [
+          187.926,
+          62.729
+        ],
+        "tangent_xz": [
+          -0.566,
+          -0.825
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "chord_length_m": 15.756,
+      "tangent_delta_deg": 92.905,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 15.756,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              189.067,
+              78.443
+            ],
+            [
+              187.926,
+              62.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 17.335,
+          "min_radius_proxy_m": 4.909,
+          "centerline_xz": [
+            [
+              189.067,
+              78.443
+            ],
+            [
+              189.863,
+              77.841
+            ],
+            [
+              190.495,
+              77.126
+            ],
+            [
+              190.974,
+              76.311
+            ],
+            [
+              191.31,
+              75.41
+            ],
+            [
+              191.513,
+              74.436
+            ],
+            [
+              191.594,
+              73.402
+            ],
+            [
+              191.563,
+              72.322
+            ],
+            [
+              191.429,
+              71.209
+            ],
+            [
+              191.204,
+              70.077
+            ],
+            [
+              190.898,
+              68.938
+            ],
+            [
+              190.52,
+              67.807
+            ],
+            [
+              190.082,
+              66.697
+            ],
+            [
+              189.593,
+              65.62
+            ],
+            [
+              189.064,
+              64.591
+            ],
+            [
+              188.505,
+              63.623
+            ],
+            [
+              187.926,
+              62.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 18.483,
+          "min_radius_proxy_m": 5.053,
+          "centerline_xz": [
+            [
+              189.067,
+              78.443
+            ],
+            [
+              190.21,
+              77.659
+            ],
+            [
+              191.129,
+              76.851
+            ],
+            [
+              191.837,
+              76.019
+            ],
+            [
+              192.348,
+              75.162
+            ],
+            [
+              192.675,
+              74.28
+            ],
+            [
+              192.832,
+              73.372
+            ],
+            [
+              192.831,
+              72.438
+            ],
+            [
+              192.686,
+              71.476
+            ],
+            [
+              192.41,
+              70.487
+            ],
+            [
+              192.016,
+              69.469
+            ],
+            [
+              191.518,
+              68.422
+            ],
+            [
+              190.929,
+              67.345
+            ],
+            [
+              190.262,
+              66.238
+            ],
+            [
+              189.53,
+              65.1
+            ],
+            [
+              188.747,
+              63.93
+            ],
+            [
+              187.926,
+              62.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    },
+    {
+      "compound_case_id": "cmc_00023",
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "source": "compound_junction_merge_trial_transaction",
+      "entry_lane_link_id": "ll_00274",
+      "exit_lane_link_id": "ll_00263",
+      "internal_bridge_lane_id": "ln_e_0173_b_00",
+      "internal_bridge_edge_ids": [
+        "e_0173"
+      ],
+      "entry_junction_node_id": "n_0191",
+      "exit_junction_node_id": "n_0187",
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "from_lane_id": "ln_e_0010_f_00",
+      "to_lane_id": "ln_e_0063_f_00",
+      "from_edge_id": "e_0010",
+      "to_edge_id": "e_0063",
+      "movement_kind": "through",
+      "status": "qa_candidate",
+      "confidence": 0.42,
+      "start_xz": [
+        189.067,
+        78.443
+      ],
+      "end_xz": [
+        196.323,
+        66.729
+      ],
+      "start_tangent_xz": [
+        0.852,
+        -0.523
+      ],
+      "end_tangent_xz": [
+        0.838,
+        -0.546
+      ],
+      "lane_entry_anchor": {
+        "anchor_id": "ln_e_0010_f_00_n_0191_entry_anchor",
+        "role": "entry",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0010_f_00",
+        "edge_id": "e_0010",
+        "node_id": "n_0191",
+        "pose_id": "j_043_e_0010_entry",
+        "point_xz": [
+          189.067,
+          78.443
+        ],
+        "tangent_xz": [
+          0.852,
+          -0.523
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": []
+      },
+      "lane_exit_anchor": {
+        "anchor_id": "ln_e_0063_f_00_n_0187_exit_anchor",
+        "role": "exit",
+        "source": "engineering_entry_pose_lateral_offset",
+        "lane_id": "ln_e_0063_f_00",
+        "edge_id": "e_0063",
+        "node_id": "n_0187",
+        "pose_id": "j_041_e_0063_entry",
+        "point_xz": [
+          196.323,
+          66.729
+        ],
+        "tangent_xz": [
+          0.838,
+          -0.546
+        ],
+        "lateral_offset_m": 1.6,
+        "entry_trim_m": 6.3,
+        "confidence": 0.42,
+        "issues": [
+          "exit_anchor_short_edge_absorption_candidate"
+        ]
+      },
+      "chord_length_m": 13.779,
+      "tangent_delta_deg": 1.542,
+      "best_candidate_family": "compound_topology_straight_baseline",
+      "best_score": 22.0,
+      "publish_ready": false,
+      "candidates": [
+        {
+          "family": "compound_topology_straight_baseline",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 13.779,
+          "min_radius_proxy_m": null,
+          "centerline_xz": [
+            [
+              189.067,
+              78.443
+            ],
+            [
+              196.323,
+              66.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_bezier_g1_preview",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.062,
+          "min_radius_proxy_m": 5.842,
+          "centerline_xz": [
+            [
+              189.067,
+              78.443
+            ],
+            [
+              189.782,
+              77.925
+            ],
+            [
+              190.393,
+              77.324
+            ],
+            [
+              190.917,
+              76.651
+            ],
+            [
+              191.366,
+              75.919
+            ],
+            [
+              191.757,
+              75.139
+            ],
+            [
+              192.104,
+              74.322
+            ],
+            [
+              192.42,
+              73.481
+            ],
+            [
+              192.721,
+              72.628
+            ],
+            [
+              193.021,
+              71.772
+            ],
+            [
+              193.335,
+              70.928
+            ],
+            [
+              193.677,
+              70.105
+            ],
+            [
+              194.062,
+              69.316
+            ],
+            [
+              194.505,
+              68.572
+            ],
+            [
+              195.019,
+              67.885
+            ],
+            [
+              195.62,
+              67.267
+            ],
+            [
+              196.323,
+              66.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        },
+        {
+          "family": "compound_param_poly3_hermite_proxy",
+          "status": "qa_candidate",
+          "score": 22.0,
+          "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
+          "publish_ready": false,
+          "length_m": 14.313,
+          "min_radius_proxy_m": 6.119,
+          "centerline_xz": [
+            [
+              189.067,
+              78.443
+            ],
+            [
+              190.053,
+              77.759
+            ],
+            [
+              190.828,
+              77.059
+            ],
+            [
+              191.422,
+              76.346
+            ],
+            [
+              191.866,
+              75.621
+            ],
+            [
+              192.189,
+              74.887
+            ],
+            [
+              192.421,
+              74.145
+            ],
+            [
+              192.592,
+              73.397
+            ],
+            [
+              192.732,
+              72.645
+            ],
+            [
+              192.871,
+              71.892
+            ],
+            [
+              193.039,
+              71.138
+            ],
+            [
+              193.265,
+              70.387
+            ],
+            [
+              193.58,
+              69.64
+            ],
+            [
+              194.013,
+              68.898
+            ],
+            [
+              194.594,
+              68.165
+            ],
+            [
+              195.354,
+              67.441
+            ],
+            [
+              196.323,
+              66.729
+            ]
+          ],
+          "issues": [
+            "compound_junction_merge_trial",
+            "exit_anchor_short_edge_absorption_candidate",
+            "inferred_without_turn_lanes",
+            "low_confidence_from_lane",
+            "low_confidence_to_lane",
+            "outgoing_turn_lanes_missing"
+          ],
+          "note": "Candidate preview（候选预览） only; not final lane geometry（最终车道几何）."
+        }
+      ],
+      "issues": [
+        "compound_junction_merge_trial",
+        "exit_anchor_short_edge_absorption_candidate",
+        "inferred_without_turn_lanes",
+        "low_confidence_from_lane",
+        "low_confidence_to_lane",
+        "outgoing_turn_lanes_missing"
+      ],
+      "transaction_contract": "Trial-only compound movement（仅试运行复合通行）. Bridge edge anchors（桥接短边锚点） are removed from the exposed entry/exit contract, but clean skeleton（干净道路骨架） is not modified."
+    }
+  ]
+}

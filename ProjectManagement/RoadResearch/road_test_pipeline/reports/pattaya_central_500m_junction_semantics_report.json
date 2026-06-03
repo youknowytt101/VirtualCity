@@ -8,7 +8,9 @@
     "approaches": 149,
     "through_pairs": 51,
     "movements": 306,
-    "blocked_movements": 142
+    "blocked_movements": 0,
+    "source_oneway_ignored_approaches": 96,
+    "source_oneway_blocked_movements_if_trusted": 142
   },
   "junction_type_counts": {
     "T": 47,
@@ -26,15 +28,15 @@
     "minor_through": 4
   },
   "allowed_movement_kind_counts": {
-    "left": 60,
-    "right": 44,
-    "through": 60
+    "left": 102,
+    "right": 102,
+    "through": 102
   },
   "notes": [
     "This model classifies road-level junctions and movement intent; it does not generate geometry.",
     "Public junction classes are restricted to T, cross, Y, offset and complex.",
     "Adaptive classification iteratively relaxes through-pair angle thresholds for low-quality OSM geometry.",
-    "Movement permissions currently use OSM oneway data and geometry-inferred turn classes.",
+    "Movement permissions currently use temporary_all_roads_bidirectional_two_lane_v1（临时全道路双向两车道策略）; OSM oneway（OSM 单行） is retained as source observation（源数据观察值） only.",
     "T and cross junctions are high-confidence; Y, offset and complex junctions remain lower-confidence inference."
   ]
 }

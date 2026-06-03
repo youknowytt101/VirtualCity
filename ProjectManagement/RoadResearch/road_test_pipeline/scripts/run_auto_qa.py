@@ -321,7 +321,7 @@ def run_lane_graph_qa(root: Path, area_id: str) -> dict:
             "lanes",
             counts["lanes"],
             rules["min_lanes"],
-            "Lane graph should expose enough lane centerlines for junction connection research.",
+            "Lane graph should expose enough directed lane records for junction connection research.",
         ),
         check_min(
             "junctions",
@@ -339,7 +339,7 @@ def run_lane_graph_qa(root: Path, area_id: str) -> dict:
             "lane_links",
             counts["lane_links"],
             rules["min_lane_links"],
-            "Allowed movements should produce laneLinks for downstream Houdini connection surfaces.",
+            "Allowed movements should produce laneLinks for downstream movement corridor research.",
         ),
         check_max(
             "lane_link_reference_errors",
@@ -357,7 +357,7 @@ def run_lane_graph_qa(root: Path, area_id: str) -> dict:
             "empty_connection_curves",
             metrics.get("empty_connection_curves", 0),
             rules["max_empty_connection_curves"],
-            "Every lane-level connection should carry a usable connecting curve.",
+            "Topology-only lane graph should not claim missing final connection curves as published geometry.",
         ),
         check_warn_above(
             "fan_fallback_ratio",
@@ -381,6 +381,7 @@ def run_lane_graph_qa(root: Path, area_id: str) -> dict:
             "counts": counts,
             "turn_counts": lane_report["turn_counts"],
             "lane_source_counts": lane_report["lane_source_counts"],
+            "traffic_direction_policy_counts": lane_report.get("traffic_direction_policy_counts", {}),
             "connection_source_counts": lane_report.get("connection_source_counts", {}),
             "lane_link_source_counts": lane_report.get("lane_link_source_counts", {}),
             "fallback_counts": lane_report["fallback_counts"],
@@ -391,16 +392,265 @@ def run_lane_graph_qa(root: Path, area_id: str) -> dict:
             "lane_graph_report": str(lane_report_path),
             "rules": str(root / "qa" / "qa_rules.json"),
         },
-        next_action="Use optimized centerlines first, then use lane_graph connections for lane-level junction surfaces.",
+        next_action="Use lane_graph as the topology contract for movement corridor solver; do not treat offset previews as final lane geometry.",
     )
     output_path = root / "reports" / "qa" / f"{area_id}_lane_graph_qa_report.json"
     write_json(output_path, report)
     return report
 
 
+def run_movement_corridor_qa(root: Path, area_id: str) -> dict:
+    rules = read_json(root / "qa" / "qa_rules.json")["movement_corridor"]
+    candidates_path = root / "data" / "processed" / f"{area_id}_movement_corridor_candidates.json"
+    report_path = root / "reports" / f"{area_id}_movement_corridor_report.json"
+    corridor_report = read_json(report_path)
+    counts = corridor_report["counts"]
+    metrics = corridor_report["metrics"]
+    candidate_issue_counts = counts.get("candidate_issue_counts", {})
+
+    checks = [
+        check_min(
+            "corridor_cases",
+            counts["corridor_cases"],
+            rules["min_corridor_cases"],
+            "Movement corridor solver should emit lane-level corridor cases from junction laneLinks.",
+        ),
+        check_min(
+            "candidate_curves",
+            counts["candidate_curves"],
+            rules["min_candidate_curves"],
+            "Movement corridor solver should emit at least one candidate curve.",
+        ),
+        check_max(
+            "reference_errors",
+            counts["reference_errors"],
+            rules["max_reference_errors"],
+            "Every movement corridor must reference existing from/to lanes.",
+        ),
+        check_max(
+            "missing_anchor_poses",
+            counts.get("missing_anchor_poses", 0),
+            rules["max_missing_anchor_poses"],
+            "Every junction movement should resolve entry/exit poses before using centerline preview fallback.",
+        ),
+        check_max(
+            "empty_candidate_geometry",
+            candidate_issue_counts.get("empty_candidate_geometry", 0),
+            rules["max_empty_candidate_geometry"],
+            "Movement corridor candidates should not contain empty geometry previews.",
+        ),
+        check_warn_above(
+            "anchor_fallback_ratio",
+            metrics.get("anchor_fallback_ratio", 0.0),
+            rules["warn_anchor_fallback_ratio_above"],
+            "Movement corridor endpoints are falling back to centerline_xz previews instead of lane-level anchors.",
+        ),
+        check_warn_below(
+            "fully_anchored_case_ratio",
+            metrics.get("fully_anchored_case_ratio", 0.0),
+            rules["warn_fully_anchored_case_ratio_below"],
+            "Most movement corridors should have both lane_entry_anchor and lane_exit_anchor resolved.",
+        ),
+        check_warn_above(
+            "low_confidence_ratio",
+            metrics["low_confidence_ratio"],
+            rules["warn_low_confidence_ratio_above"],
+            "Many movement corridors are low-confidence; review missing turn:lanes and inferred laneLinks.",
+        ),
+        check_warn_below(
+            "ready_ratio",
+            metrics["ready_ratio"],
+            rules["warn_ready_ratio_below"],
+            "Few movement corridors are ready for geometry solving; more source evidence or better inference is needed.",
+        ),
+    ]
+
+    report = qa_report(
+        area_id=area_id,
+        stage="movement_corridor",
+        checks=checks,
+        metrics={
+            "counts": counts,
+            "solver_metrics": metrics,
+        },
+        inputs={
+            "movement_corridor_candidates": str(candidates_path),
+            "movement_corridor_report": str(report_path),
+            "rules": str(root / "qa" / "qa_rules.json"),
+        },
+        next_action=(
+            "Add collision（碰撞） and swept envelope（扫掠包络） scoring, then run only "
+            "transaction-ready（事务就绪） destructive transactions（写入式事务）."
+        ),
+    )
+    output_path = root / "reports" / "qa" / f"{area_id}_movement_corridor_qa_report.json"
+    write_json(output_path, report)
+    return report
+
+
+def run_compound_junction_merge_qa(root: Path, area_id: str) -> dict:
+    rules = read_json(root / "qa" / "qa_rules.json")["compound_junction_merge"]
+    candidates_path = root / "data" / "processed" / f"{area_id}_compound_junction_merge_candidates.json"
+    report_path = root / "reports" / f"{area_id}_compound_junction_merge_report.json"
+    planner_report = read_json(report_path)
+    counts = planner_report["counts"]
+    status_counts = counts.get("status_counts", {})
+    risk_counts = counts.get("risk_counts", {})
+    eligible_anchor_records = int(counts.get("eligible_anchor_records", 0))
+    affected_anchor_records = int(counts.get("affected_anchor_records", 0))
+    candidates = int(counts.get("candidates", 0))
+    transaction_candidates = int(counts.get("transaction_candidates", 0))
+    affected_anchor_coverage_ratio = (
+        affected_anchor_records / eligible_anchor_records
+        if eligible_anchor_records
+        else 1.0
+    )
+    transaction_candidate_ratio = (
+        transaction_candidates / candidates
+        if candidates
+        else 1.0
+    )
+
+    checks = [
+        check_max(
+            "reference_errors",
+            counts.get("reference_errors", 0),
+            rules["max_reference_errors"],
+            "Compound junction merge planner should not lose references to audited anchors or bridge edges.",
+        ),
+        check_max(
+            "blocked_candidates",
+            status_counts.get("blocked", 0),
+            rules["max_blocked_candidates"],
+            "Blocked compound junction merge candidates need manual review before any transaction design.",
+        ),
+        check_warn_above(
+            "high_risk_candidates",
+            risk_counts.get("high", 0),
+            rules["warn_high_risk_candidates_above"],
+            "High-risk compound junction merges should not be auto-promoted.",
+        ),
+        check_warn_below(
+            "affected_anchor_coverage_ratio",
+            affected_anchor_coverage_ratio,
+            rules["warn_affected_anchor_coverage_ratio_below"],
+            "Every eligible adjacent-junction anchor should be explained by a compound merge candidate.",
+        ),
+        check_warn_below(
+            "transaction_candidate_ratio",
+            transaction_candidate_ratio,
+            rules["warn_transaction_candidate_ratio_below"],
+            "Few compound merge candidates are transaction candidates; review merge thresholds.",
+        ),
+    ]
+
+    report = qa_report(
+        area_id=area_id,
+        stage="compound_junction_merge",
+        checks=checks,
+        metrics={
+            "counts": counts,
+            "affected_anchor_coverage_ratio": round(affected_anchor_coverage_ratio, 3),
+            "transaction_candidate_ratio": round(transaction_candidate_ratio, 3),
+        },
+        inputs={
+            "compound_junction_merge_candidates": str(candidates_path),
+            "compound_junction_merge_report": str(report_path),
+            "rules": str(root / "qa" / "qa_rules.json"),
+        },
+        next_action=(
+            "Use transaction_candidate（事务候选） compound junction merges（复合路口合并） for trial transaction（试运行事务） "
+            "only; regenerate entry poses（入口姿态） and movement corridors（通行走廊） before accepting any rewrite."
+        ),
+    )
+    output_path = root / "reports" / "qa" / f"{area_id}_compound_junction_merge_qa_report.json"
+    write_json(output_path, report)
+    return report
+
+
+def run_compound_junction_merge_transaction_qa(root: Path, area_id: str) -> dict:
+    rules = read_json(root / "qa" / "qa_rules.json")["compound_junction_merge_transaction"]
+    transactions_path = root / "data" / "processed" / f"{area_id}_compound_junction_merge_transactions.json"
+    report_path = root / "reports" / f"{area_id}_compound_junction_merge_transaction_report.json"
+    transaction_report = read_json(report_path)
+    counts = transaction_report["counts"]
+    transactions = int(counts.get("transactions", 0))
+    accepted = int(counts.get("accepted_for_staging", 0))
+    accepted_ratio = accepted / max(1, transactions)
+    replacement_ratio = float(counts.get("affected_corridor_replacement_ratio") or 0.0)
+
+    checks = [
+        check_max(
+            "reference_errors",
+            counts.get("reference_errors", 0),
+            rules["max_reference_errors"],
+            "Compound merge transaction should not lose lane, link, or pose references.",
+        ),
+        check_max(
+            "exposed_bridge_edge_cases",
+            counts.get("exposed_bridge_edge_cases", 0),
+            rules["max_exposed_bridge_edge_cases"],
+            "Trial compound corridors should expose only external edges, not internal bridge edges.",
+        ),
+        check_max(
+            "capacity_limited_anchor_cases",
+            counts.get("capacity_limited_anchor_cases", 0),
+            rules["max_capacity_limited_anchor_cases"],
+            "Trial compound corridors should remove capacity-limited bridge-edge anchors from the exposed contract.",
+        ),
+        check_warn_below(
+            "accepted_transaction_ratio",
+            accepted_ratio,
+            rules["warn_accepted_transaction_ratio_below"],
+            "Not every compound merge transaction was accepted for staging preview.",
+        ),
+        check_warn_below(
+            "affected_corridor_replacement_ratio",
+            replacement_ratio,
+            rules["warn_affected_corridor_replacement_ratio_below"],
+            "Trial compound corridors do not cover all previously affected close-anchor corridors.",
+        ),
+    ]
+
+    report = qa_report(
+        area_id=area_id,
+        stage="compound_junction_merge_transaction",
+        checks=checks,
+        metrics={
+            "counts": counts,
+            "accepted_transaction_ratio": round(accepted_ratio, 3),
+            "affected_corridor_replacement_ratio": round(replacement_ratio, 3),
+        },
+        inputs={
+            "compound_junction_merge_transactions": str(transactions_path),
+            "compound_junction_merge_transaction_report": str(report_path),
+            "rules": str(root / "qa" / "qa_rules.json"),
+        },
+        next_action=(
+            "Use staged compound movement corridors（暂存复合通行走廊） for SVG review and collision（碰撞） / "
+            "swept-envelope（扫掠包络） scoring before any destructive writeback（写入式回写）."
+        ),
+    )
+    output_path = root / "reports" / "qa" / f"{area_id}_compound_junction_merge_transaction_qa_report.json"
+    write_json(output_path, report)
+    return report
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run auto QA for a road test stage.")
-    parser.add_argument("--stage", required=True, choices=["raw_roads", "topology_repair", "road_graph", "lane_graph"])
+    parser.add_argument(
+        "--stage",
+        required=True,
+        choices=[
+            "raw_roads",
+            "topology_repair",
+            "road_graph",
+            "lane_graph",
+            "movement_corridor",
+            "compound_junction_merge",
+            "compound_junction_merge_transaction",
+        ],
+    )
     parser.add_argument("--area-id", default="pattaya_central_500m")
     args = parser.parse_args()
 
@@ -413,6 +663,12 @@ def main() -> int:
         report = run_road_graph_qa(root, args.area_id)
     elif args.stage == "lane_graph":
         report = run_lane_graph_qa(root, args.area_id)
+    elif args.stage == "movement_corridor":
+        report = run_movement_corridor_qa(root, args.area_id)
+    elif args.stage == "compound_junction_merge":
+        report = run_compound_junction_merge_qa(root, args.area_id)
+    elif args.stage == "compound_junction_merge_transaction":
+        report = run_compound_junction_merge_transaction_qa(root, args.area_id)
     else:
         raise ValueError(args.stage)
 

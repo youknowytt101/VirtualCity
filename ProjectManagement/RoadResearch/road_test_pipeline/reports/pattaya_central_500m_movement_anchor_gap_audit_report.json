@@ -1,0 +1,176 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "movement_anchor_gap_audit_v1",
+  "status": "warn",
+  "counts": {
+    "movement_corridor_cases": 306,
+    "planned_virtual_anchors": 76,
+    "remaining_capacity_limited_anchors": 36,
+    "unique_remaining_approaches": 9,
+    "classification_counts": {
+      "adjacent_junction_short_link": 24,
+      "dead_end_stub_capacity_limited": 8,
+      "low_value_short_edge_absorption": 4
+    },
+    "recommended_action_counts": {
+      "compound_junction_merge": 24,
+      "defer": 4,
+      "keep_qa": 8
+    },
+    "corridor_counts_by_classification": {
+      "adjacent_junction_short_link": 24,
+      "dead_end_stub_capacity_limited": 8,
+      "low_value_short_edge_absorption": 4
+    }
+  },
+  "top_remaining_approaches": [
+    {
+      "junction_node_id": "n_0117",
+      "edge_id": "e_0241",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0118",
+      "edge_id": "e_0241",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 5.953,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.453,
+      "trim_deficit_m": 0.847,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0173",
+      "edge_id": "e_0171",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0176",
+      "edge_id": "e_0171",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 5.981,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.481,
+      "trim_deficit_m": 0.819,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0187",
+      "edge_id": "e_0173",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0191",
+      "edge_id": "e_0173",
+      "classification": "adjacent_junction_short_link",
+      "recommended_action": "compound_junction_merge",
+      "road_class": "secondary",
+      "edge_length_m": 6.024,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.524,
+      "trim_deficit_m": 0.776,
+      "other_node_kind": "junction",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0150",
+      "classification": "low_value_short_edge_absorption",
+      "recommended_action": "defer",
+      "road_class": "service",
+      "edge_length_m": 6.459,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 5.959,
+      "trim_deficit_m": 0.341,
+      "other_node_kind": "connector",
+      "short_edge_absorption_status": "qa_candidate",
+      "short_edge_absorption_issues": [
+        "low_trim_recovery"
+      ],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0108",
+      "edge_id": "e_0151",
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "road_class": "service",
+      "edge_length_m": 4.009,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.509,
+      "trim_deficit_m": 2.791,
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    },
+    {
+      "junction_node_id": "n_0112",
+      "edge_id": "e_0208",
+      "classification": "dead_end_stub_capacity_limited",
+      "recommended_action": "keep_qa",
+      "road_class": "service",
+      "edge_length_m": 4.255,
+      "desired_trim_m": 6.3,
+      "entry_trim_m": 3.755,
+      "trim_deficit_m": 2.545,
+      "other_node_kind": "dead_end",
+      "short_edge_absorption_status": "",
+      "short_edge_absorption_issues": [],
+      "corridor_count": 4
+    }
+  ],
+  "next_action": "Do not force these anchors through short-edge absorption. compound_junction_merge（复合路口合并） cases need a separate transaction family; dead_end_stub_capacity_limited（死端短支路退让受限） should stay low-priority QA unless a better source proves the stub continues.",
+  "inputs": {
+    "movement_corridors": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "short_edge_absorption_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+  },
+  "outputs": {
+    "audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_anchor_gap_audit.json",
+    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_anchor_gap_audit_report.json"
+  }
+}

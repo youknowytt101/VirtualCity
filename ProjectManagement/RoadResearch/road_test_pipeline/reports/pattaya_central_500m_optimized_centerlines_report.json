@@ -13,8 +13,8 @@
     "engineering_reference_entry_poses": 149,
     "regularized_entry_pose_trims": 149,
     "regularized_entry_pose_status_counts": {
-      "pass": 113,
-      "warn": 36
+      "pass": 115,
+      "warn": 34
     },
     "regularized_entry_pose_issue_counts": {}
   },
@@ -24,8 +24,8 @@
     "dropped_short_edges": 0,
     "heuristic_junction_trim_keys": 0,
     "regularized_junction_nodes": 49,
-    "regularized_endpoint_exact": 120,
-    "regularized_endpoint_scaled_for_edge_length": 29,
+    "regularized_endpoint_exact": 129,
+    "regularized_endpoint_scaled_for_edge_length": 20,
     "junction_nodes": 49,
     "junction_connectors": 149,
     "t_junctions": 47,
@@ -35,8 +35,8 @@
     "junction_turn_movements": 102,
     "corner_fillet_nodes": 21,
     "corner_fillets": 21,
-    "corner_circular_arcs": 21,
-    "corner_bezier_tangent_fallback": 0,
+    "corner_circular_arcs": 19,
+    "corner_bezier_tangent_fallback": 2,
     "corner_straight_infinite_radius": 0,
     "output_features": 413,
     "t_branch_trim_adjustments": 0,
@@ -62,17 +62,18 @@
     "t_turn": 94
   },
   "junction_connector_arc_geometry_counts": {
-    "bezier_tangent_fallback": 91,
-    "circular_arc": 16,
+    "bezier_tangent_fallback": 51,
+    "circular_arc": 56,
     "straight_infinite_radius": 42
   },
   "junction_connector_arc_fit_status_counts": {
-    "exact_tangent_arc": 16,
-    "incompatible_tangent_endpoints_bezier_fallback": 91,
+    "exact_tangent_arc": 56,
+    "incompatible_tangent_endpoints_bezier_fallback": 51,
     "near_straight_infinite_radius": 42
   },
   "corner_arc_geometry_counts": {
-    "circular_arc": 21
+    "bezier_tangent_fallback": 2,
+    "circular_arc": 19
   },
   "corner_fillet_metrics": {
     "min_turn_deg": 20.983,

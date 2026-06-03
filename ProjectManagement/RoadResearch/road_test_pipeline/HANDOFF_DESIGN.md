@@ -6,7 +6,15 @@
 ## 当前定位
 
 这份文档是早期 lane / surface 阶段的设计参考，不是当前道路修复主入口。当前主线以
-`AI_START_HERE.md`、`README.md`、`NEXT_AI_HANDOFF.md` 为准。
+`AI_START_HERE.md`、`CURRENT_STAGE_SNAPSHOT.md`、`README.md`、`NEXT_AI_HANDOFF.md` 为准。
+
+2026-06-04 当前补充：`lane-level movement anchoring（车道级通行锚点）` v1、
+`compound junction merge planner（复合路口合并规划器）` v1、
+`compound junction merge transaction（复合路口合并事务）` v1 和
+`staged compound movement SVG visualization（暂存复合通行走廊 SVG 可视化）` 已完成。
+下一步不是直接生成最终 lane surface（车道路面），也不是写回 clean skeleton（干净道路骨架），
+而是做 `L8.6 movement corridor scoring（通行走廊评分）`：
+补 collision_score（碰撞评分）/ swept_envelope_score（扫掠包络评分）/ curvature_score（曲率评分）。
 
 本文件仍然保留一个重要原则：
 

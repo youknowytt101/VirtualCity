@@ -27,12 +27,16 @@ endpoint-to-edge review candidates: 0
 high-confidence repair candidates: 0
 possible unsplit crossings: 0
 road graph QA warning: width_fallback_ratio = 1.0
-junction area regularization warning: 34 entry_trim_capacity_limited, 22 short_edge_absorption_candidate
-optimized centerlines: 149 regularized entry poses consumed, 91 bezier_tangent_fallback connectors
-junction geometry audit warning: 90 radius_below_design_min, 24 junction_trim_spread_excess
-connector solver v2 warning: 103 solver cases, 102 unresolved solver cases, 1 replacement-ready candidate
-connector replacement transaction: 1 accepted replacement, no audit regression
-connector solver v2 refresh: 102 solver cases, 102 unresolved solver cases, 0 replacement-ready candidates
+junction semantics: blocked_movements = 0, source_oneway_blocked_movements_if_trusted = 142
+junction area regularization warning: 28 entry_trim_capacity_limited, 26 short_edge_absorption_candidate
+optimized centerlines: 149 regularized entry poses consumed, 50 bezier_tangent_fallback connectors
+junction geometry audit warning: 78 radius_below_design_min
+connector replacement transaction: 6 accepted replacements, no audit regression
+connector solver v2 refresh: 85 solver cases, 85 unresolved solver cases, 0 replacement-ready candidates
+junction-zone expansion planner: 26 short-edge flags, 19 transaction_ready, 46 affected unresolved connectors
+lane attribute model: temporary_all_roads_bidirectional_two_lane_v1 active, source_oneway_overridden = 134, missing_turn_lanes_ratio = 1.0
+lane graph topology: 486 directed lanes, 612 lane links, lane_link_reference_errors = 0, QA pass
+movement corridor solver: 306 corridor cases, 918 candidate curves, reference_errors = 0, low_confidence_ratio = 1.0
 ```
 
 旧的高置信候选 `1209258529:end -> 1210710015 segment 1` 已确认是误报。
@@ -202,6 +206,25 @@ clean skeleton。替换必须进入下一轮 replacement transaction。
 当前 `apply_connector_replacements.py` 已经把 replacement transaction 接入主线：只替换
 `replacement_ready_candidates`，并在 trial audit 不回退时写回。剩余问题需要 short-edge absorption
 和真实 clothoid / paramPoly3 fitting。
+当前 `plan_short_edge_absorptions.py` 已经把 junction area 中的短边吸收标记转成非破坏式候选，
+其中 `transaction_ready` 才允许进入下一步 destructive transaction（写入式事务）；该 planner 本身不改 road graph、
+engineering reference 或 clean skeleton。
+当前 `build_lane_attribute_model.py` 已经把 lanes / width / turn:lanes 标准化为
+`confidence-tagged lane attributes（带置信度的车道属性）`，明确区分 source truth（源数据真值）、
+inferred（推断）和 missing（缺失）。
+当前 `build_lane_graph.py` 已经把 road_graph（道路拓扑图）、lane_attribute_model（车道属性模型）、
+junction_semantics（路口语义）合成为 `lane_graph（车道拓扑图）` v1。它输出 structured graph data（结构化拓扑数据），
+不是 image file（图片文件）；`centerline_xz` 只作为 approximate offset preview（近似偏移预览），
+不代表 final lane geometry（最终车道几何）。
+当前 `export_lane_graph_svg.py` 已经输出 lane graph SVG visualization（车道拓扑图 SVG 可视化），
+默认路径是 `reports/visualizations/<area_id>_lane_graph_topology.svg`。该 SVG 只用于 human QA（人工质检）。
+当前 `solve_movement_corridors.py` 已经从 lane_graph（车道拓扑图）生成 movement corridor candidates（通行走廊候选），
+但因为 turn:lanes（分车道转向）缺失，所有候选仍保持低置信 QA candidate（需复核候选）。
+当前 movement corridor solver v1（通行走廊求解器 v1）已经用 lane_entry_anchor /
+lane_exit_anchor（车道入口 / 出口锚点）替代旧的 lane preview endpoint（车道预览端点），
+并已消费 transaction_ready short-edge absorption（事务就绪短边吸收）候选生成 planned virtual anchors（规划虚拟锚点）。
+如果仍看到偏近锚点，优先看 movement_anchor_gap_audit（通行锚点缺口审计）和
+compound_junction_merge_candidates（复合路口合并候选），不要把 SVG（可缩放矢量图）当 source truth（源数据真值）。
 
 ## 事务式自我修复闭环
 
@@ -502,6 +525,18 @@ Phase 4：connector solver。
 生成 circular、clothoid、paramPoly3 candidates
 按 curvature、radius、collision、source fit、OpenDRIVE exportability 打分
 输出带 laneLink 意图的 connecting road candidates
+短边吸收必须先作为 transaction candidate（事务候选）进入 trial（试运行），再由 audit rollback（审计回滚）决定是否写回
+```
+
+Phase 4.5：lane-level junction reconstruction（车道级路口重建）。
+
+```text
+arc（圆弧）不是目标，只是 geometry candidate family（几何候选曲线族）之一
+先建立 confidence-tagged lane attributes（带置信度的车道属性）
+再建立 lane graph（车道拓扑图）：当前 v1 已输出 structured graph data（结构化拓扑数据），不是 image（图片）
+再生成 lane-level entry/exit anchors（车道级入口/出口锚点）：当前 v1 已完成
+再用 movement_anchor_gap_audit（通行锚点缺口审计）生成 compound junction merge candidates（复合路口合并候选）：当前 v1 已完成
+最后做 compound junction merge transaction（复合路口合并事务）和 collision（碰撞）/ swept envelope（扫掠包络）评分
 ```
 
 Phase 5：regression 和人工审查。

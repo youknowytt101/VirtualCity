@@ -1,0 +1,93 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "lane_graph_topology_v1",
+  "status": "warn",
+  "counts": {
+    "edges": 243,
+    "lanes": 486,
+    "junctions": 49,
+    "connections": 306,
+    "lane_links": 612,
+    "junction_lane_links": 306,
+    "connector_continuity_links": 306,
+    "issue_counts": {
+      "connector_continuity_inferred": 612,
+      "direction_forced_bidirectional_two_lane_policy": 729,
+      "inferred_without_turn_lanes": 612,
+      "lane_count_forced_bidirectional_two_lane_policy": 729,
+      "lanes_inferred": 729,
+      "low_confidence_from_lane": 612,
+      "low_confidence_to_lane": 612,
+      "missing_turn_lanes": 729,
+      "offset_centerline_preview_only": 486,
+      "source_lane_count_overridden_by_bidirectional_two_lane_policy": 702,
+      "source_oneway_overridden_by_bidirectional_two_lane_policy": 402,
+      "source_width_overridden_by_bidirectional_two_lane_policy": 729,
+      "width_forced_bidirectional_two_lane_policy": 729,
+      "width_inferred": 729
+    }
+  },
+  "lane_direction_counts": {
+    "backward": 243,
+    "forward": 243
+  },
+  "lane_source_counts": {
+    "stage_policy_override": 486
+  },
+  "width_source_counts": {
+    "stage_policy_override": 486
+  },
+  "turn_lanes_source_counts": {
+    "missing": 486
+  },
+  "traffic_direction_policy_counts": {
+    "temporary_bidirectional_two_lane_policy": 486
+  },
+  "turn_counts": {
+    "left": 102,
+    "right": 102,
+    "through": 102
+  },
+  "connection_source_counts": {
+    "junction_semantics_plus_lane_attribute_model": 306
+  },
+  "lane_link_source_counts": {
+    "connector_node_rank_match": 306,
+    "inferred_lane_rank_plus_road_movement": 306
+  },
+  "lane_link_kind_counts": {
+    "connector_continuity": 306,
+    "junction_movement": 306
+  },
+  "fallback_counts": {
+    "offset_centerline_preview": 486,
+    "shared_bidirectional_physical_lane": 0,
+    "inferred_without_turn_lanes": 306
+  },
+  "metrics": {
+    "avg_lane_confidence": 0.42,
+    "min_lane_confidence": 0.42,
+    "avg_lane_link_confidence": 0.42,
+    "min_lane_link_confidence": 0.42,
+    "lane_link_reference_errors": 0,
+    "blocked_lane_links": 0,
+    "empty_connection_curves": 0,
+    "fan_fallback_ratio": 0.0,
+    "avg_lane_links_per_junction": 6.245,
+    "inferred_turn_link_ratio": 0.5,
+    "missing_turn_lanes_lane_ratio": 1.0,
+    "inferred_bidirectional_prior_lane_ratio": 0.0,
+    "source_oneway_lane_ratio": 0.0,
+    "temporary_bidirectional_two_lane_policy_lane_ratio": 1.0
+  },
+  "next_action": "Use lane_graph（车道拓扑图） as the topology contract（拓扑契约） for movement corridor solver（通行走廊求解器）. Do not treat offset centerlines as final lane geometry（最终车道几何）.",
+  "inputs": {
+    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "lane_attribute_model": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_attribute_model.json",
+    "junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json"
+  },
+  "outputs": {
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json"
+  }
+}

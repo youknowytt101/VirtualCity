@@ -1,0 +1,146 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "compound_junction_merge_transaction_v1",
+  "status": "warn",
+  "counts": {
+    "input_candidates": 3,
+    "transactions": 3,
+    "accepted_for_staging": 3,
+    "compound_movement_corridor_cases": 24,
+    "expected_affected_anchor_records": 24,
+    "affected_corridor_replacement_ratio": 1.0,
+    "reference_errors": 0,
+    "composition_error_counts": {},
+    "transaction_status_counts": {
+      "accepted_for_staging": 3
+    },
+    "transaction_issue_counts": {},
+    "case_status_counts": {
+      "qa_candidate": 24
+    },
+    "case_issue_counts": {
+      "compound_junction_merge_trial": 24,
+      "entry_anchor_short_edge_absorption_candidate": 4,
+      "exit_anchor_short_edge_absorption_candidate": 4,
+      "inferred_without_turn_lanes": 24,
+      "low_confidence_from_lane": 24,
+      "low_confidence_to_lane": 24,
+      "outgoing_turn_lanes_missing": 24
+    },
+    "candidate_family_counts": {
+      "compound_bezier_g1_preview": 24,
+      "compound_param_poly3_hermite_proxy": 24,
+      "compound_topology_straight_baseline": 24
+    },
+    "best_family_counts": {
+      "compound_topology_straight_baseline": 24
+    },
+    "movement_kind_counts": {
+      "left": 7,
+      "right": 7,
+      "through": 10
+    },
+    "exposed_bridge_edge_cases": 0,
+    "capacity_limited_anchor_cases": 0
+  },
+  "top_transactions": [
+    {
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "status": "accepted_for_staging",
+      "risk": "low",
+      "issues": [],
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "bridge_edge_ids": [
+        "e_0241"
+      ],
+      "generated_compound_cases": 8,
+      "expected_affected_anchor_records": 8,
+      "affected_corridor_replacement_ratio": 1.0,
+      "exposed_bridge_edge_cases": 0,
+      "capacity_limited_anchor_cases": 0,
+      "compound_case_ids": [
+        "cmc_00000",
+        "cmc_00001",
+        "cmc_00002",
+        "cmc_00003",
+        "cmc_00004",
+        "cmc_00005",
+        "cmc_00006",
+        "cmc_00007"
+      ],
+      "transaction_contract": "Accepted means accepted for staging preview（暂存预览接受）, not clean skeleton writeback（非干净骨架写回）."
+    },
+    {
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "status": "accepted_for_staging",
+      "risk": "low",
+      "issues": [],
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "bridge_edge_ids": [
+        "e_0171"
+      ],
+      "generated_compound_cases": 8,
+      "expected_affected_anchor_records": 8,
+      "affected_corridor_replacement_ratio": 1.0,
+      "exposed_bridge_edge_cases": 0,
+      "capacity_limited_anchor_cases": 0,
+      "compound_case_ids": [
+        "cmc_00008",
+        "cmc_00009",
+        "cmc_00010",
+        "cmc_00011",
+        "cmc_00012",
+        "cmc_00013",
+        "cmc_00014",
+        "cmc_00015"
+      ],
+      "transaction_contract": "Accepted means accepted for staging preview（暂存预览接受）, not clean skeleton writeback（非干净骨架写回）."
+    },
+    {
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "status": "accepted_for_staging",
+      "risk": "low",
+      "issues": [],
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "bridge_edge_ids": [
+        "e_0173"
+      ],
+      "generated_compound_cases": 8,
+      "expected_affected_anchor_records": 8,
+      "affected_corridor_replacement_ratio": 1.0,
+      "exposed_bridge_edge_cases": 0,
+      "capacity_limited_anchor_cases": 0,
+      "compound_case_ids": [
+        "cmc_00016",
+        "cmc_00017",
+        "cmc_00018",
+        "cmc_00019",
+        "cmc_00020",
+        "cmc_00021",
+        "cmc_00022",
+        "cmc_00023"
+      ],
+      "transaction_contract": "Accepted means accepted for staging preview（暂存预览接受）, not clean skeleton writeback（非干净骨架写回）."
+    }
+  ],
+  "next_action": "Use these staged compound movement corridors（暂存复合通行走廊） for SVG review and collision（碰撞） / swept-envelope（扫掠包络） scoring before any destructive clean skeleton rewrite（写入式干净骨架改写）.",
+  "inputs": {
+    "compound_junction_merge_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_candidates.json",
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "engineering_reference_lines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
+    "short_edge_absorption_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+  },
+  "outputs": {
+    "compound_junction_merge_transactions": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
+    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_transaction_report.json"
+  }
+}

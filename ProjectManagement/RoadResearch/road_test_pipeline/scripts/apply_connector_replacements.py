@@ -209,6 +209,11 @@ def apply_replacements(
         trial_path = Path(tmp_dir) / f"{area_id}_roads_optimized_centerlines_trial.geojson"
         write_json(trial_path, trial)
         trial_audit = jga.audit(area_id, root, audit_output_path, optimized_path=trial_path)
+    trial_audit.setdefault("inputs", {})["optimized_centerlines"] = "temporary_connector_replacement_trial.geojson"
+    trial_audit["inputs"]["optimized_centerlines_note"] = (
+        "The trial GeoJSON is created in a temporary directory; the random local temp path is omitted for reproducible reports."
+    )
+    write_json(audit_output_path, trial_audit)
 
     checks = audit_checks(baseline_audit, trial_audit)
     accepted = bool(applied_trial_ids) and all(check["status"] == "pass" for check in checks)

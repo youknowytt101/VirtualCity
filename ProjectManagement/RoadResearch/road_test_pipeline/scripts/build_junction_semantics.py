@@ -36,6 +36,10 @@ T_ADAPTIVE_THRESHOLDS_DEG = [120.0, 115.0, 110.0, 105.0]
 CROSS_ADAPTIVE_THRESHOLDS_DEG = [140.0, 135.0, 130.0, 125.0, 120.0]
 COMPLEX_ADAPTIVE_THRESHOLDS_DEG = [135.0, 130.0, 125.0]
 JUNCTION_TYPES = ["T", "cross", "Y", "offset", "complex"]
+TEMPORARY_DIRECTION_POLICY_ID = "temporary_all_roads_bidirectional_two_lane_v1"
+TEMPORARY_LANE_COUNT = 2
+TEMPORARY_LANE_WIDTH_M = 3.2
+TEMPORARY_TOTAL_WIDTH_M = TEMPORARY_LANE_COUNT * TEMPORARY_LANE_WIDTH_M
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -91,7 +95,7 @@ def pair_key(edge_a: str, edge_b: str) -> tuple[str, str]:
     return tuple(sorted((edge_a, edge_b)))
 
 
-def allows_incoming(edge: dict[str, Any], node_id: str) -> bool:
+def source_allows_incoming(edge: dict[str, Any], node_id: str) -> bool:
     if not edge.get("oneway"):
         return True
     direction = str(edge.get("oneway_direction") or "forward")
@@ -100,7 +104,7 @@ def allows_incoming(edge: dict[str, Any], node_id: str) -> bool:
     return node_id == edge["to_node"]
 
 
-def allows_outgoing(edge: dict[str, Any], node_id: str) -> bool:
+def source_allows_outgoing(edge: dict[str, Any], node_id: str) -> bool:
     if not edge.get("oneway"):
         return True
     direction = str(edge.get("oneway_direction") or "forward")
@@ -109,11 +113,25 @@ def allows_outgoing(edge: dict[str, Any], node_id: str) -> bool:
     return node_id == edge["from_node"]
 
 
+def allows_incoming(_edge: dict[str, Any], _node_id: str) -> bool:
+    return True
+
+
+def allows_outgoing(_edge: dict[str, Any], _node_id: str) -> bool:
+    return True
+
+
 def build_approaches(node: dict[str, Any], edges: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     approaches = []
     for edge_id in node["incident_edges"]:
         edge = edges[edge_id]
         direction = direction_out(edge, node["node_id"])
+        source_can_enter = source_allows_incoming(edge, node["node_id"])
+        source_can_exit = source_allows_outgoing(edge, node["node_id"])
+        source_oneway = bool(edge.get("oneway"))
+        policy_issues = []
+        if source_oneway:
+            policy_issues.append("source_oneway_ignored_by_temporary_bidirectional_two_lane_policy")
         approaches.append({
             "approach_id": f"{node['node_id']}_{edge_id}",
             "edge_id": edge_id,
@@ -121,13 +139,21 @@ def build_approaches(node: dict[str, Any], edges: dict[str, dict[str, Any]]) -> 
             "angle_deg": round(math.degrees(math.atan2(direction[1], direction[0])), 3),
             "road_class": edge.get("road_class", edge.get("highway", "unclassified")),
             "highway": edge.get("highway", "unclassified"),
-            "lanes": int(edge.get("lanes") or 1),
-            "width_m": float(edge.get("width_m") or 0.0),
+            "lanes": TEMPORARY_LANE_COUNT,
+            "width_m": TEMPORARY_TOTAL_WIDTH_M,
+            "source_lanes": int(edge.get("lanes") or 1),
+            "source_width_m": float(edge.get("width_m") or 0.0),
             "priority": round(edge_priority(edge), 3),
-            "oneway": bool(edge.get("oneway")),
-            "oneway_direction": edge.get("oneway_direction", "unknown"),
+            "oneway": False,
+            "oneway_direction": "bidirectional",
+            "source_oneway": source_oneway,
+            "source_oneway_direction": edge.get("oneway_direction", "unknown"),
             "can_enter_junction": allows_incoming(edge, node["node_id"]),
             "can_exit_junction": allows_outgoing(edge, node["node_id"]),
+            "source_can_enter_junction": source_can_enter,
+            "source_can_exit_junction": source_can_exit,
+            "traffic_direction_policy": TEMPORARY_DIRECTION_POLICY_ID,
+            "policy_issues": policy_issues,
             "role": "approach",
         })
     approaches.sort(key=lambda item: item["angle_deg"])
@@ -288,6 +314,7 @@ def build_movements(
             if from_approach["edge_id"] == to_approach["edge_id"]:
                 continue
             allowed = bool(from_approach["can_enter_junction"] and to_approach["can_exit_junction"])
+            source_allowed = bool(from_approach["source_can_enter_junction"] and to_approach["source_can_exit_junction"])
             movement_kind = classify_movement(from_approach, to_approach, through_pairs)
             movements.append({
                 "movement_id": f"{node['node_id']}_m_{len(movements):03d}",
@@ -295,9 +322,15 @@ def build_movements(
                 "to_edge": to_approach["edge_id"],
                 "kind": movement_kind,
                 "allowed": allowed,
+                "source_direction_allowed": source_allowed,
+                "traffic_direction_policy": TEMPORARY_DIRECTION_POLICY_ID,
                 "confidence": 0.82 if junction_type in {"T", "cross"} else 0.62 if junction_type == "offset" else 0.55,
-                "source": "geometry_inferred_from_osm",
-                "notes": [] if allowed else ["blocked_by_oneway_direction"],
+                "source": "geometry_inferred_from_osm_plus_temporary_bidirectional_two_lane_policy",
+                "notes": (
+                    ["source_oneway_ignored_by_temporary_bidirectional_two_lane_policy"]
+                    if allowed and not source_allowed
+                    else [] if allowed else ["blocked_by_direction_policy"]
+                ),
             })
     return movements
 
@@ -356,6 +389,18 @@ def build_semantics(input_path: Path, output_path: Path, report_path: Path, area
         for movement in junction["movements"]
         if not movement["allowed"]
     )
+    source_oneway_ignored_approaches = sum(
+        1
+        for junction in semantic_junctions
+        for approach in junction["approaches"]
+        if "source_oneway_ignored_by_temporary_bidirectional_two_lane_policy" in approach.get("policy_issues", [])
+    )
+    source_oneway_blocked_movements_if_trusted = sum(
+        1
+        for junction in semantic_junctions
+        for movement in junction["movements"]
+        if movement["allowed"] and not movement.get("source_direction_allowed", True)
+    )
 
     output = {
         "type": "junction_semantics",
@@ -364,6 +409,7 @@ def build_semantics(input_path: Path, output_path: Path, report_path: Path, area
             "schema": "road_test_pipeline.junction_semantics.v1",
             "coord_domain": "local_xz_m",
             "source": str(input_path),
+            "active_direction_policy": TEMPORARY_DIRECTION_POLICY_ID,
             "design_note": "Road-level semantic model for later laneLink and junction surface generation.",
         },
         "junctions": semantic_junctions,
@@ -381,6 +427,8 @@ def build_semantics(input_path: Path, output_path: Path, report_path: Path, area
             "through_pairs": sum(len(junction["through_pairs"]) for junction in semantic_junctions),
             "movements": sum(len(junction["movements"]) for junction in semantic_junctions),
             "blocked_movements": blocked_movements,
+            "source_oneway_ignored_approaches": source_oneway_ignored_approaches,
+            "source_oneway_blocked_movements_if_trusted": source_oneway_blocked_movements_if_trusted,
         },
         "junction_type_counts": junction_type_counts,
         "classification_iteration_counts": dict(sorted(classification_iteration_counts.items())),
@@ -390,7 +438,7 @@ def build_semantics(input_path: Path, output_path: Path, report_path: Path, area
             "This model classifies road-level junctions and movement intent; it does not generate geometry.",
             "Public junction classes are restricted to T, cross, Y, offset and complex.",
             "Adaptive classification iteratively relaxes through-pair angle thresholds for low-quality OSM geometry.",
-            "Movement permissions currently use OSM oneway data and geometry-inferred turn classes.",
+            "Movement permissions currently use temporary_all_roads_bidirectional_two_lane_v1（临时全道路双向两车道策略）; OSM oneway（OSM 单行） is retained as source observation（源数据观察值） only.",
             "T and cross junctions are high-confidence; Y, offset and complex junctions remain lower-confidence inference.",
         ],
     }

@@ -3,7 +3,35 @@
 > Start here when taking over this project. This file is intentionally short,
 > current-state focused, and should be updated after major iteration rounds.
 
-Last updated: 2026-05-29
+Last updated: 2026-06-04
+
+## 0. 当前活跃交接入口
+
+当前最新工作集中在独立道路研究管线：
+
+```text
+ProjectManagement/RoadResearch/road_test_pipeline/
+```
+
+下一位 AI 如果是继续“道路修复 / 车道级路口 / lane graph（车道拓扑图） / movement corridor（通行走廊）”工作，先读：
+
+```text
+ProjectManagement/RoadResearch/road_test_pipeline/AI_START_HERE.md
+ProjectManagement/RoadResearch/road_test_pipeline/CURRENT_STAGE_SNAPSHOT.md
+ProjectManagement/RoadResearch/road_test_pipeline/NEXT_AI_HANDOFF.md
+```
+
+当前道路管线已经完成 `road skeleton repair（道路骨架修复） -> lane attribute model（车道属性模型） -> lane graph topology（车道拓扑图拓扑） -> movement corridor candidates（通行走廊候选） -> compound junction merge transaction（复合路口合并事务） -> staged compound movement SVG visualization（暂存复合通行走廊 SVG 可视化）` 的非破坏式闭环。
+
+`L8.5 staged compound movement SVG visualization（暂存复合通行走廊 SVG 可视化）` 已升级为 `review_drawing（审图线稿）`：默认 3200px 宽画布、`lane road casing（车道道路底线）`、更小的 `entry / exit anchors（入口 / 出口锚点）`，并高亮 24 条 `compound trial corridor（复合试运行走廊）`。当前 SVG 路径：
+
+```text
+ProjectManagement/RoadResearch/road_test_pipeline/reports/visualizations/pattaya_central_500m_lane_graph_topology.svg
+```
+
+当前道路研究管线临时启用 `temporary_all_roads_bidirectional_two_lane_v1（临时全道路双向两车道策略）`：所有 road edge（道路边）统一展开为双向 2 车道，明确 `OSM oneway（OSM 单行）` 也只作为 `source_observation（源数据观察值）` 保留，不再阻断 L5/L7/L8 的 movement（通行动作）。
+
+`L8.3 compound junction merge planner（复合路口合并规划器）` 和 `L8.4 compound junction merge transaction（复合路口合并事务）` 已闭环：24 个 `adjacent_junction_short_link（相邻路口短连接）` 锚点已归并成 3 个 low-risk `transaction_candidate（低风险事务候选）`，并生成 24 条 staged compound movement corridor（暂存复合通行走廊）。下一步是 `L8.6 movement corridor scoring（通行走廊评分）`：补 `collision_score（碰撞评分） / swept_envelope_score（扫掠包络评分） / curvature_score（曲率评分）`，不是写回 clean skeleton（干净道路骨架）。
 
 ## 1. Current Goal
 

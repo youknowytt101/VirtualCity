@@ -2,7 +2,20 @@
 
 日期：2026-06-03
 区域：`pattaya_central_500m`
-状态：初始分层计划，当前进度以 `AI_START_HERE.md` 和 `NEXT_AI_HANDOFF.md` 为准
+状态：初始分层计划，当前进度以 `AI_START_HERE.md`、`CURRENT_STAGE_SNAPSHOT.md` 和 `NEXT_AI_HANDOFF.md` 为准
+
+> 2026-06-03 补充：本文件中的 `circular_arc（圆弧）` 表述是早期几何稳定化目标。
+> 当前战略已升级为 `lane-level junction reconstruction（车道级路口重建）`，详见
+> `LANE_LEVEL_JUNCTION_RECONSTRUCTION_PLAN.md`。圆弧保留为 `geometry candidate family（几何候选曲线族）`
+> 和 `diagnostic baseline（诊断基线）`，不是最终目标。
+>
+> 2026-06-04 补充：`lane-level movement anchoring（车道级通行锚点）` v1、
+> `compound junction merge planner（复合路口合并规划器）` v1、
+> `compound junction merge transaction（复合路口合并事务）` v1 和
+> `staged compound movement SVG visualization（暂存复合通行走廊 SVG 可视化）` 已完成。
+> 当前下一步第一优先级是 `L8.6 movement corridor scoring（通行走廊评分）`：
+> 补 collision_score（碰撞评分）/ swept_envelope_score（扫掠包络评分）/ curvature_score（曲率评分）。
+> 看 SVG（可缩放矢量图）时必须确认它使用 review_drawing（审图线稿）样式和 movement corridor anchors（通行走廊锚点）。
 
 ## 目标
 
@@ -284,7 +297,7 @@ QA gate：
 自动迭代：
 
 - 拟合 `line`。
-- 拟合严格 `circular_arc`。
+- 拟合 `circular_arc（圆弧）` 作为 baseline candidate（基线候选），不是唯一目标。
 - 后续加入 `spiral / clothoid`。
 - 记录 radius、center、sweep、sample count、fit status。
 - 检查切线连续。
@@ -294,7 +307,7 @@ QA gate：
 
 QA gate：
 
-- circular arc 采样点必须落在声明圆上。
+- circular arc（圆弧）采样点必须落在声明圆上。
 - connector endpoint 必须贴合 approach endpoint。
 - corner fillet 与 junction connector 必须分开。
 - optimized connector 不得污染 lane semantic layer。
@@ -318,6 +331,8 @@ QA gate：
 主要输入：
 
 - L4 road graph
+- L5 junction semantics
+- L7.0 lane attribute model
 - L6 engineering reference lines
 
 主要输出：
@@ -328,9 +343,10 @@ QA gate：
 
 自动迭代：
 
-- 推断 lane count。
-- 推断 lane width。
-- 生成 lane centerline / boundary。
+- 消费 confidence-tagged lane attributes（带置信度的车道属性），不把 inferred（推断）当 source truth（源数据真值）。
+- 生成 topology-only lane graph（仅拓扑车道图）。
+- 生成 directed lane（有方向车道）和 lane link（车道连接边）。
+- 生成 approximate offset preview（近似偏移预览），用于 QA（质量检查），不是 final lane geometry（最终车道几何）。
 - 判断 lane direction。
 - 处理 one-way / two-way。
 - 检查 lane 是否连续。
@@ -346,8 +362,11 @@ QA gate：
 
 当前状态：
 
-- 当前阶段采用固定 `3.2m` lane width baseline。
-- 后续需要升级为 OpenDRIVE laneSection 模型。
+- `scripts/build_lane_attribute_model.py` 已输出 lane_attribute_model.json。
+- `scripts/build_lane_graph.py` 已输出 lane_graph.json（车道拓扑图 JSON）。
+- 当前 lane_graph（车道拓扑图）是 structured graph artifact（结构化拓扑产物），不是 image file（图片文件）。
+- `scripts/export_lane_graph_svg.py` 已输出 reports/visualizations/<area_id>_lane_graph_topology.svg，用于 human QA（人工质检）。
+- 后续需要升级为 OpenDRIVE laneSection（开放道路描述格式车道段）模型。
 
 ### L8 Lane-Level Junction Layer
 
@@ -365,6 +384,9 @@ QA gate：
 主要输出：
 
 - lane-level junction model
+- `data/processed/<area_id>_movement_corridor_candidates.json`
+- `reports/<area_id>_movement_corridor_report.json`
+- `reports/qa/<area_id>_movement_corridor_qa_report.json`
 - 后续目标：`data/processed/<area_id>_lane_junctions.json`
 
 自动迭代：
@@ -388,8 +410,12 @@ QA gate：
 
 当前状态：
 
-- 当前 laneLink 仍主要使用 semantic endpoint Bezier。
-- 下一阶段应升级为 engineering connector road。
+- `scripts/solve_movement_corridors.py` 已输出 movement corridor candidates（通行走廊候选）。
+- 当前候选包含 topology_straight_baseline（拓扑直线基线）、bezier_g1_preview（G1 连续贝塞尔预览）、
+  param_poly3_hermite_proxy（参数三次曲线 Hermite 代理）。
+- 当前所有候选仍是 QA candidate（需复核候选），主要因为 turn:lanes（分车道转向）缺失和 entry pose（入口姿态）未接入。
+- 下一阶段应接入 L8.6 movement corridor scoring（通行走廊评分），先补 collision_score（碰撞评分）、
+  swept_envelope_score（扫掠包络评分）和 curvature_score（曲率评分），再考虑 engineering connector road（工程连接道路）。
 
 ### L9 Visualization And Geometry QA Layer
 
@@ -589,8 +615,8 @@ fail
 
 ### Phase 2: 工程中心线稳定化
 
-- 普通转角全部使用严格 circular arc。
-- 路口 connector 使用 circular arc 或 straight infinite radius。
+- 普通转角先使用 circular arc（圆弧）作为诊断基线。
+- 路口 connector 使用 circular arc（圆弧）或 straight infinite radius（无限半径直线）作为早期候选。
 - 把 radius violation 加入 audit。
 - 空间不足的路口显式标记 constrained。
 

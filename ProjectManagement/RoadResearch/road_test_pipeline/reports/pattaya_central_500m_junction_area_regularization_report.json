@@ -7,12 +7,12 @@
     "approach_entry_poses": 149,
     "connecting_road_intents": 306,
     "status_counts": {
-      "pass": 18,
-      "warn": 31
+      "pass": 21,
+      "warn": 28
     },
     "issue_counts": {
-      "entry_trim_capacity_limited": 34,
-      "short_edge_absorption_candidate": 22
+      "entry_trim_capacity_limited": 28,
+      "short_edge_absorption_candidate": 26
     }
   },
   "notes": [

@@ -1,0 +1,71 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "lane_graph_svg_visualization",
+  "status": "pass",
+  "counts": {
+    "lanes": 486,
+    "lane_links_total": 612,
+    "junction_connections_rendered": 306,
+    "movement_corridors_rendered": 306,
+    "anchor_markers_rendered": 612,
+    "anchor_source_counts": {
+      "engineering_entry_pose_lateral_offset": 536,
+      "junction_zone_expansion_planned_pose_lateral_offset": 76
+    },
+    "visual_candidate_family_counts": {
+      "bezier_g1_preview": 204,
+      "topology_straight_baseline": 102
+    },
+    "visual_candidate_issue_counts": {
+      "entry_anchor_entry_trim_capacity_limited": 18,
+      "entry_anchor_short_edge_absorption_candidate": 14,
+      "exit_anchor_entry_trim_capacity_limited": 18,
+      "exit_anchor_short_edge_absorption_candidate": 14,
+      "inferred_without_turn_lanes": 306,
+      "low_confidence_from_lane": 306,
+      "low_confidence_lane_link": 306,
+      "low_confidence_to_lane": 306,
+      "outgoing_turn_lanes_missing": 306,
+      "radius_proxy_below_lane_min": 18
+    },
+    "compound_corridors_rendered": 24,
+    "compound_anchor_markers_rendered": 48,
+    "compound_case_status_counts": {
+      "qa_candidate": 24
+    },
+    "compound_visual_candidate_family_counts": {
+      "compound_bezier_g1_preview": 14,
+      "compound_topology_straight_baseline": 10
+    },
+    "compound_visual_candidate_issue_counts": {
+      "compound_junction_merge_trial": 24,
+      "entry_anchor_short_edge_absorption_candidate": 4,
+      "exit_anchor_short_edge_absorption_candidate": 4,
+      "inferred_without_turn_lanes": 24,
+      "low_confidence_from_lane": 24,
+      "low_confidence_to_lane": 24,
+      "outgoing_turn_lanes_missing": 24,
+      "radius_proxy_below_lane_min": 4
+    }
+  },
+  "style": {
+    "svg_width_px": 3200,
+    "svg_height_px": 2740,
+    "anchor_marker_radius_px": 0.55,
+    "anchor_marker_stroke_width_px": 0.12,
+    "lane_casing": "enabled（已启用）",
+    "visual_mode": "review_drawing（审图线稿）"
+  },
+  "link_source": "movement_corridor_anchors",
+  "compound_link_source": "compound_junction_merge_transactions",
+  "note": "SVG visualization（可视化） only. lane_graph.json, movement_corridor_candidates.json and compound_junction_merge_transactions.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
+  "inputs": {
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "movement_corridors": "ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "compound_junction_merge_transactions": "ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json"
+  },
+  "outputs": {
+    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",
+    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_svg_report.json"
+  }
+}

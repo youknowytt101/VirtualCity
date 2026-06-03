@@ -17,10 +17,10 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.072,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 4.572,
       "entry_trim_m": 4.572,
       "entry_xz": [
@@ -32,11 +32,11 @@
         -0.626785,
         -0.779193
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0026",
         "other_node_kind": "connector"
       },
@@ -56,25 +56,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 23.703,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 23.203,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -339.607,
-        -138.001
+        -339.378,
+        -138.194
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.76393,
         -0.645299
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0031",
         "other_node_kind": "connector"
       },
@@ -90,26 +90,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 27.906,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 27.406,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -338.019,
-        -125.635
+        -340.488,
+        -129.032
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.587839,
         0.808978
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0030",
         "other_node_kind": "junction"
       },
@@ -125,26 +125,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 27.906,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 27.406,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -333.959,
-        -120.048
+        -331.49,
+        -116.651
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.587839,
         -0.808978
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0028",
         "other_node_kind": "junction"
       },
@@ -160,17 +160,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 47.937,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 47.437,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -324.21,
-        -114.285
+        -322.779,
+        -115.377
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.794864,
         -0.606787
@@ -179,7 +179,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0038",
         "other_node_kind": "connector"
       },
@@ -195,26 +195,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 15.323,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 14.823,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -321.609,
-        -103.064
+        -324.08,
+        -106.46
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.588389,
         0.808578
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0032",
         "other_node_kind": "connector"
       },
@@ -230,26 +230,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 34.567,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 34.067,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -304.433,
-        -79.834
+        -301.931,
+        -76.461
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.595747,
         -0.803172
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0032",
         "other_node_kind": "connector"
       },
@@ -266,9 +266,9 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 5.599,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.099,
       "entry_trim_m": 5.099,
       "entry_xz": [
@@ -281,10 +281,10 @@
         -0.594441
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0036",
         "other_node_kind": "connector"
       },
@@ -303,26 +303,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 38.805,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 38.305,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -292.219,
-        -62.756
+        -294.602,
+        -66.214
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.567562,
         0.823331
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0040",
         "other_node_kind": "connector"
       },
@@ -338,26 +338,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 55.282,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 54.782,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -205.344,
-        65.53
+        -203.107,
+        69.085
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.532652,
         -0.846335
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0045",
         "other_node_kind": "connector"
       },
@@ -373,10 +373,10 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 4.937,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 4.437,
       "entry_trim_m": 4.437,
       "entry_xz": [
@@ -392,7 +392,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0053",
         "other_node_kind": "connector"
       },
@@ -411,33 +411,31 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 9.655,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 9.155,
-      "entry_trim_m": 9.155,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -194.874,
-        82.165
+        -196.395,
+        79.749
       ],
-      "center_distance_m": 9.155,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.532687,
         0.846312
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0054",
         "other_node_kind": "junction"
       },
-      "issues": [
-        "entry_trim_capacity_limited"
-      ],
-      "status": "warn"
+      "issues": [],
+      "status": "pass"
     },
     {
       "pose_id": "j_004_e_0098_entry",
@@ -448,33 +446,31 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 9.655,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 9.155,
-      "entry_trim_m": 9.155,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -199.485,
-        74.84
+        -197.964,
+        77.256
       ],
-      "center_distance_m": 9.155,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.532687,
         -0.846312
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0051",
         "other_node_kind": "junction"
       },
-      "issues": [
-        "entry_trim_capacity_limited"
-      ],
-      "status": "warn"
+      "issues": [],
+      "status": "pass"
     },
     {
       "pose_id": "j_004_e_0211_entry",
@@ -485,10 +481,10 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 4.775,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 4.275,
       "entry_trim_m": 4.275,
       "entry_xz": [
@@ -504,7 +500,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0055",
         "other_node_kind": "connector"
       },
@@ -523,26 +519,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 19.125,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 18.625,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -189.015,
-        91.474
+        -191.252,
+        87.92
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.532657,
         0.846331
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0059",
         "other_node_kind": "junction"
       },
@@ -558,26 +554,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 19.125,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 18.625,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -190.014,
-        89.888
+        -187.777,
+        93.442
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.532657,
         -0.846331
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0054",
         "other_node_kind": "junction"
       },
@@ -593,17 +589,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.702,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.202,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 5.202,
       "entry_xz": [
-        -180.422,
-        96.71
+        -179.799,
+        96.388
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 5.202,
       "tangent_out_xz": [
         0.888565,
         -0.45875
@@ -611,13 +607,16 @@
       "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": false,
-        "threshold_m": 5.0,
+        "candidate": true,
+        "threshold_m": 8.0,
         "other_node_id": "n_0061",
         "other_node_kind": "connector"
       },
-      "issues": [],
-      "status": "pass"
+      "issues": [
+        "entry_trim_capacity_limited",
+        "short_edge_absorption_candidate"
+      ],
+      "status": "warn"
     },
     {
       "pose_id": "j_005_e_0096_entry",
@@ -628,26 +627,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 99.327,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 98.827,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -179.391,
-        107.991
+        -181.403,
+        104.304
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.479085,
         0.877769
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0067",
         "other_node_kind": "junction"
       },
@@ -663,26 +662,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 99.327,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 98.827,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -141.865,
-        176.743
+        -139.853,
+        180.43
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.479085,
         -0.877769
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0059",
         "other_node_kind": "junction"
       },
@@ -698,17 +697,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 9.368,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.868,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -133.322,
-        183.148
+        -131.917,
+        182.023
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.780629,
         -0.624994
@@ -717,7 +716,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0071",
         "other_node_kind": "connector"
       },
@@ -733,33 +732,31 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 7.894,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 7.394,
-      "entry_trim_m": 7.394,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -133.461,
-        192.539
+        -133.96,
+        191.566
       ],
-      "center_distance_m": 7.394,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.456312,
         0.88982
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0069",
         "other_node_kind": "junction"
       },
-      "issues": [
-        "entry_trim_capacity_limited"
-      ],
-      "status": "warn"
+      "issues": [],
+      "status": "pass"
     },
     {
       "pose_id": "j_007_e_0232_entry",
@@ -770,34 +767,31 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 9.063,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.563,
-      "entry_trim_m": 8.563,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -140.98,
-        -321.209
+        -139.314,
+        -319.678
       ],
-      "center_distance_m": 8.563,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.736164,
         -0.676803
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": true,
-        "threshold_m": 15.0,
+        "candidate": false,
+        "threshold_m": 8.0,
         "other_node_id": "n_0065",
         "other_node_kind": "connector"
       },
-      "issues": [
-        "entry_trim_capacity_limited",
-        "short_edge_absorption_candidate"
-      ],
-      "status": "warn"
+      "issues": [],
+      "status": "pass"
     },
     {
       "pose_id": "j_007_e_0233_entry",
@@ -808,26 +802,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 39.372,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 38.872,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -126.858,
-        -308.405
+        -129.985,
+        -311.208
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.744573,
         0.667541
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0078",
         "other_node_kind": "junction"
       },
@@ -844,25 +838,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 253.356,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 252.856,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -139.209,
-        -311.483
+        -139.436,
+        -311.286
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.755488,
         0.655163
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0031",
         "other_node_kind": "connector"
       },
@@ -878,33 +872,31 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 7.894,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 7.394,
-      "entry_trim_m": 7.394,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -136.607,
-        186.405
+        -136.108,
+        187.378
       ],
-      "center_distance_m": 7.394,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.456312,
         -0.88982
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0067",
         "other_node_kind": "junction"
       },
-      "issues": [
-        "entry_trim_capacity_limited"
-      ],
-      "status": "warn"
+      "issues": [],
+      "status": "pass"
     },
     {
       "pose_id": "j_008_e_0011_entry",
@@ -915,10 +907,10 @@
       "role": "minor_branch",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.035,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 4.535,
       "entry_trim_m": 4.535,
       "entry_xz": [
@@ -930,11 +922,11 @@
         0.827532,
         -0.561419
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0072",
         "other_node_kind": "connector"
       },
@@ -953,26 +945,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 15.468,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 14.968,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -128.585,
-        202.399
+        -130.444,
+        198.633
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.442631,
         0.896704
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0073",
         "other_node_kind": "connector"
       },
@@ -988,10 +980,10 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 3.571,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 3.071,
       "entry_trim_m": 3.071,
       "entry_xz": [
@@ -1003,11 +995,11 @@
         -0.44048,
         -0.897762
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0073",
         "other_node_kind": "connector"
       },
@@ -1026,17 +1018,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.125,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 4.625,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 4.625,
       "entry_xz": [
-        -120.955,
-        207.745
+        -120.848,
+        207.68
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 4.625,
       "tangent_out_xz": [
         0.857355,
         -0.514725
@@ -1044,13 +1036,16 @@
       "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": false,
-        "threshold_m": 5.0,
+        "candidate": true,
+        "threshold_m": 8.0,
         "other_node_id": "n_0075",
         "other_node_kind": "connector"
       },
-      "issues": [],
-      "status": "pass"
+      "issues": [
+        "entry_trim_capacity_limited",
+        "short_edge_absorption_candidate"
+      ],
+      "status": "warn"
     },
     {
       "pose_id": "j_009_e_0092_entry",
@@ -1061,26 +1056,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 51.494,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 50.994,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -120.012,
-        219.399
+        -121.933,
+        215.664
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.457198,
         0.889365
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0081",
         "other_node_kind": "junction"
       },
@@ -1096,26 +1091,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 108.519,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 108.019,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -110.781,
-        178.131
+        -110.531,
+        177.965
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.834123,
         -0.551579
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0116",
         "other_node_kind": "connector"
       },
@@ -1131,17 +1126,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 19.879,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 19.379,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -113.441,
-        185.28
+        -112.503,
+        186.817
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.52119,
         0.853441
@@ -1150,7 +1145,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0079",
         "other_node_kind": "connector"
       },
@@ -1166,26 +1161,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 15.885,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 15.385,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -120.802,
-        184.732
+        -121.053,
+        184.897
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.83599,
         0.548744
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0072",
         "other_node_kind": "connector"
       },
@@ -1201,26 +1196,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 39.372,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 38.872,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -113.178,
-        -296.14
+        -110.051,
+        -293.337
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.744573,
         -0.667541
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0068",
         "other_node_kind": "junction"
       },
@@ -1236,10 +1231,10 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.226,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 4.726,
       "entry_trim_m": 4.726,
       "entry_xz": [
@@ -1251,11 +1246,11 @@
         0.762005,
         0.647571
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0080",
         "other_node_kind": "connector"
       },
@@ -1274,10 +1269,10 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 4.145,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 3.645,
       "entry_trim_m": 3.645,
       "entry_xz": [
@@ -1293,7 +1288,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0077",
         "other_node_kind": "connector"
       },
@@ -1312,26 +1307,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 51.494,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 50.994,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -106.071,
-        246.52
+        -104.15,
+        250.255
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.457198,
         -0.889365
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0074",
         "other_node_kind": "junction"
       },
@@ -1347,10 +1342,10 @@
       "role": "minor_branch",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 4.524,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 4.024,
       "entry_trim_m": 4.024,
       "entry_xz": [
@@ -1362,11 +1357,11 @@
         0.870505,
         -0.492159
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0082",
         "other_node_kind": "connector"
       },
@@ -1385,26 +1380,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 21.637,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 21.137,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -96.452,
-        265.187
+        -98.379,
+        261.456
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.458841,
         0.888519
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0085",
         "other_node_kind": "connector"
       },
@@ -1420,26 +1415,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 52.55,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 52.05,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -73.207,
-        313.021
+        -71.395,
+        316.81
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.431288,
         -0.902214
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0085",
         "other_node_kind": "connector"
       },
@@ -1456,9 +1451,9 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 3.721,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 3.221,
       "entry_trim_m": 3.221,
       "entry_xz": [
@@ -1471,10 +1466,10 @@
         -0.427763
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0091",
         "other_node_kind": "connector"
       },
@@ -1493,26 +1488,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 3,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 25.58,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 25.08,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -64.509,
-        332.131
+        -66.177,
+        328.276
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.397036,
         0.917803
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0093",
         "other_node_kind": "connector"
       },
@@ -1528,26 +1523,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 16.392,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 15.892,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -71.13,
-        -259.196
+        -68.044,
+        -256.347
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.73467,
         -0.678425
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0088",
         "other_node_kind": "connector"
       },
@@ -1563,26 +1558,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 18.841,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 18.341,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -55.495,
-        -245.18
+        -58.663,
+        -247.937
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.754372,
         0.656447
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0097",
         "other_node_kind": "junction"
       },
@@ -1599,9 +1594,9 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 5.608,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.108,
       "entry_trim_m": 5.108,
       "entry_xz": [
@@ -1613,11 +1608,11 @@
         -0.79125,
         0.611493
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0090",
         "other_node_kind": "connector"
       },
@@ -1636,26 +1631,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 18.841,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 18.341,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -57.124,
-        -246.598
+        -53.956,
+        -243.841
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.754372,
         -0.656447
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0092",
         "other_node_kind": "junction"
       },
@@ -1671,10 +1666,10 @@
       "role": "minor_branch",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.772,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.272,
       "entry_trim_m": 5.272,
       "entry_xz": [
@@ -1690,7 +1685,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0101",
         "other_node_kind": "connector"
       },
@@ -1709,26 +1704,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 27.098,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 26.598,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -41.539,
-        -232.528
+        -44.605,
+        -235.399
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.729902,
         0.683552
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0110",
         "other_node_kind": "junction"
       },
@@ -1744,17 +1739,17 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 21.195,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 20.695,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -42.918,
-        -211.353
+        -41.463,
+        -212.412
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.808285,
         -0.588792
@@ -1763,7 +1758,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0110",
         "other_node_kind": "junction"
       },
@@ -1779,10 +1774,10 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 3.968,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 3.468,
       "entry_trim_m": 3.468,
       "entry_xz": [
@@ -1798,7 +1793,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0102",
         "other_node_kind": "connector"
       },
@@ -1817,17 +1812,17 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 49.775,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 49.275,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -50.192,
-        -206.053
+        -51.647,
+        -204.993
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.808238,
         0.588856
@@ -1836,7 +1831,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0086",
         "other_node_kind": "connector"
       },
@@ -1852,26 +1847,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 8.852,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.352,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -38.01,
-        217.466
+        -37.757,
+        217.304
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.841992,
         -0.53949
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0107",
         "other_node_kind": "junction"
       },
@@ -1887,17 +1882,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 34.233,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 33.733,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -41.054,
-        224.73
+        -40.251,
+        226.341
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.446243,
         0.894912
@@ -1906,7 +1901,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0113",
         "other_node_kind": "connector"
       },
@@ -1922,26 +1917,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 9.009,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.509,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -48.2,
-        223.802
+        -48.457,
+        223.957
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.856286,
         0.516502
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0096",
         "other_node_kind": "connector"
       },
@@ -1957,17 +1952,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 21.107,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 20.607,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -37.919,
-        212.066
+        -38.843,
+        210.521
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.513534,
         -0.858069
@@ -1976,7 +1971,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0100",
         "other_node_kind": "dead_end"
       },
@@ -1992,26 +1987,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 58.151,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 57.651,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -30.556,
-        212.69
+        -30.303,
+        212.528
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.842013,
         -0.539457
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0124",
         "other_node_kind": "connector"
       },
@@ -2027,26 +2022,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 8.852,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.352,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -40.66,
-        219.164
+        -40.913,
+        219.326
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.841992,
         0.53949
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0103",
         "other_node_kind": "junction"
       },
@@ -2062,10 +2057,10 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 3.055,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 2.555,
       "entry_trim_m": 2.555,
       "entry_xz": [
@@ -2081,7 +2076,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0105",
         "other_node_kind": "connector"
       },
@@ -2100,17 +2095,17 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 6.459,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.959,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 5.959,
       "entry_xz": [
-        -30.756,
-        -201.553
+        -29.408,
+        -202.111
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 5.959,
       "tangent_out_xz": [
         0.923913,
         -0.382603
@@ -2118,13 +2113,16 @@
       "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": false,
-        "threshold_m": 5.0,
+        "candidate": true,
+        "threshold_m": 8.0,
         "other_node_id": "n_0111",
         "other_node_kind": "connector"
       },
-      "issues": [],
-      "status": "pass"
+      "issues": [
+        "entry_trim_capacity_limited",
+        "short_edge_absorption_candidate"
+      ],
+      "status": "warn"
     },
     {
       "pose_id": "j_019_e_0151_entry",
@@ -2135,10 +2133,10 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 4.009,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 3.509,
       "entry_trim_m": 3.509,
       "entry_xz": [
@@ -2154,7 +2152,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0106",
         "other_node_kind": "dead_end"
       },
@@ -2172,26 +2170,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 27.098,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 26.598,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -37.088,
-        -228.359
+        -34.022,
+        -225.488
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.729902,
         -0.683552
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0097",
         "other_node_kind": "junction"
       },
@@ -2207,26 +2205,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 14.061,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 13.561,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -21.695,
-        -214.075
+        -24.787,
+        -216.918
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.736073,
         0.676902
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0117",
         "other_node_kind": "junction"
       },
@@ -2242,17 +2240,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 21.195,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 20.695,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -33.061,
-        -218.532
+        -34.516,
+        -217.473
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.808285,
         0.588792
@@ -2261,7 +2259,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0099",
         "other_node_kind": "junction"
       },
@@ -2277,17 +2275,17 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 122.832,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 122.332,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -24.884,
-        -15.296
+        -23.42,
+        -16.343
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.813503,
         -0.58156
@@ -2296,7 +2294,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0142",
         "other_node_kind": "connector"
       },
@@ -2312,10 +2310,10 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 4.255,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 3.755,
       "entry_trim_m": 3.755,
       "entry_xz": [
@@ -2331,7 +2329,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0115",
         "other_node_kind": "dead_end"
       },
@@ -2349,17 +2347,17 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 185.981,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 185.481,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -32.194,
-        -10.046
+        -33.654,
+        -8.992
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.810885,
         0.585206
@@ -2368,7 +2366,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0061",
         "other_node_kind": "connector"
       },
@@ -2384,26 +2382,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 14.061,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 13.561,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -26.803,
-        -218.771
+        -23.711,
+        -215.928
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.736073,
         -0.676902
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0110",
         "other_node_kind": "junction"
       },
@@ -2419,10 +2417,10 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.953,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.453,
       "entry_trim_m": 5.453,
       "entry_xz": [
@@ -2434,11 +2432,11 @@
         0.729097,
         0.68441
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0118",
         "other_node_kind": "junction"
       },
@@ -2456,17 +2454,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 13.606,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 13.106,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -22.339,
-        -208.568
+        -23.646,
+        -207.329
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.725636,
         0.688079
@@ -2475,7 +2473,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0111",
         "other_node_kind": "connector"
       },
@@ -2491,10 +2489,10 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.953,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.453,
       "entry_trim_m": 5.453,
       "entry_xz": [
@@ -2507,10 +2505,10 @@
         -0.68441
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0117",
         "other_node_kind": "junction"
       },
@@ -2529,16 +2527,16 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 7.683,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 7.183,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -10.268,
-        -211.597
+        -10.045,
+        -211.798
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.744277,
         -0.667871
@@ -2546,13 +2544,15 @@
       "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": false,
-        "threshold_m": 7.5,
+        "candidate": true,
+        "threshold_m": 8.0,
         "other_node_id": "n_0120",
         "other_node_kind": "connector"
       },
-      "issues": [],
-      "status": "pass"
+      "issues": [
+        "short_edge_absorption_candidate"
+      ],
+      "status": "warn"
     },
     {
       "pose_id": "j_023_e_0242_entry",
@@ -2563,26 +2563,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 30.739,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 30.239,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        -7.029,
-        -200.457
+        -10.111,
+        -203.31
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.733795,
         0.679371
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0123",
         "other_node_kind": "connector"
       },
@@ -2598,17 +2598,17 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 21.033,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 20.533,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        19.165,
-        243.046
+        20.79,
+        242.271
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.902693,
         -0.430284
@@ -2617,7 +2617,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0128",
         "other_node_kind": "dead_end"
       },
@@ -2633,17 +2633,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 34.289,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 33.789,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        17.022,
-        249.052
+        17.79,
+        250.68
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.426517,
         0.904479
@@ -2652,7 +2652,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0127",
         "other_node_kind": "junction"
       },
@@ -2668,17 +2668,17 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 18.784,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 18.284,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        11.015,
-        246.862
+        9.379,
+        247.614
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.908547,
         0.417782
@@ -2687,7 +2687,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0121",
         "other_node_kind": "boundary"
       },
@@ -2703,17 +2703,17 @@
       "role": "minor_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 34.289,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 33.789,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        27.809,
-        271.926
+        27.041,
+        270.298
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.426517,
         -0.904479
@@ -2722,7 +2722,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0125",
         "other_node_kind": "junction"
       },
@@ -2739,25 +2739,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 36.404,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 35.904,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        35.184,
-        273.499
+        35.456,
+        273.374
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.909281,
         -0.416184
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0139",
         "other_node_kind": "connector"
       },
@@ -2773,17 +2773,17 @@
       "role": "minor_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 22.442,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 21.942,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        31.562,
-        280.105
+        32.295,
+        281.749
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.407535,
         0.913189
@@ -2792,7 +2792,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0129",
         "other_node_kind": "dead_end"
       },
@@ -2809,25 +2809,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 48.428,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 47.928,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        24.303,
-        278.559
+        24.031,
+        278.687
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.90421,
         0.427088
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0119",
         "other_node_kind": "connector"
       },
@@ -2843,33 +2843,31 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 12.846,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 12.346,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        43.548,
-        -137.404
+        46.009,
+        -134.001
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.586124,
         -0.810221
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": true,
-        "threshold_m": 15.0,
+        "candidate": false,
+        "threshold_m": 8.0,
         "other_node_id": "n_0130",
         "other_node_kind": "connector"
       },
-      "issues": [
-        "short_edge_absorption_candidate"
-      ],
-      "status": "warn"
+      "issues": [],
+      "status": "pass"
     },
     {
       "pose_id": "j_026_e_0190_entry",
@@ -2880,17 +2878,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 7.281,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 6.781,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        53.403,
-        -131.457
+        54.884,
+        -132.481
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.822464,
         -0.568817
@@ -2898,13 +2896,15 @@
       "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": false,
-        "threshold_m": 5.0,
+        "candidate": true,
+        "threshold_m": 8.0,
         "other_node_id": "n_0134",
         "other_node_kind": "connector"
       },
-      "issues": [],
-      "status": "pass"
+      "issues": [
+        "short_edge_absorption_candidate"
+      ],
+      "status": "warn"
     },
     {
       "pose_id": "j_026_e_0162_entry",
@@ -2915,26 +2915,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 14.349,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 13.849,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        55.815,
-        -120.36
+        53.37,
+        -123.775
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.582213,
         0.813036
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0135",
         "other_node_kind": "junction"
       },
@@ -2950,26 +2950,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 14.349,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 13.849,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        51.943,
-        -125.768
+        54.388,
+        -122.353
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.582213,
         -0.813036
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0132",
         "other_node_kind": "junction"
       },
@@ -2985,31 +2985,30 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 6.983,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 6.483,
-      "entry_trim_m": 6.483,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        61.743,
-        -111.898
+        61.639,
+        -112.049
       ],
-      "center_distance_m": 6.483,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.568666,
         0.822568
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0138",
         "other_node_kind": "connector"
       },
       "issues": [
-        "entry_trim_capacity_limited",
         "short_edge_absorption_candidate"
       ],
       "status": "warn"
@@ -3023,17 +3022,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 10.029,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 9.529,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        54.346,
-        -114.684
+        52.863,
+        -113.665
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.824347,
         0.566084
@@ -3042,7 +3041,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0133",
         "other_node_kind": "connector"
       },
@@ -3058,26 +3057,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 22.111,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 21.611,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        72.206,
-        -97.546
+        74.683,
+        -94.155
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.589792,
         -0.807555
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0140",
         "other_node_kind": "connector"
       },
@@ -3093,33 +3092,31 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 10.194,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 9.694,
-      "entry_trim_m": 9.694,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        84.167,
-        -81.276
+        82.147,
+        -84.003
       ],
-      "center_distance_m": 9.694,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.594981,
         0.80374
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0145",
         "other_node_kind": "junction"
       },
-      "issues": [
-        "entry_trim_capacity_limited"
-      ],
-      "status": "warn"
+      "issues": [],
+      "status": "pass"
     },
     {
       "pose_id": "j_028_e_0056_entry",
@@ -3130,17 +3127,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 8.592,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.092,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        74.722,
-        -86.472
+        73.252,
+        -85.435
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.817039,
         0.576583
@@ -3149,7 +3146,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0142",
         "other_node_kind": "connector"
       },
@@ -3165,33 +3162,31 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 10.194,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 9.694,
-      "entry_trim_m": 9.694,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        78.696,
-        -88.665
+        80.716,
+        -85.938
       ],
-      "center_distance_m": 9.694,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.594981,
         -0.80374
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0143",
         "other_node_kind": "junction"
       },
-      "issues": [
-        "entry_trim_capacity_limited"
-      ],
-      "status": "warn"
+      "issues": [],
+      "status": "pass"
     },
     {
       "pose_id": "j_029_e_0070_entry",
@@ -3202,17 +3197,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 8.453,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 7.953,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        88.132,
-        -83.482
+        89.599,
+        -84.525
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.815003,
         -0.579457
@@ -3221,7 +3216,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0149",
         "other_node_kind": "connector"
       },
@@ -3237,26 +3232,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 46.593,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 46.093,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        90.591,
-        -72.347
+        88.14,
+        -75.758
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.583536,
         0.812087
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0159",
         "other_node_kind": "junction"
       },
@@ -3272,26 +3267,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 8.688,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.188,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        95.433,
-        134.058
+        95.689,
+        133.9
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.85167,
         -0.524078
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0154",
         "other_node_kind": "junction"
       },
@@ -3308,16 +3303,16 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 25.205,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 24.705,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        93.482,
-        142.303
+        93.64,
+        142.558
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.526453,
         0.850204
@@ -3326,7 +3321,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0156",
         "other_node_kind": "junction"
       },
@@ -3342,26 +3337,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 90.368,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 89.868,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        85.213,
-        140.346
+        84.957,
+        140.503
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.851704,
         0.524023
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0124",
         "other_node_kind": "connector"
       },
@@ -3378,25 +3373,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 53.434,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 52.934,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        96.517,
-        244.947
+        96.79,
+        244.822
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.909445,
         -0.415824
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0171",
         "other_node_kind": "junction"
       },
@@ -3412,17 +3407,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 8.218,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 7.718,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        93.015,
-        251.495
+        93.797,
+        253.117
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.434368,
         0.900736
@@ -3431,7 +3426,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0152",
         "other_node_kind": "boundary"
       },
@@ -3448,25 +3443,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 8.707,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.207,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        85.602,
-        249.935
+        85.33,
+        250.06
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.909586,
         0.415515
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0144",
         "other_node_kind": "connector"
       },
@@ -3482,17 +3477,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 8.683,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.183,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        95.467,
-        128.755
+        94.565,
+        127.197
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.501104,
         -0.865387
@@ -3501,7 +3496,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0150",
         "other_node_kind": "dead_end"
       },
@@ -3517,26 +3512,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 39.579,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 39.079,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        102.835,
-        129.51
+        103.091,
+        129.353
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.852239,
         -0.523153
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0167",
         "other_node_kind": "junction"
       },
@@ -3552,26 +3547,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 8.688,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.188,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        92.612,
-        135.793
+        92.356,
+        135.951
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.85167,
         0.524078
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0147",
         "other_node_kind": "junction"
       },
@@ -3588,16 +3583,16 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 25.205,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 24.705,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        100.433,
-        153.53
+        100.275,
+        153.275
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.526453,
         -0.850204
@@ -3606,7 +3601,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0147",
         "other_node_kind": "junction"
       },
@@ -3622,10 +3617,10 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 4.592,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 4.092,
       "entry_trim_m": 4.092,
       "entry_xz": [
@@ -3641,7 +3636,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0157",
         "other_node_kind": "connector"
       },
@@ -3661,16 +3656,16 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 28.168,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 27.668,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        106.605,
-        163.819
+        106.756,
+        164.079
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.502248,
         0.864724
@@ -3679,7 +3674,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0161",
         "other_node_kind": "connector"
       },
@@ -3695,26 +3690,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 46.593,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 46.093,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        105.526,
-        -51.563
+        107.977,
+        -48.152
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.583536,
         -0.812087
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0145",
         "other_node_kind": "junction"
       },
@@ -3730,17 +3725,17 @@
       "role": "minor_branch",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 7.554,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 7.054,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        116.556,
-        -46.494
+        116.802,
+        -46.667
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.817243,
         -0.576293
@@ -3748,13 +3743,15 @@
       "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": false,
-        "threshold_m": 7.5,
+        "candidate": true,
+        "threshold_m": 8.0,
         "other_node_id": "n_0162",
         "other_node_kind": "connector"
       },
-      "issues": [],
-      "status": "pass"
+      "issues": [
+        "short_edge_absorption_candidate"
+      ],
+      "status": "warn"
     },
     {
       "pose_id": "j_034_e_0168_entry",
@@ -3765,26 +3762,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 15.698,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 15.198,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        117.843,
-        -34.555
+        115.367,
+        -37.947
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.589542,
         0.807738
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0163",
         "other_node_kind": "connector"
       },
@@ -3800,34 +3797,31 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 10.177,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 9.677,
-      "entry_trim_m": 9.677,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        121.203,
-        -29.954
+        123.201,
+        -27.232
       ],
-      "center_distance_m": 9.677,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.59173,
         -0.806136
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": true,
-        "threshold_m": 15.0,
+        "candidate": false,
+        "threshold_m": 8.0,
         "other_node_id": "n_0163",
         "other_node_kind": "connector"
       },
-      "issues": [
-        "entry_trim_capacity_limited",
-        "short_edge_absorption_candidate"
-      ],
-      "status": "warn"
+      "issues": [],
+      "status": "pass"
     },
     {
       "pose_id": "j_035_e_0183_entry",
@@ -3838,17 +3832,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 8.052,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 7.552,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        130.628,
-        -24.716
+        132.107,
+        -25.741
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.821942,
         -0.569572
@@ -3857,7 +3851,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0169",
         "other_node_kind": "connector"
       },
@@ -3873,26 +3867,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 29.924,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 29.424,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        133.012,
-        -13.595
+        130.579,
+        -17.018
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.579375,
         0.815061
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0173",
         "other_node_kind": "junction"
       },
@@ -3909,16 +3903,16 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 8.73,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.23,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        133.499,
-        -334.098
+        133.756,
+        -334.253
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.856328,
         -0.516432
@@ -3927,7 +3921,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0170",
         "other_node_kind": "connector"
       },
@@ -3943,17 +3937,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 102.814,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 102.314,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        130.559,
-        -327.072
+        131.438,
+        -325.502
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.488483,
         0.872574
@@ -3962,7 +3956,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0181",
         "other_node_kind": "connector"
       },
@@ -3979,16 +3973,16 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 14.991,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 14.491,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        123.198,
-        -327.942
+        122.94,
+        -327.79
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.860509,
         0.509435
@@ -3997,7 +3991,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0160",
         "other_node_kind": "connector"
       },
@@ -4013,26 +4007,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 72.927,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 72.427,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        136.566,
-        108.803
+        136.822,
+        108.646
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.85217,
         -0.523265
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0191",
         "other_node_kind": "junction"
       },
@@ -4048,17 +4042,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 27.054,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 26.554,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        133.657,
-        115.867
+        134.538,
+        117.436
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.489677,
         0.871904
@@ -4067,7 +4061,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0174",
         "other_node_kind": "connector"
       },
@@ -4083,26 +4077,26 @@
       "role": "major_through",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 39.579,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 39.079,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        126.34,
-        115.082
+        126.084,
+        115.239
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.852239,
         0.523153
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0154",
         "other_node_kind": "junction"
       },
@@ -4119,16 +4113,16 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 47.583,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 47.083,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        136.891,
-        219.897
+        136.753,
+        219.631
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.460588,
         -0.887614
@@ -4137,7 +4131,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0161",
         "other_node_kind": "connector"
       },
@@ -4154,25 +4148,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 19.946,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 19.446,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        145.076,
-        222.651
+        145.347,
+        222.523
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.90348,
         -0.428629
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0178",
         "other_node_kind": "connector"
       },
@@ -4189,16 +4183,16 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 8.839,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.339,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        143.603,
-        229.741
+        143.8,
+        229.967
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.657936,
         0.753074
@@ -4207,7 +4201,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0175",
         "other_node_kind": "connector"
       },
@@ -4224,25 +4218,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 53.434,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 52.934,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        134.198,
-        227.718
+        133.925,
+        227.843
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.909445,
         0.415824
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0148",
         "other_node_kind": "junction"
       },
@@ -4258,26 +4252,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 29.924,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 29.424,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        138.184,
-        -6.32
+        140.617,
+        -2.897
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.579375,
         -0.815061
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0165",
         "other_node_kind": "junction"
       },
@@ -4293,10 +4287,10 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.981,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.481,
       "entry_trim_m": 5.481,
       "entry_xz": [
@@ -4308,11 +4302,11 @@
         0.589543,
         0.807737
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0176",
         "other_node_kind": "junction"
       },
@@ -4330,17 +4324,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 326.492,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 325.992,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        140.493,
-        4.69
+        138.984,
+        5.67
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.838578,
         0.544782
@@ -4349,7 +4343,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0071",
         "other_node_kind": "connector"
       },
@@ -4365,10 +4359,10 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.981,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.481,
       "entry_trim_m": 5.481,
       "entry_xz": [
@@ -4381,10 +4375,10 @@
         -0.807737
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0173",
         "other_node_kind": "junction"
       },
@@ -4402,26 +4396,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 74.902,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 74.402,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        153.734,
-        15.727
+        151.357,
+        12.264
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.565785,
         0.824553
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0187",
         "other_node_kind": "junction"
       },
@@ -4437,26 +4431,26 @@
       "role": "minor_branch",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 207.518,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 207.018,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        142.789,
-        10.38
+        142.539,
+        10.546
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.833957,
         0.551829
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0116",
         "other_node_kind": "connector"
       },
@@ -4472,26 +4466,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 74.902,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 74.402,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        184.23,
-        60.171
+        186.607,
+        63.634
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.565785,
         -0.824553
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0176",
         "other_node_kind": "junction"
       },
@@ -4507,17 +4501,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 7.136,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 6.636,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        193.941,
-        66.372
+        195.449,
+        65.389
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.837783,
         -0.546003
@@ -4525,13 +4519,15 @@
       "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
-        "candidate": false,
-        "threshold_m": 5.0,
+        "candidate": true,
+        "threshold_m": 8.0,
         "other_node_id": "n_0192",
         "other_node_kind": "connector"
       },
-      "issues": [],
-      "status": "pass"
+      "issues": [
+        "short_edge_absorption_candidate"
+      ],
+      "status": "warn"
     },
     {
       "pose_id": "j_041_e_0173_entry",
@@ -4542,10 +4538,10 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 6.024,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.524,
       "entry_trim_m": 5.524,
       "entry_xz": [
@@ -4557,11 +4553,11 @@
         0.56902,
         0.822324
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0191",
         "other_node_kind": "junction"
       },
@@ -4580,25 +4576,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 67.973,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 67.473,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        197.966,
-        197.617
+        198.24,
+        197.494
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.912198,
         -0.40975
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0215",
         "other_node_kind": "junction"
       },
@@ -4615,16 +4611,16 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 50.01,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 49.51,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        195.603,
-        205.206
+        195.758,
+        205.463
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.518269,
         0.855217
@@ -4633,7 +4629,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0201",
         "other_node_kind": "connector"
       },
@@ -4650,25 +4646,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 38.57,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 38.07,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        187.077,
-        202.657
+        186.806,
+        202.786
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.90267,
         0.430334
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0178",
         "other_node_kind": "connector"
       },
@@ -4684,10 +4680,10 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 6.024,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.524,
       "entry_trim_m": 5.524,
       "entry_xz": [
@@ -4700,10 +4696,10 @@
         -0.822324
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0187",
         "other_node_kind": "junction"
       },
@@ -4721,26 +4717,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 13.205,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 12.705,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        199.371,
-        82.554
+        197.062,
+        79.046
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.549675,
         0.835379
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0194",
         "other_node_kind": "junction"
       },
@@ -4756,26 +4752,26 @@
       "role": "minor_branch",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 72.927,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 72.427,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        188.486,
-        76.923
+        188.23,
+        77.08
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.85217,
         0.523265
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0167",
         "other_node_kind": "junction"
       },
@@ -4791,26 +4787,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 13.205,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 12.705,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        195.086,
-        76.044
+        197.395,
+        79.552
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.549675,
         -0.835379
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0191",
         "other_node_kind": "junction"
       },
@@ -4827,25 +4823,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 6.875,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 6.375,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        206.019,
-        81.754
+        206.277,
+        81.601
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.8601,
         -0.510125
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0198",
         "other_node_kind": "connector"
       },
@@ -4863,26 +4859,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 12.406,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 11.906,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        206.643,
-        93.577
+        204.329,
+        90.072
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.550993,
         0.83451
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0199",
         "other_node_kind": "junction"
       },
@@ -4898,26 +4894,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 12.406,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 11.906,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        201.908,
-        86.405
+        204.222,
+        89.91
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.550993,
         -0.83451
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0194",
         "other_node_kind": "junction"
       },
@@ -4934,9 +4930,9 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 6.245,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.745,
       "entry_trim_m": 5.745,
       "entry_xz": [
@@ -4948,11 +4944,11 @@
         0.868657,
         -0.495415
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0200",
         "other_node_kind": "connector"
       },
@@ -4971,26 +4967,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 37.775,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 37.275,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        213.221,
-        104.094
+        211.01,
+        100.523
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.526463,
         0.850198
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0203",
         "other_node_kind": "junction"
       },
@@ -5006,26 +5002,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 37.775,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 37.275,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        222.052,
-        118.356
+        224.263,
+        121.927
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.526463,
         -0.850198
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0199",
         "other_node_kind": "junction"
       },
@@ -5041,10 +5037,10 @@
       "role": "minor_branch",
       "road_class": "residential",
       "highway": "residential",
-      "lanes": 1,
-      "width_m": 6.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 5.606,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 5.106,
       "entry_trim_m": 5.106,
       "entry_xz": [
@@ -5060,7 +5056,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": true,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0205",
         "other_node_kind": "connector"
       },
@@ -5079,26 +5075,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 52.385,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 51.885,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        232.975,
-        136.291
+        230.817,
+        132.688
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.51385,
         0.85788
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0215",
         "other_node_kind": "junction"
       },
@@ -5114,17 +5110,17 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 9.296,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 8.796,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        230.923,
-        -88.401
+        229.986,
+        -89.938
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.520479,
         -0.853874
@@ -5133,7 +5129,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0204",
         "other_node_kind": "connector"
       },
@@ -5149,17 +5145,17 @@
       "role": "minor_branch",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 50.81,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 50.31,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        237.44,
-        -86.238
+        239.11,
+        -86.909
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.927795,
         -0.37309
@@ -5168,7 +5164,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0218",
         "other_node_kind": "connector"
       },
@@ -5184,17 +5180,17 @@
       "role": "major_through",
       "road_class": "service",
       "highway": "service",
-      "lanes": 1,
-      "width_m": 4.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 23.79,
-      "desired_trim_m": 4.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 23.29,
-      "entry_trim_m": 4.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        235.607,
-        -80.716
+        236.543,
+        -79.179
       ],
-      "center_distance_m": 4.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.520368,
         0.853942
@@ -5203,7 +5199,7 @@
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 5.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0211",
         "other_node_kind": "connector"
       },
@@ -5219,26 +5215,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 52.385,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 51.885,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        249.103,
-        163.215
+        251.261,
+        166.818
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.51385,
         -0.85788
       ],
       "can_enter_junction": true,
-      "can_exit_junction": false,
+      "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0203",
         "other_node_kind": "junction"
       },
@@ -5254,26 +5250,26 @@
       "role": "major_through",
       "road_class": "secondary",
       "highway": "secondary",
-      "lanes": 4,
-      "width_m": 12.0,
+      "lanes": 2,
+      "width_m": 6.4,
       "edge_length_m": 58.708,
-      "desired_trim_m": 10.5,
+      "desired_trim_m": 6.3,
       "available_trim_m": 58.208,
-      "entry_trim_m": 10.5,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        259.623,
-        181.387
+        257.573,
+        177.722
       ],
-      "center_distance_m": 10.5,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         0.488072,
         0.872803
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 15.0,
+        "threshold_m": 8.0,
         "other_node_id": "n_0219",
         "other_node_kind": "connector"
       },
@@ -5290,25 +5286,25 @@
       "road_class": "residential",
       "highway": "residential",
       "lanes": 2,
-      "width_m": 6.0,
+      "width_m": 6.4,
       "edge_length_m": 67.973,
-      "desired_trim_m": 6.0,
+      "desired_trim_m": 6.3,
       "available_trim_m": 67.473,
-      "entry_trim_m": 6.0,
+      "entry_trim_m": 6.3,
       "entry_xz": [
-        249.025,
-        174.681
+        248.751,
+        174.804
       ],
-      "center_distance_m": 6.0,
+      "center_distance_m": 6.3,
       "tangent_out_xz": [
         -0.912198,
         0.40975
       ],
-      "can_enter_junction": false,
+      "can_enter_junction": true,
       "can_exit_junction": true,
       "short_edge_absorption": {
         "candidate": false,
-        "threshold_m": 7.5,
+        "threshold_m": 8.0,
         "other_node_id": "n_0189",
         "other_node_kind": "junction"
       },
@@ -5326,7 +5322,7 @@
       "from_pose_id": "j_000_e_0106_entry",
       "to_pose_id": "j_000_e_0021_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5339,7 +5335,7 @@
       "from_pose_id": "j_000_e_0106_entry",
       "to_pose_id": "j_000_e_0105_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5365,7 +5361,7 @@
       "from_pose_id": "j_000_e_0021_entry",
       "to_pose_id": "j_000_e_0105_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5391,7 +5387,7 @@
       "from_pose_id": "j_000_e_0105_entry",
       "to_pose_id": "j_000_e_0021_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5404,7 +5400,7 @@
       "from_pose_id": "j_001_e_0105_entry",
       "to_pose_id": "j_001_e_0030_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5417,7 +5413,7 @@
       "from_pose_id": "j_001_e_0105_entry",
       "to_pose_id": "j_001_e_0104_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5443,7 +5439,7 @@
       "from_pose_id": "j_001_e_0030_entry",
       "to_pose_id": "j_001_e_0104_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5482,7 +5478,7 @@
       "from_pose_id": "j_002_e_0103_entry",
       "to_pose_id": "j_002_e_0019_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5495,7 +5491,7 @@
       "from_pose_id": "j_002_e_0103_entry",
       "to_pose_id": "j_002_e_0102_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5521,7 +5517,7 @@
       "from_pose_id": "j_002_e_0019_entry",
       "to_pose_id": "j_002_e_0102_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5547,7 +5543,7 @@
       "from_pose_id": "j_002_e_0102_entry",
       "to_pose_id": "j_002_e_0019_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5560,7 +5556,7 @@
       "from_pose_id": "j_003_e_0099_entry",
       "to_pose_id": "j_003_e_0209_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5573,7 +5569,7 @@
       "from_pose_id": "j_003_e_0099_entry",
       "to_pose_id": "j_003_e_0098_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5599,7 +5595,7 @@
       "from_pose_id": "j_003_e_0209_entry",
       "to_pose_id": "j_003_e_0098_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5638,7 +5634,7 @@
       "from_pose_id": "j_004_e_0098_entry",
       "to_pose_id": "j_004_e_0211_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5651,7 +5647,7 @@
       "from_pose_id": "j_004_e_0098_entry",
       "to_pose_id": "j_004_e_0097_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5677,7 +5673,7 @@
       "from_pose_id": "j_004_e_0211_entry",
       "to_pose_id": "j_004_e_0097_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5716,7 +5712,7 @@
       "from_pose_id": "j_005_e_0097_entry",
       "to_pose_id": "j_005_e_0053_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5729,7 +5725,7 @@
       "from_pose_id": "j_005_e_0097_entry",
       "to_pose_id": "j_005_e_0096_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5755,7 +5751,7 @@
       "from_pose_id": "j_005_e_0053_entry",
       "to_pose_id": "j_005_e_0096_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5794,7 +5790,7 @@
       "from_pose_id": "j_006_e_0096_entry",
       "to_pose_id": "j_006_e_0213_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5807,7 +5803,7 @@
       "from_pose_id": "j_006_e_0096_entry",
       "to_pose_id": "j_006_e_0095_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5833,7 +5829,7 @@
       "from_pose_id": "j_006_e_0213_entry",
       "to_pose_id": "j_006_e_0095_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5898,7 +5894,7 @@
       "from_pose_id": "j_007_e_0233_entry",
       "to_pose_id": "j_007_e_0232_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5911,7 +5907,7 @@
       "from_pose_id": "j_007_e_0233_entry",
       "to_pose_id": "j_007_e_0020_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5924,7 +5920,7 @@
       "from_pose_id": "j_007_e_0020_entry",
       "to_pose_id": "j_007_e_0232_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5937,7 +5933,7 @@
       "from_pose_id": "j_007_e_0020_entry",
       "to_pose_id": "j_007_e_0233_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5950,7 +5946,7 @@
       "from_pose_id": "j_008_e_0095_entry",
       "to_pose_id": "j_008_e_0011_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5963,7 +5959,7 @@
       "from_pose_id": "j_008_e_0095_entry",
       "to_pose_id": "j_008_e_0094_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5976,7 +5972,7 @@
       "from_pose_id": "j_008_e_0011_entry",
       "to_pose_id": "j_008_e_0095_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -5989,7 +5985,7 @@
       "from_pose_id": "j_008_e_0011_entry",
       "to_pose_id": "j_008_e_0094_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6028,7 +6024,7 @@
       "from_pose_id": "j_009_e_0093_entry",
       "to_pose_id": "j_009_e_0202_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6041,7 +6037,7 @@
       "from_pose_id": "j_009_e_0093_entry",
       "to_pose_id": "j_009_e_0092_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6067,7 +6063,7 @@
       "from_pose_id": "j_009_e_0202_entry",
       "to_pose_id": "j_009_e_0092_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6106,7 +6102,7 @@
       "from_pose_id": "j_010_e_0013_entry",
       "to_pose_id": "j_010_e_0204_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6119,7 +6115,7 @@
       "from_pose_id": "j_010_e_0013_entry",
       "to_pose_id": "j_010_e_0012_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6145,7 +6141,7 @@
       "from_pose_id": "j_010_e_0204_entry",
       "to_pose_id": "j_010_e_0012_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6210,7 +6206,7 @@
       "from_pose_id": "j_011_e_0234_entry",
       "to_pose_id": "j_011_e_0233_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6223,7 +6219,7 @@
       "from_pose_id": "j_011_e_0234_entry",
       "to_pose_id": "j_011_e_0135_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6236,7 +6232,7 @@
       "from_pose_id": "j_011_e_0135_entry",
       "to_pose_id": "j_011_e_0233_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6262,7 +6258,7 @@
       "from_pose_id": "j_012_e_0092_entry",
       "to_pose_id": "j_012_e_0000_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6275,7 +6271,7 @@
       "from_pose_id": "j_012_e_0092_entry",
       "to_pose_id": "j_012_e_0091_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6288,7 +6284,7 @@
       "from_pose_id": "j_012_e_0000_entry",
       "to_pose_id": "j_012_e_0092_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6301,7 +6297,7 @@
       "from_pose_id": "j_012_e_0000_entry",
       "to_pose_id": "j_012_e_0091_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6340,7 +6336,7 @@
       "from_pose_id": "j_013_e_0090_entry",
       "to_pose_id": "j_013_e_0040_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6353,7 +6349,7 @@
       "from_pose_id": "j_013_e_0090_entry",
       "to_pose_id": "j_013_e_0089_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6379,7 +6375,7 @@
       "from_pose_id": "j_013_e_0040_entry",
       "to_pose_id": "j_013_e_0089_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6405,7 +6401,7 @@
       "from_pose_id": "j_013_e_0089_entry",
       "to_pose_id": "j_013_e_0040_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6444,7 +6440,7 @@
       "from_pose_id": "j_014_e_0238_entry",
       "to_pose_id": "j_014_e_0237_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6457,7 +6453,7 @@
       "from_pose_id": "j_014_e_0238_entry",
       "to_pose_id": "j_014_e_0015_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6470,7 +6466,7 @@
       "from_pose_id": "j_014_e_0015_entry",
       "to_pose_id": "j_014_e_0237_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6483,7 +6479,7 @@
       "from_pose_id": "j_014_e_0015_entry",
       "to_pose_id": "j_014_e_0238_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6522,7 +6518,7 @@
       "from_pose_id": "j_015_e_0057_entry",
       "to_pose_id": "j_015_e_0238_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6548,7 +6544,7 @@
       "from_pose_id": "j_015_e_0239_entry",
       "to_pose_id": "j_015_e_0238_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6561,7 +6557,7 @@
       "from_pose_id": "j_015_e_0239_entry",
       "to_pose_id": "j_015_e_0057_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6652,7 +6648,7 @@
       "from_pose_id": "j_017_e_0005_entry",
       "to_pose_id": "j_017_e_0084_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6665,7 +6661,7 @@
       "from_pose_id": "j_017_e_0005_entry",
       "to_pose_id": "j_017_e_0004_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6691,7 +6687,7 @@
       "from_pose_id": "j_017_e_0084_entry",
       "to_pose_id": "j_017_e_0004_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6743,7 +6739,7 @@
       "from_pose_id": "j_018_e_0206_entry",
       "to_pose_id": "j_018_e_0005_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6756,7 +6752,7 @@
       "from_pose_id": "j_018_e_0006_entry",
       "to_pose_id": "j_018_e_0206_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6769,7 +6765,7 @@
       "from_pose_id": "j_018_e_0006_entry",
       "to_pose_id": "j_018_e_0005_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6912,7 +6908,7 @@
       "from_pose_id": "j_020_e_0240_entry",
       "to_pose_id": "j_020_e_0239_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6925,7 +6921,7 @@
       "from_pose_id": "j_020_e_0240_entry",
       "to_pose_id": "j_020_e_0069_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -6938,7 +6934,7 @@
       "from_pose_id": "j_020_e_0069_entry",
       "to_pose_id": "j_020_e_0239_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7068,7 +7064,7 @@
       "from_pose_id": "j_022_e_0241_entry",
       "to_pose_id": "j_022_e_0240_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7081,7 +7077,7 @@
       "from_pose_id": "j_022_e_0241_entry",
       "to_pose_id": "j_022_e_0149_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7094,7 +7090,7 @@
       "from_pose_id": "j_022_e_0149_entry",
       "to_pose_id": "j_022_e_0240_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7146,7 +7142,7 @@
       "from_pose_id": "j_023_e_0041_entry",
       "to_pose_id": "j_023_e_0241_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7172,7 +7168,7 @@
       "from_pose_id": "j_023_e_0242_entry",
       "to_pose_id": "j_023_e_0241_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7185,7 +7181,7 @@
       "from_pose_id": "j_023_e_0242_entry",
       "to_pose_id": "j_023_e_0041_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7276,7 +7272,7 @@
       "from_pose_id": "j_025_e_0078_entry",
       "to_pose_id": "j_025_e_0037_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7367,7 +7363,7 @@
       "from_pose_id": "j_025_e_0079_entry",
       "to_pose_id": "j_025_e_0037_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7393,7 +7389,7 @@
       "from_pose_id": "j_025_e_0038_entry",
       "to_pose_id": "j_025_e_0078_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7406,7 +7402,7 @@
       "from_pose_id": "j_025_e_0038_entry",
       "to_pose_id": "j_025_e_0037_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7419,7 +7415,7 @@
       "from_pose_id": "j_025_e_0038_entry",
       "to_pose_id": "j_025_e_0079_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7458,7 +7454,7 @@
       "from_pose_id": "j_026_e_0190_entry",
       "to_pose_id": "j_026_e_0161_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7484,7 +7480,7 @@
       "from_pose_id": "j_026_e_0162_entry",
       "to_pose_id": "j_026_e_0161_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7497,7 +7493,7 @@
       "from_pose_id": "j_026_e_0162_entry",
       "to_pose_id": "j_026_e_0190_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7536,7 +7532,7 @@
       "from_pose_id": "j_027_e_0163_entry",
       "to_pose_id": "j_027_e_0162_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7549,7 +7545,7 @@
       "from_pose_id": "j_027_e_0163_entry",
       "to_pose_id": "j_027_e_0152_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7562,7 +7558,7 @@
       "from_pose_id": "j_027_e_0152_entry",
       "to_pose_id": "j_027_e_0162_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7614,7 +7610,7 @@
       "from_pose_id": "j_028_e_0166_entry",
       "to_pose_id": "j_028_e_0165_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7627,7 +7623,7 @@
       "from_pose_id": "j_028_e_0166_entry",
       "to_pose_id": "j_028_e_0056_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7640,7 +7636,7 @@
       "from_pose_id": "j_028_e_0056_entry",
       "to_pose_id": "j_028_e_0165_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7692,7 +7688,7 @@
       "from_pose_id": "j_029_e_0070_entry",
       "to_pose_id": "j_029_e_0166_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7718,7 +7714,7 @@
       "from_pose_id": "j_029_e_0167_entry",
       "to_pose_id": "j_029_e_0166_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7731,7 +7727,7 @@
       "from_pose_id": "j_029_e_0167_entry",
       "to_pose_id": "j_029_e_0070_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7744,7 +7740,7 @@
       "from_pose_id": "j_030_e_0008_entry",
       "to_pose_id": "j_030_e_0022_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7757,7 +7753,7 @@
       "from_pose_id": "j_030_e_0008_entry",
       "to_pose_id": "j_030_e_0007_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7783,7 +7779,7 @@
       "from_pose_id": "j_030_e_0022_entry",
       "to_pose_id": "j_030_e_0007_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7848,7 +7844,7 @@
       "from_pose_id": "j_031_e_0207_entry",
       "to_pose_id": "j_031_e_0034_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7874,7 +7870,7 @@
       "from_pose_id": "j_031_e_0035_entry",
       "to_pose_id": "j_031_e_0034_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7887,7 +7883,7 @@
       "from_pose_id": "j_031_e_0035_entry",
       "to_pose_id": "j_031_e_0207_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7913,7 +7909,7 @@
       "from_pose_id": "j_032_e_0205_entry",
       "to_pose_id": "j_032_e_0008_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7926,7 +7922,7 @@
       "from_pose_id": "j_032_e_0009_entry",
       "to_pose_id": "j_032_e_0205_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -7939,7 +7935,7 @@
       "from_pose_id": "j_032_e_0009_entry",
       "to_pose_id": "j_032_e_0008_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8082,7 +8078,7 @@
       "from_pose_id": "j_034_e_0051_entry",
       "to_pose_id": "j_034_e_0167_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8108,7 +8104,7 @@
       "from_pose_id": "j_034_e_0168_entry",
       "to_pose_id": "j_034_e_0167_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8121,7 +8117,7 @@
       "from_pose_id": "j_034_e_0168_entry",
       "to_pose_id": "j_034_e_0051_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8160,7 +8156,7 @@
       "from_pose_id": "j_035_e_0183_entry",
       "to_pose_id": "j_035_e_0169_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8186,7 +8182,7 @@
       "from_pose_id": "j_035_e_0170_entry",
       "to_pose_id": "j_035_e_0169_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8199,7 +8195,7 @@
       "from_pose_id": "j_035_e_0170_entry",
       "to_pose_id": "j_035_e_0183_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8290,7 +8286,7 @@
       "from_pose_id": "j_037_e_0010_entry",
       "to_pose_id": "j_037_e_0198_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8303,7 +8299,7 @@
       "from_pose_id": "j_037_e_0010_entry",
       "to_pose_id": "j_037_e_0009_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8329,7 +8325,7 @@
       "from_pose_id": "j_037_e_0198_entry",
       "to_pose_id": "j_037_e_0009_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8368,7 +8364,7 @@
       "from_pose_id": "j_038_e_0024_entry",
       "to_pose_id": "j_038_e_0033_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8459,7 +8455,7 @@
       "from_pose_id": "j_038_e_0025_entry",
       "to_pose_id": "j_038_e_0033_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8485,7 +8481,7 @@
       "from_pose_id": "j_038_e_0034_entry",
       "to_pose_id": "j_038_e_0024_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8498,7 +8494,7 @@
       "from_pose_id": "j_038_e_0034_entry",
       "to_pose_id": "j_038_e_0033_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8511,7 +8507,7 @@
       "from_pose_id": "j_038_e_0034_entry",
       "to_pose_id": "j_038_e_0025_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8550,7 +8546,7 @@
       "from_pose_id": "j_039_e_0171_entry",
       "to_pose_id": "j_039_e_0170_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8563,7 +8559,7 @@
       "from_pose_id": "j_039_e_0171_entry",
       "to_pose_id": "j_039_e_0214_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8576,7 +8572,7 @@
       "from_pose_id": "j_039_e_0214_entry",
       "to_pose_id": "j_039_e_0170_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8615,7 +8611,7 @@
       "from_pose_id": "j_040_e_0171_entry",
       "to_pose_id": "j_040_e_0014_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8628,7 +8624,7 @@
       "from_pose_id": "j_040_e_0172_entry",
       "to_pose_id": "j_040_e_0171_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8641,7 +8637,7 @@
       "from_pose_id": "j_040_e_0172_entry",
       "to_pose_id": "j_040_e_0014_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8654,7 +8650,7 @@
       "from_pose_id": "j_040_e_0014_entry",
       "to_pose_id": "j_040_e_0171_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8706,7 +8702,7 @@
       "from_pose_id": "j_041_e_0063_entry",
       "to_pose_id": "j_041_e_0172_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8732,7 +8728,7 @@
       "from_pose_id": "j_041_e_0173_entry",
       "to_pose_id": "j_041_e_0172_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8745,7 +8741,7 @@
       "from_pose_id": "j_041_e_0173_entry",
       "to_pose_id": "j_041_e_0063_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8784,7 +8780,7 @@
       "from_pose_id": "j_042_e_0028_entry",
       "to_pose_id": "j_042_e_0031_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8810,7 +8806,7 @@
       "from_pose_id": "j_042_e_0032_entry",
       "to_pose_id": "j_042_e_0031_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8823,7 +8819,7 @@
       "from_pose_id": "j_042_e_0032_entry",
       "to_pose_id": "j_042_e_0028_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8849,7 +8845,7 @@
       "from_pose_id": "j_043_e_0173_entry",
       "to_pose_id": "j_043_e_0010_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8862,7 +8858,7 @@
       "from_pose_id": "j_043_e_0174_entry",
       "to_pose_id": "j_043_e_0173_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8875,7 +8871,7 @@
       "from_pose_id": "j_043_e_0174_entry",
       "to_pose_id": "j_043_e_0010_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8888,7 +8884,7 @@
       "from_pose_id": "j_043_e_0010_entry",
       "to_pose_id": "j_043_e_0173_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8914,7 +8910,7 @@
       "from_pose_id": "j_044_e_0174_entry",
       "to_pose_id": "j_044_e_0139_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8940,7 +8936,7 @@
       "from_pose_id": "j_044_e_0139_entry",
       "to_pose_id": "j_044_e_0174_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8966,7 +8962,7 @@
       "from_pose_id": "j_044_e_0175_entry",
       "to_pose_id": "j_044_e_0174_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -8979,7 +8975,7 @@
       "from_pose_id": "j_044_e_0175_entry",
       "to_pose_id": "j_044_e_0139_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9018,7 +9014,7 @@
       "from_pose_id": "j_045_e_0140_entry",
       "to_pose_id": "j_045_e_0175_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9031,7 +9027,7 @@
       "from_pose_id": "j_045_e_0140_entry",
       "to_pose_id": "j_045_e_0176_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9044,7 +9040,7 @@
       "from_pose_id": "j_045_e_0176_entry",
       "to_pose_id": "j_045_e_0175_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9057,7 +9053,7 @@
       "from_pose_id": "j_045_e_0176_entry",
       "to_pose_id": "j_045_e_0140_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9096,7 +9092,7 @@
       "from_pose_id": "j_046_e_0061_entry",
       "to_pose_id": "j_046_e_0176_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9122,7 +9118,7 @@
       "from_pose_id": "j_046_e_0177_entry",
       "to_pose_id": "j_046_e_0176_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9135,7 +9131,7 @@
       "from_pose_id": "j_046_e_0177_entry",
       "to_pose_id": "j_046_e_0061_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9252,7 +9248,7 @@
       "from_pose_id": "j_048_e_0178_entry",
       "to_pose_id": "j_048_e_0177_entry",
       "kind": "through",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9265,7 +9261,7 @@
       "from_pose_id": "j_048_e_0178_entry",
       "to_pose_id": "j_048_e_0031_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9278,7 +9274,7 @@
       "from_pose_id": "j_048_e_0031_entry",
       "to_pose_id": "j_048_e_0177_entry",
       "kind": "right",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     },
@@ -9291,7 +9287,7 @@
       "from_pose_id": "j_048_e_0031_entry",
       "to_pose_id": "j_048_e_0178_entry",
       "kind": "left",
-      "allowed": false,
+      "allowed": true,
       "confidence": 0.82,
       "geometry_status": "pending_connector_solver"
     }

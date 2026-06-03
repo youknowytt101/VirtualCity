@@ -6,6 +6,9 @@
 > AI / 新成员接手项目时，先阅读根目录：`AI_HANDOFF.md`。  
 > 然后阅读：`项目管理/00_AI接手指南.md`。  
 > 当前状态和下一步见：`项目管理/02_当前状态与下一步.md`。
+>
+> 当前最新道路研究工作见：`ProjectManagement/RoadResearch/road_test_pipeline/AI_START_HERE.md` 和
+> `ProjectManagement/RoadResearch/road_test_pipeline/CURRENT_STAGE_SNAPSHOT.md`。
 
 ## 目录结构
 

@@ -11,7 +11,7 @@
   },
   "metrics": {
     "junctions_with_connectors": 49,
-    "junctions_with_issues": 46,
+    "junctions_with_issues": 42,
     "connectors": 149,
     "connector_kind_counts": {
       "adjacent_fallback": 8,
@@ -19,102 +19,68 @@
       "t_turn": 94
     },
     "arc_geometry_counts": {
-      "bezier_tangent_fallback": 91,
-      "circular_arc": 16,
+      "bezier_tangent_fallback": 51,
+      "circular_arc": 56,
       "straight_infinite_radius": 42
     },
     "arc_fit_status_counts": {
-      "exact_tangent_arc": 16,
-      "incompatible_tangent_endpoints_bezier_fallback": 91,
+      "exact_tangent_arc": 56,
+      "incompatible_tangent_endpoints_bezier_fallback": 51,
       "near_straight_infinite_radius": 42
     },
     "issue_counts": {
-      "junction_trim_spread_excess": 24,
-      "radius_below_design_min": 90
+      "radius_below_design_min": 78
     }
   },
   "worst_junctions": [
     {
-      "junction_id": "n_0127",
-      "degree": 4,
-      "connector_count": 4,
+      "junction_id": "n_0191",
+      "degree": 3,
+      "connector_count": 3,
       "connector_kind_counts": {
-        "adjacent_fallback": 4
+        "t_through": 1,
+        "t_turn": 2
       },
-      "endpoint_distance_min_m": 4.499,
-      "endpoint_distance_max_m": 6.0,
-      "endpoint_distance_spread_m": 1.501,
-      "turn_radius_min_m": 3.694,
-      "turn_radius_avg_m": 3.773,
-      "turn_radius_margin_min_m": -2.306,
+      "endpoint_distance_min_m": 2.762,
+      "endpoint_distance_max_m": 6.301,
+      "endpoint_distance_spread_m": 3.539,
+      "turn_radius_min_m": 1.928,
+      "turn_radius_avg_m": 4.215,
+      "turn_radius_margin_min_m": -7.072,
       "issue_counts": {
-        "radius_below_design_min": 4
+        "radius_below_design_min": 2
       },
       "connectors_with_issues": [
         {
-          "connector_id": "n_0127_c_00",
-          "connector_kind": "adjacent_fallback",
-          "from_edge_id": "e_0078",
-          "to_edge_id": "e_0037",
+          "connector_id": "n_0191_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0010",
+          "to_edge_id": "e_0173",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.815,
-          "arc_design_min_radius_m": 6.0,
-          "arc_radius_margin_m": -2.185,
-          "arc_sweep_deg_abs": 89.347,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 6.0,
+          "arc_radius_m": 1.928,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -7.072,
+          "arc_sweep_deg_abs": 93.13,
+          "start_distance_to_center_m": 6.301,
+          "end_distance_to_center_m": 2.762,
           "issues": [
             "radius_below_design_min"
           ]
         },
         {
-          "connector_id": "n_0127_c_01",
-          "connector_kind": "adjacent_fallback",
-          "from_edge_id": "e_0037",
-          "to_edge_id": "e_0079",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.807,
-          "arc_design_min_radius_m": 6.0,
-          "arc_radius_margin_m": -2.193,
-          "arc_sweep_deg_abs": 89.456,
-          "start_distance_to_center_m": 6.0,
-          "end_distance_to_center_m": 4.499,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0127_c_02",
-          "connector_kind": "adjacent_fallback",
-          "from_edge_id": "e_0079",
-          "to_edge_id": "e_0038",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.694,
-          "arc_design_min_radius_m": 6.0,
-          "arc_radius_margin_m": -2.306,
-          "arc_sweep_deg_abs": 91.233,
-          "start_distance_to_center_m": 4.499,
-          "end_distance_to_center_m": 6.0,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0127_c_03",
-          "connector_kind": "adjacent_fallback",
-          "from_edge_id": "e_0038",
-          "to_edge_id": "e_0078",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.776,
-          "arc_design_min_radius_m": 6.0,
-          "arc_radius_margin_m": -2.224,
-          "arc_sweep_deg_abs": 89.964,
-          "start_distance_to_center_m": 6.0,
-          "end_distance_to_center_m": 4.5,
+          "connector_id": "n_0191_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0010",
+          "to_edge_id": "e_0174",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.501,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.499,
+          "arc_sweep_deg_abs": 88.207,
+          "start_distance_to_center_m": 6.301,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -130,13 +96,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 2.74,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 7.76,
-      "turn_radius_min_m": 1.933,
-      "turn_radius_avg_m": 3.315,
-      "turn_radius_margin_min_m": -7.067,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 3.56,
+      "turn_radius_min_m": 1.937,
+      "turn_radius_avg_m": 4.172,
+      "turn_radius_margin_min_m": -7.063,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -147,11 +112,11 @@
           "to_edge_id": "e_0171",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 1.933,
+          "arc_radius_m": 1.937,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -7.067,
+          "arc_radius_margin_m": -7.063,
           "arc_sweep_deg_abs": 92.632,
-          "start_distance_to_center_m": 6.0,
+          "start_distance_to_center_m": 6.3,
           "end_distance_to_center_m": 2.74,
           "issues": [
             "radius_below_design_min"
@@ -162,14 +127,14 @@
           "connector_kind": "t_turn",
           "from_edge_id": "e_0014",
           "to_edge_id": "e_0172",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.697,
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.407,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.303,
+          "arc_radius_margin_m": -2.593,
           "arc_sweep_deg_abs": 89.036,
-          "start_distance_to_center_m": 6.0,
-          "end_distance_to_center_m": 10.5,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -185,13 +150,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 2.762,
-      "endpoint_distance_max_m": 10.501,
-      "endpoint_distance_spread_m": 7.739,
-      "turn_radius_min_m": 2.075,
-      "turn_radius_avg_m": 2.788,
-      "turn_radius_margin_min_m": -6.925,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 3.538,
+      "turn_radius_min_m": 2.001,
+      "turn_radius_avg_m": 4.226,
+      "turn_radius_margin_min_m": -6.999,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -200,14 +164,14 @@
           "connector_kind": "t_turn",
           "from_edge_id": "e_0063",
           "to_edge_id": "e_0172",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.501,
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.451,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.499,
+          "arc_radius_margin_m": -2.549,
           "arc_sweep_deg_abs": 88.636,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 10.501,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -219,11 +183,11 @@
           "to_edge_id": "e_0173",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.075,
+          "arc_radius_m": 2.001,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.925,
+          "arc_radius_margin_m": -6.999,
           "arc_sweep_deg_abs": 91.589,
-          "start_distance_to_center_m": 4.5,
+          "start_distance_to_center_m": 6.3,
           "end_distance_to_center_m": 2.762,
           "issues": [
             "radius_below_design_min"
@@ -240,13 +204,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 3.072,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 7.428,
-      "turn_radius_min_m": 2.226,
-      "turn_radius_avg_m": 2.965,
-      "turn_radius_margin_min_m": -6.774,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 3.228,
+      "turn_radius_min_m": 2.2,
+      "turn_radius_avg_m": 3.155,
+      "turn_radius_margin_min_m": -6.8,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -257,11 +220,11 @@
           "to_edge_id": "e_0093",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.226,
+          "arc_radius_m": 2.2,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.774,
+          "arc_radius_margin_m": -6.8,
           "arc_sweep_deg_abs": 94.845,
-          "start_distance_to_center_m": 4.499,
+          "start_distance_to_center_m": 4.625,
           "end_distance_to_center_m": 3.072,
           "issues": [
             "radius_below_design_min"
@@ -274,12 +237,12 @@
           "to_edge_id": "e_0092",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.704,
+          "arc_radius_m": 4.11,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.296,
+          "arc_radius_margin_m": -4.89,
           "arc_sweep_deg_abs": 86.227,
-          "start_distance_to_center_m": 4.499,
-          "end_distance_to_center_m": 10.5,
+          "start_distance_to_center_m": 4.625,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -295,13 +258,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 2.741,
-      "endpoint_distance_max_m": 10.499,
-      "endpoint_distance_spread_m": 7.758,
-      "turn_radius_min_m": 2.285,
-      "turn_radius_avg_m": 2.744,
-      "turn_radius_margin_min_m": -6.715,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 3.559,
+      "turn_radius_min_m": 2.219,
+      "turn_radius_avg_m": 4.13,
+      "turn_radius_margin_min_m": -6.781,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -310,14 +272,14 @@
           "connector_kind": "t_turn",
           "from_edge_id": "e_0214",
           "to_edge_id": "e_0170",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.203,
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.042,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.797,
+          "arc_radius_margin_m": -2.958,
           "arc_sweep_deg_abs": 92.397,
-          "start_distance_to_center_m": 4.501,
-          "end_distance_to_center_m": 10.499,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -329,12 +291,66 @@
           "to_edge_id": "e_0171",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.285,
+          "arc_radius_m": 2.219,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.715,
+          "arc_radius_margin_m": -6.781,
           "arc_sweep_deg_abs": 86.885,
-          "start_distance_to_center_m": 4.501,
+          "start_distance_to_center_m": 6.3,
           "end_distance_to_center_m": 2.741,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0117",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 2.727,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 3.573,
+      "turn_radius_min_m": 2.22,
+      "turn_radius_avg_m": 4.051,
+      "turn_radius_margin_min_m": -6.78,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0117_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0149",
+          "to_edge_id": "e_0240",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 5.883,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -3.117,
+          "arc_sweep_deg_abs": 93.92,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0117_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0149",
+          "to_edge_id": "e_0241",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 2.22,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -6.78,
+          "arc_sweep_deg_abs": 86.667,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 2.727,
           "issues": [
             "radius_below_design_min"
           ]
@@ -350,13 +366,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 2.726,
-      "endpoint_distance_max_m": 10.499,
-      "endpoint_distance_spread_m": 7.773,
-      "turn_radius_min_m": 2.296,
-      "turn_radius_avg_m": 3.178,
-      "turn_radius_margin_min_m": -6.704,
+      "endpoint_distance_max_m": 6.301,
+      "endpoint_distance_spread_m": 3.575,
+      "turn_radius_min_m": 2.302,
+      "turn_radius_avg_m": 4.022,
+      "turn_radius_margin_min_m": -6.698,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -367,11 +382,11 @@
           "to_edge_id": "e_0241",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.296,
+          "arc_radius_m": 2.302,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.704,
+          "arc_radius_margin_m": -6.698,
           "arc_sweep_deg_abs": 85.092,
-          "start_distance_to_center_m": 6.0,
+          "start_distance_to_center_m": 6.301,
           "end_distance_to_center_m": 2.726,
           "issues": [
             "radius_below_design_min"
@@ -382,14 +397,14 @@
           "connector_kind": "t_turn",
           "from_edge_id": "e_0041",
           "to_edge_id": "e_0242",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.06,
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 5.743,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.94,
+          "arc_radius_margin_m": -3.257,
           "arc_sweep_deg_abs": 95.303,
-          "start_distance_to_center_m": 6.0,
-          "end_distance_to_center_m": 10.499,
+          "start_distance_to_center_m": 6.301,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -405,13 +420,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 3.645,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 6.855,
-      "turn_radius_min_m": 2.33,
-      "turn_radius_avg_m": 2.974,
-      "turn_radius_margin_min_m": -6.67,
+      "endpoint_distance_max_m": 6.301,
+      "endpoint_distance_spread_m": 2.656,
+      "turn_radius_min_m": 2.308,
+      "turn_radius_avg_m": 2.962,
+      "turn_radius_margin_min_m": -6.692,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -422,12 +436,12 @@
           "to_edge_id": "e_0233",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.33,
+          "arc_radius_m": 2.308,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.67,
+          "arc_radius_margin_m": -6.692,
           "arc_sweep_deg_abs": 98.202,
           "start_distance_to_center_m": 3.645,
-          "end_distance_to_center_m": 10.5,
+          "end_distance_to_center_m": 6.301,
           "issues": [
             "radius_below_design_min"
           ]
@@ -452,61 +466,6 @@
       ]
     },
     {
-      "junction_id": "n_0110",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 4.5,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 6.0,
-      "turn_radius_min_m": 2.603,
-      "turn_radius_avg_m": 3.541,
-      "turn_radius_margin_min_m": -6.397,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0110_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0069",
-          "to_edge_id": "e_0239",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.603,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.397,
-          "arc_sweep_deg_abs": 100.807,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 10.5,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0110_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0069",
-          "to_edge_id": "e_0240",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.479,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.521,
-          "arc_sweep_deg_abs": 78.673,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 6.781,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
       "junction_id": "n_0089",
       "degree": 3,
       "connector_count": 3,
@@ -515,13 +474,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 3.221,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 7.279,
-      "turn_radius_min_m": 2.625,
-      "turn_radius_avg_m": 2.679,
-      "turn_radius_margin_min_m": -6.375,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 3.079,
+      "turn_radius_min_m": 2.439,
+      "turn_radius_avg_m": 2.489,
+      "turn_radius_margin_min_m": -6.561,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -532,12 +490,12 @@
           "to_edge_id": "e_0090",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.625,
+          "arc_radius_m": 2.439,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.375,
+          "arc_radius_margin_m": -6.561,
           "arc_sweep_deg_abs": 89.776,
           "start_distance_to_center_m": 3.221,
-          "end_distance_to_center_m": 10.5,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -549,67 +507,12 @@
           "to_edge_id": "e_0089",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.734,
+          "arc_radius_m": 2.538,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.266,
+          "arc_radius_margin_m": -6.462,
           "arc_sweep_deg_abs": 88.067,
           "start_distance_to_center_m": 3.221,
-          "end_distance_to_center_m": 10.5,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0067",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 3.697,
-      "endpoint_distance_max_m": 10.501,
-      "endpoint_distance_spread_m": 6.804,
-      "turn_radius_min_m": 2.652,
-      "turn_radius_avg_m": 3.248,
-      "turn_radius_margin_min_m": -6.348,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0067_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0213",
-          "to_edge_id": "e_0096",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.652,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.348,
-          "arc_sweep_deg_abs": 100.056,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 10.501,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0067_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0213",
-          "to_edge_id": "e_0095",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.845,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.155,
-          "arc_sweep_deg_abs": 78.468,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 3.697,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -625,13 +528,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 3.696,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 6.804,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 2.604,
       "turn_radius_min_m": 2.814,
-      "turn_radius_avg_m": 3.458,
+      "turn_radius_avg_m": 3.558,
       "turn_radius_margin_min_m": -6.186,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -659,12 +561,12 @@
           "to_edge_id": "e_0094",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.102,
+          "arc_radius_m": 4.301,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.898,
+          "arc_radius_margin_m": -4.699,
           "arc_sweep_deg_abs": 82.118,
           "start_distance_to_center_m": 4.535,
-          "end_distance_to_center_m": 10.5,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -680,13 +582,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 4.024,
-      "endpoint_distance_max_m": 10.499,
-      "endpoint_distance_spread_m": 6.475,
-      "turn_radius_min_m": 2.913,
-      "turn_radius_avg_m": 3.075,
-      "turn_radius_margin_min_m": -6.087,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 2.276,
+      "turn_radius_min_m": 3.013,
+      "turn_radius_avg_m": 3.171,
+      "turn_radius_margin_min_m": -5.987,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -697,12 +598,12 @@
           "to_edge_id": "e_0092",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.913,
+          "arc_radius_m": 3.013,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.087,
+          "arc_radius_margin_m": -5.987,
           "arc_sweep_deg_abs": 92.276,
           "start_distance_to_center_m": 4.024,
-          "end_distance_to_center_m": 10.499,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -714,12 +615,12 @@
           "to_edge_id": "e_0091",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.238,
+          "arc_radius_m": 3.33,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.762,
+          "arc_radius_margin_m": -5.67,
           "arc_sweep_deg_abs": 87.83,
           "start_distance_to_center_m": 4.024,
-          "end_distance_to_center_m": 10.499,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -735,13 +636,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 4.275,
-      "endpoint_distance_max_m": 9.313,
-      "endpoint_distance_spread_m": 5.038,
-      "turn_radius_min_m": 3.032,
-      "turn_radius_avg_m": 3.489,
-      "turn_radius_margin_min_m": -5.968,
+      "endpoint_distance_max_m": 6.301,
+      "endpoint_distance_spread_m": 2.026,
+      "turn_radius_min_m": 3.265,
+      "turn_radius_avg_m": 3.605,
+      "turn_radius_margin_min_m": -5.735,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -769,177 +669,12 @@
           "to_edge_id": "e_0097",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.032,
+          "arc_radius_m": 3.265,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.968,
+          "arc_radius_margin_m": -5.735,
           "arc_sweep_deg_abs": 92.409,
           "start_distance_to_center_m": 4.275,
-          "end_distance_to_center_m": 9.313,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0092",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 5.108,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 5.392,
-      "turn_radius_min_m": 3.046,
-      "turn_radius_avg_m": 4.032,
-      "turn_radius_margin_min_m": -5.954,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0092_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0015",
-          "to_edge_id": "e_0237",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.046,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.954,
-          "arc_sweep_deg_abs": 99.582,
-          "start_distance_to_center_m": 5.108,
-          "end_distance_to_center_m": 10.5,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0092_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0015",
-          "to_edge_id": "e_0238",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 5.018,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -3.982,
-          "arc_sweep_deg_abs": 78.727,
-          "start_distance_to_center_m": 5.108,
-          "end_distance_to_center_m": 9.171,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0030",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 4.5,
-      "endpoint_distance_max_m": 10.499,
-      "endpoint_distance_spread_m": 5.999,
-      "turn_radius_min_m": 3.283,
-      "turn_radius_avg_m": 3.391,
-      "turn_radius_margin_min_m": -5.717,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0030_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0030",
-          "to_edge_id": "e_0105",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.283,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.717,
-          "arc_sweep_deg_abs": 91.354,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 10.499,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0030_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0030",
-          "to_edge_id": "e_0104",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.498,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.502,
-          "arc_sweep_deg_abs": 88.685,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 10.499,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0059",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 4.5,
-      "endpoint_distance_max_m": 10.501,
-      "endpoint_distance_spread_m": 6.001,
-      "turn_radius_min_m": 3.286,
-      "turn_radius_avg_m": 3.535,
-      "turn_radius_margin_min_m": -5.714,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0059_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0053",
-          "to_edge_id": "e_0097",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.785,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.215,
-          "arc_sweep_deg_abs": 85.121,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 9.312,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0059_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0053",
-          "to_edge_id": "e_0096",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.286,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.714,
-          "arc_sweep_deg_abs": 91.319,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 10.501,
+          "end_distance_to_center_m": 6.301,
           "issues": [
             "radius_below_design_min"
           ]
@@ -955,13 +690,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 4.437,
-      "endpoint_distance_max_m": 10.501,
-      "endpoint_distance_spread_m": 6.064,
-      "turn_radius_min_m": 3.29,
-      "turn_radius_avg_m": 3.655,
-      "turn_radius_margin_min_m": -5.71,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 1.863,
+      "turn_radius_min_m": 3.575,
+      "turn_radius_avg_m": 3.798,
+      "turn_radius_margin_min_m": -5.425,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -972,12 +706,12 @@
           "to_edge_id": "e_0099",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.29,
+          "arc_radius_m": 3.575,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.71,
+          "arc_radius_margin_m": -5.425,
           "arc_sweep_deg_abs": 90.726,
           "start_distance_to_center_m": 4.437,
-          "end_distance_to_center_m": 10.501,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -1002,329 +736,53 @@
       ]
     },
     {
-      "junction_id": "n_0143",
+      "junction_id": "n_0092",
       "degree": 3,
       "connector_count": 3,
       "connector_kind_counts": {
         "t_through": 1,
         "t_turn": 2
       },
-      "endpoint_distance_min_m": 4.5,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 6.0,
-      "turn_radius_min_m": 3.316,
-      "turn_radius_avg_m": 3.707,
-      "turn_radius_margin_min_m": -5.684,
+      "endpoint_distance_min_m": 5.108,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 1.192,
+      "turn_radius_min_m": 3.661,
+      "turn_radius_avg_m": 4.466,
+      "turn_radius_margin_min_m": -5.339,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
         {
-          "connector_id": "n_0143_c_01",
+          "connector_id": "n_0092_c_01",
           "connector_kind": "t_turn",
-          "from_edge_id": "e_0056",
-          "to_edge_id": "e_0165",
+          "from_edge_id": "e_0015",
+          "to_edge_id": "e_0237",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.316,
+          "arc_radius_m": 3.661,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.684,
-          "arc_sweep_deg_abs": 90.932,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 10.5,
+          "arc_radius_margin_m": -5.339,
+          "arc_sweep_deg_abs": 99.582,
+          "start_distance_to_center_m": 5.108,
+          "end_distance_to_center_m": 6.299,
           "issues": [
             "radius_below_design_min"
           ]
         },
         {
-          "connector_id": "n_0143_c_02",
+          "connector_id": "n_0092_c_02",
           "connector_kind": "t_turn",
-          "from_edge_id": "e_0056",
-          "to_edge_id": "e_0166",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.098,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.902,
-          "arc_sweep_deg_abs": 88.699,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 4.847,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0165",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 4.5,
-      "endpoint_distance_max_m": 10.499,
-      "endpoint_distance_spread_m": 5.999,
-      "turn_radius_min_m": 3.336,
-      "turn_radius_avg_m": 3.42,
-      "turn_radius_margin_min_m": -5.664,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0165_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0183",
-          "to_edge_id": "e_0169",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.504,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.496,
-          "arc_sweep_deg_abs": 88.44,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 9.677,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0165_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0183",
-          "to_edge_id": "e_0170",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.336,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.664,
-          "arc_sweep_deg_abs": 90.686,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 10.499,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0145",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 4.501,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 5.999,
-      "turn_radius_min_m": 3.368,
-      "turn_radius_avg_m": 3.728,
-      "turn_radius_margin_min_m": -5.632,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0145_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0070",
-          "to_edge_id": "e_0166",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.088,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.912,
-          "arc_sweep_deg_abs": 88.901,
-          "start_distance_to_center_m": 4.501,
-          "end_distance_to_center_m": 4.847,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0145_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0070",
-          "to_edge_id": "e_0167",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.368,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.632,
-          "arc_sweep_deg_abs": 90.287,
-          "start_distance_to_center_m": 4.501,
-          "end_distance_to_center_m": 10.5,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0132",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 4.5,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 6.0,
-      "turn_radius_min_m": 3.489,
-      "turn_radius_avg_m": 3.492,
-      "turn_radius_margin_min_m": -5.511,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0132_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0190",
-          "to_edge_id": "e_0161",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.489,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.511,
-          "arc_sweep_deg_abs": 88.785,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 10.5,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0132_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0190",
-          "to_edge_id": "e_0162",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.495,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.505,
-          "arc_sweep_deg_abs": 90.939,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 6.925,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0097",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 5.272,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 5.228,
-      "turn_radius_min_m": 3.498,
-      "turn_radius_avg_m": 4.136,
-      "turn_radius_margin_min_m": -5.502,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0097_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0057",
+          "from_edge_id": "e_0015",
           "to_edge_id": "e_0238",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.775,
+          "arc_radius_m": 5.271,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.225,
-          "arc_sweep_deg_abs": 82.602,
-          "start_distance_to_center_m": 5.272,
-          "end_distance_to_center_m": 9.17,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0097_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0057",
-          "to_edge_id": "e_0239",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.498,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.502,
-          "arc_sweep_deg_abs": 95.306,
-          "start_distance_to_center_m": 5.272,
-          "end_distance_to_center_m": 10.5,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0203",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 5.106,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 5.394,
-      "turn_radius_min_m": 3.565,
-      "turn_radius_avg_m": 3.885,
-      "turn_radius_margin_min_m": -5.435,
-      "issue_counts": {
-        "junction_trim_spread_excess": 1,
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0203_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0061",
-          "to_edge_id": "e_0176",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.204,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.796,
-          "arc_sweep_deg_abs": 86.051,
-          "start_distance_to_center_m": 5.106,
-          "end_distance_to_center_m": 10.499,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0203_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0061",
-          "to_edge_id": "e_0177",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.565,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.435,
-          "arc_sweep_deg_abs": 93.103,
-          "start_distance_to_center_m": 5.106,
-          "end_distance_to_center_m": 10.5,
+          "arc_radius_margin_m": -3.729,
+          "arc_sweep_deg_abs": 78.727,
+          "start_distance_to_center_m": 5.108,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -1340,13 +798,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 4.571,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 5.929,
-      "turn_radius_min_m": 3.762,
-      "turn_radius_avg_m": 4.407,
-      "turn_radius_margin_min_m": -5.238,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 1.729,
+      "turn_radius_min_m": 3.682,
+      "turn_radius_avg_m": 5.23,
+      "turn_radius_margin_min_m": -5.318,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -1357,11 +814,11 @@
           "to_edge_id": "e_0106",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.762,
+          "arc_radius_m": 3.682,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.238,
+          "arc_radius_margin_m": -5.318,
           "arc_sweep_deg_abs": 91.375,
-          "start_distance_to_center_m": 6.0,
+          "start_distance_to_center_m": 6.299,
           "end_distance_to_center_m": 4.571,
           "issues": [
             "radius_below_design_min"
@@ -1372,14 +829,284 @@
           "connector_kind": "t_turn",
           "from_edge_id": "e_0021",
           "to_edge_id": "e_0105",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.778,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.222,
+          "arc_sweep_deg_abs": 85.816,
+          "start_distance_to_center_m": 6.299,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0067",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 3.697,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 2.603,
+      "turn_radius_min_m": 3.683,
+      "turn_radius_avg_m": 4.482,
+      "turn_radius_margin_min_m": -5.317,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0067_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0213",
+          "to_edge_id": "e_0096",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 5.281,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -3.719,
+          "arc_sweep_deg_abs": 100.056,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0067_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0213",
+          "to_edge_id": "e_0095",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 5.053,
+          "arc_radius_m": 3.683,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -3.947,
-          "arc_sweep_deg_abs": 85.816,
-          "start_distance_to_center_m": 6.0,
-          "end_distance_to_center_m": 10.5,
+          "arc_radius_margin_m": -5.317,
+          "arc_sweep_deg_abs": 78.468,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 3.697,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0203",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 5.106,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 1.194,
+      "turn_radius_min_m": 4.166,
+      "turn_radius_avg_m": 4.421,
+      "turn_radius_margin_min_m": -4.834,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0203_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0061",
+          "to_edge_id": "e_0176",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 4.676,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -4.324,
+          "arc_sweep_deg_abs": 86.051,
+          "start_distance_to_center_m": 5.106,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0203_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0061",
+          "to_edge_id": "e_0177",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 4.166,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -4.834,
+          "arc_sweep_deg_abs": 93.103,
+          "start_distance_to_center_m": 5.106,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0145",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 4.847,
+      "endpoint_distance_max_m": 6.301,
+      "endpoint_distance_spread_m": 1.454,
+      "turn_radius_min_m": 4.167,
+      "turn_radius_avg_m": 5.218,
+      "turn_radius_margin_min_m": -4.833,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0145_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0070",
+          "to_edge_id": "e_0166",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 4.167,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -4.833,
+          "arc_sweep_deg_abs": 88.901,
+          "start_distance_to_center_m": 6.301,
+          "end_distance_to_center_m": 4.847,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0145_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0070",
+          "to_edge_id": "e_0167",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.269,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.731,
+          "arc_sweep_deg_abs": 90.287,
+          "start_distance_to_center_m": 6.301,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0143",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 4.847,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 1.453,
+      "turn_radius_min_m": 4.182,
+      "turn_radius_avg_m": 5.19,
+      "turn_radius_margin_min_m": -4.818,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0143_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0056",
+          "to_edge_id": "e_0165",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.198,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.802,
+          "arc_sweep_deg_abs": 90.932,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0143_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0056",
+          "to_edge_id": "e_0166",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 4.182,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -4.818,
+          "arc_sweep_deg_abs": 88.699,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 4.847,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0097",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 5.272,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 1.028,
+      "turn_radius_min_m": 4.201,
+      "turn_radius_avg_m": 4.68,
+      "turn_radius_margin_min_m": -4.799,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0097_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0057",
+          "to_edge_id": "e_0238",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 5.159,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -3.841,
+          "arc_sweep_deg_abs": 82.602,
+          "start_distance_to_center_m": 5.272,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0097_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0057",
+          "to_edge_id": "e_0239",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 4.201,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -4.799,
+          "arc_sweep_deg_abs": 95.306,
+          "start_distance_to_center_m": 5.272,
+          "end_distance_to_center_m": 6.299,
           "issues": [
             "radius_below_design_min"
           ]
@@ -1395,13 +1122,12 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 5.098,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 5.402,
-      "turn_radius_min_m": 3.838,
-      "turn_radius_avg_m": 3.921,
-      "turn_radius_margin_min_m": -5.162,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 1.202,
+      "turn_radius_min_m": 4.381,
+      "turn_radius_avg_m": 4.447,
+      "turn_radius_margin_min_m": -4.619,
       "issue_counts": {
-        "junction_trim_spread_excess": 1,
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
@@ -1412,12 +1138,12 @@
           "to_edge_id": "e_0103",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.838,
+          "arc_radius_m": 4.381,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.162,
+          "arc_radius_margin_m": -4.619,
           "arc_sweep_deg_abs": 89.907,
           "start_distance_to_center_m": 5.098,
-          "end_distance_to_center_m": 10.5,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -1429,12 +1155,12 @@
           "to_edge_id": "e_0102",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.003,
+          "arc_radius_m": 4.512,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.997,
+          "arc_radius_margin_m": -4.488,
           "arc_sweep_deg_abs": 88.108,
           "start_distance_to_center_m": 5.098,
-          "end_distance_to_center_m": 10.5,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
@@ -1442,215 +1168,53 @@
       ]
     },
     {
-      "junction_id": "n_0191",
+      "junction_id": "n_0059",
       "degree": 3,
       "connector_count": 3,
       "connector_kind_counts": {
         "t_through": 1,
         "t_turn": 2
       },
-      "endpoint_distance_min_m": 2.762,
-      "endpoint_distance_max_m": 6.353,
-      "endpoint_distance_spread_m": 3.591,
-      "turn_radius_min_m": 1.926,
-      "turn_radius_avg_m": 3.712,
-      "turn_radius_margin_min_m": -7.074,
+      "endpoint_distance_min_m": 5.202,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 1.098,
+      "turn_radius_min_m": 4.4,
+      "turn_radius_avg_m": 4.633,
+      "turn_radius_margin_min_m": -4.6,
       "issue_counts": {
         "radius_below_design_min": 2
       },
       "connectors_with_issues": [
         {
-          "connector_id": "n_0191_c_01",
+          "connector_id": "n_0059_c_01",
           "connector_kind": "t_turn",
-          "from_edge_id": "e_0010",
-          "to_edge_id": "e_0173",
+          "from_edge_id": "e_0053",
+          "to_edge_id": "e_0097",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 1.926,
+          "arc_radius_m": 4.865,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -7.074,
-          "arc_sweep_deg_abs": 93.13,
-          "start_distance_to_center_m": 6.0,
-          "end_distance_to_center_m": 2.762,
+          "arc_radius_margin_m": -4.135,
+          "arc_sweep_deg_abs": 85.121,
+          "start_distance_to_center_m": 5.202,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]
         },
         {
-          "connector_id": "n_0191_c_02",
+          "connector_id": "n_0059_c_02",
           "connector_kind": "t_turn",
-          "from_edge_id": "e_0010",
-          "to_edge_id": "e_0174",
+          "from_edge_id": "e_0053",
+          "to_edge_id": "e_0096",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 5.498,
+          "arc_radius_m": 4.4,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -3.502,
-          "arc_sweep_deg_abs": 88.207,
-          "start_distance_to_center_m": 6.0,
-          "end_distance_to_center_m": 6.353,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0117",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 2.727,
-      "endpoint_distance_max_m": 6.781,
-      "endpoint_distance_spread_m": 4.054,
-      "turn_radius_min_m": 2.281,
-      "turn_radius_avg_m": 2.787,
-      "turn_radius_margin_min_m": -6.719,
-      "issue_counts": {
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0117_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0149",
-          "to_edge_id": "e_0240",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.292,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.708,
-          "arc_sweep_deg_abs": 93.92,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 6.781,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0117_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0149",
-          "to_edge_id": "e_0241",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 2.281,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -6.719,
-          "arc_sweep_deg_abs": 86.667,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 2.727,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0135",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 4.5,
-      "endpoint_distance_max_m": 6.924,
-      "endpoint_distance_spread_m": 2.424,
-      "turn_radius_min_m": 3.48,
-      "turn_radius_avg_m": 3.577,
-      "turn_radius_margin_min_m": -5.52,
-      "issue_counts": {
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0135_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0152",
-          "to_edge_id": "e_0162",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.48,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.52,
-          "arc_sweep_deg_abs": 91.129,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 6.924,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0135_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0152",
-          "to_edge_id": "e_0163",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.675,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.325,
-          "arc_sweep_deg_abs": 89.82,
-          "start_distance_to_center_m": 4.5,
-          "end_distance_to_center_m": 6.483,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        }
-      ]
-    },
-    {
-      "junction_id": "n_0215",
-      "degree": 3,
-      "connector_count": 3,
-      "connector_kind_counts": {
-        "t_through": 1,
-        "t_turn": 2
-      },
-      "endpoint_distance_min_m": 5.999,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 4.501,
-      "turn_radius_min_m": 3.925,
-      "turn_radius_avg_m": 4.537,
-      "turn_radius_margin_min_m": -5.075,
-      "issue_counts": {
-        "radius_below_design_min": 2
-      },
-      "connectors_with_issues": [
-        {
-          "connector_id": "n_0215_c_01",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0031",
-          "to_edge_id": "e_0177",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 3.925,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -5.075,
-          "arc_sweep_deg_abs": 96.731,
-          "start_distance_to_center_m": 5.999,
-          "end_distance_to_center_m": 10.5,
-          "issues": [
-            "radius_below_design_min"
-          ]
-        },
-        {
-          "connector_id": "n_0215_c_02",
-          "connector_kind": "t_turn",
-          "from_edge_id": "e_0031",
-          "to_edge_id": "e_0178",
-          "arc_geometry": "bezier_tangent_fallback",
-          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 5.148,
-          "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -3.852,
-          "arc_sweep_deg_abs": 84.975,
-          "start_distance_to_center_m": 5.999,
-          "end_distance_to_center_m": 10.5,
+          "arc_radius_margin_m": -4.6,
+          "arc_sweep_deg_abs": 91.319,
+          "start_distance_to_center_m": 5.202,
+          "end_distance_to_center_m": 6.299,
           "issues": [
             "radius_below_design_min"
           ]
@@ -1666,11 +1230,11 @@
         "t_turn": 2
       },
       "endpoint_distance_min_m": 5.744,
-      "endpoint_distance_max_m": 10.5,
-      "endpoint_distance_spread_m": 4.756,
-      "turn_radius_min_m": 4.159,
-      "turn_radius_avg_m": 4.772,
-      "turn_radius_margin_min_m": -4.841,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 0.556,
+      "turn_radius_min_m": 5.018,
+      "turn_radius_avg_m": 5.201,
+      "turn_radius_margin_min_m": -3.982,
       "issue_counts": {
         "radius_below_design_min": 2
       },
@@ -1699,12 +1263,390 @@
           "to_edge_id": "e_0176",
           "arc_geometry": "bezier_tangent_fallback",
           "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
-          "arc_radius_m": 4.159,
+          "arc_radius_m": 5.018,
           "arc_design_min_radius_m": 9.0,
-          "arc_radius_margin_m": -4.841,
+          "arc_radius_margin_m": -3.982,
           "arc_sweep_deg_abs": 92.07,
           "start_distance_to_center_m": 5.744,
-          "end_distance_to_center_m": 10.5,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0194",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 5.953,
+      "endpoint_distance_max_m": 6.301,
+      "endpoint_distance_spread_m": 0.348,
+      "turn_radius_min_m": 5.17,
+      "turn_radius_avg_m": 5.886,
+      "turn_radius_margin_min_m": -3.83,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0194_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0139",
+          "to_edge_id": "e_0174",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.601,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.399,
+          "arc_sweep_deg_abs": 87.327,
+          "start_distance_to_center_m": 6.301,
+          "end_distance_to_center_m": 6.301,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0194_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0139",
+          "to_edge_id": "e_0175",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 5.17,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -3.83,
+          "arc_sweep_deg_abs": 92.763,
+          "start_distance_to_center_m": 6.301,
+          "end_distance_to_center_m": 5.953,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0110",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 6.299,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 0.001,
+      "turn_radius_min_m": 5.211,
+      "turn_radius_avg_m": 6.449,
+      "turn_radius_margin_min_m": -3.789,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0110_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0069",
+          "to_edge_id": "e_0239",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 5.211,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -3.789,
+          "arc_sweep_deg_abs": 100.807,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.299,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0110_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0069",
+          "to_edge_id": "e_0240",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 7.687,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -1.313,
+          "arc_sweep_deg_abs": 78.673,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.299,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0215",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 6.3,
+      "endpoint_distance_max_m": 6.301,
+      "endpoint_distance_spread_m": 0.001,
+      "turn_radius_min_m": 5.6,
+      "turn_radius_avg_m": 6.239,
+      "turn_radius_margin_min_m": -3.4,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0215_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0031",
+          "to_edge_id": "e_0177",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 5.6,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -3.4,
+          "arc_sweep_deg_abs": 96.731,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.301,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0215_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0031",
+          "to_edge_id": "e_0178",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.879,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.121,
+          "arc_sweep_deg_abs": 84.975,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.301,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0068",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 6.3,
+      "endpoint_distance_max_m": 6.301,
+      "endpoint_distance_spread_m": 0.001,
+      "turn_radius_min_m": 5.626,
+      "turn_radius_avg_m": 6.386,
+      "turn_radius_margin_min_m": -3.374,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0068_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0020",
+          "to_edge_id": "e_0232",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 5.626,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -3.374,
+          "arc_sweep_deg_abs": 96.474,
+          "start_distance_to_center_m": 6.301,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0068_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0020",
+          "to_edge_id": "e_0233",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 7.145,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -1.855,
+          "arc_sweep_deg_abs": 82.81,
+          "start_distance_to_center_m": 6.301,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0030",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 6.3,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 0.0,
+      "turn_radius_min_m": 6.153,
+      "turn_radius_avg_m": 6.3,
+      "turn_radius_margin_min_m": -2.847,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0030_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0030",
+          "to_edge_id": "e_0105",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.153,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.847,
+          "arc_sweep_deg_abs": 91.354,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0030_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0030",
+          "to_edge_id": "e_0104",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.446,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.554,
+          "arc_sweep_deg_abs": 88.685,
+          "start_distance_to_center_m": 6.3,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0135",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 6.299,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 0.001,
+      "turn_radius_min_m": 6.177,
+      "turn_radius_avg_m": 6.248,
+      "turn_radius_margin_min_m": -2.823,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0135_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0152",
+          "to_edge_id": "e_0162",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.177,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.823,
+          "arc_sweep_deg_abs": 91.129,
+          "start_distance_to_center_m": 6.299,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0135_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0152",
+          "to_edge_id": "e_0163",
+          "arc_geometry": "circular_arc",
+          "arc_fit_status": "exact_tangent_arc",
+          "arc_radius_m": 6.32,
+          "arc_design_min_radius_m": 9.0,
+          "arc_radius_margin_m": -2.68,
+          "arc_sweep_deg_abs": 89.82,
+          "start_distance_to_center_m": 6.299,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        }
+      ]
+    },
+    {
+      "junction_id": "n_0156",
+      "degree": 3,
+      "connector_count": 3,
+      "connector_kind_counts": {
+        "t_through": 1,
+        "t_turn": 2
+      },
+      "endpoint_distance_min_m": 4.092,
+      "endpoint_distance_max_m": 6.3,
+      "endpoint_distance_spread_m": 2.208,
+      "turn_radius_min_m": 3.186,
+      "turn_radius_avg_m": 3.306,
+      "turn_radius_margin_min_m": -2.814,
+      "issue_counts": {
+        "radius_below_design_min": 2
+      },
+      "connectors_with_issues": [
+        {
+          "connector_id": "n_0156_c_01",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0201",
+          "to_edge_id": "e_0022",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 3.426,
+          "arc_design_min_radius_m": 6.0,
+          "arc_radius_margin_m": -2.574,
+          "arc_sweep_deg_abs": 87.562,
+          "start_distance_to_center_m": 4.092,
+          "end_distance_to_center_m": 6.3,
+          "issues": [
+            "radius_below_design_min"
+          ]
+        },
+        {
+          "connector_id": "n_0156_c_02",
+          "connector_kind": "t_turn",
+          "from_edge_id": "e_0201",
+          "to_edge_id": "e_0023",
+          "arc_geometry": "bezier_tangent_fallback",
+          "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+          "arc_radius_m": 3.186,
+          "arc_design_min_radius_m": 6.0,
+          "arc_radius_margin_m": -2.814,
+          "arc_sweep_deg_abs": 90.82,
+          "start_distance_to_center_m": 4.092,
+          "end_distance_to_center_m": 6.3,
           "issues": [
             "radius_below_design_min"
           ]

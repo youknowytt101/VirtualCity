@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build the clean road skeleton stage before Houdini construction.
 
-This runner intentionally stops before lane graph, lane surfaces and OpenDRIVE
-export. Its contract is:
+This runner intentionally stops before lane surfaces and OpenDRIVE export. It
+now also emits a topology-only lane graph artifact as a non-destructive contract
+for later lane-level junction reconstruction. Its road skeleton contract is:
 
 raw data -> road repair/pre-Houdini engineering -> clean skeleton GeoJSON
 
@@ -372,6 +373,7 @@ def main() -> int:
     parser.add_argument("--apply-high-confidence", action="store_true", help="Promote high-confidence topology repair candidates before graph building.")
     parser.add_argument("--manual-overrides", default="", help="Manual topology overrides JSON. Defaults to config/<area_id>.manual_overrides.json.")
     parser.add_argument("--no-manual-overrides", action="store_true", help="Do not load manual topology overrides.")
+    parser.add_argument("--traffic-side", choices=["left", "right"], default="left", help="Traffic side assumption for lane graph topology.")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=18811)
     args = parser.parse_args()
@@ -396,11 +398,30 @@ def main() -> int:
     engineering_reference_lines = processed / f"{args.area_id}_engineering_reference_lines.json"
     optimized_centerlines = processed / f"{args.area_id}_roads_optimized_centerlines.geojson"
     junction_connector_candidates = processed / f"{args.area_id}_junction_connector_candidates.json"
+    short_edge_absorption_candidates = processed / f"{args.area_id}_short_edge_absorption_candidates.json"
+    lane_attribute_model = processed / f"{args.area_id}_lane_attribute_model.json"
+    lane_graph = processed / f"{args.area_id}_lane_graph.json"
+    movement_corridor_candidates = processed / f"{args.area_id}_movement_corridor_candidates.json"
     clean_skeleton = processed / f"{args.area_id}_roads_clean_skeleton.geojson"
+    lane_graph_svg = reports / "visualizations" / f"{args.area_id}_lane_graph_topology.svg"
     clean_skeleton_report = reports / f"{args.area_id}_road_skeleton_repair_report.json"
     junction_geometry_audit = reports / f"{args.area_id}_junction_geometry_audit_report.json"
     junction_connector_solver = reports / f"{args.area_id}_junction_connector_solver_report.json"
     junction_connector_replacement = reports / f"{args.area_id}_junction_connector_replacement_report.json"
+    short_edge_absorption_report = reports / f"{args.area_id}_short_edge_absorption_report.json"
+    lane_attribute_model_report = reports / f"{args.area_id}_lane_attribute_model_report.json"
+    lane_graph_report = reports / f"{args.area_id}_lane_graph_report.json"
+    lane_graph_svg_report = reports / f"{args.area_id}_lane_graph_svg_report.json"
+    movement_corridor_report = reports / f"{args.area_id}_movement_corridor_report.json"
+    movement_corridor_qa = reports / "qa" / f"{args.area_id}_movement_corridor_qa_report.json"
+    movement_anchor_gap_audit = processed / f"{args.area_id}_movement_anchor_gap_audit.json"
+    movement_anchor_gap_audit_report = reports / f"{args.area_id}_movement_anchor_gap_audit_report.json"
+    compound_junction_merge_candidates = processed / f"{args.area_id}_compound_junction_merge_candidates.json"
+    compound_junction_merge_report = reports / f"{args.area_id}_compound_junction_merge_report.json"
+    compound_junction_merge_qa = reports / "qa" / f"{args.area_id}_compound_junction_merge_qa_report.json"
+    compound_junction_merge_transactions = processed / f"{args.area_id}_compound_junction_merge_transactions.json"
+    compound_junction_merge_transaction_report = reports / f"{args.area_id}_compound_junction_merge_transaction_report.json"
+    compound_junction_merge_transaction_qa = reports / "qa" / f"{args.area_id}_compound_junction_merge_transaction_qa_report.json"
     junction_area_regularization = reports / f"{args.area_id}_junction_area_regularization_report.json"
     repair_casebook_qa = reports / "qa" / f"{args.area_id}_repair_casebook_qa_report.json"
     manual_overrides = Path(args.manual_overrides) if args.manual_overrides else root / "config" / f"{args.area_id}.manual_overrides.json"
@@ -442,6 +463,62 @@ def main() -> int:
         ("L6.6 connector replacement transaction", [python_cmd(), str(root / "scripts" / "apply_connector_replacements.py"), "--area-id", args.area_id]),
         ("L6.7 junction geometry audit after replacement", [python_cmd(), str(root / "scripts" / "junction_geometry_audit.py"), "--area-id", args.area_id]),
         ("L6.8 junction connector solver candidates refresh", [python_cmd(), str(root / "scripts" / "solve_junction_connectors.py"), "--area-id", args.area_id]),
+        ("L6.9 junction-zone expansion planner", [python_cmd(), str(root / "scripts" / "plan_short_edge_absorptions.py"), "--area-id", args.area_id]),
+        ("L7.0 lane attribute model", [python_cmd(), str(root / "scripts" / "build_lane_attribute_model.py"), "--area-id", args.area_id]),
+        ("L7.1 lane graph topology", [python_cmd(), str(root / "scripts" / "build_lane_graph.py"), "--area-id", args.area_id, "--traffic-side", args.traffic_side]),
+        ("L7.1 lane graph QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "lane_graph", "--area-id", args.area_id]),
+        (
+            "L8.0 movement corridor candidates",
+            [
+                python_cmd(),
+                str(root / "scripts" / "solve_movement_corridors.py"),
+                "--area-id",
+                args.area_id,
+                "--short-edge-absorptions",
+                str(short_edge_absorption_candidates),
+            ],
+        ),
+        (
+            "L8.1 anchored movement corridor SVG visualization",
+            [
+                python_cmd(),
+                str(root / "scripts" / "export_lane_graph_svg.py"),
+                "--area-id",
+                args.area_id,
+                "--movement-corridors",
+                str(movement_corridor_candidates),
+                "--width-px",
+                "3200",
+                "--max-height-px",
+                "9000",
+            ],
+        ),
+        ("L8.0 movement corridor QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "movement_corridor", "--area-id", args.area_id]),
+        ("L8.2 movement anchor gap audit", [python_cmd(), str(root / "scripts" / "audit_movement_anchors.py"), "--area-id", args.area_id]),
+        ("L8.3 compound junction merge planner", [python_cmd(), str(root / "scripts" / "plan_compound_junction_merges.py"), "--area-id", args.area_id]),
+        ("L8.3 compound junction merge QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "compound_junction_merge", "--area-id", args.area_id]),
+        ("L8.4 compound junction merge transaction", [python_cmd(), str(root / "scripts" / "apply_compound_junction_merges.py"), "--area-id", args.area_id]),
+        (
+            "L8.4 compound junction merge transaction QA",
+            [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "compound_junction_merge_transaction", "--area-id", args.area_id],
+        ),
+        (
+            "L8.5 staged compound movement SVG visualization",
+            [
+                python_cmd(),
+                str(root / "scripts" / "export_lane_graph_svg.py"),
+                "--area-id",
+                args.area_id,
+                "--movement-corridors",
+                str(movement_corridor_candidates),
+                "--compound-transactions",
+                str(compound_junction_merge_transactions),
+                "--width-px",
+                "3200",
+                "--max-height-px",
+                "9000",
+            ],
+        ),
     ])
 
     for name, cmd in steps:
@@ -496,12 +573,31 @@ def main() -> int:
             "engineering_reference_lines": str(engineering_reference_lines),
             "engineering_centerlines": str(optimized_centerlines),
             "junction_connector_candidates": str(junction_connector_candidates),
+            "short_edge_absorption_candidates": str(short_edge_absorption_candidates),
+            "lane_attribute_model": str(lane_attribute_model),
+            "lane_graph": str(lane_graph),
+            "lane_graph_svg": str(lane_graph_svg),
+            "movement_corridor_candidates": str(movement_corridor_candidates),
             "clean_skeleton": str(clean_skeleton),
             "clean_skeleton_report": str(clean_skeleton_report),
             "junction_area_regularization": str(junction_area_regularization),
             "junction_geometry_audit": str(junction_geometry_audit),
             "junction_connector_solver": str(junction_connector_solver),
             "junction_connector_replacement": str(junction_connector_replacement),
+            "short_edge_absorption_report": str(short_edge_absorption_report),
+            "lane_attribute_model_report": str(lane_attribute_model_report),
+            "lane_graph_report": str(lane_graph_report),
+            "lane_graph_svg_report": str(lane_graph_svg_report),
+            "movement_corridor_report": str(movement_corridor_report),
+            "movement_corridor_qa": str(movement_corridor_qa),
+            "movement_anchor_gap_audit": str(movement_anchor_gap_audit),
+            "movement_anchor_gap_audit_report": str(movement_anchor_gap_audit_report),
+            "compound_junction_merge_candidates": str(compound_junction_merge_candidates),
+            "compound_junction_merge_report": str(compound_junction_merge_report),
+            "compound_junction_merge_qa": str(compound_junction_merge_qa),
+            "compound_junction_merge_transactions": str(compound_junction_merge_transactions),
+            "compound_junction_merge_transaction_report": str(compound_junction_merge_transaction_report),
+            "compound_junction_merge_transaction_qa": str(compound_junction_merge_transaction_qa),
             "repair_casebook_qa": str(repair_casebook_qa),
             "log": str(log_path),
             "manual_overrides": "" if args.no_manual_overrides else str(manual_overrides),
@@ -509,8 +605,13 @@ def main() -> int:
         "options": {
             "apply_high_confidence": args.apply_high_confidence,
             "manual_overrides_enabled": not args.no_manual_overrides,
+            "traffic_side": args.traffic_side,
         },
-        "next_stage": "Resolve remaining connector cases with short-edge absorption and real clothoid/paramPoly3 fitting.",
+        "next_stage": (
+            "compound_junction_merge_transactions（复合路口合并事务） are accepted for staging preview. "
+            "Next review staged compound movement corridors（暂存复合通行走廊） in SVG, then add "
+            "collision（碰撞） and swept-envelope（扫掠包络） scoring before destructive writeback（写入式回写）."
+        ),
     }
     summary_path = reports / f"{args.area_id}_road_skeleton_repair_summary.json"
     write_json(summary_path, summary)

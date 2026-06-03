@@ -1,0 +1,507 @@
+{
+  "type": "compound_junction_merge_candidates",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "road_test_pipeline.compound_junction_merge_candidates.v1",
+    "coord_domain": "local_xz_m",
+    "planning_domain": "compound junction merge（复合路口合并）",
+    "contract": "Non-destructive planner（非破坏式规划器） for adjacent_junction_short_link（相邻路口短连接） records from movement_anchor_gap_audit（通行锚点缺口审计）. It groups short junction-to-junction bridge edges（桥接短边） into compound junction merge candidates（复合路口合并候选） and does not modify road_graph（道路图）, clean skeleton（干净道路骨架） or Houdini（胡迪尼） geometry.",
+    "inputs": {
+      "movement_anchor_gap_audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_anchor_gap_audit.json",
+      "junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+      "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json"
+    }
+  },
+  "candidates": [
+    {
+      "candidate_id": "pattaya_central_500m_compound_merge_000",
+      "status": "transaction_candidate",
+      "risk": "low",
+      "issues": [],
+      "transaction_family": "compound_junction_merge（复合路口合并）",
+      "member_junction_node_ids": [
+        "n_0117",
+        "n_0118"
+      ],
+      "member_junctions": [
+        {
+          "junction_id": "j_022",
+          "junction_node_id": "n_0117",
+          "degree": 3,
+          "center_xz": [
+            -19.074,
+            -211.664
+          ],
+          "conflict_zone_radius_m": 7.8
+        },
+        {
+          "junction_id": "j_023",
+          "junction_node_id": "n_0118",
+          "degree": 3,
+          "center_xz": [
+            -14.734,
+            -207.59
+          ],
+          "conflict_zone_radius_m": 7.8
+        }
+      ],
+      "bridge_edge_ids": [
+        "e_0241"
+      ],
+      "bridge_edges": [
+        {
+          "edge_id": "e_0241",
+          "from_node": "n_0117",
+          "to_node": "n_0118",
+          "from_node_kind": "junction",
+          "to_node_kind": "junction",
+          "road_class": "secondary",
+          "name": "ถนนพัทยาสายสอง",
+          "length_m": 5.953,
+          "anchor_record_count": 8,
+          "corridor_ids": [
+            "mc_00132",
+            "mc_00134",
+            "mc_00135",
+            "mc_00137",
+            "mc_00138",
+            "mc_00139",
+            "mc_00140",
+            "mc_00142"
+          ],
+          "lane_link_ids": [
+            "ll_00132",
+            "ll_00134",
+            "ll_00135",
+            "ll_00137",
+            "ll_00138",
+            "ll_00139",
+            "ll_00140",
+            "ll_00142"
+          ],
+          "avg_desired_trim_m": 6.3,
+          "avg_entry_trim_m": 5.453,
+          "avg_trim_deficit_m": 0.847,
+          "max_trim_deficit_m": 0.847
+        }
+      ],
+      "external_approach_edge_ids": [
+        "e_0041",
+        "e_0149",
+        "e_0240",
+        "e_0242"
+      ],
+      "external_approaches": [
+        {
+          "junction_node_id": "n_0118",
+          "edge_id": "e_0041",
+          "other_node_id": "n_0120",
+          "road_class": "residential",
+          "edge_length_m": 7.683,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "warn",
+          "issues": [
+            "short_edge_absorption_candidate"
+          ]
+        },
+        {
+          "junction_node_id": "n_0117",
+          "edge_id": "e_0149",
+          "other_node_id": "n_0111",
+          "road_class": "service",
+          "edge_length_m": 13.606,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        },
+        {
+          "junction_node_id": "n_0117",
+          "edge_id": "e_0240",
+          "other_node_id": "n_0110",
+          "road_class": "secondary",
+          "edge_length_m": 14.061,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        },
+        {
+          "junction_node_id": "n_0118",
+          "edge_id": "e_0242",
+          "other_node_id": "n_0123",
+          "road_class": "secondary",
+          "edge_length_m": 30.739,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        }
+      ],
+      "planned_compound_zone": {
+        "center_xz": [
+          -16.904,
+          -209.627
+        ],
+        "conflict_zone_radius_m": 10.776,
+        "model": "union_of_member_junction_zones（成员路口影响区并集）"
+      },
+      "affected_anchor_records": 8,
+      "affected_corridor_ids": [
+        "mc_00132",
+        "mc_00134",
+        "mc_00135",
+        "mc_00137",
+        "mc_00138",
+        "mc_00139",
+        "mc_00140",
+        "mc_00142"
+      ],
+      "affected_lane_link_ids": [
+        "ll_00132",
+        "ll_00134",
+        "ll_00135",
+        "ll_00137",
+        "ll_00138",
+        "ll_00139",
+        "ll_00140",
+        "ll_00142"
+      ],
+      "predicted_benefit": {
+        "capacity_limited_anchors_explained": 8,
+        "unique_corridors_explained": 8,
+        "avg_bridge_length_m": 5.953,
+        "max_bridge_length_m": 5.953,
+        "avg_trim_deficit_m": 0.847
+      },
+      "transaction_contract": "Candidate only（仅候选）. A later destructive transaction（写入式事务） must trial-merge the member junction zones（成员路口影响区）, regenerate entry poses（入口姿态） and movement corridors（通行走廊）, then rollback（回滚） if protected QA（保护质量门禁） regresses."
+    },
+    {
+      "candidate_id": "pattaya_central_500m_compound_merge_001",
+      "status": "transaction_candidate",
+      "risk": "low",
+      "issues": [],
+      "transaction_family": "compound_junction_merge（复合路口合并）",
+      "member_junction_node_ids": [
+        "n_0173",
+        "n_0176"
+      ],
+      "member_junctions": [
+        {
+          "junction_id": "j_039",
+          "junction_node_id": "n_0173",
+          "degree": 3,
+          "center_xz": [
+            144.267,
+            2.238
+          ],
+          "conflict_zone_radius_m": 7.8
+        },
+        {
+          "junction_id": "j_040",
+          "junction_node_id": "n_0176",
+          "degree": 3,
+          "center_xz": [
+            147.793,
+            7.069
+          ],
+          "conflict_zone_radius_m": 7.8
+        }
+      ],
+      "bridge_edge_ids": [
+        "e_0171"
+      ],
+      "bridge_edges": [
+        {
+          "edge_id": "e_0171",
+          "from_node": "n_0173",
+          "to_node": "n_0176",
+          "from_node_kind": "junction",
+          "to_node_kind": "junction",
+          "road_class": "secondary",
+          "name": "ถนนพัทยาสายสอง",
+          "length_m": 5.981,
+          "anchor_record_count": 8,
+          "corridor_ids": [
+            "mc_00246",
+            "mc_00248",
+            "mc_00249",
+            "mc_00251",
+            "mc_00252",
+            "mc_00253",
+            "mc_00254",
+            "mc_00256"
+          ],
+          "lane_link_ids": [
+            "ll_00246",
+            "ll_00248",
+            "ll_00249",
+            "ll_00251",
+            "ll_00252",
+            "ll_00253",
+            "ll_00254",
+            "ll_00256"
+          ],
+          "avg_desired_trim_m": 6.3,
+          "avg_entry_trim_m": 5.481,
+          "avg_trim_deficit_m": 0.819,
+          "max_trim_deficit_m": 0.819
+        }
+      ],
+      "external_approach_edge_ids": [
+        "e_0014",
+        "e_0170",
+        "e_0172",
+        "e_0214"
+      ],
+      "external_approaches": [
+        {
+          "junction_node_id": "n_0176",
+          "edge_id": "e_0014",
+          "other_node_id": "n_0116",
+          "road_class": "residential",
+          "edge_length_m": 207.518,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        },
+        {
+          "junction_node_id": "n_0173",
+          "edge_id": "e_0170",
+          "other_node_id": "n_0165",
+          "road_class": "secondary",
+          "edge_length_m": 29.924,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        },
+        {
+          "junction_node_id": "n_0176",
+          "edge_id": "e_0172",
+          "other_node_id": "n_0187",
+          "road_class": "secondary",
+          "edge_length_m": 74.902,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        },
+        {
+          "junction_node_id": "n_0173",
+          "edge_id": "e_0214",
+          "other_node_id": "n_0071",
+          "road_class": "service",
+          "edge_length_m": 326.492,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        }
+      ],
+      "planned_compound_zone": {
+        "center_xz": [
+          146.03,
+          4.654
+        ],
+        "conflict_zone_radius_m": 10.79,
+        "model": "union_of_member_junction_zones（成员路口影响区并集）"
+      },
+      "affected_anchor_records": 8,
+      "affected_corridor_ids": [
+        "mc_00246",
+        "mc_00248",
+        "mc_00249",
+        "mc_00251",
+        "mc_00252",
+        "mc_00253",
+        "mc_00254",
+        "mc_00256"
+      ],
+      "affected_lane_link_ids": [
+        "ll_00246",
+        "ll_00248",
+        "ll_00249",
+        "ll_00251",
+        "ll_00252",
+        "ll_00253",
+        "ll_00254",
+        "ll_00256"
+      ],
+      "predicted_benefit": {
+        "capacity_limited_anchors_explained": 8,
+        "unique_corridors_explained": 8,
+        "avg_bridge_length_m": 5.981,
+        "max_bridge_length_m": 5.981,
+        "avg_trim_deficit_m": 0.819
+      },
+      "transaction_contract": "Candidate only（仅候选）. A later destructive transaction（写入式事务） must trial-merge the member junction zones（成员路口影响区）, regenerate entry poses（入口姿态） and movement corridors（通行走廊）, then rollback（回滚） if protected QA（保护质量门禁） regresses."
+    },
+    {
+      "candidate_id": "pattaya_central_500m_compound_merge_002",
+      "status": "transaction_candidate",
+      "risk": "low",
+      "issues": [],
+      "transaction_family": "compound_junction_merge（复合路口合并）",
+      "member_junction_node_ids": [
+        "n_0187",
+        "n_0191"
+      ],
+      "member_junctions": [
+        {
+          "junction_id": "j_041",
+          "junction_node_id": "n_0187",
+          "degree": 3,
+          "center_xz": [
+            190.171,
+            68.829
+          ],
+          "conflict_zone_radius_m": 7.8
+        },
+        {
+          "junction_id": "j_043",
+          "junction_node_id": "n_0191",
+          "degree": 3,
+          "center_xz": [
+            193.599,
+            73.783
+          ],
+          "conflict_zone_radius_m": 7.8
+        }
+      ],
+      "bridge_edge_ids": [
+        "e_0173"
+      ],
+      "bridge_edges": [
+        {
+          "edge_id": "e_0173",
+          "from_node": "n_0187",
+          "to_node": "n_0191",
+          "from_node_kind": "junction",
+          "to_node_kind": "junction",
+          "road_class": "secondary",
+          "name": "ถนนพัทยาสายสอง",
+          "length_m": 6.024,
+          "anchor_record_count": 8,
+          "corridor_ids": [
+            "mc_00259",
+            "mc_00261",
+            "mc_00262",
+            "mc_00263",
+            "mc_00270",
+            "mc_00271",
+            "mc_00272",
+            "mc_00274"
+          ],
+          "lane_link_ids": [
+            "ll_00259",
+            "ll_00261",
+            "ll_00262",
+            "ll_00263",
+            "ll_00270",
+            "ll_00271",
+            "ll_00272",
+            "ll_00274"
+          ],
+          "avg_desired_trim_m": 6.3,
+          "avg_entry_trim_m": 5.524,
+          "avg_trim_deficit_m": 0.776,
+          "max_trim_deficit_m": 0.776
+        }
+      ],
+      "external_approach_edge_ids": [
+        "e_0010",
+        "e_0063",
+        "e_0172",
+        "e_0174"
+      ],
+      "external_approaches": [
+        {
+          "junction_node_id": "n_0191",
+          "edge_id": "e_0010",
+          "other_node_id": "n_0167",
+          "road_class": "residential",
+          "edge_length_m": 72.927,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        },
+        {
+          "junction_node_id": "n_0187",
+          "edge_id": "e_0063",
+          "other_node_id": "n_0192",
+          "road_class": "service",
+          "edge_length_m": 7.136,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "warn",
+          "issues": [
+            "short_edge_absorption_candidate"
+          ]
+        },
+        {
+          "junction_node_id": "n_0187",
+          "edge_id": "e_0172",
+          "other_node_id": "n_0176",
+          "road_class": "secondary",
+          "edge_length_m": 74.902,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        },
+        {
+          "junction_node_id": "n_0191",
+          "edge_id": "e_0174",
+          "other_node_id": "n_0194",
+          "road_class": "secondary",
+          "edge_length_m": 13.205,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        }
+      ],
+      "planned_compound_zone": {
+        "center_xz": [
+          191.885,
+          71.306
+        ],
+        "conflict_zone_radius_m": 10.812,
+        "model": "union_of_member_junction_zones（成员路口影响区并集）"
+      },
+      "affected_anchor_records": 8,
+      "affected_corridor_ids": [
+        "mc_00259",
+        "mc_00261",
+        "mc_00262",
+        "mc_00263",
+        "mc_00270",
+        "mc_00271",
+        "mc_00272",
+        "mc_00274"
+      ],
+      "affected_lane_link_ids": [
+        "ll_00259",
+        "ll_00261",
+        "ll_00262",
+        "ll_00263",
+        "ll_00270",
+        "ll_00271",
+        "ll_00272",
+        "ll_00274"
+      ],
+      "predicted_benefit": {
+        "capacity_limited_anchors_explained": 8,
+        "unique_corridors_explained": 8,
+        "avg_bridge_length_m": 6.024,
+        "max_bridge_length_m": 6.024,
+        "avg_trim_deficit_m": 0.776
+      },
+      "transaction_contract": "Candidate only（仅候选）. A later destructive transaction（写入式事务） must trial-merge the member junction zones（成员路口影响区）, regenerate entry poses（入口姿态） and movement corridors（通行走廊）, then rollback（回滚） if protected QA（保护质量门禁） regresses."
+    }
+  ]
+}

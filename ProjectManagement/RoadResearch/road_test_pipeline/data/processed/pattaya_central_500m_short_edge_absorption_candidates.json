@@ -1,0 +1,1718 @@
+{
+  "type": "short_edge_absorption_candidates",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "road_test_pipeline.short_edge_absorption_candidates.v1",
+    "planning_domain": "junction-zone expansion（路口影响区扩张）",
+    "coord_domain": "local_xz_m",
+    "source_road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "source_junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+    "note": "Planner output only. short-edge absorption（短边吸收） is treated as a junction-zone expansion（路口影响区扩张） candidate; no graph, centerline, or Houdini geometry is modified here.",
+    "source_connector_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json"
+  },
+  "candidates": [
+    {
+      "candidate_id": "n_0108_e_0145_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "medium",
+      "issues": [],
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "short_edge_id": "e_0145",
+      "absorbed_connector_node_id": "n_0105",
+      "terminal_node_id": "n_0104",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0145",
+        "e_0146"
+      ],
+      "successor_edge_ids": [
+        "e_0146"
+      ],
+      "affected_connector_ids": [
+        "n_0108_c_00",
+        "n_0108_c_01"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0108_c_00",
+        "n_0108_c_01"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_019_e_0145_entry",
+        "entry_trim_m": 2.555,
+        "entry_xz": [
+          -37.409,
+          -200.38
+        ],
+        "center_distance_m": 2.555,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -40.843,
+          -201.849
+        ],
+        "center_distance_m": 6.263,
+        "tangent_out_xz": [
+          -0.9077,
+          -0.419619
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 2.555,
+        "available_after_absorption_m": 7.754,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 3.745,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 8.254,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 12.408,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0089_e_0040_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_013",
+      "junction_node_id": "n_0089",
+      "short_edge_id": "e_0040",
+      "absorbed_connector_node_id": "n_0091",
+      "terminal_node_id": "n_0119",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0040",
+        "e_0039"
+      ],
+      "successor_edge_ids": [
+        "e_0039"
+      ],
+      "affected_connector_ids": [
+        "n_0089_c_01",
+        "n_0089_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0089_c_01",
+        "n_0089_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_013_e_0040_entry",
+        "entry_trim_m": 3.221,
+        "entry_xz": [
+          -65.767,
+          321.116
+        ],
+        "center_distance_m": 3.221,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -62.983,
+          319.8
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.904111,
+          -0.427298
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 3.221,
+        "available_after_absorption_m": 59.91,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 3.079,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 60.41,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.029,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0099_e_0148_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "medium",
+      "issues": [],
+      "junction_id": "j_016",
+      "junction_node_id": "n_0099",
+      "short_edge_id": "e_0148",
+      "absorbed_connector_node_id": "n_0102",
+      "terminal_node_id": "n_0104",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0148",
+        "e_0147"
+      ],
+      "successor_edge_ids": [
+        "e_0147"
+      ],
+      "affected_connector_ids": [
+        "n_0099_c_01",
+        "n_0099_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0099_c_01",
+        "n_0099_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_016_e_0148_entry",
+        "entry_trim_m": 3.468,
+        "entry_xz": [
+          -45.152,
+          -205.531
+        ],
+        "center_distance_m": 3.468,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -43.326,
+          -203.4
+        ],
+        "center_distance_m": 6.208,
+        "tangent_out_xz": [
+          0.696281,
+          0.717769
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 3.468,
+        "available_after_absorption_m": 6.818,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 2.832,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 7.318,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 20.271,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0078_e_0135_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_011",
+      "junction_node_id": "n_0078",
+      "short_edge_id": "e_0135",
+      "absorbed_connector_node_id": "n_0077",
+      "terminal_node_id": "n_0063",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0135",
+        "e_0134"
+      ],
+      "successor_edge_ids": [
+        "e_0134"
+      ],
+      "affected_connector_ids": [
+        "n_0078_c_01",
+        "n_0078_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0078_c_01",
+        "n_0078_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_011_e_0135_entry",
+        "entry_trim_m": 3.645,
+        "entry_xz": [
+          -108.155,
+          -286.792
+        ],
+        "center_distance_m": 3.645,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -110.193,
+          -285.089
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          -0.767459,
+          0.641098
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 3.645,
+        "available_after_absorption_m": 79.942,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 2.655,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 80.442,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.047,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0081_e_0000_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_012",
+      "junction_node_id": "n_0081",
+      "short_edge_id": "e_0000",
+      "absorbed_connector_node_id": "n_0082",
+      "terminal_node_id": "n_0084",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0000",
+        "e_0001"
+      ],
+      "successor_edge_ids": [
+        "e_0001"
+      ],
+      "affected_connector_ids": [
+        "n_0081_c_01",
+        "n_0081_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0081_c_01",
+        "n_0081_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_012_e_0000_entry",
+        "entry_trim_m": 4.024,
+        "entry_xz": [
+          -97.767,
+          253.878
+        ],
+        "center_distance_m": 4.024,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -95.786,
+          252.756
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.870209,
+          -0.492683
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 4.024,
+        "available_after_absorption_m": 9.921,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 2.276,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 10.421,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.034,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0156_e_0201_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_033",
+      "junction_node_id": "n_0156",
+      "short_edge_id": "e_0201",
+      "absorbed_connector_node_id": "n_0157",
+      "terminal_node_id": "n_0164",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0201",
+        "e_0200"
+      ],
+      "successor_edge_ids": [
+        "e_0200"
+      ],
+      "affected_connector_ids": [
+        "n_0156_c_01",
+        "n_0156_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0156_c_01",
+        "n_0156_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_033_e_0201_entry",
+        "entry_trim_m": 4.092,
+        "entry_xz": [
+          107.16,
+          156.627
+        ],
+        "center_distance_m": 4.092,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          109.085,
+          155.545
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.87187,
+          -0.489738
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 4.092,
+        "available_after_absorption_m": 22.957,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 2.208,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 23.457,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.005,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0054_e_0211_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_004",
+      "junction_node_id": "n_0054",
+      "short_edge_id": "e_0211",
+      "absorbed_connector_node_id": "n_0055",
+      "terminal_node_id": "n_0057",
+      "terminal_node_kind": "dead_end",
+      "path_edge_ids": [
+        "e_0211",
+        "e_0212"
+      ],
+      "successor_edge_ids": [
+        "e_0212"
+      ],
+      "affected_connector_ids": [
+        "n_0054_c_01",
+        "n_0054_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0054_c_01",
+        "n_0054_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_004_e_0211_entry",
+        "entry_trim_m": 4.275,
+        "entry_xz": [
+          -190.897,
+          80.465
+        ],
+        "center_distance_m": 4.275,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -189.14,
+          79.459
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.867805,
+          -0.496906
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 4.275,
+        "available_after_absorption_m": 7.926,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 2.025,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 8.426,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.019,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0051_e_0209_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "medium",
+      "issues": [],
+      "junction_id": "j_003",
+      "junction_node_id": "n_0051",
+      "short_edge_id": "e_0209",
+      "absorbed_connector_node_id": "n_0053",
+      "terminal_node_id": "n_0058",
+      "terminal_node_kind": "dead_end",
+      "path_edge_ids": [
+        "e_0209",
+        "e_0210"
+      ],
+      "successor_edge_ids": [
+        "e_0210"
+      ],
+      "affected_connector_ids": [
+        "n_0051_c_01",
+        "n_0051_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0051_c_01",
+        "n_0051_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_003_e_0209_entry",
+        "entry_trim_m": 4.437,
+        "entry_xz": [
+          -196.026,
+          72.006
+        ],
+        "center_distance_m": 4.437,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -194.626,
+          70.787
+        ],
+        "center_distance_m": 6.28,
+        "tangent_out_xz": [
+          0.719002,
+          -0.695008
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 4.437,
+        "available_after_absorption_m": 17.731,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.863,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 18.231,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 11.117,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0069_e_0011_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_008",
+      "junction_node_id": "n_0069",
+      "short_edge_id": "e_0011",
+      "absorbed_connector_node_id": "n_0072",
+      "terminal_node_id": "n_0076",
+      "terminal_node_kind": "junction",
+      "path_edge_ids": [
+        "e_0011",
+        "e_0012"
+      ],
+      "successor_edge_ids": [
+        "e_0012"
+      ],
+      "affected_connector_ids": [
+        "n_0069_c_01",
+        "n_0069_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0069_c_01",
+        "n_0069_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_008_e_0011_entry",
+        "entry_trim_m": 4.535,
+        "entry_xz": [
+          -129.48,
+          190.438
+        ],
+        "center_distance_m": 4.535,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -128.009,
+          189.463
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.83599,
+          -0.548744
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 4.535,
+        "available_after_absorption_m": 20.42,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.765,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 20.92,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.873,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0028_e_0106_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_000",
+      "junction_node_id": "n_0028",
+      "short_edge_id": "e_0106",
+      "absorbed_connector_node_id": "n_0026",
+      "terminal_node_id": "n_0024",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0106",
+        "e_0107"
+      ],
+      "successor_edge_ids": [
+        "e_0107"
+      ],
+      "affected_connector_ids": [
+        "n_0028_c_00",
+        "n_0028_c_01"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0028_c_00",
+        "n_0028_c_01"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_000_e_0106_entry",
+        "entry_trim_m": 4.572,
+        "entry_xz": [
+          -347.057,
+          -137.691
+        ],
+        "center_distance_m": 4.572,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -348.146,
+          -139.033
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          -0.631877,
+          -0.775069
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 4.572,
+        "available_after_absorption_m": 58.59,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.728,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 59.09,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.375,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0074_e_0202_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_009",
+      "junction_node_id": "n_0074",
+      "short_edge_id": "e_0202",
+      "absorbed_connector_node_id": "n_0075",
+      "terminal_node_id": "n_0079",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0202",
+        "e_0203"
+      ],
+      "successor_edge_ids": [
+        "e_0203"
+      ],
+      "affected_connector_ids": [
+        "n_0074_c_01",
+        "n_0074_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0074_c_01",
+        "n_0074_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_009_e_0202_entry",
+        "entry_trim_m": 4.625,
+        "entry_xz": [
+          -120.848,
+          207.68
+        ],
+        "center_distance_m": 4.625,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -119.412,
+          206.817
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.856973,
+          -0.515361
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 4.625,
+        "available_after_absorption_m": 22.121,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.675,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 22.621,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.043,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0035_e_0019_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_002",
+      "junction_node_id": "n_0035",
+      "short_edge_id": "e_0019",
+      "absorbed_connector_node_id": "n_0036",
+      "terminal_node_id": "n_0042",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0019",
+        "e_0018"
+      ],
+      "successor_edge_ids": [
+        "e_0018"
+      ],
+      "affected_connector_ids": [
+        "n_0035_c_01",
+        "n_0035_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0035_c_01",
+        "n_0035_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_002_e_0019_entry",
+        "entry_trim_m": 5.099,
+        "entry_xz": [
+          -294.078,
+          -74.432
+        ],
+        "center_distance_m": 5.099,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -293.112,
+          -75.146
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.804445,
+          -0.594027
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 5.099,
+        "available_after_absorption_m": 41.042,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.201,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 41.542,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.029,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0203_e_0061_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_046",
+      "junction_node_id": "n_0203",
+      "short_edge_id": "e_0061",
+      "absorbed_connector_node_id": "n_0205",
+      "terminal_node_id": "n_0230",
+      "terminal_node_kind": "dead_end",
+      "path_edge_ids": [
+        "e_0061",
+        "e_0062"
+      ],
+      "successor_edge_ids": [
+        "e_0062"
+      ],
+      "affected_connector_ids": [
+        "n_0203_c_01",
+        "n_0203_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0203_c_01",
+        "n_0203_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_046_e_0061_entry",
+        "entry_trim_m": 5.106,
+        "entry_xz": [
+          232.096,
+          124.9
+        ],
+        "center_distance_m": 5.106,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          233.152,
+          124.343
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.884363,
+          -0.466801
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 5.106,
+        "available_after_absorption_m": 91.217,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.194,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 91.717,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.009,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0092_e_0015_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_014",
+      "junction_node_id": "n_0092",
+      "short_edge_id": "e_0015",
+      "absorbed_connector_node_id": "n_0090",
+      "terminal_node_id": "n_0066",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0015",
+        "e_0016"
+      ],
+      "successor_edge_ids": [
+        "e_0016"
+      ],
+      "affected_connector_ids": [
+        "n_0092_c_01",
+        "n_0092_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0092_c_01",
+        "n_0092_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_014_e_0015_entry",
+        "entry_trim_m": 5.108,
+        "entry_xz": [
+          -67.458,
+          -248.949
+        ],
+        "center_distance_m": 5.108,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -68.401,
+          -248.221
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          -0.791731,
+          0.61087
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 5.108,
+        "available_after_absorption_m": 92.578,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.192,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 93.078,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.045,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0059_e_0053_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "medium",
+      "issues": [],
+      "junction_id": "j_005",
+      "junction_node_id": "n_0059",
+      "short_edge_id": "e_0053",
+      "absorbed_connector_node_id": "n_0061",
+      "terminal_node_id": "n_0112",
+      "terminal_node_kind": "junction",
+      "path_edge_ids": [
+        "e_0053",
+        "e_0054"
+      ],
+      "successor_edge_ids": [
+        "e_0054"
+      ],
+      "affected_connector_ids": [
+        "n_0059_c_01",
+        "n_0059_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0059_c_01",
+        "n_0059_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_005_e_0053_entry",
+        "entry_trim_m": 5.202,
+        "entry_xz": [
+          -179.799,
+          96.388
+        ],
+        "center_distance_m": 5.202,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -178.869,
+          95.808
+        ],
+        "center_distance_m": 6.294,
+        "tangent_out_xz": [
+          0.810885,
+          -0.585206
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 5.202,
+        "available_after_absorption_m": 191.183,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.098,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 191.683,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 8.511,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0097_e_0057_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_015",
+      "junction_node_id": "n_0097",
+      "short_edge_id": "e_0057",
+      "absorbed_connector_node_id": "n_0101",
+      "terminal_node_id": "n_0131",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0057",
+        "e_0058"
+      ],
+      "successor_edge_ids": [
+        "e_0058"
+      ],
+      "affected_connector_ids": [
+        "n_0097_c_01",
+        "n_0097_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0097_c_01",
+        "n_0097_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_015_e_0057_entry",
+        "entry_trim_m": 5.272,
+        "entry_xz": [
+          -45.259,
+          -243.203
+        ],
+        "center_distance_m": 5.272,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -44.49,
+          -243.885
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.748619,
+          -0.663
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 5.272,
+        "available_after_absorption_m": 124.533,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.028,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 125.033,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.043,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0199_e_0140_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_045",
+      "junction_node_id": "n_0199",
+      "short_edge_id": "e_0140",
+      "absorbed_connector_node_id": "n_0200",
+      "terminal_node_id": "n_0216",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0140",
+        "e_0141"
+      ],
+      "successor_edge_ids": [
+        "e_0141"
+      ],
+      "affected_connector_ids": [
+        "n_0199_c_01",
+        "n_0199_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0199_c_01",
+        "n_0199_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_045_e_0140_entry",
+        "entry_trim_m": 5.745,
+        "entry_xz": [
+          212.683,
+          92.321
+        ],
+        "center_distance_m": 5.745,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          213.166,
+          92.046
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.868687,
+          -0.495361
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 5.745,
+        "available_after_absorption_m": 57.14,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 0.555,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 57.64,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.004,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0074_e_0093_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_009",
+      "junction_node_id": "n_0074",
+      "short_edge_id": "e_0093",
+      "absorbed_connector_node_id": "n_0073",
+      "terminal_node_id": "n_0069",
+      "terminal_node_kind": "junction",
+      "path_edge_ids": [
+        "e_0093",
+        "e_0094"
+      ],
+      "successor_edge_ids": [
+        "e_0094"
+      ],
+      "affected_connector_ids": [
+        "n_0074_c_00",
+        "n_0074_c_01"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0074_c_01"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_009_e_0093_entry",
+        "entry_trim_m": 3.071,
+        "entry_xz": [
+          -126.166,
+          207.304
+        ],
+        "center_distance_m": 3.071,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -127.594,
+          204.408
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          -0.442631,
+          -0.896704
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 3.071,
+        "available_after_absorption_m": 18.539,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 3.229,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 19.039,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.137,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 1
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0078_e_0234_short_edge_absorption",
+      "status": "transaction_ready",
+      "risk": "low",
+      "issues": [],
+      "junction_id": "j_011",
+      "junction_node_id": "n_0078",
+      "short_edge_id": "e_0234",
+      "absorbed_connector_node_id": "n_0080",
+      "terminal_node_id": "n_0083",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0234",
+        "e_0235"
+      ],
+      "successor_edge_ids": [
+        "e_0235"
+      ],
+      "affected_connector_ids": [
+        "n_0078_c_00",
+        "n_0078_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0078_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_011_e_0234_entry",
+        "entry_trim_m": 4.726,
+        "entry_xz": [
+          -101.759,
+          -286.071
+        ],
+        "center_distance_m": 4.726,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -100.56,
+          -285.051
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.761498,
+          0.648167
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 4.726,
+        "available_after_absorption_m": 10.824,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 1.574,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 11.324,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 0.045,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 1
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0108_e_0150_short_edge_absorption",
+      "status": "qa_candidate",
+      "risk": "medium",
+      "issues": [
+        "low_trim_recovery"
+      ],
+      "junction_id": "j_019",
+      "junction_node_id": "n_0108",
+      "short_edge_id": "e_0150",
+      "absorbed_connector_node_id": "n_0111",
+      "terminal_node_id": "n_0117",
+      "terminal_node_kind": "junction",
+      "path_edge_ids": [
+        "e_0150",
+        "e_0149"
+      ],
+      "successor_edge_ids": [
+        "e_0149"
+      ],
+      "affected_connector_ids": [
+        "n_0108_c_00",
+        "n_0108_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0108_c_00",
+        "n_0108_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_019_e_0150_entry",
+        "entry_trim_m": 5.959,
+        "entry_xz": [
+          -29.408,
+          -202.111
+        ],
+        "center_distance_m": 5.959,
+        "issues": [
+          "entry_trim_capacity_limited",
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -29.093,
+          -202.241
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.923913,
+          -0.382603
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 5.959,
+        "available_after_absorption_m": 19.565,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 0.341,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 20.065,
+        "path_edge_count": 2,
+        "max_chain_angle_deg": 20.983,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0118_e_0041_short_edge_absorption",
+      "status": "qa_candidate",
+      "risk": "medium",
+      "issues": [
+        "low_trim_recovery"
+      ],
+      "junction_id": "j_023",
+      "junction_node_id": "n_0118",
+      "short_edge_id": "e_0041",
+      "absorbed_connector_node_id": "n_0120",
+      "terminal_node_id": "n_0120",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0041"
+      ],
+      "successor_edge_ids": [],
+      "affected_connector_ids": [
+        "n_0118_c_01",
+        "n_0118_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0118_c_01",
+        "n_0118_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_023_e_0041_entry",
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -10.045,
+          -211.798
+        ],
+        "center_distance_m": 6.3,
+        "issues": [
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          -10.045,
+          -211.798
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.744277,
+          -0.667871
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 6.3,
+        "available_after_absorption_m": 7.183,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 0.0,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 7.683,
+        "path_edge_count": 1,
+        "max_chain_angle_deg": 0.0,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0132_e_0190_short_edge_absorption",
+      "status": "qa_candidate",
+      "risk": "medium",
+      "issues": [
+        "low_trim_recovery"
+      ],
+      "junction_id": "j_026",
+      "junction_node_id": "n_0132",
+      "short_edge_id": "e_0190",
+      "absorbed_connector_node_id": "n_0134",
+      "terminal_node_id": "n_0134",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0190"
+      ],
+      "successor_edge_ids": [],
+      "affected_connector_ids": [
+        "n_0132_c_01",
+        "n_0132_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0132_c_01",
+        "n_0132_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_026_e_0190_entry",
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          54.884,
+          -132.481
+        ],
+        "center_distance_m": 6.3,
+        "issues": [
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          54.884,
+          -132.481
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.822464,
+          -0.568817
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 6.3,
+        "available_after_absorption_m": 6.781,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 0.0,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 7.281,
+        "path_edge_count": 1,
+        "max_chain_angle_deg": 0.0,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0159_e_0051_short_edge_absorption",
+      "status": "qa_candidate",
+      "risk": "medium",
+      "issues": [
+        "low_trim_recovery"
+      ],
+      "junction_id": "j_034",
+      "junction_node_id": "n_0159",
+      "short_edge_id": "e_0051",
+      "absorbed_connector_node_id": "n_0162",
+      "terminal_node_id": "n_0162",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0051"
+      ],
+      "successor_edge_ids": [],
+      "affected_connector_ids": [
+        "n_0159_c_01",
+        "n_0159_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0159_c_01",
+        "n_0159_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_034_e_0051_entry",
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          116.802,
+          -46.667
+        ],
+        "center_distance_m": 6.3,
+        "issues": [
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          116.802,
+          -46.667
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.817243,
+          -0.576293
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 6.3,
+        "available_after_absorption_m": 7.054,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 0.0,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 7.554,
+        "path_edge_count": 1,
+        "max_chain_angle_deg": 0.0,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0187_e_0063_short_edge_absorption",
+      "status": "qa_candidate",
+      "risk": "medium",
+      "issues": [
+        "low_trim_recovery"
+      ],
+      "junction_id": "j_041",
+      "junction_node_id": "n_0187",
+      "short_edge_id": "e_0063",
+      "absorbed_connector_node_id": "n_0192",
+      "terminal_node_id": "n_0192",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0063"
+      ],
+      "successor_edge_ids": [],
+      "affected_connector_ids": [
+        "n_0187_c_01",
+        "n_0187_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0187_c_01",
+        "n_0187_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_041_e_0063_entry",
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          195.449,
+          65.389
+        ],
+        "center_distance_m": 6.3,
+        "issues": [
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          195.449,
+          65.389
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.837783,
+          -0.546003
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 6.3,
+        "available_after_absorption_m": 6.636,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 0.0,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 7.136,
+        "path_edge_count": 1,
+        "max_chain_angle_deg": 0.0,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0194_e_0139_short_edge_absorption",
+      "status": "qa_candidate",
+      "risk": "medium",
+      "issues": [
+        "low_trim_recovery"
+      ],
+      "junction_id": "j_044",
+      "junction_node_id": "n_0194",
+      "short_edge_id": "e_0139",
+      "absorbed_connector_node_id": "n_0198",
+      "terminal_node_id": "n_0198",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0139"
+      ],
+      "successor_edge_ids": [],
+      "affected_connector_ids": [
+        "n_0194_c_01",
+        "n_0194_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0194_c_01",
+        "n_0194_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_044_e_0139_entry",
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          206.277,
+          81.601
+        ],
+        "center_distance_m": 6.3,
+        "issues": [
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          206.277,
+          81.601
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.8601,
+          -0.510125
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 6.3,
+        "available_after_absorption_m": 6.375,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 0.0,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 6.875,
+        "path_edge_count": 1,
+        "max_chain_angle_deg": 0.0,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 2
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    },
+    {
+      "candidate_id": "n_0135_e_0163_short_edge_absorption",
+      "status": "qa_candidate",
+      "risk": "medium",
+      "issues": [
+        "low_trim_recovery"
+      ],
+      "junction_id": "j_027",
+      "junction_node_id": "n_0135",
+      "short_edge_id": "e_0163",
+      "absorbed_connector_node_id": "n_0138",
+      "terminal_node_id": "n_0138",
+      "terminal_node_kind": "connector",
+      "path_edge_ids": [
+        "e_0163"
+      ],
+      "successor_edge_ids": [],
+      "affected_connector_ids": [
+        "n_0135_c_00",
+        "n_0135_c_02"
+      ],
+      "affected_unresolved_connector_ids": [
+        "n_0135_c_02"
+      ],
+      "current_entry_pose": {
+        "pose_id": "j_027_e_0163_entry",
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          61.639,
+          -112.049
+        ],
+        "center_distance_m": 6.3,
+        "issues": [
+          "short_edge_absorption_candidate"
+        ]
+      },
+      "planned_entry_pose": {
+        "entry_trim_m": 6.3,
+        "entry_xz": [
+          61.639,
+          -112.049
+        ],
+        "center_distance_m": 6.3,
+        "tangent_out_xz": [
+          0.568666,
+          0.822568
+        ]
+      },
+      "metrics": {
+        "desired_trim_m": 6.3,
+        "current_trim_m": 6.3,
+        "available_after_absorption_m": 6.483,
+        "planned_trim_m": 6.3,
+        "trim_recovery_m": 0.0,
+        "remaining_trim_deficit_m": 0.0,
+        "path_length_m": 6.983,
+        "path_edge_count": 1,
+        "max_chain_angle_deg": 0.0,
+        "affected_connectors": 2,
+        "affected_unresolved_connectors": 1
+      },
+      "note": "Candidate only. A later transaction should rewrite the junction approach/entry pose and re-run optimize centerlines, connector solver, replacement, and junction geometry audit."
+    }
+  ]
+}

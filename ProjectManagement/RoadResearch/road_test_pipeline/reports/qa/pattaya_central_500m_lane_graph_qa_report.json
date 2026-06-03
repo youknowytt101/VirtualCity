@@ -1,0 +1,142 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "lane_graph",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "lanes",
+      "status": "pass",
+      "value": 486,
+      "threshold": 40,
+      "message": "Lane graph should expose enough directed lane records for junction connection research."
+    },
+    {
+      "id": "junctions",
+      "status": "pass",
+      "value": 49,
+      "threshold": 1,
+      "message": "Lane graph should include junction models derived from road_graph junction nodes."
+    },
+    {
+      "id": "connections",
+      "status": "pass",
+      "value": 306,
+      "threshold": 1,
+      "message": "Semantic junctions should infer at least one road-level movement."
+    },
+    {
+      "id": "lane_links",
+      "status": "pass",
+      "value": 612,
+      "threshold": 1,
+      "message": "Allowed movements should produce laneLinks for downstream movement corridor research."
+    },
+    {
+      "id": "lane_link_reference_errors",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Every laneLink from_lane and to_lane should reference an existing lane."
+    },
+    {
+      "id": "blocked_lane_links",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Blocked or disallowed semantic movements must not produce laneLinks."
+    },
+    {
+      "id": "empty_connection_curves",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Topology-only lane graph should not claim missing final connection curves as published geometry."
+    },
+    {
+      "id": "fan_fallback_ratio",
+      "status": "pass",
+      "value": 0.0,
+      "threshold": 0.95,
+      "message": "Layer 3 should avoid junction fan fallback; lane-boundary envelopes belong to the later geometry layer."
+    },
+    {
+      "id": "avg_lane_links_per_junction",
+      "status": "pass",
+      "value": 6.245,
+      "threshold": 1.0,
+      "message": "LaneLink density is low; review oneway, lane count and movement inference."
+    }
+  ],
+  "metrics": {
+    "counts": {
+      "edges": 243,
+      "lanes": 486,
+      "junctions": 49,
+      "connections": 306,
+      "lane_links": 612,
+      "junction_lane_links": 306,
+      "connector_continuity_links": 306,
+      "issue_counts": {
+        "connector_continuity_inferred": 612,
+        "direction_forced_bidirectional_two_lane_policy": 729,
+        "inferred_without_turn_lanes": 612,
+        "lane_count_forced_bidirectional_two_lane_policy": 729,
+        "lanes_inferred": 729,
+        "low_confidence_from_lane": 612,
+        "low_confidence_to_lane": 612,
+        "missing_turn_lanes": 729,
+        "offset_centerline_preview_only": 486,
+        "source_lane_count_overridden_by_bidirectional_two_lane_policy": 702,
+        "source_oneway_overridden_by_bidirectional_two_lane_policy": 402,
+        "source_width_overridden_by_bidirectional_two_lane_policy": 729,
+        "width_forced_bidirectional_two_lane_policy": 729,
+        "width_inferred": 729
+      }
+    },
+    "turn_counts": {
+      "left": 102,
+      "right": 102,
+      "through": 102
+    },
+    "lane_source_counts": {
+      "stage_policy_override": 486
+    },
+    "traffic_direction_policy_counts": {
+      "temporary_bidirectional_two_lane_policy": 486
+    },
+    "connection_source_counts": {
+      "junction_semantics_plus_lane_attribute_model": 306
+    },
+    "lane_link_source_counts": {
+      "connector_node_rank_match": 306,
+      "inferred_lane_rank_plus_road_movement": 306
+    },
+    "fallback_counts": {
+      "offset_centerline_preview": 486,
+      "shared_bidirectional_physical_lane": 0,
+      "inferred_without_turn_lanes": 306
+    },
+    "lane_graph_metrics": {
+      "avg_lane_confidence": 0.42,
+      "min_lane_confidence": 0.42,
+      "avg_lane_link_confidence": 0.42,
+      "min_lane_link_confidence": 0.42,
+      "lane_link_reference_errors": 0,
+      "blocked_lane_links": 0,
+      "empty_connection_curves": 0,
+      "fan_fallback_ratio": 0.0,
+      "avg_lane_links_per_junction": 6.245,
+      "inferred_turn_link_ratio": 0.5,
+      "missing_turn_lanes_lane_ratio": 1.0,
+      "inferred_bidirectional_prior_lane_ratio": 0.0,
+      "source_oneway_lane_ratio": 0.0,
+      "temporary_bidirectional_two_lane_policy_lane_ratio": 1.0
+    }
+  },
+  "inputs": {
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "lane_graph_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
+    "rules": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+  },
+  "next_action": "Use lane_graph as the topology contract for movement corridor solver; do not treat offset previews as final lane geometry."
+}

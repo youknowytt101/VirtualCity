@@ -43,5 +43,30 @@
     "max_empty_connection_curves": 0,
     "warn_fan_fallback_ratio_above": 0.95,
     "warn_avg_lane_links_per_junction_below": 1.0
+  },
+  "movement_corridor": {
+    "min_corridor_cases": 1,
+    "min_candidate_curves": 1,
+    "max_reference_errors": 0,
+    "max_missing_anchor_poses": 0,
+    "max_empty_candidate_geometry": 0,
+    "warn_anchor_fallback_ratio_above": 0.05,
+    "warn_fully_anchored_case_ratio_below": 0.95,
+    "warn_low_confidence_ratio_above": 0.85,
+    "warn_ready_ratio_below": 0.05
+  },
+  "compound_junction_merge": {
+    "max_reference_errors": 0,
+    "max_blocked_candidates": 0,
+    "warn_high_risk_candidates_above": 0,
+    "warn_affected_anchor_coverage_ratio_below": 1.0,
+    "warn_transaction_candidate_ratio_below": 0.5
+  },
+  "compound_junction_merge_transaction": {
+    "max_reference_errors": 0,
+    "max_exposed_bridge_edge_cases": 0,
+    "max_capacity_limited_anchor_cases": 0,
+    "warn_accepted_transaction_ratio_below": 1.0,
+    "warn_affected_corridor_replacement_ratio_below": 1.0
   }
 }

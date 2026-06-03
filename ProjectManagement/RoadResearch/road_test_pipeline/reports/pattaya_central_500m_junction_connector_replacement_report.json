@@ -13,13 +13,18 @@
     "baseline_audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_baseline_audit_report.json"
   },
   "counts": {
-    "replacement_ready_cases": 1,
-    "trial_replacements": 1,
-    "accepted_replacements": 1,
+    "replacement_ready_cases": 6,
+    "trial_replacements": 6,
+    "accepted_replacements": 6,
     "candidate_rejections": 0
   },
   "applied_trial_connector_ids": [
-    "n_0147_c_02"
+    "n_0076_c_02",
+    "n_0107_c_01",
+    "n_0154_c_01",
+    "n_0166_c_02",
+    "n_0167_c_02",
+    "n_0206_c_01"
   ],
   "rejected_candidates": [],
   "audit_checks": [
@@ -33,8 +38,8 @@
     {
       "check_id": "total_issue_count_no_regression",
       "status": "pass",
-      "before": 114,
-      "after": 114,
+      "before": 78,
+      "after": 78,
       "message": "Replacement must not increase total junction geometry audit issues."
     },
     {
@@ -54,15 +59,15 @@
     {
       "check_id": "junction_trim_spread_excess_no_regression",
       "status": "pass",
-      "before": 24,
-      "after": 24,
+      "before": 0,
+      "after": 0,
       "message": "Replacement must not increase junction_trim_spread_excess."
     },
     {
       "check_id": "radius_below_design_min_no_regression",
       "status": "pass",
-      "before": 90,
-      "after": 90,
+      "before": 78,
+      "after": 78,
       "message": "Replacement must not increase radius_below_design_min."
     },
     {
@@ -75,7 +80,7 @@
   ],
   "baseline_metrics": {
     "junctions_with_connectors": 49,
-    "junctions_with_issues": 46,
+    "junctions_with_issues": 42,
     "connectors": 149,
     "connector_kind_counts": {
       "adjacent_fallback": 8,
@@ -83,23 +88,22 @@
       "t_turn": 94
     },
     "arc_geometry_counts": {
-      "bezier_tangent_fallback": 91,
-      "circular_arc": 16,
+      "bezier_tangent_fallback": 51,
+      "circular_arc": 56,
       "straight_infinite_radius": 42
     },
     "arc_fit_status_counts": {
-      "exact_tangent_arc": 16,
-      "incompatible_tangent_endpoints_bezier_fallback": 91,
+      "exact_tangent_arc": 56,
+      "incompatible_tangent_endpoints_bezier_fallback": 51,
       "near_straight_infinite_radius": 42
     },
     "issue_counts": {
-      "junction_trim_spread_excess": 24,
-      "radius_below_design_min": 90
+      "radius_below_design_min": 78
     }
   },
   "trial_metrics": {
     "junctions_with_connectors": 49,
-    "junctions_with_issues": 46,
+    "junctions_with_issues": 42,
     "connectors": 149,
     "connector_kind_counts": {
       "adjacent_fallback": 8,
@@ -107,19 +111,19 @@
       "t_turn": 94
     },
     "arc_geometry_counts": {
-      "bezier_tangent_fallback": 91,
-      "circular_arc": 16,
+      "bezier_tangent_fallback": 50,
+      "circular_arc": 56,
+      "param_poly3_hermite": 1,
       "straight_infinite_radius": 42
     },
     "arc_fit_status_counts": {
-      "exact_tangent_arc": 15,
-      "incompatible_tangent_endpoints_bezier_fallback": 91,
+      "exact_tangent_arc": 51,
+      "incompatible_tangent_endpoints_bezier_fallback": 50,
       "near_straight_infinite_radius": 42,
-      "solver_v2_transaction_replacement": 1
+      "solver_v2_transaction_replacement": 6
     },
     "issue_counts": {
-      "junction_trim_spread_excess": 24,
-      "radius_below_design_min": 90
+      "radius_below_design_min": 78
     }
   },
   "note": "Accepted replacements are written only when audit metrics do not regress. Rejected/no-op transactions leave optimized centerlines unchanged."
