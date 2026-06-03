@@ -4,10 +4,28 @@
   "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
   "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
   "movement_debug_output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_movements_debug.geojson",
+  "regularization_inputs": {
+    "junction_areas_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+    "junction_areas_loaded": true,
+    "junction_area_count": 49,
+    "engineering_reference_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
+    "engineering_reference_loaded": true,
+    "engineering_reference_entry_poses": 149,
+    "regularized_entry_pose_trims": 149,
+    "regularized_entry_pose_status_counts": {
+      "pass": 113,
+      "warn": 36
+    },
+    "regularized_entry_pose_issue_counts": {}
+  },
   "counts": {
     "input_edges": 243,
     "optimized_approaches": 243,
     "dropped_short_edges": 0,
+    "heuristic_junction_trim_keys": 0,
+    "regularized_junction_nodes": 49,
+    "regularized_endpoint_exact": 120,
+    "regularized_endpoint_scaled_for_edge_length": 29,
     "junction_nodes": 49,
     "junction_connectors": 149,
     "t_junctions": 47,
@@ -18,18 +36,21 @@
     "corner_fillet_nodes": 21,
     "corner_fillets": 21,
     "corner_circular_arcs": 21,
+    "corner_bezier_tangent_fallback": 0,
     "corner_straight_infinite_radius": 0,
     "output_features": 413,
-    "t_branch_trim_adjustments": 42,
-    "t_branch_trim_max_delta_m": 3.379,
-    "t_branch_trim_avg_delta_m": 2.555,
-    "junction_common_trim_nodes": 43,
-    "junction_common_trim_raised": 51,
-    "junction_common_trim_lowered": 55,
-    "junction_common_trim_max_raise_m": 1.234,
-    "junction_common_trim_avg_raise_m": 0.571,
-    "junction_common_trim_max_lower_m": 5.87,
-    "junction_common_trim_avg_lower_m": 1.934
+    "t_branch_trim_adjustments": 0,
+    "t_branch_trim_locked_skips": 47,
+    "t_branch_trim_max_delta_m": 0.0,
+    "t_branch_trim_avg_delta_m": 0.0,
+    "junction_common_trim_nodes": 0,
+    "junction_common_trim_raised": 0,
+    "junction_common_trim_lowered": 0,
+    "junction_common_trim_max_raise_m": 0.0,
+    "junction_common_trim_avg_raise_m": 0.0,
+    "junction_common_trim_max_lower_m": 0.0,
+    "junction_common_trim_avg_lower_m": 0.0,
+    "junction_common_trim_skipped_regularized_nodes": 49
   },
   "junction_degree_counts": {
     "3": 47,
@@ -41,11 +62,13 @@
     "t_turn": 94
   },
   "junction_connector_arc_geometry_counts": {
-    "circular_arc": 107,
+    "bezier_tangent_fallback": 91,
+    "circular_arc": 16,
     "straight_infinite_radius": 42
   },
   "junction_connector_arc_fit_status_counts": {
-    "exact_tangent_arc": 107,
+    "exact_tangent_arc": 16,
+    "incompatible_tangent_endpoints_bezier_fallback": 91,
     "near_straight_infinite_radius": 42
   },
   "corner_arc_geometry_counts": {
@@ -62,8 +85,10 @@
   },
   "notes": [
     "This stage optimizes centerlines before road width extrusion, matching the sketch-driven junction approach.",
-    "Approach lines are clipped near junctions; visible junction connectors stay in the centerline skeleton.",
+    "Approach lines use regularized junction entry poses when engineering_reference_lines.json is available.",
+    "Visible junction connectors stay in the centerline skeleton.",
     "Visible junction connectors and degree-2 corner fillets are sampled from tangent circular arcs where geometry allows it.",
+    "If regularized entry poses are not compatible with a single circle, a tangent-continuous Bezier fallback is emitted and remains visible to QA.",
     "Near-straight through connectors are represented as straight infinite-radius arcs.",
     "Road-level through/turn movement curves are exported to a separate debug layer so they do not visually cross the road skeleton.",
     "Surface builders should consume this optimized centerline output before using any fan fallback."

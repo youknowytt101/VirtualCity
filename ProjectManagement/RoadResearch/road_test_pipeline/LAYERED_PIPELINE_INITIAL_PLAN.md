@@ -1,8 +1,8 @@
-# Road Test Pipeline Layered Plan
+# 道路测试管线分层初始计划
 
-Date: 2026-06-03
-Area: `pattaya_central_500m`
-Status: initial layered plan
+日期：2026-06-03
+区域：`pattaya_central_500m`
+状态：初始分层计划，当前进度以 `AI_START_HERE.md` 和 `NEXT_AI_HANDOFF.md` 为准
 
 ## 目标
 
@@ -28,7 +28,7 @@ Status: initial layered plan
 
 ## 分层框架
 
-### L0 Raw Data Layer
+### L0 原始数据层
 
 职责：
 
@@ -64,7 +64,7 @@ QA gate：
 - duplicate point feature 为 0。
 - too-short feature 不超过阈值。
 
-### L1 Normalization Layer
+### L1 标准化层
 
 职责：
 
@@ -100,7 +100,7 @@ QA gate：
 - 该层还没有完全独立出来。
 - 当前部分逻辑分散在 raw analysis、topology repair 和 road graph builder 中。
 
-### L2 Repair Audit Layer
+### L2 修复审计层
 
 职责：
 
@@ -144,7 +144,7 @@ QA gate：
   - endpoint-to-edge review candidates: `1`
   - high-confidence candidates: `1`
 
-### L3 Topology Repair Application Layer
+### L3 拓扑修复应用层
 
 职责：
 
@@ -189,7 +189,7 @@ QA gate：
 - 已支持 endpoint snap、endpoint-to-edge snap、intersection split、short edge cleanup。
 - 还需要把 L2 high-confidence candidate promotion 做成可控开关。
 
-### L4 Road Graph Layer
+### L4 道路图层
 
 职责：
 

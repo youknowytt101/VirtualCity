@@ -1,65 +1,96 @@
-# Road Test Pipeline
+# 道路测试管线
 
-This folder is an isolated road-research pipeline for `ProjectManagement/RoadResearch`.
-It does not read from or write to the main VirtualCity `RawData/`, `Scripts/`,
-`Config/`, `Reports/`, or `Houdini/` pipeline.
+这个目录是 `ProjectManagement/RoadResearch` 下的独立道路研究管线。它不读写 VirtualCity
+主管线的 `RawData/`、`Scripts/`、`Config/`、`Reports/`、`Houdini/` 目录。
 
-## Current Contract
+## 先读
 
-The current working boundary is:
+下一个 AI 或开发者优先按这个顺序看：
 
 ```text
-raw map data
-  -> road repair / pre-Houdini engineering
-  -> clean road skeleton in Houdini
-  -> Houdini construction starts after skeleton acceptance
+AI_START_HERE.md
+NEXT_AI_HANDOFF.md
+scripts/README.md
+data/README.md
+reports/README.md
+ROAD_REPAIR_STAGE_ARCHITECTURE.md
 ```
 
-Houdini is now a visualization and construction environment. It must not be the
-place where road topology is repaired or where data truth is invented.
+## 当前目标
 
-## Main Entry Point
+当前目标不是生成最终车道或 OpenDRIVE，而是先把地图 API 的脏道路数据修成稳定、可审计、
+可迭代的道路骨架：
 
-Run the current road-repair stage from the repository root:
+```text
+原始地图数据
+  -> 道路修复 / Houdini 前置工程处理
+  -> road graph
+  -> junction semantics
+  -> junction area regularization
+  -> clean single-line skeleton
+  -> Houdini 只负责可视化和后续构建
+```
+
+Houdini 不负责修复道路拓扑，也不发明数据真值。
+
+## 主入口
+
+从仓库根目录运行：
 
 ```powershell
 uv --cache-dir E:\VirtualCity\Scripts\.uv-cache run python ProjectManagement/RoadResearch/road_test_pipeline/scripts/repair_road_skeleton.py --area-id pattaya_central_500m --sync-houdini
 ```
 
-This runner stops before lane graph, lane surface, and OpenDRIVE export.
+如果不用 `uv`，当前环境也可以直接：
 
-It performs:
+```powershell
+python ProjectManagement/RoadResearch/road_test_pipeline/scripts/repair_road_skeleton.py --area-id pattaya_central_500m --sync-houdini
+```
+
+## 当前阶段顺序
 
 ```text
 L3 topology repair
 L3 topology repair QA
+L3 repair casebook QA
 L4 road graph
 L4 road graph QA
 L5 junction semantics
-L6 engineering centerline
+L5.5 junction area regularization
+L6 engineering centerline, consumes regularized entry poses
 L6 junction geometry audit
 L6 clean skeleton artifact
-L9 optional Houdini raw preview + clean skeleton sync
+L9 optional Houdini sync
 ```
 
-Manual topology overrides are read from `config/<area_id>.manual_overrides.json`
-when the file exists. High-confidence review candidates are still report-only
-unless they are listed in that override file or the runner is called with
-`--apply-high-confidence`.
+## Houdini 节点视图
 
-The Houdini sync replaces `/obj/road_test_<area_id>` with a comparison view:
+`--sync-houdini` 会重建 `/obj/road_test_<area_id>`。节点从左到右是阶段列：
 
 ```text
-/obj/road_test_pattaya_central_500m
+原始数据线
   python_import_raw_roads
   OUT_raw_road_lines
+
+道路拓扑修复线
+  python_import_repaired_roads
+  OUT_repaired_road_lines
+
+干净单线工程骨架
   python_import_clean_road_skeleton
   OUT_clean_road_skeleton
+
+L6 debug 分支
+  python_filter_junction_connector_arcs
+  OUT_junction_connector_arcs
+  python_filter_corner_fillet_arcs
+  OUT_corner_fillet_arcs
 ```
 
-## Current Outputs
+主线是 `raw -> repaired topology -> clean single-line skeleton`。路口 connector arcs 和
+corner fillets 是 clean skeleton 的 debug 分支，不是新的数据真值层。
 
-Core stage artifacts:
+## 核心产物
 
 ```text
 data/processed/<area_id>_roads_raw.geojson
@@ -69,18 +100,22 @@ data/processed/<area_id>_repair_decisions.json
 data/processed/<area_id>_repair_casebook.json
 data/processed/<area_id>_road_graph.json
 data/processed/<area_id>_junction_semantics.json
+data/processed/<area_id>_junction_areas.json
+data/processed/<area_id>_engineering_reference_lines.json
 data/processed/<area_id>_roads_optimized_centerlines.geojson
 data/processed/<area_id>_roads_clean_skeleton.geojson
 ```
 
-Core reports:
+## 核心报告
 
 ```text
 reports/<area_id>_repair_report.json
 reports/qa/<area_id>_topology_repair_qa_report.json
+reports/qa/<area_id>_repair_casebook_qa_report.json
 reports/<area_id>_road_graph_report.json
 reports/qa/<area_id>_road_graph_qa_report.json
 reports/<area_id>_junction_semantics_report.json
+reports/<area_id>_junction_area_regularization_report.json
 reports/<area_id>_optimized_centerlines_report.json
 reports/<area_id>_junction_geometry_audit_report.json
 reports/<area_id>_road_skeleton_repair_report.json
@@ -89,30 +124,21 @@ reports/<area_id>_houdini_raw_road_preview_report.json
 reports/<area_id>_houdini_clean_skeleton_report.json
 ```
 
-## Layer Rules
-
-- Raw data is read-only after ingest.
-- Repair, semantics, engineering geometry, lane generation, and visualization are separate layers.
-- Every layer writes stable artifacts and reports.
-- Houdini imports artifacts; it does not repair topology.
-- Clean skeleton output is the handoff into Houdini construction.
-- Lane graph, lane surface, lane-level junctions, and XODR export are future downstream stages.
-
-## Important Scripts
-
-Current stage:
+## 当前主线脚本
 
 ```text
-scripts/repair_road_skeleton.py
-scripts/topology_repair.py
+scripts/repair_road_skeleton.py          # 当前唯一主入口
+scripts/topology_repair.py               # 保守拓扑修复 + candidates/decisions/casebook
+scripts/run_repair_casebook.py           # 已知误报/拒绝案例回归测试
 scripts/build_road_graph.py
 scripts/build_junction_semantics.py
-scripts/optimize_junction_centerlines.py
+scripts/regularize_junction_areas.py     # 路口区域正规化，输出 entry poses / movement intents
+scripts/optimize_junction_centerlines.py # 当前 clean skeleton 生成器，消费 regularized entry poses
 scripts/junction_geometry_audit.py
 scripts/run_auto_qa.py
 ```
 
-Houdini helpers:
+Houdini 相关 helper：
 
 ```text
 scripts/enable_rpyc_in_houdini.py
@@ -120,7 +146,7 @@ scripts/houdini_build_road_test.py
 scripts/houdini_cook_rpyc.py
 ```
 
-Downstream or legacy research stages, not part of the current clean skeleton entry:
+旧 lane / preview / rebuild 脚本暂时保留给未来 lane/OpenDRIVE 阶段，但不是当前入口：
 
 ```text
 scripts/rebuild_road_test.py
@@ -131,34 +157,32 @@ scripts/generate_road_preview.py
 scripts/audit_road_pipeline.py
 ```
 
-Keep these scripts for later lane/OpenDRIVE work, but do not use them as the
-current road-repair entry point.
+## 设计文档
 
-## Junction Geometry Status
-
-The current clean skeleton keeps visual connector arcs, but the engineering
-audit flags connector arcs whose radius is below the design threshold.
-
-Known current sample status:
+优先阅读：
 
 ```text
-junction connector arcs: 107 circular arcs + 42 near-straight infinite-radius connectors
-radius_below_design_min: 96
+NEXT_AI_HANDOFF.md
+ROAD_REPAIR_STAGE_ARCHITECTURE.md
+LAYERED_PIPELINE_INITIAL_PLAN.md
 ```
 
-Those violations are diagnostics for the next engineering model pass. They
-should be solved by junction-area regularization and connecting-road generation,
-not by editing Houdini display geometry.
+`HANDOFF_DESIGN.md` 是较早的交接设计，仍可参考，但当前进度以本 README 和
+`NEXT_AI_HANDOFF.md` 为准。
 
-## Next Development Stage
+## 当前已知状态
 
-After the clean skeleton is accepted, continue with:
+`pattaya_central_500m` 当前样本：
 
 ```text
-engineering_reference_lines.json
-road reference line + laneSection
-junction connecting roads
-laneLink model
-Houdini debug layers
-XODR export
+topology repair QA: pass
+repair casebook QA: pass
+road graph QA: warn, width_fallback_ratio = 1.0
+junction area regularization: warn, entry_trim_capacity_limited = 34, short_edge_absorption_candidate = 22
+optimized centerlines: 149 regularized entry poses consumed, 91 bezier_tangent_fallback connectors
+junction geometry audit: warn, radius_below_design_min = 90, junction_trim_spread_excess = 24
 ```
+
+这些 warning 不是 Houdini 布局问题。`width_fallback_ratio` 说明 OSM 宽度缺失；`radius_below_design_min`
+和 `bezier_tangent_fallback` 说明当前 connector solver 还停留在圆弧 + 切线 Bezier 占位阶段。
+下一步应该做 circular / clothoid / paramPoly3 候选求解和评分。

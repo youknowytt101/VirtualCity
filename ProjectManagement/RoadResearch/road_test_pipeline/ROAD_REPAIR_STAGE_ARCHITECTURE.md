@@ -18,15 +18,18 @@ Houdini 的职责是查看、调试和构建，不应该在里面发明或修复
 
 ```text
 topology repair QA: pass
+repair casebook QA: pass
 Houdini raw roads: 44 primitives / 303 points
 repaired road graph input: 243 simple edges
-Houdini clean skeleton: 413 primitives / 2936 points
+Houdini clean skeleton: 413 primitives / 2182 points
 internal dangling endpoints for review: 28
 endpoint-to-edge review candidates: 0
 high-confidence repair candidates: 0
 possible unsplit crossings: 0
 road graph QA warning: width_fallback_ratio = 1.0
-junction geometry audit warning: 96 radius_below_design_min, 9 endpoint_too_close_to_junction_center
+junction area regularization warning: 34 entry_trim_capacity_limited, 22 short_edge_absorption_candidate
+optimized centerlines: 149 regularized entry poses consumed, 91 bezier_tangent_fallback connectors
+junction geometry audit warning: 90 radius_below_design_min, 24 junction_trim_spread_excess
 ```
 
 旧的高置信候选 `1209258529:end -> 1210710015 segment 1` 已确认是误报。
@@ -188,6 +191,9 @@ V10 输出能从 source + config 完整复现
 ```
 
 当前 `topology_repair.py` 已经补上了 endpoint-to-edge repair 的 V4/V5 核心保护。
+当前 `optimize_junction_centerlines.py` 已经消费 `engineering_reference_lines.json` 的 regularized
+entry poses；如果两端 entry pose 和切线不满足单圆弧条件，会输出 `bezier_tangent_fallback`，并继续
+交给 `junction_geometry_audit.py` 暴露半径与 trim spread 问题。
 
 ## 事务式自我修复闭环
 
@@ -439,6 +445,25 @@ candidate -> operation -> deepcopy roads -> trial apply
   -> accepted commit / rejected casebook
 ```
 
+当前 `run_repair_casebook.py` 已作为自动回归入口接入一键 runner：
+
+```text
+topology_repair.py
+  -> repair_candidates / repair_decisions / repair_casebook
+  -> run_auto_qa.py --stage topology_repair
+  -> run_repair_casebook.py
+```
+
+Houdini 视图采用从左到右的阶段列，而不是假装在 Houdini 内修路：
+
+```text
+raw source lines
+  -> repaired topology lines
+  -> clean single-line skeleton
+       -> junction connector arc debug branch
+       -> corner fillet arc debug branch
+```
+
 Phase 3：junction area regularization。
 
 ```text
@@ -446,6 +471,21 @@ Phase 3：junction area regularization。
 把过短边吸收到 conflict-zone boundary
 从稳定 approach 计算 entry / exit pose
 发布 engineering_reference_lines.json
+```
+
+当前已落地初版：
+
+```text
+scripts/regularize_junction_areas.py
+
+data/processed/<area_id>_junction_areas.json
+  junction conflict zone 估计、approach entry pose、short-edge absorption candidate。
+
+data/processed/<area_id>_engineering_reference_lines.json
+  approach_entry_poses + connecting_road_intents，供后续 connector solver 使用。
+
+reports/<area_id>_junction_area_regularization_report.json
+  记录 capacity-limited entry pose、short-edge absorption candidate 等问题。
 ```
 
 Phase 4：connector solver。

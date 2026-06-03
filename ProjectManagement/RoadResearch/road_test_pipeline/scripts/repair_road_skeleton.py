@@ -120,7 +120,13 @@ def clean_skeleton_from_optimized(
     return report
 
 
-def build_houdini_remote_code(root: Path, area_id: str, raw_roads_path: Path, clean_skeleton_path: Path) -> str:
+def build_houdini_remote_code(
+    root: Path,
+    area_id: str,
+    raw_roads_path: Path,
+    repaired_roads_path: Path,
+    clean_skeleton_path: Path,
+) -> str:
     builder_path = root / "scripts" / "houdini_build_road_test.py"
     config_path = root / "config" / f"{area_id}.area.json"
     raw_report_path = root / "reports" / f"{area_id}_houdini_raw_road_preview_report.json"
@@ -135,11 +141,13 @@ root = Path({json.dumps(str(root))})
 builder_path = Path({json.dumps(str(builder_path))})
 config_path = Path({json.dumps(str(config_path))})
 raw_roads_path = Path({json.dumps(str(raw_roads_path))})
+repaired_roads_path = Path({json.dumps(str(repaired_roads_path))})
 clean_skeleton_path = Path({json.dumps(str(clean_skeleton_path))})
 raw_report_path = Path({json.dumps(str(raw_report_path))})
 clean_report_path = Path({json.dumps(str(clean_report_path))})
 cfg = json.loads(config_path.read_text(encoding="utf-8"))
 center = cfg["center"]
+hip_path = root / "houdini" / f"{{cfg['area_id']}}_road_test.hip"
 
 spec = importlib.util.spec_from_file_location("road_test_houdini_builder_clean_skeleton", str(builder_path))
 builder = importlib.util.module_from_spec(spec)
@@ -157,6 +165,25 @@ if old_geo is not None:
 geo = obj.createNode("geo", node_name=geo_name)
 builder.clear_children(geo)
 
+def filter_vc_part_code(allowed_parts):
+    allowed_repr = repr(list(allowed_parts))
+    return "import hou\\n\\n" + "\\n".join([
+        "node = hou.pwd()",
+        "geo = node.geometry()",
+        "geo.clear()",
+        "src = node.inputs()[0] if node.inputs() else None",
+        "if src is None:",
+        "    raise hou.NodeError('filter node requires an input')",
+        "geo.merge(src.geometry())",
+        "allowed = set(" + allowed_repr + ")",
+        "attrib = geo.findPrimAttrib('vc_part')",
+        "if attrib is None:",
+        "    raise hou.NodeError('Missing vc_part primitive attribute')",
+        "to_delete = [prim for prim in geo.prims() if str(prim.attribValue(attrib)) not in allowed]",
+        "if to_delete:",
+        "    geo.deletePrims(to_delete, keep_points=False)",
+    ])
+
 raw_import = geo.createNode("python", node_name="python_import_raw_roads")
 raw_import.parm("python").set(builder.python_import_code(
     geojson_path=raw_roads_path,
@@ -165,6 +192,15 @@ raw_import.parm("python").set(builder.python_import_code(
 ))
 raw_out = geo.createNode("null", node_name="OUT_raw_road_lines")
 raw_out.setInput(0, raw_import)
+
+repaired_import = geo.createNode("python", node_name="python_import_repaired_roads")
+repaired_import.parm("python").set(builder.python_import_code(
+    geojson_path=repaired_roads_path,
+    origin_lon=float(center["lon"]),
+    origin_lat=float(center["lat"]),
+))
+repaired_out = geo.createNode("null", node_name="OUT_repaired_road_lines")
+repaired_out.setInput(0, repaired_import)
 
 import_node = geo.createNode("python", node_name="python_import_clean_road_skeleton")
 import_node.parm("python").set(builder.python_import_code(
@@ -179,25 +215,48 @@ out_node.setDisplayFlag(True)
 out_node.setRenderFlag(True)
 out_node.setCurrent(True, clear_all_selected=True)
 
+junction_arc_node = geo.createNode("python", node_name="python_filter_junction_connector_arcs")
+junction_arc_node.setInput(0, import_node)
+junction_arc_node.parm("python").set(filter_vc_part_code(["optimized_junction_connector"]))
+junction_arc_out = geo.createNode("null", node_name="OUT_junction_connector_arcs")
+junction_arc_out.setInput(0, junction_arc_node)
+
+corner_arc_node = geo.createNode("python", node_name="python_filter_corner_fillet_arcs")
+corner_arc_node.setInput(0, import_node)
+corner_arc_node.parm("python").set(filter_vc_part_code(["optimized_corner_fillet"]))
+corner_arc_out = geo.createNode("null", node_name="OUT_corner_fillet_arcs")
+corner_arc_out.setInput(0, corner_arc_node)
+
 note = geo.createStickyNote("ROAD_REPAIR_STAGE_NOTES")
 note.setText(
     "Road repair stage output\\n"
     f"Area: {{cfg['area_id']}}\\n"
-    "Mode: raw source preview + clean road skeleton\\n"
-    "Compare OUT_raw_road_lines with OUT_clean_road_skeleton.\\n"
+    "Left to right: raw source -> repaired topology -> clean single-line skeleton.\\n"
+    "Junction connector arcs and corner fillet arcs are debug branches of the clean skeleton.\\n"
     "Next: start Houdini construction after this skeleton is accepted."
 )
-note.setPosition(hou.Vector2(-3.5, 1.5))
+note.setPosition(hou.Vector2(-5.5, 1.8))
 
-raw_import.setPosition(hou.Vector2(-2.0, 0.0))
-raw_out.setPosition(hou.Vector2(0.0, 0.0))
-import_node.setPosition(hou.Vector2(-2.0, -1.4))
-out_node.setPosition(hou.Vector2(0.0, -1.4))
-geo.layoutChildren()
+raw_import.setPosition(hou.Vector2(-6.0, 0.0))
+raw_out.setPosition(hou.Vector2(-6.0, -1.0))
+repaired_import.setPosition(hou.Vector2(-3.0, 0.0))
+repaired_out.setPosition(hou.Vector2(-3.0, -1.0))
+import_node.setPosition(hou.Vector2(0.0, 0.0))
+out_node.setPosition(hou.Vector2(0.0, -1.0))
+junction_arc_node.setPosition(hou.Vector2(3.0, 0.65))
+junction_arc_out.setPosition(hou.Vector2(3.0, -0.35))
+corner_arc_node.setPosition(hou.Vector2(3.0, -1.65))
+corner_arc_out.setPosition(hou.Vector2(3.0, -2.65))
 raw_import.cook(force=True)
 raw_out.cook(force=True)
+repaired_import.cook(force=True)
+repaired_out.cook(force=True)
 import_node.cook(force=True)
 out_node.cook(force=True)
+junction_arc_node.cook(force=True)
+junction_arc_out.cook(force=True)
+corner_arc_node.cook(force=True)
+corner_arc_out.cook(force=True)
 
 try:
     desktop = hou.ui.curDesktop()
@@ -222,11 +281,15 @@ def geometry_stats(node):
     }}
 
 raw_stats = geometry_stats(raw_out)
+repaired_stats = geometry_stats(repaired_out)
 clean_stats = geometry_stats(out_node)
+junction_arc_stats = geometry_stats(junction_arc_out)
+corner_arc_stats = geometry_stats(corner_arc_out)
 raw_report = {{
     "area_id": cfg["area_id"],
     "stage": "houdini_raw_road_preview",
     "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+    "hip_path": str(hip_path),
     "obj_node": geo.path(),
     "raw_node": raw_import.path(),
     "display_node": raw_out.path(),
@@ -234,31 +297,53 @@ raw_report = {{
     "primitives": raw_stats["primitives"],
     "points": raw_stats["points"],
     "part_counts": raw_stats["part_counts"],
-    "compare_with": out_node.path(),
-    "note": "Switch display between OUT_raw_road_lines and OUT_clean_road_skeleton to compare raw vs repaired skeleton.",
+    "compare_with": repaired_out.path(),
+    "note": "Stage 1/3: raw source road lines.",
 }}
 clean_report = {{
     "area_id": cfg["area_id"],
     "stage": "houdini_clean_road_skeleton",
     "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+    "hip_path": str(hip_path),
     "obj_node": geo.path(),
     "display_node": out_node.path(),
+    "repaired_node": repaired_out.path(),
+    "junction_arc_node": junction_arc_out.path(),
+    "corner_arc_node": corner_arc_out.path(),
     "clean_skeleton_path": str(clean_skeleton_path),
+    "repaired_roads_path": str(repaired_roads_path),
     "primitives": clean_stats["primitives"],
     "points": clean_stats["points"],
     "part_counts": clean_stats["part_counts"],
+    "stage_stats": {{
+        "raw": raw_stats,
+        "repaired": repaired_stats,
+        "clean_skeleton": clean_stats,
+        "junction_connector_arcs": junction_arc_stats,
+        "corner_fillet_arcs": corner_arc_stats,
+    }},
     "compare_with": raw_out.path(),
-    "note": "Raw road preview and clean skeleton output nodes were created together.",
+    "note": "Stage layout: raw source -> repaired topology -> clean single-line skeleton, with junction/corner arc debug branches.",
 }}
 raw_report_path.parent.mkdir(parents=True, exist_ok=True)
 raw_report_path.write_text(json.dumps(raw_report, ensure_ascii=False, indent=2), encoding="utf-8")
 clean_report_path.write_text(json.dumps(clean_report, ensure_ascii=False, indent=2), encoding="utf-8")
+hip_path.parent.mkdir(parents=True, exist_ok=True)
+hou.hipFile.save(str(hip_path))
 print("[RoadSkeleton] Houdini raw preview and clean skeleton synced")
 print(json.dumps({{"raw": raw_report, "clean": clean_report}}, ensure_ascii=False, indent=2))
 '''
 
 
-def sync_houdini_clean_skeleton(root: Path, area_id: str, raw_roads_path: Path, clean_skeleton_path: Path, host: str, port: int) -> tuple[str, int]:
+def sync_houdini_clean_skeleton(
+    root: Path,
+    area_id: str,
+    raw_roads_path: Path,
+    repaired_roads_path: Path,
+    clean_skeleton_path: Path,
+    host: str,
+    port: int,
+) -> tuple[str, int]:
     if not rpyc_port_reachable(host, port):
         print(f"[WARN] Houdini RPYC is not reachable at {host}:{port}.")
         return "unavailable", 1
@@ -268,7 +353,7 @@ def sync_houdini_clean_skeleton(root: Path, area_id: str, raw_roads_path: Path, 
         print("[WARN] rpyc is not importable in this Python environment.")
         return "missing_rpyc", 1
 
-    code = build_houdini_remote_code(root, area_id, raw_roads_path, clean_skeleton_path)
+    code = build_houdini_remote_code(root, area_id, raw_roads_path, repaired_roads_path, clean_skeleton_path)
     conn = rpyc.classic.connect(host, port)
     try:
         conn._config["sync_request_timeout"] = 600
@@ -307,10 +392,14 @@ def main() -> int:
     repair_casebook = processed / f"{args.area_id}_repair_casebook.json"
     road_graph = processed / f"{args.area_id}_road_graph.json"
     junction_semantics = processed / f"{args.area_id}_junction_semantics.json"
+    junction_areas = processed / f"{args.area_id}_junction_areas.json"
+    engineering_reference_lines = processed / f"{args.area_id}_engineering_reference_lines.json"
     optimized_centerlines = processed / f"{args.area_id}_roads_optimized_centerlines.geojson"
     clean_skeleton = processed / f"{args.area_id}_roads_clean_skeleton.geojson"
     clean_skeleton_report = reports / f"{args.area_id}_road_skeleton_repair_report.json"
     junction_geometry_audit = reports / f"{args.area_id}_junction_geometry_audit_report.json"
+    junction_area_regularization = reports / f"{args.area_id}_junction_area_regularization_report.json"
+    repair_casebook_qa = reports / "qa" / f"{args.area_id}_repair_casebook_qa_report.json"
     manual_overrides = Path(args.manual_overrides) if args.manual_overrides else root / "config" / f"{args.area_id}.manual_overrides.json"
 
     steps: list[tuple[str, list[str]]] = []
@@ -339,9 +428,11 @@ def main() -> int:
             ],
         ),
         ("L3 topology repair QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "topology_repair", "--area-id", args.area_id]),
+        ("L3 repair casebook QA", [python_cmd(), str(root / "scripts" / "run_repair_casebook.py"), "--area-id", args.area_id]),
         ("L4 road graph", [python_cmd(), str(root / "scripts" / "build_road_graph.py"), "--area-id", args.area_id]),
         ("L4 road graph QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "road_graph", "--area-id", args.area_id]),
         ("L5 junction semantics", [python_cmd(), str(root / "scripts" / "build_junction_semantics.py"), "--area-id", args.area_id]),
+        ("L5.5 junction area regularization", [python_cmd(), str(root / "scripts" / "regularize_junction_areas.py"), "--area-id", args.area_id]),
         ("L6 engineering centerline", [python_cmd(), str(root / "scripts" / "optimize_junction_centerlines.py"), "--area-id", args.area_id]),
         ("L6 junction geometry audit", [python_cmd(), str(root / "scripts" / "junction_geometry_audit.py"), "--area-id", args.area_id]),
     ])
@@ -369,7 +460,15 @@ def main() -> int:
     houdini_status = "skipped"
     if args.sync_houdini:
         print("[RoadSkeleton] L9 Houdini raw preview + clean skeleton sync...")
-        houdini_status, code = sync_houdini_clean_skeleton(root, args.area_id, raw_geojson, clean_skeleton, args.host, args.port)
+        houdini_status, code = sync_houdini_clean_skeleton(
+            root,
+            args.area_id,
+            raw_geojson,
+            repaired_geojson,
+            clean_skeleton,
+            args.host,
+            args.port,
+        )
         if code != 0 and args.require_houdini:
             return code
 
@@ -386,10 +485,14 @@ def main() -> int:
             "repair_casebook": str(repair_casebook),
             "road_graph": str(road_graph),
             "junction_semantics": str(junction_semantics),
+            "junction_areas": str(junction_areas),
+            "engineering_reference_lines": str(engineering_reference_lines),
             "engineering_centerlines": str(optimized_centerlines),
             "clean_skeleton": str(clean_skeleton),
             "clean_skeleton_report": str(clean_skeleton_report),
+            "junction_area_regularization": str(junction_area_regularization),
             "junction_geometry_audit": str(junction_geometry_audit),
+            "repair_casebook_qa": str(repair_casebook_qa),
             "log": str(log_path),
             "manual_overrides": "" if args.no_manual_overrides else str(manual_overrides),
         },

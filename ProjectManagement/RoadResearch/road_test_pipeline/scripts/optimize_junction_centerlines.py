@@ -169,8 +169,11 @@ def projected_branch_trim_to_through_edge(
 def apply_t_junction_branch_trims(
     nodes: dict[str, dict[str, Any]],
     trim_by_edge_node: dict[tuple[str, str], float],
+    locked_trim_keys: set[tuple[str, str]] | None = None,
 ) -> dict[str, Any]:
     adjustments: list[float] = []
+    locked_skips = 0
+    locked_trim_keys = locked_trim_keys or set()
     for node in nodes.values():
         if node.get("degree") != 3:
             continue
@@ -197,12 +200,16 @@ def apply_t_junction_branch_trims(
             through_width,
         )
         key = (branch["edge"]["edge_id"], node["node_id"])
+        if key in locked_trim_keys:
+            locked_skips += 1
+            continue
         previous = trim_by_edge_node.get(key, 0.0)
         if target_trim > previous + 1e-6:
             trim_by_edge_node[key] = target_trim
             adjustments.append(target_trim - previous)
     return {
         "t_branch_trim_adjustments": len(adjustments),
+        "t_branch_trim_locked_skips": locked_skips,
         "t_branch_trim_max_delta_m": round(max(adjustments), 3) if adjustments else 0.0,
         "t_branch_trim_avg_delta_m": round(sum(adjustments) / len(adjustments), 3) if adjustments else 0.0,
     }
@@ -345,6 +352,95 @@ def circular_arc_from_tangents(
     }
 
 
+def polyline_min_radius(points: list[tuple[float, float]]) -> float:
+    radii: list[float] = []
+    for i in range(1, len(points) - 1):
+        a = points[i - 1]
+        b = points[i]
+        c = points[i + 1]
+        ab = distance(a, b)
+        bc = distance(b, c)
+        ca = distance(c, a)
+        denom = 2.0 * abs(cross((b[0] - a[0], b[1] - a[1]), (c[0] - a[0], c[1] - a[1])))
+        if denom <= 1e-9:
+            continue
+        radius = (ab * bc * ca) / denom
+        if radius > 0.0:
+            radii.append(radius)
+    return min(radii) if radii else 0.0
+
+
+def bezier_tangent_fallback_arc(
+    a: tuple[float, float],
+    start_tangent: tuple[float, float],
+    b: tuple[float, float],
+    end_tangent: tuple[float, float],
+    min_samples: int,
+    reason: str,
+) -> dict[str, Any]:
+    t0 = normalize(start_tangent)
+    t1 = normalize(end_tangent)
+    chord = distance(a, b)
+    if t0 == (0.0, 0.0) or t1 == (0.0, 0.0) or chord <= 0.05:
+        return straight_arc_metadata(a, b, reason)
+    samples = max(min_samples, 11)
+    handle = chord * 0.42
+    c1 = (a[0] + t0[0] * handle, a[1] + t0[1] * handle)
+    c2 = (b[0] - t1[0] * handle, b[1] - t1[1] * handle)
+    points = []
+    for i in range(samples):
+        t = i / (samples - 1)
+        u = 1.0 - t
+        x = (
+            u * u * u * a[0]
+            + 3.0 * u * u * t * c1[0]
+            + 3.0 * u * t * t * c2[0]
+            + t * t * t * b[0]
+        )
+        z = (
+            u * u * u * a[1]
+            + 3.0 * u * u * t * c1[1]
+            + 3.0 * u * t * t * c2[1]
+            + t * t * t * b[1]
+        )
+        points.append((x, z))
+    points[0] = a
+    points[-1] = b
+    return {
+        "points": points,
+        "geometry": "bezier_tangent_fallback",
+        "fit_status": reason,
+        "radius_m": polyline_min_radius(points),
+        "center": None,
+        "sweep_deg": math.degrees(angle_between(t0, t1)),
+        "sample_count": samples,
+    }
+
+
+def connector_arc_from_tangents(
+    a: tuple[float, float],
+    start_tangent: tuple[float, float],
+    b: tuple[float, float],
+    end_tangent: tuple[float, float],
+    min_samples: int,
+) -> dict[str, Any]:
+    arc = circular_arc_from_tangents(a, start_tangent, b, end_tangent, min_samples)
+    if arc["fit_status"] in {
+        "incompatible_tangent_endpoints",
+        "parallel_tangent_infinite_radius",
+        "degenerate_radius",
+    }:
+        return bezier_tangent_fallback_arc(
+            a,
+            start_tangent,
+            b,
+            end_tangent,
+            min_samples,
+            f"{arc['fit_status']}_bezier_fallback",
+        )
+    return arc
+
+
 def arc_properties(arc: dict[str, Any]) -> dict[str, Any]:
     center = arc.get("center")
     design_min_radius = float(arc.get("design_min_radius_m") or 0.0)
@@ -392,13 +488,22 @@ def equalize_junction_trims(
     nodes: dict[str, dict[str, Any]],
     edges: dict[str, dict[str, Any]],
     trim_by_edge_node: dict[tuple[str, str], float],
+    locked_trim_keys: set[tuple[str, str]] | None = None,
 ) -> dict[str, Any]:
     equalized_nodes = 0
     raised = []
     lowered = []
+    locked_trim_keys = locked_trim_keys or set()
+    locked_node_ids = {
+        node["node_id"]
+        for node in nodes.values()
+        if any((edge_id, node["node_id"]) in locked_trim_keys for edge_id in node.get("incident_edges", []))
+    }
     for _iteration in range(4):
         for node in nodes.values():
             if node["degree"] < MIN_JUNCTION_DEGREE:
+                continue
+            if node["node_id"] in locked_node_ids:
                 continue
             values = [trim_by_edge_node.get((edge_id, node["node_id"]), 0.0) for edge_id in node["incident_edges"]]
             if not values:
@@ -440,6 +545,7 @@ def equalize_junction_trims(
         "junction_common_trim_avg_raise_m": round(sum(raised) / len(raised), 3) if raised else 0.0,
         "junction_common_trim_max_lower_m": round(max(lowered), 3) if lowered else 0.0,
         "junction_common_trim_avg_lower_m": round(sum(lowered) / len(lowered), 3) if lowered else 0.0,
+        "junction_common_trim_skipped_regularized_nodes": len(locked_node_ids),
     }
 
 
@@ -519,6 +625,113 @@ def edge_priority(edge: dict[str, Any]) -> float:
     road_class = str(edge.get("road_class") or edge.get("highway") or "unclassified")
     rank = ROAD_CLASS_RANK.get(road_class, ROAD_CLASS_RANK.get(str(edge.get("highway") or ""), 1))
     return rank * 10.0 + float(edge.get("width_m") or 0.0)
+
+
+def read_optional_json(path: Path | None) -> dict[str, Any]:
+    if path is None or not path.exists():
+        return {}
+    return read_json(path)
+
+
+def junction_area_by_node(junction_areas_doc: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    indexed: dict[str, dict[str, Any]] = {}
+    for area in junction_areas_doc.get("junction_areas", []):
+        node_id = str(area.get("node_id") or "")
+        if node_id:
+            indexed[node_id] = area
+    return indexed
+
+
+def reference_entry_pose_index(
+    engineering_reference_doc: dict[str, Any],
+    nodes: dict[str, dict[str, Any]],
+    edges: dict[str, dict[str, Any]],
+) -> tuple[dict[tuple[str, str], dict[str, Any]], dict[str, Any]]:
+    indexed: dict[tuple[str, str], dict[str, Any]] = {}
+    issue_counts: Counter[str] = Counter()
+    status_counts: Counter[str] = Counter()
+    raw_count = 0
+
+    for pose in engineering_reference_doc.get("approach_entry_poses", []):
+        raw_count += 1
+        edge_id = str(pose.get("edge_id") or "")
+        node_id = str(pose.get("node_id") or "")
+        if not edge_id or not node_id:
+            issue_counts["missing_edge_or_node_id"] += 1
+            continue
+        if edge_id not in edges:
+            issue_counts["missing_graph_edge"] += 1
+            continue
+        if node_id not in nodes:
+            issue_counts["missing_graph_node"] += 1
+            continue
+        if edge_id not in nodes[node_id].get("incident_edges", []):
+            issue_counts["edge_not_incident_to_node"] += 1
+            continue
+        entry = pose.get("entry_xz") or []
+        tangent = pose.get("tangent_out_xz") or []
+        if len(entry) < 2 or len(tangent) < 2:
+            issue_counts["missing_entry_geometry"] += 1
+            continue
+        try:
+            entry_xz = (float(entry[0]), float(entry[1]))
+            tangent_xz = normalize((float(tangent[0]), float(tangent[1])))
+            entry_trim_m = max(0.0, float(pose.get("entry_trim_m") or 0.0))
+        except (TypeError, ValueError):
+            issue_counts["invalid_entry_geometry"] += 1
+            continue
+        if tangent_xz == (0.0, 0.0):
+            issue_counts["zero_tangent"] += 1
+            continue
+        if entry_trim_m <= 0.0:
+            issue_counts["zero_entry_trim"] += 1
+            continue
+        key = (edge_id, node_id)
+        if key in indexed:
+            issue_counts["duplicate_entry_pose_key"] += 1
+        status_counts[str(pose.get("status") or "unknown")] += 1
+        indexed[key] = {
+            "pose_id": str(pose.get("pose_id") or ""),
+            "junction_id": str(pose.get("junction_id") or ""),
+            "edge_id": edge_id,
+            "node_id": node_id,
+            "entry_trim_m": entry_trim_m,
+            "entry_xz": entry_xz,
+            "tangent_out_xz": tangent_xz,
+            "status": str(pose.get("status") or ""),
+            "issues": [str(issue) for issue in (pose.get("issues") or [])],
+        }
+
+    return indexed, {
+        "engineering_reference_entry_poses": raw_count,
+        "regularized_entry_pose_trims": len(indexed),
+        "regularized_entry_pose_status_counts": dict(sorted(status_counts.items())),
+        "regularized_entry_pose_issue_counts": dict(sorted(issue_counts.items())),
+    }
+
+
+def endpoint_from_trim(
+    *,
+    edge: dict[str, Any],
+    node: dict[str, Any],
+    trim_m: float,
+    regularized_pose: dict[str, Any] | None,
+) -> tuple[tuple[float, float], tuple[float, float], str]:
+    direction = direction_out(edge, node["node_id"])
+    if regularized_pose is not None:
+        regularized_trim = float(regularized_pose["entry_trim_m"])
+        if abs(trim_m - regularized_trim) <= 0.05:
+            return regularized_pose["entry_xz"], regularized_pose["tangent_out_xz"], "regularized_entry_pose"
+        return (
+            (float(node["x"]) + direction[0] * trim_m, float(node["z"]) + direction[1] * trim_m),
+            direction,
+            "regularized_scaled_for_edge_length",
+        )
+    return (
+        (float(node["x"]) + direction[0] * trim_m, float(node["z"]) + direction[1] * trim_m),
+        direction,
+        "heuristic_trim",
+    )
 
 
 def pair_key(a: dict[str, Any], b: dict[str, Any]) -> tuple[str, str]:
@@ -699,29 +912,52 @@ def feature(
     }
 
 
-def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path, area_id: str) -> dict[str, Any]:
+def optimize_centerlines(
+    input_path: Path,
+    output_path: Path,
+    report_path: Path,
+    area_id: str,
+    junction_areas_path: Path | None = None,
+    engineering_reference_path: Path | None = None,
+) -> dict[str, Any]:
     graph = read_json(input_path)
     meta = graph["metadata"]
     origin_lon = float(meta["origin_lon"])
     origin_lat = float(meta["origin_lat"])
     edges = {edge["edge_id"]: edge for edge in graph["edges"]}
     nodes = {node["node_id"]: dict(node, _edges=edges) for node in graph["nodes"]}
+    junction_areas_doc = read_optional_json(junction_areas_path)
+    engineering_reference_doc = read_optional_json(engineering_reference_path)
+    area_by_node = junction_area_by_node(junction_areas_doc)
+    regularized_entry_by_key, regularization_metrics = reference_entry_pose_index(
+        engineering_reference_doc,
+        nodes,
+        edges,
+    )
+    locked_trim_keys = set(regularized_entry_by_key)
 
     trim_by_edge_node: dict[tuple[str, str], float] = {}
     trimmed_endpoint: dict[tuple[str, str], tuple[float, float]] = {}
     trimmed_tangent: dict[tuple[str, str], tuple[float, float]] = {}
+    trimmed_endpoint_source: dict[tuple[str, str], str] = {}
     corner_nodes: dict[str, dict[str, Any]] = {}
+    heuristic_trim_keys = 0
     for node in nodes.values():
         if node["degree"] < MIN_JUNCTION_DEGREE:
             continue
         for edge_id in node["incident_edges"]:
             edge = edges[edge_id]
+            key = (edge_id, node["node_id"])
+            regularized_pose = regularized_entry_by_key.get(key)
+            if regularized_pose is not None:
+                trim_by_edge_node[key] = max(trim_by_edge_node.get(key, 0.0), float(regularized_pose["entry_trim_m"]))
+                continue
             d = direction_out(edge, node["node_id"])
             trim = trim_distance(edge, node, d)
-            key = (edge_id, node["node_id"])
             trim_by_edge_node[key] = max(trim_by_edge_node.get(key, 0.0), trim)
+            heuristic_trim_keys += 1
 
-    t_branch_trim_metrics = apply_t_junction_branch_trims(nodes, trim_by_edge_node)
+    t_branch_trim_metrics = apply_t_junction_branch_trims(nodes, trim_by_edge_node, locked_trim_keys)
 
     for node in nodes.values():
         if node.get("kind") != "connector" or node["degree"] != 2:
@@ -747,15 +983,19 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             "cut_m": cut,
         }
 
-    junction_common_trim_metrics = equalize_junction_trims(nodes, edges, trim_by_edge_node)
+    junction_common_trim_metrics = equalize_junction_trims(nodes, edges, trim_by_edge_node, locked_trim_keys)
 
     features: list[dict[str, Any]] = []
     kept_approaches = 0
     dropped_short = 0
+    regularized_endpoint_exact = 0
+    regularized_endpoint_scaled = 0
     for edge in graph["edges"]:
         points = edge_points(edge)
-        start_trim = trim_by_edge_node.get((edge["edge_id"], edge["from_node"]), 0.0)
-        end_trim = trim_by_edge_node.get((edge["edge_id"], edge["to_node"]), 0.0)
+        start_key = (edge["edge_id"], edge["from_node"])
+        end_key = (edge["edge_id"], edge["to_node"])
+        start_trim = trim_by_edge_node.get(start_key, 0.0)
+        end_trim = trim_by_edge_node.get(end_key, 0.0)
         start_trim, end_trim = scale_trims_for_length(points, start_trim, end_trim)
         trimmed = trim_endpoint(points, start_trim, end_trim)
         if not trimmed:
@@ -763,24 +1003,36 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             continue
         if start_trim > 0.0:
             start_node = nodes[edge["from_node"]]
-            start_center = (float(start_node["x"]), float(start_node["z"]))
-            start_direction = direction_out(edge, edge["from_node"])
-            trimmed[0] = (
-                start_center[0] + start_direction[0] * start_trim,
-                start_center[1] + start_direction[1] * start_trim,
+            endpoint, tangent, source = endpoint_from_trim(
+                edge=edge,
+                node=start_node,
+                trim_m=start_trim,
+                regularized_pose=regularized_entry_by_key.get(start_key),
             )
-            trimmed_endpoint[(edge["edge_id"], edge["from_node"])] = trimmed[0]
-            trimmed_tangent[(edge["edge_id"], edge["from_node"])] = start_direction
+            trimmed[0] = endpoint
+            trimmed_endpoint[start_key] = trimmed[0]
+            trimmed_tangent[start_key] = tangent
+            trimmed_endpoint_source[start_key] = source
+            if source == "regularized_entry_pose":
+                regularized_endpoint_exact += 1
+            elif source == "regularized_scaled_for_edge_length":
+                regularized_endpoint_scaled += 1
         if end_trim > 0.0:
             end_node = nodes[edge["to_node"]]
-            end_center = (float(end_node["x"]), float(end_node["z"]))
-            end_direction = direction_out(edge, edge["to_node"])
-            trimmed[-1] = (
-                end_center[0] + end_direction[0] * end_trim,
-                end_center[1] + end_direction[1] * end_trim,
+            endpoint, tangent, source = endpoint_from_trim(
+                edge=edge,
+                node=end_node,
+                trim_m=end_trim,
+                regularized_pose=regularized_entry_by_key.get(end_key),
             )
-            trimmed_endpoint[(edge["edge_id"], edge["to_node"])] = trimmed[-1]
-            trimmed_tangent[(edge["edge_id"], edge["to_node"])] = end_direction
+            trimmed[-1] = endpoint
+            trimmed_endpoint[end_key] = trimmed[-1]
+            trimmed_tangent[end_key] = tangent
+            trimmed_endpoint_source[end_key] = source
+            if source == "regularized_entry_pose":
+                regularized_endpoint_exact += 1
+            elif source == "regularized_scaled_for_edge_length":
+                regularized_endpoint_scaled += 1
         kept_approaches += 1
         features.append(feature(trimmed, {
             "vc_part": "optimized_approach_centerline",
@@ -791,6 +1043,10 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             "lanes": edge["lanes"],
             "width_m": edge["width_m"],
             "oneway": edge["oneway"],
+            "start_trim_source": trimmed_endpoint_source.get(start_key, "none"),
+            "end_trim_source": trimmed_endpoint_source.get(end_key, "none"),
+            "start_entry_pose_id": regularized_entry_by_key.get(start_key, {}).get("pose_id", ""),
+            "end_entry_pose_id": regularized_entry_by_key.get(end_key, {}).get("pose_id", ""),
         }, origin_lon, origin_lat))
 
     corner_fillet_count = 0
@@ -808,7 +1064,7 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
         width = max(float(edge_a["width_m"]), float(edge_b["width_m"]))
         direction_a = trimmed_tangent.get((edge_ids[0], node_id), direction_out(edge_a, node_id))
         direction_b = trimmed_tangent.get((edge_ids[1], node_id), direction_out(edge_b, node_id))
-        arc = circular_arc_from_tangents(
+        arc = connector_arc_from_tangents(
             endpoints[0],
             (-direction_a[0], -direction_a[1]),
             endpoints[1],
@@ -849,6 +1105,7 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
         if node["degree"] < MIN_JUNCTION_DEGREE:
             continue
         center = (float(node["x"]), float(node["z"]))
+        junction_area = area_by_node.get(node["node_id"], {})
         ends = []
         for edge_id in node["incident_edges"]:
             edge = edges[edge_id]
@@ -886,7 +1143,7 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             nxt = spec["b"]
             connector_kind = spec["connector_kind"]
             width = max(float(current["edge"]["width_m"]), float(nxt["edge"]["width_m"]))
-            arc = circular_arc_from_tangents(
+            arc = connector_arc_from_tangents(
                 current["endpoint"],
                 (-current["direction"][0], -current["direction"][1]),
                 nxt["endpoint"],
@@ -915,6 +1172,11 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
                 "lanes": max(int(current["edge"]["lanes"]), int(nxt["edge"]["lanes"])),
                 "width_m": round(width, 3),
                 "oneway": False,
+                "regularized_junction_id": str(junction_area.get("junction_id") or ""),
+                "junction_area_status": str(junction_area.get("status") or ""),
+                "conflict_zone_radius_m": float(junction_area.get("conflict_zone_radius_m") or 0.0),
+                "from_trim_source": trimmed_endpoint_source.get((current["edge"]["edge_id"], node["node_id"]), ""),
+                "to_trim_source": trimmed_endpoint_source.get((nxt["edge"]["edge_id"], node["node_id"]), ""),
             }
             props.update(arc_properties(arc))
             features.append(feature(connector, props, origin_lon, origin_lat))
@@ -946,6 +1208,10 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
                 "lanes": max(int(current["edge"]["lanes"]), int(nxt["edge"]["lanes"])),
                 "width_m": round(width, 3),
                 "oneway": False,
+                "regularized_junction_id": str(junction_area.get("junction_id") or ""),
+                "junction_area_status": str(junction_area.get("status") or ""),
+                "from_trim_source": trimmed_endpoint_source.get((current["edge"]["edge_id"], node["node_id"]), ""),
+                "to_trim_source": trimmed_endpoint_source.get((nxt["edge"]["edge_id"], node["node_id"]), ""),
             }, origin_lon, origin_lat))
             movement_index += 1
 
@@ -958,7 +1224,9 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             "origin_lon": origin_lon,
             "origin_lat": origin_lat,
             "source": str(input_path),
-            "strategy": "trim approaches first, add tangent circular-arc junction connectors and corner fillets, then extrude widths",
+            "source_junction_areas": str(junction_areas_path) if junction_areas_path and junction_areas_path.exists() else "",
+            "source_engineering_reference": str(engineering_reference_path) if engineering_reference_path and engineering_reference_path.exists() else "",
+            "strategy": "use regularized junction entry poses where available, trim approaches, add tangent circular-arc junction connectors and corner fillets, then extrude widths",
         },
         "features": features,
     }
@@ -973,6 +1241,8 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             "origin_lon": origin_lon,
             "origin_lat": origin_lat,
             "source": str(input_path),
+            "source_junction_areas": str(junction_areas_path) if junction_areas_path and junction_areas_path.exists() else "",
+            "source_engineering_reference": str(engineering_reference_path) if engineering_reference_path and engineering_reference_path.exists() else "",
             "display_note": "Debug-only movement layer. Do not mix this into OUT_roads_centerlines.",
         },
         "features": movement_debug_features,
@@ -983,10 +1253,22 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
         "input": str(input_path),
         "output": str(output_path),
         "movement_debug_output": str(movement_debug_path),
+        "regularization_inputs": {
+            "junction_areas_path": str(junction_areas_path) if junction_areas_path else "",
+            "junction_areas_loaded": bool(junction_areas_doc),
+            "junction_area_count": len(junction_areas_doc.get("junction_areas", [])),
+            "engineering_reference_path": str(engineering_reference_path) if engineering_reference_path else "",
+            "engineering_reference_loaded": bool(engineering_reference_doc),
+            **regularization_metrics,
+        },
         "counts": {
             "input_edges": len(graph["edges"]),
             "optimized_approaches": kept_approaches,
             "dropped_short_edges": dropped_short,
+            "heuristic_junction_trim_keys": heuristic_trim_keys,
+            "regularized_junction_nodes": len({node_id for _edge_id, node_id in regularized_entry_by_key}),
+            "regularized_endpoint_exact": regularized_endpoint_exact,
+            "regularized_endpoint_scaled_for_edge_length": regularized_endpoint_scaled,
             "junction_nodes": sum(1 for node in nodes.values() if node["degree"] >= MIN_JUNCTION_DEGREE),
             "junction_connectors": connector_count,
             "t_junctions": t_junction_count,
@@ -997,6 +1279,7 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             "corner_fillet_nodes": len(corner_nodes),
             "corner_fillets": corner_fillet_count,
             "corner_circular_arcs": corner_arc_geometry_counts.get("circular_arc", 0),
+            "corner_bezier_tangent_fallback": corner_arc_geometry_counts.get("bezier_tangent_fallback", 0),
             "corner_straight_infinite_radius": corner_arc_geometry_counts.get("straight_infinite_radius", 0),
             "output_features": len(features),
             **t_branch_trim_metrics,
@@ -1018,8 +1301,10 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
         },
         "notes": [
             "This stage optimizes centerlines before road width extrusion, matching the sketch-driven junction approach.",
-            "Approach lines are clipped near junctions; visible junction connectors stay in the centerline skeleton.",
+            "Approach lines use regularized junction entry poses when engineering_reference_lines.json is available.",
+            "Visible junction connectors stay in the centerline skeleton.",
             "Visible junction connectors and degree-2 corner fillets are sampled from tangent circular arcs where geometry allows it.",
+            "If regularized entry poses are not compatible with a single circle, a tangent-continuous Bezier fallback is emitted and remains visible to QA.",
             "Near-straight through connectors are represented as straight infinite-radius arcs.",
             "Road-level through/turn movement curves are exported to a separate debug layer so they do not visually cross the road skeleton.",
             "Surface builders should consume this optimized centerline output before using any fan fallback.",
@@ -1035,13 +1320,25 @@ def main() -> int:
     parser.add_argument("--input", default="")
     parser.add_argument("--output", default="")
     parser.add_argument("--report", default="")
+    parser.add_argument("--junction-areas", default="")
+    parser.add_argument("--engineering-reference", default="")
     args = parser.parse_args()
 
     root = pipeline_root_from_script(Path(__file__))
+    processed = root / "data" / "processed"
     input_path = Path(args.input) if args.input else root / "data" / "processed" / f"{args.area_id}_road_graph.json"
     output_path = Path(args.output) if args.output else root / "data" / "processed" / f"{args.area_id}_roads_optimized_centerlines.geojson"
     report_path = Path(args.report) if args.report else root / "reports" / f"{args.area_id}_optimized_centerlines_report.json"
-    report = optimize_centerlines(input_path, output_path, report_path, args.area_id)
+    junction_areas_path = Path(args.junction_areas) if args.junction_areas else processed / f"{args.area_id}_junction_areas.json"
+    engineering_reference_path = Path(args.engineering_reference) if args.engineering_reference else processed / f"{args.area_id}_engineering_reference_lines.json"
+    report = optimize_centerlines(
+        input_path,
+        output_path,
+        report_path,
+        args.area_id,
+        junction_areas_path,
+        engineering_reference_path,
+    )
     print(json.dumps({
         "area_id": args.area_id,
         "output": str(output_path),

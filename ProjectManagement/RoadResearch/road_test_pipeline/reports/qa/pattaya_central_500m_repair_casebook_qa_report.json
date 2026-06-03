@@ -1,0 +1,113 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "repair_casebook_qa",
+  "status": "pass",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
+  "casebook": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_casebook.json",
+  "manual_overrides": {
+    "enabled": true,
+    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\pattaya_central_500m.manual_overrides.json",
+    "exists": true,
+    "loaded": 1
+  },
+  "base_repair_counts": {
+    "duplicate_points_removed": 0,
+    "endpoint_snaps": 2,
+    "endpoint_to_edge_snaps": 0,
+    "intersection_split_insertions": 0,
+    "short_edges_before_cleanup": 23,
+    "short_edge_threshold_m": 3,
+    "short_edge_collapse_passes": 1,
+    "short_edge_points_removed": 15,
+    "short_edges_remaining_under_threshold_pre_output": 1
+  },
+  "case_count": 1,
+  "pass_count": 1,
+  "fail_count": 0,
+  "results": [
+    {
+      "case_id": "case_manual_forbid_snap_1209258529_end_to_1210710015_seg_1",
+      "case_type": "manual_override_regression",
+      "status": "pass",
+      "checks": [
+        {
+          "case_id": "case_manual_forbid_snap_1209258529_end_to_1210710015_seg_1",
+          "check_id": "manual_override_blocks_candidate",
+          "status": "pass",
+          "message": "Manual override must still block the corresponding force operation."
+        },
+        {
+          "case_id": "case_manual_forbid_snap_1209258529_end_to_1210710015_seg_1",
+          "check_id": "transaction_does_not_accept",
+          "status": "pass",
+          "message": "Known false-positive force operation must not be accepted by transactional validation.",
+          "transaction_status": "rejected",
+          "operation_status": "rejected"
+        }
+      ],
+      "trial_result": {
+        "source": "casebook_replay",
+        "id": "replay_forbid_snap_1209258529_end_to_1210710015_seg_1",
+        "action": "force_snap_endpoint_to_edge",
+        "status": "rejected",
+        "message": "Rejected by transactional repair validators.",
+        "blocking_crossings": [
+          {
+            "source_feature_id": "27443575",
+            "segment_index": 1,
+            "x": -115.926,
+            "z": 181.532
+          }
+        ],
+        "transactional": true,
+        "validators": [
+          {
+            "id": "no_new_short_or_zero_edge",
+            "status": "pass",
+            "before": 1,
+            "after": 1,
+            "message": "Trial repair must not increase short segments under the repair threshold."
+          },
+          {
+            "id": "no_new_third_road_crossing",
+            "status": "pass",
+            "before": 0,
+            "after": 0,
+            "message": "Trial repair must not introduce new planar road-road crossings."
+          },
+          {
+            "id": "dangling_endpoint_ratio_no_regression",
+            "status": "pass",
+            "before": 0.94,
+            "after": 0.94,
+            "message": "Trial repair must not increase the dangling endpoint ratio."
+          },
+          {
+            "id": "operation_result_acceptable",
+            "status": "fail",
+            "before": "pending",
+            "after": "failed",
+            "message": "The operation must apply cleanly or be a deterministic no-op."
+          }
+        ],
+        "before_metrics": {
+          "short_segments_under_threshold": 1,
+          "possible_unsplit_crossings": 0,
+          "possible_unsplit_crossing_samples": [],
+          "endpoint_clusters": 83,
+          "dangling_endpoint_clusters": 78,
+          "dangling_endpoint_ratio": 0.94
+        },
+        "after_metrics": {
+          "short_segments_under_threshold": 1,
+          "possible_unsplit_crossings": 0,
+          "possible_unsplit_crossing_samples": [],
+          "endpoint_clusters": 83,
+          "dangling_endpoint_clusters": 78,
+          "dangling_endpoint_ratio": 0.94
+        },
+        "transaction_status": "rejected"
+      }
+    }
+  ]
+}

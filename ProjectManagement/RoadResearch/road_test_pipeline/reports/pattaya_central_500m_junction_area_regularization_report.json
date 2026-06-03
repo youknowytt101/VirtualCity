@@ -1,0 +1,27 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "junction_area_regularization_v1",
+  "status": "warn",
+  "counts": {
+    "junction_areas": 49,
+    "approach_entry_poses": 149,
+    "connecting_road_intents": 306,
+    "status_counts": {
+      "pass": 18,
+      "warn": 31
+    },
+    "issue_counts": {
+      "entry_trim_capacity_limited": 34,
+      "short_edge_absorption_candidate": 22
+    }
+  },
+  "notes": [
+    "This stage publishes regularized junction areas without changing topology.",
+    "Short-edge absorption is currently a candidate flag, not a destructive graph edit.",
+    "Connector solvers should use these entry poses before fitting circular, clothoid or paramPoly3 curves."
+  ],
+  "input_road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+  "input_junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
+  "junction_areas_output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+  "engineering_reference_output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json"
+}
