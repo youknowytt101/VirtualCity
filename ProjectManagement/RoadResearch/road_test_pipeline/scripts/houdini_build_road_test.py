@@ -139,6 +139,20 @@ geo.addAttrib(hou.attribType.Prim, "half_width", 0.0)
 geo.addAttrib(hou.attribType.Prim, "oneway", 0)
 geo.addAttrib(hou.attribType.Prim, "seg_id", -1)
 geo.addAttrib(hou.attribType.Prim, "vc_part", "")
+geo.addAttrib(hou.attribType.Prim, "connector_id", "")
+geo.addAttrib(hou.attribType.Prim, "connector_kind", "")
+geo.addAttrib(hou.attribType.Prim, "corner_id", "")
+geo.addAttrib(hou.attribType.Prim, "from_edge_id", "")
+geo.addAttrib(hou.attribType.Prim, "to_edge_id", "")
+geo.addAttrib(hou.attribType.Prim, "arc_geometry", "")
+geo.addAttrib(hou.attribType.Prim, "arc_fit_status", "")
+geo.addAttrib(hou.attribType.Prim, "arc_radius_m", 0.0)
+geo.addAttrib(hou.attribType.Prim, "arc_center_x", 0.0)
+geo.addAttrib(hou.attribType.Prim, "arc_center_z", 0.0)
+geo.addAttrib(hou.attribType.Prim, "arc_sweep_deg", 0.0)
+geo.addAttrib(hou.attribType.Prim, "arc_sample_count", 0)
+geo.addAttrib(hou.attribType.Prim, "arc_design_min_radius_m", 0.0)
+geo.addAttrib(hou.attribType.Prim, "arc_radius_margin_m", 0.0)
 
 road_group = geo.createPrimGroup("roads_centerline")
 
@@ -174,7 +188,21 @@ for i, feat in enumerate(fc.get("features", [])):
     poly.setAttribValue("half_width", float(width) * 0.5)
     poly.setAttribValue("oneway", 1 if str(props.get("oneway") or "").lower() in ("1", "true", "yes") else 0)
     poly.setAttribValue("seg_id", int(props.get("seg_id") or i))
-    poly.setAttribValue("vc_part", "road_centerline")
+    poly.setAttribValue("vc_part", str(props.get("vc_part") or "road_centerline"))
+    poly.setAttribValue("connector_id", str(props.get("connector_id") or ""))
+    poly.setAttribValue("connector_kind", str(props.get("connector_kind") or ""))
+    poly.setAttribValue("corner_id", str(props.get("corner_id") or ""))
+    poly.setAttribValue("from_edge_id", str(props.get("from_edge_id") or ""))
+    poly.setAttribValue("to_edge_id", str(props.get("to_edge_id") or ""))
+    poly.setAttribValue("arc_geometry", str(props.get("arc_geometry") or ""))
+    poly.setAttribValue("arc_fit_status", str(props.get("arc_fit_status") or ""))
+    poly.setAttribValue("arc_radius_m", float(props.get("arc_radius_m") or 0.0))
+    poly.setAttribValue("arc_center_x", float(props.get("arc_center_x") or 0.0))
+    poly.setAttribValue("arc_center_z", float(props.get("arc_center_z") or 0.0))
+    poly.setAttribValue("arc_sweep_deg", float(props.get("arc_sweep_deg") or 0.0))
+    poly.setAttribValue("arc_sample_count", int(props.get("arc_sample_count") or 0))
+    poly.setAttribValue("arc_design_min_radius_m", float(props.get("arc_design_min_radius_m") or 0.0))
+    poly.setAttribValue("arc_radius_margin_m", float(props.get("arc_radius_margin_m") or 0.0))
     road_group.add(poly)
 '''
 
@@ -720,6 +748,7 @@ def lane_link_records(lane_graph):
 
 def lane_trim_distances(lane_graph, lane_links, continuity_links):
     trim_m = float(lane_graph.get("metadata", {}).get("junction_trim_m") or 8.0)
+    lanes_by_id = {str(lane.get("lane_id") or ""): lane for lane in lane_graph.get("lanes", [])}
     trim_by_lane = {}
 
     def update(lane_id, side, value):
@@ -735,11 +764,22 @@ def lane_trim_distances(lane_graph, lane_links, continuity_links):
         item[side] = max(item[side], value)
         item["locked_" + side] = max(item["locked_" + side], value)
 
+    def default_lane_link_trim(lane_id):
+        lane = lanes_by_id.get(lane_id)
+        if lane is not None and bool(lane.get("approach_centerline_trimmed")):
+            return 0.0
+        return trim_m
+
+    def link_trim_value(link, key, default):
+        if key not in link or link.get(key) is None:
+            return default
+        return max(0.0, float(link.get(key) or 0.0))
+
     for link in lane_links:
         from_lane = str(link.get("from_lane") or "")
         to_lane = str(link.get("to_lane") or "")
-        update(from_lane, "end", float(link.get("from_lane_trim_end_m") or trim_m))
-        update(to_lane, "start", float(link.get("to_lane_trim_start_m") or trim_m))
+        update(from_lane, "end", link_trim_value(link, "from_lane_trim_end_m", default_lane_link_trim(from_lane)))
+        update(to_lane, "start", link_trim_value(link, "to_lane_trim_start_m", default_lane_link_trim(to_lane)))
 
     for link in continuity_links:
         lock(str(link.get("from_lane") or ""), "end", float(link.get("from_lane_trim_end_m") or 0.0))

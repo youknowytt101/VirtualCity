@@ -2,12 +2,14 @@
   "type": "FeatureCollection",
   "metadata": {
     "area_id": "pattaya_central_500m",
-    "schema": "road_test_pipeline.optimized_centerlines.v1",
+    "schema": "road_test_pipeline.clean_road_skeleton.v1",
     "coord_domain": "WGS84",
     "origin_lon": 100.8837,
     "origin_lat": 12.93425,
-    "source": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "strategy": "trim approaches first, add tangent circular-arc junction connectors and corner fillets, then extrude widths"
+    "source": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "strategy": "trim approaches first, add tangent circular-arc junction connectors and corner fillets, then extrude widths",
+    "stage": "road_repair_clean_skeleton",
+    "display_contract": "Houdini imports this as the clean pre-construction road skeleton."
   },
   "features": [
     {

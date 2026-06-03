@@ -1,0 +1,17 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "houdini_clean_road_skeleton",
+  "timestamp": "2026-06-03 21:42:04",
+  "obj_node": "/obj/road_test_pattaya_central_500m",
+  "display_node": "/obj/road_test_pattaya_central_500m/OUT_clean_road_skeleton",
+  "clean_skeleton_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_clean_skeleton.geojson",
+  "primitives": 413,
+  "points": 2936,
+  "part_counts": {
+    "optimized_approach_centerline": 243,
+    "optimized_corner_fillet": 21,
+    "optimized_junction_connector": 149
+  },
+  "compare_with": "/obj/road_test_pattaya_central_500m/OUT_raw_road_lines",
+  "note": "Raw road preview and clean skeleton output nodes were created together."
+}

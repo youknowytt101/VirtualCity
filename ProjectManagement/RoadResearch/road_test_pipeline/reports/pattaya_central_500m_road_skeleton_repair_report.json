@@ -1,0 +1,19 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "road_repair_clean_skeleton",
+  "status": "warn",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_clean_skeleton.geojson",
+  "feature_count": 413,
+  "part_counts": {
+    "optimized_approach_centerline": 243,
+    "optimized_corner_fillet": 21,
+    "optimized_junction_connector": 149
+  },
+  "arc_geometry_counts": {
+    "circular_arc": 128,
+    "straight_infinite_radius": 42
+  },
+  "radius_violation_features": 96,
+  "note": "Radius violations stay visible as skeleton diagnostics; they are not fixed in Houdini."
+}

@@ -1,0 +1,25 @@
+{
+  "area_id": "pattaya_central_500m",
+  "schema": "road_test_pipeline.manual_overrides.v1",
+  "topology_repair": [
+    {
+      "id": "forbid_snap_1209258529_end_to_1210710015_seg_1",
+      "enabled": true,
+      "action": "forbid_snap_endpoint_to_edge",
+      "reason": "Old endpoint-only review candidate was a false positive: this endpoint is already connected to 27443575, and snapping it to 1210710015 would create a third-road crossing.",
+      "from": {
+        "source_feature_id": "1209258529",
+        "endpoint_role": "end",
+        "review_x": -115.786,
+        "review_z": 181.44
+      },
+      "to_edge": {
+        "source_feature_id": "1210710015",
+        "segment_index": 1,
+        "review_segment_t": 0.033,
+        "review_x": -120.473,
+        "review_z": 174.226
+      }
+    }
+  ]
+}

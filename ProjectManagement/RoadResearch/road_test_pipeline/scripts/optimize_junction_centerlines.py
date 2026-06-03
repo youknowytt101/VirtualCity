@@ -22,6 +22,23 @@ MIN_TRIM_M = 3.0
 MAX_TRIM_M = 9.0
 CONNECTOR_SAMPLES = 7
 CONNECTOR_CENTER_WEIGHT = 0.65
+ARC_SAMPLE_DEG = 5.0
+ARC_RADIUS_TOLERANCE_M = 0.05
+MAX_ARC_RADIUS_M = 10000.0
+STRAIGHT_SWEEP_DEG = 2.0
+JUNCTION_TURN_MIN_RADIUS_M = 3.0
+JUNCTION_TURN_RADIUS_WIDTH_FACTOR = 0.75
+JUNCTION_TURN_MIN_RADIUS_BY_CLASS = {
+    "service": 3.0,
+    "living_street": 3.0,
+    "residential": 6.0,
+    "unclassified": 6.0,
+    "tertiary": 8.0,
+    "secondary": 9.0,
+    "primary": 12.0,
+    "trunk": 15.0,
+    "motorway": 20.0,
+}
 MIN_CORNER_TURN_DEG = 18.0
 MIN_CORNER_ANGLE_DEG = 35.0
 CORNER_MIN_CUT_M = 2.0
@@ -92,6 +109,22 @@ def angle_of(v: tuple[float, float]) -> float:
 def angle_between(a: tuple[float, float], b: tuple[float, float]) -> float:
     dot = max(-1.0, min(1.0, a[0] * b[0] + a[1] * b[1]))
     return math.acos(dot)
+
+
+def rotate90(v: tuple[float, float]) -> tuple[float, float]:
+    return -v[1], v[0]
+
+
+def dot(a: tuple[float, float], b: tuple[float, float]) -> float:
+    return a[0] * b[0] + a[1] * b[1]
+
+
+def cross(a: tuple[float, float], b: tuple[float, float]) -> float:
+    return a[0] * b[1] - a[1] * b[0]
+
+
+def sub(a: tuple[float, float], b: tuple[float, float]) -> tuple[float, float]:
+    return a[0] - b[0], a[1] - b[1]
 
 
 def edge_points(edge: dict[str, Any]) -> list[tuple[float, float]]:
@@ -222,6 +255,192 @@ def trim_endpoint(
     trimmed = trim_from_start(points, trim_start)
     trimmed = list(reversed(trim_from_start(list(reversed(trimmed)), trim_end)))
     return trimmed if len(trimmed) >= 2 and polyline_length(trimmed) > 0.05 else []
+
+
+def line_intersection(
+    p: tuple[float, float],
+    r: tuple[float, float],
+    q: tuple[float, float],
+    s: tuple[float, float],
+) -> tuple[float, float] | None:
+    denom = cross(r, s)
+    if abs(denom) <= 1e-9:
+        return None
+    qp = sub(q, p)
+    t = cross(qp, s) / denom
+    return p[0] + r[0] * t, p[1] + r[1] * t
+
+
+def straight_arc_metadata(a: tuple[float, float], b: tuple[float, float], reason: str) -> dict[str, Any]:
+    return {
+        "points": [a, b],
+        "geometry": "straight_infinite_radius",
+        "fit_status": reason,
+        "radius_m": 0.0,
+        "center": None,
+        "sweep_deg": 0.0,
+        "sample_count": 2,
+    }
+
+
+def circular_arc_from_tangents(
+    a: tuple[float, float],
+    start_tangent: tuple[float, float],
+    b: tuple[float, float],
+    end_tangent: tuple[float, float],
+    min_samples: int,
+) -> dict[str, Any]:
+    t0 = normalize(start_tangent)
+    t1 = normalize(end_tangent)
+    if t0 == (0.0, 0.0) or t1 == (0.0, 0.0) or distance(a, b) <= 0.05:
+        return straight_arc_metadata(a, b, "degenerate_tangent_or_chord")
+
+    center = line_intersection(a, rotate90(t0), b, rotate90(t1))
+    if center is None:
+        return straight_arc_metadata(a, b, "parallel_tangent_infinite_radius")
+
+    r0 = distance(center, a)
+    r1 = distance(center, b)
+    radius = (r0 + r1) * 0.5
+    if radius <= 0.05:
+        return straight_arc_metadata(a, b, "degenerate_radius")
+    if abs(r0 - r1) > max(ARC_RADIUS_TOLERANCE_M, radius * 0.01):
+        return straight_arc_metadata(a, b, "incompatible_tangent_endpoints")
+
+    start_angle = math.atan2(a[1] - center[1], a[0] - center[0])
+    end_angle = math.atan2(b[1] - center[1], b[0] - center[0])
+    radial = normalize((a[0] - center[0], a[1] - center[1]))
+    ccw_tangent = rotate90(radial)
+    clockwise_tangent = (-ccw_tangent[0], -ccw_tangent[1])
+    use_ccw = dot(ccw_tangent, t0) >= dot(clockwise_tangent, t0)
+    sweep = end_angle - start_angle
+    if use_ccw:
+        while sweep < 0.0:
+            sweep += math.tau
+    else:
+        while sweep > 0.0:
+            sweep -= math.tau
+
+    sweep_deg = math.degrees(sweep)
+    if abs(sweep_deg) <= STRAIGHT_SWEEP_DEG or radius >= MAX_ARC_RADIUS_M:
+        return straight_arc_metadata(a, b, "near_straight_infinite_radius")
+
+    samples = max(min_samples, int(math.ceil(abs(sweep_deg) / ARC_SAMPLE_DEG)) + 1)
+    points = []
+    for i in range(samples):
+        t = i / (samples - 1)
+        angle = start_angle + sweep * t
+        points.append((center[0] + math.cos(angle) * radius, center[1] + math.sin(angle) * radius))
+
+    points[0] = a
+    points[-1] = b
+    return {
+        "points": points,
+        "geometry": "circular_arc",
+        "fit_status": "exact_tangent_arc",
+        "radius_m": radius,
+        "center": center,
+        "sweep_deg": sweep_deg,
+        "sample_count": samples,
+    }
+
+
+def arc_properties(arc: dict[str, Any]) -> dict[str, Any]:
+    center = arc.get("center")
+    design_min_radius = float(arc.get("design_min_radius_m") or 0.0)
+    radius = float(arc["radius_m"])
+    return {
+        "arc_geometry": arc["geometry"],
+        "arc_fit_status": arc["fit_status"],
+        "arc_radius_m": round(radius, 3),
+        "arc_center_x": round(float(center[0]), 3) if center is not None else None,
+        "arc_center_z": round(float(center[1]), 3) if center is not None else None,
+        "arc_sweep_deg": round(float(arc["sweep_deg"]), 3),
+        "arc_sample_count": int(arc["sample_count"]),
+        "arc_design_min_radius_m": round(design_min_radius, 3),
+        "arc_radius_margin_m": round(radius - design_min_radius, 3) if design_min_radius > 0.0 else 0.0,
+    }
+
+
+def road_class_min_turn_radius(edge: dict[str, Any]) -> float:
+    road_class = str(edge.get("road_class") or edge.get("highway") or "unclassified")
+    return JUNCTION_TURN_MIN_RADIUS_BY_CLASS.get(road_class, JUNCTION_TURN_MIN_RADIUS_M)
+
+
+def design_min_radius_for_connector(
+    edge_a: dict[str, Any],
+    edge_b: dict[str, Any],
+    connector_kind: str,
+) -> float:
+    if connector_kind == "t_through":
+        return 0.0
+    width = max(float(edge_a.get("width_m") or 0.0), float(edge_b.get("width_m") or 0.0))
+    return max(
+        JUNCTION_TURN_MIN_RADIUS_M,
+        width * JUNCTION_TURN_RADIUS_WIDTH_FACTOR,
+        road_class_min_turn_radius(edge_a),
+        road_class_min_turn_radius(edge_b),
+    )
+
+
+def enforce_design_min_radius(arc: dict[str, Any], min_radius: float) -> dict[str, Any]:
+    arc["design_min_radius_m"] = min_radius
+    return arc
+
+
+def equalize_junction_trims(
+    nodes: dict[str, dict[str, Any]],
+    edges: dict[str, dict[str, Any]],
+    trim_by_edge_node: dict[tuple[str, str], float],
+) -> dict[str, Any]:
+    equalized_nodes = 0
+    raised = []
+    lowered = []
+    for _iteration in range(4):
+        for node in nodes.values():
+            if node["degree"] < MIN_JUNCTION_DEGREE:
+                continue
+            values = [trim_by_edge_node.get((edge_id, node["node_id"]), 0.0) for edge_id in node["incident_edges"]]
+            if not values:
+                continue
+            desired_trim = max(values)
+            if desired_trim <= 0.0:
+                continue
+
+            capacities = []
+            for edge_id in node["incident_edges"]:
+                edge = edges[edge_id]
+                other_node_id = edge["to_node"] if edge["from_node"] == node["node_id"] else edge["from_node"]
+                other_trim = trim_by_edge_node.get((edge_id, other_node_id), 0.0)
+                capacities.append(max(0.0, float(edge["length_m"]) - 0.5 - other_trim))
+            common_trim = min(desired_trim, min(capacities) if capacities else desired_trim)
+            if common_trim <= 0.0:
+                continue
+
+            changed = False
+            for edge_id in node["incident_edges"]:
+                key = (edge_id, node["node_id"])
+                old = trim_by_edge_node.get(key, 0.0)
+                delta = common_trim - old
+                if abs(delta) <= 1e-6:
+                    continue
+                trim_by_edge_node[key] = common_trim
+                if delta > 0.0:
+                    raised.append(delta)
+                else:
+                    lowered.append(-delta)
+                changed = True
+            if changed:
+                equalized_nodes += 1
+    return {
+        "junction_common_trim_nodes": equalized_nodes,
+        "junction_common_trim_raised": len(raised),
+        "junction_common_trim_lowered": len(lowered),
+        "junction_common_trim_max_raise_m": round(max(raised), 3) if raised else 0.0,
+        "junction_common_trim_avg_raise_m": round(sum(raised) / len(raised), 3) if raised else 0.0,
+        "junction_common_trim_max_lower_m": round(max(lowered), 3) if lowered else 0.0,
+        "junction_common_trim_avg_lower_m": round(sum(lowered) / len(lowered), 3) if lowered else 0.0,
+    }
 
 
 def bezier_connector(
@@ -490,6 +709,7 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
 
     trim_by_edge_node: dict[tuple[str, str], float] = {}
     trimmed_endpoint: dict[tuple[str, str], tuple[float, float]] = {}
+    trimmed_tangent: dict[tuple[str, str], tuple[float, float]] = {}
     corner_nodes: dict[str, dict[str, Any]] = {}
     for node in nodes.values():
         if node["degree"] < MIN_JUNCTION_DEGREE:
@@ -527,6 +747,8 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             "cut_m": cut,
         }
 
+    junction_common_trim_metrics = equalize_junction_trims(nodes, edges, trim_by_edge_node)
+
     features: list[dict[str, Any]] = []
     kept_approaches = 0
     dropped_short = 0
@@ -540,9 +762,25 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             dropped_short += 1
             continue
         if start_trim > 0.0:
+            start_node = nodes[edge["from_node"]]
+            start_center = (float(start_node["x"]), float(start_node["z"]))
+            start_direction = direction_out(edge, edge["from_node"])
+            trimmed[0] = (
+                start_center[0] + start_direction[0] * start_trim,
+                start_center[1] + start_direction[1] * start_trim,
+            )
             trimmed_endpoint[(edge["edge_id"], edge["from_node"])] = trimmed[0]
+            trimmed_tangent[(edge["edge_id"], edge["from_node"])] = start_direction
         if end_trim > 0.0:
+            end_node = nodes[edge["to_node"]]
+            end_center = (float(end_node["x"]), float(end_node["z"]))
+            end_direction = direction_out(edge, edge["to_node"])
+            trimmed[-1] = (
+                end_center[0] + end_direction[0] * end_trim,
+                end_center[1] + end_direction[1] * end_trim,
+            )
             trimmed_endpoint[(edge["edge_id"], edge["to_node"])] = trimmed[-1]
+            trimmed_tangent[(edge["edge_id"], edge["to_node"])] = end_direction
         kept_approaches += 1
         features.append(feature(trimmed, {
             "vc_part": "optimized_approach_centerline",
@@ -557,6 +795,7 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
 
     corner_fillet_count = 0
     corner_turn_degrees: list[float] = []
+    corner_arc_geometry_counts = Counter()
     for node_id, corner in corner_nodes.items():
         node = nodes[node_id]
         center = (float(node["x"]), float(node["z"]))
@@ -567,8 +806,17 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
         edge_a = edges[edge_ids[0]]
         edge_b = edges[edge_ids[1]]
         width = max(float(edge_a["width_m"]), float(edge_b["width_m"]))
-        curve = tangent_corner_curve(endpoints[0], endpoints[1], center, CORNER_SAMPLES)
-        features.append(feature(curve, {
+        direction_a = trimmed_tangent.get((edge_ids[0], node_id), direction_out(edge_a, node_id))
+        direction_b = trimmed_tangent.get((edge_ids[1], node_id), direction_out(edge_b, node_id))
+        arc = circular_arc_from_tangents(
+            endpoints[0],
+            (-direction_a[0], -direction_a[1]),
+            endpoints[1],
+            direction_b,
+            CORNER_SAMPLES,
+        )
+        corner_arc_geometry_counts[str(arc["geometry"])] += 1
+        props = {
             "vc_part": "optimized_corner_fillet",
             "corner_node_id": node_id,
             "corner_id": f"{node_id}_fillet",
@@ -581,7 +829,9 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             "turn_angle_deg": round(corner["turn_deg"], 3),
             "cut_m": round(corner["cut_m"], 3),
             "oneway": False,
-        }, origin_lon, origin_lat))
+        }
+        props.update(arc_properties(arc))
+        features.append(feature(arc["points"], props, origin_lon, origin_lat))
         corner_fillet_count += 1
         corner_turn_degrees.append(corner["turn_deg"])
 
@@ -593,6 +843,8 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
     t_junction_connector_count = 0
     connector_style_counts = Counter()
     connector_degrees = Counter()
+    connector_arc_geometry_counts = Counter()
+    connector_arc_fit_status_counts = Counter()
     for node in nodes.values():
         if node["degree"] < MIN_JUNCTION_DEGREE:
             continue
@@ -600,7 +852,7 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
         ends = []
         for edge_id in node["incident_edges"]:
             edge = edges[edge_id]
-            d = direction_out(edge, node["node_id"])
+            d = trimmed_tangent.get((edge_id, node["node_id"]), direction_out(edge, node["node_id"]))
             endpoint = trimmed_endpoint.get((edge_id, node["node_id"]))
             if endpoint is None:
                 continue
@@ -634,20 +886,24 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             nxt = spec["b"]
             connector_kind = spec["connector_kind"]
             width = max(float(current["edge"]["width_m"]), float(nxt["edge"]["width_m"]))
+            arc = circular_arc_from_tangents(
+                current["endpoint"],
+                (-current["direction"][0], -current["direction"][1]),
+                nxt["endpoint"],
+                nxt["direction"],
+                T_JUNCTION_SAMPLES if connector_kind.startswith("t_") else CONNECTOR_SAMPLES,
+            )
+            arc = enforce_design_min_radius(
+                arc,
+                design_min_radius_for_connector(current["edge"], nxt["edge"], connector_kind),
+            )
+            connector = arc["points"]
+            connector_arc_geometry_counts[str(arc["geometry"])] += 1
+            connector_arc_fit_status_counts[str(arc["fit_status"])] += 1
             if connector_kind.startswith("t_"):
-                connector = t_junction_curve(
-                    current["endpoint"],
-                    nxt["endpoint"],
-                    current["direction"],
-                    nxt["direction"],
-                    center,
-                    connector_kind,
-                )
                 t_junction_connector_count += 1
-            else:
-                connector = bezier_connector(current["endpoint"], nxt["endpoint"], center)
             connector_style_counts[connector_kind] += 1
-            features.append(feature(connector, {
+            props = {
                 "vc_part": "optimized_junction_connector",
                 "junction_node_id": node["node_id"],
                 "connector_id": f"{node['node_id']}_c_{i:02d}",
@@ -659,7 +915,9 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
                 "lanes": max(int(current["edge"]["lanes"]), int(nxt["edge"]["lanes"])),
                 "width_m": round(width, 3),
                 "oneway": False,
-            }, origin_lon, origin_lat))
+            }
+            props.update(arc_properties(arc))
+            features.append(feature(connector, props, origin_lon, origin_lat))
             connector_count += 1
 
         movement_index = 0
@@ -700,7 +958,7 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             "origin_lon": origin_lon,
             "origin_lat": origin_lat,
             "source": str(input_path),
-            "strategy": "trim approaches first, add curved adjacent-edge junction connectors, then extrude widths",
+            "strategy": "trim approaches first, add tangent circular-arc junction connectors and corner fillets, then extrude widths",
         },
         "features": features,
     }
@@ -738,11 +996,17 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
             "junction_turn_movements": turn_movement_count,
             "corner_fillet_nodes": len(corner_nodes),
             "corner_fillets": corner_fillet_count,
+            "corner_circular_arcs": corner_arc_geometry_counts.get("circular_arc", 0),
+            "corner_straight_infinite_radius": corner_arc_geometry_counts.get("straight_infinite_radius", 0),
             "output_features": len(features),
             **t_branch_trim_metrics,
+            **junction_common_trim_metrics,
         },
         "junction_degree_counts": dict(sorted(connector_degrees.items())),
         "junction_connector_style_counts": dict(sorted(connector_style_counts.items())),
+        "junction_connector_arc_geometry_counts": dict(sorted(connector_arc_geometry_counts.items())),
+        "junction_connector_arc_fit_status_counts": dict(sorted(connector_arc_fit_status_counts.items())),
+        "corner_arc_geometry_counts": dict(sorted(corner_arc_geometry_counts.items())),
         "corner_fillet_metrics": {
             "min_turn_deg": round(min(corner_turn_degrees), 3) if corner_turn_degrees else 0.0,
             "max_turn_deg": round(max(corner_turn_degrees), 3) if corner_turn_degrees else 0.0,
@@ -755,8 +1019,9 @@ def optimize_centerlines(input_path: Path, output_path: Path, report_path: Path,
         "notes": [
             "This stage optimizes centerlines before road width extrusion, matching the sketch-driven junction approach.",
             "Approach lines are clipped near junctions; visible junction connectors stay in the centerline skeleton.",
+            "Visible junction connectors and degree-2 corner fillets are sampled from tangent circular arcs where geometry allows it.",
+            "Near-straight through connectors are represented as straight infinite-radius arcs.",
             "Road-level through/turn movement curves are exported to a separate debug layer so they do not visually cross the road skeleton.",
-            "Degree-2 connector bends are locally filleted with stronger tangent-continuous cubic corner curves; endpoints and junction nodes are preserved.",
             "Surface builders should consume this optimized centerline output before using any fan fallback.",
         ],
     }

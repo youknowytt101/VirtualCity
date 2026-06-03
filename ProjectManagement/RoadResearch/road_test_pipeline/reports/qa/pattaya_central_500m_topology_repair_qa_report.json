@@ -66,7 +66,20 @@
       "short_edge_collapse_passes": 1,
       "short_edge_points_removed": 15,
       "short_edges_remaining_under_threshold_pre_output": 1,
-      "short_edges_remaining_under_threshold": 0
+      "post_promotion_short_edge_points_removed": 0,
+      "post_promotion_short_edges_remaining_under_threshold_pre_output": 1,
+      "short_edges_remaining_under_threshold": 0,
+      "internal_dangling_endpoints_for_review": 28,
+      "endpoint_bridge_candidates_for_review": 0,
+      "endpoint_to_edge_candidates_for_review": 0,
+      "high_confidence_repair_candidates": 0,
+      "manual_override_ops_loaded": 1,
+      "manual_override_ops_applied": 0,
+      "manual_override_ops_failed": 0,
+      "high_confidence_promotions_applied": 0,
+      "high_confidence_promotions_rejected": 0,
+      "high_confidence_promotions_failed": 0,
+      "high_confidence_promotions_skipped": 0
     },
     "endpoint_stats_before": {
       "endpoint_clusters": 84,

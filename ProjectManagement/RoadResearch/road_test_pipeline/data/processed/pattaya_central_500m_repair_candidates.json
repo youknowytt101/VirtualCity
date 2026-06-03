@@ -1,0 +1,14 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "topology_repair_candidates_v1",
+  "schema": "road_test_pipeline.repair_candidates.v1",
+  "source": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
+  "candidate_count": 0,
+  "counts": {
+    "endpoint_bridge": 0,
+    "endpoint_to_edge": 0,
+    "auto_promotable": 0
+  },
+  "candidates": [],
+  "note": "Candidates are evidence, not repairs. A candidate can change geometry only after validator and QA gates pass."
+}
