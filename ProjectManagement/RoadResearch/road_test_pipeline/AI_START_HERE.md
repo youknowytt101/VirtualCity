@@ -186,6 +186,7 @@ export_lane_graph_svg.py
   默认输出 reports/visualizations/<area_id>_lane_graph_topology.svg
   如果 movement_corridor_candidates.json 已存在，会优先叠加 lane_entry_anchor / lane_exit_anchor（车道入口 / 出口锚点）
   如果 compound_junction_merge_transactions.json 已存在，会叠加 compound trial corridor（复合试运行走廊）
+  当前支持 --no-compound-transactions（禁用复合事务叠加），主入口 L8.1 会用它避免旧 compound overlay（复合叠加）污染审图
   当前默认是 review_drawing（审图线稿）模式：3200px 宽画布、lane road casing（车道道路底线）、小锚点和复合走廊高亮
   只给人看图，不是 source truth（源数据真值）
 
@@ -219,6 +220,8 @@ apply_compound_junction_merges.py
 
 repair_road_skeleton.py
   串起 L3-L8.5、QA、clean skeleton artifact 和可选 Houdini sync
+  L8.1 输出 anchor-only SVG（仅锚点通行走廊 SVG），compound_corridors_rendered = 0
+  L8.5 输出 staged compound SVG（暂存复合走廊 SVG），compound_corridors_rendered = 24
 ```
 
 ## 当前样本状态

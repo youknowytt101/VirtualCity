@@ -154,6 +154,14 @@ temporary_bidirectional_two_lane_policy（临时双向两车道策略）
 reports/visualizations/<area_id>_lane_graph_topology.svg
 ```
 
+`export_lane_graph_svg.py（SVG 导出器）` 默认会在相关 JSON 存在时自动叠加 movement corridors（通行走廊）和
+compound trial corridors（复合试运行走廊）。当前主入口会分阶段显式控制：
+
+```text
+L8.1 planned-anchor SVG: 使用 --no-compound-transactions（禁用复合事务叠加），compound_corridors_rendered = 0
+L8.5 staged compound SVG: 显式传入 compound_junction_merge_transactions.json，compound_corridors_rendered = 24
+```
+
 当前默认 SVG 是 `review_drawing（审图线稿）` 样式：
 
 ```text
@@ -322,6 +330,7 @@ lane graph topology: warn, lanes = 486, lane_links = 612, lane_link_reference_er
 traffic direction policy: source_oneway_lane_ratio = 0.0, temporary_bidirectional_two_lane_policy_lane_ratio = 1.0
 lane graph QA: pass
 lane graph SVG: reports/visualizations/pattaya_central_500m_lane_graph_topology.svg, review_drawing = 3200 x 2740
+L8.1 anchor-only SVG: pass, compound_corridors_rendered = 0
 movement corridor solver: warn, corridor_cases = 306, candidate_curves = 918, reference_errors = 0, planned_virtual_anchors = 76, planned_virtual_anchor_cases = 72
 movement anchor gap audit: warn, remaining_capacity_limited_anchors = 36, adjacent_junction_short_link = 24, dead_end_stub_capacity_limited = 8, low_value_short_edge_absorption = 4
 compound junction merge planner: warn, eligible_anchor_records = 24, eligible_bridge_edges = 3, candidates = 3, transaction_candidates = 3, risk_counts.low = 3

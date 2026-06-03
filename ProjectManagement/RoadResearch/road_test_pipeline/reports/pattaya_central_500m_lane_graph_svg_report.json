@@ -61,8 +61,8 @@
   "note": "SVG visualization（可视化） only. lane_graph.json, movement_corridor_candidates.json and compound_junction_merge_transactions.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
   "inputs": {
     "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "movement_corridors": "ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-    "compound_junction_merge_transactions": "ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json"
+    "movement_corridors": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "compound_junction_merge_transactions": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json"
   },
   "outputs": {
     "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",

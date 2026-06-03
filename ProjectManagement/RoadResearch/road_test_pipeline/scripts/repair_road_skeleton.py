@@ -487,6 +487,7 @@ def main() -> int:
                 args.area_id,
                 "--movement-corridors",
                 str(movement_corridor_candidates),
+                "--no-compound-transactions",
                 "--width-px",
                 "3200",
                 "--max-height-px",

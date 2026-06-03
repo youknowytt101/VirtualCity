@@ -506,6 +506,8 @@ def main() -> int:
     parser.add_argument("--lane-graph", default="")
     parser.add_argument("--movement-corridors", default="", help="Optional movement_corridor_candidates.json. Defaults to processed/<area_id> file if present.")
     parser.add_argument("--compound-transactions", default="", help="Optional compound_junction_merge_transactions.json overlay.")
+    parser.add_argument("--no-movement-corridors", action="store_true", help="Do not auto-load movement corridor overlay.")
+    parser.add_argument("--no-compound-transactions", action="store_true", help="Do not auto-load compound junction merge transaction overlay.")
     parser.add_argument("--output", default="")
     parser.add_argument("--report", default="")
     parser.add_argument("--width-px", type=int, default=DEFAULT_REVIEW_WIDTH_PX)
@@ -518,17 +520,21 @@ def main() -> int:
     reports = root / "reports"
     lane_graph_path = Path(args.lane_graph) if args.lane_graph else processed / f"{args.area_id}_lane_graph.json"
     movement_corridors_path = (
-        Path(args.movement_corridors)
+        None
+        if args.no_movement_corridors
+        else Path(args.movement_corridors)
         if args.movement_corridors
         else processed / f"{args.area_id}_movement_corridor_candidates.json"
     )
-    movement_corridors = read_json(movement_corridors_path) if movement_corridors_path.exists() else None
+    movement_corridors = read_json(movement_corridors_path) if movement_corridors_path and movement_corridors_path.exists() else None
     compound_transactions_path = (
-        Path(args.compound_transactions)
+        None
+        if args.no_compound_transactions
+        else Path(args.compound_transactions)
         if args.compound_transactions
         else processed / f"{args.area_id}_compound_junction_merge_transactions.json"
     )
-    compound_transactions = read_json(compound_transactions_path) if compound_transactions_path.exists() else None
+    compound_transactions = read_json(compound_transactions_path) if compound_transactions_path and compound_transactions_path.exists() else None
     output_path = Path(args.output) if args.output else reports / "visualizations" / f"{args.area_id}_lane_graph_topology.svg"
     report_path = Path(args.report) if args.report else reports / f"{args.area_id}_lane_graph_svg_report.json"
 
@@ -543,8 +549,8 @@ def main() -> int:
     )
     report["inputs"] = {
         "lane_graph": str(lane_graph_path),
-        "movement_corridors": str(movement_corridors_path) if movement_corridors is not None else "",
-        "compound_junction_merge_transactions": str(compound_transactions_path) if compound_transactions is not None else "",
+        "movement_corridors": str(movement_corridors_path) if movement_corridors_path and movement_corridors is not None else "",
+        "compound_junction_merge_transactions": str(compound_transactions_path) if compound_transactions_path and compound_transactions is not None else "",
     }
     report["outputs"] = {"svg": str(output_path), "report": str(report_path)}
     write_text(output_path, svg)

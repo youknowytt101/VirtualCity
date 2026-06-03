@@ -175,6 +175,7 @@ export_lane_graph_svg.py
   writes reports/visualizations/<area_id>_lane_graph_topology.svg
   if movement_corridor_candidates.json exists, renders anchored movement corridors（锚点版通行走廊）
   if compound_junction_merge_transactions.json exists, renders compound trial corridors（复合试运行走廊）
+  supports --no-compound-transactions（禁用复合事务叠加）; repair_road_skeleton.py uses it at L8.1 so old compound overlay（旧复合叠加） cannot pollute anchor-only review
   current default style is review_drawing（审图线稿） with 3200px canvas width, lane road casing（车道道路底线）,
   smaller entry / exit anchors（入口 / 出口锚点） and highlighted compound corridors（复合走廊高亮）
   image is human QA（人工质检） only, not source truth（源数据真值）

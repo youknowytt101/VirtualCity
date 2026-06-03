@@ -21,6 +21,8 @@ DEFAULT_LANE_WIDTH_M = 3.2
 JUNCTION_TRIM_M = 8.0
 CURVE_SAMPLE_COUNT = 9
 SURFACE_STRATEGY_PENDING = "not_generated_layer3_lane_graph_only"
+TEMPORARY_LANE_POLICY_ID = "temporary_all_roads_bidirectional_two_lane_v1"
+TEMPORARY_TRAFFIC_SIDE = "left"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -318,12 +320,15 @@ def direction_out_of_node(edge: dict[str, Any], node_id: str) -> tuple[float, fl
 
 
 def lane_counts(edge: dict[str, Any]) -> tuple[int, int]:
-    lanes = max(1, int(edge.get("lanes") or 1))
-    if edge.get("oneway"):
-        return lanes, 0
-    forward = max(1, math.ceil(lanes / 2))
-    backward = max(1, lanes - forward)
-    return forward, backward
+    _edge = edge
+    return 1, 1
+
+
+def temporary_direction_offset(direction: str, lane_width_m: float) -> float:
+    sign = 1.0 if TEMPORARY_TRAFFIC_SIDE == "left" else -1.0
+    if direction == "forward":
+        return sign * lane_width_m * 0.5
+    return -sign * lane_width_m * 0.5
 
 
 def lane_offset(index: int, count: int, side: int, lane_width_m: float) -> float:
@@ -364,9 +369,9 @@ def build_lanes(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
         lane_width_start = float(width_profile["lane_width_start_m"])
         lane_width_end = float(width_profile["lane_width_end_m"])
         for index in range(forward_count):
-            offset = lane_offset(index, forward_count, -1, lane_width)
-            offset_start = lane_offset(index, forward_count, -1, lane_width_start)
-            offset_end = lane_offset(index, forward_count, -1, lane_width_end)
+            offset = temporary_direction_offset("forward", lane_width)
+            offset_start = temporary_direction_offset("forward", lane_width_start)
+            offset_end = temporary_direction_offset("forward", lane_width_end)
             lane_id = f"{edge['edge_id']}_f_{index + 1}"
             lanes.append({
                 "lane_id": lane_id,
@@ -389,14 +394,23 @@ def build_lanes(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "width_source": width_profile["width_source"],
                 "width_confidence": round(float(width_profile["width_confidence"]), 3),
                 "allowed_turns": ["left", "through", "right"],
-                "source": edge.get("lanes_source", "unknown"),
+                "source": "temporary_bidirectional_two_lane_policy",
+                "source_observation": {
+                    "lanes": max(1, int(edge.get("lanes") or 1)),
+                    "lanes_source": str(edge.get("lanes_source") or "unknown"),
+                    "oneway": bool(edge.get("oneway")),
+                    "oneway_direction": str(edge.get("oneway_direction") or "unknown"),
+                },
+                "traffic_policy": TEMPORARY_LANE_POLICY_ID,
+                "traffic_side_assumption": TEMPORARY_TRAFFIC_SIDE,
+                "policy_issues": ["source_direction_overridden_by_temporary_bidirectional_policy"],
                 "centerline_source": edge.get("centerline_geometry_source", "road_graph"),
                 "approach_centerline_trimmed": bool(edge.get("approach_centerline_trimmed")),
             })
         for index in range(backward_count):
-            offset = lane_offset(index, backward_count, 1, lane_width)
-            offset_start = lane_offset(index, backward_count, 1, lane_width_start)
-            offset_end = lane_offset(index, backward_count, 1, lane_width_end)
+            offset = temporary_direction_offset("backward", lane_width)
+            offset_start = temporary_direction_offset("backward", lane_width_start)
+            offset_end = temporary_direction_offset("backward", lane_width_end)
             lane_id = f"{edge['edge_id']}_b_{index + 1}"
             reversed_pts = list(reversed(offset_points_profile(pts, offset_start, offset_end)))
             lanes.append({
@@ -420,7 +434,16 @@ def build_lanes(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "width_source": width_profile["width_source"],
                 "width_confidence": round(float(width_profile["width_confidence"]), 3),
                 "allowed_turns": ["left", "through", "right"],
-                "source": edge.get("lanes_source", "unknown"),
+                "source": "temporary_bidirectional_two_lane_policy",
+                "source_observation": {
+                    "lanes": max(1, int(edge.get("lanes") or 1)),
+                    "lanes_source": str(edge.get("lanes_source") or "unknown"),
+                    "oneway": bool(edge.get("oneway")),
+                    "oneway_direction": str(edge.get("oneway_direction") or "unknown"),
+                },
+                "traffic_policy": TEMPORARY_LANE_POLICY_ID,
+                "traffic_side_assumption": TEMPORARY_TRAFFIC_SIDE,
+                "policy_issues": ["source_direction_overridden_by_temporary_bidirectional_policy"],
                 "centerline_source": edge.get("centerline_geometry_source", "road_graph"),
                 "approach_centerline_trimmed": bool(edge.get("approach_centerline_trimmed")),
             })
@@ -1070,6 +1093,9 @@ def build_lane_graph(
             "optimized_centerlines_source": optimized_refs["path"],
             "junction_lane_strategy": "semantic_lane_endpoint_bezier",
             "corner_continuity_strategy": "optimized_corner_fillet_only",
+            "temporary_lane_policy": TEMPORARY_LANE_POLICY_ID,
+            "traffic_side_assumption": TEMPORARY_TRAFFIC_SIDE,
+            "traffic_direction_strategy": "force_every_edge_bidirectional_two_lane",
             "approach_centerlines_trimmed": approach_centerlines_trimmed,
             "lane_width_m": DEFAULT_LANE_WIDTH_M,
             "width_strategy": "fixed_lane_width",
@@ -1139,6 +1165,7 @@ def build_lane_graph(
         },
         "notes": [
             "M2/M3 redesign: lane graph now consumes junction_semantics road-level movements.",
+            "Temporary policy: every source road is generated as bidirectional two-lane geometry, including source one-way roads.",
             "Lane widths use a fixed default width for this replay state.",
             "Junction laneLinks are generated only for allowed semantic movements and stay independent from road-level optimized junction connectors.",
             "Degree-2 road bends are bridged by continuity_links derived from optimized_corner_fillet curves, not by junction fan patches.",

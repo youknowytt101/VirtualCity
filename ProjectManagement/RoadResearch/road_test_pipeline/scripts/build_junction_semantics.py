@@ -265,7 +265,11 @@ def assign_roles(approaches: list[dict[str, Any]], through_pairs: set[tuple[str,
         a, b = key
         pair_strength[key] = float(by_edge[a]["priority"]) + float(by_edge[b]["priority"])
 
-    major_pair = max(pair_strength, key=pair_strength.get) if pair_strength else None
+    major_pair = (
+        max(sorted(pair_strength), key=lambda key: (pair_strength[key], key))
+        if pair_strength
+        else None
+    )
     for approach in approaches:
         approach["role"] = "approach"
 

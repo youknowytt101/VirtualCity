@@ -86,7 +86,7 @@ temporary_all_roads_bidirectional_two_lane_v1（临时全道路双向两车道�
 
 ## 当前最容易误判的点
 
-`reports/visualizations/pattaya_central_500m_lane_graph_topology.svg` 只是 `human QA visualization（人工质检可视化）`，不是 `source truth（源数据真值）`，也不是最终车道几何。当前 exporter（导出器）会在 `movement_corridor_candidates.json（通行走廊候选 JSON）` 存在时叠加锚点版 corridor preview（通行走廊预览），在 `compound_junction_merge_transactions.json（复合路口合并事务 JSON）` 存在时叠加 compound trial corridor（复合试运行走廊）。
+`reports/visualizations/pattaya_central_500m_lane_graph_topology.svg` 只是 `human QA visualization（人工质检可视化）`，不是 `source truth（源数据真值）`，也不是最终车道几何。当前 exporter（导出器）会在 `movement_corridor_candidates.json（通行走廊候选 JSON）` 存在时叠加锚点版 corridor preview（通行走廊预览），在 `compound_junction_merge_transactions.json（复合路口合并事务 JSON）` 存在时叠加 compound trial corridor（复合试运行走廊）。主入口 L8.1 使用 `--no-compound-transactions（禁用复合事务叠加）` 输出 anchor-only SVG（仅锚点通行走廊 SVG），L8.5 才显式叠加 staged compound corridors（暂存复合走廊）。
 
 当前 SVG 已经升级为 `review_drawing（审图线稿）`：
 
