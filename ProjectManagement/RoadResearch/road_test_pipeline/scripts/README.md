@@ -34,6 +34,10 @@ optimize_junction_centerlines.py
 
 junction_geometry_audit.py
   L6 工程几何 QA。重点看 radius、trim spread、endpoint distance。
+
+solve_junction_connectors.py
+  L6.5 connector solver v2 候选入口。生成 current / circular / paramPoly3 Hermite / G1 proxy 候选并评分。
+  只写 candidate/report，不直接替换 clean skeleton。
 ```
 
 ## Houdini helper
@@ -66,5 +70,6 @@ audit_road_pipeline.py
 修 topology_repair.py 后必须跑 run_repair_casebook.py。
 修 regularize_junction_areas.py 后必须重跑 optimize_junction_centerlines.py 和 junction_geometry_audit.py。
 修 optimize_junction_centerlines.py 后必须看 optimized_centerlines_report 和 junction_geometry_audit_report。
+修 solve_junction_connectors.py 后必须看 junction_connector_solver_report，确认 replacement_ready 与 unresolved case。
 修 Houdini 同步后必须确认 OUT_raw_road_lines、OUT_repaired_road_lines、OUT_clean_road_skeleton 的列顺序。
 ```

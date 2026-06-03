@@ -14,10 +14,12 @@
     "junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
     "engineering_reference_lines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
     "engineering_centerlines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "junction_connector_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json",
     "clean_skeleton": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_clean_skeleton.geojson",
     "clean_skeleton_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_road_skeleton_repair_report.json",
     "junction_area_regularization": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_area_regularization_report.json",
     "junction_geometry_audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_geometry_audit_report.json",
+    "junction_connector_solver": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_solver_report.json",
     "repair_casebook_qa": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_repair_casebook_qa_report.json",
     "log": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_road_skeleton_repair.log",
     "manual_overrides": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\pattaya_central_500m.manual_overrides.json"
@@ -26,5 +28,5 @@
     "apply_high_confidence": false,
     "manual_overrides_enabled": true
   },
-  "next_stage": "Houdini construction can start only after the clean skeleton is accepted."
+  "next_stage": "Connector solver replacement pass can start after the v2 candidate report is accepted."
 }

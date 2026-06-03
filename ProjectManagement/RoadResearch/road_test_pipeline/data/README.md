@@ -28,6 +28,7 @@ pattaya_central_500m_junction_semantics.json
 pattaya_central_500m_junction_areas.json
 pattaya_central_500m_engineering_reference_lines.json
 pattaya_central_500m_roads_optimized_centerlines.geojson
+pattaya_central_500m_junction_connector_candidates.json
 pattaya_central_500m_roads_clean_skeleton.geojson
 pattaya_central_500m_junction_movements_debug.geojson
 ```
@@ -46,6 +47,9 @@ junction_areas.json / engineering_reference_lines.json
 
 roads_optimized_centerlines.geojson
   L6 工程中心线，包含 approach、junction connector、corner fillet。
+
+junction_connector_candidates.json
+  L6.5 connector solver v2 候选集。用于 replacement transaction，不是发布几何。
 
 roads_clean_skeleton.geojson
   Houdini 默认导入的 clean skeleton artifact。

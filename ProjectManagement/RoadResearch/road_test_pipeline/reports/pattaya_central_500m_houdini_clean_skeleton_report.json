@@ -1,7 +1,7 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "houdini_clean_road_skeleton",
-  "timestamp": "2026-06-03 22:20:40",
+  "timestamp": "2026-06-03 22:29:50",
   "hip_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\houdini\\pattaya_central_500m_road_test.hip",
   "obj_node": "/obj/road_test_pattaya_central_500m",
   "display_node": "/obj/road_test_pattaya_central_500m/OUT_clean_road_skeleton",

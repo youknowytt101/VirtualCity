@@ -13,6 +13,7 @@ pattaya_central_500m_junction_semantics_report.json
 pattaya_central_500m_junction_area_regularization_report.json
 pattaya_central_500m_optimized_centerlines_report.json
 pattaya_central_500m_junction_geometry_audit_report.json
+pattaya_central_500m_junction_connector_solver_report.json
 pattaya_central_500m_road_skeleton_repair_report.json
 pattaya_central_500m_road_skeleton_repair_summary.json
 pattaya_central_500m_road_skeleton_repair.log
@@ -42,6 +43,7 @@ qa/*_road_graph_qa_report.json
 junction_area_regularization_report.json
 optimized_centerlines_report.json
 junction_geometry_audit_report.json
+junction_connector_solver_report.json
 ```
 
 ## 当前 warning 含义
@@ -61,4 +63,10 @@ bezier_tangent_fallback
 
 radius_below_design_min
   当前 connector 半径未达到设计阈值，是下一阶段 solver 的优先目标。
+
+replacement_ready_candidates
+  connector solver v2 认为可以进入替换事务的候选数量。不是自动发布数量。
+
+unresolved_solver_cases
+  当前候选族仍无法安全解决的 connector，通常需要短边吸收、真实 clothoid/paramPoly3 或路口区域重构。
 ```

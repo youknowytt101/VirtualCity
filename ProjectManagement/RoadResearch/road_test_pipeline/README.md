@@ -59,6 +59,7 @@ L5 junction semantics
 L5.5 junction area regularization
 L6 engineering centerline, consumes regularized entry poses
 L6 junction geometry audit
+L6.5 junction connector solver candidates
 L6 clean skeleton artifact
 L9 optional Houdini sync
 ```
@@ -103,6 +104,7 @@ data/processed/<area_id>_junction_semantics.json
 data/processed/<area_id>_junction_areas.json
 data/processed/<area_id>_engineering_reference_lines.json
 data/processed/<area_id>_roads_optimized_centerlines.geojson
+data/processed/<area_id>_junction_connector_candidates.json
 data/processed/<area_id>_roads_clean_skeleton.geojson
 ```
 
@@ -118,6 +120,7 @@ reports/<area_id>_junction_semantics_report.json
 reports/<area_id>_junction_area_regularization_report.json
 reports/<area_id>_optimized_centerlines_report.json
 reports/<area_id>_junction_geometry_audit_report.json
+reports/<area_id>_junction_connector_solver_report.json
 reports/<area_id>_road_skeleton_repair_report.json
 reports/<area_id>_road_skeleton_repair_summary.json
 reports/<area_id>_houdini_raw_road_preview_report.json
@@ -135,6 +138,7 @@ scripts/build_junction_semantics.py
 scripts/regularize_junction_areas.py     # 路口区域正规化，输出 entry poses / movement intents
 scripts/optimize_junction_centerlines.py # 当前 clean skeleton 生成器，消费 regularized entry poses
 scripts/junction_geometry_audit.py
+scripts/solve_junction_connectors.py     # connector solver v2 候选生成 + 评分，不直接替换几何
 scripts/run_auto_qa.py
 ```
 
@@ -181,8 +185,10 @@ road graph QA: warn, width_fallback_ratio = 1.0
 junction area regularization: warn, entry_trim_capacity_limited = 34, short_edge_absorption_candidate = 22
 optimized centerlines: 149 regularized entry poses consumed, 91 bezier_tangent_fallback connectors
 junction geometry audit: warn, radius_below_design_min = 90, junction_trim_spread_excess = 24
+connector solver v2: warn, solver_cases = 103, unresolved_solver_cases = 102, replacement_ready_candidates = 1
 ```
 
 这些 warning 不是 Houdini 布局问题。`width_fallback_ratio` 说明 OSM 宽度缺失；`radius_below_design_min`
 和 `bezier_tangent_fallback` 说明当前 connector solver 还停留在圆弧 + 切线 Bezier 占位阶段。
-下一步应该做 circular / clothoid / paramPoly3 候选求解和评分。
+当前 `solve_junction_connectors.py` 已能生成候选和评分。下一步应该做 replacement transaction：
+只替换 `replacement_ready_candidates`，替换后重跑 audit，失败则回滚。

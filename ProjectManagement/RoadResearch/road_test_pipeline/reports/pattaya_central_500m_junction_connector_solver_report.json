@@ -1,0 +1,1868 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "junction_connector_solver_v2_candidates",
+  "status": "warn",
+  "inputs": {
+    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "optimized_centerlines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "engineering_reference": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json"
+  },
+  "outputs": {
+    "candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json",
+    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_solver_report.json"
+  },
+  "counts": {
+    "connectors": 149,
+    "solver_cases": 103,
+    "unresolved_solver_cases": 102,
+    "publishable_best_candidates": 47,
+    "publishable_replacement_candidates": 46,
+    "replacement_ready_candidates": 1,
+    "candidate_family_counts": {
+      "biarc_g1_proxy": 447,
+      "circular_arc_exact": 149,
+      "current_geometry": 149,
+      "param_poly3_hermite": 745
+    },
+    "best_family_counts": {
+      "biarc_g1_proxy": 8,
+      "circular_arc_exact": 9,
+      "current_geometry": 98,
+      "param_poly3_hermite": 34
+    },
+    "best_replacement_family_counts": {
+      "biarc_g1_proxy": 8,
+      "circular_arc_exact": 52,
+      "param_poly3_hermite": 89
+    },
+    "best_status_counts": {
+      "needs_work": 102,
+      "publishable_candidate": 47
+    },
+    "best_replacement_status_counts": {
+      "needs_work": 103,
+      "publishable_candidate": 46
+    },
+    "current_issue_counts": {
+      "center_intrusion": 61,
+      "current_bezier_tangent_fallback": 91,
+      "curvature_reversal": 8,
+      "radius_below_design_min": 91,
+      "single_arc_incompatible": 91
+    },
+    "best_issue_counts": {
+      "center_intrusion": 25,
+      "radius_below_design_min": 92,
+      "tangent_error": 1
+    },
+    "best_replacement_issue_counts": {
+      "center_intrusion": 25,
+      "radius_below_design_min": 93,
+      "tangent_error": 1
+    }
+  },
+  "thresholds": {
+    "publish_score_min": 72.0,
+    "max_tangent_error_deg": 10.0,
+    "max_endpoint_error_m": 0.05
+  },
+  "worst_cases": [
+    {
+      "connector_id": "n_0089_c_01",
+      "junction_node_id": "n_0089",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0040",
+      "to_edge_id": "e_0090",
+      "current_candidate_score": 24.479,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "curvature_reversal",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 25.619,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.79,
+        "end_tangent_error_deg": 0.216,
+        "max_tangent_error_deg": 8.79,
+        "min_radius_m": 1.751,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.249,
+        "length_m": 11.767,
+        "length_to_chord_ratio": 1.07,
+        "min_center_distance_m": 1.86,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 25.619,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.79,
+        "end_tangent_error_deg": 0.216,
+        "max_tangent_error_deg": 8.79,
+        "min_radius_m": 1.751,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.249,
+        "length_m": 11.767,
+        "length_to_chord_ratio": 1.07,
+        "min_center_distance_m": 1.86,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0089_c_02",
+      "junction_node_id": "n_0089",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0040",
+      "to_edge_id": "e_0089",
+      "current_candidate_score": 25.288,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "curvature_reversal",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 26.148,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.651,
+        "end_tangent_error_deg": 0.188,
+        "max_tangent_error_deg": 8.651,
+        "min_radius_m": 1.819,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.181,
+        "length_m": 11.842,
+        "length_to_chord_ratio": 1.068,
+        "min_center_distance_m": 1.821,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 26.148,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.651,
+        "end_tangent_error_deg": 0.188,
+        "max_tangent_error_deg": 8.651,
+        "min_radius_m": 1.819,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.181,
+        "length_m": 11.842,
+        "length_to_chord_ratio": 1.068,
+        "min_center_distance_m": 1.821,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0191_c_01",
+      "junction_node_id": "n_0191",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0010",
+      "to_edge_id": "e_0173",
+      "current_candidate_score": 26.964,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 26.964,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 0.276,
+        "end_tangent_error_deg": 7.376,
+        "max_tangent_error_deg": 7.376,
+        "min_radius_m": 1.924,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.076,
+        "length_m": 7.332,
+        "length_to_chord_ratio": 1.134,
+        "min_center_distance_m": 1.278,
+        "max_center_distance_m": 6.0,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 26.762,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 0.131,
+        "end_tangent_error_deg": 4.498,
+        "max_tangent_error_deg": 4.498,
+        "min_radius_m": 1.898,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.102,
+        "length_m": 7.339,
+        "length_to_chord_ratio": 1.135,
+        "min_center_distance_m": 1.281,
+        "max_center_distance_m": 6.0,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0176_c_01",
+      "junction_node_id": "n_0176",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0014",
+      "to_edge_id": "e_0171",
+      "current_candidate_score": 27.081,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 27.081,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 0.182,
+        "end_tangent_error_deg": 7.272,
+        "max_tangent_error_deg": 7.272,
+        "min_radius_m": 1.939,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.061,
+        "length_m": 7.341,
+        "length_to_chord_ratio": 1.133,
+        "min_center_distance_m": 1.256,
+        "max_center_distance_m": 6.0,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 26.817,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 0.096,
+        "end_tangent_error_deg": 4.483,
+        "max_tangent_error_deg": 4.483,
+        "min_radius_m": 1.905,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.095,
+        "length_m": 7.348,
+        "length_to_chord_ratio": 1.134,
+        "min_center_distance_m": 1.261,
+        "max_center_distance_m": 6.0,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0187_c_02",
+      "junction_node_id": "n_0187",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0063",
+      "to_edge_id": "e_0173",
+      "current_candidate_score": 28.131,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 28.131,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 1.546,
+        "end_tangent_error_deg": 6.278,
+        "max_tangent_error_deg": 6.278,
+        "min_radius_m": 2.074,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.926,
+        "length_m": 5.883,
+        "length_to_chord_ratio": 1.128,
+        "min_center_distance_m": 1.291,
+        "max_center_distance_m": 4.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 28.069,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 0.969,
+        "end_tangent_error_deg": 3.871,
+        "max_tangent_error_deg": 3.871,
+        "min_radius_m": 2.066,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.934,
+        "length_m": 5.887,
+        "length_to_chord_ratio": 1.129,
+        "min_center_distance_m": 1.272,
+        "max_center_distance_m": 4.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0074_c_01",
+      "junction_node_id": "n_0074",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0202",
+      "to_edge_id": "e_0093",
+      "current_candidate_score": 29.352,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 29.352,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 2.353,
+        "end_tangent_error_deg": 6.233,
+        "max_tangent_error_deg": 6.233,
+        "min_radius_m": 2.231,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.769,
+        "length_m": 5.935,
+        "length_to_chord_ratio": 1.135,
+        "min_center_distance_m": 1.468,
+        "max_center_distance_m": 4.499,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 29.259,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 1.438,
+        "end_tangent_error_deg": 3.818,
+        "max_tangent_error_deg": 3.818,
+        "min_radius_m": 2.219,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.781,
+        "length_m": 5.939,
+        "length_to_chord_ratio": 1.136,
+        "min_center_distance_m": 1.47,
+        "max_center_distance_m": 4.499,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0117_c_02",
+      "junction_node_id": "n_0117",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0149",
+      "to_edge_id": "e_0241",
+      "current_candidate_score": 29.764,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 29.764,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 1.29,
+        "end_tangent_error_deg": 5.909,
+        "max_tangent_error_deg": 5.909,
+        "min_radius_m": 2.284,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.716,
+        "length_m": 6.028,
+        "length_to_chord_ratio": 1.117,
+        "min_center_distance_m": 1.185,
+        "max_center_distance_m": 4.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 29.508,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 0.772,
+        "end_tangent_error_deg": 3.611,
+        "max_tangent_error_deg": 3.611,
+        "min_radius_m": 2.251,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.749,
+        "length_m": 6.033,
+        "length_to_chord_ratio": 1.118,
+        "min_center_distance_m": 1.163,
+        "max_center_distance_m": 4.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0173_c_02",
+      "junction_node_id": "n_0173",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0214",
+      "to_edge_id": "e_0171",
+      "current_candidate_score": 29.741,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 29.741,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 1.28,
+        "end_tangent_error_deg": 5.824,
+        "max_tangent_error_deg": 5.824,
+        "min_radius_m": 2.281,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.719,
+        "length_m": 6.031,
+        "length_to_chord_ratio": 1.118,
+        "min_center_distance_m": 1.193,
+        "max_center_distance_m": 4.501,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 29.539,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 0.793,
+        "end_tangent_error_deg": 3.613,
+        "max_tangent_error_deg": 3.613,
+        "min_radius_m": 2.255,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.745,
+        "length_m": 6.035,
+        "length_to_chord_ratio": 1.119,
+        "min_center_distance_m": 1.172,
+        "max_center_distance_m": 4.501,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0118_c_01",
+      "junction_node_id": "n_0118",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0041",
+      "to_edge_id": "e_0241",
+      "current_candidate_score": 29.803,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 29.803,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 0.062,
+        "end_tangent_error_deg": 6.643,
+        "max_tangent_error_deg": 6.643,
+        "min_radius_m": 2.289,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.711,
+        "length_m": 7.591,
+        "length_to_chord_ratio": 1.116,
+        "min_center_distance_m": 1.109,
+        "max_center_distance_m": 6.0,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 29.71,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 0.08,
+        "end_tangent_error_deg": 4.069,
+        "max_tangent_error_deg": 4.069,
+        "min_radius_m": 2.277,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.723,
+        "length_m": 7.597,
+        "length_to_chord_ratio": 1.117,
+        "min_center_distance_m": 1.113,
+        "max_center_distance_m": 6.0,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0078_c_02",
+      "junction_node_id": "n_0078",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0135",
+      "to_edge_id": "e_0234",
+      "current_candidate_score": 40.078,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 40.078,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 4.341,
+        "end_tangent_error_deg": 2.096,
+        "max_tangent_error_deg": 4.341,
+        "min_radius_m": 3.61,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -5.39,
+        "length_m": 7.092,
+        "length_to_chord_ratio": 1.102,
+        "min_center_distance_m": 1.36,
+        "max_center_distance_m": 4.725,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 39.984,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 2.688,
+        "end_tangent_error_deg": 1.268,
+        "max_tangent_error_deg": 2.688,
+        "min_radius_m": 3.598,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -5.402,
+        "length_m": 7.096,
+        "length_to_chord_ratio": 1.102,
+        "min_center_distance_m": 1.347,
+        "max_center_distance_m": 4.725,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0069_c_01",
+      "junction_node_id": "n_0069",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0011",
+      "to_edge_id": "e_0095",
+      "current_candidate_score": 33.941,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 41.511,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 4.639,
+        "end_tangent_error_deg": 6.629,
+        "max_tangent_error_deg": 6.629,
+        "min_radius_m": 1.48,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.52,
+        "length_m": 5.902,
+        "length_to_chord_ratio": 1.075,
+        "min_center_distance_m": 2.178,
+        "max_center_distance_m": 4.535,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 41.511,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 4.639,
+        "end_tangent_error_deg": 6.629,
+        "max_tangent_error_deg": 6.629,
+        "min_radius_m": 1.48,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.52,
+        "length_m": 5.902,
+        "length_to_chord_ratio": 1.075,
+        "min_center_distance_m": 2.178,
+        "max_center_distance_m": 4.535,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0067_c_02",
+      "junction_node_id": "n_0067",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0213",
+      "to_edge_id": "e_0095",
+      "current_candidate_score": 41.672,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 41.672,
+      "best_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 2.221,
+        "end_tangent_error_deg": 3.977,
+        "max_tangent_error_deg": 3.977,
+        "min_radius_m": 3.815,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -5.185,
+        "length_m": 6.992,
+        "length_to_chord_ratio": 1.098,
+        "min_center_distance_m": 1.341,
+        "max_center_distance_m": 4.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 41.571,
+      "best_replacement_issues": [
+        "radius_below_design_min",
+        "center_intrusion"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 1.377,
+        "end_tangent_error_deg": 2.44,
+        "max_tangent_error_deg": 2.44,
+        "min_radius_m": 3.802,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -5.198,
+        "length_m": 6.995,
+        "length_to_chord_ratio": 1.098,
+        "min_center_distance_m": 1.299,
+        "max_center_distance_m": 4.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0078_c_01",
+      "junction_node_id": "n_0078",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0135",
+      "to_edge_id": "e_0233",
+      "current_candidate_score": 22.068,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "curvature_reversal",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 41.97,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 9.247,
+        "end_tangent_error_deg": 0.775,
+        "max_tangent_error_deg": 9.247,
+        "min_radius_m": 1.539,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.461,
+        "length_m": 11.454,
+        "length_to_chord_ratio": 1.079,
+        "min_center_distance_m": 2.334,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 41.97,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 9.247,
+        "end_tangent_error_deg": 0.775,
+        "max_tangent_error_deg": 9.247,
+        "min_radius_m": 1.539,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.461,
+        "length_m": 11.454,
+        "length_to_chord_ratio": 1.079,
+        "min_center_distance_m": 2.334,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0081_c_01",
+      "junction_node_id": "n_0081",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0000",
+      "to_edge_id": "e_0092",
+      "current_candidate_score": 26.626,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "curvature_reversal",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 44.552,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.597,
+        "end_tangent_error_deg": 1.007,
+        "max_tangent_error_deg": 8.597,
+        "min_radius_m": 1.871,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.129,
+        "length_m": 11.892,
+        "length_to_chord_ratio": 1.072,
+        "min_center_distance_m": 2.448,
+        "max_center_distance_m": 10.499,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 44.552,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.597,
+        "end_tangent_error_deg": 1.007,
+        "max_tangent_error_deg": 8.597,
+        "min_radius_m": 1.871,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.129,
+        "length_m": 11.892,
+        "length_to_chord_ratio": 1.072,
+        "min_center_distance_m": 2.448,
+        "max_center_distance_m": 10.499,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0054_c_02",
+      "junction_node_id": "n_0054",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0211",
+      "to_edge_id": "e_0097",
+      "current_candidate_score": 35.574,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 44.568,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.198,
+        "end_tangent_error_deg": 1.71,
+        "max_tangent_error_deg": 8.198,
+        "min_radius_m": 1.873,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.127,
+        "length_m": 10.801,
+        "length_to_chord_ratio": 1.071,
+        "min_center_distance_m": 2.634,
+        "max_center_distance_m": 9.313,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 44.568,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.198,
+        "end_tangent_error_deg": 1.71,
+        "max_tangent_error_deg": 8.198,
+        "min_radius_m": 1.873,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -7.127,
+        "length_m": 10.801,
+        "length_to_chord_ratio": 1.071,
+        "min_center_distance_m": 2.634,
+        "max_center_distance_m": 9.313,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0051_c_01",
+      "junction_node_id": "n_0051",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0209",
+      "to_edge_id": "e_0099",
+      "current_candidate_score": 37.589,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 46.092,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.252,
+        "end_tangent_error_deg": 1.332,
+        "max_tangent_error_deg": 8.252,
+        "min_radius_m": 2.069,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.931,
+        "length_m": 12.138,
+        "length_to_chord_ratio": 1.07,
+        "min_center_distance_m": 2.697,
+        "max_center_distance_m": 10.501,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 46.092,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.252,
+        "end_tangent_error_deg": 1.332,
+        "max_tangent_error_deg": 8.252,
+        "min_radius_m": 2.069,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.931,
+        "length_m": 12.138,
+        "length_to_chord_ratio": 1.07,
+        "min_center_distance_m": 2.697,
+        "max_center_distance_m": 10.501,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0081_c_02",
+      "junction_node_id": "n_0081",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0000",
+      "to_edge_id": "e_0091",
+      "current_candidate_score": 29.153,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "curvature_reversal",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 46.123,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.216,
+        "end_tangent_error_deg": 0.904,
+        "max_tangent_error_deg": 8.216,
+        "min_radius_m": 2.073,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.927,
+        "length_m": 12.145,
+        "length_to_chord_ratio": 1.067,
+        "min_center_distance_m": 2.332,
+        "max_center_distance_m": 10.499,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 46.123,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.216,
+        "end_tangent_error_deg": 0.904,
+        "max_tangent_error_deg": 8.216,
+        "min_radius_m": 2.073,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.927,
+        "length_m": 12.145,
+        "length_to_chord_ratio": 1.067,
+        "min_center_distance_m": 2.332,
+        "max_center_distance_m": 10.499,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0145_c_02",
+      "junction_node_id": "n_0145",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0070",
+      "to_edge_id": "e_0167",
+      "current_candidate_score": 38.164,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 46.419,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.18,
+        "end_tangent_error_deg": 1.376,
+        "max_tangent_error_deg": 8.18,
+        "min_radius_m": 2.111,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.889,
+        "length_m": 12.191,
+        "length_to_chord_ratio": 1.069,
+        "min_center_distance_m": 2.723,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 46.419,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.18,
+        "end_tangent_error_deg": 1.376,
+        "max_tangent_error_deg": 8.18,
+        "min_radius_m": 2.111,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.889,
+        "length_m": 12.191,
+        "length_to_chord_ratio": 1.069,
+        "min_center_distance_m": 2.723,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0165_c_01",
+      "junction_node_id": "n_0165",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0183",
+      "to_edge_id": "e_0169",
+      "current_candidate_score": 39.183,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 46.792,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 7.812,
+        "end_tangent_error_deg": 1.639,
+        "max_tangent_error_deg": 7.812,
+        "min_radius_m": 2.159,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.841,
+        "length_m": 11.499,
+        "length_to_chord_ratio": 1.066,
+        "min_center_distance_m": 2.642,
+        "max_center_distance_m": 9.677,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 46.792,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 7.812,
+        "end_tangent_error_deg": 1.639,
+        "max_tangent_error_deg": 7.812,
+        "min_radius_m": 2.159,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.841,
+        "length_m": 11.499,
+        "length_to_chord_ratio": 1.066,
+        "min_center_distance_m": 2.642,
+        "max_center_distance_m": 9.677,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0132_c_01",
+      "junction_node_id": "n_0132",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0190",
+      "to_edge_id": "e_0161",
+      "current_candidate_score": 39.168,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 47.002,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.048,
+        "end_tangent_error_deg": 1.334,
+        "max_tangent_error_deg": 8.048,
+        "min_radius_m": 2.186,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.814,
+        "length_m": 12.285,
+        "length_to_chord_ratio": 1.067,
+        "min_center_distance_m": 2.674,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 47.002,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.048,
+        "end_tangent_error_deg": 1.334,
+        "max_tangent_error_deg": 8.048,
+        "min_radius_m": 2.186,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.814,
+        "length_m": 12.285,
+        "length_to_chord_ratio": 1.067,
+        "min_center_distance_m": 2.674,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0030_c_02",
+      "junction_node_id": "n_0030",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0030",
+      "to_edge_id": "e_0104",
+      "current_candidate_score": 39.106,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 47.049,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.039,
+        "end_tangent_error_deg": 1.332,
+        "max_tangent_error_deg": 8.039,
+        "min_radius_m": 2.192,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.808,
+        "length_m": 12.291,
+        "length_to_chord_ratio": 1.067,
+        "min_center_distance_m": 2.671,
+        "max_center_distance_m": 10.499,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 47.049,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.039,
+        "end_tangent_error_deg": 1.332,
+        "max_tangent_error_deg": 8.039,
+        "min_radius_m": 2.192,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.808,
+        "length_m": 12.291,
+        "length_to_chord_ratio": 1.067,
+        "min_center_distance_m": 2.671,
+        "max_center_distance_m": 10.499,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0187_c_01",
+      "junction_node_id": "n_0187",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0063",
+      "to_edge_id": "e_0172",
+      "current_candidate_score": 39.207,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 47.064,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.035,
+        "end_tangent_error_deg": 1.33,
+        "max_tangent_error_deg": 8.035,
+        "min_radius_m": 2.194,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.806,
+        "length_m": 12.296,
+        "length_to_chord_ratio": 1.067,
+        "min_center_distance_m": 2.669,
+        "max_center_distance_m": 10.501,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 47.064,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.035,
+        "end_tangent_error_deg": 1.33,
+        "max_tangent_error_deg": 8.035,
+        "min_radius_m": 2.194,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.806,
+        "length_m": 12.296,
+        "length_to_chord_ratio": 1.067,
+        "min_center_distance_m": 2.669,
+        "max_center_distance_m": 10.501,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0054_c_01",
+      "junction_node_id": "n_0054",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0211",
+      "to_edge_id": "e_0098",
+      "current_candidate_score": 42.886,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 47.648,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 5.262,
+        "end_tangent_error_deg": 4.657,
+        "max_tangent_error_deg": 5.262,
+        "min_radius_m": 2.269,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.731,
+        "length_m": 6.798,
+        "length_to_chord_ratio": 1.063,
+        "min_center_distance_m": 2.136,
+        "max_center_distance_m": 4.577,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 47.648,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 5.262,
+        "end_tangent_error_deg": 4.657,
+        "max_tangent_error_deg": 5.262,
+        "min_radius_m": 2.269,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.731,
+        "length_m": 6.798,
+        "length_to_chord_ratio": 1.063,
+        "min_center_distance_m": 2.136,
+        "max_center_distance_m": 4.577,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0051_c_02",
+      "junction_node_id": "n_0051",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0209",
+      "to_edge_id": "e_0098",
+      "current_candidate_score": 42.854,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 47.967,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 5.228,
+        "end_tangent_error_deg": 4.944,
+        "max_tangent_error_deg": 5.228,
+        "min_radius_m": 2.31,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.69,
+        "length_m": 6.833,
+        "length_to_chord_ratio": 1.065,
+        "min_center_distance_m": 2.221,
+        "max_center_distance_m": 4.578,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 47.967,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 5.228,
+        "end_tangent_error_deg": 4.944,
+        "max_tangent_error_deg": 5.228,
+        "min_radius_m": 2.31,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.69,
+        "length_m": 6.833,
+        "length_to_chord_ratio": 1.065,
+        "min_center_distance_m": 2.221,
+        "max_center_distance_m": 4.578,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0145_c_01",
+      "junction_node_id": "n_0145",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0070",
+      "to_edge_id": "e_0166",
+      "current_candidate_score": 43.873,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 47.974,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 5.387,
+        "end_tangent_error_deg": 4.724,
+        "max_tangent_error_deg": 5.387,
+        "min_radius_m": 2.311,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.689,
+        "length_m": 7.109,
+        "length_to_chord_ratio": 1.065,
+        "min_center_distance_m": 2.294,
+        "max_center_distance_m": 4.847,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 47.974,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 5.387,
+        "end_tangent_error_deg": 4.724,
+        "max_tangent_error_deg": 5.387,
+        "min_radius_m": 2.311,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.689,
+        "length_m": 7.109,
+        "length_to_chord_ratio": 1.065,
+        "min_center_distance_m": 2.294,
+        "max_center_distance_m": 4.847,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0059_c_01",
+      "junction_node_id": "n_0059",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0053",
+      "to_edge_id": "e_0097",
+      "current_candidate_score": 41.384,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 48.006,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 7.41,
+        "end_tangent_error_deg": 1.684,
+        "max_tangent_error_deg": 7.41,
+        "min_radius_m": 2.315,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.685,
+        "length_m": 11.348,
+        "length_to_chord_ratio": 1.062,
+        "min_center_distance_m": 2.53,
+        "max_center_distance_m": 9.312,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 48.006,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 7.41,
+        "end_tangent_error_deg": 1.684,
+        "max_tangent_error_deg": 7.41,
+        "min_radius_m": 2.315,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.685,
+        "length_m": 11.348,
+        "length_to_chord_ratio": 1.062,
+        "min_center_distance_m": 2.53,
+        "max_center_distance_m": 9.312,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0074_c_02",
+      "junction_node_id": "n_0074",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0202",
+      "to_edge_id": "e_0092",
+      "current_candidate_score": 40.863,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 48.044,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 7.82,
+        "end_tangent_error_deg": 1.264,
+        "max_tangent_error_deg": 7.82,
+        "min_radius_m": 2.32,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.68,
+        "length_m": 12.443,
+        "length_to_chord_ratio": 1.064,
+        "min_center_distance_m": 2.59,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 48.044,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 7.82,
+        "end_tangent_error_deg": 1.264,
+        "max_tangent_error_deg": 7.82,
+        "min_radius_m": 2.32,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.68,
+        "length_m": 12.443,
+        "length_to_chord_ratio": 1.064,
+        "min_center_distance_m": 2.59,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0143_c_02",
+      "junction_node_id": "n_0143",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0056",
+      "to_edge_id": "e_0166",
+      "current_candidate_score": 43.912,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 48.052,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 5.373,
+        "end_tangent_error_deg": 4.708,
+        "max_tangent_error_deg": 5.373,
+        "min_radius_m": 2.321,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.679,
+        "length_m": 7.12,
+        "length_to_chord_ratio": 1.064,
+        "min_center_distance_m": 2.289,
+        "max_center_distance_m": 4.847,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 48.052,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 5.373,
+        "end_tangent_error_deg": 4.708,
+        "max_tangent_error_deg": 5.373,
+        "min_radius_m": 2.321,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.679,
+        "length_m": 7.12,
+        "length_to_chord_ratio": 1.064,
+        "min_center_distance_m": 2.289,
+        "max_center_distance_m": 4.847,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0110_c_01",
+      "junction_node_id": "n_0110",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0069",
+      "to_edge_id": "e_0239",
+      "current_candidate_score": 50.246,
+      "current_candidate_issues": [
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "current_geometry",
+      "best_status": "needs_work",
+      "best_score": 50.246,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 8.242,
+        "end_tangent_error_deg": 0.221,
+        "max_tangent_error_deg": 8.242,
+        "min_radius_m": 2.603,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.397,
+        "length_m": 12.222,
+        "length_to_chord_ratio": 1.151,
+        "min_center_distance_m": 2.302,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 11
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 49.74,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 5.007,
+        "end_tangent_error_deg": 0.101,
+        "max_tangent_error_deg": 5.007,
+        "min_radius_m": 2.538,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.462,
+        "length_m": 12.235,
+        "length_to_chord_ratio": 1.152,
+        "min_center_distance_m": 2.325,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    },
+    {
+      "connector_id": "n_0069_c_02",
+      "junction_node_id": "n_0069",
+      "connector_kind": "t_turn",
+      "from_edge_id": "e_0011",
+      "to_edge_id": "e_0094",
+      "current_candidate_score": 43.928,
+      "current_candidate_issues": [
+        "center_intrusion",
+        "current_bezier_tangent_fallback",
+        "radius_below_design_min",
+        "single_arc_incompatible"
+      ],
+      "best_family": "param_poly3_hermite",
+      "best_status": "needs_work",
+      "best_score": 49.958,
+      "best_issues": [
+        "radius_below_design_min"
+      ],
+      "best_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 7.429,
+        "end_tangent_error_deg": 1.182,
+        "max_tangent_error_deg": 7.429,
+        "min_radius_m": 2.566,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.434,
+        "length_m": 12.705,
+        "length_to_chord_ratio": 1.059,
+        "min_center_distance_m": 2.473,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "best_replacement_family": "param_poly3_hermite",
+      "best_replacement_status": "needs_work",
+      "best_replacement_score": 49.958,
+      "best_replacement_issues": [
+        "radius_below_design_min"
+      ],
+      "best_replacement_metrics": {
+        "endpoint_error_m": 0.0,
+        "start_tangent_error_deg": 7.429,
+        "end_tangent_error_deg": 1.182,
+        "max_tangent_error_deg": 7.429,
+        "min_radius_m": 2.566,
+        "design_min_radius_m": 9.0,
+        "radius_margin_m": -6.434,
+        "length_m": 12.705,
+        "length_to_chord_ratio": 1.059,
+        "min_center_distance_m": 2.473,
+        "max_center_distance_m": 10.5,
+        "curvature_reversal_count": 0,
+        "self_intersection": false,
+        "sample_count": 17
+      },
+      "replacement_ready": false
+    }
+  ],
+  "next_action": "Use publishable replacement candidates only after a separate replacement pass and QA. Cases still failing radius or trim spread need short-edge absorption or a real clothoid/paramPoly3 fit."
+}

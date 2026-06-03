@@ -30,6 +30,7 @@ road graph QA warning: width_fallback_ratio = 1.0
 junction area regularization warning: 34 entry_trim_capacity_limited, 22 short_edge_absorption_candidate
 optimized centerlines: 149 regularized entry poses consumed, 91 bezier_tangent_fallback connectors
 junction geometry audit warning: 90 radius_below_design_min, 24 junction_trim_spread_excess
+connector solver v2 warning: 103 solver cases, 102 unresolved solver cases, 1 replacement-ready candidate
 ```
 
 旧的高置信候选 `1209258529:end -> 1210710015 segment 1` 已确认是误报。
@@ -194,6 +195,8 @@ V10 输出能从 source + config 完整复现
 当前 `optimize_junction_centerlines.py` 已经消费 `engineering_reference_lines.json` 的 regularized
 entry poses；如果两端 entry pose 和切线不满足单圆弧条件，会输出 `bezier_tangent_fallback`，并继续
 交给 `junction_geometry_audit.py` 暴露半径与 trim spread 问题。
+当前 `solve_junction_connectors.py` 已经生成 connector solver v2 候选和评分，但不会直接替换
+clean skeleton。替换必须进入下一轮 replacement transaction。
 
 ## 事务式自我修复闭环
 

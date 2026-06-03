@@ -27,6 +27,7 @@ L5 junction semantics
 L5.5 junction area regularization
 L6 clean engineering skeleton
 L6 junction geometry audit
+L6.5 junction connector solver candidates
 L9 optional Houdini sync
 ```
 
@@ -60,6 +61,11 @@ optimize_junction_centerlines.py
   已消费 regularized entry poses
   已把不满足单圆弧条件的 connector 标成 bezier_tangent_fallback
 
+solve_junction_connectors.py
+  connector solver v2 候选入口
+  对每条 junction connector 生成 current / circular / paramPoly3 Hermite / G1 proxy 候选
+  输出评分和是否可替换，不直接改 clean skeleton
+
 repair_road_skeleton.py
   串起 L3-L6、QA、clean skeleton artifact 和可选 Houdini sync
 ```
@@ -75,34 +81,28 @@ road graph QA: warn, width_fallback_ratio = 1.0
 junction area regularization: warn, 34 entry_trim_capacity_limited, 22 short_edge_absorption_candidate
 optimized centerlines: 149 regularized entry poses consumed
 junction geometry audit: warn, radius_below_design_min = 90, junction_trim_spread_excess = 24
+connector solver v2: warn, solver_cases = 103, unresolved_solver_cases = 102, replacement_ready_candidates = 1
 ```
 
 `width_fallback_ratio` 是源数据缺少宽度；`radius_below_design_min` 和 `bezier_tangent_fallback` 是下一阶段 connector solver 的靶子，不应该在 Houdini 里硬改。
 
 ## 下一步
 
-优先做 connector solver v2：
+当前 connector solver v2 已经生成候选和评分。下一步是 replacement pass：
 
 ```text
 输入:
-  junction_areas.json
-  engineering_reference_lines.json
-  optimized_centerlines.geojson 中的 bezier_tangent_fallback / radius_below_design_min case
+  junction_connector_candidates.json
+  junction_connector_solver_report.json
 
-候选:
-  circular arc
-  clothoid
-  paramPoly3
-
-评分:
-  radius margin
-  curvature continuity
-  collision / envelope
-  endpoint and tangent fit
-  OpenDRIVE connecting road exportability
+动作:
+  只替换 replacement_ready_candidates
+  替换后重跑 junction_geometry_audit.py
+  如果半径/trim spread 变差，自动回滚
+  剩余 unresolved case 进入 short-edge absorption 或真实 clothoid/paramPoly3 求解
 ```
 
-先让 solver 给出候选、分数和 QA 报告，再决定是否替换当前 fallback geometry。
+不要直接把所有最高分候选写回 clean skeleton。候选必须先过 replacement transaction + QA。
 
 ## 必读顺序
 

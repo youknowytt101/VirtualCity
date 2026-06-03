@@ -63,6 +63,12 @@ optimize_junction_centerlines.py
   marks incompatible single-arc connectors as bezier_tangent_fallback
   leaves radius and fallback issues visible to junction_geometry_audit.py
 
+solve_junction_connectors.py
+  connector solver v2 candidate generator
+  scores current / circular / paramPoly3 Hermite / G1 proxy candidates
+  writes junction_connector_candidates.json and junction_connector_solver_report.json
+  does not replace clean skeleton geometry yet
+
 repair_road_skeleton.py
   main runner
   Houdini layout is raw -> repaired -> clean skeleton, with arc debug branches
@@ -95,6 +101,7 @@ road graph QA: warn because width_fallback_ratio = 1.0
 junction area regularization: warn because 34 entry trims are capacity-limited and 22 short edges are absorption candidates
 optimized centerlines: 149 regularized entry poses consumed, 120 exact, 29 scaled for edge length
 junction geometry audit: warn because radius_below_design_min = 90 and junction_trim_spread_excess = 24
+connector solver v2: warn because solver_cases = 103, unresolved_solver_cases = 102, replacement_ready_candidates = 1
 ```
 
 `radius_below_design_min` 现在已经不是 Houdini 布局问题，也不是 entry pose 未接入问题。
@@ -107,10 +114,12 @@ junction geometry audit: warn because radius_below_design_min = 90 and junction_
 优先做：
 
 ```text
-connector solver v2:
-  从 junction_areas.json / engineering_reference_lines.json 读取 conflict zone、entry pose、movement intent
-  对 bezier_tangent_fallback 和 radius_below_design_min case 生成候选
-  评分后再决定是否替换当前 connector geometry
+connector replacement transaction:
+  读取 junction_connector_candidates.json
+  只尝试 replacement_ready_candidates
+  生成替换后的临时 optimized_centerlines
+  重跑 junction_geometry_audit.py
+  若 radius / trim / endpoint 指标变差则回滚
 ```
 
 然后再做：
