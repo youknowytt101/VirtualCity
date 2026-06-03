@@ -5846,7 +5846,7 @@
           "oneway_direction": "unknown",
           "can_enter_junction": true,
           "can_exit_junction": true,
-          "role": "minor_through"
+          "role": "major_through"
         },
         {
           "approach_id": "n_0171_e_0033",
@@ -5865,7 +5865,7 @@
           "oneway_direction": "forward",
           "can_enter_junction": true,
           "can_exit_junction": false,
-          "role": "major_through"
+          "role": "minor_through"
         },
         {
           "approach_id": "n_0171_e_0025",
@@ -5884,7 +5884,7 @@
           "oneway_direction": "unknown",
           "can_enter_junction": true,
           "can_exit_junction": true,
-          "role": "minor_through"
+          "role": "major_through"
         },
         {
           "approach_id": "n_0171_e_0034",
@@ -5903,7 +5903,7 @@
           "oneway_direction": "forward",
           "can_enter_junction": false,
           "can_exit_junction": true,
-          "role": "major_through"
+          "role": "minor_through"
         }
       ],
       "through_pairs": [

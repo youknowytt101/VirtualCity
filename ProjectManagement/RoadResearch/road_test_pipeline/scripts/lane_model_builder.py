@@ -605,30 +605,14 @@ def build_lane_link_records(
     movement: dict[str, Any],
     junction_id: str,
     connection_index: int,
-    connector_ref: dict[str, Any] | None = None,
-    approach_centerlines_trimmed: bool = False,
 ) -> list[dict[str, Any]]:
     lane_links = match_lane_links(from_lanes, to_lanes)
     confidence = float(movement.get("confidence", 0.45))
     for link_index, link in enumerate(lane_links):
         from_lane = next(lane for lane in from_lanes if lane["lane_id"] == link["from_lane"])
         to_lane = next(lane for lane in to_lanes if lane["lane_id"] == link["to_lane"])
-        curve = lane_connection_curve_from_connector(connector_ref, from_lane, to_lane) if connector_ref else []
-        if curve:
-            curve_source = "optimized_junction_connector"
-            connector_id = str(connector_ref.get("connector_id") or "")
-            connector_kind = str(connector_ref.get("connector_kind") or "")
-        else:
-            no_trim = {"start": 0.0, "end": 0.0, "locked_start": 0.0, "locked_end": 0.0}
-            curve = lane_connection_curve(
-                from_lane,
-                to_lane,
-                no_trim if approach_centerlines_trimmed else None,
-                no_trim if approach_centerlines_trimmed else None,
-            )
-            curve_source = "optimized_approach_endpoint_bezier" if approach_centerlines_trimmed else "junction_lane_endpoint_bezier"
-            connector_id = ""
-            connector_kind = ""
+        curve = lane_connection_curve(from_lane, to_lane)
+        curve_source = "junction_lane_endpoint_bezier"
         stats = curve_stats(curve)
         trim_metadata = lane_link_endpoint_trim_metadata(curve, from_lane, to_lane)
         width_start = float(from_lane.get("width_end_m") or from_lane.get("width_m") or DEFAULT_LANE_WIDTH_M)
@@ -644,8 +628,8 @@ def build_lane_link_records(
         link["turn"] = movement["kind"]
         link["turn_normalized"] = normalize_turn_kind(str(movement["kind"]))
         link["curve_source"] = curve_source
-        link["connector_id"] = connector_id
-        link["connector_kind"] = connector_kind
+        link["connector_id"] = ""
+        link["connector_kind"] = ""
         link["connecting_curve_xz"] = curve
         link["curve_length_m"] = stats["length_m"]
         link["curve_sample_count"] = stats["sample_count"]
@@ -902,11 +886,8 @@ def build_junctions_from_semantics(
     graph: dict[str, Any],
     lanes: list[dict[str, Any]],
     semantics: dict[str, Any],
-    junction_connectors: dict[tuple[str, tuple[str, str]], dict[str, Any]] | None = None,
-    approach_centerlines_trimmed: bool = False,
 ) -> tuple[list[dict[str, Any]], Counter, Counter]:
     nodes = {node["node_id"]: node for node in graph["nodes"]}
-    junction_connectors = junction_connectors or {}
     lanes_by_start: dict[str, list[dict[str, Any]]] = {}
     lanes_by_end: dict[str, list[dict[str, Any]]] = {}
     for lane in lanes:
@@ -946,15 +927,12 @@ def build_junctions_from_semantics(
             from_candidates = select_lanes(incoming_for_edge, turn, incoming=True)
             to_candidates = select_lanes(outgoing_for_edge, turn, incoming=False)
             connection_index = len(connections)
-            connector_ref = junction_connectors.get(junction_connector_key(node_id, from_edge_id, to_edge_id))
             lane_links = build_lane_link_records(
                 from_candidates,
                 to_candidates,
                 movement,
                 semantic["junction_id"],
                 connection_index,
-                connector_ref,
-                approach_centerlines_trimmed,
             )
             if not lane_links:
                 fallback_counts["missing_lane_link"] += 1
@@ -1012,17 +990,14 @@ def build_lane_graph(
     graph = read_json(input_path)
     semantics = read_json(semantics_path)
     optimized_refs = load_optimized_centerline_refs(optimized_centerlines_path)
-    lane_edges, optimized_approach_count = edges_with_optimized_approaches(graph["edges"], optimized_refs["approaches_by_edge"])
-    approach_centerlines_trimmed = optimized_approach_count > 0
-    lanes = build_lanes(lane_edges)
+    optimized_approach_count = len(optimized_refs["approaches_by_edge"])
+    approach_centerlines_trimmed = False
+    lanes = build_lanes(graph["edges"])
     continuity_links = build_continuity_links(lanes, optimized_refs["corner_fillets"])
-    junction_connectors = index_junction_connectors(optimized_refs["junction_connectors"])
     junctions, fallback_counts, skipped_counts = build_junctions_from_semantics(
         graph,
         lanes,
         semantics,
-        junction_connectors,
-        approach_centerlines_trimmed,
     )
     all_lane_links = [
         link
@@ -1093,7 +1068,7 @@ def build_lane_graph(
             "source": str(input_path),
             "junction_semantics_source": str(semantics_path),
             "optimized_centerlines_source": optimized_refs["path"],
-            "junction_lane_strategy": "optimized_connector_curve_with_endpoint_bezier_fallback",
+            "junction_lane_strategy": "semantic_lane_endpoint_bezier",
             "corner_continuity_strategy": "optimized_corner_fillet_only",
             "approach_centerlines_trimmed": approach_centerlines_trimmed,
             "lane_width_m": DEFAULT_LANE_WIDTH_M,
@@ -1125,7 +1100,7 @@ def build_lane_graph(
             "continuity_links": len(continuity_links),
             "optimized_approach_centerlines": optimized_approach_count,
             "optimized_junction_connectors": len(optimized_refs["junction_connectors"]),
-            "optimized_junction_connector_lane_links": lane_link_curve_source_counts.get("optimized_junction_connector", 0),
+            "optimized_junction_connector_lane_links": 0,
             "optimized_corner_fillet_links": len(continuity_links),
             "fan_fallback_junctions": fan_fallback,
         },

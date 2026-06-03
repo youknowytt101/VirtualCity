@@ -632,6 +632,135 @@ def as_points(coords):
     return [(float(point[0]), float(point[1])) for point in coords]
 
 
+def distance(a, b):
+    dx = a[0] - b[0]
+    dz = a[1] - b[1]
+    return math.sqrt(dx * dx + dz * dz)
+
+
+def polyline_length(points):
+    return sum(distance(points[i], points[i + 1]) for i in range(len(points) - 1))
+
+
+def resolve_trim_distances(length, trim_start_m, trim_end_m, locked_start_m=0.0, locked_end_m=0.0):
+    trim_start_m = max(0.0, trim_start_m)
+    trim_end_m = max(0.0, trim_end_m)
+    locked_start_m = min(max(0.0, locked_start_m), trim_start_m)
+    locked_end_m = min(max(0.0, locked_end_m), trim_end_m)
+    trim_total = trim_start_m + trim_end_m
+    max_trim_total = max(0.0, length - 0.5)
+    if trim_total > max_trim_total and trim_total > 0.0:
+        locked_total = locked_start_m + locked_end_m
+        if locked_total >= max_trim_total and locked_total > 0.0:
+            scale = max_trim_total / locked_total
+            return locked_start_m * scale, locked_end_m * scale
+        remaining = max_trim_total - locked_total
+        start_extra = trim_start_m - locked_start_m
+        end_extra = trim_end_m - locked_end_m
+        extra_total = start_extra + end_extra
+        if extra_total <= 0.0:
+            return locked_start_m, locked_end_m
+        scale = remaining / extra_total
+        return locked_start_m + start_extra * scale, locked_end_m + end_extra * scale
+    return trim_start_m, trim_end_m
+
+
+def trim_polyline(points, trim_start_m, trim_end_m, locked_start_m=0.0, locked_end_m=0.0):
+    if len(points) < 2:
+        return []
+    length = polyline_length(points)
+    if length <= 0.05:
+        return []
+    trim_start_m, trim_end_m = resolve_trim_distances(length, trim_start_m, trim_end_m, locked_start_m, locked_end_m)
+
+    def point_at(distance_m):
+        if distance_m <= 0.0:
+            return points[0]
+        remaining = distance_m
+        for i in range(len(points) - 1):
+            seg_len = distance(points[i], points[i + 1])
+            if seg_len <= 1e-9:
+                continue
+            if remaining <= seg_len:
+                t = remaining / seg_len
+                return (
+                    points[i][0] + (points[i + 1][0] - points[i][0]) * t,
+                    points[i][1] + (points[i + 1][1] - points[i][1]) * t,
+                )
+            remaining -= seg_len
+        return points[-1]
+
+    start_distance = trim_start_m
+    end_distance = max(start_distance + 0.05, length - trim_end_m)
+    trimmed = [point_at(start_distance)]
+    cursor = 0.0
+    for i in range(len(points) - 1):
+        seg_len = distance(points[i], points[i + 1])
+        next_cursor = cursor + seg_len
+        if start_distance < next_cursor and cursor < end_distance:
+            if start_distance < next_cursor and points[i] != trimmed[-1] and cursor >= start_distance:
+                trimmed.append(points[i])
+            if next_cursor <= end_distance:
+                trimmed.append(points[i + 1])
+        cursor = next_cursor
+    end_point = point_at(end_distance)
+    if not trimmed or distance(trimmed[-1], end_point) > 0.01:
+        trimmed.append(end_point)
+    return trimmed if polyline_length(trimmed) > 0.05 else []
+
+
+def lane_link_records(lane_graph):
+    records = []
+    for junction in lane_graph.get("junctions", []):
+        for connection in junction.get("connections", []):
+            for link in connection.get("lane_links", []):
+                records.append(dict(link))
+    return records
+
+
+def lane_trim_distances(lane_graph, lane_links, continuity_links):
+    trim_m = float(lane_graph.get("metadata", {}).get("junction_trim_m") or 8.0)
+    trim_by_lane = {}
+
+    def update(lane_id, side, value):
+        if not lane_id or value <= 0.0:
+            return
+        item = trim_by_lane.setdefault(lane_id, {"start": 0.0, "end": 0.0, "locked_start": 0.0, "locked_end": 0.0})
+        item[side] = max(item[side], value)
+
+    def lock(lane_id, side, value):
+        if not lane_id or value <= 0.0:
+            return
+        item = trim_by_lane.setdefault(lane_id, {"start": 0.0, "end": 0.0, "locked_start": 0.0, "locked_end": 0.0})
+        item[side] = max(item[side], value)
+        item["locked_" + side] = max(item["locked_" + side], value)
+
+    for link in lane_links:
+        from_lane = str(link.get("from_lane") or "")
+        to_lane = str(link.get("to_lane") or "")
+        update(from_lane, "end", float(link.get("from_lane_trim_end_m") or trim_m))
+        update(to_lane, "start", float(link.get("to_lane_trim_start_m") or trim_m))
+
+    for link in continuity_links:
+        lock(str(link.get("from_lane") or ""), "end", float(link.get("from_lane_trim_end_m") or 0.0))
+        lock(str(link.get("to_lane") or ""), "start", float(link.get("to_lane_trim_start_m") or 0.0))
+
+    return trim_by_lane
+
+
+def trimmed_lane_points(lane, trim_by_lane):
+    lane_id = str(lane.get("lane_id") or "")
+    points = as_points(lane.get("centerline_xz") or [])
+    lane_trim = trim_by_lane.get(lane_id, {})
+    return trim_polyline(
+        points,
+        float(lane_trim.get("start") or 0.0),
+        float(lane_trim.get("end") or 0.0),
+        float(lane_trim.get("locked_start") or 0.0),
+        float(lane_trim.get("locked_end") or 0.0),
+    )
+
+
 def ribbon_polygon(points, width_m):
     if len(points) < 2:
         return []
@@ -698,8 +827,12 @@ def add_ribbon(points, width, part, debug_id, y, group, turn="", from_lane="", t
 with open(LANE_GRAPH_PATH, encoding="utf-8") as f:
     lane_graph = json.load(f)
 
+lane_links = lane_link_records(lane_graph)
+continuity_links = [dict(link) for link in lane_graph.get("continuity_links", [])]
+trim_by_lane = lane_trim_distances(lane_graph, lane_links, continuity_links)
+
 for lane in lane_graph.get("lanes", []):
-    points = as_points(lane.get("centerline_xz") or [])
+    points = trimmed_lane_points(lane, trim_by_lane)
     lane_id = str(lane.get("lane_id") or "")
     add_line(points, "lane_debug_centerline", lane_id, LANE_LINE_Y, LANE_RIBBON_WIDTH_M, lane_line_group)
     add_ribbon(points, LANE_RIBBON_WIDTH_M, "lane_debug_ribbon", lane_id, RIBBON_Y, lane_ribbon_group)

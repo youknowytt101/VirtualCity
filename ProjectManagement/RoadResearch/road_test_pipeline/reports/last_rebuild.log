@@ -1,7 +1,7 @@
-[RoadTest] rebuild started 2026-06-03 02:48:43
+[RoadTest] rebuild started 2026-06-03 10:04:46
 
-[2026-06-03 02:48:43] Running topology repair
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\topology_repair.py --area-id pattaya_central_500m
+[2026-06-03 10:04:46] Running topology repair
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\topology_repair.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
@@ -28,8 +28,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 02:48:43] Analyzing repaired roads
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_repaired.geojson --output E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_repaired_analysis.json
+[2026-06-03 10:04:46] Analyzing repaired roads
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_repaired.geojson --output E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_repaired_analysis.json
 {
   "area_id": "pattaya_central_500m",
   "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
@@ -40,8 +40,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 02:48:43] Running topology repair QA
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage topology_repair --area-id pattaya_central_500m
+[2026-06-03 10:04:46] Running topology repair QA
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage topology_repair --area-id pattaya_central_500m
 topology_repair QA status: pass
 [pass] output_edges: 243 / 40
 [pass] empty_geometry: 0 / 0
@@ -52,8 +52,8 @@ topology_repair QA status: pass
 [pass] repair_ops_when_dangling_high: 0 / 0
 [exit] 0
 
-[2026-06-03 02:48:43] Building road graph
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m
+[2026-06-03 10:04:46] Building road graph
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
@@ -75,8 +75,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 02:48:43] Running road graph QA
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage road_graph --area-id pattaya_central_500m
+[2026-06-03 10:04:46] Running road graph QA
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage road_graph --area-id pattaya_central_500m
 road_graph QA status: warn
 [pass] nodes: 233 / 40
 [pass] edges: 243 / 40
@@ -89,8 +89,8 @@ road_graph QA status: warn
 [pass] lanes_fallback_ratio: 0.37 / 0.6
 [exit] 0
 
-[2026-06-03 02:48:43] Building junction semantic model
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_junction_semantics.py --area-id pattaya_central_500m
+[2026-06-03 10:04:46] Building junction semantic model
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_junction_semantics.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
@@ -112,8 +112,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 02:48:43] Optimizing junction centerlines
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\optimize_junction_centerlines.py --area-id pattaya_central_500m
+[2026-06-03 10:04:46] Optimizing junction centerlines
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\optimize_junction_centerlines.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
@@ -139,8 +139,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 02:48:43] Building lane graph and junction connections
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\lane_model_builder.py --area-id pattaya_central_500m
+[2026-06-03 10:04:46] Building lane graph and junction connections
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\lane_model_builder.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
@@ -154,7 +154,7 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
     "continuity_links": 42,
     "optimized_approach_centerlines": 243,
     "optimized_junction_connectors": 149,
-    "optimized_junction_connector_lane_links": 245,
+    "optimized_junction_connector_lane_links": 0,
     "optimized_corner_fillet_links": 42,
     "fan_fallback_junctions": 0
   },
@@ -167,8 +167,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
     "empty_connection_curves": 0,
     "avg_lane_link_confidence": 0.82,
     "min_lane_link_confidence": 0.82,
-    "avg_curve_length_m": 7.499,
-    "max_curve_length_m": 10.391,
+    "avg_curve_length_m": 12.059,
+    "max_curve_length_m": 16.195,
     "avg_continuity_curve_length_m": 5.229,
     "max_continuity_curve_length_m": 5.868,
     "avg_lane_width_m": 3.2,
@@ -180,8 +180,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 02:48:44] Running lane graph QA
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage lane_graph --area-id pattaya_central_500m
+[2026-06-03 10:04:46] Running lane graph QA
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage lane_graph --area-id pattaya_central_500m
 lane_graph QA status: pass
 [pass] lanes: 612 / 40
 [pass] junctions: 49 / 1
@@ -194,8 +194,8 @@ lane_graph QA status: pass
 [pass] avg_lane_links_per_junction: 5.163 / 1.0
 [exit] 0
 
-[2026-06-03 02:48:44] Generating standalone preview
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_road_preview.py --area-id pattaya_central_500m
+[2026-06-03 10:04:46] Generating standalone preview
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_road_preview.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
@@ -249,8 +249,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 02:48:44] Generating lane-level debug geometry
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_geometry_debug.py --area-id pattaya_central_500m
+[2026-06-03 10:04:47] Generating lane-level debug geometry
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_geometry_debug.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "outputs": {
@@ -268,15 +268,15 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
     "lane_link_curves": 253,
     "lane_continuity_ribbons": 42,
     "lane_continuity_curves": 42,
-    "obj_vertices": 13011,
+    "obj_vertices": 11637,
     "obj_lines": 907,
     "obj_faces": 907
   },
   "metrics": {
     "empty_lane_link_curves": 0,
     "empty_continuity_curves": 0,
-    "avg_lane_link_curve_length_m": 7.499,
-    "max_lane_link_curve_length_m": 10.391,
+    "avg_lane_link_curve_length_m": 12.059,
+    "max_lane_link_curve_length_m": 16.195,
     "avg_continuity_curve_length_m": 5.229,
     "max_continuity_curve_length_m": 5.868,
     "avg_lane_width_m": 3.2,
@@ -289,8 +289,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 02:48:44] Generating lane surface v1 geometry
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_surface_v1.py --area-id pattaya_central_500m
+[2026-06-03 10:04:47] Generating lane surface v1 geometry
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_surface_v1.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "outputs": {
@@ -305,30 +305,30 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
     "lane_surfaces": 612,
     "lane_turn_surfaces": 253,
     "lane_continuity_surfaces": 42,
-    "obj_vertices": 8674,
+    "obj_vertices": 7758,
     "obj_faces": 907
   },
   "metrics": {
-    "trim_start_lane_count": 0,
-    "trim_end_lane_count": 0,
+    "trim_start_lane_count": 232,
+    "trim_end_lane_count": 232,
     "junction_trim_m": 8.0,
-    "approach_centerlines_trimmed": true,
+    "approach_centerlines_trimmed": false,
     "corner_continuity_trimmed_lane_count": 62,
     "avg_lane_surface_width_m": 3.2,
     "avg_turn_surface_width_m": 3.2,
     "avg_continuity_surface_width_m": 3.2,
     "area_by_part_m2": {
-      "lane_surface_v1": 56380.563,
-      "lane_turn_surface_v1": 6059.443,
+      "lane_surface_v1": 53611.964,
+      "lane_turn_surface_v1": 9743.688,
       "lane_continuity_surface_v1": 700.323
     },
-    "total_area_m2": 63140.329
+    "total_area_m2": 64055.976
   }
 }
 [exit] 0
 
-[2026-06-03 02:48:44] Auditing road pipeline contracts
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\audit_road_pipeline.py --area-id pattaya_central_500m
+[2026-06-03 10:04:47] Auditing road pipeline contracts
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\audit_road_pipeline.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "pass",
@@ -346,14 +346,13 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
     "lane_links": 253,
     "continuity_links": 42,
     "lane_curve_gap_metrics": {
-      "max_lane_link_start_gap_m": 0.0,
-      "max_lane_link_end_gap_m": 0.0,
-      "max_continuity_start_gap_m": 0.0,
-      "max_continuity_end_gap_m": 0.0
+      "max_lane_link_start_gap_m": 0.000637,
+      "max_lane_link_end_gap_m": 0.000637,
+      "max_continuity_start_gap_m": 0.001268,
+      "max_continuity_end_gap_m": 0.001268
     },
     "lane_link_curve_source_counts": {
-      "optimized_junction_connector": 245,
-      "optimized_approach_endpoint_bezier": 8
+      "junction_lane_endpoint_bezier": 253
     },
     "optimized_features": 413,
     "optimized_corner_fillets": 21,
@@ -361,9 +360,9 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
     "optimized_points": 2282,
     "preview_points": 2282,
     "preview_obj_vertices": 2282,
-    "lane_debug_obj_vertices": 13011,
+    "lane_debug_obj_vertices": 11637,
     "lane_debug_obj_faces": 907,
-    "lane_surface_v1_obj_vertices": 8674,
+    "lane_surface_v1_obj_vertices": 7758,
     "lane_surface_v1_obj_faces": 907,
     "qa_statuses": {
       "topology_repair": "pass",
@@ -375,8 +374,8 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 02:48:44] Cooking Houdini via RPYC
-C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\houdini_cook_rpyc.py --root E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline --port 18811
+[2026-06-03 10:04:47] Cooking Houdini via RPYC
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\houdini_cook_rpyc.py --root E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline --port 18811
 [RoadTest] RPYC cook complete
 {
   "area_id": "pattaya_central_500m",
@@ -387,9 +386,9 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
   "preview_output_points": 2282,
   "lane_debug_node": "/obj/road_test_pattaya_central_500m/OUT_lane_connections_debug",
   "lane_debug_prims": 1814,
-  "lane_debug_points": 13011,
+  "lane_debug_points": 11637,
   "lane_surface_node": "/obj/road_test_pattaya_central_500m/OUT_lane_surfaces_v1",
   "lane_surface_prims": 907,
-  "lane_surface_points": 8674
+  "lane_surface_points": 7758
 }
 [exit] 0

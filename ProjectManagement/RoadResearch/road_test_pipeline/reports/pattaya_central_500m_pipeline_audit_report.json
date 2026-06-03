@@ -72,10 +72,10 @@
       "id": "lane_curves_match_trimmed_lane_endpoints",
       "status": "pass",
       "value": {
-        "max_lane_link_start_gap_m": 0.0,
-        "max_lane_link_end_gap_m": 0.0,
-        "max_continuity_start_gap_m": 0.0,
-        "max_continuity_end_gap_m": 0.0
+        "max_lane_link_start_gap_m": 0.000637,
+        "max_lane_link_end_gap_m": 0.000637,
+        "max_continuity_start_gap_m": 0.001268,
+        "max_continuity_end_gap_m": 0.001268
       },
       "message": "LaneLink and corner continuity curves should start/end at the same trimmed lane endpoints used by lane surfaces."
     },
@@ -120,16 +120,15 @@
       "message": "Lane graph should preserve road-level rounded corner fillets as continuity links."
     },
     {
-      "id": "junction_connectors_feed_lane_links",
+      "id": "junction_lane_links_are_semantic_not_optimized_connectors",
       "status": "pass",
       "value": {
         "optimized_junction_connectors": 149,
         "lane_link_curve_source_counts": {
-          "optimized_junction_connector": 245,
-          "optimized_approach_endpoint_bezier": 8
+          "junction_lane_endpoint_bezier": 253
         }
       },
-      "message": "LaneLink curves should consume optimized T/cross connector curves when they are available, with endpoint Bezier only as fallback."
+      "message": "T/cross/Y/merge junction laneLinks should stay on the semantic lane movement branch; optimized road connectors are reserved for the centerline skeleton."
     },
     {
       "id": "preview_obj_centerline_only",
@@ -155,7 +154,7 @@
           "lane_link_curves": 253,
           "lane_continuity_ribbons": 42,
           "lane_continuity_curves": 42,
-          "obj_vertices": 13011,
+          "obj_vertices": 11637,
           "obj_lines": 907,
           "obj_faces": 907
         },
@@ -178,7 +177,7 @@
       "id": "lane_debug_obj_has_lines_and_faces",
       "status": "pass",
       "value": {
-        "vertices": 13011,
+        "vertices": 11637,
         "line_elements": 907,
         "faces": 907
       },
@@ -195,7 +194,7 @@
           "lane_surfaces": 612,
           "lane_turn_surfaces": 253,
           "lane_continuity_surfaces": 42,
-          "obj_vertices": 8674,
+          "obj_vertices": 7758,
           "obj_faces": 907
         },
         "lane_graph_lanes": 612,
@@ -208,7 +207,7 @@
       "id": "lane_surface_v1_obj_has_faces",
       "status": "pass",
       "value": {
-        "vertices": 8674,
+        "vertices": 7758,
         "faces": 907
       },
       "message": "Lane surface v1 OBJ should contain surface faces."
@@ -243,14 +242,13 @@
     "lane_links": 253,
     "continuity_links": 42,
     "lane_curve_gap_metrics": {
-      "max_lane_link_start_gap_m": 0.0,
-      "max_lane_link_end_gap_m": 0.0,
-      "max_continuity_start_gap_m": 0.0,
-      "max_continuity_end_gap_m": 0.0
+      "max_lane_link_start_gap_m": 0.000637,
+      "max_lane_link_end_gap_m": 0.000637,
+      "max_continuity_start_gap_m": 0.001268,
+      "max_continuity_end_gap_m": 0.001268
     },
     "lane_link_curve_source_counts": {
-      "optimized_junction_connector": 245,
-      "optimized_approach_endpoint_bezier": 8
+      "junction_lane_endpoint_bezier": 253
     },
     "optimized_features": 413,
     "optimized_corner_fillets": 21,
@@ -258,9 +256,9 @@
     "optimized_points": 2282,
     "preview_points": 2282,
     "preview_obj_vertices": 2282,
-    "lane_debug_obj_vertices": 13011,
+    "lane_debug_obj_vertices": 11637,
     "lane_debug_obj_faces": 907,
-    "lane_surface_v1_obj_vertices": 8674,
+    "lane_surface_v1_obj_vertices": 7758,
     "lane_surface_v1_obj_faces": 907,
     "qa_statuses": {
       "topology_repair": "pass",

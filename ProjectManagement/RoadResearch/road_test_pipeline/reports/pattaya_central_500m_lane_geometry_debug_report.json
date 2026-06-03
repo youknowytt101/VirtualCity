@@ -17,7 +17,7 @@
     "lane_link_curves": 253,
     "lane_continuity_ribbons": 42,
     "lane_continuity_curves": 42,
-    "obj_vertices": 13011,
+    "obj_vertices": 11637,
     "obj_lines": 907,
     "obj_faces": 907
   },
@@ -29,8 +29,8 @@
   "metrics": {
     "empty_lane_link_curves": 0,
     "empty_continuity_curves": 0,
-    "avg_lane_link_curve_length_m": 7.499,
-    "max_lane_link_curve_length_m": 10.391,
+    "avg_lane_link_curve_length_m": 12.059,
+    "max_lane_link_curve_length_m": 16.195,
     "avg_continuity_curve_length_m": 5.229,
     "max_continuity_curve_length_m": 5.868,
     "avg_lane_width_m": 3.2,

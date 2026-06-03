@@ -14,24 +14,24 @@
     "lane_surfaces": 612,
     "lane_turn_surfaces": 253,
     "lane_continuity_surfaces": 42,
-    "obj_vertices": 8674,
+    "obj_vertices": 7758,
     "obj_faces": 907
   },
   "metrics": {
-    "trim_start_lane_count": 0,
-    "trim_end_lane_count": 0,
+    "trim_start_lane_count": 232,
+    "trim_end_lane_count": 232,
     "junction_trim_m": 8.0,
-    "approach_centerlines_trimmed": true,
+    "approach_centerlines_trimmed": false,
     "corner_continuity_trimmed_lane_count": 62,
     "avg_lane_surface_width_m": 3.2,
     "avg_turn_surface_width_m": 3.2,
     "avg_continuity_surface_width_m": 3.2,
     "area_by_part_m2": {
-      "lane_surface_v1": 56380.563,
-      "lane_turn_surface_v1": 6059.443,
+      "lane_surface_v1": 53611.964,
+      "lane_turn_surface_v1": 9743.688,
       "lane_continuity_surface_v1": 700.323
     },
-    "total_area_m2": 63140.329
+    "total_area_m2": 64055.976
   },
   "notes": [
     "Approach lane surfaces use optimized trimmed centerlines when available; raw fallback still trims near junctions using laneLink membership.",

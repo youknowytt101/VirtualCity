@@ -467,9 +467,10 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         },
     ))
     checks.append(make_check(
-        "junction_connectors_feed_lane_links",
-        optimized_junction_connector_count == 0 or lane_link_curve_source_counts.get("optimized_junction_connector", 0) > 0,
-        "LaneLink curves should consume optimized T/cross connector curves when they are available, with endpoint Bezier only as fallback.",
+        "junction_lane_links_are_semantic_not_optimized_connectors",
+        lane_link_curve_source_counts.get("optimized_junction_connector", 0) == 0
+        and lane_link_curve_source_counts.get("optimized_approach_endpoint_bezier", 0) == 0,
+        "T/cross/Y/merge junction laneLinks should stay on the semantic lane movement branch; optimized road connectors are reserved for the centerline skeleton.",
         {
             "optimized_junction_connectors": optimized_junction_connector_count,
             "lane_link_curve_source_counts": lane_link_curve_source_counts,
