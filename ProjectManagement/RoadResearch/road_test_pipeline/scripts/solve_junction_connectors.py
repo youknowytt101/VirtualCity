@@ -526,6 +526,7 @@ def solve_connectors(
     best_status_counts = Counter()
     best_replacement_status_counts = Counter()
     current_issue_counts = Counter()
+    current_scored_issue_counts = Counter()
     best_issue_counts = Counter()
     best_replacement_issue_counts = Counter()
     replacement_ready = 0
@@ -537,8 +538,10 @@ def solve_connectors(
         best_replacement_family_counts[case["best_replacement_family"]] += 1
         best_status_counts[case["best_status"]] += 1
         best_replacement_status_counts[case["best_replacement_status"]] += 1
-        for issue in case["current_candidate_issues"]:
+        for issue in case["current_issues"]:
             current_issue_counts[issue] += 1
+        for issue in case["current_candidate_issues"]:
+            current_scored_issue_counts[issue] += 1
         for issue in case["best_issues"]:
             best_issue_counts[issue] += 1
         for issue in case["best_replacement_issues"]:
@@ -601,6 +604,7 @@ def solve_connectors(
             "best_status_counts": dict(sorted(best_status_counts.items())),
             "best_replacement_status_counts": dict(sorted(best_replacement_status_counts.items())),
             "current_issue_counts": dict(sorted(current_issue_counts.items())),
+            "current_scored_issue_counts": dict(sorted(current_scored_issue_counts.items())),
             "best_issue_counts": dict(sorted(best_issue_counts.items())),
             "best_replacement_issue_counts": dict(sorted(best_replacement_issue_counts.items())),
         },

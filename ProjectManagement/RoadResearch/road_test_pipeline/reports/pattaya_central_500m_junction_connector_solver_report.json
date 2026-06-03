@@ -44,6 +44,11 @@
       "publishable_candidate": 46
     },
     "current_issue_counts": {
+      "current_bezier_tangent_fallback": 91,
+      "radius_below_design_min": 90,
+      "single_arc_incompatible": 91
+    },
+    "current_scored_issue_counts": {
       "center_intrusion": 61,
       "current_bezier_tangent_fallback": 91,
       "curvature_reversal": 8,
