@@ -9,7 +9,11 @@
     "source": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
     "source_junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
     "source_engineering_reference": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
-    "strategy": "use regularized junction entry poses where available, trim approaches, add tangent circular-arc junction connectors and corner fillets, then extrude widths"
+    "strategy": "use regularized junction entry poses where available, trim approaches, add tangent circular-arc junction connectors and corner fillets, then extrude widths",
+    "connector_replacement_transaction": "accepted",
+    "connector_replacement_source": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json",
+    "connector_replacement_trial_count": 1,
+    "connector_replacement_accepted_count": 1
   },
   "features": [
     {
@@ -15814,12 +15818,12 @@
             12.93552443
           ],
           [
-            100.88455585,
+            100.88455584,
             12.93552079
           ],
           [
             100.88455248,
-            12.93551742
+            12.93551741
           ],
           [
             100.88454882,
@@ -15862,7 +15866,7 @@
             12.93550309
           ],
           [
-            100.88450328,
+            100.88450329,
             12.93550384
           ],
           [
@@ -15874,7 +15878,7 @@
             12.93550653
           ],
           [
-            100.88448962,
+            100.88448963,
             12.93550845
           ],
           [
@@ -15901,14 +15905,19 @@
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose",
         "arc_geometry": "circular_arc",
-        "arc_fit_status": "exact_tangent_arc",
-        "arc_radius_m": 6.017,
-        "arc_center_x": 88.366,
-        "arc_center_z": 145.471,
+        "arc_fit_status": "solver_v2_transaction_replacement",
+        "arc_radius_m": 6.013,
+        "arc_center_x": null,
+        "arc_center_z": null,
         "arc_sweep_deg": -89.836,
         "arc_sample_count": 19,
         "arc_design_min_radius_m": 6.0,
-        "arc_radius_margin_m": 0.017
+        "arc_radius_margin_m": 0.013,
+        "connector_solver_v2_candidate_id": "n_0147_c_02_circular",
+        "connector_solver_v2_family": "circular_arc_exact",
+        "connector_solver_v2_score": 100.0,
+        "connector_solver_v2_status": "publishable_candidate",
+        "connector_replacement_transaction": "accepted_trial"
       }
     },
     {

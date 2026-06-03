@@ -444,7 +444,10 @@ def candidate_set_for_connector(
     current_candidate = next(candidate for candidate in candidates if candidate["family"] == "current_geometry")
     replacement_candidates = [candidate for candidate in candidates if candidate["family"] != "current_geometry"]
     best_replacement = replacement_candidates[0] if replacement_candidates else None
+    accepted_transaction = str(props.get("connector_replacement_transaction") or "") == "accepted_trial"
     needs_solver = bool(current_issues) or current_candidate["status"] != "publishable_candidate"
+    if accepted_transaction and not current_issues:
+        needs_solver = False
     replacement_ready = bool(
         needs_solver
         and best_replacement is not None

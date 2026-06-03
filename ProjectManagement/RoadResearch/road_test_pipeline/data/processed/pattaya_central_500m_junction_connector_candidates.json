@@ -49381,10 +49381,10 @@
       "from_edge_id": "e_0022",
       "to_edge_id": "e_0007",
       "current_arc_geometry": "circular_arc",
-      "current_arc_fit_status": "exact_tangent_arc",
-      "current_arc_radius_m": 6.017,
+      "current_arc_fit_status": "solver_v2_transaction_replacement",
+      "current_arc_radius_m": 6.013,
       "current_design_min_radius_m": 6.0,
-      "current_radius_margin_m": 0.017,
+      "current_radius_margin_m": 0.013,
       "current_issues": [],
       "pose_refs": {
         "from_pose_id": "j_030_e_0022_entry",
@@ -49399,7 +49399,7 @@
         140.346
       ],
       "current_candidate_status": "needs_work",
-      "current_candidate_score": 98.705,
+      "current_candidate_score": 97.503,
       "current_candidate_issues": [
         "radius_below_design_min"
       ],
@@ -49445,8 +49445,8 @@
         "self_intersection": false,
         "sample_count": 19
       },
-      "needs_solver": true,
-      "replacement_ready": true,
+      "needs_solver": false,
+      "replacement_ready": false,
       "candidates": [
         {
           "candidate_id": "n_0147_c_02_circular",
@@ -49555,18 +49555,18 @@
           "candidate_id": "n_0147_c_02_current",
           "family": "current_geometry",
           "status": "needs_work",
-          "score": 98.705,
+          "score": 97.503,
           "issues": [
             "radius_below_design_min"
           ],
           "metrics": {
             "endpoint_error_m": 0.0,
             "start_tangent_error_deg": 2.508,
-            "end_tangent_error_deg": 2.436,
+            "end_tangent_error_deg": 2.494,
             "max_tangent_error_deg": 2.508,
-            "min_radius_m": 5.889,
+            "min_radius_m": 5.786,
             "design_min_radius_m": 6.0,
-            "radius_margin_m": -0.111,
+            "radius_margin_m": -0.214,
             "length_m": 9.431,
             "length_to_chord_ratio": 1.11,
             "min_center_distance_m": 2.48,
@@ -49586,12 +49586,12 @@
               141.87
             ],
             [
-              92.856,
+              92.855,
               141.464
             ],
             [
               92.49,
-              141.089
+              141.088
             ],
             [
               92.093,
@@ -49634,7 +49634,7 @@
               139.494
             ],
             [
-              87.152,
+              87.153,
               139.577
             ],
             [
@@ -49646,7 +49646,7 @@
               139.877
             ],
             [
-              85.67,
+              85.671,
               140.091
             ],
             [

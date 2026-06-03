@@ -69,6 +69,12 @@ solve_junction_connectors.py
   writes junction_connector_candidates.json and junction_connector_solver_report.json
   does not replace clean skeleton geometry yet
 
+apply_connector_replacements.py
+  transactional replacement pass
+  applies only replacement_ready_candidates
+  accepts only if trial audit does not regress
+  writes junction_connector_replacement_report.json
+
 repair_road_skeleton.py
   main runner
   Houdini layout is raw -> repaired -> clean skeleton, with arc debug branches
@@ -101,7 +107,8 @@ road graph QA: warn because width_fallback_ratio = 1.0
 junction area regularization: warn because 34 entry trims are capacity-limited and 22 short edges are absorption candidates
 optimized centerlines: 149 regularized entry poses consumed, 120 exact, 29 scaled for edge length
 junction geometry audit: warn because radius_below_design_min = 90 and junction_trim_spread_excess = 24
-connector solver v2: warn because solver_cases = 103, unresolved_solver_cases = 102, replacement_ready_candidates = 1
+connector replacement: accepted 1 replacement without audit regression
+connector solver v2 refresh: warn because solver_cases = 102, unresolved_solver_cases = 102, replacement_ready_candidates = 0
 ```
 
 `radius_below_design_min` 现在已经不是 Houdini 布局问题，也不是 entry pose 未接入问题。
@@ -114,12 +121,11 @@ connector solver v2: warn because solver_cases = 103, unresolved_solver_cases = 
 优先做：
 
 ```text
-connector replacement transaction:
-  读取 junction_connector_candidates.json
-  只尝试 replacement_ready_candidates
-  生成替换后的临时 optimized_centerlines
-  重跑 junction_geometry_audit.py
-  若 radius / trim / endpoint 指标变差则回滚
+remaining connector resolution:
+  use junction_areas.json short_edge_absorption_candidate cases
+  build short-edge absorption transaction
+  add real clothoid / paramPoly3 fitting instead of Hermite proxy
+  add collision / swept-envelope scoring
 ```
 
 然后再做：

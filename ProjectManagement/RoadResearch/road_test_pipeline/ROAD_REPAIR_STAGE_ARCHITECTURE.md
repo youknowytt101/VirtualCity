@@ -31,6 +31,8 @@ junction area regularization warning: 34 entry_trim_capacity_limited, 22 short_e
 optimized centerlines: 149 regularized entry poses consumed, 91 bezier_tangent_fallback connectors
 junction geometry audit warning: 90 radius_below_design_min, 24 junction_trim_spread_excess
 connector solver v2 warning: 103 solver cases, 102 unresolved solver cases, 1 replacement-ready candidate
+connector replacement transaction: 1 accepted replacement, no audit regression
+connector solver v2 refresh: 102 solver cases, 102 unresolved solver cases, 0 replacement-ready candidates
 ```
 
 旧的高置信候选 `1209258529:end -> 1210710015 segment 1` 已确认是误报。
@@ -197,6 +199,9 @@ entry poses；如果两端 entry pose 和切线不满足单圆弧条件，会输
 交给 `junction_geometry_audit.py` 暴露半径与 trim spread 问题。
 当前 `solve_junction_connectors.py` 已经生成 connector solver v2 候选和评分，但不会直接替换
 clean skeleton。替换必须进入下一轮 replacement transaction。
+当前 `apply_connector_replacements.py` 已经把 replacement transaction 接入主线：只替换
+`replacement_ready_candidates`，并在 trial audit 不回退时写回。剩余问题需要 short-edge absorption
+和真实 clothoid / paramPoly3 fitting。
 
 ## 事务式自我修复闭环
 

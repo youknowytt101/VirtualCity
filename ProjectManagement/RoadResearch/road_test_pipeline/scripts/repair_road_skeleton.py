@@ -400,6 +400,7 @@ def main() -> int:
     clean_skeleton_report = reports / f"{args.area_id}_road_skeleton_repair_report.json"
     junction_geometry_audit = reports / f"{args.area_id}_junction_geometry_audit_report.json"
     junction_connector_solver = reports / f"{args.area_id}_junction_connector_solver_report.json"
+    junction_connector_replacement = reports / f"{args.area_id}_junction_connector_replacement_report.json"
     junction_area_regularization = reports / f"{args.area_id}_junction_area_regularization_report.json"
     repair_casebook_qa = reports / "qa" / f"{args.area_id}_repair_casebook_qa_report.json"
     manual_overrides = Path(args.manual_overrides) if args.manual_overrides else root / "config" / f"{args.area_id}.manual_overrides.json"
@@ -438,6 +439,9 @@ def main() -> int:
         ("L6 engineering centerline", [python_cmd(), str(root / "scripts" / "optimize_junction_centerlines.py"), "--area-id", args.area_id]),
         ("L6 junction geometry audit", [python_cmd(), str(root / "scripts" / "junction_geometry_audit.py"), "--area-id", args.area_id]),
         ("L6.5 junction connector solver candidates", [python_cmd(), str(root / "scripts" / "solve_junction_connectors.py"), "--area-id", args.area_id]),
+        ("L6.6 connector replacement transaction", [python_cmd(), str(root / "scripts" / "apply_connector_replacements.py"), "--area-id", args.area_id]),
+        ("L6.7 junction geometry audit after replacement", [python_cmd(), str(root / "scripts" / "junction_geometry_audit.py"), "--area-id", args.area_id]),
+        ("L6.8 junction connector solver candidates refresh", [python_cmd(), str(root / "scripts" / "solve_junction_connectors.py"), "--area-id", args.area_id]),
     ])
 
     for name, cmd in steps:
@@ -497,6 +501,7 @@ def main() -> int:
             "junction_area_regularization": str(junction_area_regularization),
             "junction_geometry_audit": str(junction_geometry_audit),
             "junction_connector_solver": str(junction_connector_solver),
+            "junction_connector_replacement": str(junction_connector_replacement),
             "repair_casebook_qa": str(repair_casebook_qa),
             "log": str(log_path),
             "manual_overrides": "" if args.no_manual_overrides else str(manual_overrides),
@@ -505,7 +510,7 @@ def main() -> int:
             "apply_high_confidence": args.apply_high_confidence,
             "manual_overrides_enabled": not args.no_manual_overrides,
         },
-        "next_stage": "Connector solver replacement pass can start after the v2 candidate report is accepted.",
+        "next_stage": "Resolve remaining connector cases with short-edge absorption and real clothoid/paramPoly3 fitting.",
     }
     summary_path = reports / f"{args.area_id}_road_skeleton_repair_summary.json"
     write_json(summary_path, summary)

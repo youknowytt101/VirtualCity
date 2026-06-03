@@ -24,10 +24,9 @@
       "straight_infinite_radius": 42
     },
     "arc_fit_status_counts": {
-      "exact_tangent_arc": 15,
+      "exact_tangent_arc": 16,
       "incompatible_tangent_endpoints_bezier_fallback": 91,
-      "near_straight_infinite_radius": 42,
-      "solver_v2_transaction_replacement": 1
+      "near_straight_infinite_radius": 42
     },
     "issue_counts": {
       "junction_trim_spread_excess": 24,

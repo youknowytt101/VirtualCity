@@ -1,6 +1,6 @@
-[RoadSkeleton] started 2026-06-03 22:29:47
+[RoadSkeleton] started 2026-06-03 22:42:13
 
-[2026-06-03 22:29:47] L3 topology repair
+[2026-06-03 22:42:13] L3 topology repair
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\topology_repair.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -44,7 +44,7 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 22:29:47] L3 repaired-road analysis
+[2026-06-03 22:42:13] L3 repaired-road analysis
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_repaired.geojson --output E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_repaired_analysis.json
 {
   "area_id": "pattaya_central_500m",
@@ -56,7 +56,7 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 22:29:47] L3 topology repair QA
+[2026-06-03 22:42:13] L3 topology repair QA
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage topology_repair --area-id pattaya_central_500m
 topology_repair QA status: pass
 [pass] output_edges: 243 / 40
@@ -68,7 +68,7 @@ topology_repair QA status: pass
 [pass] repair_ops_when_dangling_high: 0 / 0
 [exit] 0
 
-[2026-06-03 22:29:47] L3 repair casebook QA
+[2026-06-03 22:42:13] L3 repair casebook QA
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_repair_casebook.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -80,7 +80,7 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 22:29:48] L4 road graph
+[2026-06-03 22:42:13] L4 road graph
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -103,7 +103,7 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 22:29:48] L4 road graph QA
+[2026-06-03 22:42:13] L4 road graph QA
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage road_graph --area-id pattaya_central_500m
 road_graph QA status: warn
 [pass] nodes: 233 / 40
@@ -117,7 +117,7 @@ road_graph QA status: warn
 [pass] lanes_fallback_ratio: 0.37 / 0.6
 [exit] 0
 
-[2026-06-03 22:29:48] L5 junction semantics
+[2026-06-03 22:42:13] L5 junction semantics
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_junction_semantics.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -140,7 +140,7 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 22:29:48] L5.5 junction area regularization
+[2026-06-03 22:42:13] L5.5 junction area regularization
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\regularize_junction_areas.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -160,7 +160,7 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 22:29:48] L6 engineering centerline
+[2026-06-03 22:42:13] L6 engineering centerline
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\optimize_junction_centerlines.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -203,7 +203,7 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 22:29:48] L6 junction geometry audit
+[2026-06-03 22:42:13] L6 junction geometry audit
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\junction_geometry_audit.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -236,7 +236,7 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
 }
 [exit] 0
 
-[2026-06-03 22:29:48] L6.5 junction connector solver candidates
+[2026-06-03 22:42:13] L6.5 junction connector solver candidates
 C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_junction_connectors.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -274,6 +274,183 @@ C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCi
       "publishable_candidate": 46
     },
     "current_issue_counts": {
+      "current_bezier_tangent_fallback": 91,
+      "radius_below_design_min": 90,
+      "single_arc_incompatible": 91
+    },
+    "current_scored_issue_counts": {
+      "center_intrusion": 61,
+      "current_bezier_tangent_fallback": 91,
+      "curvature_reversal": 8,
+      "radius_below_design_min": 91,
+      "single_arc_incompatible": 91
+    },
+    "best_issue_counts": {
+      "center_intrusion": 25,
+      "radius_below_design_min": 92,
+      "tangent_error": 1
+    },
+    "best_replacement_issue_counts": {
+      "center_intrusion": 25,
+      "radius_below_design_min": 93,
+      "tangent_error": 1
+    }
+  },
+  "outputs": {
+    "candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json",
+    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_solver_report.json"
+  }
+}
+[exit] 0
+
+[2026-06-03 22:42:14] L6.6 connector replacement transaction
+C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\apply_connector_replacements.py --area-id pattaya_central_500m
+{
+  "area_id": "pattaya_central_500m",
+  "status": "accepted",
+  "counts": {
+    "replacement_ready_cases": 1,
+    "trial_replacements": 1,
+    "accepted_replacements": 1,
+    "candidate_rejections": 0
+  },
+  "audit_checks": [
+    {
+      "check_id": "connector_count_stable",
+      "status": "pass",
+      "before": 149,
+      "after": 149,
+      "message": "Replacement must not add or remove connector primitives."
+    },
+    {
+      "check_id": "total_issue_count_no_regression",
+      "status": "pass",
+      "before": 114,
+      "after": 114,
+      "message": "Replacement must not increase total junction geometry audit issues."
+    },
+    {
+      "check_id": "endpoint_too_close_to_junction_center_no_regression",
+      "status": "pass",
+      "before": 0,
+      "after": 0,
+      "message": "Replacement must not increase endpoint_too_close_to_junction_center."
+    },
+    {
+      "check_id": "endpoint_too_far_from_junction_center_no_regression",
+      "status": "pass",
+      "before": 0,
+      "after": 0,
+      "message": "Replacement must not increase endpoint_too_far_from_junction_center."
+    },
+    {
+      "check_id": "junction_trim_spread_excess_no_regression",
+      "status": "pass",
+      "before": 24,
+      "after": 24,
+      "message": "Replacement must not increase junction_trim_spread_excess."
+    },
+    {
+      "check_id": "radius_below_design_min_no_regression",
+      "status": "pass",
+      "before": 90,
+      "after": 90,
+      "message": "Replacement must not increase radius_below_design_min."
+    },
+    {
+      "check_id": "turn_sweep_abnormal_no_regression",
+      "status": "pass",
+      "before": 0,
+      "after": 0,
+      "message": "Replacement must not increase turn_sweep_abnormal."
+    }
+  ],
+  "outputs": {
+    "optimized_centerlines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_report.json",
+    "trial_audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_trial_audit_report.json",
+    "baseline_audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_baseline_audit_report.json"
+  }
+}
+[exit] 0
+
+[2026-06-03 22:42:14] L6.7 junction geometry audit after replacement
+C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\junction_geometry_audit.py --area-id pattaya_central_500m
+{
+  "area_id": "pattaya_central_500m",
+  "status": "warn",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_geometry_audit_report.json",
+  "metrics": {
+    "junctions_with_connectors": 49,
+    "junctions_with_issues": 46,
+    "connectors": 149,
+    "connector_kind_counts": {
+      "adjacent_fallback": 8,
+      "t_through": 47,
+      "t_turn": 94
+    },
+    "arc_geometry_counts": {
+      "bezier_tangent_fallback": 91,
+      "circular_arc": 16,
+      "straight_infinite_radius": 42
+    },
+    "arc_fit_status_counts": {
+      "exact_tangent_arc": 15,
+      "incompatible_tangent_endpoints_bezier_fallback": 91,
+      "near_straight_infinite_radius": 42,
+      "solver_v2_transaction_replacement": 1
+    },
+    "issue_counts": {
+      "junction_trim_spread_excess": 24,
+      "radius_below_design_min": 90
+    }
+  }
+}
+[exit] 0
+
+[2026-06-03 22:42:14] L6.8 junction connector solver candidates refresh
+C:\Users\yintong\AppData\Local\Programs\Python\Python312\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_junction_connectors.py --area-id pattaya_central_500m
+{
+  "area_id": "pattaya_central_500m",
+  "status": "warn",
+  "counts": {
+    "connectors": 149,
+    "solver_cases": 102,
+    "unresolved_solver_cases": 102,
+    "publishable_best_candidates": 47,
+    "publishable_replacement_candidates": 46,
+    "replacement_ready_candidates": 0,
+    "candidate_family_counts": {
+      "biarc_g1_proxy": 447,
+      "circular_arc_exact": 149,
+      "current_geometry": 149,
+      "param_poly3_hermite": 745
+    },
+    "best_family_counts": {
+      "biarc_g1_proxy": 8,
+      "circular_arc_exact": 9,
+      "current_geometry": 98,
+      "param_poly3_hermite": 34
+    },
+    "best_replacement_family_counts": {
+      "biarc_g1_proxy": 8,
+      "circular_arc_exact": 52,
+      "param_poly3_hermite": 89
+    },
+    "best_status_counts": {
+      "needs_work": 102,
+      "publishable_candidate": 47
+    },
+    "best_replacement_status_counts": {
+      "needs_work": 103,
+      "publishable_candidate": 46
+    },
+    "current_issue_counts": {
+      "current_bezier_tangent_fallback": 91,
+      "radius_below_design_min": 90,
+      "single_arc_incompatible": 91
+    },
+    "current_scored_issue_counts": {
       "center_intrusion": 61,
       "current_bezier_tangent_fallback": 91,
       "curvature_reversal": 8,

@@ -13,11 +13,11 @@
   },
   "counts": {
     "connectors": 149,
-    "solver_cases": 103,
+    "solver_cases": 102,
     "unresolved_solver_cases": 102,
     "publishable_best_candidates": 47,
     "publishable_replacement_candidates": 46,
-    "replacement_ready_candidates": 1,
+    "replacement_ready_candidates": 0,
     "candidate_family_counts": {
       "biarc_g1_proxy": 447,
       "circular_arc_exact": 149,

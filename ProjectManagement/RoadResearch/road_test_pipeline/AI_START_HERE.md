@@ -28,6 +28,9 @@ L5.5 junction area regularization
 L6 clean engineering skeleton
 L6 junction geometry audit
 L6.5 junction connector solver candidates
+L6.6 connector replacement transaction
+L6.7 post-replacement junction geometry audit
+L6.8 connector solver candidates refresh
 L9 optional Houdini sync
 ```
 
@@ -66,6 +69,11 @@ solve_junction_connectors.py
   对每条 junction connector 生成 current / circular / paramPoly3 Hermite / G1 proxy 候选
   输出评分和是否可替换，不直接改 clean skeleton
 
+apply_connector_replacements.py
+  replacement transaction
+  只替换 replacement_ready_candidates
+  trial audit 不回退才写回 optimized centerlines
+
 repair_road_skeleton.py
   串起 L3-L6、QA、clean skeleton artifact 和可选 Houdini sync
 ```
@@ -81,28 +89,31 @@ road graph QA: warn, width_fallback_ratio = 1.0
 junction area regularization: warn, 34 entry_trim_capacity_limited, 22 short_edge_absorption_candidate
 optimized centerlines: 149 regularized entry poses consumed
 junction geometry audit: warn, radius_below_design_min = 90, junction_trim_spread_excess = 24
-connector solver v2: warn, solver_cases = 103, unresolved_solver_cases = 102, replacement_ready_candidates = 1
+connector replacement: accepted_replacements = 1
+connector solver v2 refresh: warn, solver_cases = 102, unresolved_solver_cases = 102, replacement_ready_candidates = 0
 ```
 
 `width_fallback_ratio` 是源数据缺少宽度；`radius_below_design_min` 和 `bezier_tangent_fallback` 是下一阶段 connector solver 的靶子，不应该在 Houdini 里硬改。
 
 ## 下一步
 
-当前 connector solver v2 已经生成候选和评分。下一步是 replacement pass：
+当前 replacement transaction 已经闭环。下一步是处理剩余 102 个 unresolved solver case：
 
 ```text
 输入:
   junction_connector_candidates.json
   junction_connector_solver_report.json
+  junction_connector_replacement_report.json
+  junction_areas.json 里的 short_edge_absorption_candidate
 
 动作:
-  只替换 replacement_ready_candidates
-  替换后重跑 junction_geometry_audit.py
-  如果半径/trim spread 变差，自动回滚
-  剩余 unresolved case 进入 short-edge absorption 或真实 clothoid/paramPoly3 求解
+  short-edge absorption transaction
+  clothoid / true paramPoly3 fitting
+  collision / swept-envelope scoring
+  replacement transaction + audit rollback
 ```
 
-不要直接把所有最高分候选写回 clean skeleton。候选必须先过 replacement transaction + QA。
+不要直接把所有最高分候选写回 clean skeleton。任何替换仍然必须过 transaction + QA。
 
 ## 必读顺序
 

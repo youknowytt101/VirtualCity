@@ -20,6 +20,7 @@
     "junction_area_regularization": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_area_regularization_report.json",
     "junction_geometry_audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_geometry_audit_report.json",
     "junction_connector_solver": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_solver_report.json",
+    "junction_connector_replacement": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_report.json",
     "repair_casebook_qa": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_repair_casebook_qa_report.json",
     "log": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_road_skeleton_repair.log",
     "manual_overrides": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\pattaya_central_500m.manual_overrides.json"
@@ -28,5 +29,5 @@
     "apply_high_confidence": false,
     "manual_overrides_enabled": true
   },
-  "next_stage": "Connector solver replacement pass can start after the v2 candidate report is accepted."
+  "next_stage": "Resolve remaining connector cases with short-edge absorption and real clothoid/paramPoly3 fitting."
 }

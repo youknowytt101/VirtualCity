@@ -104,9 +104,15 @@ def connector_record(
     }
 
 
-def audit(area_id: str, root: Path, output_path: Path) -> dict[str, Any]:
-    road_graph_path = root / "data" / "processed" / f"{area_id}_road_graph.json"
-    optimized_path = root / "data" / "processed" / f"{area_id}_roads_optimized_centerlines.geojson"
+def audit(
+    area_id: str,
+    root: Path,
+    output_path: Path,
+    road_graph_path: Path | None = None,
+    optimized_path: Path | None = None,
+) -> dict[str, Any]:
+    road_graph_path = road_graph_path or root / "data" / "processed" / f"{area_id}_road_graph.json"
+    optimized_path = optimized_path or root / "data" / "processed" / f"{area_id}_roads_optimized_centerlines.geojson"
     graph = read_json(road_graph_path)
     optimized = read_json(optimized_path)
     meta = optimized.get("metadata") or graph.get("metadata") or {}
@@ -223,6 +229,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Audit optimized junction geometry for engineering readiness.")
     parser.add_argument("--area-id", default="pattaya_central_500m")
     parser.add_argument("--root", default="")
+    parser.add_argument("--road-graph", default="")
+    parser.add_argument("--optimized-centerlines", default="")
     parser.add_argument("--output", default="")
     args = parser.parse_args()
 
@@ -233,7 +241,9 @@ def main() -> int:
         if args.output
         else root / "reports" / f"{args.area_id}_junction_geometry_audit_report.json"
     )
-    report = audit(args.area_id, root, output_path)
+    road_graph_path = Path(args.road_graph).resolve() if args.road_graph else None
+    optimized_path = Path(args.optimized_centerlines).resolve() if args.optimized_centerlines else None
+    report = audit(args.area_id, root, output_path, road_graph_path, optimized_path)
     print(json.dumps({
         "area_id": report["area_id"],
         "status": report["status"],
