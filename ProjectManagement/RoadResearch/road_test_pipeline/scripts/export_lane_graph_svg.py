@@ -158,9 +158,91 @@ def raw_road_local_lines(raw_roads: dict[str, Any] | None) -> list[dict[str, Any
     return lines
 
 
+def joined(value: Any) -> str:
+    if isinstance(value, list):
+        return ", ".join(str(item) for item in value if str(item))
+    if value is None:
+        return ""
+    return str(value)
+
+
+def road_graph_edge_ids_by_canonical(road_graph: dict[str, Any] | None) -> dict[str, str]:
+    if not road_graph:
+        return {}
+    mapping: dict[str, str] = {}
+    for edge in road_graph.get("edges", []):
+        edge_id = str(edge.get("edge_id") or "")
+        canonical_road_id = str(edge.get("canonical_road_id") or edge.get("source_feature_id") or "")
+        if edge_id and canonical_road_id:
+            mapping[canonical_road_id] = edge_id
+    return mapping
+
+
+def road_layer_local_lines(
+    roads: dict[str, Any] | None,
+    fallback_prefix: str,
+    road_graph_edge_by_canonical: dict[str, str] | None = None,
+) -> list[dict[str, Any]]:
+    if not roads:
+        return []
+    edge_by_canonical = road_graph_edge_by_canonical or {}
+    origin_lon, origin_lat = local_projector_from_metadata(roads)
+    lines: list[dict[str, Any]] = []
+    for index, feature in enumerate(roads.get("features", [])):
+        props = feature.get("properties") or {}
+        canonical_road_id = str(props.get("canonical_road_id") or "")
+        source_id = str(
+            canonical_road_id
+            or props.get("source_feature_id")
+            or props.get("repair_edge_id")
+            or props.get("id")
+            or f"{fallback_prefix}_{index:04d}"
+        )
+        road_graph_edge_id = str(props.get("road_graph_edge_id") or edge_by_canonical.get(canonical_road_id, ""))
+        for part_index, coords in enumerate(raw_road_feature_lines(feature)):
+            points: list[list[float]] = []
+            for coord in coords:
+                if len(coord) < 2:
+                    continue
+                x, z = to_local(float(coord[0]), float(coord[1]), origin_lon, origin_lat)
+                points.append([x, z])
+            if len(points) < 2:
+                continue
+            lines.append({
+                "road_id": f"{source_id}:{part_index}",
+                "road_graph_edge_id": road_graph_edge_id,
+                "source_feature_id": str(props.get("source_feature_id") or source_id),
+                "canonical_road_id": canonical_road_id,
+                "part_index": part_index,
+                "highway": str(props.get("highway") or ""),
+                "road_class": str(props.get("road_class") or props.get("highway") or ""),
+                "name": str(props.get("name") or ""),
+                "lanes": str(props.get("lanes") or ""),
+                "width_m": str(props.get("width_m") or ""),
+                "oneway": str(props.get("oneway") or ""),
+                "canonical_edge_count": str(props.get("canonical_edge_count") or ""),
+                "canonical_length_m": str(props.get("canonical_length_m") or ""),
+                "canonical_ops": joined(props.get("canonical_ops")),
+                "repair_ops": joined(props.get("repair_ops")),
+                "repair_edge_ids": joined(props.get("repair_edge_ids") or props.get("repair_edge_id")),
+                "source_feature_ids": joined(props.get("source_feature_ids")),
+                "repaired_source_feature_ids": joined(props.get("repaired_source_feature_ids")),
+                "points": points,
+            })
+    return lines
+
+
 def points_from_raw_roads(raw_roads: dict[str, Any] | None) -> list[tuple[float, float]]:
     points: list[tuple[float, float]] = []
     for line in raw_road_local_lines(raw_roads):
+        for point in line["points"]:
+            points.append((float(point[0]), float(point[1])))
+    return points
+
+
+def points_from_road_layer(roads: dict[str, Any] | None, fallback_prefix: str) -> list[tuple[float, float]]:
+    points: list[tuple[float, float]] = []
+    for line in road_layer_local_lines(roads, fallback_prefix):
         for point in line["points"]:
             points.append((float(point[0]), float(point[1])))
     return points
@@ -180,6 +262,20 @@ def points_from_raw_topology_diagnostics(raw_topology_diagnostics: dict[str, Any
         z = crossing.get("z")
         if x is not None and z is not None:
             points.append((float(x), float(z)))
+    return points
+
+
+def points_from_corner_candidates(corner_candidates: dict[str, Any] | None) -> list[tuple[float, float]]:
+    if not corner_candidates:
+        return []
+    points: list[tuple[float, float]] = []
+    for candidate in corner_candidates.get("candidates", []):
+        for point in candidate.get("context_polyline_xz") or []:
+            if len(point) >= 2:
+                points.append((float(point[0]), float(point[1])))
+        center = candidate.get("center_xz") or []
+        if len(center) >= 2:
+            points.append((float(center[0]), float(center[1])))
     return points
 
 
@@ -599,6 +695,85 @@ def raw_road_lines(
     }
 
 
+def road_overlay_lines(
+    *,
+    roads: dict[str, Any],
+    transform: Any,
+    layer: str,
+    kind: str,
+    source_label: str,
+    fallback_prefix: str,
+    stroke: str,
+    stroke_width: float,
+    stroke_opacity: float,
+    dasharray: str = "",
+    max_roads: int,
+    road_graph_edge_by_canonical: dict[str, str] | None = None,
+) -> tuple[list[str], dict[str, Any]]:
+    lines: list[str] = []
+    class_counts: dict[str, int] = {}
+    rendered = 0
+    total_source_edges = 0
+    mapped_road_graph_edges = 0
+    for road_line in road_layer_local_lines(roads, fallback_prefix, road_graph_edge_by_canonical):
+        if rendered >= max_roads:
+            break
+        points = road_line["points"]
+        if len(points) < 2:
+            continue
+        highway = str(road_line.get("highway") or "unknown")
+        class_counts[highway] = class_counts.get(highway, 0) + 1
+        try:
+            total_source_edges += int(road_line.get("canonical_edge_count") or 0)
+        except ValueError:
+            pass
+        name = str(road_line.get("name") or "")
+        road_graph_edge_id = str(road_line.get("road_graph_edge_id") or "")
+        if road_graph_edge_id:
+            mapped_road_graph_edges += 1
+        tooltip = (
+            f"{kind}={road_line.get('road_id', '')}; highway={highway}; name={name}; "
+            f"canonical={road_line.get('canonical_road_id', '')}; source={road_line.get('source_feature_id', '')}; "
+            f"road_graph_edge={road_graph_edge_id}; edges={road_line.get('canonical_edge_count', '')}"
+        )
+        attrs = svg_attrs({
+            "kind": kind,
+            "layer": layer,
+            "source": source_label,
+            "id": road_line.get("road_id", ""),
+            "road_graph_edge_id": road_graph_edge_id,
+            "source_feature_id": road_line.get("source_feature_id", ""),
+            "canonical_road_id": road_line.get("canonical_road_id", ""),
+            "part_index": road_line.get("part_index", ""),
+            "highway": highway,
+            "road_class": road_line.get("road_class", ""),
+            "road_name": name,
+            "lanes": road_line.get("lanes", ""),
+            "width_m": road_line.get("width_m", ""),
+            "oneway": road_line.get("oneway", ""),
+            "canonical_edge_count": road_line.get("canonical_edge_count", ""),
+            "canonical_length_m": road_line.get("canonical_length_m", ""),
+            "canonical_ops": road_line.get("canonical_ops", ""),
+            "repair_ops": road_line.get("repair_ops", ""),
+            "repair_edge_ids": road_line.get("repair_edge_ids", ""),
+            "source_feature_ids": road_line.get("source_feature_ids", ""),
+            "repaired_source_feature_ids": road_line.get("repaired_source_feature_ids", ""),
+        })
+        dash = f' stroke-dasharray="{html.escape(dasharray, quote=True)}"' if dasharray else ""
+        lines.append(
+            f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
+            f'stroke="{stroke}" stroke-width="{stroke_width}" stroke-opacity="{stroke_opacity:.2f}"{dash} '
+            f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
+        )
+        rendered += 1
+    return lines, {
+        f"{layer}_rendered": rendered,
+        f"{layer}_class_counts": dict(sorted(class_counts.items())),
+        f"{layer}_source_edge_count_sum": total_source_edges,
+        f"{layer}_road_graph_edge_mapped": mapped_road_graph_edges,
+    }
+
+
 def raw_topology_issue_markers(
     *,
     raw_topology_diagnostics: dict[str, Any],
@@ -684,12 +859,96 @@ def raw_topology_issue_markers(
     }
 
 
+def corner_candidate_marks(
+    *,
+    corner_candidates: dict[str, Any],
+    transform: Any,
+) -> tuple[list[str], dict[str, Any]]:
+    marks: list[str] = []
+    type_counts: dict[str, int] = {}
+    risk_counts: dict[str, int] = {}
+    status_counts: dict[str, int] = {}
+
+    for candidate in corner_candidates.get("candidates", []):
+        candidate_id = str(candidate.get("candidate_id") or "")
+        center = candidate.get("center_xz") or []
+        context = candidate.get("context_polyline_xz") or []
+        if not candidate_id or len(center) < 2:
+            continue
+        candidate_type = str(candidate.get("candidate_type") or "unknown")
+        risk = str(candidate.get("risk_level") or "unknown")
+        status = str(candidate.get("status") or "unknown")
+        type_counts[candidate_type] = type_counts.get(candidate_type, 0) + 1
+        risk_counts[risk] = risk_counts.get(risk, 0) + 1
+        status_counts[status] = status_counts.get(status, 0) + 1
+        color = "#0ea5e9" if status == "accepted_active" else {
+            "low": "#22c55e",
+            "medium": "#f59e0b",
+            "high": "#ef4444",
+        }.get(risk, "#64748b")
+        sx, sy = transform(float(center[0]), float(center[1]))
+        tooltip = (
+            f"corner_candidate={candidate_id}; type={candidate_type}; risk={risk}; "
+            f"turn={candidate.get('turn_angle_deg', '')}; radius={candidate.get('suggested_radius_m', '')}"
+        )
+        attrs = svg_attrs({
+            "kind": "corner_candidate",
+            "layer": "corner_optimization",
+            "source": "corner_optimization_candidates.json",
+            "id": candidate_id,
+            "corner_id": candidate_id,
+            "candidate_type": candidate_type,
+            "risk_level": risk,
+            "status": candidate.get("status", ""),
+            "recommended_action": candidate.get("recommended_action", ""),
+            "corner_optimization_id": candidate.get("corner_optimization_id", ""),
+            "corner_optimization_application_id": candidate.get("corner_optimization_application_id", ""),
+            "corner_optimization_policy": candidate.get("corner_optimization_policy", ""),
+            "node_id": candidate.get("node_id", ""),
+            "source_edge_id": candidate.get("source_edge_id", ""),
+            "from_edge_id": candidate.get("from_edge_id", ""),
+            "to_edge_id": candidate.get("to_edge_id", ""),
+            "canonical_road_id": candidate.get("canonical_road_id", ""),
+            "from_canonical_road_id": candidate.get("from_canonical_road_id", ""),
+            "to_canonical_road_id": candidate.get("to_canonical_road_id", ""),
+            "road_class": candidate.get("road_class", ""),
+            "point_index": candidate.get("point_index", ""),
+            "turn_angle_deg": candidate.get("turn_angle_deg", ""),
+            "interior_angle_deg": candidate.get("interior_angle_deg", ""),
+            "suggested_cut_m": candidate.get("suggested_cut_m", ""),
+            "suggested_radius_m": candidate.get("suggested_radius_m", ""),
+            "nearest_junction_distance_m": candidate.get("nearest_junction_distance_m", ""),
+            "point_xz": f"{float(center[0]):.3f}, {float(center[1]):.3f}",
+            "issues": candidate.get("rationale", ""),
+        })
+        if len(context) >= 2:
+            marks.append(
+                f'<polyline {attrs} points="{polyline(context, transform)}" fill="none" '
+                f'stroke="{color}" stroke-width="1.45" stroke-opacity="0.72" stroke-dasharray="5 3" '
+                f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
+            )
+        marks.append(
+            f'<circle {attrs} cx="{sx}" cy="{sy}" r="4.2" fill="{color}" fill-opacity="0.92" '
+            f'stroke="#111827" stroke-width="0.75">{svg_title(tooltip)}</circle>'
+        )
+
+    return marks, {
+        "corner_candidates_rendered": len([mark for mark in marks if mark.startswith("<circle")]),
+        "corner_candidate_type_counts": dict(sorted(type_counts.items())),
+        "corner_candidate_risk_counts": dict(sorted(risk_counts.items())),
+        "corner_candidate_status_counts": dict(sorted(status_counts.items())),
+    }
+
+
 def build_svg(
     *,
     lane_graph: dict[str, Any],
     movement_corridors: dict[str, Any] | None,
     compound_transactions: dict[str, Any] | None,
     raw_roads: dict[str, Any] | None,
+    repaired_roads: dict[str, Any] | None,
+    canonical_roads: dict[str, Any] | None,
+    road_graph: dict[str, Any] | None,
     raw_topology_diagnostics: dict[str, Any] | None,
     area_id: str,
     width_px: int,
@@ -697,16 +956,21 @@ def build_svg(
     max_lane_links: int,
     max_raw_roads: int,
     max_raw_topology_issues: int,
+    corner_candidates: dict[str, Any] | None = None,
 ) -> tuple[str, dict[str, Any]]:
     lanes = lane_graph.get("lanes", [])
     links = lane_graph.get("lane_links", [])
     lanes_by_id = lane_by_id(lane_graph)
+    road_graph_edge_by_canonical = road_graph_edge_ids_by_canonical(road_graph)
     all_points = (
         points_from_lanes(lane_graph)
         + points_from_movement_corridors(movement_corridors)
         + points_from_compound_transactions(compound_transactions)
         + points_from_raw_roads(raw_roads)
+        + points_from_road_layer(repaired_roads, "repaired")
+        + points_from_road_layer(canonical_roads, "canonical")
         + points_from_raw_topology_diagnostics(raw_topology_diagnostics)
+        + points_from_corner_candidates(corner_candidates)
     )
     svg_w, svg_h, transform = scale_transform(
         all_points,
@@ -722,6 +986,7 @@ def build_svg(
         if len(points) < 2:
             continue
         direction = str(lane.get("direction") or "")
+        road_id = str(lane.get("road_id") or lane.get("edge_id") or "")
         color = "#0f766e" if direction == "forward" else "#6d28d9"
         confidence = float(lane.get("overall_confidence") or 0.0)
         opacity = 0.48 + min(0.40, confidence * 0.42)
@@ -729,19 +994,30 @@ def build_svg(
         casing_width = 3.25 if confidence < 0.5 else 3.85
         points_attr = polyline(points, transform)
         tooltip = (
-            f"lane={lane.get('lane_id', '')}; edge={lane.get('edge_id', '')}; "
+            f"lane={lane.get('lane_id', '')}; road={road_id}; "
             f"direction={direction}; confidence={confidence:.3f}; "
-            f"policy={lane.get('traffic_direction_policy', '')}"
+            f"policy={lane.get('traffic_direction_policy', '')}; "
+            f"upgrade={lane.get('lane_upgrade_id', '')}; target={lane.get('lane_upgrade_target_physical_lane_count', '')}"
         )
         attrs = svg_attrs({
             "kind": "lane",
             "source": "lane_graph.json",
             "id": lane.get("lane_id", ""),
             "lane_id": lane.get("lane_id", ""),
-            "edge_id": lane.get("edge_id", ""),
+            "road_id": road_id,
+            "edge_id": road_id,
             "direction": direction,
+            "lane_index": lane.get("index", ""),
             "confidence": f"{confidence:.3f}",
             "policy": lane.get("traffic_direction_policy", ""),
+            "lane_upgrade_id": lane.get("lane_upgrade_id", ""),
+            "lane_upgrade_target_physical_lane_count": lane.get("lane_upgrade_target_physical_lane_count", ""),
+            "lane_upgrade_distribution_policy": lane.get("lane_upgrade_distribution_policy", ""),
+            "lane_source": lane.get("source", ""),
+            "physical_lane_shared": lane.get("physical_lane_shared", ""),
+            "road_width_m": lane.get("road_width_m", ""),
+            "source_observation_lanes": (lane.get("source_observation") or {}).get("lanes", ""),
+            "source_observation_lanes_source": (lane.get("source_observation") or {}).get("lanes_source", ""),
             "issues": ", ".join(str(issue) for issue in lane.get("issues") or []),
         })
         lane_casing_lines.append(
@@ -827,7 +1103,67 @@ def build_svg(
             "raw_topology_issue_severity_counts": {},
         }
 
+    if corner_candidates:
+        corner_marks, corner_metrics = corner_candidate_marks(
+            corner_candidates=corner_candidates,
+            transform=transform,
+        )
+    else:
+        corner_marks = []
+        corner_metrics = {
+            "corner_candidates_rendered": 0,
+            "corner_candidate_type_counts": {},
+            "corner_candidate_risk_counts": {},
+            "corner_candidate_status_counts": {},
+        }
+
     title = html.escape(f"{area_id} lane graph (车道拓扑图) visualization")
+    if repaired_roads:
+        repaired_lines, repaired_metrics = road_overlay_lines(
+            roads=repaired_roads,
+            transform=transform,
+            layer="repaired_roads",
+            kind="repaired_road",
+            source_label="roads_repaired.geojson",
+            fallback_prefix="repaired",
+            stroke="#2563eb",
+            stroke_width=0.95,
+            stroke_opacity=0.82,
+            dasharray="5 3",
+            max_roads=max_raw_roads,
+        )
+    else:
+        repaired_lines = []
+        repaired_metrics = {
+            "repaired_roads_rendered": 0,
+            "repaired_roads_class_counts": {},
+            "repaired_roads_source_edge_count_sum": 0,
+            "repaired_roads_road_graph_edge_mapped": 0,
+        }
+
+    if canonical_roads:
+        canonical_lines, canonical_metrics = road_overlay_lines(
+            roads=canonical_roads,
+            transform=transform,
+            layer="canonical_roads",
+            kind="canonical_road",
+            source_label="roads_canonical.geojson",
+            fallback_prefix="canonical",
+            stroke="#e11d48",
+            stroke_width=1.35,
+            stroke_opacity=0.88,
+            max_roads=max_raw_roads,
+            road_graph_edge_by_canonical=road_graph_edge_by_canonical,
+        )
+    else:
+        canonical_lines = []
+        canonical_metrics = {
+            "canonical_roads_rendered": 0,
+            "canonical_roads_class_counts": {},
+            "canonical_roads_source_edge_count_sum": 0,
+            "canonical_roads_road_graph_edge_mapped": 0,
+        }
+
     subtitle = html.escape(
         "SVG is visualization（可视化） only; JSON artifacts remain source truth（源数据真值）. "
         f"Link source: {link_source}."
@@ -838,6 +1174,12 @@ def build_svg(
         '<rect width="100%" height="100%" fill="#f8fafc" />',
         f'<text x="24" y="28" font-family="Arial, sans-serif" font-size="18" fill="#111827">{title}</text>',
         f'<text x="24" y="49" font-family="Arial, sans-serif" font-size="12" fill="#475569">{subtitle}</text>',
+        '<g id="repaired-roads" data-vc-layer="repaired_roads" style="display:none">',
+        *repaired_lines,
+        '</g>',
+        '<g id="canonical-roads" data-vc-layer="canonical_roads" style="display:none">',
+        *canonical_lines,
+        '</g>',
         '<g id="lane-road-casing">',
         *lane_casing_lines,
         '</g>',
@@ -855,12 +1197,15 @@ def build_svg(
         *raw_endpoint_marks,
         *raw_issue_marks,
         '</g>',
+        '<g id="corner-optimization-candidates" data-vc-layer="corner_optimization">',
+        *corner_marks,
+        '</g>',
         '<g id="movement-anchors">',
         *anchor_marks,
         *compound_anchor_marks,
         '</g>',
         '<g id="legend" font-family="Arial, sans-serif" font-size="12" fill="#334155">',
-        '<rect x="24" y="64" width="360" height="184" fill="#ffffff" stroke="#cbd5e1" />',
+        '<rect x="24" y="64" width="360" height="228" fill="#ffffff" stroke="#cbd5e1" />',
         '<line x1="40" y1="86" x2="84" y2="86" stroke="#0f766e" stroke-width="2" /><text x="94" y="90">forward lane（正向车道）</text>',
         '<line x1="40" y1="106" x2="84" y2="106" stroke="#6d28d9" stroke-width="2" /><text x="94" y="110">backward lane（反向车道）</text>',
         '<line x1="40" y1="126" x2="84" y2="126" stroke="#f97316" stroke-width="2" /><text x="94" y="130">turn corridor preview（转向走廊预览）</text>',
@@ -870,6 +1215,8 @@ def build_svg(
         '<line x1="40" y1="206" x2="84" y2="206" stroke="#000000" stroke-width="1" /><text x="94" y="210">raw road data（原始道路数据）</text>',
         '<circle cx="47" cy="226" r="3" fill="#000000" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="230">raw vertices（原始全部断点）</text>',
         '<circle cx="47" cy="242" r="3" fill="#ef4444" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="246">topology issue（拓扑问题）</text>',
+        '<line x1="40" y1="262" x2="84" y2="262" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="5 3" /><text x="94" y="266">repaired roads</text>',
+        '<line x1="40" y1="282" x2="84" y2="282" stroke="#e11d48" stroke-width="1.8" /><text x="94" y="286">canonical roads</text>',
         '</g>',
         '</svg>',
     ])
@@ -885,6 +1232,9 @@ def build_svg(
             **compound_metrics,
             **raw_metrics,
             **raw_issue_metrics,
+            **corner_metrics,
+            **repaired_metrics,
+            **canonical_metrics,
         },
         "style": {
             "svg_width_px": svg_w,
@@ -898,6 +1248,8 @@ def build_svg(
                 "（细黑实线 + 全部原始顶点/断点标记，默认隐藏）"
             ) if raw_roads else "missing（缺失）",
             "raw_topology_issue_overlay": "enabled_when_diagnostics_exist（诊断存在时启用）" if raw_topology_diagnostics else "missing（缺失）",
+            "repaired_roads_overlay": "blue_dashed_hidden_by_default" if repaired_roads else "missing",
+            "canonical_roads_overlay": "rose_solid_hidden_by_default" if canonical_roads else "missing",
         },
         "link_source": link_source,
         "compound_link_source": "compound_junction_merge_transactions" if compound_transactions else "",
@@ -917,11 +1269,18 @@ def main() -> int:
     parser.add_argument("--movement-corridors", default="", help="Optional movement_corridor_candidates.json. Defaults to processed/<area_id> file if present.")
     parser.add_argument("--compound-transactions", default="", help="Optional compound_junction_merge_transactions.json overlay.")
     parser.add_argument("--raw-roads", default="", help="Optional roads_raw.geojson overlay. Defaults to processed/<area_id> file if present.")
+    parser.add_argument("--repaired-roads", default="", help="Optional roads_repaired.geojson overlay. Defaults to processed/<area_id> file if present.")
+    parser.add_argument("--canonical-roads", default="", help="Optional roads_canonical.geojson overlay. Defaults to processed/<area_id> file if present.")
+    parser.add_argument("--road-graph", default="", help="Optional road_graph.json used to map canonical roads to road graph edge ids.")
     parser.add_argument("--raw-topology-diagnostics", default="", help="Optional raw_topology_diagnostics.json issue overlay.")
+    parser.add_argument("--corner-candidates", default="", help="Optional corner_optimization_candidates.json overlay.")
     parser.add_argument("--no-movement-corridors", action="store_true", help="Do not auto-load movement corridor overlay.")
     parser.add_argument("--no-compound-transactions", action="store_true", help="Do not auto-load compound junction merge transaction overlay.")
     parser.add_argument("--no-raw-roads", action="store_true", help="Do not auto-load raw road source overlay.")
+    parser.add_argument("--no-repaired-roads", action="store_true", help="Do not auto-load repaired road overlay.")
+    parser.add_argument("--no-canonical-roads", action="store_true", help="Do not auto-load canonical road overlay.")
     parser.add_argument("--no-raw-topology-diagnostics", action="store_true", help="Do not auto-load raw topology diagnostics overlay.")
+    parser.add_argument("--no-corner-candidates", action="store_true", help="Do not auto-load corner optimization candidate overlay.")
     parser.add_argument("--output", default="")
     parser.add_argument("--report", default="")
     parser.add_argument("--width-px", type=int, default=DEFAULT_REVIEW_WIDTH_PX)
@@ -959,6 +1318,24 @@ def main() -> int:
         else processed / f"{args.area_id}_roads_raw.geojson"
     )
     raw_roads = read_json(raw_roads_path) if raw_roads_path and raw_roads_path.exists() else None
+    repaired_roads_path = (
+        None
+        if args.no_repaired_roads
+        else Path(args.repaired_roads)
+        if args.repaired_roads
+        else processed / f"{args.area_id}_roads_repaired.geojson"
+    )
+    repaired_roads = read_json(repaired_roads_path) if repaired_roads_path and repaired_roads_path.exists() else None
+    canonical_roads_path = (
+        None
+        if args.no_canonical_roads
+        else Path(args.canonical_roads)
+        if args.canonical_roads
+        else processed / f"{args.area_id}_roads_canonical.geojson"
+    )
+    canonical_roads = read_json(canonical_roads_path) if canonical_roads_path and canonical_roads_path.exists() else None
+    road_graph_path = Path(args.road_graph) if args.road_graph else processed / f"{args.area_id}_road_graph.json"
+    road_graph = read_json(road_graph_path) if road_graph_path.exists() else None
     raw_topology_diagnostics_path = (
         None
         if args.no_raw_topology_diagnostics
@@ -971,6 +1348,18 @@ def main() -> int:
         if raw_topology_diagnostics_path and raw_topology_diagnostics_path.exists()
         else None
     )
+    corner_candidates_path = (
+        None
+        if args.no_corner_candidates
+        else Path(args.corner_candidates)
+        if args.corner_candidates
+        else processed / f"{args.area_id}_corner_optimization_candidates.json"
+    )
+    corner_candidates = (
+        read_json(corner_candidates_path)
+        if corner_candidates_path and corner_candidates_path.exists()
+        else None
+    )
     output_path = Path(args.output) if args.output else reports / "visualizations" / f"{args.area_id}_lane_graph_topology.svg"
     report_path = Path(args.report) if args.report else reports / f"{args.area_id}_lane_graph_svg_report.json"
 
@@ -979,6 +1368,9 @@ def main() -> int:
         movement_corridors=movement_corridors,
         compound_transactions=compound_transactions,
         raw_roads=raw_roads,
+        repaired_roads=repaired_roads,
+        canonical_roads=canonical_roads,
+        road_graph=road_graph,
         raw_topology_diagnostics=raw_topology_diagnostics,
         area_id=args.area_id,
         width_px=args.width_px,
@@ -986,13 +1378,18 @@ def main() -> int:
         max_lane_links=args.max_lane_links,
         max_raw_roads=args.max_raw_roads,
         max_raw_topology_issues=args.max_raw_topology_issues,
+        corner_candidates=corner_candidates,
     )
     report["inputs"] = {
         "lane_graph": str(lane_graph_path),
         "movement_corridors": str(movement_corridors_path) if movement_corridors_path and movement_corridors is not None else "",
         "compound_junction_merge_transactions": str(compound_transactions_path) if compound_transactions_path and compound_transactions is not None else "",
         "raw_roads": str(raw_roads_path) if raw_roads_path and raw_roads is not None else "",
+        "repaired_roads": str(repaired_roads_path) if repaired_roads_path and repaired_roads is not None else "",
+        "canonical_roads": str(canonical_roads_path) if canonical_roads_path and canonical_roads is not None else "",
+        "road_graph": str(road_graph_path) if road_graph is not None else "",
         "raw_topology_diagnostics": str(raw_topology_diagnostics_path) if raw_topology_diagnostics_path and raw_topology_diagnostics is not None else "",
+        "corner_candidates": str(corner_candidates_path) if corner_candidates_path and corner_candidates is not None else "",
     }
     report["outputs"] = {"svg": str(output_path), "report": str(report_path)}
     write_text(output_path, svg)

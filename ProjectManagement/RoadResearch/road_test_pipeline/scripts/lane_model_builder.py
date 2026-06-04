@@ -23,6 +23,8 @@ CURVE_SAMPLE_COUNT = 9
 SURFACE_STRATEGY_PENDING = "not_generated_layer3_lane_graph_only"
 TEMPORARY_LANE_POLICY_ID = "temporary_all_roads_bidirectional_two_lane_v1"
 TEMPORARY_TRAFFIC_SIDE = "left"
+LANE_UPGRADE_SYSTEM_ID = "LaneForge"
+LANE_UPGRADE_OVERRIDE_SCHEMA = "lane_upgrade_system.active_overrides.v1"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -112,6 +114,43 @@ def tangent_at_distance(points: list[tuple[float, float]], distance_m: float) ->
             return fallback
         remaining -= seg_len
     return fallback
+
+
+def nearest_station_on_polyline(points: list[tuple[float, float]], query: tuple[float, float]) -> float:
+    if len(points) < 2:
+        return 0.0
+    best_distance = float("inf")
+    best_station = 0.0
+    station = 0.0
+    for i in range(len(points) - 1):
+        ax, az = points[i]
+        bx, bz = points[i + 1]
+        vx = bx - ax
+        vz = bz - az
+        seg_len_sq = vx * vx + vz * vz
+        if seg_len_sq <= 1e-12:
+            continue
+        t = max(0.0, min(1.0, ((query[0] - ax) * vx + (query[1] - az) * vz) / seg_len_sq))
+        px = ax + vx * t
+        pz = az + vz * t
+        d = distance(query, (px, pz))
+        seg_len = math.sqrt(seg_len_sq)
+        if d < best_distance:
+            best_distance = d
+            best_station = station + seg_len * t
+        station += seg_len
+    return best_station
+
+
+def longitudinal_trim_to_point(
+    points: list[tuple[float, float]],
+    side: str,
+    point: tuple[float, float],
+) -> float:
+    station = nearest_station_on_polyline(points, point)
+    if side == "end":
+        return max(0.0, polyline_length(points) - station)
+    return max(0.0, station)
 
 
 def trimmed_endpoint_and_tangent(
@@ -267,6 +306,71 @@ def edges_with_optimized_approaches(
     return updated, replaced
 
 
+def load_lane_upgrade_overrides(path: Path | None) -> dict[str, Any]:
+    if path is None or not path.exists():
+        return {
+            "path": "",
+            "schema": LANE_UPGRADE_OVERRIDE_SCHEMA,
+            "active_upgrades_by_road": {},
+            "ignored": [],
+        }
+    data = read_json(path)
+    active_by_road: dict[str, dict[str, Any]] = {}
+    ignored: list[dict[str, Any]] = []
+    for index, item in enumerate(data.get("active_upgrades", [])):
+        road_id = str(item.get("road_id") or item.get("edge_id") or "")
+        try:
+            target = int(item.get("target_physical_lane_count") or item.get("target_lane_count") or 0)
+        except (TypeError, ValueError):
+            target = 0
+        enabled = bool(item.get("enabled", True))
+        if not enabled or not road_id or target < 1 or target > 4:
+            ignored.append({
+                "index": index,
+                "road_id": road_id,
+                "target_physical_lane_count": target,
+                "reason": "disabled_or_invalid_road_id_or_target_lane_count",
+            })
+            continue
+        active_by_road[road_id] = {
+            "upgrade_id": str(item.get("upgrade_id") or item.get("transaction_id") or f"lane_upgrade_{index:04d}"),
+            "road_id": road_id,
+            "target_physical_lane_count": target,
+            "distribution_policy": str(item.get("distribution_policy") or "balanced_bidirectional_left_traffic_v1"),
+            "source": str(item.get("source") or "manual_lane_upgrade_override"),
+            "reason": str(item.get("reason") or ""),
+            "version": str(item.get("version") or ""),
+        }
+    return {
+        "path": str(path),
+        "schema": str((data.get("metadata") or {}).get("schema") or data.get("schema") or LANE_UPGRADE_OVERRIDE_SCHEMA),
+        "active_upgrades_by_road": active_by_road,
+        "ignored": ignored,
+    }
+
+
+def apply_lane_upgrade_overrides(
+    edges: list[dict[str, Any]],
+    active_upgrades_by_road: dict[str, dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    updated: list[dict[str, Any]] = []
+    applied: list[str] = []
+    missing = set(active_upgrades_by_road)
+    for edge in edges:
+        item = dict(edge)
+        edge_id = str(edge.get("edge_id") or "")
+        upgrade = active_upgrades_by_road.get(edge_id)
+        if upgrade:
+            item["lane_upgrade"] = dict(upgrade)
+            applied.append(edge_id)
+            missing.discard(edge_id)
+        updated.append(item)
+    return updated, {
+        "applied_road_ids": sorted(applied),
+        "missing_road_ids": sorted(missing),
+    }
+
+
 def junction_connector_key(node_id: str, edge_a: str, edge_b: str) -> tuple[str, tuple[str, str]]:
     return node_id, tuple(sorted((edge_a, edge_b)))
 
@@ -320,15 +424,36 @@ def direction_out_of_node(edge: dict[str, Any], node_id: str) -> tuple[float, fl
 
 
 def lane_counts(edge: dict[str, Any]) -> tuple[int, int]:
-    _edge = edge
+    upgrade = edge.get("lane_upgrade") or {}
+    target = int(upgrade.get("target_physical_lane_count") or 0)
+    if target > 0:
+        target = max(1, min(4, target))
+        if target == 1:
+            return 1, 1
+        forward = (target + 1) // 2
+        backward = target - forward
+        return max(1, forward), max(1, backward)
     return 1, 1
 
 
-def temporary_direction_offset(direction: str, lane_width_m: float) -> float:
+def edge_has_shared_single_lane_upgrade(edge: dict[str, Any]) -> bool:
+    upgrade = edge.get("lane_upgrade") or {}
+    return int(upgrade.get("target_physical_lane_count") or 0) == 1
+
+
+def directional_lane_offset(
+    direction: str,
+    index: int,
+    lane_width_m: float,
+    *,
+    shared_single_lane: bool = False,
+) -> float:
+    if shared_single_lane:
+        return 0.0
     sign = 1.0 if TEMPORARY_TRAFFIC_SIDE == "left" else -1.0
     if direction == "forward":
-        return sign * lane_width_m * 0.5
-    return -sign * lane_width_m * 0.5
+        return sign * (index + 0.5) * lane_width_m
+    return -sign * (index + 0.5) * lane_width_m
 
 
 def lane_offset(index: int, count: int, side: int, lane_width_m: float) -> float:
@@ -337,7 +462,10 @@ def lane_offset(index: int, count: int, side: int, lane_width_m: float) -> float
 
 def edge_width_profile(edge: dict[str, Any], generated_lane_count: int) -> dict[str, Any]:
     lane_width = DEFAULT_LANE_WIDTH_M
-    road_width = generated_lane_count * lane_width
+    upgrade = edge.get("lane_upgrade") or {}
+    physical_lane_count = int(upgrade.get("target_physical_lane_count") or generated_lane_count)
+    physical_lane_count = max(1, physical_lane_count)
+    road_width = physical_lane_count * lane_width
     return {
         "road_width_m": road_width,
         "road_width_start_m": road_width,
@@ -347,6 +475,39 @@ def edge_width_profile(edge: dict[str, Any], generated_lane_count: int) -> dict[
         "lane_width_end_m": lane_width,
         "width_source": "fixed_default",
         "width_confidence": 0.45,
+    }
+
+
+def lane_source(edge: dict[str, Any]) -> str:
+    if edge.get("lane_upgrade"):
+        return "lane_upgrade_system_manual_override"
+    return "temporary_bidirectional_two_lane_policy"
+
+
+def lane_policy_issues(edge: dict[str, Any]) -> list[str]:
+    issues = ["source_direction_overridden_by_temporary_bidirectional_policy"]
+    upgrade = edge.get("lane_upgrade") or {}
+    if upgrade:
+        issues.append("lane_count_set_by_lane_upgrade_transaction")
+        if int(upgrade.get("target_physical_lane_count") or 0) == 1:
+            issues.append("single_physical_lane_represented_as_bidirectional_shared_lane")
+    return issues
+
+
+def lane_upgrade_fields(edge: dict[str, Any]) -> dict[str, Any]:
+    upgrade = edge.get("lane_upgrade") or {}
+    if not upgrade:
+        return {
+            "lane_upgrade_id": "",
+            "lane_upgrade_target_physical_lane_count": 0,
+            "lane_upgrade_distribution_policy": "",
+            "physical_lane_shared": False,
+        }
+    return {
+        "lane_upgrade_id": str(upgrade.get("upgrade_id") or ""),
+        "lane_upgrade_target_physical_lane_count": int(upgrade.get("target_physical_lane_count") or 0),
+        "lane_upgrade_distribution_policy": str(upgrade.get("distribution_policy") or ""),
+        "physical_lane_shared": edge_has_shared_single_lane_upgrade(edge),
     }
 
 
@@ -368,10 +529,11 @@ def build_lanes(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
         lane_width = float(width_profile["lane_width_m"])
         lane_width_start = float(width_profile["lane_width_start_m"])
         lane_width_end = float(width_profile["lane_width_end_m"])
+        shared_single_lane = edge_has_shared_single_lane_upgrade(edge)
         for index in range(forward_count):
-            offset = temporary_direction_offset("forward", lane_width)
-            offset_start = temporary_direction_offset("forward", lane_width_start)
-            offset_end = temporary_direction_offset("forward", lane_width_end)
+            offset = directional_lane_offset("forward", index, lane_width, shared_single_lane=shared_single_lane)
+            offset_start = directional_lane_offset("forward", index, lane_width_start, shared_single_lane=shared_single_lane)
+            offset_end = directional_lane_offset("forward", index, lane_width_end, shared_single_lane=shared_single_lane)
             lane_id = f"{edge['edge_id']}_f_{index + 1}"
             lanes.append({
                 "lane_id": lane_id,
@@ -394,7 +556,7 @@ def build_lanes(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "width_source": width_profile["width_source"],
                 "width_confidence": round(float(width_profile["width_confidence"]), 3),
                 "allowed_turns": ["left", "through", "right"],
-                "source": "temporary_bidirectional_two_lane_policy",
+                "source": lane_source(edge),
                 "source_observation": {
                     "lanes": max(1, int(edge.get("lanes") or 1)),
                     "lanes_source": str(edge.get("lanes_source") or "unknown"),
@@ -403,14 +565,15 @@ def build_lanes(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 },
                 "traffic_policy": TEMPORARY_LANE_POLICY_ID,
                 "traffic_side_assumption": TEMPORARY_TRAFFIC_SIDE,
-                "policy_issues": ["source_direction_overridden_by_temporary_bidirectional_policy"],
+                "policy_issues": lane_policy_issues(edge),
                 "centerline_source": edge.get("centerline_geometry_source", "road_graph"),
                 "approach_centerline_trimmed": bool(edge.get("approach_centerline_trimmed")),
+                **lane_upgrade_fields(edge),
             })
         for index in range(backward_count):
-            offset = temporary_direction_offset("backward", lane_width)
-            offset_start = temporary_direction_offset("backward", lane_width_start)
-            offset_end = temporary_direction_offset("backward", lane_width_end)
+            offset = directional_lane_offset("backward", index, lane_width, shared_single_lane=shared_single_lane)
+            offset_start = directional_lane_offset("backward", index, lane_width_start, shared_single_lane=shared_single_lane)
+            offset_end = directional_lane_offset("backward", index, lane_width_end, shared_single_lane=shared_single_lane)
             lane_id = f"{edge['edge_id']}_b_{index + 1}"
             reversed_pts = list(reversed(offset_points_profile(pts, offset_start, offset_end)))
             lanes.append({
@@ -434,7 +597,7 @@ def build_lanes(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "width_source": width_profile["width_source"],
                 "width_confidence": round(float(width_profile["width_confidence"]), 3),
                 "allowed_turns": ["left", "through", "right"],
-                "source": "temporary_bidirectional_two_lane_policy",
+                "source": lane_source(edge),
                 "source_observation": {
                     "lanes": max(1, int(edge.get("lanes") or 1)),
                     "lanes_source": str(edge.get("lanes_source") or "unknown"),
@@ -443,9 +606,10 @@ def build_lanes(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 },
                 "traffic_policy": TEMPORARY_LANE_POLICY_ID,
                 "traffic_side_assumption": TEMPORARY_TRAFFIC_SIDE,
-                "policy_issues": ["source_direction_overridden_by_temporary_bidirectional_policy"],
+                "policy_issues": lane_policy_issues(edge),
                 "centerline_source": edge.get("centerline_geometry_source", "road_graph"),
                 "approach_centerline_trimmed": bool(edge.get("approach_centerline_trimmed")),
+                **lane_upgrade_fields(edge),
             })
     return lanes
 
@@ -609,8 +773,8 @@ def lane_link_endpoint_trim_metadata(
     curve_start = (float(curve[0][0]), float(curve[0][1]))
     curve_end = (float(curve[-1][0]), float(curve[-1][1]))
     return {
-        "from_lane_trim_end_m": round(distance(from_pts[-1], curve_start), 3),
-        "to_lane_trim_start_m": round(distance(to_pts[0], curve_end), 3),
+        "from_lane_trim_end_m": round(longitudinal_trim_to_point(from_pts, "end", curve_start), 3),
+        "to_lane_trim_start_m": round(longitudinal_trim_to_point(to_pts, "start", curve_end), 3),
     }
 
 
@@ -797,13 +961,16 @@ def add_continuity_links_for_direction(
     direction_index: int,
 ) -> None:
     for link_index, (from_lane, to_lane) in enumerate(match_corner_lanes(incoming_lanes, outgoing_lanes)):
-        start_offset = lane_endpoint_offset(from_lane, node_id, "end")
-        end_offset = lane_endpoint_offset(to_lane, node_id, "start")
+        offset_sign = -1.0 if direction_index == 1 else 1.0
+        start_offset = lane_endpoint_offset(from_lane, node_id, "end") * offset_sign
+        end_offset = lane_endpoint_offset(to_lane, node_id, "start") * offset_sign
         curve = continuity_curve_from_fillet(base_points, start_offset, end_offset)
         if len(curve) < 2:
             continue
         from_lane_points = [(float(p[0]), float(p[1])) for p in from_lane["centerline_xz"]]
         to_lane_points = [(float(p[0]), float(p[1])) for p in to_lane["centerline_xz"]]
+        curve[0] = [round(from_lane_points[-1][0], 3), round(from_lane_points[-1][1], 3)]
+        curve[-1] = [round(to_lane_points[0][0], 3), round(to_lane_points[0][1], 3)]
         curve_start = (float(curve[0][0]), float(curve[0][1]))
         curve_end = (float(curve[-1][0]), float(curve[-1][1]))
         stats = curve_stats(curve)
@@ -826,8 +993,8 @@ def add_continuity_links_for_direction(
             "connecting_curve_xz": curve,
             "curve_length_m": stats["length_m"],
             "curve_sample_count": stats["sample_count"],
-            "from_lane_trim_end_m": round(distance(from_lane_points[-1], curve_start), 3),
-            "to_lane_trim_start_m": round(distance(to_lane_points[0], curve_end), 3),
+            "from_lane_trim_end_m": round(longitudinal_trim_to_point(from_lane_points, "end", curve_start), 3),
+            "to_lane_trim_start_m": round(longitudinal_trim_to_point(to_lane_points, "start", curve_end), 3),
             "width_m": round((width_start + width_end) * 0.5, 3),
             "width_start_m": round(width_start, 3),
             "width_end_m": round(width_end, 3),
@@ -1009,13 +1176,23 @@ def build_lane_graph(
     report_path: Path,
     area_id: str,
     optimized_centerlines_path: Path | None = None,
+    lane_upgrades_path: Path | None = None,
 ) -> dict[str, Any]:
     graph = read_json(input_path)
     semantics = read_json(semantics_path)
     optimized_refs = load_optimized_centerline_refs(optimized_centerlines_path)
+    lane_upgrade_refs = load_lane_upgrade_overrides(lane_upgrades_path)
     optimized_approach_count = len(optimized_refs["approaches_by_edge"])
-    approach_centerlines_trimmed = False
-    lanes = build_lanes(graph["edges"])
+    lane_edges, optimized_approaches_applied = edges_with_optimized_approaches(
+        graph["edges"],
+        optimized_refs["approaches_by_edge"],
+    )
+    lane_edges, lane_upgrade_stats = apply_lane_upgrade_overrides(
+        lane_edges,
+        lane_upgrade_refs["active_upgrades_by_road"],
+    )
+    approach_centerlines_trimmed = optimized_approaches_applied > 0
+    lanes = build_lanes(lane_edges)
     continuity_links = build_continuity_links(lanes, optimized_refs["corner_fillets"])
     junctions, fallback_counts, skipped_counts = build_junctions_from_semantics(
         graph,
@@ -1091,6 +1268,9 @@ def build_lane_graph(
             "source": str(input_path),
             "junction_semantics_source": str(semantics_path),
             "optimized_centerlines_source": optimized_refs["path"],
+            "lane_upgrade_system": LANE_UPGRADE_SYSTEM_ID,
+            "lane_upgrade_overrides_source": lane_upgrade_refs["path"],
+            "lane_upgrade_override_schema": lane_upgrade_refs["schema"],
             "junction_lane_strategy": "semantic_lane_endpoint_bezier",
             "corner_continuity_strategy": "optimized_corner_fillet_only",
             "temporary_lane_policy": TEMPORARY_LANE_POLICY_ID,
@@ -1125,10 +1305,24 @@ def build_lane_graph(
             "lane_links": lane_link_count,
             "continuity_links": len(continuity_links),
             "optimized_approach_centerlines": optimized_approach_count,
+            "optimized_approach_centerlines_applied": optimized_approaches_applied,
             "optimized_junction_connectors": len(optimized_refs["junction_connectors"]),
             "optimized_junction_connector_lane_links": 0,
             "optimized_corner_fillet_links": len(continuity_links),
+            "active_lane_upgrades": len(lane_upgrade_refs["active_upgrades_by_road"]),
+            "active_lane_upgrades_applied": len(lane_upgrade_stats["applied_road_ids"]),
+            "active_lane_upgrades_missing_roads": len(lane_upgrade_stats["missing_road_ids"]),
+            "active_lane_upgrades_ignored": len(lane_upgrade_refs["ignored"]),
             "fan_fallback_junctions": fan_fallback,
+        },
+        "lane_upgrade_system": {
+            "system": LANE_UPGRADE_SYSTEM_ID,
+            "overrides_source": lane_upgrade_refs["path"],
+            "applied_road_ids": lane_upgrade_stats["applied_road_ids"],
+            "missing_road_ids": lane_upgrade_stats["missing_road_ids"],
+            "ignored": lane_upgrade_refs["ignored"],
+            "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+            "note": "Manual lane upgrades are applied as transaction-scoped overrides; source map data remains unchanged.",
         },
         "junction_type_counts": dict(sorted(junction_type_counts.items())),
         "turn_counts": dict(sorted(turn_counts.items())),
@@ -1166,6 +1360,7 @@ def build_lane_graph(
         "notes": [
             "M2/M3 redesign: lane graph now consumes junction_semantics road-level movements.",
             "Temporary policy: every source road is generated as bidirectional two-lane geometry, including source one-way roads.",
+            "LaneForge lane upgrades can override the generated physical lane count per road through versioned transactions.",
             "Lane widths use a fixed default width for this replay state.",
             "Junction laneLinks are generated only for allowed semantic movements and stay independent from road-level optimized junction connectors.",
             "Degree-2 road bends are bridged by continuity_links derived from optimized_corner_fillet curves, not by junction fan patches.",
@@ -1183,6 +1378,7 @@ def main() -> int:
     parser.add_argument("--input", default="")
     parser.add_argument("--semantics", default="")
     parser.add_argument("--optimized-centerlines", default="")
+    parser.add_argument("--lane-upgrades", default="")
     parser.add_argument("--output", default="")
     parser.add_argument("--report", default="")
     args = parser.parse_args()
@@ -1197,10 +1393,25 @@ def main() -> int:
     )
     if not optimized_centerlines_path.exists():
         optimized_centerlines_path = None
+    lane_upgrades_path = (
+        Path(args.lane_upgrades)
+        if args.lane_upgrades
+        else root / "data" / "processed" / f"{args.area_id}_lane_upgrade_overrides.json"
+    )
+    if not lane_upgrades_path.exists():
+        lane_upgrades_path = None
     output_path = Path(args.output) if args.output else root / "data" / "processed" / f"{args.area_id}_lane_graph.json"
     report_path = Path(args.report) if args.report else root / "reports" / f"{args.area_id}_lane_graph_report.json"
 
-    report = build_lane_graph(input_path, semantics_path, output_path, report_path, args.area_id, optimized_centerlines_path)
+    report = build_lane_graph(
+        input_path,
+        semantics_path,
+        output_path,
+        report_path,
+        args.area_id,
+        optimized_centerlines_path,
+        lane_upgrades_path,
+    )
     print(json.dumps({
         "area_id": args.area_id,
         "output": str(output_path),

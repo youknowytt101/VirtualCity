@@ -19,6 +19,11 @@ from typing import Any
 NODE_EPS_M = 0.35
 BBOX_EDGE_MARGIN_M = 5.0
 DEDUP_EPS_M = 0.05
+CANONICAL_SIMPLIFY_TOLERANCE_M = 0.25
+CANONICAL_SIMPLIFY_MAX_TURN_DEG = 7.0
+CANONICAL_SMOOTHING_WEIGHT = 0.18
+CANONICAL_SMOOTHING_MAX_TURN_DEG = 22.0
+CANONICAL_SMOOTHING_MAX_OFFSET_M = 0.35
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -80,6 +85,129 @@ def distance(a: tuple[float, float], b: tuple[float, float]) -> float:
 
 def polyline_length(points: list[tuple[float, float]]) -> float:
     return sum(distance(points[index], points[index + 1]) for index in range(len(points) - 1))
+
+
+def point_line_distance(
+    point: tuple[float, float],
+    a: tuple[float, float],
+    b: tuple[float, float],
+) -> float:
+    dx = b[0] - a[0]
+    dz = b[1] - a[1]
+    length_sq = dx * dx + dz * dz
+    if length_sq <= 1e-12:
+        return distance(point, a)
+    t = max(0.0, min(1.0, ((point[0] - a[0]) * dx + (point[1] - a[1]) * dz) / length_sq))
+    projected = a[0] + dx * t, a[1] + dz * t
+    return distance(point, projected)
+
+
+def vertex_turn_degrees(
+    a: tuple[float, float],
+    point: tuple[float, float],
+    b: tuple[float, float],
+) -> float:
+    va = (a[0] - point[0], a[1] - point[1])
+    vb = (b[0] - point[0], b[1] - point[1])
+    la = math.sqrt(va[0] * va[0] + va[1] * va[1])
+    lb = math.sqrt(vb[0] * vb[0] + vb[1] * vb[1])
+    if la <= 1e-9 or lb <= 1e-9:
+        return 0.0
+    cosine = max(-1.0, min(1.0, (va[0] * vb[0] + va[1] * vb[1]) / (la * lb)))
+    interior = math.degrees(math.acos(cosine))
+    return abs(180.0 - interior)
+
+
+def simplify_centerline_points(
+    points: list[tuple[float, float]],
+    *,
+    tolerance_m: float = CANONICAL_SIMPLIFY_TOLERANCE_M,
+    max_turn_deg: float = CANONICAL_SIMPLIFY_MAX_TURN_DEG,
+) -> tuple[list[tuple[float, float]], dict[str, Any]]:
+    if len(points) <= 2:
+        return points[:], {"vertices_removed": 0, "max_removed_deviation_m": 0.0, "passes": 0}
+
+    output = points[:]
+    removed = 0
+    max_removed_deviation = 0.0
+    passes = 0
+    while True:
+        passes += 1
+        removed_this_pass = 0
+        index = 1
+        while index < len(output) - 1:
+            prev_point = output[index - 1]
+            point = output[index]
+            next_point = output[index + 1]
+            turn_deg = vertex_turn_degrees(prev_point, point, next_point)
+            deviation = point_line_distance(point, prev_point, next_point)
+            if turn_deg <= max_turn_deg and deviation <= tolerance_m:
+                max_removed_deviation = max(max_removed_deviation, deviation)
+                del output[index]
+                removed += 1
+                removed_this_pass += 1
+                continue
+            index += 1
+        if removed_this_pass == 0 or len(output) <= 2:
+            break
+    return output, {
+        "vertices_removed": removed,
+        "max_removed_deviation_m": round(max_removed_deviation, 3),
+        "passes": passes,
+    }
+
+
+def smooth_centerline_points(
+    points: list[tuple[float, float]],
+    *,
+    weight: float = CANONICAL_SMOOTHING_WEIGHT,
+    max_turn_deg: float = CANONICAL_SMOOTHING_MAX_TURN_DEG,
+    max_offset_m: float = CANONICAL_SMOOTHING_MAX_OFFSET_M,
+) -> tuple[list[tuple[float, float]], dict[str, Any]]:
+    if len(points) <= 2 or weight <= 0.0:
+        return points[:], {"vertices_smoothed": 0, "max_offset_m": 0.0, "avg_offset_m": 0.0}
+
+    output = [points[0]]
+    offsets: list[float] = []
+    for index in range(1, len(points) - 1):
+        prev_point = points[index - 1]
+        point = points[index]
+        next_point = points[index + 1]
+        turn_deg = vertex_turn_degrees(prev_point, point, next_point)
+        if turn_deg > max_turn_deg:
+            output.append(point)
+            continue
+        midpoint = ((prev_point[0] + next_point[0]) * 0.5, (prev_point[1] + next_point[1]) * 0.5)
+        candidate = (
+            point[0] + (midpoint[0] - point[0]) * weight,
+            point[1] + (midpoint[1] - point[1]) * weight,
+        )
+        offset = distance(point, candidate)
+        if offset <= max_offset_m:
+            output.append(candidate)
+            if offset > 1e-6:
+                offsets.append(offset)
+        else:
+            output.append(point)
+    output.append(points[-1])
+    return output, {
+        "vertices_smoothed": len(offsets),
+        "max_offset_m": round(max(offsets), 3) if offsets else 0.0,
+        "avg_offset_m": round(sum(offsets) / len(offsets), 3) if offsets else 0.0,
+    }
+
+
+def refine_centerline_geometry(points: list[tuple[float, float]]) -> tuple[list[tuple[float, float]], dict[str, Any]]:
+    before_points = compact_points(points)
+    simplified, simplify_metrics = simplify_centerline_points(before_points)
+    smoothed, smoothing_metrics = smooth_centerline_points(simplified)
+    after_points = compact_points(smoothed)
+    return after_points, {
+        "control_points_before": len(before_points),
+        "control_points_after": len(after_points),
+        **simplify_metrics,
+        **smoothing_metrics,
+    }
 
 
 def node_key(point: tuple[float, float], eps: float = NODE_EPS_M) -> tuple[int, int]:
@@ -362,6 +490,14 @@ def build_canonical_roads(
     features: list[dict[str, Any]] = []
     chain_edge_counts: Counter[int] = Counter()
     merge_stop_counts: Counter[str] = Counter()
+    total_control_points_before = 0
+    total_control_points_after = 0
+    total_vertices_removed = 0
+    total_vertices_smoothed = 0
+    max_removed_deviation_m = 0.0
+    max_smoothing_offset_m = 0.0
+    smoothing_offsets_weighted_sum = 0.0
+    length_delta_values: list[float] = []
 
     for edge in edges:
         edge_id = int(edge["edge_id"])
@@ -386,9 +522,37 @@ def build_canonical_roads(
         points = compact_points(points)
         if len(points) < 2:
             continue
+        source_length_m = polyline_length(points)
+        points, geometry_metrics = refine_centerline_geometry(points)
+        if len(points) < 2:
+            continue
+        refined_length_m = polyline_length(points)
+        length_delta_m = refined_length_m - source_length_m
+        length_delta_values.append(length_delta_m)
+        total_control_points_before += int(geometry_metrics["control_points_before"])
+        total_control_points_after += int(geometry_metrics["control_points_after"])
+        total_vertices_removed += int(geometry_metrics["vertices_removed"])
+        total_vertices_smoothed += int(geometry_metrics["vertices_smoothed"])
+        max_removed_deviation_m = max(max_removed_deviation_m, float(geometry_metrics["max_removed_deviation_m"]))
+        max_smoothing_offset_m = max(max_smoothing_offset_m, float(geometry_metrics["max_offset_m"]))
+        smoothing_offsets_weighted_sum += (
+            float(geometry_metrics["avg_offset_m"]) * int(geometry_metrics["vertices_smoothed"])
+        )
         canonical_id = f"cr_{len(features):04d}"
-        length_m = polyline_length(points)
+        length_m = refined_length_m
         props = merged_props(canonical_id, chain_ids, edges, length_m)
+        if geometry_metrics["vertices_removed"]:
+            props["canonical_ops"] = sorted(set([*props["canonical_ops"], "centerline_vertex_simplification"]))
+        if geometry_metrics["vertices_smoothed"]:
+            props["canonical_ops"] = sorted(set([*props["canonical_ops"], "centerline_smoothing"]))
+        props["canonical_source_length_m"] = round(source_length_m, 3)
+        props["canonical_length_delta_m"] = round(length_delta_m, 3)
+        props["canonical_control_points_before"] = geometry_metrics["control_points_before"]
+        props["canonical_control_points_after"] = geometry_metrics["control_points_after"]
+        props["canonical_vertices_removed"] = geometry_metrics["vertices_removed"]
+        props["canonical_vertices_smoothed"] = geometry_metrics["vertices_smoothed"]
+        props["canonical_max_removed_deviation_m"] = geometry_metrics["max_removed_deviation_m"]
+        props["canonical_max_smoothing_offset_m"] = geometry_metrics["max_offset_m"]
         coords = [
             [round(lon, 8), round(lat, 8)]
             for lon, lat in (to_lonlat(point[0], point[1], origin_lon, origin_lat) for point in points)
@@ -438,6 +602,11 @@ def build_canonical_roads(
             "node_eps_m": NODE_EPS_M,
             "bbox_edge_margin_m": BBOX_EDGE_MARGIN_M,
             "merge_policy": "degree2_nodes_only_with_matching_attribute_signature",
+            "centerline_simplify_tolerance_m": CANONICAL_SIMPLIFY_TOLERANCE_M,
+            "centerline_simplify_max_turn_deg": CANONICAL_SIMPLIFY_MAX_TURN_DEG,
+            "centerline_smoothing_weight": CANONICAL_SMOOTHING_WEIGHT,
+            "centerline_smoothing_max_turn_deg": CANONICAL_SMOOTHING_MAX_TURN_DEG,
+            "centerline_smoothing_max_offset_m": CANONICAL_SMOOTHING_MAX_OFFSET_M,
         },
         "counts": {
             "input_edges": input_count,
@@ -450,6 +619,20 @@ def build_canonical_roads(
         },
         "chain_edge_count_histogram": {str(key): value for key, value in sorted(chain_edge_counts.items())},
         "merge_stop_counts": dict(sorted(merge_stop_counts.items())),
+        "geometry_refinement": {
+            "control_points_before": total_control_points_before,
+            "control_points_after": total_control_points_after,
+            "vertices_removed": total_vertices_removed,
+            "vertices_smoothed": total_vertices_smoothed,
+            "max_removed_deviation_m": round(max_removed_deviation_m, 3),
+            "max_smoothing_offset_m": round(max_smoothing_offset_m, 3),
+            "avg_smoothing_offset_m": round(
+                smoothing_offsets_weighted_sum / max(1, total_vertices_smoothed),
+                3,
+            ) if total_vertices_smoothed else 0.0,
+            "max_abs_length_delta_m": round(max((abs(value) for value in length_delta_values), default=0.0), 3),
+            "total_length_delta_m": round(sum(length_delta_values), 3),
+        },
         "metrics": {
             "edge_reduction_ratio": round((input_count - output_count) / max(1, input_count), 3),
             "avg_input_edges_per_canonical_road": round(input_count / max(1, output_count), 3),
@@ -459,6 +642,7 @@ def build_canonical_roads(
             "Canonical roads are machine-readable GeoJSON, not SVG visualization.",
             "Each canonical road keeps source_feature_ids, repaired_source_feature_ids, and repair_parent_ids for traceability.",
             "The stage does not cross true junctions or attribute conflicts; it only removes unstable degree-2 fragmentation from downstream graph construction.",
+            "Centerline refinement preserves chain endpoints; simplification and smoothing only touch internal control points inside conservative deviation thresholds.",
         ],
     }
     write_json(report_path, report)

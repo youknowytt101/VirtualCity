@@ -535,17 +535,41 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     ))
 
     lane_surface_counts = lane_surface_report.get("counts", {})
+    junctions_with_lane_links = sum(
+        1
+        for junction in lane_graph.get("junctions", [])
+        if any(
+            connection.get("lane_links")
+            for connection in junction.get("connections", [])
+        )
+    )
     checks.append(make_check(
         "lane_surface_v1_matches_lane_graph",
         lane_surface_counts.get("lane_surfaces") == len(lane_graph.get("lanes", []))
         and lane_surface_counts.get("lane_turn_surfaces") == len(lane_links)
-        and lane_surface_counts.get("lane_continuity_surfaces", 0) == len(continuity_links),
-        "Lane surface v1 should generate one approach surface per lane, one turn surface per laneLink and one continuity surface per rounded corner link.",
+        and lane_surface_counts.get("lane_continuity_surfaces", 0) == len(continuity_links)
+        and lane_surface_counts.get("junction_envelope_surfaces", 0) == junctions_with_lane_links,
+        "Lane surface v1 should generate approach, turn, continuity and junction envelope surfaces from the lane graph.",
         {
             "surface_counts": lane_surface_counts,
             "lane_graph_lanes": len(lane_graph.get("lanes", [])),
             "lane_graph_lane_links": len(lane_links),
             "lane_graph_continuity_links": len(continuity_links),
+            "junctions_with_lane_links": junctions_with_lane_links,
+        },
+    ))
+    lane_surface_metrics = lane_surface_report.get("metrics", {})
+    checks.append(make_check(
+        "junction_envelope_surfaces_have_area",
+        lane_surface_counts.get("junction_envelope_surfaces", 0) == junctions_with_lane_links
+        and float(lane_surface_metrics.get("avg_junction_envelope_area_m2") or 0.0) > 0.0
+        and float(lane_surface_metrics.get("max_junction_envelope_area_m2") or 0.0) > 0.0,
+        "Every junction with laneLinks should publish a non-empty conservative envelope surface.",
+        {
+            "junction_envelope_surfaces": lane_surface_counts.get("junction_envelope_surfaces", 0),
+            "junctions_with_lane_links": junctions_with_lane_links,
+            "avg_junction_envelope_area_m2": lane_surface_metrics.get("avg_junction_envelope_area_m2", 0.0),
+            "max_junction_envelope_area_m2": lane_surface_metrics.get("max_junction_envelope_area_m2", 0.0),
         },
     ))
     lane_surface_obj_lines = paths["lane_surface_v1_obj"].read_text(encoding="utf-8").splitlines()
@@ -616,6 +640,7 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "lane_debug_obj_faces": lane_debug_obj_stats["faces"],
         "lane_surface_v1_obj_vertices": lane_surface_obj_stats["vertices"],
         "lane_surface_v1_obj_faces": lane_surface_obj_stats["faces"],
+        "junction_envelope_surfaces": lane_surface_counts.get("junction_envelope_surfaces", 0),
         "qa_statuses": qa_statuses,
     }
     report = {
@@ -625,7 +650,7 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "checks": checks,
         "metrics": metrics,
         "inputs": {name: str(path) for name, path in paths.items()},
-        "next_action": "Use this audit as the automated gate before adding lane ribbons and junction surface geometry.",
+        "next_action": "Use this audit as the automated gate before curb, island, marking and swept-envelope geometry.",
     }
     write_json(output_path, report)
     return report

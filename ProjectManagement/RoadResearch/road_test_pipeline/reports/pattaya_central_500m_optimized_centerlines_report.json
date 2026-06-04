@@ -35,6 +35,8 @@
     "junction_turn_movements": 102,
     "corner_fillet_nodes": 3,
     "corner_fillets": 3,
+    "corner_transaction_fillets": 3,
+    "corner_heuristic_fillets": 0,
     "corner_circular_arcs": 3,
     "corner_bezier_tangent_fallback": 0,
     "corner_straight_infinite_radius": 0,
@@ -50,7 +52,10 @@
     "junction_common_trim_avg_raise_m": 0.0,
     "junction_common_trim_max_lower_m": 0.0,
     "junction_common_trim_avg_lower_m": 0.0,
-    "junction_common_trim_skipped_regularized_nodes": 49
+    "junction_common_trim_skipped_regularized_nodes": 49,
+    "corner_override_records": 3,
+    "active_corner_overrides": 3,
+    "corner_override_issue_counts": {}
   },
   "junction_degree_counts": {
     "3": 47,

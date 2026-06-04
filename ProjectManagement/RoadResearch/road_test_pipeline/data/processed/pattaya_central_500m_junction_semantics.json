@@ -475,10 +475,10 @@
           "approach_id": "n_0004_e_0051",
           "edge_id": "e_0051",
           "direction_out_xz": [
-            0.567562,
-            0.823331
+            0.571566,
+            0.820556
           ],
-          "angle_deg": 55.42,
+          "angle_deg": 55.14,
           "road_class": "secondary",
           "highway": "secondary",
           "lanes": 2,
@@ -3142,10 +3142,10 @@
           "approach_id": "n_0026_e_0058",
           "edge_id": "e_0058",
           "direction_out_xz": [
-            0.404478,
-            0.914548
+            0.428737,
+            0.903429
           ],
-          "angle_deg": 66.142,
+          "angle_deg": 64.613,
           "road_class": "service",
           "highway": "service",
           "lanes": 2,
@@ -3352,10 +3352,10 @@
           "approach_id": "n_0028_e_0002",
           "edge_id": "e_0002",
           "direction_out_xz": [
-            -0.856286,
-            0.516502
+            -0.847426,
+            0.530913
           ],
-          "angle_deg": 148.902,
+          "angle_deg": 147.933,
           "road_class": "residential",
           "highway": "residential",
           "lanes": 2,
@@ -3678,10 +3678,10 @@
           "approach_id": "n_0031_e_0058",
           "edge_id": "e_0058",
           "direction_out_xz": [
-            -0.973522,
-            -0.228591
+            -0.968643,
+            -0.248457
           ],
-          "angle_deg": -166.786,
+          "angle_deg": -165.614,
           "road_class": "service",
           "highway": "service",
           "lanes": 2,
@@ -4451,10 +4451,10 @@
           "approach_id": "n_0039_e_0024",
           "edge_id": "e_0024",
           "direction_out_xz": [
-            0.744377,
-            -0.667759
+            0.743105,
+            -0.669175
           ],
-          "angle_deg": -41.894,
+          "angle_deg": -42.003,
           "road_class": "residential",
           "highway": "residential",
           "lanes": 2,
@@ -6992,10 +6992,10 @@
           "approach_id": "n_0059_e_0025",
           "edge_id": "e_0025",
           "direction_out_xz": [
-            0.864319,
-            -0.502944
+            0.863734,
+            -0.503948
           ],
-          "angle_deg": -30.195,
+          "angle_deg": -30.262,
           "road_class": "residential",
           "highway": "residential",
           "lanes": 2,
@@ -8268,10 +8268,10 @@
           "approach_id": "n_0068_e_0016",
           "edge_id": "e_0016",
           "direction_out_xz": [
-            0.518269,
-            0.855217
+            0.515101,
+            0.857129
           ],
-          "angle_deg": 58.784,
+          "angle_deg": 58.996,
           "road_class": "residential",
           "highway": "residential",
           "lanes": 2,

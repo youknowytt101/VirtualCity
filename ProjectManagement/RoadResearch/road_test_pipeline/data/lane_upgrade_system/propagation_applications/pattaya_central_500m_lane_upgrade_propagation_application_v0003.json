@@ -1,0 +1,76 @@
+{
+  "type": "lane_upgrade_propagation_application",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "lane_upgrade_system.propagation_application.v1",
+    "system": "LaneForge",
+    "version": "v0003",
+    "policy": "short_edge_absorption_only_v1"
+  },
+  "source_plan": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_system\\propagation\\pattaya_central_500m_lane_upgrade_propagation_plan_v0003.json",
+  "selection_policy": {
+    "candidate_ids": [
+      "prop_0000"
+    ],
+    "allowed_rules": [
+      "short_edge_absorption_lane_count_v2"
+    ],
+    "allowed_statuses": [
+      "candidate_high_confidence"
+    ],
+    "min_confidence": 0.74,
+    "max_candidate_length_m": 12.0,
+    "require_same_road_class": true
+  },
+  "status": "dry_run",
+  "selected_candidates": [
+    {
+      "candidate_id": "prop_0000",
+      "source_upgrade_id": "lane_upgrade_transaction_v0003",
+      "source_road_id": "e_0013",
+      "source_canonical_road_id": "cr_0013",
+      "candidate_road_id": "e_0005",
+      "candidate_canonical_road_id": "cr_0005",
+      "junction_id": "j_030",
+      "junction_node_id": "n_0050",
+      "junction_type": "T",
+      "rule_id": "short_edge_absorption_lane_count_v2",
+      "confidence": 0.76,
+      "status": "candidate_high_confidence",
+      "recommended_action": "proposal_only_no_active_override",
+      "current_physical_lane_count": 1,
+      "proposed_target_physical_lane_count": 3,
+      "candidate_length_m": 8.688,
+      "candidate_road_class": "residential",
+      "source_road_class": "residential",
+      "source_approach_role": "minor_branch",
+      "candidate_approach_role": "major_through",
+      "through_partner_of_source": "",
+      "rationale": "Candidate edge length 8.688m is under the short-edge threshold."
+    }
+  ],
+  "skipped_existing_active_road_ids": [
+    "e_0013",
+    "e_0014",
+    "e_0015"
+  ],
+  "before_lane_snapshot": {
+    "e_0005": {
+      "lane_count": 2,
+      "lane_ids": [
+        "e_0005_f_1",
+        "e_0005_b_1"
+      ],
+      "directions": [
+        "forward",
+        "backward"
+      ],
+      "upgrade_targets": [
+        0,
+        0
+      ]
+    }
+  },
+  "planned_package_version": "lane_package_v0006",
+  "log": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_upgrade_propagation_application_v0003.log"
+}

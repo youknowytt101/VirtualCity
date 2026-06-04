@@ -6,7 +6,7 @@
     {
       "id": "lanes",
       "status": "pass",
-      "value": 200,
+      "value": 204,
       "threshold": 40,
       "message": "Lane graph should expose enough directed lane records for junction connection research."
     },
@@ -27,7 +27,7 @@
     {
       "id": "lane_links",
       "status": "pass",
-      "value": 326,
+      "value": 308,
       "threshold": 1,
       "message": "Allowed movements should produce laneLinks for downstream movement corridor research."
     },
@@ -62,36 +62,29 @@
     {
       "id": "avg_lane_links_per_junction",
       "status": "pass",
-      "value": 6.245,
+      "value": 6.286,
       "threshold": 1.0,
       "message": "LaneLink density is low; review oneway, lane count and movement inference."
     }
   ],
   "metrics": {
     "counts": {
-      "edges": 100,
-      "lanes": 200,
+      "lanes": 204,
       "junctions": 49,
+      "approach_lane_records": 149,
       "connections": 306,
-      "lane_links": 326,
-      "junction_lane_links": 306,
-      "connector_continuity_links": 20,
-      "issue_counts": {
-        "connector_continuity_inferred": 40,
-        "direction_forced_bidirectional_two_lane_policy": 300,
-        "inferred_without_turn_lanes": 612,
-        "lane_count_forced_bidirectional_two_lane_policy": 300,
-        "lanes_inferred": 300,
-        "low_confidence_from_lane": 612,
-        "low_confidence_to_lane": 612,
-        "missing_turn_lanes": 300,
-        "offset_centerline_preview_only": 200,
-        "source_lane_count_overridden_by_bidirectional_two_lane_policy": 291,
-        "source_oneway_overridden_by_bidirectional_two_lane_policy": 168,
-        "source_width_overridden_by_bidirectional_two_lane_policy": 300,
-        "width_forced_bidirectional_two_lane_policy": 300,
-        "width_inferred": 300
-      }
+      "lane_links": 308,
+      "continuity_links": 6,
+      "optimized_approach_centerlines": 100,
+      "optimized_approach_centerlines_applied": 100,
+      "optimized_junction_connectors": 149,
+      "optimized_junction_connector_lane_links": 0,
+      "optimized_corner_fillet_links": 6,
+      "active_lane_upgrades": 4,
+      "active_lane_upgrades_applied": 4,
+      "active_lane_upgrades_missing_roads": 0,
+      "active_lane_upgrades_ignored": 0,
+      "fan_fallback_junctions": 0
     },
     "turn_counts": {
       "left": 102,
@@ -99,38 +92,37 @@
       "through": 102
     },
     "lane_source_counts": {
-      "stage_policy_override": 200
+      "lane_upgrade_system_manual_override": 12,
+      "temporary_bidirectional_two_lane_policy": 192
     },
-    "traffic_direction_policy_counts": {
-      "temporary_bidirectional_two_lane_policy": 200
-    },
+    "traffic_direction_policy_counts": {},
     "connection_source_counts": {
-      "junction_semantics_plus_lane_attribute_model": 306
+      "geometry_inferred_from_osm_plus_temporary_bidirectional_two_lane_policy": 306
     },
     "lane_link_source_counts": {
-      "connector_node_rank_match": 20,
-      "inferred_lane_rank_plus_road_movement": 306
+      "junction_semantics": 308
     },
     "fallback_counts": {
-      "offset_centerline_preview": 200,
-      "shared_bidirectional_physical_lane": 0,
-      "inferred_without_turn_lanes": 306
+      "not_generated_layer3_lane_graph_only": 49
     },
     "lane_graph_metrics": {
-      "avg_lane_confidence": 0.42,
-      "min_lane_confidence": 0.42,
-      "avg_lane_link_confidence": 0.42,
-      "min_lane_link_confidence": 0.42,
+      "junctions_with_connections_ratio": 1.0,
+      "fan_fallback_ratio": 0.0,
+      "avg_lane_links_per_junction": 6.286,
       "lane_link_reference_errors": 0,
       "blocked_lane_links": 0,
       "empty_connection_curves": 0,
-      "fan_fallback_ratio": 0.0,
-      "avg_lane_links_per_junction": 6.245,
-      "inferred_turn_link_ratio": 0.939,
-      "missing_turn_lanes_lane_ratio": 1.0,
-      "inferred_bidirectional_prior_lane_ratio": 0.0,
-      "source_oneway_lane_ratio": 0.0,
-      "temporary_bidirectional_two_lane_policy_lane_ratio": 1.0
+      "avg_lane_link_confidence": 0.82,
+      "min_lane_link_confidence": 0.82,
+      "avg_curve_length_m": 20.459,
+      "max_curve_length_m": 29.564,
+      "avg_continuity_curve_length_m": 4.152,
+      "max_continuity_curve_length_m": 7.299,
+      "avg_lane_width_m": 3.2,
+      "min_lane_width_m": 3.2,
+      "max_lane_width_m": 3.2,
+      "avg_lane_width_confidence": 0.45,
+      "max_lane_width_start_end_delta_m": 0.0
     }
   },
   "inputs": {

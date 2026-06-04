@@ -642,6 +642,46 @@ def junction_area_by_node(junction_areas_doc: dict[str, Any]) -> dict[str, dict[
     return indexed
 
 
+def corner_override_key(node_id: str, edge_ids: list[str]) -> tuple[str, tuple[str, str]]:
+    a, b = sorted(str(edge_id) for edge_id in edge_ids)
+    return node_id, (a, b)
+
+
+def corner_override_index(overrides_doc: dict[str, Any]) -> tuple[dict[tuple[str, tuple[str, str]], dict[str, Any]], dict[str, Any]]:
+    indexed: dict[tuple[str, tuple[str, str]], dict[str, Any]] = {}
+    issue_counts: Counter[str] = Counter()
+    raw_count = 0
+    active_count = 0
+    for item in overrides_doc.get("active_corner_optimizations", []):
+        raw_count += 1
+        if not bool(item.get("enabled", True)):
+            issue_counts["disabled"] += 1
+            continue
+        node_id = str(item.get("node_id") or "")
+        edge_ids = [str(item.get("from_edge_id") or ""), str(item.get("to_edge_id") or "")]
+        if not node_id or not all(edge_ids):
+            issue_counts["missing_node_or_edge_id"] += 1
+            continue
+        indexed[corner_override_key(node_id, edge_ids)] = item
+        active_count += 1
+    return indexed, {
+        "corner_override_records": raw_count,
+        "active_corner_overrides": active_count,
+        "corner_override_issue_counts": dict(sorted(issue_counts.items())),
+    }
+
+
+def override_cut_m(override: dict[str, Any], fallback: float, edge_a: dict[str, Any], edge_b: dict[str, Any]) -> float:
+    try:
+        cut = float(override.get("suggested_cut_m") or override.get("cut_m") or fallback)
+    except (TypeError, ValueError):
+        cut = fallback
+    cut = max(CORNER_MIN_CUT_M, cut)
+    cut = min(cut, CORNER_MAX_CUT_M)
+    cut = min(cut, float(edge_a["length_m"]) * CORNER_EDGE_LENGTH_FACTOR, float(edge_b["length_m"]) * CORNER_EDGE_LENGTH_FACTOR)
+    return max(0.0, cut)
+
+
 def reference_entry_pose_index(
     engineering_reference_doc: dict[str, Any],
     nodes: dict[str, dict[str, Any]],
@@ -919,6 +959,7 @@ def optimize_centerlines(
     area_id: str,
     junction_areas_path: Path | None = None,
     engineering_reference_path: Path | None = None,
+    corner_overrides_path: Path | None = None,
 ) -> dict[str, Any]:
     graph = read_json(input_path)
     meta = graph["metadata"]
@@ -928,12 +969,14 @@ def optimize_centerlines(
     nodes = {node["node_id"]: dict(node, _edges=edges) for node in graph["nodes"]}
     junction_areas_doc = read_optional_json(junction_areas_path)
     engineering_reference_doc = read_optional_json(engineering_reference_path)
+    corner_overrides_doc = read_optional_json(corner_overrides_path)
     area_by_node = junction_area_by_node(junction_areas_doc)
     regularized_entry_by_key, regularization_metrics = reference_entry_pose_index(
         engineering_reference_doc,
         nodes,
         edges,
     )
+    active_corner_overrides, corner_override_metrics = corner_override_index(corner_overrides_doc)
     locked_trim_keys = set(regularized_entry_by_key)
 
     trim_by_edge_node: dict[tuple[str, str], float] = {}
@@ -972,6 +1015,9 @@ def optimize_centerlines(
         if turn_deg < MIN_CORNER_TURN_DEG or math.degrees(angle) < MIN_CORNER_ANGLE_DEG:
             continue
         cut = corner_trim_distance(edge_a, edge_b, turn_deg)
+        override = active_corner_overrides.get(corner_override_key(node["node_id"], [edge_a_id, edge_b_id]))
+        if override is not None:
+            cut = override_cut_m(override, cut, edge_a, edge_b)
         if cut < CORNER_MIN_CUT_M:
             continue
         for edge_id in (edge_a_id, edge_b_id):
@@ -981,6 +1027,11 @@ def optimize_centerlines(
             "edge_ids": [edge_a_id, edge_b_id],
             "turn_deg": turn_deg,
             "cut_m": cut,
+            "optimization_source": "corner_optimization_transaction" if override is not None else "heuristic_degree2_connector_fillet",
+            "corner_optimization_id": str((override or {}).get("corner_optimization_id") or ""),
+            "corner_optimization_application_id": str((override or {}).get("application_id") or ""),
+            "corner_optimization_candidate_id": str((override or {}).get("candidate_id") or ""),
+            "corner_optimization_policy": str((override or {}).get("policy") or ""),
         }
 
     junction_common_trim_metrics = equalize_junction_trims(nodes, edges, trim_by_edge_node, locked_trim_keys)
@@ -1084,6 +1135,11 @@ def optimize_centerlines(
             "width_m": round(width, 3),
             "turn_angle_deg": round(corner["turn_deg"], 3),
             "cut_m": round(corner["cut_m"], 3),
+            "corner_optimization_source": corner["optimization_source"],
+            "corner_optimization_id": corner["corner_optimization_id"],
+            "corner_optimization_application_id": corner["corner_optimization_application_id"],
+            "corner_optimization_candidate_id": corner["corner_optimization_candidate_id"],
+            "corner_optimization_policy": corner["corner_optimization_policy"],
             "oneway": False,
         }
         props.update(arc_properties(arc))
@@ -1226,6 +1282,7 @@ def optimize_centerlines(
             "source": str(input_path),
             "source_junction_areas": str(junction_areas_path) if junction_areas_path and junction_areas_path.exists() else "",
             "source_engineering_reference": str(engineering_reference_path) if engineering_reference_path and engineering_reference_path.exists() else "",
+            "source_corner_overrides": str(corner_overrides_path) if corner_overrides_path and corner_overrides_path.exists() else "",
             "strategy": "use regularized junction entry poses where available, trim approaches, add tangent circular-arc junction connectors and corner fillets, then extrude widths",
         },
         "features": features,
@@ -1278,12 +1335,15 @@ def optimize_centerlines(
             "junction_turn_movements": turn_movement_count,
             "corner_fillet_nodes": len(corner_nodes),
             "corner_fillets": corner_fillet_count,
+            "corner_transaction_fillets": sum(1 for corner in corner_nodes.values() if corner.get("optimization_source") == "corner_optimization_transaction"),
+            "corner_heuristic_fillets": sum(1 for corner in corner_nodes.values() if corner.get("optimization_source") == "heuristic_degree2_connector_fillet"),
             "corner_circular_arcs": corner_arc_geometry_counts.get("circular_arc", 0),
             "corner_bezier_tangent_fallback": corner_arc_geometry_counts.get("bezier_tangent_fallback", 0),
             "corner_straight_infinite_radius": corner_arc_geometry_counts.get("straight_infinite_radius", 0),
             "output_features": len(features),
             **t_branch_trim_metrics,
             **junction_common_trim_metrics,
+            **corner_override_metrics,
         },
         "junction_degree_counts": dict(sorted(connector_degrees.items())),
         "junction_connector_style_counts": dict(sorted(connector_style_counts.items())),
@@ -1322,6 +1382,7 @@ def main() -> int:
     parser.add_argument("--report", default="")
     parser.add_argument("--junction-areas", default="")
     parser.add_argument("--engineering-reference", default="")
+    parser.add_argument("--corner-overrides", default="")
     args = parser.parse_args()
 
     root = pipeline_root_from_script(Path(__file__))
@@ -1331,6 +1392,7 @@ def main() -> int:
     report_path = Path(args.report) if args.report else root / "reports" / f"{args.area_id}_optimized_centerlines_report.json"
     junction_areas_path = Path(args.junction_areas) if args.junction_areas else processed / f"{args.area_id}_junction_areas.json"
     engineering_reference_path = Path(args.engineering_reference) if args.engineering_reference else processed / f"{args.area_id}_engineering_reference_lines.json"
+    corner_overrides_path = Path(args.corner_overrides) if args.corner_overrides else processed / f"{args.area_id}_corner_optimization_overrides.json"
     report = optimize_centerlines(
         input_path,
         output_path,
@@ -1338,6 +1400,7 @@ def main() -> int:
         args.area_id,
         junction_areas_path,
         engineering_reference_path,
+        corner_overrides_path,
     )
     print(json.dumps({
         "area_id": args.area_id,

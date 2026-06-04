@@ -916,6 +916,9 @@ geo.addAttrib(hou.attribType.Prim, "vc_part", "")
 geo.addAttrib(hou.attribType.Prim, "lane_id", "")
 geo.addAttrib(hou.attribType.Prim, "lane_link_id", "")
 geo.addAttrib(hou.attribType.Prim, "continuity_link_id", "")
+geo.addAttrib(hou.attribType.Prim, "junction_id", "")
+geo.addAttrib(hou.attribType.Prim, "node_id", "")
+geo.addAttrib(hou.attribType.Prim, "junction_type", "")
 geo.addAttrib(hou.attribType.Prim, "from_lane", "")
 geo.addAttrib(hou.attribType.Prim, "to_lane", "")
 geo.addAttrib(hou.attribType.Prim, "turn", "")
@@ -926,6 +929,7 @@ geo.addAttrib(hou.attribType.Prim, "area_m2", 0.0)
 lane_surface_group = geo.createPrimGroup("lane_surface_v1")
 turn_surface_group = geo.createPrimGroup("lane_turn_surface_v1")
 continuity_surface_group = geo.createPrimGroup("lane_continuity_surface_v1")
+junction_envelope_group = geo.createPrimGroup("junction_envelope_surface_v1")
 
 with open(SURFACE_GEOJSON_PATH, encoding="utf-8") as f:
     fc = json.load(f)
@@ -941,16 +945,20 @@ for feature in fc.get("features", []):
     ring = rings[0]
     if ring[0] == ring[-1]:
         ring = ring[:-1]
+    part = str(props.get("vc_part") or "")
+    y = 0.01 if part == "junction_envelope_surface_v1" else 0.02 if part == "lane_surface_v1" else 0.05
     prim = geo.createPolygon(is_closed=True)
     for x, z in ring:
         point = geo.createPoint()
-        point.setPosition(hou.Vector3(float(x), 0.04, -float(z)))
+        point.setPosition(hou.Vector3(float(x), y, -float(z)))
         prim.addVertex(point)
-    part = str(props.get("vc_part") or "")
     prim.setAttribValue("vc_part", part)
     prim.setAttribValue("lane_id", str(props.get("lane_id") or ""))
     prim.setAttribValue("lane_link_id", str(props.get("lane_link_id") or ""))
     prim.setAttribValue("continuity_link_id", str(props.get("continuity_link_id") or ""))
+    prim.setAttribValue("junction_id", str(props.get("junction_id") or ""))
+    prim.setAttribValue("node_id", str(props.get("node_id") or ""))
+    prim.setAttribValue("junction_type", str(props.get("junction_type") or ""))
     prim.setAttribValue("from_lane", str(props.get("from_lane") or ""))
     prim.setAttribValue("to_lane", str(props.get("to_lane") or ""))
     prim.setAttribValue("turn", str(props.get("turn") or ""))
@@ -961,6 +969,8 @@ for feature in fc.get("features", []):
         turn_surface_group.add(prim)
     elif part == "lane_continuity_surface_v1":
         continuity_surface_group.add(prim)
+    elif part == "junction_envelope_surface_v1":
+        junction_envelope_group.add(prim)
     else:
         lane_surface_group.add(prim)
 '''

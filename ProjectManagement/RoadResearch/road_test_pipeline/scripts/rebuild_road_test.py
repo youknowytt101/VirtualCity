@@ -113,12 +113,14 @@ def main() -> int:
         ("Running road graph QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "road_graph", "--area-id", args.area_id]),
         ("Building junction semantic model", [python_cmd(), str(root / "scripts" / "build_junction_semantics.py"), "--area-id", args.area_id]),
         ("Optimizing junction centerlines", [python_cmd(), str(root / "scripts" / "optimize_junction_centerlines.py"), "--area-id", args.area_id]),
+        ("Planning corner optimization candidates", [python_cmd(), str(root / "scripts" / "plan_corner_optimization.py"), "--area-id", args.area_id]),
         ("Building lane graph and junction connections", [python_cmd(), str(root / "scripts" / "lane_model_builder.py"), "--area-id", args.area_id]),
         ("Running lane graph QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "lane_graph", "--area-id", args.area_id]),
         ("Generating standalone preview", [python_cmd(), str(root / "scripts" / "generate_road_preview.py"), "--area-id", args.area_id]),
         ("Generating lane-level debug geometry", [python_cmd(), str(root / "scripts" / "generate_lane_geometry_debug.py"), "--area-id", args.area_id]),
         ("Generating lane surface v1 geometry", [python_cmd(), str(root / "scripts" / "generate_lane_surface_v1.py"), "--area-id", args.area_id]),
         ("Auditing road pipeline contracts", [python_cmd(), str(root / "scripts" / "audit_road_pipeline.py"), "--area-id", args.area_id]),
+        ("Publishing LaneForge standard lane package", [python_cmd(), str(root / "scripts" / "build_lane_upgrade_package.py"), "--area-id", args.area_id]),
     ])
 
     for name, cmd in steps:
@@ -150,11 +152,13 @@ def main() -> int:
             "road_graph": str(road_graph),
             "junction_semantics": str(junction_semantics),
             "optimized_centerlines": str(optimized_centerlines),
+            "corner_optimization_candidates": str(root / "data" / "processed" / f"{args.area_id}_corner_optimization_candidates.json"),
             "lane_graph": str(lane_graph),
             "preview_report": str(reports / f"{args.area_id}_road_preview_report.json"),
             "lane_geometry_debug_report": str(reports / f"{args.area_id}_lane_geometry_debug_report.json"),
             "lane_surface_v1_report": str(reports / f"{args.area_id}_lane_surface_v1_report.json"),
             "pipeline_audit_report": str(reports / f"{args.area_id}_pipeline_audit_report.json"),
+            "lane_package_manifest": str(root / "data" / "lane_upgrade_packages" / args.area_id / "lane_package_v0001" / "manifest.json"),
             "topology_qa_report": str(reports / "qa" / f"{args.area_id}_topology_repair_qa_report.json"),
             "road_graph_qa_report": str(reports / "qa" / f"{args.area_id}_road_graph_qa_report.json"),
             "lane_graph_qa_report": str(reports / "qa" / f"{args.area_id}_lane_graph_qa_report.json"),

@@ -18,6 +18,7 @@ from typing import Any
 
 DEFAULT_LANE_WIDTH_M = 3.2
 DEFAULT_JUNCTION_TRIM_M = 8.0
+JUNCTION_ENVELOPE_PADDING_M = 0.25
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -68,6 +69,69 @@ def polygon_area(poly: list[tuple[float, float]]) -> float:
         nxt = clean[(i + 1) % len(clean)]
         twice_area += point[0] * nxt[1] - nxt[0] * point[1]
     return abs(twice_area) * 0.5
+
+
+def polygon_centroid(poly: list[tuple[float, float]]) -> tuple[float, float]:
+    clean = poly[:-1] if len(poly) > 2 and poly[0] == poly[-1] else poly
+    if not clean:
+        return 0.0, 0.0
+    area_twice = 0.0
+    cx = 0.0
+    cz = 0.0
+    for i, point in enumerate(clean):
+        nxt = clean[(i + 1) % len(clean)]
+        cross_value = point[0] * nxt[1] - nxt[0] * point[1]
+        area_twice += cross_value
+        cx += (point[0] + nxt[0]) * cross_value
+        cz += (point[1] + nxt[1]) * cross_value
+    if abs(area_twice) <= 1e-9:
+        return (
+            sum(point[0] for point in clean) / len(clean),
+            sum(point[1] for point in clean) / len(clean),
+        )
+    return cx / (3.0 * area_twice), cz / (3.0 * area_twice)
+
+
+def convex_hull(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    unique = sorted({(round(point[0], 6), round(point[1], 6)) for point in points})
+    if len(unique) <= 1:
+        return [(float(point[0]), float(point[1])) for point in unique]
+
+    def cross(o: tuple[float, float], a: tuple[float, float], b: tuple[float, float]) -> float:
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+    lower: list[tuple[float, float]] = []
+    for point in unique:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], point) <= 1e-9:
+            lower.pop()
+        lower.append(point)
+
+    upper: list[tuple[float, float]] = []
+    for point in reversed(unique):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], point) <= 1e-9:
+            upper.pop()
+        upper.append(point)
+
+    return [(float(point[0]), float(point[1])) for point in lower[:-1] + upper[:-1]]
+
+
+def pad_polygon_from_centroid(
+    poly: list[tuple[float, float]],
+    padding_m: float,
+) -> list[tuple[float, float]]:
+    if padding_m <= 0.0 or len(poly) < 3:
+        return poly
+    center = polygon_centroid(poly)
+    padded: list[tuple[float, float]] = []
+    for point in poly:
+        vx = point[0] - center[0]
+        vz = point[1] - center[1]
+        length = math.sqrt(vx * vx + vz * vz)
+        if length <= 1e-9:
+            padded.append(point)
+        else:
+            padded.append((point[0] + vx / length * padding_m, point[1] + vz / length * padding_m))
+    return padded
 
 
 def normalize(v: tuple[float, float]) -> tuple[float, float]:
@@ -226,6 +290,18 @@ def continuity_link_records(lane_graph: dict[str, Any]) -> list[dict[str, Any]]:
     return [dict(link) for link in lane_graph.get("continuity_links", [])]
 
 
+def junction_lane_link_records(junction: dict[str, Any]) -> list[dict[str, Any]]:
+    records = []
+    for connection in junction.get("connections", []):
+        for link in connection.get("lane_links", []):
+            item = dict(link)
+            item["junction_id"] = junction.get("junction_id", "")
+            item["connection_id"] = connection.get("connection_id", "")
+            item["connection_turn"] = connection.get("turn", "")
+            records.append(item)
+    return records
+
+
 def lane_trim_roles(lane_links: list[dict[str, Any]]) -> tuple[set[str], set[str]]:
     trim_end_lanes = {str(link.get("from_lane") or "") for link in lane_links}
     trim_start_lanes = {str(link.get("to_lane") or "") for link in lane_links}
@@ -287,6 +363,76 @@ def lane_trim_distances(
             corner_trimmed_lanes.add(to_lane)
 
     return trim_by_lane, corner_trimmed_lanes
+
+
+def surface_widths(record: dict[str, Any]) -> tuple[float, float, float]:
+    width = max(0.1, float(record.get("width_m") or DEFAULT_LANE_WIDTH_M))
+    width_start = max(0.1, float(record.get("width_start_m") or width))
+    width_end = max(0.1, float(record.get("width_end_m") or width))
+    return width, width_start, width_end
+
+
+def junction_envelope_feature(junction: dict[str, Any]) -> dict[str, Any] | None:
+    links = junction_lane_link_records(junction)
+    if not links:
+        return None
+
+    envelope_points: list[tuple[float, float]] = []
+    turn_counts: Counter = Counter()
+    link_ids: list[str] = []
+    connection_ids: set[str] = set()
+    max_width = DEFAULT_LANE_WIDTH_M
+    min_curve_length = float("inf")
+    max_curve_length = 0.0
+
+    for link in links:
+        points = as_points(link.get("connecting_curve_xz") or [])
+        if len(points) < 2:
+            continue
+        width, width_start, width_end = surface_widths(link)
+        max_width = max(max_width, width_start, width_end)
+        ribbon = tapered_ribbon_polygon(points, width_start, width_end)
+        if len(ribbon) < 4:
+            continue
+        envelope_points.extend(ribbon[:-1] if ribbon[0] == ribbon[-1] else ribbon)
+        turn = str(link.get("turn") or link.get("connection_turn") or "unknown")
+        turn_counts[turn] += 1
+        link_ids.append(str(link.get("lane_link_id") or ""))
+        if link.get("connection_id"):
+            connection_ids.add(str(link.get("connection_id")))
+        curve_length = polyline_length(points)
+        min_curve_length = min(min_curve_length, curve_length)
+        max_curve_length = max(max_curve_length, curve_length)
+
+    hull = convex_hull(envelope_points)
+    if len(hull) < 3:
+        return None
+    hull = pad_polygon_from_centroid(hull, JUNCTION_ENVELOPE_PADDING_M)
+    area = polygon_area(hull)
+    if area <= 0.01:
+        return None
+
+    return {
+        "type": "Feature",
+        "geometry": {"type": "Polygon", "coordinates": round_polygon(hull)},
+        "properties": {
+            "vc_part": "junction_envelope_surface_v1",
+            "junction_id": junction.get("junction_id", ""),
+            "node_id": junction.get("node_id", ""),
+            "junction_type": junction.get("type", ""),
+            "incident_roads": list(junction.get("incident_roads", [])),
+            "connection_count": len(connection_ids),
+            "lane_link_count": len(link_ids),
+            "lane_link_ids": [link_id for link_id in link_ids if link_id],
+            "turn_counts": dict(sorted(turn_counts.items())),
+            "width_m": round(max_width, 3),
+            "padding_m": JUNCTION_ENVELOPE_PADDING_M,
+            "area_m2": round(area, 3),
+            "min_curve_length_m": round(min_curve_length, 3) if min_curve_length < float("inf") else 0.0,
+            "max_curve_length_m": round(max_curve_length, 3),
+            "source": "lane_link_ribbon_convex_envelope",
+        },
+    }
 
 
 def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -353,6 +499,20 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         })
         counts["lane_surfaces"] += 1
         area_by_part["lane_surface_v1"] += area
+
+    junction_envelope_areas: list[float] = []
+    for junction in lane_graph.get("junctions", []):
+        if not junction_lane_link_records(junction):
+            continue
+        feature = junction_envelope_feature(junction)
+        if feature is None:
+            counts["skipped_junction_envelope_surface"] += 1
+            continue
+        area = float((feature.get("properties") or {}).get("area_m2") or 0.0)
+        features.append(feature)
+        counts["junction_envelope_surfaces"] += 1
+        area_by_part["junction_envelope_surface_v1"] += area
+        junction_envelope_areas.append(area)
 
     for link in lane_links:
         points = as_points(link.get("connecting_curve_xz") or [])
@@ -451,6 +611,12 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
             / max(1, counts["lane_continuity_surfaces"]),
             3,
         ),
+        "avg_junction_envelope_area_m2": round(
+            sum(junction_envelope_areas) / max(1, len(junction_envelope_areas)),
+            3,
+        ),
+        "max_junction_envelope_area_m2": round(max(junction_envelope_areas), 3) if junction_envelope_areas else 0.0,
+        "junction_envelope_padding_m": JUNCTION_ENVELOPE_PADDING_M,
         "area_by_part_m2": {key: round(value, 3) for key, value in area_by_part.items()},
         "total_area_m2": round(sum(area_by_part.values()), 3),
     }
@@ -466,7 +632,7 @@ def write_geojson(path: Path, area_id: str, lane_graph: dict[str, Any]) -> dict[
             "schema": "road_test_pipeline.lane_surfaces_v1",
             "coord_domain": "local_xz_m",
             "source": "lane_graph.json",
-            "design_note": "First lane-level surface pass; junction envelope, curbs and markings are deferred.",
+            "design_note": "First lane-level surface pass with conservative junction envelopes; curbs, islands and markings are deferred.",
         },
         "features": features,
     })
@@ -482,6 +648,14 @@ def obj_face_indices(vertices: list[tuple[float, float, float]], polygon: list[l
     return list(range(start, start + len(clean)))
 
 
+def obj_y_for_part(part: str) -> float:
+    if part == "junction_envelope_surface_v1":
+        return 0.01
+    if part == "lane_surface_v1":
+        return 0.02
+    return 0.05
+
+
 def write_obj(path: Path, features: list[dict[str, Any]]) -> dict[str, int]:
     path.parent.mkdir(parents=True, exist_ok=True)
     vertices: list[tuple[float, float, float]] = []
@@ -495,7 +669,7 @@ def write_obj(path: Path, features: list[dict[str, Any]]) -> dict[str, int]:
         rings = geom.get("coordinates") or []
         if not rings:
             continue
-        face = obj_face_indices(vertices, rings[0], 0.02 if group == "lane_surface_v1" else 0.05)
+        face = obj_face_indices(vertices, rings[0], obj_y_for_part(group))
         faces_by_group.append((group, face))
 
     with path.open("w", encoding="utf-8") as f:
@@ -577,6 +751,10 @@ def write_svg(path: Path, area_id: str, features: list[dict[str, Any]]) -> None:
             fill = "#CBD5E1"
             opacity = "0.32"
             stroke = "#94A3B8"
+        elif part == "junction_envelope_surface_v1":
+            fill = "#E11D48"
+            opacity = "0.18"
+            stroke = "#BE123C"
         elif part == "lane_continuity_surface_v1":
             fill = "#0F766E"
             opacity = "0.42"
@@ -633,8 +811,9 @@ def generate(area_id: str, root: Path) -> dict[str, Any]:
         "notes": [
             "Approach lane surfaces use optimized trimmed centerlines when available; raw fallback still trims near junctions using laneLink membership.",
             "LaneLink turn surfaces are generated from connector curves.",
+            "Junction envelope surfaces are conservative convex envelopes derived from laneLink ribbon boundaries.",
             "Continuity surfaces are generated from optimized corner fillet lane links for degree-2 road bends.",
-            "Junction envelope, curb, island, sidewalk and marking generation are deferred.",
+            "Curb, island, sidewalk and marking generation are deferred.",
         ],
     }
     write_json(report_path, report)

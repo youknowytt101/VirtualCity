@@ -10,9 +10,9 @@
     "empty_geometry": 0,
     "duplicate_point_features": 0,
     "too_short_features": 0,
-    "total_length_m": 8325.886,
+    "total_length_m": 8325.773,
     "min_length_m": 4.009,
-    "max_length_m": 891.135
+    "max_length_m": 891.134
   },
   "tags": {
     "lanes_count": 64,

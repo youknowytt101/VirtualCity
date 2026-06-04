@@ -18,6 +18,7 @@
       --warn: #b45309;
       --danger: #b42318;
       --shadow: 0 8px 24px rgba(35, 48, 67, 0.14);
+      --cursor-triangle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M4 3 19 13 11.7 14.3 8.5 21 6.6 20.1 9.7 13.8 4 16.8Z' fill='%23000000'/%3E%3C/svg%3E") 4 3, default;
     }
 
     * {
@@ -209,11 +210,15 @@
         #f7f9fb;
       background-size: 32px 32px;
       touch-action: none;
-      cursor: grab;
+      cursor: var(--cursor-triangle);
     }
 
     .viewport.dragging {
-      cursor: grabbing;
+      cursor: var(--cursor-triangle);
+    }
+
+    .viewport.dragging * {
+      cursor: var(--cursor-triangle) !important;
     }
 
     .map-layer {
@@ -231,11 +236,51 @@
       background: #fff;
       shape-rendering: geometricPrecision;
       text-rendering: geometricPrecision;
+      cursor: var(--cursor-triangle);
+    }
+
+    .map-layer svg [data-vc-hit="true"] {
+      cursor: var(--cursor-triangle);
     }
 
     .map-layer .svg-inspector-selected {
-      filter: drop-shadow(0 0 3px rgba(244, 63, 94, 0.88));
+      filter: drop-shadow(0 0 4px rgba(217, 119, 6, 0.86));
       outline: none;
+    }
+
+    .map-layer .vc-selection-overlay {
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .map-layer .vc-selection-halo,
+    .map-layer .vc-selection-core,
+    .map-layer .vc-selection-pin {
+      pointer-events: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .map-layer .vc-selection-halo {
+      fill: none;
+      stroke: #fff7ed;
+      stroke-width: 12;
+      stroke-opacity: 0.96;
+      filter: drop-shadow(0 2px 5px rgba(15, 23, 42, 0.35));
+    }
+
+    .map-layer .vc-selection-core {
+      fill: none;
+      stroke: #f59e0b;
+      stroke-width: 5;
+      stroke-opacity: 1;
+    }
+
+    .map-layer .vc-selection-pin {
+      fill: #111827;
+      stroke: #fff7ed;
+      stroke-width: 2;
     }
 
     .map-info {
@@ -528,6 +573,182 @@
       text-transform: uppercase;
     }
 
+    .lane-upgrade-panel {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(213, 220, 229, 0.55);
+      background: rgba(248, 250, 252, 0.72);
+    }
+
+    .lane-upgrade-title {
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 750;
+      line-height: 1.25;
+    }
+
+    .lane-upgrade-note {
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.35;
+    }
+
+    .lane-upgrade-status {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 8px;
+      color: #334155;
+      font-size: 10.5px;
+      line-height: 1.35;
+    }
+
+    .lane-upgrade-status strong {
+      color: var(--accent-strong);
+      font-weight: 750;
+    }
+
+    .lane-upgrade-actions {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .lane-upgrade-actions button,
+    .lane-upgrade-copy {
+      width: auto;
+      height: 30px;
+      min-width: 0;
+      padding: 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .lane-upgrade-copy {
+      justify-self: start;
+      border-color: rgba(15, 118, 110, 0.45);
+      background: #e9f6f4;
+      color: var(--accent-strong);
+    }
+
+    .lane-upgrade-secondary {
+      justify-self: start;
+      background: #ffffff;
+      color: #475569;
+    }
+
+    .lane-upgrade-output {
+      width: 100%;
+      min-height: 120px;
+      max-height: 190px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 8px;
+      background: #fff;
+      color: #263445;
+      font: 10.5px/1.35 "Cascadia Mono", Consolas, monospace;
+      white-space: pre;
+      overflow: auto;
+    }
+
+    .hit-stack-panel {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 7px;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(213, 220, 229, 0.55);
+      background: rgba(248, 250, 252, 0.72);
+    }
+
+    .hit-stack-title {
+      color: #475569;
+      font-size: 10px;
+      font-weight: 750;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    .hit-stack-summary {
+      justify-content: flex-start;
+      width: 100%;
+      height: 28px;
+      padding: 0 8px;
+      border-color: rgba(148, 163, 184, 0.42);
+      background: rgba(255, 255, 255, 0.82);
+      color: #334155;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .hit-stack-list {
+      display: grid;
+      gap: 5px;
+    }
+
+    .hit-stack-list[hidden] {
+      display: none;
+    }
+
+    .hit-stack-option {
+      justify-content: flex-start;
+      width: 100%;
+      height: auto;
+      min-height: 28px;
+      padding: 5px 8px;
+      border-color: rgba(180, 83, 9, 0.28);
+      background: rgba(255, 255, 255, 0.78);
+      color: #3d4652;
+      font-size: 11px;
+      font-weight: 650;
+      line-height: 1.25;
+      text-align: left;
+    }
+
+    .hit-stack-option.active {
+      border-color: rgba(217, 119, 6, 0.62);
+      background: #fffbeb;
+      color: #78350f;
+      box-shadow: inset 3px 0 0 #f59e0b;
+    }
+
+    .inspector-details-panel {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: 7px;
+      padding: 8px 12px 10px;
+      border-bottom: 1px solid rgba(213, 220, 229, 0.55);
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .inspector-details-toggle {
+      justify-content: flex-start;
+      width: 100%;
+      height: 28px;
+      padding: 0 8px;
+      border-color: rgba(148, 163, 184, 0.42);
+      background: rgba(248, 250, 252, 0.9);
+      color: #475569;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .inspector-details-body {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      border: 1px solid rgba(213, 220, 229, 0.7);
+      border-radius: 7px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .inspector-details-body[hidden] {
+      display: none;
+    }
+
     .score-ready {
       color: var(--accent-strong);
     }
@@ -606,6 +827,18 @@
       <input id="rawRoadsToggle" type="checkbox">
       <span>Raw</span>
     </label>
+    <label class="toggle" title="Show topology-repaired roads">
+      <input id="repairedRoadsToggle" type="checkbox">
+      <span>Repaired</span>
+    </label>
+    <label class="toggle" title="Show canonical roads">
+      <input id="canonicalRoadsToggle" type="checkbox" checked>
+      <span>Canonical</span>
+    </label>
+    <label class="toggle" title="Show corner optimization candidates">
+      <input id="cornerCandidatesToggle" type="checkbox" checked>
+      <span>Corners</span>
+    </label>
     <label class="field" title="刷新间隔">
       <span>ms</span>
       <input id="intervalInput" type="number" min="500" step="500" value="1500">
@@ -640,6 +873,8 @@
         <div class="legend-item" style="color:#000000"><span class="legend-line"></span><span>raw roads（原始道路）</span></div>
         <div class="legend-item" style="color:#000000"><span class="legend-dot" style="background:#000000;border-color:#ffffff;box-shadow:0 0 0 1px #000000"></span><span>raw vertices（原始全部断点）</span></div>
         <div class="legend-item" style="color:#ef4444"><span class="legend-dot" style="background:#ef4444;border-color:#ffffff;box-shadow:0 0 0 1px #ef4444"></span><span>topology issues（拓扑问题）</span></div>
+        <div class="legend-item" style="color:#2563eb"><span class="legend-line dashed"></span><span>repaired roads</span></div>
+        <div class="legend-item" style="color:#e11d48"><span class="legend-line"></span><span>canonical roads</span></div>
       </div>
     </section>
     <section id="mapInspector" class="map-inspector" aria-label="SVG inspection panel">
@@ -673,6 +908,9 @@
     const intervalInput = document.getElementById("intervalInput");
     const autoRefresh = document.getElementById("autoRefresh");
     const rawRoadsToggle = document.getElementById("rawRoadsToggle");
+    const repairedRoadsToggle = document.getElementById("repairedRoadsToggle");
+    const canonicalRoadsToggle = document.getElementById("canonicalRoadsToggle");
+    const cornerCandidatesToggle = document.getElementById("cornerCandidatesToggle");
     const mapInspector = document.getElementById("mapInspector");
     const inspectorKicker = document.getElementById("inspectorKicker");
     const inspectorTitle = document.getElementById("inspectorTitle");
@@ -704,8 +942,17 @@
       scoringMeta: null,
       scoringState: "idle",
       selectedElement: null,
-      selectedRef: null
+      selectedRef: null,
+      selectionOverlay: null,
+      hitStackKey: "",
+      hitStackIndex: 0,
+      fixedSizingFrame: 0,
+      fixedSizingScale: 0,
+      suppressMouseSelectionUntil: 0,
+      suppressMouseSelectionPoint: null
     };
+
+    const SVG_NS = "http://www.w3.org/2000/svg";
 
     const KIND_LABELS = {
       lane: "Lane（车道）",
@@ -714,6 +961,9 @@
       compound_corridor: "Compound corridor（复合通行走廊）",
       compound_anchor: "Compound anchor（复合锚点）",
       raw_road: "Raw road（原始道路）",
+      repaired_road: "Repaired road",
+      canonical_road: "Canonical road",
+      corner_candidate: "Corner candidate（转角候选）",
       raw_road_endpoint: "Raw endpoint（原始断点）",
       raw_road_vertex: "Raw vertex（原始顶点 / 断点）",
       raw_topology_issue: "Raw topology issue（原始拓扑问题）",
@@ -725,14 +975,40 @@
       id: "ID（编号）",
       laneId: "lane_id（车道编号）",
       edgeId: "edge_id（道路边编号）",
+      roadGraphEdgeId: "road_graph_edge_id",
       sourceFeatureId: "source_feature_id（源要素编号）",
+      canonicalRoadId: "canonical_road_id",
+      sourceFeatureIds: "source_feature_ids",
+      repairedSourceFeatureIds: "repaired_source_feature_ids",
+      repairEdgeIds: "repair_edge_ids",
       partIndex: "part_index（分段编号）",
       pointIndex: "point_index（点序号）",
       highway: "highway（道路等级）",
+      roadClass: "road_class",
       roadName: "name（道路名称）",
       lanes: "lanes（源车道数）",
+      widthM: "width_m",
       oneway: "oneway（源单行标记）",
+      canonicalEdgeCount: "canonical_edge_count",
+      canonicalLengthM: "canonical_length_m",
+      canonicalOps: "canonical_ops",
+      repairOps: "repair_ops",
       diagnosticId: "diagnostic_id（诊断编号）",
+      cornerId: "corner_id",
+      candidateType: "candidate_type",
+      riskLevel: "risk_level",
+      recommendedAction: "recommended_action",
+      nodeId: "node_id",
+      fromEdgeId: "from_edge_id",
+      toEdgeId: "to_edge_id",
+      sourceEdgeId: "source_edge_id",
+      fromCanonicalRoadId: "from_canonical_road_id",
+      toCanonicalRoadId: "to_canonical_road_id",
+      turnAngleDeg: "turn_angle_deg",
+      interiorAngleDeg: "interior_angle_deg",
+      suggestedCutM: "suggested_cut_m",
+      suggestedRadiusM: "suggested_radius_m",
+      nearestJunctionDistanceM: "nearest_junction_distance_m",
       classification: "classification（分类）",
       severity: "severity（严重度）",
       issueType: "issue_type（问题类型）",
@@ -772,13 +1048,39 @@
       "id",
       "laneId",
       "edgeId",
+      "roadGraphEdgeId",
       "sourceFeatureId",
+      "canonicalRoadId",
+      "sourceFeatureIds",
+      "repairedSourceFeatureIds",
+      "repairEdgeIds",
       "partIndex",
       "pointIndex",
+      "cornerId",
+      "candidateType",
+      "riskLevel",
+      "recommendedAction",
+      "nodeId",
+      "fromEdgeId",
+      "toEdgeId",
+      "sourceEdgeId",
+      "fromCanonicalRoadId",
+      "toCanonicalRoadId",
+      "turnAngleDeg",
+      "interiorAngleDeg",
+      "suggestedCutM",
+      "suggestedRadiusM",
+      "nearestJunctionDistanceM",
       "highway",
+      "roadClass",
       "roadName",
       "lanes",
+      "widthM",
       "oneway",
+      "canonicalEdgeCount",
+      "canonicalLengthM",
+      "canonicalOps",
+      "repairOps",
       "diagnosticId",
       "classification",
       "severity",
@@ -804,10 +1106,41 @@
       "tooltip"
     ];
 
+    Object.assign(FIELD_LABELS, {
+      laneIndex: "lane_index",
+      laneUpgradeId: "lane_upgrade_id",
+      laneUpgradeTargetPhysicalLaneCount: "upgrade_target_lanes",
+      laneUpgradeDistributionPolicy: "upgrade_distribution",
+      laneSource: "lane_source",
+      physicalLaneShared: "physical_lane_shared",
+      roadWidthM: "road_width_m",
+      sourceObservationLanes: "source_lanes",
+      sourceObservationLanesSource: "source_lanes_source"
+    });
+    INSPECT_FIELD_ORDER.splice(
+      4,
+      0,
+      "laneIndex",
+      "laneUpgradeId",
+      "laneUpgradeTargetPhysicalLaneCount",
+      "laneUpgradeDistributionPolicy",
+      "laneSource",
+      "physicalLaneShared",
+      "roadWidthM",
+      "sourceObservationLanes",
+      "sourceObservationLanesSource"
+    );
+
     function defaultScoringPath(path) {
       const fileName = String(path || "").split("/").pop() || "";
       const match = fileName.match(/^(.+)_lane_graph_topology\.svg$/);
       return match ? `${match[1]}_movement_corridor_scoring_viewer.json` : "";
+    }
+
+    function areaIdFromSvgPath(path) {
+      const fileName = String(path || "").split("/").pop() || "";
+      const match = fileName.match(/^(.+)_lane_graph_topology\.svg$/);
+      return match ? match[1] : "pattaya_central_500m";
     }
 
     function clamp(value, min, max) {
@@ -846,6 +1179,133 @@
       }
       const parsed = Number(String(value).replace("px", ""));
       return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+    }
+
+    function screenScale() {
+      const size = viewportSize();
+      return size.width / Math.max(1e-6, state.view.width);
+    }
+
+    function svgUnitsPerScreenPixel() {
+      return 1 / Math.max(1e-6, screenScale());
+    }
+
+    function circleVisualRadiusPx(element) {
+      const kind = element.dataset.vcKind || "";
+      if (kind === "movement_anchor" || kind === "compound_anchor") {
+        return 4.2;
+      }
+      if (kind === "corner_candidate") {
+        return 5.0;
+      }
+      if (kind === "raw_topology_issue") {
+        return 5.0;
+      }
+      if (kind === "raw_road_endpoint") {
+        return 3.2;
+      }
+      if (kind === "raw_road_vertex") {
+        return 2.8;
+      }
+      return clamp(Number(element.dataset.vcBaseRadiusPx) || Number(element.getAttribute("r")) || 3.5, 2.8, 5.0);
+    }
+
+    function circleVisualStrokePx(element) {
+      const kind = element.dataset.vcKind || "";
+      if (kind === "raw_road_vertex") {
+        return 0.9;
+      }
+      if (kind === "raw_road_endpoint") {
+        return 1.0;
+      }
+      if (kind === "movement_anchor" || kind === "compound_anchor") {
+        return 1.3;
+      }
+      if (kind === "corner_candidate") {
+        return 1.4;
+      }
+      return 1.2;
+    }
+
+    function circleHitRadiusPx(element) {
+      const kind = element.dataset.vcKind || "";
+      if (kind === "raw_topology_issue") {
+        return 15;
+      }
+      if (kind === "corner_candidate") {
+        return 16;
+      }
+      if (kind === "movement_anchor" || kind === "compound_anchor") {
+        return 13;
+      }
+      if (kind === "raw_road_endpoint" || kind === "raw_road_vertex") {
+        return 11;
+      }
+      return 12;
+    }
+
+    function lineHitWidthPx(element) {
+      const kind = element.dataset.vcKind || "";
+      const layer = element.dataset.vcLayer || "";
+      if (layer === "canonical_roads") {
+        return 16;
+      }
+      if (layer === "repaired_roads" || layer === "raw_roads") {
+        return 14;
+      }
+      if (kind === "movement_corridor" || kind === "compound_corridor") {
+        return 15;
+      }
+      if (kind === "corner_candidate") {
+        return 16;
+      }
+      if (kind === "lane") {
+        return 12;
+      }
+      return 12;
+    }
+
+    function setSvgPixelLength(element, attribute, pixels) {
+      element.setAttribute(attribute, String(rounded(pixels * svgUnitsPerScreenPixel())));
+    }
+
+    function applyFixedScreenSizing(force = false) {
+      if (!state.svg) {
+        return;
+      }
+      const scale = screenScale();
+      if (!force && Math.abs(scale - state.fixedSizingScale) < 0.0001) {
+        return;
+      }
+      state.svg.querySelectorAll("circle[data-vc-kind]:not([data-vc-hit])").forEach((circle) => {
+        if (!circle.dataset.vcBaseRadiusPx) {
+          circle.dataset.vcBaseRadiusPx = circle.getAttribute("r") || "";
+        }
+        if (!circle.dataset.vcBaseStrokeWidthPx) {
+          circle.dataset.vcBaseStrokeWidthPx = circle.getAttribute("stroke-width") || "";
+        }
+        setSvgPixelLength(circle, "r", circleVisualRadiusPx(circle));
+        setSvgPixelLength(circle, "stroke-width", circleVisualStrokePx(circle));
+      });
+      state.svg.querySelectorAll('circle[data-vc-hit="true"]').forEach((circle) => {
+        const radiusPx = Number(circle.dataset.vcHitRadiusPx) || circleHitRadiusPx(circle);
+        setSvgPixelLength(circle, "r", radiusPx);
+      });
+      state.svg.querySelectorAll(".vc-selection-pin").forEach((pin) => {
+        setSvgPixelLength(pin, "r", 3.2);
+        setSvgPixelLength(pin, "stroke-width", 1.4);
+      });
+      state.fixedSizingScale = scale;
+    }
+
+    function scheduleFixedScreenSizing() {
+      if (state.fixedSizingFrame) {
+        return;
+      }
+      state.fixedSizingFrame = window.requestAnimationFrame(() => {
+        state.fixedSizingFrame = 0;
+        applyFixedScreenSizing(false);
+      });
     }
 
     function measureSvg(svg) {
@@ -910,13 +1370,209 @@
       return findElementByRef(ref) || element;
     }
 
+    function sameRef(left, right) {
+      return !!left && !!right && left.kind === right.kind && left.id === right.id;
+    }
+
+    function elementStackFromPoint(clientX, clientY, fallbackTarget = null) {
+      const seen = new Set();
+      const stack = [];
+      for (const node of document.elementsFromPoint(clientX, clientY)) {
+        const element = inspectableElement(node);
+        const ref = selectedRefFrom(element);
+        if (!ref) {
+          continue;
+        }
+        const key = `${ref.kind}:${ref.id}`;
+        if (seen.has(key)) {
+          continue;
+        }
+        seen.add(key);
+        stack.push({ element, ref });
+      }
+
+      const fallback = inspectableElement(fallbackTarget);
+      const fallbackRef = selectedRefFrom(fallback);
+      if (fallbackRef) {
+        const key = `${fallbackRef.kind}:${fallbackRef.id}`;
+        if (!seen.has(key)) {
+          stack.unshift({ element: fallback, ref: fallbackRef });
+        }
+      }
+      return stack;
+    }
+
+    function stackLabel(element, index) {
+      const data = element.dataset || {};
+      const kind = data.vcKind || "";
+      const label = KIND_LABELS[kind] || kind || "Object";
+      const id = data.vcId || data.vcLaneId || data.vcCorridorId || data.vcCompoundCaseId || "";
+      const score = scoringForData(data);
+      const scoreText = score ? ` · ${formatScore(score.best_overall_score)}` : "";
+      return `${index + 1}. ${label} · ${id}${scoreText}`;
+    }
+
+    function appendHitStackPanel(stack, activeRef) {
+      if (!Array.isArray(stack) || stack.length <= 1) {
+        return;
+      }
+      const panel = document.createElement("div");
+      panel.className = "hit-stack-panel";
+
+      const title = document.createElement("div");
+      title.className = "hit-stack-title";
+      title.textContent = "重叠选择";
+      panel.append(title);
+
+      const summary = document.createElement("button");
+      summary.type = "button";
+      summary.className = "hit-stack-summary";
+      summary.textContent = `还有 ${stack.length - 1} 个重叠对象 · 展开选择`;
+      summary.setAttribute("aria-expanded", "false");
+
+      const list = document.createElement("div");
+      list.className = "hit-stack-list";
+      list.hidden = true;
+      stack.slice(0, 12).forEach((item, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "hit-stack-option";
+        if (sameRef(item.ref, activeRef)) {
+          button.classList.add("active");
+        }
+        button.textContent = stackLabel(item.element, index);
+        button.title = titleText(visibleElementFor(item.element)) || titleText(item.element);
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          showInspection(item.element, stack);
+        });
+        list.append(button);
+      });
+      summary.addEventListener("click", (event) => {
+        event.stopPropagation();
+        list.hidden = !list.hidden;
+        summary.setAttribute("aria-expanded", list.hidden ? "false" : "true");
+        summary.textContent = list.hidden
+          ? `还有 ${stack.length - 1} 个重叠对象 · 展开选择`
+          : "收起重叠对象";
+      });
+      panel.append(summary, list);
+      inspectorBody.append(panel);
+    }
+
+    function removeSelectionOverlay() {
+      if (state.selectionOverlay) {
+        state.selectionOverlay.remove();
+        state.selectionOverlay = null;
+      }
+      state.svg?.querySelector("#vc-selection-overlay")?.remove();
+    }
+
+    function resetSelectionClone(clone) {
+      Array.from(clone.attributes).forEach((attribute) => {
+        if (
+          attribute.name.startsWith("data-vc-") ||
+          [
+            "id",
+            "class",
+            "style",
+            "filter",
+            "opacity",
+            "stroke",
+            "stroke-width",
+            "stroke-opacity",
+            "stroke-dasharray",
+            "fill",
+            "fill-opacity",
+            "pointer-events"
+          ].includes(attribute.name)
+        ) {
+          clone.removeAttribute(attribute.name);
+        }
+      });
+      clone.setAttribute("aria-hidden", "true");
+      clone.setAttribute("pointer-events", "none");
+    }
+
+    function selectionClone(element, className) {
+      const clone = element.cloneNode(false);
+      resetSelectionClone(clone);
+      clone.setAttribute("class", className);
+      return clone;
+    }
+
+    function pointFromPair(pair) {
+      const [x, y] = String(pair || "").split(",").map(Number);
+      return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
+    }
+
+    function selectionEndPoints(element) {
+      const tag = element.tagName.toLowerCase();
+      if (tag === "line") {
+        const x1 = Number(element.getAttribute("x1"));
+        const y1 = Number(element.getAttribute("y1"));
+        const x2 = Number(element.getAttribute("x2"));
+        const y2 = Number(element.getAttribute("y2"));
+        if ([x1, y1, x2, y2].every(Number.isFinite)) {
+          return [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+        }
+      }
+      if (tag === "polyline" || tag === "polygon") {
+        const points = String(element.getAttribute("points") || "")
+          .trim()
+          .split(/\s+/)
+          .map(pointFromPair)
+          .filter(Boolean);
+        if (points.length >= 2) {
+          return [points[0], points[points.length - 1]];
+        }
+      }
+      return [];
+    }
+
+    function appendSelectionPins(overlay, element) {
+      for (const point of selectionEndPoints(element)) {
+        const pin = state.svg.ownerDocument.createElementNS(SVG_NS, "circle");
+        pin.setAttribute("class", "vc-selection-pin");
+        pin.setAttribute("cx", String(point.x));
+        pin.setAttribute("cy", String(point.y));
+        pin.setAttribute("r", "2.8");
+        pin.setAttribute("aria-hidden", "true");
+        pin.setAttribute("pointer-events", "none");
+        overlay.appendChild(pin);
+      }
+    }
+
+    function drawSelectionOverlay(element) {
+      if (!state.svg || !element) {
+        return;
+      }
+      const tag = element.tagName.toLowerCase();
+      if (!["polyline", "line", "path", "circle", "polygon"].includes(tag)) {
+        return;
+      }
+      const overlay = state.svg.ownerDocument.createElementNS(SVG_NS, "g");
+      overlay.setAttribute("id", "vc-selection-overlay");
+      overlay.setAttribute("class", "vc-selection-overlay");
+      overlay.setAttribute("aria-hidden", "true");
+      overlay.setAttribute("pointer-events", "none");
+      overlay.appendChild(selectionClone(element, "vc-selection-halo"));
+      overlay.appendChild(selectionClone(element, "vc-selection-core"));
+      appendSelectionPins(overlay, element);
+      state.svg.appendChild(overlay);
+      state.selectionOverlay = overlay;
+      applyFixedScreenSizing(true);
+    }
+
     function setSelectedElement(element) {
       if (state.selectedElement && state.selectedElement !== element) {
         state.selectedElement.classList.remove("svg-inspector-selected");
       }
+      removeSelectionOverlay();
       state.selectedElement = element;
       if (state.selectedElement) {
         state.selectedElement.classList.add("svg-inspector-selected");
+        drawSelectionOverlay(state.selectedElement);
       }
     }
 
@@ -951,6 +1607,476 @@
       valueNode.className = "inspector-value code multiline";
       valueNode.textContent = String(value);
       inspectorBody.append(labelNode, valueNode);
+    }
+
+    function appendRowTo(container, label, value, code = false) {
+      if (value === undefined || value === null || value === "") {
+        return;
+      }
+      const labelNode = document.createElement("div");
+      labelNode.className = "inspector-label";
+      labelNode.textContent = label;
+      const valueNode = document.createElement("div");
+      valueNode.className = code ? "inspector-value code" : "inspector-value";
+      valueNode.textContent = String(value);
+      container.append(labelNode, valueNode);
+    }
+
+    function appendSourceAttributesPanel(data) {
+      const panel = document.createElement("div");
+      panel.className = "inspector-details-panel";
+
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "inspector-details-toggle";
+      toggle.textContent = "技术详情 / 源属性";
+      toggle.setAttribute("aria-expanded", "false");
+
+      const body = document.createElement("div");
+      body.className = "inspector-details-body";
+      body.hidden = true;
+
+      for (const key of INSPECT_FIELD_ORDER) {
+        const datasetKey = `vc${key[0].toUpperCase()}${key.slice(1)}`;
+        appendRowTo(body, FIELD_LABELS[key] || key, data[datasetKey] || data[key]);
+      }
+
+      toggle.addEventListener("click", (event) => {
+        event.stopPropagation();
+        body.hidden = !body.hidden;
+        toggle.setAttribute("aria-expanded", body.hidden ? "false" : "true");
+        toggle.textContent = body.hidden ? "技术详情 / 源属性" : "收起技术详情";
+      });
+
+      panel.append(toggle, body);
+      inspectorBody.append(panel);
+    }
+
+    function roadGraphIdFromCanonical(canonicalRoadId) {
+      const match = String(canonicalRoadId || "").match(/^cr_(\d+)$/);
+      return match ? `e_${match[1]}` : "";
+    }
+
+    function laneForgeRoadIdFromData(data) {
+      const kind = data.vcKind || "";
+      if (data.vcRoadGraphEdgeId) {
+        return data.vcRoadGraphEdgeId;
+      }
+      if (kind === "canonical_road") {
+        return roadGraphIdFromCanonical(data.vcCanonicalRoadId);
+      }
+      if (kind === "lane") {
+        return data.vcEdgeId || data.vcRoadId || "";
+      }
+      return "";
+    }
+
+    function laneForgeTransactionText(data, targetLaneCount) {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const roadId = laneForgeRoadIdFromData(data);
+      const canonicalRoadId = data.vcCanonicalRoadId || "";
+      const now = new Date().toISOString();
+      const canonicalCliArg = canonicalRoadId ? ` --canonical-road-id ${canonicalRoadId}` : "";
+      const createCliCommand = `python scripts\\create_lane_upgrade_transaction.py --area-id ${areaId} --road-id ${roadId}${canonicalCliArg} --target-lane-count ${targetLaneCount} --reason "web menu lane upgrade"`;
+      const executeCliCommand = `python scripts\\execute_lane_upgrade.py --area-id ${areaId} --road-id ${roadId}${canonicalCliArg} --target-lane-count ${targetLaneCount} --reason "web menu lane upgrade"`;
+      const transaction = {
+        type: "lane_upgrade_transaction_request",
+        metadata: {
+          area_id: areaId,
+          schema: "lane_upgrade_system.transaction_request.v1",
+          system: "LaneForge",
+          created_at_utc: now,
+          source_surface: "svg_live_viewer"
+        },
+        request: {
+          action: "set_road_physical_lane_count",
+          road_id: roadId,
+          canonical_road_id: canonicalRoadId,
+          target_physical_lane_count: targetLaneCount,
+          distribution_policy: "balanced_bidirectional_left_traffic_v1",
+          source: "web_lane_count_menu",
+          reason: `viewer request: set ${roadId || canonicalRoadId} to ${targetLaneCount} physical lanes`,
+          reviewer: "web_user"
+        },
+        next_cli_command: executeCliCommand,
+        create_transaction_cli_command: createCliCommand,
+        execute_cli_command: executeCliCommand
+      };
+      return JSON.stringify(transaction, null, 2);
+    }
+
+    async function copyText(text) {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+      return false;
+    }
+
+    function appendLaneUpgradePanel(data) {
+      const roadId = laneForgeRoadIdFromData(data);
+      const kind = data.vcKind || "";
+      if (!roadId && kind !== "canonical_road") {
+        return;
+      }
+
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "LaneForge 车道升级";
+      panel.append(title);
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      if (roadId) {
+        note.textContent = `Road ${roadId}：选择 1/2/3/4 物理车道，生成升级事务请求。网页只发起事务，不直接改道路真值。`;
+      } else {
+        note.textContent = "请优先选择 Canonical road；当前对象缺少可映射到 road_graph 的 road_id。";
+      }
+      panel.append(note);
+
+      if (!roadId) {
+        inspectorBody.append(panel);
+        return;
+      }
+
+      const actions = document.createElement("div");
+      actions.className = "lane-upgrade-actions";
+      const output = document.createElement("textarea");
+      output.className = "lane-upgrade-output";
+      output.readOnly = true;
+      output.hidden = true;
+      output.setAttribute("aria-label", "LaneForge transaction request JSON");
+
+      for (const count of [1, 2, 3, 4]) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = `${count}车道`;
+        button.title = `生成 ${count} 车道升级事务`;
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          output.value = laneForgeTransactionText(data, count);
+          output.hidden = false;
+          copyButton.disabled = false;
+          copyCommandButton.disabled = false;
+        });
+        actions.append(button);
+      }
+
+      const copyButton = document.createElement("button");
+      copyButton.type = "button";
+      copyButton.className = "lane-upgrade-copy";
+      copyButton.textContent = "复制事务 JSON";
+      copyButton.disabled = true;
+      copyButton.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        if (!output.value) {
+          return;
+        }
+        const ok = await copyText(output.value);
+        copyButton.textContent = ok ? "已复制" : "请手动复制";
+        setTimeout(() => {
+          copyButton.textContent = "复制事务 JSON";
+        }, 1200);
+      });
+
+      const copyCommandButton = document.createElement("button");
+      copyCommandButton.type = "button";
+      copyCommandButton.className = "lane-upgrade-copy";
+      copyCommandButton.textContent = "复制执行命令";
+      copyCommandButton.disabled = true;
+      copyCommandButton.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        if (!output.value) {
+          return;
+        }
+        let command = "";
+        try {
+          command = JSON.parse(output.value).execute_cli_command || "";
+        } catch {
+          command = "";
+        }
+        if (!command) {
+          return;
+        }
+        const ok = await copyText(command);
+        copyCommandButton.textContent = ok ? "已复制命令" : "请手动复制";
+        setTimeout(() => {
+          copyCommandButton.textContent = "复制执行命令";
+        }, 1200);
+      });
+
+      panel.append(actions, copyButton, copyCommandButton, output);
+      inspectorBody.append(panel);
+    }
+
+    function laneForgeRequestTextV2(data, targetLaneCount, restoreDefault = false) {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const roadId = laneForgeRoadIdFromData(data);
+      const canonicalRoadId = data.vcCanonicalRoadId || "";
+      const now = new Date().toISOString();
+      const canonicalCliArg = canonicalRoadId ? ` --canonical-road-id ${canonicalRoadId}` : "";
+      const operationCliArg = restoreDefault ? "--restore-default" : `--target-lane-count ${targetLaneCount}`;
+      const reason = restoreDefault ? "web restore default lane model" : "web menu lane upgrade";
+      const createCliCommand = `python scripts\\create_lane_upgrade_transaction.py --area-id ${areaId} --road-id ${roadId}${canonicalCliArg} ${operationCliArg} --reason "${reason}"`;
+      const executeCliCommand = `python scripts\\execute_lane_upgrade.py --area-id ${areaId} --road-id ${roadId}${canonicalCliArg} ${operationCliArg} --reason "${reason}"`;
+      const request = {
+        type: "lane_upgrade_transaction_request",
+        metadata: {
+          area_id: areaId,
+          schema: "lane_upgrade_system.transaction_request.v1",
+          system: "LaneForge",
+          created_at_utc: now,
+          source_surface: "svg_live_viewer"
+        },
+        request: {
+          action: restoreDefault ? "restore_road_lane_count_default" : "set_road_physical_lane_count",
+          road_id: roadId,
+          canonical_road_id: canonicalRoadId,
+          target_physical_lane_count: restoreDefault ? 0 : targetLaneCount,
+          distribution_policy: restoreDefault ? "source_or_default_lane_model_v1" : "balanced_bidirectional_left_traffic_v1",
+          source: "web_lane_count_menu",
+          reason: restoreDefault
+            ? `viewer request: restore ${roadId || canonicalRoadId} to default lane model`
+            : `viewer request: set ${roadId || canonicalRoadId} to ${targetLaneCount} physical lanes`,
+          reviewer: "web_user"
+        },
+        next_cli_command: executeCliCommand,
+        create_transaction_cli_command: createCliCommand,
+        execute_cli_command: executeCliCommand
+      };
+      return JSON.stringify(request, null, 2);
+    }
+
+    function appendLaneUpgradePanelV2(data) {
+      const roadId = laneForgeRoadIdFromData(data);
+      const kind = data.vcKind || "";
+      if (!roadId && kind !== "canonical_road") {
+        return;
+      }
+
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "LaneForge 车道";
+      panel.append(title);
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = roadId
+        ? `Road ${roadId}：选择目标车道数，或恢复默认。网页只生成事务命令，不直接改道路真值。`
+        : "请优先选择 lane 或 canonical road；当前对象缺少 road_graph road_id。";
+      panel.append(note);
+
+      if (!roadId) {
+        inspectorBody.append(panel);
+        return;
+      }
+
+      const activeTarget = Number(data.vcLaneUpgradeTargetPhysicalLaneCount || 0);
+      const laneUpgradeId = data.vcLaneUpgradeId || "";
+      const sourceLanes = data.vcSourceObservationLanes || "";
+      const sourceLaneText = sourceLanes ? `${sourceLanes}（源数据）` : "默认规则";
+      const currentText = activeTarget > 0 ? `${activeTarget} 车道（active）` : sourceLaneText;
+      const selectedLaneText = data.vcLaneId
+        ? `${data.vcLaneId}${data.vcDirection ? ` / ${data.vcDirection}` : ""}`
+        : "road selection";
+
+      const status = document.createElement("div");
+      status.className = "lane-upgrade-status";
+      for (const [label, value] of [["当前", currentText], ["选中", selectedLaneText], ["事务", laneUpgradeId || "无 active override"]]) {
+        const key = document.createElement("strong");
+        key.textContent = label;
+        const val = document.createElement("span");
+        val.textContent = value;
+        status.append(key, val);
+      }
+      panel.append(status);
+
+      const actions = document.createElement("div");
+      actions.className = "lane-upgrade-actions";
+      const output = document.createElement("textarea");
+      output.className = "lane-upgrade-output";
+      output.readOnly = true;
+      output.hidden = true;
+      output.setAttribute("aria-label", "LaneForge transaction request JSON");
+      let selectedRequest = "";
+
+      const copyCommandButton = document.createElement("button");
+      copyCommandButton.type = "button";
+      copyCommandButton.className = "lane-upgrade-copy";
+      copyCommandButton.textContent = "先选择操作";
+      copyCommandButton.disabled = true;
+
+      const detailsButton = document.createElement("button");
+      detailsButton.type = "button";
+      detailsButton.className = "lane-upgrade-copy lane-upgrade-secondary";
+      detailsButton.textContent = "显示详情";
+      detailsButton.disabled = true;
+
+      function setRequest(label, requestText) {
+        selectedRequest = requestText;
+        output.value = selectedRequest;
+        copyCommandButton.disabled = false;
+        detailsButton.disabled = false;
+        copyCommandButton.textContent = label;
+      }
+
+      for (const count of [1, 2, 3, 4]) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = `${count}车道`;
+        button.title = `生成 ${count} 车道事务`;
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          setRequest(`复制 ${count}车道命令`, laneForgeRequestTextV2(data, count, false));
+        });
+        actions.append(button);
+      }
+
+      const restoreButton = document.createElement("button");
+      restoreButton.type = "button";
+      restoreButton.textContent = "恢复默认";
+      restoreButton.title = "移除 active override，回到源数据/默认规则";
+      restoreButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        setRequest("复制恢复命令", laneForgeRequestTextV2(data, 0, true));
+      });
+      actions.append(restoreButton);
+
+      copyCommandButton.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        if (!selectedRequest) {
+          return;
+        }
+        let command = "";
+        try {
+          command = JSON.parse(selectedRequest).execute_cli_command || "";
+        } catch {
+          command = "";
+        }
+        if (!command) {
+          return;
+        }
+        const resetLabel = copyCommandButton.textContent;
+        const ok = await copyText(command);
+        copyCommandButton.textContent = ok ? "已复制命令" : "请手动复制";
+        setTimeout(() => {
+          copyCommandButton.textContent = resetLabel;
+        }, 1200);
+      });
+
+      detailsButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        output.hidden = !output.hidden;
+        detailsButton.textContent = output.hidden ? "显示详情" : "隐藏详情";
+      });
+
+      panel.append(actions, copyCommandButton, detailsButton, output);
+      inspectorBody.append(panel);
+    }
+
+    function cornerOptimizationRequestText(data) {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const candidateId = data.vcCornerId || data.vcId || "";
+      const now = new Date().toISOString();
+      const applyCliCommand = `python scripts\\apply_corner_optimization.py --area-id ${areaId} --candidate-id ${candidateId} --reason "web corner optimization"`;
+      const request = {
+        type: "corner_optimization_application_request",
+        metadata: {
+          area_id: areaId,
+          schema: "lane_upgrade_system.corner_optimization_application_request.v1",
+          system: "LaneForge",
+          created_at_utc: now,
+          source_surface: "svg_live_viewer"
+        },
+        request: {
+          action: "apply_corner_optimization_candidate",
+          candidate_id: candidateId,
+          candidate_type: data.vcCandidateType || "",
+          risk_level: data.vcRiskLevel || "",
+          status: data.vcStatus || "",
+          node_id: data.vcNodeId || "",
+          from_edge_id: data.vcFromEdgeId || "",
+          to_edge_id: data.vcToEdgeId || "",
+          policy: "low_risk_degree2_connector_only_v1",
+          source: "web_corner_candidate_menu",
+          reason: `viewer request: apply corner optimization ${candidateId}`,
+          reviewer: "web_user"
+        },
+        apply_cli_command: applyCliCommand,
+        next_cli_command: applyCliCommand
+      };
+      return JSON.stringify(request, null, 2);
+    }
+
+    function appendCornerOptimizationPanel(data) {
+      if ((data.vcKind || "") !== "corner_candidate") {
+        return;
+      }
+      const candidateId = data.vcCornerId || data.vcId || "";
+      if (!candidateId) {
+        return;
+      }
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "LaneForge 转角优化";
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      const status = data.vcStatus || "candidate_review";
+      note.textContent = status === "accepted_active"
+        ? `Corner ${candidateId} 已进入 active geometry transaction；可以复制命令复查或重新跑 QA。`
+        : `Corner ${candidateId}：复制应用命令后，后端会创建几何事务、重建、QA、发布 package，并刷新 SVG。`;
+
+      const output = document.createElement("textarea");
+      output.className = "lane-upgrade-output";
+      output.readOnly = true;
+      output.hidden = true;
+      output.value = cornerOptimizationRequestText(data);
+      output.setAttribute("aria-label", "LaneForge corner optimization request JSON");
+
+      const copyCommandButton = document.createElement("button");
+      copyCommandButton.type = "button";
+      copyCommandButton.className = "lane-upgrade-copy";
+      copyCommandButton.textContent = "复制应用命令";
+      copyCommandButton.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        let command = "";
+        try {
+          command = JSON.parse(output.value).apply_cli_command || "";
+        } catch {
+          command = "";
+        }
+        if (!command) {
+          return;
+        }
+        const ok = await copyText(command);
+        copyCommandButton.textContent = ok ? "已复制命令" : "请手动复制";
+        setTimeout(() => {
+          copyCommandButton.textContent = "复制应用命令";
+        }, 1200);
+      });
+
+      const detailsButton = document.createElement("button");
+      detailsButton.type = "button";
+      detailsButton.className = "lane-upgrade-copy lane-upgrade-secondary";
+      detailsButton.textContent = "请求详情";
+      detailsButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        output.hidden = !output.hidden;
+        detailsButton.textContent = output.hidden ? "请求详情" : "隐藏详情";
+      });
+
+      panel.append(title, note, copyCommandButton, detailsButton, output);
+      inspectorBody.append(panel);
     }
 
     function scoreTone(score) {
@@ -1027,7 +2153,7 @@
       appendMultilineRow("candidate_scores（候选评分）", candidateSummary(caseScore));
     }
 
-    function showInspection(element) {
+    function showInspection(element, hitStack = []) {
       const data = { ...element.dataset };
       const visibleElement = visibleElementFor(element);
       const kind = data.vcKind || "unknown";
@@ -1041,13 +2167,77 @@
         ? `${caseIdFromData(data)} · score ${formatScore(caseScore.best_overall_score)}`
         : data.vcId || data.vcLaneId || data.vcCorridorId || "Selection（选中项）";
       inspectorBody.replaceChildren();
-      appendScoringRows(caseScore);
-      appendInspectorSection("Source Attributes（源数据属性）");
-      for (const key of INSPECT_FIELD_ORDER) {
-        const datasetKey = `vc${key[0].toUpperCase()}${key.slice(1)}`;
-        appendInspectorRow(FIELD_LABELS[key] || key, data[datasetKey] || data[key]);
+      appendLaneUpgradePanelV2(data);
+      appendCornerOptimizationPanel(data);
+      appendHitStackPanel(hitStack, state.selectedRef);
+      if (caseScore) {
+        appendScoringRows(caseScore);
       }
+      appendSourceAttributesPanel(data);
       mapInspector.classList.add("visible");
+    }
+
+    function inspectTarget(fallbackTarget) {
+      const element = inspectableElement(fallbackTarget);
+      if (!element) {
+        return false;
+      }
+      state.hitStackKey = "";
+      state.hitStackIndex = 0;
+      showInspection(element);
+      return true;
+    }
+
+    function hitStackKey(stack) {
+      return stack
+        .map((item) => `${item.ref.kind}:${item.ref.id}`)
+        .join("|");
+    }
+
+    function selectionPointFromEvent(event) {
+      return { x: event.clientX, y: event.clientY };
+    }
+
+    function suppressMouseSelection(event) {
+      if (!event || Date.now() > state.suppressMouseSelectionUntil || !state.suppressMouseSelectionPoint) {
+        return false;
+      }
+      return Math.hypot(
+        event.clientX - state.suppressMouseSelectionPoint.x,
+        event.clientY - state.suppressMouseSelectionPoint.y
+      ) <= 4;
+    }
+
+    function suppressMouseSelectionBriefly(event) {
+      if (!event) {
+        return;
+      }
+      state.suppressMouseSelectionUntil = Date.now() + 320;
+      state.suppressMouseSelectionPoint = selectionPointFromEvent(event);
+    }
+
+    function inspectFromPoint(event, fallbackTarget = null) {
+      if (!event) {
+        return inspectTarget(fallbackTarget);
+      }
+      try {
+        const stack = elementStackFromPoint(event.clientX, event.clientY, fallbackTarget || event.target);
+        if (stack.length) {
+          const key = hitStackKey(stack);
+          if (stack.length > 1 && key === state.hitStackKey) {
+            state.hitStackIndex = (state.hitStackIndex + 1) % stack.length;
+          } else {
+            state.hitStackKey = key;
+            state.hitStackIndex = 0;
+          }
+          const selected = stack[Math.min(state.hitStackIndex, stack.length - 1)] || stack[0];
+          showInspection(selected.element, stack);
+          return true;
+        }
+      } catch {
+        // Fall back to the original direct-target inspection path.
+      }
+      return inspectTarget(fallbackTarget || event.target);
     }
 
     function clearInspection() {
@@ -1097,9 +2287,9 @@
         return;
       }
       state.svg.setAttribute("viewBox", viewBoxString(state.view));
-      const size = viewportSize();
-      const screenScale = size.width / Math.max(1e-6, state.view.width);
-      scaleReadout.textContent = `${Math.round(screenScale * 100)}%`;
+      const scale = screenScale();
+      scaleReadout.textContent = `${Math.round(scale * 100)}%`;
+      scheduleFixedScreenSizing();
     }
 
     function viewCenter() {
@@ -1198,6 +2388,7 @@
       const items = ["SVG visual layer", "JSON source truth"];
       const linkMatch = normalized.match(/Link source:\s*([^.;]+)/i);
       items.push(linkMatch ? linkMatch[1].trim() : "movement_corridor_anchors");
+      items.push("raw / repaired / canonical overlays");
       mapInfoMeta.replaceChildren(...items.map((item) => {
         const span = document.createElement("span");
         span.textContent = item;
@@ -1224,7 +2415,30 @@
       hitLayer.setAttribute("id", "vc-hit-targets");
       hitLayer.setAttribute("aria-hidden", "true");
 
-      svg.querySelectorAll("[data-vc-kind]:not([data-vc-hit])").forEach((element) => {
+      function hitPriority(element) {
+        const kind = element.dataset.vcKind || "";
+        const layer = element.dataset.vcLayer || "";
+        if (kind === "raw_topology_issue" || kind === "raw_road_endpoint" || kind === "raw_road_vertex") {
+          return 70;
+        }
+        if (kind === "corner_candidate" || layer === "corner_optimization") {
+          return 68;
+        }
+        if (layer === "canonical_roads") {
+          return 60;
+        }
+        if (layer === "repaired_roads") {
+          return 50;
+        }
+        if (layer === "raw_roads") {
+          return 40;
+        }
+        return 10;
+      }
+
+      Array.from(svg.querySelectorAll("[data-vc-kind]:not([data-vc-hit])"))
+        .sort((a, b) => hitPriority(a) - hitPriority(b))
+        .forEach((element) => {
         const tag = element.tagName.toLowerCase();
         if (!["polyline", "line", "circle"].includes(tag)) {
           return;
@@ -1237,17 +2451,19 @@
         clone.removeAttribute("filter");
         clone.removeAttribute("class");
         if (tag === "circle") {
-          const radius = Math.max(Number(element.getAttribute("r")) * 4 || 0, 5);
-          clone.setAttribute("r", String(radius));
+          clone.dataset.vcHitRadiusPx = String(circleHitRadiusPx(element));
+          clone.setAttribute("r", "12");
           clone.setAttribute("fill", "#000");
           clone.removeAttribute("stroke");
         } else {
-          const width = Math.max(Number(element.getAttribute("stroke-width")) * 5 || 0, 8);
+          const width = lineHitWidthPx(element);
+          clone.dataset.vcHitWidthPx = String(width);
           clone.setAttribute("fill", "none");
           clone.setAttribute("stroke", "#000");
           clone.setAttribute("stroke-width", String(width));
           clone.setAttribute("stroke-linecap", "round");
           clone.setAttribute("stroke-linejoin", "round");
+          clone.setAttribute("vector-effect", "non-scaling-stroke");
         }
         hitLayer.appendChild(clone);
       });
@@ -1255,19 +2471,26 @@
       svg.appendChild(hitLayer);
     }
 
-    function setRawRoadLayerVisible(visible) {
+    function setRoadOverlayVisible(layerName, toggle, visible) {
       if (!state.svg) {
         return;
       }
-      state.svg.querySelectorAll('[data-vc-layer="raw_roads"], [data-vc-kind="raw_road"][data-vc-hit="true"]').forEach((node) => {
+      state.svg.querySelectorAll(`[data-vc-layer="${cssEscape(layerName)}"]`).forEach((node) => {
         node.style.display = visible ? "" : "none";
       });
-      const hasRawRoads = !!state.svg.querySelector('[data-vc-kind="raw_road"]:not([data-vc-hit])');
-      rawRoadsToggle.disabled = !hasRawRoads;
-      rawRoadsToggle.parentElement.style.opacity = hasRawRoads ? "1" : "0.55";
-      if (!visible && ["raw_road", "raw_road_endpoint", "raw_road_vertex", "raw_topology_issue"].includes(state.selectedRef?.kind)) {
+      const hasLayer = !!state.svg.querySelector(`[data-vc-layer="${cssEscape(layerName)}"]:not([data-vc-hit])`);
+      toggle.disabled = !hasLayer;
+      toggle.parentElement.style.opacity = hasLayer ? "1" : "0.55";
+      if (!visible && state.selectedElement?.dataset?.vcLayer === layerName) {
         clearInspection();
       }
+    }
+
+    function syncRoadOverlayVisibility() {
+      setRoadOverlayVisible("raw_roads", rawRoadsToggle, rawRoadsToggle.checked);
+      setRoadOverlayVisible("repaired_roads", repairedRoadsToggle, repairedRoadsToggle.checked);
+      setRoadOverlayVisible("canonical_roads", canonicalRoadsToggle, canonicalRoadsToggle.checked);
+      setRoadOverlayVisible("corner_optimization", cornerCandidatesToggle, cornerCandidatesToggle.checked);
     }
 
     function prepareSvg(svg) {
@@ -1307,7 +2530,8 @@
       mapLayer.replaceChildren(document.importNode(svg, true));
       state.svg = mapLayer.querySelector("svg");
       state.sourceView = sourceView;
-      setRawRoadLayerVisible(rawRoadsToggle.checked);
+      state.fixedSizingScale = 0;
+      syncRoadOverlayVisibility();
       emptyState.classList.remove("visible");
       restoreInspection();
 
@@ -1481,31 +2705,30 @@
       endDrag(event);
       state.pointerDownTarget = null;
       if (!wasDrag) {
-        const element = inspectableElement(target);
-        if (element) {
-          showInspection(element);
+        if (inspectFromPoint(event, target)) {
+          suppressMouseSelectionBriefly(event);
         }
       }
     });
     viewport.addEventListener("mouseup", (event) => {
+      if (suppressMouseSelection(event)) {
+        return;
+      }
       const target = inspectableElement(event.target) ? event.target : state.pointerDownTarget;
       const distance = Math.hypot(event.clientX - state.dragStartX, event.clientY - state.dragStartY);
       if (distance <= 3) {
-        const element = inspectableElement(target);
-        if (element) {
-          showInspection(element);
-        }
+        inspectFromPoint(event, target);
       }
     });
     viewport.addEventListener("click", (event) => {
+      if (suppressMouseSelection(event)) {
+        return;
+      }
       if (state.dragMoved) {
         state.dragMoved = false;
         return;
       }
-      const element = inspectableElement(event.target);
-      if (element) {
-        showInspection(element);
-      }
+      inspectFromPoint(event, event.target);
     });
     viewport.addEventListener("pointercancel", endDrag);
     viewport.addEventListener("lostpointercapture", endDrag);
@@ -1526,7 +2749,10 @@
     document.getElementById("reloadBtn").addEventListener("click", () => loadSvg(true));
     autoRefresh.addEventListener("change", schedulePolling);
     intervalInput.addEventListener("change", schedulePolling);
-    rawRoadsToggle.addEventListener("change", () => setRawRoadLayerVisible(rawRoadsToggle.checked));
+    rawRoadsToggle.addEventListener("change", syncRoadOverlayVisibility);
+    repairedRoadsToggle.addEventListener("change", syncRoadOverlayVisibility);
+    canonicalRoadsToggle.addEventListener("change", syncRoadOverlayVisibility);
+    cornerCandidatesToggle.addEventListener("change", syncRoadOverlayVisibility);
     window.addEventListener("resize", () => {
       if (!state.hasLoaded) {
         return;

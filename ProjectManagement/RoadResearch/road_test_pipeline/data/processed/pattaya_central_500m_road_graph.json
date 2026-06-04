@@ -1456,6 +1456,7 @@
       ],
       "canonical_edge_count": 3,
       "canonical_ops": [
+        "centerline_vertex_simplification",
         "degree2_chain_merge"
       ],
       "attribute_conflicts": {},
@@ -1470,7 +1471,7 @@
       "half_width_m": 3.0,
       "oneway": true,
       "oneway_direction": "forward",
-      "length_m": 57.594,
+      "length_m": 57.592,
       "geometry_xz": [
         [
           -92.2,
@@ -1479,10 +1480,6 @@
         [
           -77.054,
           241.999
-        ],
-        [
-          -50.776,
-          225.356
         ],
         [
           -43.062,
@@ -1497,10 +1494,6 @@
         [
           100.8829898,
           12.9364239
-        ],
-        [
-          100.883232,
-          12.9362744
         ],
         [
           100.8833031,
@@ -2102,6 +2095,7 @@
       ],
       "canonical_edge_count": 3,
       "canonical_ops": [
+        "centerline_vertex_simplification",
         "degree2_chain_merge"
       ],
       "attribute_conflicts": {},
@@ -2123,10 +2117,6 @@
           -248.644
         ],
         [
-          -137.106,
-          -195.211
-        ],
-        [
           -264.762,
           -96.08
         ],
@@ -2139,10 +2129,6 @@
         [
           100.8830746,
           12.9320164
-        ],
-        [
-          100.8824363,
-          12.9324964
         ],
         [
           100.8812597,
@@ -2481,6 +2467,7 @@
       ],
       "canonical_edge_count": 2,
       "canonical_ops": [
+        "centerline_smoothing",
         "degree2_chain_merge"
       ],
       "attribute_conflicts": {},
@@ -2495,15 +2482,15 @@
       "half_width_m": 3.0,
       "oneway": false,
       "oneway_direction": "unknown",
-      "length_m": 103.111,
+      "length_m": 103.105,
       "geometry_xz": [
         [
           244.137,
           289.298
         ],
         [
-          218.412,
-          242.845
+          218.395,
+          243.176
         ],
         [
           192.493,
@@ -2516,8 +2503,8 @@
           12.9368488
         ],
         [
-          100.8857131,
-          12.9364315
+          100.88571294,
+          12.93643448
         ],
         [
           100.8854742,
@@ -3098,6 +3085,7 @@
       ],
       "canonical_edge_count": 4,
       "canonical_ops": [
+        "centerline_vertex_simplification",
         "degree2_chain_merge"
       ],
       "attribute_conflicts": {},
@@ -3112,15 +3100,11 @@
       "half_width_m": 3.0,
       "oneway": false,
       "oneway_direction": "unknown",
-      "length_m": 189.236,
+      "length_m": 189.235,
       "geometry_xz": [
         [
           -14.734,
           -207.59
-        ],
-        [
-          72.54,
-          -285.881
         ],
         [
           95.682,
@@ -3139,10 +3123,6 @@
         [
           100.8835642,
           12.9323852
-        ],
-        [
-          100.8843686,
-          12.9316819
         ],
         [
           100.8845819,
@@ -3189,6 +3169,7 @@
       ],
       "canonical_edge_count": 2,
       "canonical_ops": [
+        "centerline_vertex_simplification",
         "degree2_chain_merge"
       ],
       "attribute_conflicts": {},
@@ -3203,15 +3184,11 @@
       "half_width_m": 3.0,
       "oneway": false,
       "oneway_direction": "unknown",
-      "length_m": 138.326,
+      "length_m": 138.324,
       "geometry_xz": [
         [
           128.361,
           -330.999
-        ],
-        [
-          242.78,
-          -397.579
         ],
         [
           247.836,
@@ -3222,10 +3199,6 @@
         [
           100.8848831,
           12.9312766
-        ],
-        [
-          100.8859377,
-          12.9306785
         ],
         [
           100.8859843,
@@ -5027,6 +5000,7 @@
       ],
       "canonical_edge_count": 3,
       "canonical_ops": [
+        "centerline_vertex_simplification",
         "degree2_chain_merge"
       ],
       "attribute_conflicts": {},
@@ -5052,10 +5026,6 @@
           27.63
         ],
         [
-          -276.154,
-          -39.452
-        ],
-        [
           -298.178,
           -71.401
         ]
@@ -5068,10 +5038,6 @@
         [
           100.8815875,
           12.9344982
-        ],
-        [
-          100.8811547,
-          12.9338956
         ],
         [
           100.8809517,
@@ -5293,6 +5259,7 @@
       ],
       "canonical_edge_count": 12,
       "canonical_ops": [
+        "centerline_vertex_simplification",
         "degree2_chain_merge"
       ],
       "attribute_conflicts": {},
@@ -5307,7 +5274,7 @@
       "half_width_m": 6.0,
       "oneway": true,
       "oneway_direction": "forward",
-      "length_m": 891.135,
+      "length_m": 891.134,
       "geometry_xz": [
         [
           -344.191,
@@ -5332,10 +5299,6 @@
         [
           -706.675,
           -524.829
-        ],
-        [
-          -720.085,
-          -537.041
         ],
         [
           -762.149,
@@ -5386,10 +5349,6 @@
         [
           100.8771866,
           12.9295354
-        ],
-        [
-          100.877063,
-          12.9294257
         ],
         [
           100.8766753,
@@ -5655,6 +5614,7 @@
       ],
       "canonical_edge_count": 4,
       "canonical_ops": [
+        "centerline_smoothing",
         "degree2_chain_merge"
       ],
       "attribute_conflicts": {},
@@ -5669,23 +5629,23 @@
       "half_width_m": 2.0,
       "oneway": false,
       "oneway_direction": "unknown",
-      "length_m": 15.601,
+      "length_m": 15.507,
       "geometry_xz": [
         [
           -34.914,
           -199.831
         ],
         [
-          -39.275,
-          -200.855
+          -39.183,
+          -200.926
         ],
         [
-          -42.617,
-          -202.669
+          -42.526,
+          -202.723
         ],
         [
-          -44.95,
-          -205.074
+          -44.885,
+          -205.184
         ],
         [
           -46.555,
@@ -5698,16 +5658,16 @@
           12.9324549
         ],
         [
-          100.883338,
-          12.9324457
+          100.88333885,
+          12.93244506
         ],
         [
-          100.8833072,
-          12.9324294
+          100.88330804,
+          12.93242892
         ],
         [
-          100.8832857,
-          12.9324078
+          100.8832863,
+          12.93240681
         ],
         [
           100.8832709,
@@ -8177,6 +8137,8 @@
       ],
       "canonical_edge_count": 11,
       "canonical_ops": [
+        "centerline_smoothing",
+        "centerline_vertex_simplification",
         "degree2_chain_merge"
       ],
       "attribute_conflicts": {},
@@ -8191,27 +8153,19 @@
       "half_width_m": 6.0,
       "oneway": true,
       "oneway_direction": "forward",
-      "length_m": 337.847,
+      "length_m": 337.841,
       "geometry_xz": [
         [
           -383.445,
           -543.798
         ],
         [
-          -346.036,
-          -506.818
-        ],
-        [
           -330.673,
           -492.068
         ],
         [
-          -310.84,
-          -473.889
-        ],
-        [
-          -305.22,
-          -468.167
+          -310.947,
+          -473.884
         ],
         [
           -292.2,
@@ -8248,20 +8202,12 @@
           12.929365
         ],
         [
-          100.8805106,
-          12.9296972
-        ],
-        [
           100.8806522,
           12.9298297
         ],
         [
-          100.880835,
-          12.929993
-        ],
-        [
-          100.8808868,
-          12.9300444
+          100.88083401,
+          12.92999305
         ],
         [
           100.8810068,

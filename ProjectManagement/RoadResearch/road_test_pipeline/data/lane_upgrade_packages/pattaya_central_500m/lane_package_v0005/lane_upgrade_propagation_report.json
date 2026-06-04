@@ -1,0 +1,34 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "lane_upgrade_propagation_v2",
+  "schema": "lane_upgrade_system.propagation_report.v2",
+  "status": "pass",
+  "inputs": {
+    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
+    "active_overrides": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_upgrade_overrides.json"
+  },
+  "outputs": {
+    "plan": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_system\\propagation\\pattaya_central_500m_lane_upgrade_propagation_plan_v0003.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_upgrade_propagation_report.json"
+  },
+  "counts": {
+    "active_upgrades": 3,
+    "candidates": 8,
+    "high_confidence_candidates": 1,
+    "review_candidates": 5,
+    "context_review_candidates": 2,
+    "already_satisfies_target": 0
+  },
+  "status_counts": {
+    "candidate_high_confidence": 1,
+    "candidate_review": 5,
+    "context_review": 2
+  },
+  "rule_counts": {
+    "adjacent_junction_context_review_v2": 2,
+    "same_class_adjacent_approach_review_v2": 5,
+    "short_edge_absorption_lane_count_v2": 1
+  },
+  "note": "Propagation v2 is proposal-only; no active overrides are modified by this stage."
+}

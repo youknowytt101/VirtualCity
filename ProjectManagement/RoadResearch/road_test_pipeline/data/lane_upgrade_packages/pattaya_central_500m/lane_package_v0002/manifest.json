@@ -1,0 +1,116 @@
+{
+  "type": "standard_lane_package_manifest",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "lane_upgrade_system.standard_lane_package.v1",
+    "system": "LaneForge",
+    "package_version": "lane_package_v0002",
+    "source_pipeline_root": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline",
+    "qa_status": "pass"
+  },
+  "human_model": "raw map data -> LaneForge lane upgrade system -> standard lane package -> Houdini construction pipeline",
+  "contents": {
+    "standard_lanes": "standard_lanes.json",
+    "standard_junctions": "standard_junctions.json",
+    "standard_lane_surfaces": "standard_lane_surfaces.geojson",
+    "standard_lane_surfaces_obj": "standard_lane_surfaces.obj",
+    "lane_debug_geometry": "lane_debug_geometry.geojson",
+    "qa_report": "qa_report.json",
+    "lane_graph_report": "lane_graph_report.json",
+    "lane_surface_report": "lane_surface_report.json",
+    "active_lane_upgrades": "active_lane_upgrades.json",
+    "houdini_manifest": "houdini_manifest.json"
+  },
+  "counts": {
+    "lanes": 201,
+    "junctions": 49,
+    "lane_links": 306,
+    "continuity_links": 6,
+    "junction_envelope_surfaces": 49,
+    "active_lane_upgrades": 1
+  },
+  "metrics": {
+    "lane_graph": {
+      "junctions_with_connections_ratio": 1.0,
+      "fan_fallback_ratio": 0.0,
+      "avg_lane_links_per_junction": 6.245,
+      "lane_link_reference_errors": 0,
+      "blocked_lane_links": 0,
+      "empty_connection_curves": 0,
+      "avg_lane_link_confidence": 0.82,
+      "min_lane_link_confidence": 0.82,
+      "avg_curve_length_m": 20.372,
+      "max_curve_length_m": 28.802,
+      "avg_continuity_curve_length_m": 4.363,
+      "max_continuity_curve_length_m": 7.932,
+      "avg_lane_width_m": 3.2,
+      "min_lane_width_m": 3.2,
+      "max_lane_width_m": 3.2,
+      "avg_lane_width_confidence": 0.45,
+      "max_lane_width_start_end_delta_m": 0.0
+    },
+    "lane_surface": {
+      "trim_start_lane_count": 129,
+      "trim_end_lane_count": 128,
+      "junction_trim_m": 8.0,
+      "approach_centerlines_trimmed": true,
+      "corner_continuity_trimmed_lane_count": 10,
+      "avg_lane_surface_width_m": 3.2,
+      "avg_turn_surface_width_m": 3.2,
+      "avg_continuity_surface_width_m": 3.2,
+      "avg_junction_envelope_area_m2": 311.203,
+      "max_junction_envelope_area_m2": 625.284,
+      "junction_envelope_padding_m": 0.25,
+      "area_by_part_m2": {
+        "lane_surface_v1": 41508.813,
+        "junction_envelope_surface_v1": 15248.944,
+        "lane_turn_surface_v1": 19889.162,
+        "lane_continuity_surface_v1": 83.695
+      },
+      "total_area_m2": 76730.614
+    },
+    "pipeline_audit": {
+      "road_graph": {
+        "nodes": 90,
+        "edges": 100
+      },
+      "junctions": 49,
+      "allowed_movements": 306,
+      "blocked_movements": 0,
+      "lanes": 201,
+      "lane_connections": 306,
+      "lane_links": 306,
+      "continuity_links": 6,
+      "lane_curve_gap_metrics": {
+        "max_lane_link_start_gap_m": 0.000679,
+        "max_lane_link_end_gap_m": 0.000679,
+        "max_continuity_start_gap_m": 0.0,
+        "max_continuity_end_gap_m": 0.0
+      },
+      "lane_link_curve_source_counts": {
+        "junction_lane_endpoint_bezier": 306
+      },
+      "optimized_features": 252,
+      "optimized_corner_fillets": 3,
+      "optimized_junction_connectors": 149,
+      "optimized_points": 2193,
+      "preview_points": 2193,
+      "preview_obj_vertices": 2193,
+      "lane_debug_obj_vertices": 10146,
+      "lane_debug_obj_faces": 513,
+      "lane_surface_v1_obj_vertices": 7300,
+      "lane_surface_v1_obj_faces": 562,
+      "junction_envelope_surfaces": 49,
+      "qa_statuses": {
+        "topology_repair": "warn",
+        "road_graph": "warn",
+        "lane_graph": "pass"
+      }
+    }
+  },
+  "publish_policy": {
+    "source_map_data_immutable": true,
+    "manual_lane_upgrades_are_transactions": true,
+    "houdini_consumes_package_outputs_only": true
+  }
+}

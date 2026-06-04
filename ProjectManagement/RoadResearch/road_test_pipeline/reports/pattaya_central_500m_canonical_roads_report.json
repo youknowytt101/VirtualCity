@@ -7,7 +7,12 @@
   "parameters": {
     "node_eps_m": 0.35,
     "bbox_edge_margin_m": 5.0,
-    "merge_policy": "degree2_nodes_only_with_matching_attribute_signature"
+    "merge_policy": "degree2_nodes_only_with_matching_attribute_signature",
+    "centerline_simplify_tolerance_m": 0.25,
+    "centerline_simplify_max_turn_deg": 7.0,
+    "centerline_smoothing_weight": 0.18,
+    "centerline_smoothing_max_turn_deg": 22.0,
+    "centerline_smoothing_max_offset_m": 0.35
   },
   "counts": {
     "input_edges": 171,
@@ -28,14 +33,26 @@
     "12": 1
   },
   "merge_stop_counts": {},
+  "geometry_refinement": {
+    "control_points_before": 271,
+    "control_points_after": 263,
+    "vertices_removed": 8,
+    "vertices_smoothed": 5,
+    "max_removed_deviation_m": 0.223,
+    "max_smoothing_offset_m": 0.332,
+    "avg_smoothing_offset_m": 0.158,
+    "max_abs_length_delta_m": 0.094,
+    "total_length_delta_m": -0.113
+  },
   "metrics": {
     "edge_reduction_ratio": 0.415,
     "avg_input_edges_per_canonical_road": 1.71,
-    "total_length_m": 8325.886
+    "total_length_m": 8325.773
   },
   "notes": [
     "Canonical roads are machine-readable GeoJSON, not SVG visualization.",
     "Each canonical road keeps source_feature_ids, repaired_source_feature_ids, and repair_parent_ids for traceability.",
-    "The stage does not cross true junctions or attribute conflicts; it only removes unstable degree-2 fragmentation from downstream graph construction."
+    "The stage does not cross true junctions or attribute conflicts; it only removes unstable degree-2 fragmentation from downstream graph construction.",
+    "Centerline refinement preserves chain endpoints; simplification and smoothing only touch internal control points inside conservative deviation thresholds."
   ]
 }

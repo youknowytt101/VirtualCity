@@ -9,11 +9,8 @@
     "source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
     "source_junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
     "source_engineering_reference": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
-    "strategy": "use regularized junction entry poses where available, trim approaches, add tangent circular-arc junction connectors and corner fillets, then extrude widths",
-    "connector_replacement_transaction": "accepted",
-    "connector_replacement_source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json",
-    "connector_replacement_trial_count": 7,
-    "connector_replacement_accepted_count": 7
+    "source_corner_overrides": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_overrides.json",
+    "strategy": "use regularized junction entry poses where available, trim approaches, add tangent circular-arc junction connectors and corner fillets, then extrude widths"
   },
   "features": [
     {
@@ -88,10 +85,6 @@
           [
             100.8829898,
             12.9364239
-          ],
-          [
-            100.883232,
-            12.9362744
           ],
           [
             100.88325337,
@@ -368,10 +361,6 @@
             12.9320164
           ],
           [
-            100.8824363,
-            12.9324964
-          ],
-          [
             100.8812597,
             12.9333869
           ],
@@ -538,8 +527,8 @@
             12.9368488
           ],
           [
-            100.8857131,
-            12.9364315
+            100.88571294,
+            12.93643448
           ],
           [
             100.8855043,
@@ -806,10 +795,6 @@
             12.9323474
           ],
           [
-            100.8843686,
-            12.9316819
-          ],
-          [
             100.8845819,
             12.931492
           ],
@@ -846,10 +831,6 @@
           [
             100.88493329,
             12.93124813
-          ],
-          [
-            100.8859377,
-            12.9306785
           ],
           [
             100.8859843,
@@ -1668,10 +1649,6 @@
             12.9344982
           ],
           [
-            100.8811547,
-            12.9338956
-          ],
-          [
             100.88098466,
             12.93365519
           ]
@@ -1780,10 +1757,6 @@
           [
             100.8771866,
             12.9295354
-          ],
-          [
-            100.877063,
-            12.9294257
           ],
           [
             100.8766753,
@@ -1926,8 +1899,8 @@
             12.9324379
           ],
           [
-            100.8833072,
-            12.9324294
+            100.88330804,
+            12.93242892
           ],
           [
             100.88330067,
@@ -2618,8 +2591,8 @@
             12.93353873
           ],
           [
-            100.88594752,
-            12.93364637
+            100.88594947,
+            12.93364949
           ]
         ]
       },
@@ -2644,8 +2617,8 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88599087,
-            12.93365604
+            100.88598772,
+            12.93365802
           ],
           [
             100.8863477,
@@ -3040,20 +3013,12 @@
             12.929365
           ],
           [
-            100.8805106,
-            12.9296972
-          ],
-          [
             100.8806522,
             12.9298297
           ],
           [
-            100.880835,
-            12.929993
-          ],
-          [
-            100.8808868,
-            12.9300444
+            100.88083401,
+            12.92999305
           ],
           [
             100.8810068,
@@ -3319,7 +3284,7 @@
           ],
           [
             100.88339902,
-            12.93654071
+            12.9365407
           ],
           [
             100.88339942,
@@ -3379,6 +3344,11 @@
         "width_m": 4.0,
         "turn_angle_deg": 87.416,
         "cut_m": 2.43,
+        "corner_optimization_source": "corner_optimization_transaction",
+        "corner_optimization_id": "corner_optimization_application_v0003_corner_0000",
+        "corner_optimization_application_id": "corner_optimization_application_v0003",
+        "corner_optimization_candidate_id": "corner_0000",
+        "corner_optimization_policy": "low_risk_degree2_connector_only_v1",
         "oneway": false,
         "arc_geometry": "circular_arc",
         "arc_fit_status": "exact_tangent_arc",
@@ -3486,6 +3456,11 @@
         "width_m": 4.0,
         "turn_angle_deg": 89.253,
         "cut_m": 2.43,
+        "corner_optimization_source": "corner_optimization_transaction",
+        "corner_optimization_id": "corner_optimization_application_v0002_corner_0000",
+        "corner_optimization_application_id": "corner_optimization_application_v0002",
+        "corner_optimization_candidate_id": "corner_0001",
+        "corner_optimization_policy": "low_risk_degree2_connector_only_v1",
         "oneway": false,
         "arc_geometry": "circular_arc",
         "arc_fit_status": "exact_tangent_arc",
@@ -3504,84 +3479,84 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88594752,
-            12.93364637
+            100.88594947,
+            12.93364949
           ],
           [
-            100.88594897,
-            12.93364849
+            100.88595075,
+            12.93365136
           ],
           [
-            100.8859506,
-            12.93365047
+            100.88595218,
+            12.93365311
           ],
           [
-            100.88595239,
-            12.93365232
+            100.88595376,
+            12.93365474
           ],
           [
-            100.88595433,
-            12.93365402
+            100.88595548,
+            12.93365624
           ],
           [
-            100.88595642,
-            12.93365554
+            100.88595732,
+            12.93365758
           ],
           [
-            100.88595862,
-            12.9336569
+            100.88595927,
+            12.93365878
           ],
           [
-            100.88596094,
-            12.93365806
-          ],
-          [
-            100.88596335,
-            12.93365904
-          ],
-          [
-            100.88596584,
+            100.88596131,
             12.93365981
           ],
           [
-            100.88596838,
-            12.93366038
+            100.88596344,
+            12.93366067
           ],
           [
-            100.88597096,
-            12.93366073
+            100.88596563,
+            12.93366135
           ],
           [
-            100.88597356,
-            12.93366088
+            100.88596788,
+            12.93366185
           ],
           [
-            100.88597617,
-            12.93366081
+            100.88597015,
+            12.93366216
           ],
           [
-            100.88597876,
-            12.93366052
+            100.88597245,
+            12.93366229
           ],
           [
-            100.88598132,
-            12.93366003
+            100.88597475,
+            12.93366223
           ],
           [
-            100.88598383,
-            12.93365933
+            100.88597704,
+            12.93366198
           ],
           [
-            100.88598627,
-            12.93365842
+            100.8859793,
+            12.93366154
           ],
           [
-            100.88598862,
-            12.93365732
+            100.88598151,
+            12.93366092
           ],
           [
-            100.88599087,
-            12.93365604
+            100.88598366,
+            12.93366013
+          ],
+          [
+            100.88598573,
+            12.93365916
+          ],
+          [
+            100.88598772,
+            12.93365802
           ]
         ]
       },
@@ -3596,13 +3571,18 @@
         "lanes": 1,
         "width_m": 4.0,
         "turn_angle_deg": 91.525,
-        "cut_m": 3.458,
+        "cut_m": 3.051,
+        "corner_optimization_source": "corner_optimization_transaction",
+        "corner_optimization_id": "corner_optimization_application_v0004_corner_0000",
+        "corner_optimization_application_id": "corner_optimization_application_v0004",
+        "corner_optimization_candidate_id": "corner_0002",
+        "corner_optimization_policy": "low_risk_degree2_connector_only_v1",
         "oneway": false,
         "arc_geometry": "circular_arc",
         "arc_fit_status": "exact_tangent_arc",
-        "arc_radius_m": 3.367,
-        "arc_center_x": 246.721,
-        "arc_center_z": -68.948,
+        "arc_radius_m": 2.971,
+        "arc_center_x": 246.594,
+        "arc_center_z": -68.394,
         "arc_sweep_deg": -91.525,
         "arc_sample_count": 20,
         "arc_design_min_radius_m": 0.0,
@@ -7778,64 +7758,40 @@
             12.93242284
           ],
           [
-            100.88329817,
-            12.93241692
+            100.88329687,
+            12.9324134
           ],
           [
-            100.88329609,
-            12.93241109
+            100.88329415,
+            12.93240418
           ],
           [
-            100.88329443,
-            12.93240533
+            100.88329258,
+            12.93239521
           ],
           [
-            100.88329323,
-            12.93239967
-          ],
-          [
-            100.88329246,
-            12.93239411
-          ],
-          [
-            100.88329218,
-            12.93238866
-          ],
-          [
-            100.88329237,
-            12.93238333
+            100.88329219,
+            12.93238651
           ],
           [
             100.88329305,
             12.93237812
           ],
           [
-            100.88329424,
-            12.93237304
+            100.8832952,
+            12.93237006
           ],
           [
-            100.88329596,
-            12.93236811
+            100.88329871,
+            12.93236238
           ],
           [
-            100.8832982,
-            12.93236332
+            100.88330361,
+            12.9323551
           ],
           [
-            100.88330098,
-            12.93235869
-          ],
-          [
-            100.88330432,
-            12.93235422
-          ],
-          [
-            100.88330824,
-            12.93234993
-          ],
-          [
-            100.88331274,
-            12.93234581
+            100.88330997,
+            12.93234826
           ],
           [
             100.88331784,
@@ -7860,20 +7816,15 @@
         "conflict_zone_radius_m": 7.8,
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose",
-        "arc_geometry": "param_poly3_hermite",
-        "arc_fit_status": "solver_v2_transaction_replacement",
-        "arc_radius_m": 5.685,
+        "arc_geometry": "bezier_tangent_fallback",
+        "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+        "arc_radius_m": 5.712,
         "arc_center_x": null,
         "arc_center_z": null,
         "arc_sweep_deg": 77.787,
-        "arc_sample_count": 17,
+        "arc_sample_count": 11,
         "arc_design_min_radius_m": 3.0,
-        "arc_radius_margin_m": 2.685,
-        "connector_solver_v2_candidate_id": "n_0026_c_01_parampoly3_0.42",
-        "connector_solver_v2_family": "param_poly3_hermite",
-        "connector_solver_v2_score": 100.0,
-        "connector_solver_v2_status": "publishable_candidate",
-        "connector_replacement_transaction": "accepted_trial"
+        "arc_radius_margin_m": 2.712
       }
     },
     {
@@ -7886,64 +7837,40 @@
             12.93242284
           ],
           [
-            100.88329791,
-            12.93241765
+            100.88329601,
+            12.93241482
           ],
           [
-            100.88329466,
-            12.93241306
+            100.88329014,
+            12.93240831
           ],
           [
-            100.88329093,
-            12.93240905
+            100.88328326,
+            12.93240329
           ],
           [
-            100.88328681,
-            12.93240562
-          ],
-          [
-            100.88328234,
-            12.93240278
-          ],
-          [
-            100.88327756,
-            12.93240049
-          ],
-          [
-            100.88327253,
-            12.9323988
+            100.88327557,
+            12.93239975
           ],
           [
             100.88326728,
             12.93239766
           ],
           [
-            100.88326189,
-            12.93239708
+            100.8832586,
+            12.93239701
           ],
           [
-            100.88325639,
-            12.93239707
+            100.88324972,
+            12.93239779
           ],
           [
-            100.88325084,
-            12.93239761
+            100.88324085,
+            12.93239998
           ],
           [
-            100.88324527,
-            12.93239871
-          ],
-          [
-            100.88323976,
-            12.93240035
-          ],
-          [
-            100.88323433,
-            12.93240253
-          ],
-          [
-            100.88322905,
-            12.93240526
+            100.8832322,
+            12.93240356
           ],
           [
             100.88322397,
@@ -7968,20 +7895,15 @@
         "conflict_zone_radius_m": 7.8,
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose",
-        "arc_geometry": "param_poly3_hermite",
-        "arc_fit_status": "solver_v2_transaction_replacement",
-        "arc_radius_m": 4.568,
+        "arc_geometry": "bezier_tangent_fallback",
+        "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+        "arc_radius_m": 4.588,
         "arc_center_x": null,
         "arc_center_z": null,
         "arc_sweep_deg": 102.217,
-        "arc_sample_count": 17,
+        "arc_sample_count": 11,
         "arc_design_min_radius_m": 3.0,
-        "arc_radius_margin_m": 1.568,
-        "connector_solver_v2_candidate_id": "n_0026_c_02_parampoly3_0.42",
-        "connector_solver_v2_family": "param_poly3_hermite",
-        "connector_solver_v2_score": 100.0,
-        "connector_solver_v2_status": "publishable_candidate",
-        "connector_replacement_transaction": "accepted_trial"
+        "arc_radius_margin_m": 1.588
       }
     },
     {
@@ -8279,15 +8201,15 @@
           ],
           [
             100.88334752,
-            12.93614863
+            12.93614864
           ],
           [
             100.88335076,
-            12.93615201
+            12.93615202
           ],
           [
-            100.88335428,
-            12.93615512
+            100.88335427,
+            12.93615513
           ],
           [
             100.88335805,
@@ -8303,23 +8225,23 @@
           ],
           [
             100.88337062,
-            12.93616436
+            12.93616437
           ],
           [
             100.88337513,
             12.9361658
           ],
           [
-            100.88337976,
+            100.88337975,
             12.93616686
           ],
           [
-            100.88338445,
+            100.88338444,
             12.93616754
           ],
           [
-            100.88338919,
-            12.93616782
+            100.88338918,
+            12.93616783
           ],
           [
             100.88339392,
@@ -8330,8 +8252,8 @@
             12.93616723
           ],
           [
-            100.88340331,
-            12.93616635
+            100.8834033,
+            12.93616636
           ],
           [
             100.88340787,
@@ -8339,7 +8261,7 @@
           ],
           [
             100.88341231,
-            12.93616347
+            12.93616348
           ],
           [
             100.8834166,
@@ -8369,19 +8291,14 @@
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose",
         "arc_geometry": "circular_arc",
-        "arc_fit_status": "solver_v2_transaction_replacement",
-        "arc_radius_m": 6.101,
-        "arc_center_x": null,
-        "arc_center_z": null,
+        "arc_fit_status": "exact_tangent_arc",
+        "arc_radius_m": 6.111,
+        "arc_center_x": -33.599,
+        "arc_center_z": 207.383,
         "arc_sweep_deg": -91.747,
         "arc_sample_count": 20,
         "arc_design_min_radius_m": 6.0,
-        "arc_radius_margin_m": 0.101,
-        "connector_solver_v2_candidate_id": "n_0030_c_01_circular",
-        "connector_solver_v2_family": "circular_arc_exact",
-        "connector_solver_v2_score": 100.0,
-        "connector_solver_v2_status": "publishable_candidate",
-        "connector_replacement_transaction": "accepted_trial"
+        "arc_radius_margin_m": 0.111
       }
     },
     {
@@ -10146,7 +10063,7 @@
           ],
           [
             100.88399554,
-            12.93677682
+            12.93677683
           ],
           [
             100.88399307,
@@ -10157,16 +10074,16 @@
             12.93676911
           ],
           [
-            100.88398715,
-            12.93676559
+            100.88398716,
+            12.9367656
           ],
           [
-            100.88398374,
-            12.93676235
+            100.88398375,
+            12.93676236
           ],
           [
             100.88398008,
-            12.93675941
+            12.9367594
           ],
           [
             100.88397617,
@@ -10174,26 +10091,26 @@
           ],
           [
             100.88397204,
-            12.93675445
+            12.93675444
           ],
           [
             100.88396773,
             12.93675247
           ],
           [
-            100.88396326,
+            100.88396327,
             12.93675086
           ],
           [
-            100.88395867,
+            100.88395868,
             12.93674962
           ],
           [
             100.883954,
-            12.93674875
+            12.93674876
           ],
           [
-            100.88394926,
+            100.88394927,
             12.93674828
           ],
           [
@@ -10201,15 +10118,15 @@
             12.93674819
           ],
           [
-            100.88393975,
+            100.88393976,
             12.93674848
           ],
           [
-            100.88393504,
-            12.93674916
+            100.88393505,
+            12.93674917
           ],
           [
-            100.88393041,
+            100.88393042,
             12.93675023
           ],
           [
@@ -10240,19 +10157,14 @@
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose",
         "arc_geometry": "circular_arc",
-        "arc_fit_status": "solver_v2_transaction_replacement",
-        "arc_radius_m": 6.156,
-        "arc_center_x": null,
-        "arc_center_z": null,
+        "arc_fit_status": "exact_tangent_arc",
+        "arc_radius_m": 6.165,
+        "arc_center_x": 26.666,
+        "arc_center_z": 284.261,
         "arc_sweep_deg": -91.241,
         "arc_sample_count": 20,
         "arc_design_min_radius_m": 6.0,
-        "arc_radius_margin_m": 0.156,
-        "connector_solver_v2_candidate_id": "n_0042_c_02_circular",
-        "connector_solver_v2_family": "circular_arc_exact",
-        "connector_solver_v2_score": 100.0,
-        "connector_solver_v2_status": "publishable_candidate",
-        "connector_replacement_transaction": "accepted_trial"
+        "arc_radius_margin_m": 0.165
       }
     },
     {
@@ -11937,7 +11849,7 @@
             12.93539653
           ],
           [
-            100.88457703,
+            100.88457704,
             12.93540022
           ],
           [
@@ -11950,10 +11862,10 @@
           ],
           [
             100.88458743,
-            12.93540968
+            12.93540969
           ],
           [
-            100.88459139,
+            100.8845914,
             12.93541224
           ],
           [
@@ -11962,10 +11874,10 @@
           ],
           [
             100.88459992,
-            12.93541633
+            12.93541634
           ],
           [
-            100.88460442,
+            100.88460441,
             12.93541784
           ],
           [
@@ -11981,7 +11893,7 @@
             12.9354201
           ],
           [
-            100.88462321,
+            100.8846232,
             12.93542008
           ],
           [
@@ -11989,19 +11901,19 @@
             12.93541967
           ],
           [
-            100.88463263,
-            12.93541887
+            100.88463262,
+            12.93541888
           ],
           [
-            100.88463723,
-            12.93541771
+            100.88463722,
+            12.9354177
           ],
           [
-            100.88464171,
-            12.93541615
+            100.8846417,
+            12.93541616
           ],
           [
-            100.88464604,
+            100.88464603,
             12.93541425
           ],
           [
@@ -12028,19 +11940,14 @@
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose",
         "arc_geometry": "circular_arc",
-        "arc_fit_status": "solver_v2_transaction_replacement",
-        "arc_radius_m": 6.137,
-        "arc_center_x": null,
-        "arc_center_z": null,
+        "arc_fit_status": "exact_tangent_arc",
+        "arc_radius_m": 6.14,
+        "arc_center_x": 99.879,
+        "arc_center_z": 124.12,
         "arc_sweep_deg": -91.471,
         "arc_sample_count": 20,
         "arc_design_min_radius_m": 6.0,
-        "arc_radius_margin_m": 0.137,
-        "connector_solver_v2_candidate_id": "n_0055_c_01_circular",
-        "connector_solver_v2_family": "circular_arc_exact",
-        "connector_solver_v2_score": 100.0,
-        "connector_solver_v2_status": "publishable_candidate",
-        "connector_replacement_transaction": "accepted_trial"
+        "arc_radius_margin_m": 0.14
       }
     },
     {
@@ -13093,28 +13000,28 @@
             12.93132598
           ],
           [
-            100.88490896,
-            12.93132204
+            100.88490897,
+            12.93132203
           ],
           [
             100.88490614,
-            12.93131831
+            12.9313183
           ],
           [
             100.884903,
             12.93131482
           ],
           [
-            100.88489957,
-            12.93131161
+            100.88489958,
+            12.9313116
           ],
           [
-            100.88489588,
+            100.88489589,
             12.93130868
           ],
           [
             100.88489196,
-            12.93130606
+            12.93130607
           ],
           [
             100.88488782,
@@ -13133,7 +13040,7 @@
             12.93129907
           ],
           [
-            100.88486974,
+            100.88486975,
             12.93129824
           ],
           [
@@ -13145,15 +13052,15 @@
             12.93129775
           ],
           [
-            100.88485551,
+            100.88485552,
             12.93129809
           ],
           [
-            100.88485081,
+            100.88485082,
             12.93129881
           ],
           [
-            100.88484619,
+            100.8848462,
             12.93129992
           ],
           [
@@ -13161,8 +13068,8 @@
             12.93130139
           ],
           [
-            100.88483732,
-            12.93130323
+            100.88483733,
+            12.93130324
           ],
           [
             100.88483313,
@@ -13188,19 +13095,14 @@
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose",
         "arc_geometry": "circular_arc",
-        "arc_fit_status": "solver_v2_transaction_replacement",
-        "arc_radius_m": 6.14,
-        "arc_center_x": null,
-        "arc_center_z": null,
+        "arc_fit_status": "exact_tangent_arc",
+        "arc_radius_m": 6.149,
+        "arc_center_x": 126.073,
+        "arc_center_z": -322.498,
         "arc_sweep_deg": -91.385,
         "arc_sample_count": 20,
         "arc_design_min_radius_m": 6.0,
-        "arc_radius_margin_m": 0.14,
-        "connector_solver_v2_candidate_id": "n_0059_c_02_circular",
-        "connector_solver_v2_family": "circular_arc_exact",
-        "connector_solver_v2_score": 100.0,
-        "connector_solver_v2_status": "publishable_candidate",
-        "connector_replacement_transaction": "accepted_trial"
+        "arc_radius_margin_m": 0.149
       }
     },
     {
@@ -13372,7 +13274,7 @@
           ],
           [
             100.88493472,
-            12.93529731
+            12.93529732
           ],
           [
             100.88493159,
@@ -13383,12 +13285,12 @@
             12.93529068
           ],
           [
-            100.88492448,
-            12.93528778
+            100.88492449,
+            12.93528779
           ],
           [
-            100.88492057,
-            12.9352852
+            100.88492056,
+            12.93528521
           ],
           [
             100.88491643,
@@ -13399,7 +13301,7 @@
             12.93528107
           ],
           [
-            100.88490765,
+            100.88490766,
             12.93527954
           ],
           [
@@ -13411,7 +13313,7 @@
             12.9352776
           ],
           [
-            100.88489371,
+            100.8848937,
             12.93527721
           ],
           [
@@ -13424,7 +13326,7 @@
           ],
           [
             100.8848796,
-            12.93527837
+            12.93527838
           ],
           [
             100.88487502,
@@ -13432,7 +13334,7 @@
           ],
           [
             100.88487056,
-            12.93528106
+            12.93528107
           ],
           [
             100.88486624,
@@ -13462,19 +13364,14 @@
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose",
         "arc_geometry": "circular_arc",
-        "arc_fit_status": "solver_v2_transaction_replacement",
-        "arc_radius_m": 6.026,
-        "arc_center_x": null,
-        "arc_center_z": null,
+        "arc_fit_status": "exact_tangent_arc",
+        "arc_radius_m": 6.06,
+        "arc_center_x": 129.254,
+        "arc_center_z": 120.403,
         "arc_sweep_deg": -92.225,
         "arc_sample_count": 20,
         "arc_design_min_radius_m": 6.0,
-        "arc_radius_margin_m": 0.026,
-        "connector_solver_v2_candidate_id": "n_0060_c_02_circular",
-        "connector_solver_v2_family": "circular_arc_exact",
-        "connector_solver_v2_score": 100.0,
-        "connector_solver_v2_status": "publishable_candidate",
-        "connector_replacement_transaction": "accepted_trial"
+        "arc_radius_margin_m": 0.06
       }
     },
     {
