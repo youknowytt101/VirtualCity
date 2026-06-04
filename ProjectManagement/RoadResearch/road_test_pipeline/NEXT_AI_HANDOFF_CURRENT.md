@@ -35,6 +35,15 @@ LANEFORGE_LANE_UPGRADE_SYSTEM.md
 scripts/README.md
 ```
 
+Optional review note:
+
+```text
+AI点评.md
+```
+
+`AI点评.md` is a useful critique/scorecard, not source truth. Trust JSON
+reports and package manifests for exact state.
+
 Older files such as `NEXT_AI_HANDOFF.md`, `CURRENT_STAGE_SNAPSHOT.md`, and
 some deep sections of historical docs are background only. If they disagree
 with this file, trust this file and the latest JSON reports.

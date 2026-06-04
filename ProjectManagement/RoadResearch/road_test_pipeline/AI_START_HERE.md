@@ -179,3 +179,11 @@ reports/pattaya_central_500m_pipeline_audit_report.json
 reports/pattaya_central_500m_corner_optimization_report.json
 reports/pattaya_central_500m_lane_upgrade_propagation_report.json
 ```
+
+可选复盘：
+
+```text
+AI点评.md
+```
+
+`AI点评.md` 是工程状态评审和风险评分，不是 source truth；真实状态仍以最新 JSON 报告和 package manifest 为准。

@@ -12,11 +12,14 @@ AI_START_HERE.md
 NEXT_AI_HANDOFF_CURRENT.md
 LANEFORGE_LANE_UPGRADE_SYSTEM.md
 scripts/README.md
+AI点评.md
 data/lane_upgrade_packages/pattaya_central_500m/latest.json
 ```
 
 历史设计文档仍有参考价值，但如果与上面文件和最新 JSON 报告冲突，以当前入口文档和
 JSON 报告为准。
+
+`AI点评.md` 是评审/评分视角，不是 source truth。
 
 ## 当前心智模型
 
