@@ -1,0 +1,49 @@
+{
+  "area_id": "pattaya_central_500m",
+  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
+  "origin": {
+    "lon": 100.8837,
+    "lat": 12.93425
+  },
+  "feature_count": 100,
+  "geometry": {
+    "empty_geometry": 0,
+    "duplicate_point_features": 0,
+    "too_short_features": 0,
+    "total_length_m": 8325.886,
+    "min_length_m": 4.009,
+    "max_length_m": 891.135
+  },
+  "tags": {
+    "lanes_count": 64,
+    "lanes_coverage_pct": 64.0,
+    "turn_lanes_count": 0,
+    "turn_lanes_coverage_pct": 0.0,
+    "width_count": 0,
+    "width_coverage_pct": 0.0,
+    "oneway_count": 56,
+    "oneway_coverage_pct": 56.0,
+    "maxspeed_count": 12,
+    "maxspeed_coverage_pct": 12.0,
+    "bridge_tunnel_layer_count": 0
+  },
+  "topology": {
+    "endpoint_clusters": 90,
+    "endpoint_cluster_size_distribution": {
+      "1": 31,
+      "2": 10,
+      "3": 47,
+      "4": 2
+    },
+    "dangling_endpoint_clusters": 31,
+    "dangling_endpoint_ratio": 0.344,
+    "low_confidence_endpoint_clusters": 2,
+    "possible_unsplit_crossings": 0,
+    "possible_unsplit_crossing_samples": []
+  },
+  "highway_class_counts": {
+    "service": 34,
+    "secondary": 34,
+    "residential": 32
+  }
+}

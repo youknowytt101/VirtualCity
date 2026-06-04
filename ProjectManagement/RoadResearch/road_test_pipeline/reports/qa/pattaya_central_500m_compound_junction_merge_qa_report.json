@@ -41,7 +41,7 @@
   ],
   "metrics": {
     "counts": {
-      "remaining_anchor_records": 36,
+      "remaining_anchor_records": 32,
       "eligible_anchor_records": 24,
       "eligible_bridge_edges": 3,
       "candidates": 3,
@@ -55,8 +55,7 @@
       },
       "issue_counts": {},
       "ignored_classification_counts": {
-        "dead_end_stub_capacity_limited": 8,
-        "low_value_short_edge_absorption": 4
+        "dead_end_stub_capacity_limited": 8
       },
       "affected_corridors": 24,
       "affected_anchor_records": 24,

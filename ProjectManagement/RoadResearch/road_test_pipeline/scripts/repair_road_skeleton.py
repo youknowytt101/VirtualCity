@@ -389,11 +389,13 @@ def main() -> int:
     config = root / "config" / f"{args.area_id}.area.json"
     raw_geojson = processed / f"{args.area_id}_roads_raw.geojson"
     repaired_geojson = processed / f"{args.area_id}_roads_repaired.geojson"
+    canonical_geojson = processed / f"{args.area_id}_roads_canonical.geojson"
     repair_candidates = processed / f"{args.area_id}_repair_candidates.json"
     repair_decisions = processed / f"{args.area_id}_repair_decisions.json"
     repair_casebook = processed / f"{args.area_id}_repair_casebook.json"
     raw_topology_diagnostics = processed / f"{args.area_id}_raw_topology_diagnostics.json"
     road_graph = processed / f"{args.area_id}_road_graph.json"
+    canonical_analysis = reports / f"{args.area_id}_canonical_analysis.json"
     junction_semantics = processed / f"{args.area_id}_junction_semantics.json"
     junction_areas = processed / f"{args.area_id}_junction_areas.json"
     engineering_reference_lines = processed / f"{args.area_id}_engineering_reference_lines.json"
@@ -405,6 +407,7 @@ def main() -> int:
     movement_corridor_candidates = processed / f"{args.area_id}_movement_corridor_candidates.json"
     clean_skeleton = processed / f"{args.area_id}_roads_clean_skeleton.geojson"
     lane_graph_svg = reports / "visualizations" / f"{args.area_id}_lane_graph_topology.svg"
+    canonical_roads_report = reports / f"{args.area_id}_canonical_roads_report.json"
     clean_skeleton_report = reports / f"{args.area_id}_road_skeleton_repair_report.json"
     junction_geometry_audit = reports / f"{args.area_id}_junction_geometry_audit_report.json"
     junction_connector_solver = reports / f"{args.area_id}_junction_connector_solver_report.json"
@@ -458,7 +461,21 @@ def main() -> int:
         ),
         ("L3 topology repair QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "topology_repair", "--area-id", args.area_id]),
         ("L3 repair casebook QA", [python_cmd(), str(root / "scripts" / "run_repair_casebook.py"), "--area-id", args.area_id]),
-        ("L4 road graph", [python_cmd(), str(root / "scripts" / "build_road_graph.py"), "--area-id", args.area_id]),
+        ("L3.5 canonical road chains", [python_cmd(), str(root / "scripts" / "build_canonical_roads.py"), "--area-id", args.area_id]),
+        (
+            "L3.5 canonical-road analysis",
+            [
+                python_cmd(),
+                str(root / "scripts" / "analyze_raw_roads.py"),
+                "--area-id",
+                args.area_id,
+                "--input",
+                str(canonical_geojson),
+                "--output",
+                str(canonical_analysis),
+            ],
+        ),
+        ("L4 road graph", [python_cmd(), str(root / "scripts" / "build_road_graph.py"), "--area-id", args.area_id, "--input", str(canonical_geojson)]),
         ("L4 road graph QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "road_graph", "--area-id", args.area_id]),
         ("L5 junction semantics", [python_cmd(), str(root / "scripts" / "build_junction_semantics.py"), "--area-id", args.area_id]),
         ("L5.5 junction area regularization", [python_cmd(), str(root / "scripts" / "regularize_junction_areas.py"), "--area-id", args.area_id]),
@@ -575,11 +592,14 @@ def main() -> int:
         "outputs": {
             "raw_roads": str(raw_geojson),
             "repaired_roads": str(repaired_geojson),
+            "canonical_roads": str(canonical_geojson),
+            "canonical_analysis": str(canonical_analysis),
             "repair_candidates": str(repair_candidates),
             "repair_decisions": str(repair_decisions),
             "repair_casebook": str(repair_casebook),
             "raw_topology_diagnostics": str(raw_topology_diagnostics),
             "road_graph": str(road_graph),
+            "canonical_roads_report": str(canonical_roads_report),
             "junction_semantics": str(junction_semantics),
             "junction_areas": str(junction_areas),
             "engineering_reference_lines": str(engineering_reference_lines),

@@ -69,6 +69,7 @@ def main() -> int:
 
     raw_geojson = root / "data" / "processed" / f"{args.area_id}_roads_raw.geojson"
     repaired_geojson = root / "data" / "processed" / f"{args.area_id}_roads_repaired.geojson"
+    canonical_geojson = root / "data" / "processed" / f"{args.area_id}_roads_canonical.geojson"
     road_graph = root / "data" / "processed" / f"{args.area_id}_road_graph.json"
     junction_semantics = root / "data" / "processed" / f"{args.area_id}_junction_semantics.json"
     optimized_centerlines = root / "data" / "processed" / f"{args.area_id}_roads_optimized_centerlines.geojson"
@@ -94,7 +95,21 @@ def main() -> int:
             ],
         ),
         ("Running topology repair QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "topology_repair", "--area-id", args.area_id]),
-        ("Building road graph", [python_cmd(), str(root / "scripts" / "build_road_graph.py"), "--area-id", args.area_id]),
+        ("Building canonical roads", [python_cmd(), str(root / "scripts" / "build_canonical_roads.py"), "--area-id", args.area_id]),
+        (
+            "Analyzing canonical roads",
+            [
+                python_cmd(),
+                str(root / "scripts" / "analyze_raw_roads.py"),
+                "--area-id",
+                args.area_id,
+                "--input",
+                str(canonical_geojson),
+                "--output",
+                str(reports / f"{args.area_id}_canonical_analysis.json"),
+            ],
+        ),
+        ("Building road graph", [python_cmd(), str(root / "scripts" / "build_road_graph.py"), "--area-id", args.area_id, "--input", str(canonical_geojson)]),
         ("Running road graph QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "road_graph", "--area-id", args.area_id]),
         ("Building junction semantic model", [python_cmd(), str(root / "scripts" / "build_junction_semantics.py"), "--area-id", args.area_id]),
         ("Optimizing junction centerlines", [python_cmd(), str(root / "scripts" / "optimize_junction_centerlines.py"), "--area-id", args.area_id]),
@@ -131,6 +146,7 @@ def main() -> int:
         "houdini_status": houdini_status,
         "outputs": {
             "repaired_geojson": str(repaired_geojson),
+            "canonical_geojson": str(canonical_geojson),
             "road_graph": str(road_graph),
             "junction_semantics": str(junction_semantics),
             "optimized_centerlines": str(optimized_centerlines),

@@ -1,6 +1,6 @@
-[RoadSkeleton] started 2026-06-04 13:42:26
+[RoadSkeleton] started 2026-06-04 13:59:08
 
-[2026-06-04 13:42:26] L3 topology repair
+[2026-06-04 13:59:08] L3 topology repair
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\topology_repair.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -47,7 +47,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:26] L3 repaired-road analysis
+[2026-06-04 13:59:08] L3 repaired-road analysis
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_repaired.geojson --output D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_repaired_analysis.json
 {
   "area_id": "pattaya_central_500m",
@@ -59,7 +59,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:27] L3 topology repair QA
+[2026-06-04 13:59:09] L3 topology repair QA
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage topology_repair --area-id pattaya_central_500m
 topology_repair QA status: warn
 [pass] output_edges: 171 / 40
@@ -71,7 +71,7 @@ topology_repair QA status: warn
 [pass] repair_ops_when_dangling_high: 0 / 0
 [exit] 0
 
-[2026-06-04 13:42:28] L3 repair casebook QA
+[2026-06-04 13:59:10] L3 repair casebook QA
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_repair_casebook.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -83,44 +83,79 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:29] L4 road graph
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m
+[2026-06-04 13:59:11] L3.5 canonical road chains
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_canonical_roads.py --area-id pattaya_central_500m
+{
+  "area_id": "pattaya_central_500m",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
+  "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_canonical_roads_report.json",
+  "counts": {
+    "input_edges": 171,
+    "output_canonical_roads": 100,
+    "skipped_empty_geometry": 0,
+    "merged_input_edges": 71,
+    "connector_nodes_available_for_merge": 73,
+    "boundary_nodes_protected": 14,
+    "junction_or_terminal_nodes_protected": 80
+  },
+  "metrics": {
+    "edge_reduction_ratio": 0.415,
+    "avg_input_edges_per_canonical_road": 1.71,
+    "total_length_m": 8325.886
+  }
+}
+[exit] 0
+
+[2026-06-04 13:59:11] L3.5 canonical-road analysis
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_canonical.geojson --output D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_canonical_analysis.json
+{
+  "area_id": "pattaya_central_500m",
+  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_canonical_analysis.json",
+  "feature_count": 100,
+  "possible_unsplit_crossings": 0,
+  "dangling_endpoint_clusters": 31
+}
+[exit] 0
+
+[2026-06-04 13:59:12] L4 road graph
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_canonical.geojson
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
   "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_road_graph_report.json",
   "counts": {
-    "input_features": 171,
-    "nodes": 161,
-    "edges": 171,
+    "input_features": 100,
+    "nodes": 90,
+    "edges": 100,
     "skipped_empty_geometry": 0,
     "zero_length_edges": 0,
     "orphan_edges": 0
   },
   "node_kind_counts": {
     "boundary": 3,
-    "connector": 81,
+    "connector": 10,
     "dead_end": 28,
     "junction": 49
   }
 }
 [exit] 0
 
-[2026-06-04 13:42:29] L4 road graph QA
+[2026-06-04 13:59:12] L4 road graph QA
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage road_graph --area-id pattaya_central_500m
 road_graph QA status: warn
-[pass] nodes: 161 / 40
-[pass] edges: 171 / 40
+[pass] nodes: 90 / 40
+[pass] edges: 100 / 40
 [pass] junction_nodes: 49 / 1
 [pass] skipped_empty_geometry: 0 / 0
 [pass] zero_length_edges: 0 / 0
 [pass] orphan_edges: 0 / 0
-[warn] dead_end_ratio: 0.174 / 0.12
+[warn] dead_end_ratio: 0.311 / 0.12
 [warn] width_fallback_ratio: 1.0 / 0.8
-[pass] lanes_fallback_ratio: 0.38 / 0.6
+[pass] lanes_fallback_ratio: 0.36 / 0.6
 [exit] 0
 
-[2026-06-04 13:42:30] L5 junction semantics
+[2026-06-04 13:59:14] L5 junction semantics
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_junction_semantics.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -145,7 +180,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:30] L5.5 junction area regularization
+[2026-06-04 13:59:14] L5.5 junction area regularization
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\regularize_junction_areas.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -154,8 +189,8 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
   "approach_entry_poses": 149,
   "connecting_road_intents": 306,
   "issue_counts": {
-    "entry_trim_capacity_limited": 14,
-    "short_edge_absorption_candidate": 6
+    "entry_trim_capacity_limited": 10,
+    "short_edge_absorption_candidate": 2
   },
   "outputs": {
     "junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
@@ -165,20 +200,20 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:31] L6 engineering centerline
+[2026-06-04 13:59:15] L6 engineering centerline
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\optimize_junction_centerlines.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
   "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_optimized_centerlines_report.json",
   "counts": {
-    "input_edges": 171,
-    "optimized_approaches": 171,
+    "input_edges": 100,
+    "optimized_approaches": 100,
     "dropped_short_edges": 0,
     "heuristic_junction_trim_keys": 0,
     "regularized_junction_nodes": 49,
-    "regularized_endpoint_exact": 130,
-    "regularized_endpoint_scaled_for_edge_length": 19,
+    "regularized_endpoint_exact": 131,
+    "regularized_endpoint_scaled_for_edge_length": 18,
     "junction_nodes": 49,
     "junction_connectors": 149,
     "t_junctions": 47,
@@ -186,12 +221,12 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "junction_movement_debug": 153,
     "junction_through_movements": 51,
     "junction_turn_movements": 102,
-    "corner_fillet_nodes": 20,
-    "corner_fillets": 20,
-    "corner_circular_arcs": 19,
-    "corner_bezier_tangent_fallback": 1,
+    "corner_fillet_nodes": 3,
+    "corner_fillets": 3,
+    "corner_circular_arcs": 3,
+    "corner_bezier_tangent_fallback": 0,
     "corner_straight_infinite_radius": 0,
-    "output_features": 340,
+    "output_features": 252,
     "t_branch_trim_adjustments": 0,
     "t_branch_trim_locked_skips": 47,
     "t_branch_trim_max_delta_m": 0.0,
@@ -208,7 +243,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:31] L6 junction geometry audit
+[2026-06-04 13:59:15] L6 junction geometry audit
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\junction_geometry_audit.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -216,7 +251,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_geometry_audit_report.json",
   "metrics": {
     "junctions_with_connectors": 49,
-    "junctions_with_issues": 40,
+    "junctions_with_issues": 39,
     "connectors": 149,
     "connector_kind_counts": {
       "adjacent_fallback": 8,
@@ -224,34 +259,34 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
       "t_turn": 94
     },
     "arc_geometry_counts": {
-      "bezier_tangent_fallback": 31,
-      "circular_arc": 76,
+      "bezier_tangent_fallback": 30,
+      "circular_arc": 77,
       "straight_infinite_radius": 42
     },
     "arc_fit_status_counts": {
-      "exact_tangent_arc": 76,
-      "incompatible_tangent_endpoints_bezier_fallback": 31,
+      "exact_tangent_arc": 77,
+      "incompatible_tangent_endpoints_bezier_fallback": 30,
       "near_straight_infinite_radius": 42
     },
     "issue_counts": {
-      "radius_below_design_min": 75
+      "radius_below_design_min": 74
     }
   }
 }
 [exit] 0
 
-[2026-06-04 13:42:33] L6.5 junction connector solver candidates
+[2026-06-04 13:59:16] L6.5 junction connector solver candidates
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_junction_connectors.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
   "counts": {
     "connectors": 149,
-    "solver_cases": 90,
-    "unresolved_solver_cases": 84,
-    "publishable_best_candidates": 65,
-    "publishable_replacement_candidates": 65,
-    "replacement_ready_candidates": 6,
+    "solver_cases": 89,
+    "unresolved_solver_cases": 82,
+    "publishable_best_candidates": 67,
+    "publishable_replacement_candidates": 67,
+    "replacement_ready_candidates": 7,
     "candidate_family_counts": {
       "biarc_g1_proxy": 447,
       "circular_arc_exact": 149,
@@ -259,45 +294,45 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
       "param_poly3_hermite": 745
     },
     "best_family_counts": {
-      "biarc_g1_proxy": 3,
-      "circular_arc_exact": 70,
-      "current_geometry": 67,
+      "biarc_g1_proxy": 4,
+      "circular_arc_exact": 71,
+      "current_geometry": 65,
       "param_poly3_hermite": 9
     },
     "best_replacement_family_counts": {
-      "biarc_g1_proxy": 3,
-      "circular_arc_exact": 116,
-      "param_poly3_hermite": 30
+      "biarc_g1_proxy": 4,
+      "circular_arc_exact": 117,
+      "param_poly3_hermite": 28
     },
     "best_status_counts": {
-      "needs_work": 84,
-      "publishable_candidate": 65
+      "needs_work": 82,
+      "publishable_candidate": 67
     },
     "best_replacement_status_counts": {
-      "needs_work": 84,
-      "publishable_candidate": 65
+      "needs_work": 82,
+      "publishable_candidate": 67
     },
     "current_issue_counts": {
-      "current_bezier_tangent_fallback": 31,
-      "radius_below_design_min": 75,
-      "single_arc_incompatible": 31
+      "current_bezier_tangent_fallback": 30,
+      "radius_below_design_min": 74,
+      "single_arc_incompatible": 30
     },
     "current_scored_issue_counts": {
-      "center_intrusion": 28,
-      "current_bezier_tangent_fallback": 31,
+      "center_intrusion": 26,
+      "current_bezier_tangent_fallback": 30,
       "curvature_reversal": 1,
-      "radius_below_design_min": 81,
-      "single_arc_incompatible": 31
+      "radius_below_design_min": 80,
+      "single_arc_incompatible": 30
     },
     "best_issue_counts": {
-      "center_intrusion": 19,
-      "curvature_reversal": 1,
-      "radius_below_design_min": 76
+      "center_intrusion": 16,
+      "curvature_reversal": 2,
+      "radius_below_design_min": 75
     },
     "best_replacement_issue_counts": {
-      "center_intrusion": 18,
-      "curvature_reversal": 1,
-      "radius_below_design_min": 76
+      "center_intrusion": 15,
+      "curvature_reversal": 2,
+      "radius_below_design_min": 75
     }
   },
   "outputs": {
@@ -307,15 +342,15 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:33] L6.6 connector replacement transaction
+[2026-06-04 13:59:17] L6.6 connector replacement transaction
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\apply_connector_replacements.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "accepted",
   "counts": {
-    "replacement_ready_cases": 6,
-    "trial_replacements": 6,
-    "accepted_replacements": 6,
+    "replacement_ready_cases": 7,
+    "trial_replacements": 7,
+    "accepted_replacements": 7,
     "candidate_rejections": 0
   },
   "audit_checks": [
@@ -329,8 +364,8 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     {
       "check_id": "total_issue_count_no_regression",
       "status": "pass",
-      "before": 75,
-      "after": 75,
+      "before": 74,
+      "after": 74,
       "message": "Replacement must not increase total junction geometry audit issues."
     },
     {
@@ -357,8 +392,8 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     {
       "check_id": "radius_below_design_min_no_regression",
       "status": "pass",
-      "before": 75,
-      "after": 75,
+      "before": 74,
+      "after": 74,
       "message": "Replacement must not increase radius_below_design_min."
     },
     {
@@ -378,7 +413,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:34] L6.7 junction geometry audit after replacement
+[2026-06-04 13:59:18] L6.7 junction geometry audit after replacement
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\junction_geometry_audit.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -386,7 +421,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_geometry_audit_report.json",
   "metrics": {
     "junctions_with_connectors": 49,
-    "junctions_with_issues": 40,
+    "junctions_with_issues": 39,
     "connectors": 149,
     "connector_kind_counts": {
       "adjacent_fallback": 8,
@@ -394,35 +429,35 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
       "t_turn": 94
     },
     "arc_geometry_counts": {
-      "bezier_tangent_fallback": 30,
-      "circular_arc": 76,
-      "param_poly3_hermite": 1,
+      "bezier_tangent_fallback": 28,
+      "circular_arc": 77,
+      "param_poly3_hermite": 2,
       "straight_infinite_radius": 42
     },
     "arc_fit_status_counts": {
-      "exact_tangent_arc": 71,
-      "incompatible_tangent_endpoints_bezier_fallback": 30,
+      "exact_tangent_arc": 72,
+      "incompatible_tangent_endpoints_bezier_fallback": 28,
       "near_straight_infinite_radius": 42,
-      "solver_v2_transaction_replacement": 6
+      "solver_v2_transaction_replacement": 7
     },
     "issue_counts": {
-      "radius_below_design_min": 75
+      "radius_below_design_min": 74
     }
   }
 }
 [exit] 0
 
-[2026-06-04 13:42:34] L6.8 junction connector solver candidates refresh
+[2026-06-04 13:59:18] L6.8 junction connector solver candidates refresh
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_junction_connectors.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
   "counts": {
     "connectors": 149,
-    "solver_cases": 84,
-    "unresolved_solver_cases": 84,
-    "publishable_best_candidates": 65,
-    "publishable_replacement_candidates": 65,
+    "solver_cases": 82,
+    "unresolved_solver_cases": 82,
+    "publishable_best_candidates": 67,
+    "publishable_replacement_candidates": 67,
     "replacement_ready_candidates": 0,
     "candidate_family_counts": {
       "biarc_g1_proxy": 447,
@@ -431,45 +466,45 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
       "param_poly3_hermite": 745
     },
     "best_family_counts": {
-      "biarc_g1_proxy": 3,
-      "circular_arc_exact": 70,
-      "current_geometry": 66,
+      "biarc_g1_proxy": 4,
+      "circular_arc_exact": 71,
+      "current_geometry": 64,
       "param_poly3_hermite": 10
     },
     "best_replacement_family_counts": {
-      "biarc_g1_proxy": 3,
-      "circular_arc_exact": 116,
-      "param_poly3_hermite": 30
+      "biarc_g1_proxy": 4,
+      "circular_arc_exact": 117,
+      "param_poly3_hermite": 28
     },
     "best_status_counts": {
-      "needs_work": 84,
-      "publishable_candidate": 65
+      "needs_work": 82,
+      "publishable_candidate": 67
     },
     "best_replacement_status_counts": {
-      "needs_work": 84,
-      "publishable_candidate": 65
+      "needs_work": 82,
+      "publishable_candidate": 67
     },
     "current_issue_counts": {
-      "current_bezier_tangent_fallback": 30,
-      "radius_below_design_min": 75,
-      "single_arc_incompatible": 30
+      "current_bezier_tangent_fallback": 28,
+      "radius_below_design_min": 74,
+      "single_arc_incompatible": 28
     },
     "current_scored_issue_counts": {
-      "center_intrusion": 28,
-      "current_bezier_tangent_fallback": 30,
+      "center_intrusion": 26,
+      "current_bezier_tangent_fallback": 28,
       "curvature_reversal": 1,
-      "radius_below_design_min": 81,
-      "single_arc_incompatible": 30
+      "radius_below_design_min": 80,
+      "single_arc_incompatible": 28
     },
     "best_issue_counts": {
-      "center_intrusion": 19,
-      "curvature_reversal": 1,
-      "radius_below_design_min": 76
+      "center_intrusion": 16,
+      "curvature_reversal": 2,
+      "radius_below_design_min": 75
     },
     "best_replacement_issue_counts": {
-      "center_intrusion": 18,
-      "curvature_reversal": 1,
-      "radius_below_design_min": 76
+      "center_intrusion": 15,
+      "curvature_reversal": 2,
+      "radius_below_design_min": 75
     }
   },
   "outputs": {
@@ -479,31 +514,24 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:36] L6.9 junction-zone expansion planner
+[2026-06-04 13:59:19] L6.9 junction-zone expansion planner
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\plan_short_edge_absorptions.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
   "counts": {
-    "short_edge_absorption_flags": 6,
+    "short_edge_absorption_flags": 2,
     "status_counts": {
-      "blocked": 1,
-      "transaction_ready": 5
+      "transaction_ready": 2
     },
     "risk_counts": {
-      "high": 1,
-      "low": 2,
-      "medium": 3
+      "low": 2
     },
-    "issue_counts": {
-      "chain_angle_too_large": 1,
-      "low_trim_recovery": 1,
-      "remaining_trim_deficit": 1
-    },
-    "affected_connectors": 11,
-    "affected_unresolved_connectors": 11,
-    "total_trim_recovery_m": 9.718,
-    "max_trim_recovery_m": 2.832
+    "issue_counts": {},
+    "affected_connectors": 4,
+    "affected_unresolved_connectors": 4,
+    "total_trim_recovery_m": 3.468,
+    "max_trim_recovery_m": 2.276
   },
   "outputs": {
     "candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json",
@@ -512,32 +540,32 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:36] L7.0 lane attribute model
+[2026-06-04 13:59:20] L7.0 lane attribute model
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_attribute_model.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
   "counts": {
-    "edges": 171,
+    "edges": 100,
     "lane_source_counts": {
-      "stage_policy_override": 171
+      "stage_policy_override": 100
     },
     "width_source_counts": {
-      "stage_policy_override": 171
+      "stage_policy_override": 100
     },
     "turn_lanes_source_counts": {
-      "missing": 171
+      "missing": 100
     },
     "issue_counts": {
-      "direction_forced_bidirectional_two_lane_policy": 171,
-      "lane_count_forced_bidirectional_two_lane_policy": 171,
-      "lanes_inferred": 171,
-      "missing_turn_lanes": 171,
-      "source_lane_count_overridden_by_bidirectional_two_lane_policy": 168,
-      "source_oneway_overridden_by_bidirectional_two_lane_policy": 91,
-      "source_width_overridden_by_bidirectional_two_lane_policy": 171,
-      "width_forced_bidirectional_two_lane_policy": 171,
-      "width_inferred": 171
+      "direction_forced_bidirectional_two_lane_policy": 100,
+      "lane_count_forced_bidirectional_two_lane_policy": 100,
+      "lanes_inferred": 100,
+      "missing_turn_lanes": 100,
+      "source_lane_count_overridden_by_bidirectional_two_lane_policy": 97,
+      "source_oneway_overridden_by_bidirectional_two_lane_policy": 56,
+      "source_width_overridden_by_bidirectional_two_lane_policy": 100,
+      "width_forced_bidirectional_two_lane_policy": 100,
+      "width_inferred": 100
     }
   },
   "metrics": {
@@ -556,34 +584,34 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:37] L7.1 lane graph topology
+[2026-06-04 13:59:21] L7.1 lane graph topology
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_graph.py --area-id pattaya_central_500m --traffic-side left
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
   "counts": {
-    "edges": 171,
-    "lanes": 342,
+    "edges": 100,
+    "lanes": 200,
     "junctions": 49,
     "connections": 306,
-    "lane_links": 468,
+    "lane_links": 326,
     "junction_lane_links": 306,
-    "connector_continuity_links": 162,
+    "connector_continuity_links": 20,
     "issue_counts": {
-      "connector_continuity_inferred": 324,
-      "direction_forced_bidirectional_two_lane_policy": 513,
+      "connector_continuity_inferred": 40,
+      "direction_forced_bidirectional_two_lane_policy": 300,
       "inferred_without_turn_lanes": 612,
-      "lane_count_forced_bidirectional_two_lane_policy": 513,
-      "lanes_inferred": 513,
+      "lane_count_forced_bidirectional_two_lane_policy": 300,
+      "lanes_inferred": 300,
       "low_confidence_from_lane": 612,
       "low_confidence_to_lane": 612,
-      "missing_turn_lanes": 513,
-      "offset_centerline_preview_only": 342,
-      "source_lane_count_overridden_by_bidirectional_two_lane_policy": 504,
-      "source_oneway_overridden_by_bidirectional_two_lane_policy": 273,
-      "source_width_overridden_by_bidirectional_two_lane_policy": 513,
-      "width_forced_bidirectional_two_lane_policy": 513,
-      "width_inferred": 513
+      "missing_turn_lanes": 300,
+      "offset_centerline_preview_only": 200,
+      "source_lane_count_overridden_by_bidirectional_two_lane_policy": 291,
+      "source_oneway_overridden_by_bidirectional_two_lane_policy": 168,
+      "source_width_overridden_by_bidirectional_two_lane_policy": 300,
+      "width_forced_bidirectional_two_lane_policy": 300,
+      "width_inferred": 300
     }
   },
   "metrics": {
@@ -596,7 +624,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "empty_connection_curves": 0,
     "fan_fallback_ratio": 0.0,
     "avg_lane_links_per_junction": 6.245,
-    "inferred_turn_link_ratio": 0.654,
+    "inferred_turn_link_ratio": 0.939,
     "missing_turn_lanes_lane_ratio": 1.0,
     "inferred_bidirectional_prior_lane_ratio": 0.0,
     "source_oneway_lane_ratio": 0.0,
@@ -609,13 +637,13 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:37] L7.1 lane graph QA
+[2026-06-04 13:59:21] L7.1 lane graph QA
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage lane_graph --area-id pattaya_central_500m
 lane_graph QA status: pass
-[pass] lanes: 342 / 40
+[pass] lanes: 200 / 40
 [pass] junctions: 49 / 1
 [pass] connections: 306 / 1
-[pass] lane_links: 468 / 1
+[pass] lane_links: 326 / 1
 [pass] lane_link_reference_errors: 0 / 0
 [pass] blocked_lane_links: 0 / 0
 [pass] empty_connection_curves: 0 / 0
@@ -623,7 +651,7 @@ lane_graph QA status: pass
 [pass] avg_lane_links_per_junction: 6.245 / 1.0
 [exit] 0
 
-[2026-06-04 13:42:38] L8.0 movement corridor candidates
+[2026-06-04 13:59:22] L8.0 movement corridor candidates
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_movement_corridors.py --area-id pattaya_central_500m --short-edge-absorptions D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_short_edge_absorption_candidates.json
 {
   "area_id": "pattaya_central_500m",
@@ -634,7 +662,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "candidate_curves": 918,
     "ready_for_geometry_solver": 0,
     "reference_errors": 0,
-    "skipped_non_junction_lane_links": 162,
+    "skipped_non_junction_lane_links": 20,
     "status_counts": {
       "qa_candidate": 306
     },
@@ -655,27 +683,23 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
       "temporary_bidirectional_two_lane_policy->temporary_bidirectional_two_lane_policy": 306
     },
     "approach_entry_poses_indexed": 149,
-    "short_edge_absorption_planned_poses_indexed": 5,
+    "short_edge_absorption_planned_poses_indexed": 2,
     "anchor_source_counts": {
-      "engineering_entry_pose_lateral_offset": 592,
-      "junction_zone_expansion_planned_pose_lateral_offset": 20
+      "engineering_entry_pose_lateral_offset": 604,
+      "junction_zone_expansion_planned_pose_lateral_offset": 8
     },
     "anchor_issue_counts": {
-      "entry_anchor_entry_trim_capacity_limited": 18,
-      "entry_anchor_short_edge_absorption_candidate": 2,
-      "exit_anchor_entry_trim_capacity_limited": 18,
-      "exit_anchor_short_edge_absorption_candidate": 2
+      "entry_anchor_entry_trim_capacity_limited": 16,
+      "exit_anchor_entry_trim_capacity_limited": 16
     },
     "fully_anchored_cases": 306,
-    "planned_virtual_anchors": 20,
-    "planned_virtual_anchor_cases": 20,
+    "planned_virtual_anchors": 8,
+    "planned_virtual_anchor_cases": 8,
     "fallback_anchors": 0,
     "missing_anchor_poses": 0,
     "issue_counts": {
-      "entry_anchor_entry_trim_capacity_limited": 18,
-      "entry_anchor_short_edge_absorption_candidate": 2,
-      "exit_anchor_entry_trim_capacity_limited": 18,
-      "exit_anchor_short_edge_absorption_candidate": 2,
+      "entry_anchor_entry_trim_capacity_limited": 16,
+      "exit_anchor_entry_trim_capacity_limited": 16,
       "inferred_without_turn_lanes": 306,
       "low_confidence_from_lane": 306,
       "low_confidence_lane_link": 306,
@@ -683,16 +707,14 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
       "outgoing_turn_lanes_missing": 306
     },
     "candidate_issue_counts": {
-      "entry_anchor_entry_trim_capacity_limited": 54,
-      "entry_anchor_short_edge_absorption_candidate": 6,
-      "exit_anchor_entry_trim_capacity_limited": 54,
-      "exit_anchor_short_edge_absorption_candidate": 6,
+      "entry_anchor_entry_trim_capacity_limited": 48,
+      "exit_anchor_entry_trim_capacity_limited": 48,
       "inferred_without_turn_lanes": 918,
       "low_confidence_from_lane": 918,
       "low_confidence_lane_link": 918,
       "low_confidence_to_lane": 918,
       "outgoing_turn_lanes_missing": 918,
-      "radius_proxy_below_lane_min": 80
+      "radius_proxy_below_lane_min": 75
     },
     "publish_ready_cases": 0
   },
@@ -704,7 +726,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "avg_anchor_confidence": 0.42,
     "fully_anchored_case_ratio": 1.0,
     "anchor_fallback_ratio": 0.0,
-    "planned_virtual_anchor_ratio": 0.033
+    "planned_virtual_anchor_ratio": 0.013
   },
   "outputs": {
     "movement_corridor_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
@@ -713,37 +735,35 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:38] L8.1 anchored movement corridor SVG visualization
+[2026-06-04 13:59:22] L8.1 anchored movement corridor SVG visualization
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\export_lane_graph_svg.py --area-id pattaya_central_500m --movement-corridors D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_movement_corridor_candidates.json --no-compound-transactions --width-px 3200 --max-height-px 9000
 {
   "area_id": "pattaya_central_500m",
   "stage": "lane_graph_svg_visualization",
   "status": "pass",
   "counts": {
-    "lanes": 342,
-    "lane_links_total": 468,
+    "lanes": 200,
+    "lane_links_total": 326,
     "junction_connections_rendered": 306,
     "movement_corridors_rendered": 306,
     "anchor_markers_rendered": 612,
     "anchor_source_counts": {
-      "engineering_entry_pose_lateral_offset": 592,
-      "junction_zone_expansion_planned_pose_lateral_offset": 20
+      "engineering_entry_pose_lateral_offset": 604,
+      "junction_zone_expansion_planned_pose_lateral_offset": 8
     },
     "visual_candidate_family_counts": {
       "bezier_g1_preview": 204,
       "topology_straight_baseline": 102
     },
     "visual_candidate_issue_counts": {
-      "entry_anchor_entry_trim_capacity_limited": 18,
-      "entry_anchor_short_edge_absorption_candidate": 2,
-      "exit_anchor_entry_trim_capacity_limited": 18,
-      "exit_anchor_short_edge_absorption_candidate": 2,
+      "entry_anchor_entry_trim_capacity_limited": 16,
+      "exit_anchor_entry_trim_capacity_limited": 16,
       "inferred_without_turn_lanes": 306,
       "low_confidence_from_lane": 306,
       "low_confidence_lane_link": 306,
       "low_confidence_to_lane": 306,
       "outgoing_turn_lanes_missing": 306,
-      "radius_proxy_below_lane_min": 17
+      "radius_proxy_below_lane_min": 15
     },
     "compound_corridors_rendered": 0,
     "compound_anchor_markers_rendered": 0,
@@ -795,7 +815,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:40] L8.0 movement corridor QA
+[2026-06-04 13:59:23] L8.0 movement corridor QA
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage movement_corridor --area-id pattaya_central_500m
 movement_corridor QA status: warn
 [pass] corridor_cases: 306 / 1
@@ -809,30 +829,27 @@ movement_corridor QA status: warn
 [warn] ready_ratio: 0.0 / 0.05
 [exit] 0
 
-[2026-06-04 13:42:40] L8.2 movement anchor gap audit
+[2026-06-04 13:59:24] L8.2 movement anchor gap audit
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\audit_movement_anchors.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
   "counts": {
     "movement_corridor_cases": 306,
-    "planned_virtual_anchors": 20,
-    "remaining_capacity_limited_anchors": 36,
-    "unique_remaining_approaches": 9,
+    "planned_virtual_anchors": 8,
+    "remaining_capacity_limited_anchors": 32,
+    "unique_remaining_approaches": 8,
     "classification_counts": {
       "adjacent_junction_short_link": 24,
-      "dead_end_stub_capacity_limited": 8,
-      "low_value_short_edge_absorption": 4
+      "dead_end_stub_capacity_limited": 8
     },
     "recommended_action_counts": {
       "compound_junction_merge": 24,
-      "defer": 4,
       "keep_qa": 8
     },
     "corridor_counts_by_classification": {
       "adjacent_junction_short_link": 24,
-      "dead_end_stub_capacity_limited": 8,
-      "low_value_short_edge_absorption": 4
+      "dead_end_stub_capacity_limited": 8
     }
   },
   "outputs": {
@@ -842,13 +859,13 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:41] L8.3 compound junction merge planner
+[2026-06-04 13:59:25] L8.3 compound junction merge planner
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\plan_compound_junction_merges.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
   "counts": {
-    "remaining_anchor_records": 36,
+    "remaining_anchor_records": 32,
     "eligible_anchor_records": 24,
     "eligible_bridge_edges": 3,
     "candidates": 3,
@@ -862,8 +879,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     },
     "issue_counts": {},
     "ignored_classification_counts": {
-      "dead_end_stub_capacity_limited": 8,
-      "low_value_short_edge_absorption": 4
+      "dead_end_stub_capacity_limited": 8
     },
     "affected_corridors": 24,
     "affected_anchor_records": 24,
@@ -877,7 +893,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:41] L8.3 compound junction merge QA
+[2026-06-04 13:59:25] L8.3 compound junction merge QA
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage compound_junction_merge --area-id pattaya_central_500m
 compound_junction_merge QA status: pass
 [pass] reference_errors: 0 / 0
@@ -887,7 +903,7 @@ compound_junction_merge QA status: pass
 [pass] transaction_candidate_ratio: 1.0 / 0.5
 [exit] 0
 
-[2026-06-04 13:42:42] L8.4 compound junction merge transaction
+[2026-06-04 13:59:26] L8.4 compound junction merge transaction
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\apply_compound_junction_merges.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -938,7 +954,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:42] L8.4 compound junction merge transaction QA
+[2026-06-04 13:59:26] L8.4 compound junction merge transaction QA
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage compound_junction_merge_transaction --area-id pattaya_central_500m
 compound_junction_merge_transaction QA status: pass
 [pass] reference_errors: 0 / 0
@@ -948,37 +964,35 @@ compound_junction_merge_transaction QA status: pass
 [pass] affected_corridor_replacement_ratio: 1.0 / 1.0
 [exit] 0
 
-[2026-06-04 13:42:43] L8.5 staged compound movement SVG visualization
+[2026-06-04 13:59:27] L8.5 staged compound movement SVG visualization
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\export_lane_graph_svg.py --area-id pattaya_central_500m --movement-corridors D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_movement_corridor_candidates.json --compound-transactions D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_compound_junction_merge_transactions.json --width-px 3200 --max-height-px 9000
 {
   "area_id": "pattaya_central_500m",
   "stage": "lane_graph_svg_visualization",
   "status": "pass",
   "counts": {
-    "lanes": 342,
-    "lane_links_total": 468,
+    "lanes": 200,
+    "lane_links_total": 326,
     "junction_connections_rendered": 306,
     "movement_corridors_rendered": 306,
     "anchor_markers_rendered": 612,
     "anchor_source_counts": {
-      "engineering_entry_pose_lateral_offset": 592,
-      "junction_zone_expansion_planned_pose_lateral_offset": 20
+      "engineering_entry_pose_lateral_offset": 604,
+      "junction_zone_expansion_planned_pose_lateral_offset": 8
     },
     "visual_candidate_family_counts": {
       "bezier_g1_preview": 204,
       "topology_straight_baseline": 102
     },
     "visual_candidate_issue_counts": {
-      "entry_anchor_entry_trim_capacity_limited": 18,
-      "entry_anchor_short_edge_absorption_candidate": 2,
-      "exit_anchor_entry_trim_capacity_limited": 18,
-      "exit_anchor_short_edge_absorption_candidate": 2,
+      "entry_anchor_entry_trim_capacity_limited": 16,
+      "exit_anchor_entry_trim_capacity_limited": 16,
       "inferred_without_turn_lanes": 306,
       "low_confidence_from_lane": 306,
       "low_confidence_lane_link": 306,
       "low_confidence_to_lane": 306,
       "outgoing_turn_lanes_missing": 306,
-      "radius_proxy_below_lane_min": 17
+      "radius_proxy_below_lane_min": 15
     },
     "compound_corridors_rendered": 24,
     "compound_anchor_markers_rendered": 48,
@@ -1042,7 +1056,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:44] L8.6 movement corridor scoring
+[2026-06-04 13:59:28] L8.6 movement corridor scoring
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\score_movement_corridors.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
@@ -1055,14 +1069,14 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "candidate_scores": 990,
     "reference_errors": 0,
     "scored_candidate_ratio": 1.0,
-    "qa_ready_cases": 165,
-    "qa_ready_case_ratio": 0.5,
-    "collision_risk_candidate_ratio": 0.686,
-    "swept_margin_candidate_ratio": 0.068,
-    "curvature_risk_candidate_ratio": 0.633,
-    "avg_overall_score": 48.838,
-    "min_overall_score": 3.91,
-    "max_overall_score": 92.01,
+    "qa_ready_cases": 175,
+    "qa_ready_case_ratio": 0.53,
+    "collision_risk_candidate_ratio": 0.663,
+    "swept_margin_candidate_ratio": 0.066,
+    "curvature_risk_candidate_ratio": 0.632,
+    "avg_overall_score": 50.744,
+    "min_overall_score": 8.58,
+    "max_overall_score": 100.0,
     "candidate_family_counts": {
       "bezier_g1_preview": 306,
       "compound_bezier_g1_preview": 24,
@@ -1072,22 +1086,22 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
       "topology_straight_baseline": 306
     },
     "best_scored_family_counts": {
-      "bezier_g1_preview": 105,
+      "bezier_g1_preview": 101,
       "compound_bezier_g1_preview": 2,
       "compound_param_poly3_hermite_proxy": 1,
       "compound_topology_straight_baseline": 21,
-      "param_poly3_hermite_proxy": 8,
-      "topology_straight_baseline": 193
+      "param_poly3_hermite_proxy": 7,
+      "topology_straight_baseline": 198
     },
     "candidate_status_counts": {
-      "needs_review": 660,
-      "scored_qa_candidate": 330
+      "needs_review": 635,
+      "scored_qa_candidate": 355
     },
     "scoring_issue_counts": {
-      "collision_risk_non_target_lane_centerline": 679,
-      "curvature_radius_below_scoring_min": 627,
-      "curvature_reversal": 200,
-      "swept_envelope_margin_low": 67
+      "collision_risk_non_target_lane_centerline": 656,
+      "curvature_radius_below_scoring_min": 626,
+      "curvature_reversal": 198,
+      "swept_envelope_margin_low": 65
     },
     "publish_ready_candidates": 0,
     "destructive_writeback_ready": false
@@ -1106,13 +1120,13 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-04 13:42:47] L8.6 movement corridor scoring QA
+[2026-06-04 13:59:31] L8.6 movement corridor scoring QA
 C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage movement_corridor_scoring --area-id pattaya_central_500m
 movement_corridor_scoring QA status: pass
 [pass] cases_scored: 330 / 1
 [pass] candidate_scores: 990 / 1
 [pass] reference_errors: 0 / 0
 [pass] scored_candidate_ratio: 1.0 / 1.0
-[pass] qa_ready_case_ratio: 0.5 / 0.25
-[pass] collision_risk_candidate_ratio: 0.686 / 0.95
+[pass] qa_ready_case_ratio: 0.53 / 0.25
+[pass] collision_risk_candidate_ratio: 0.663 / 0.95
 [exit] 0

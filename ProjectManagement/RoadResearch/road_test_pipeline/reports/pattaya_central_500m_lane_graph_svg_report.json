@@ -3,30 +3,28 @@
   "stage": "lane_graph_svg_visualization",
   "status": "pass",
   "counts": {
-    "lanes": 342,
-    "lane_links_total": 468,
+    "lanes": 200,
+    "lane_links_total": 326,
     "junction_connections_rendered": 306,
     "movement_corridors_rendered": 306,
     "anchor_markers_rendered": 612,
     "anchor_source_counts": {
-      "engineering_entry_pose_lateral_offset": 592,
-      "junction_zone_expansion_planned_pose_lateral_offset": 20
+      "engineering_entry_pose_lateral_offset": 604,
+      "junction_zone_expansion_planned_pose_lateral_offset": 8
     },
     "visual_candidate_family_counts": {
       "bezier_g1_preview": 204,
       "topology_straight_baseline": 102
     },
     "visual_candidate_issue_counts": {
-      "entry_anchor_entry_trim_capacity_limited": 18,
-      "entry_anchor_short_edge_absorption_candidate": 2,
-      "exit_anchor_entry_trim_capacity_limited": 18,
-      "exit_anchor_short_edge_absorption_candidate": 2,
+      "entry_anchor_entry_trim_capacity_limited": 16,
+      "exit_anchor_entry_trim_capacity_limited": 16,
       "inferred_without_turn_lanes": 306,
       "low_confidence_from_lane": 306,
       "low_confidence_lane_link": 306,
       "low_confidence_to_lane": 306,
       "outgoing_turn_lanes_missing": 306,
-      "radius_proxy_below_lane_min": 17
+      "radius_proxy_below_lane_min": 15
     },
     "compound_corridors_rendered": 24,
     "compound_anchor_markers_rendered": 48,

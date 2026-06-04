@@ -1,0 +1,41 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "canonical_roads_v1",
+  "status": "pass",
+  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
+  "parameters": {
+    "node_eps_m": 0.35,
+    "bbox_edge_margin_m": 5.0,
+    "merge_policy": "degree2_nodes_only_with_matching_attribute_signature"
+  },
+  "counts": {
+    "input_edges": 171,
+    "output_canonical_roads": 100,
+    "skipped_empty_geometry": 0,
+    "merged_input_edges": 71,
+    "connector_nodes_available_for_merge": 73,
+    "boundary_nodes_protected": 14,
+    "junction_or_terminal_nodes_protected": 80
+  },
+  "chain_edge_count_histogram": {
+    "1": 68,
+    "2": 19,
+    "3": 6,
+    "4": 3,
+    "6": 2,
+    "11": 1,
+    "12": 1
+  },
+  "merge_stop_counts": {},
+  "metrics": {
+    "edge_reduction_ratio": 0.415,
+    "avg_input_edges_per_canonical_road": 1.71,
+    "total_length_m": 8325.886
+  },
+  "notes": [
+    "Canonical roads are machine-readable GeoJSON, not SVG visualization.",
+    "Each canonical road keeps source_feature_ids, repaired_source_feature_ids, and repair_parent_ids for traceability.",
+    "The stage does not cross true junctions or attribute conflicts; it only removes unstable degree-2 fragmentation from downstream graph construction."
+  ]
+}

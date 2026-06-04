@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a stable road_graph.json from repaired road edges."""
+"""Build a stable road_graph.json from canonical or repaired road edges."""
 
 from __future__ import annotations
 
@@ -235,8 +235,16 @@ def build_graph(input_path: Path, output_path: Path, report_path: Path, area_id:
             "points": points,
             "length_m": length_m,
             "source_feature_id": str(props.get("source_feature_id") or index),
+            "canonical_road_id": str(props.get("canonical_road_id") or ""),
+            "source_feature_ids": props.get("source_feature_ids") or [],
+            "repaired_source_feature_ids": props.get("repaired_source_feature_ids") or [],
+            "repair_parent_ids": props.get("repair_parent_ids") or [],
             "repair_parent_id": props.get("repair_parent_id", ""),
             "repair_edge_id": props.get("repair_edge_id", ""),
+            "repair_edge_ids": props.get("repair_edge_ids") or [],
+            "canonical_edge_count": props.get("canonical_edge_count", ""),
+            "canonical_ops": props.get("canonical_ops") or [],
+            "attribute_conflicts": props.get("attribute_conflicts") or {},
             "highway": highway,
             "road_class": str(props.get("road_class") or highway),
             "name": props.get("name", ""),
@@ -274,8 +282,16 @@ def build_graph(input_path: Path, output_path: Path, report_path: Path, area_id:
             "from_node": from_node,
             "to_node": to_node,
             "source_feature_id": raw["source_feature_id"],
+            "canonical_road_id": raw["canonical_road_id"],
+            "source_feature_ids": raw["source_feature_ids"],
+            "repaired_source_feature_ids": raw["repaired_source_feature_ids"],
+            "repair_parent_ids": raw["repair_parent_ids"],
             "repair_parent_id": raw["repair_parent_id"],
             "repair_edge_id": raw["repair_edge_id"],
+            "repair_edge_ids": raw["repair_edge_ids"],
+            "canonical_edge_count": raw["canonical_edge_count"],
+            "canonical_ops": raw["canonical_ops"],
+            "attribute_conflicts": raw["attribute_conflicts"],
             "source_provider": raw["source_provider"],
             "road_class": raw["road_class"],
             "highway": raw["highway"],
@@ -377,7 +393,7 @@ def build_graph(input_path: Path, output_path: Path, report_path: Path, area_id:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build road_graph.json from repaired roads.")
+    parser = argparse.ArgumentParser(description="Build road_graph.json from canonical or repaired roads.")
     parser.add_argument("--area-id", default="pattaya_central_500m")
     parser.add_argument("--input", default="")
     parser.add_argument("--output", default="")
@@ -385,7 +401,10 @@ def main() -> int:
     args = parser.parse_args()
 
     root = pipeline_root_from_script(Path(__file__))
-    input_path = Path(args.input) if args.input else root / "data" / "processed" / f"{args.area_id}_roads_repaired.geojson"
+    processed = root / "data" / "processed"
+    canonical_path = processed / f"{args.area_id}_roads_canonical.geojson"
+    repaired_path = processed / f"{args.area_id}_roads_repaired.geojson"
+    input_path = Path(args.input) if args.input else canonical_path if canonical_path.exists() else repaired_path
     output_path = Path(args.output) if args.output else root / "data" / "processed" / f"{args.area_id}_road_graph.json"
     report_path = Path(args.report) if args.report else root / "reports" / f"{args.area_id}_road_graph_report.json"
 

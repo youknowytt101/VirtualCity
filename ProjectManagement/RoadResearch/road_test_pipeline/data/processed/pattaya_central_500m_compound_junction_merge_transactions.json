@@ -19,11 +19,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
       "bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -48,11 +48,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
       "bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -77,11 +77,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
       "bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -108,20 +108,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00132",
       "exit_lane_link_id": "ll_00138",
-      "internal_bridge_lane_id": "ln_e_0169_f_00",
+      "internal_bridge_lane_id": "ln_e_0099_f_00",
       "internal_bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
-      "entry_junction_node_id": "n_0081",
-      "exit_junction_node_id": "n_0082",
+      "entry_junction_node_id": "n_0038",
+      "exit_junction_node_id": "n_0039",
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
-      "from_lane_id": "ln_e_0168_f_00",
-      "to_lane_id": "ln_e_0035_f_00",
-      "from_edge_id": "e_0168",
-      "to_edge_id": "e_0035",
+      "from_lane_id": "ln_e_0098_f_00",
+      "to_lane_id": "ln_e_0024_f_00",
+      "from_edge_id": "e_0098",
+      "to_edge_id": "e_0024",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -142,13 +142,13 @@
         -0.668
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0168_f_00_n_0081_entry_anchor",
+        "anchor_id": "ln_e_0098_f_00_n_0038_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0168_f_00",
-        "edge_id": "e_0168",
-        "node_id": "n_0081",
-        "pose_id": "j_022_e_0168_entry",
+        "lane_id": "ln_e_0098_f_00",
+        "edge_id": "e_0098",
+        "node_id": "n_0038",
+        "pose_id": "j_022_e_0098_entry",
         "point_xz": [
           -24.794,
           -214.75
@@ -163,13 +163,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0035_f_00_n_0082_exit_anchor",
+        "anchor_id": "ln_e_0024_f_00_n_0039_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0035_f_00",
-        "edge_id": "e_0035",
-        "node_id": "n_0082",
-        "pose_id": "j_023_e_0035_entry",
+        "lane_id": "ln_e_0024_f_00",
+        "edge_id": "e_0024",
+        "node_id": "n_0039",
+        "pose_id": "j_023_e_0024_entry",
         "point_xz": [
           -8.976,
           -210.606
@@ -406,20 +406,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00132",
       "exit_lane_link_id": "ll_00139",
-      "internal_bridge_lane_id": "ln_e_0169_f_00",
+      "internal_bridge_lane_id": "ln_e_0099_f_00",
       "internal_bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
-      "entry_junction_node_id": "n_0081",
-      "exit_junction_node_id": "n_0082",
+      "entry_junction_node_id": "n_0038",
+      "exit_junction_node_id": "n_0039",
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
-      "from_lane_id": "ln_e_0168_f_00",
-      "to_lane_id": "ln_e_0170_f_00",
-      "from_edge_id": "e_0168",
-      "to_edge_id": "e_0170",
+      "from_lane_id": "ln_e_0098_f_00",
+      "to_lane_id": "ln_e_0063_f_00",
+      "from_edge_id": "e_0098",
+      "to_edge_id": "e_0063",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -440,13 +440,13 @@
         0.679
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0168_f_00_n_0081_entry_anchor",
+        "anchor_id": "ln_e_0098_f_00_n_0038_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0168_f_00",
-        "edge_id": "e_0168",
-        "node_id": "n_0081",
-        "pose_id": "j_022_e_0168_entry",
+        "lane_id": "ln_e_0098_f_00",
+        "edge_id": "e_0098",
+        "node_id": "n_0038",
+        "pose_id": "j_022_e_0098_entry",
         "point_xz": [
           -24.794,
           -214.75
@@ -461,13 +461,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0170_f_00_n_0082_exit_anchor",
+        "anchor_id": "ln_e_0063_f_00_n_0039_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0170_f_00",
-        "edge_id": "e_0170",
-        "node_id": "n_0082",
-        "pose_id": "j_023_e_0170_entry",
+        "lane_id": "ln_e_0063_f_00",
+        "edge_id": "e_0063",
+        "node_id": "n_0039",
+        "pose_id": "j_023_e_0063_entry",
         "point_xz": [
           -11.198,
           -202.136
@@ -704,20 +704,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00137",
       "exit_lane_link_id": "ll_00138",
-      "internal_bridge_lane_id": "ln_e_0169_f_00",
+      "internal_bridge_lane_id": "ln_e_0099_f_00",
       "internal_bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
-      "entry_junction_node_id": "n_0081",
-      "exit_junction_node_id": "n_0082",
+      "entry_junction_node_id": "n_0038",
+      "exit_junction_node_id": "n_0039",
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
-      "from_lane_id": "ln_e_0103_b_00",
-      "to_lane_id": "ln_e_0035_f_00",
-      "from_edge_id": "e_0103",
-      "to_edge_id": "e_0035",
+      "from_lane_id": "ln_e_0059_b_00",
+      "to_lane_id": "ln_e_0024_f_00",
+      "from_edge_id": "e_0059",
+      "to_edge_id": "e_0024",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -738,13 +738,13 @@
         -0.668
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0103_b_00_n_0081_entry_anchor",
+        "anchor_id": "ln_e_0059_b_00_n_0038_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0103_b_00",
-        "edge_id": "e_0103",
-        "node_id": "n_0081",
-        "pose_id": "j_022_e_0103_entry",
+        "lane_id": "ln_e_0059_b_00",
+        "edge_id": "e_0059",
+        "node_id": "n_0038",
+        "pose_id": "j_022_e_0059_entry",
         "point_xz": [
           -22.582,
           -206.192
@@ -759,13 +759,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0035_f_00_n_0082_exit_anchor",
+        "anchor_id": "ln_e_0024_f_00_n_0039_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0035_f_00",
-        "edge_id": "e_0035",
-        "node_id": "n_0082",
-        "pose_id": "j_023_e_0035_entry",
+        "lane_id": "ln_e_0024_f_00",
+        "edge_id": "e_0024",
+        "node_id": "n_0039",
+        "pose_id": "j_023_e_0024_entry",
         "point_xz": [
           -8.976,
           -210.606
@@ -1002,20 +1002,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00137",
       "exit_lane_link_id": "ll_00139",
-      "internal_bridge_lane_id": "ln_e_0169_f_00",
+      "internal_bridge_lane_id": "ln_e_0099_f_00",
       "internal_bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
-      "entry_junction_node_id": "n_0081",
-      "exit_junction_node_id": "n_0082",
+      "entry_junction_node_id": "n_0038",
+      "exit_junction_node_id": "n_0039",
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
-      "from_lane_id": "ln_e_0103_b_00",
-      "to_lane_id": "ln_e_0170_f_00",
-      "from_edge_id": "e_0103",
-      "to_edge_id": "e_0170",
+      "from_lane_id": "ln_e_0059_b_00",
+      "to_lane_id": "ln_e_0063_f_00",
+      "from_edge_id": "e_0059",
+      "to_edge_id": "e_0063",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -1036,13 +1036,13 @@
         0.679
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0103_b_00_n_0081_entry_anchor",
+        "anchor_id": "ln_e_0059_b_00_n_0038_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0103_b_00",
-        "edge_id": "e_0103",
-        "node_id": "n_0081",
-        "pose_id": "j_022_e_0103_entry",
+        "lane_id": "ln_e_0059_b_00",
+        "edge_id": "e_0059",
+        "node_id": "n_0038",
+        "pose_id": "j_022_e_0059_entry",
         "point_xz": [
           -22.582,
           -206.192
@@ -1057,13 +1057,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0170_f_00_n_0082_exit_anchor",
+        "anchor_id": "ln_e_0063_f_00_n_0039_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0170_f_00",
-        "edge_id": "e_0170",
-        "node_id": "n_0082",
-        "pose_id": "j_023_e_0170_entry",
+        "lane_id": "ln_e_0063_f_00",
+        "edge_id": "e_0063",
+        "node_id": "n_0039",
+        "pose_id": "j_023_e_0063_entry",
         "point_xz": [
           -11.198,
           -202.136
@@ -1300,20 +1300,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00140",
       "exit_lane_link_id": "ll_00134",
-      "internal_bridge_lane_id": "ln_e_0169_b_00",
+      "internal_bridge_lane_id": "ln_e_0099_b_00",
       "internal_bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
-      "entry_junction_node_id": "n_0082",
-      "exit_junction_node_id": "n_0081",
+      "entry_junction_node_id": "n_0039",
+      "exit_junction_node_id": "n_0038",
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
-      "from_lane_id": "ln_e_0035_b_00",
-      "to_lane_id": "ln_e_0168_b_00",
-      "from_edge_id": "e_0035",
-      "to_edge_id": "e_0168",
+      "from_lane_id": "ln_e_0024_b_00",
+      "to_lane_id": "ln_e_0098_b_00",
+      "from_edge_id": "e_0024",
+      "to_edge_id": "e_0098",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -1334,13 +1334,13 @@
         -0.677
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0035_b_00_n_0082_entry_anchor",
+        "anchor_id": "ln_e_0024_b_00_n_0039_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0035_b_00",
-        "edge_id": "e_0035",
-        "node_id": "n_0082",
-        "pose_id": "j_023_e_0035_entry",
+        "lane_id": "ln_e_0024_b_00",
+        "edge_id": "e_0024",
+        "node_id": "n_0039",
+        "pose_id": "j_023_e_0024_entry",
         "point_xz": [
           -11.112,
           -212.988
@@ -1355,13 +1355,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0168_b_00_n_0081_exit_anchor",
+        "anchor_id": "ln_e_0098_b_00_n_0038_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0168_b_00",
-        "edge_id": "e_0168",
-        "node_id": "n_0081",
-        "pose_id": "j_022_e_0168_entry",
+        "lane_id": "ln_e_0098_b_00",
+        "edge_id": "e_0098",
+        "node_id": "n_0038",
+        "pose_id": "j_022_e_0098_entry",
         "point_xz": [
           -22.628,
           -217.106
@@ -1598,20 +1598,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00140",
       "exit_lane_link_id": "ll_00135",
-      "internal_bridge_lane_id": "ln_e_0169_b_00",
+      "internal_bridge_lane_id": "ln_e_0099_b_00",
       "internal_bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
-      "entry_junction_node_id": "n_0082",
-      "exit_junction_node_id": "n_0081",
+      "entry_junction_node_id": "n_0039",
+      "exit_junction_node_id": "n_0038",
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
-      "from_lane_id": "ln_e_0035_b_00",
-      "to_lane_id": "ln_e_0103_f_00",
-      "from_edge_id": "e_0035",
-      "to_edge_id": "e_0103",
+      "from_lane_id": "ln_e_0024_b_00",
+      "to_lane_id": "ln_e_0059_f_00",
+      "from_edge_id": "e_0024",
+      "to_edge_id": "e_0059",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -1632,13 +1632,13 @@
         0.683
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0035_b_00_n_0082_entry_anchor",
+        "anchor_id": "ln_e_0024_b_00_n_0039_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0035_b_00",
-        "edge_id": "e_0035",
-        "node_id": "n_0082",
-        "pose_id": "j_023_e_0035_entry",
+        "lane_id": "ln_e_0024_b_00",
+        "edge_id": "e_0024",
+        "node_id": "n_0039",
+        "pose_id": "j_023_e_0024_entry",
         "point_xz": [
           -11.112,
           -212.988
@@ -1653,13 +1653,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0103_f_00_n_0081_exit_anchor",
+        "anchor_id": "ln_e_0059_f_00_n_0038_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0103_f_00",
-        "edge_id": "e_0103",
-        "node_id": "n_0081",
-        "pose_id": "j_022_e_0103_entry",
+        "lane_id": "ln_e_0059_f_00",
+        "edge_id": "e_0059",
+        "node_id": "n_0038",
+        "pose_id": "j_022_e_0059_entry",
         "point_xz": [
           -24.768,
           -208.528
@@ -1896,20 +1896,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00142",
       "exit_lane_link_id": "ll_00134",
-      "internal_bridge_lane_id": "ln_e_0169_b_00",
+      "internal_bridge_lane_id": "ln_e_0099_b_00",
       "internal_bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
-      "entry_junction_node_id": "n_0082",
-      "exit_junction_node_id": "n_0081",
+      "entry_junction_node_id": "n_0039",
+      "exit_junction_node_id": "n_0038",
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
-      "from_lane_id": "ln_e_0170_b_00",
-      "to_lane_id": "ln_e_0168_b_00",
-      "from_edge_id": "e_0170",
-      "to_edge_id": "e_0168",
+      "from_lane_id": "ln_e_0063_b_00",
+      "to_lane_id": "ln_e_0098_b_00",
+      "from_edge_id": "e_0063",
+      "to_edge_id": "e_0098",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -1930,13 +1930,13 @@
         -0.677
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0170_b_00_n_0082_entry_anchor",
+        "anchor_id": "ln_e_0063_b_00_n_0039_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0170_b_00",
-        "edge_id": "e_0170",
-        "node_id": "n_0082",
-        "pose_id": "j_023_e_0170_entry",
+        "lane_id": "ln_e_0063_b_00",
+        "edge_id": "e_0063",
+        "node_id": "n_0039",
+        "pose_id": "j_023_e_0063_entry",
         "point_xz": [
           -9.024,
           -204.484
@@ -1951,13 +1951,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0168_b_00_n_0081_exit_anchor",
+        "anchor_id": "ln_e_0098_b_00_n_0038_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0168_b_00",
-        "edge_id": "e_0168",
-        "node_id": "n_0081",
-        "pose_id": "j_022_e_0168_entry",
+        "lane_id": "ln_e_0098_b_00",
+        "edge_id": "e_0098",
+        "node_id": "n_0038",
+        "pose_id": "j_022_e_0098_entry",
         "point_xz": [
           -22.628,
           -217.106
@@ -2194,20 +2194,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00142",
       "exit_lane_link_id": "ll_00135",
-      "internal_bridge_lane_id": "ln_e_0169_b_00",
+      "internal_bridge_lane_id": "ln_e_0099_b_00",
       "internal_bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
-      "entry_junction_node_id": "n_0082",
-      "exit_junction_node_id": "n_0081",
+      "entry_junction_node_id": "n_0039",
+      "exit_junction_node_id": "n_0038",
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
-      "from_lane_id": "ln_e_0170_b_00",
-      "to_lane_id": "ln_e_0103_f_00",
-      "from_edge_id": "e_0170",
-      "to_edge_id": "e_0103",
+      "from_lane_id": "ln_e_0063_b_00",
+      "to_lane_id": "ln_e_0059_f_00",
+      "from_edge_id": "e_0063",
+      "to_edge_id": "e_0059",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -2228,13 +2228,13 @@
         0.683
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0170_b_00_n_0082_entry_anchor",
+        "anchor_id": "ln_e_0063_b_00_n_0039_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0170_b_00",
-        "edge_id": "e_0170",
-        "node_id": "n_0082",
-        "pose_id": "j_023_e_0170_entry",
+        "lane_id": "ln_e_0063_b_00",
+        "edge_id": "e_0063",
+        "node_id": "n_0039",
+        "pose_id": "j_023_e_0063_entry",
         "point_xz": [
           -9.024,
           -204.484
@@ -2249,13 +2249,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0103_f_00_n_0081_exit_anchor",
+        "anchor_id": "ln_e_0059_f_00_n_0038_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0103_f_00",
-        "edge_id": "e_0103",
-        "node_id": "n_0081",
-        "pose_id": "j_022_e_0103_entry",
+        "lane_id": "ln_e_0059_f_00",
+        "edge_id": "e_0059",
+        "node_id": "n_0038",
+        "pose_id": "j_022_e_0059_entry",
         "point_xz": [
           -24.768,
           -208.528
@@ -2492,20 +2492,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00246",
       "exit_lane_link_id": "ll_00252",
-      "internal_bridge_lane_id": "ln_e_0118_f_00",
+      "internal_bridge_lane_id": "ln_e_0070_f_00",
       "internal_bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
-      "entry_junction_node_id": "n_0116",
-      "exit_junction_node_id": "n_0119",
+      "entry_junction_node_id": "n_0062",
+      "exit_junction_node_id": "n_0063",
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
-      "from_lane_id": "ln_e_0117_f_00",
-      "to_lane_id": "ln_e_0119_f_00",
-      "from_edge_id": "e_0117",
-      "to_edge_id": "e_0119",
+      "from_lane_id": "ln_e_0069_f_00",
+      "to_lane_id": "ln_e_0071_f_00",
+      "from_edge_id": "e_0069",
+      "to_edge_id": "e_0071",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -2526,13 +2526,13 @@
         0.825
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0117_f_00_n_0116_entry_anchor",
+        "anchor_id": "ln_e_0069_f_00_n_0062_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0117_f_00",
-        "edge_id": "e_0117",
-        "node_id": "n_0116",
-        "pose_id": "j_039_e_0117_entry",
+        "lane_id": "ln_e_0069_f_00",
+        "edge_id": "e_0069",
+        "node_id": "n_0062",
+        "pose_id": "j_039_e_0069_entry",
         "point_xz": [
           139.313,
           -1.97
@@ -2547,13 +2547,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0119_f_00_n_0119_exit_anchor",
+        "anchor_id": "ln_e_0071_f_00_n_0063_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0119_f_00",
-        "edge_id": "e_0119",
-        "node_id": "n_0119",
-        "pose_id": "j_040_e_0119_entry",
+        "lane_id": "ln_e_0071_f_00",
+        "edge_id": "e_0071",
+        "node_id": "n_0063",
+        "pose_id": "j_040_e_0071_entry",
         "point_xz": [
           150.038,
           13.169
@@ -2790,20 +2790,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00246",
       "exit_lane_link_id": "ll_00253",
-      "internal_bridge_lane_id": "ln_e_0118_f_00",
+      "internal_bridge_lane_id": "ln_e_0070_f_00",
       "internal_bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
-      "entry_junction_node_id": "n_0116",
-      "exit_junction_node_id": "n_0119",
+      "entry_junction_node_id": "n_0062",
+      "exit_junction_node_id": "n_0063",
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
-      "from_lane_id": "ln_e_0117_f_00",
-      "to_lane_id": "ln_e_0012_b_00",
-      "from_edge_id": "e_0117",
-      "to_edge_id": "e_0012",
+      "from_lane_id": "ln_e_0069_f_00",
+      "to_lane_id": "ln_e_0009_b_00",
+      "from_edge_id": "e_0069",
+      "to_edge_id": "e_0009",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -2824,13 +2824,13 @@
         0.552
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0117_f_00_n_0116_entry_anchor",
+        "anchor_id": "ln_e_0069_f_00_n_0062_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0117_f_00",
-        "edge_id": "e_0117",
-        "node_id": "n_0116",
-        "pose_id": "j_039_e_0117_entry",
+        "lane_id": "ln_e_0069_f_00",
+        "edge_id": "e_0069",
+        "node_id": "n_0062",
+        "pose_id": "j_039_e_0069_entry",
         "point_xz": [
           139.313,
           -1.97
@@ -2845,13 +2845,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0012_b_00_n_0119_exit_anchor",
+        "anchor_id": "ln_e_0009_b_00_n_0063_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0012_b_00",
-        "edge_id": "e_0012",
-        "node_id": "n_0119",
-        "pose_id": "j_040_e_0012_entry",
+        "lane_id": "ln_e_0009_b_00",
+        "edge_id": "e_0009",
+        "node_id": "n_0063",
+        "pose_id": "j_040_e_0009_entry",
         "point_xz": [
           141.656,
           9.211
@@ -3089,20 +3089,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00251",
       "exit_lane_link_id": "ll_00252",
-      "internal_bridge_lane_id": "ln_e_0118_f_00",
+      "internal_bridge_lane_id": "ln_e_0070_f_00",
       "internal_bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
-      "entry_junction_node_id": "n_0116",
-      "exit_junction_node_id": "n_0119",
+      "entry_junction_node_id": "n_0062",
+      "exit_junction_node_id": "n_0063",
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
-      "from_lane_id": "ln_e_0150_f_00",
-      "to_lane_id": "ln_e_0119_f_00",
-      "from_edge_id": "e_0150",
-      "to_edge_id": "e_0119",
+      "from_lane_id": "ln_e_0091_f_00",
+      "to_lane_id": "ln_e_0071_f_00",
+      "from_edge_id": "e_0091",
+      "to_edge_id": "e_0071",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -3123,13 +3123,13 @@
         0.825
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0150_f_00_n_0116_entry_anchor",
+        "anchor_id": "ln_e_0091_f_00_n_0062_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0150_f_00",
-        "edge_id": "e_0150",
-        "node_id": "n_0116",
-        "pose_id": "j_039_e_0150_entry",
+        "lane_id": "ln_e_0091_f_00",
+        "edge_id": "e_0091",
+        "node_id": "n_0062",
+        "pose_id": "j_039_e_0091_entry",
         "point_xz": [
           139.856,
           7.012
@@ -3144,13 +3144,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0119_f_00_n_0119_exit_anchor",
+        "anchor_id": "ln_e_0071_f_00_n_0063_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0119_f_00",
-        "edge_id": "e_0119",
-        "node_id": "n_0119",
-        "pose_id": "j_040_e_0119_entry",
+        "lane_id": "ln_e_0071_f_00",
+        "edge_id": "e_0071",
+        "node_id": "n_0063",
+        "pose_id": "j_040_e_0071_entry",
         "point_xz": [
           150.038,
           13.169
@@ -3387,20 +3387,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00251",
       "exit_lane_link_id": "ll_00253",
-      "internal_bridge_lane_id": "ln_e_0118_f_00",
+      "internal_bridge_lane_id": "ln_e_0070_f_00",
       "internal_bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
-      "entry_junction_node_id": "n_0116",
-      "exit_junction_node_id": "n_0119",
+      "entry_junction_node_id": "n_0062",
+      "exit_junction_node_id": "n_0063",
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
-      "from_lane_id": "ln_e_0150_f_00",
-      "to_lane_id": "ln_e_0012_b_00",
-      "from_edge_id": "e_0150",
-      "to_edge_id": "e_0012",
+      "from_lane_id": "ln_e_0091_f_00",
+      "to_lane_id": "ln_e_0009_b_00",
+      "from_edge_id": "e_0091",
+      "to_edge_id": "e_0009",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -3421,13 +3421,13 @@
         0.552
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0150_f_00_n_0116_entry_anchor",
+        "anchor_id": "ln_e_0091_f_00_n_0062_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0150_f_00",
-        "edge_id": "e_0150",
-        "node_id": "n_0116",
-        "pose_id": "j_039_e_0150_entry",
+        "lane_id": "ln_e_0091_f_00",
+        "edge_id": "e_0091",
+        "node_id": "n_0062",
+        "pose_id": "j_039_e_0091_entry",
         "point_xz": [
           139.856,
           7.012
@@ -3442,13 +3442,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0012_b_00_n_0119_exit_anchor",
+        "anchor_id": "ln_e_0009_b_00_n_0063_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0012_b_00",
-        "edge_id": "e_0012",
-        "node_id": "n_0119",
-        "pose_id": "j_040_e_0012_entry",
+        "lane_id": "ln_e_0009_b_00",
+        "edge_id": "e_0009",
+        "node_id": "n_0063",
+        "pose_id": "j_040_e_0009_entry",
         "point_xz": [
           141.656,
           9.211
@@ -3687,20 +3687,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00254",
       "exit_lane_link_id": "ll_00248",
-      "internal_bridge_lane_id": "ln_e_0118_b_00",
+      "internal_bridge_lane_id": "ln_e_0070_b_00",
       "internal_bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
-      "entry_junction_node_id": "n_0119",
-      "exit_junction_node_id": "n_0116",
+      "entry_junction_node_id": "n_0063",
+      "exit_junction_node_id": "n_0062",
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
-      "from_lane_id": "ln_e_0119_b_00",
-      "to_lane_id": "ln_e_0117_b_00",
-      "from_edge_id": "e_0119",
-      "to_edge_id": "e_0117",
+      "from_lane_id": "ln_e_0071_b_00",
+      "to_lane_id": "ln_e_0069_b_00",
+      "from_edge_id": "e_0071",
+      "to_edge_id": "e_0069",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -3721,13 +3721,13 @@
         -0.815
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0119_b_00_n_0119_entry_anchor",
+        "anchor_id": "ln_e_0071_b_00_n_0063_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0119_b_00",
-        "edge_id": "e_0119",
-        "node_id": "n_0119",
-        "pose_id": "j_040_e_0119_entry",
+        "lane_id": "ln_e_0071_b_00",
+        "edge_id": "e_0071",
+        "node_id": "n_0063",
+        "pose_id": "j_040_e_0071_entry",
         "point_xz": [
           152.676,
           11.359
@@ -3742,13 +3742,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0117_b_00_n_0116_exit_anchor",
+        "anchor_id": "ln_e_0069_b_00_n_0062_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0117_b_00",
-        "edge_id": "e_0117",
-        "node_id": "n_0116",
-        "pose_id": "j_039_e_0117_entry",
+        "lane_id": "ln_e_0069_b_00",
+        "edge_id": "e_0069",
+        "node_id": "n_0062",
+        "pose_id": "j_039_e_0069_entry",
         "point_xz": [
           141.921,
           -3.824
@@ -3985,20 +3985,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00254",
       "exit_lane_link_id": "ll_00249",
-      "internal_bridge_lane_id": "ln_e_0118_b_00",
+      "internal_bridge_lane_id": "ln_e_0070_b_00",
       "internal_bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
-      "entry_junction_node_id": "n_0119",
-      "exit_junction_node_id": "n_0116",
+      "entry_junction_node_id": "n_0063",
+      "exit_junction_node_id": "n_0062",
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
-      "from_lane_id": "ln_e_0119_b_00",
-      "to_lane_id": "ln_e_0150_b_00",
-      "from_edge_id": "e_0119",
-      "to_edge_id": "e_0150",
+      "from_lane_id": "ln_e_0071_b_00",
+      "to_lane_id": "ln_e_0091_b_00",
+      "from_edge_id": "e_0071",
+      "to_edge_id": "e_0091",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -4019,13 +4019,13 @@
         0.545
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0119_b_00_n_0119_entry_anchor",
+        "anchor_id": "ln_e_0071_b_00_n_0063_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0119_b_00",
-        "edge_id": "e_0119",
-        "node_id": "n_0119",
-        "pose_id": "j_040_e_0119_entry",
+        "lane_id": "ln_e_0071_b_00",
+        "edge_id": "e_0071",
+        "node_id": "n_0063",
+        "pose_id": "j_040_e_0071_entry",
         "point_xz": [
           152.676,
           11.359
@@ -4040,13 +4040,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0150_b_00_n_0116_exit_anchor",
+        "anchor_id": "ln_e_0091_b_00_n_0062_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0150_b_00",
-        "edge_id": "e_0150",
-        "node_id": "n_0116",
-        "pose_id": "j_039_e_0150_entry",
+        "lane_id": "ln_e_0091_b_00",
+        "edge_id": "e_0091",
+        "node_id": "n_0062",
+        "pose_id": "j_039_e_0091_entry",
         "point_xz": [
           138.112,
           4.328
@@ -4283,20 +4283,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00256",
       "exit_lane_link_id": "ll_00248",
-      "internal_bridge_lane_id": "ln_e_0118_b_00",
+      "internal_bridge_lane_id": "ln_e_0070_b_00",
       "internal_bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
-      "entry_junction_node_id": "n_0119",
-      "exit_junction_node_id": "n_0116",
+      "entry_junction_node_id": "n_0063",
+      "exit_junction_node_id": "n_0062",
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
-      "from_lane_id": "ln_e_0012_f_00",
-      "to_lane_id": "ln_e_0117_b_00",
-      "from_edge_id": "e_0012",
-      "to_edge_id": "e_0117",
+      "from_lane_id": "ln_e_0009_f_00",
+      "to_lane_id": "ln_e_0069_b_00",
+      "from_edge_id": "e_0009",
+      "to_edge_id": "e_0069",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -4317,13 +4317,13 @@
         -0.815
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0012_f_00_n_0119_entry_anchor",
+        "anchor_id": "ln_e_0009_f_00_n_0063_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0012_f_00",
-        "edge_id": "e_0012",
-        "node_id": "n_0119",
-        "pose_id": "j_040_e_0012_entry",
+        "lane_id": "ln_e_0009_f_00",
+        "edge_id": "e_0009",
+        "node_id": "n_0063",
+        "pose_id": "j_040_e_0009_entry",
         "point_xz": [
           143.422,
           11.879
@@ -4338,13 +4338,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0117_b_00_n_0116_exit_anchor",
+        "anchor_id": "ln_e_0069_b_00_n_0062_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0117_b_00",
-        "edge_id": "e_0117",
-        "node_id": "n_0116",
-        "pose_id": "j_039_e_0117_entry",
+        "lane_id": "ln_e_0069_b_00",
+        "edge_id": "e_0069",
+        "node_id": "n_0062",
+        "pose_id": "j_039_e_0069_entry",
         "point_xz": [
           141.921,
           -3.824
@@ -4581,20 +4581,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00256",
       "exit_lane_link_id": "ll_00249",
-      "internal_bridge_lane_id": "ln_e_0118_b_00",
+      "internal_bridge_lane_id": "ln_e_0070_b_00",
       "internal_bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
-      "entry_junction_node_id": "n_0119",
-      "exit_junction_node_id": "n_0116",
+      "entry_junction_node_id": "n_0063",
+      "exit_junction_node_id": "n_0062",
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
-      "from_lane_id": "ln_e_0012_f_00",
-      "to_lane_id": "ln_e_0150_b_00",
-      "from_edge_id": "e_0012",
-      "to_edge_id": "e_0150",
+      "from_lane_id": "ln_e_0009_f_00",
+      "to_lane_id": "ln_e_0091_b_00",
+      "from_edge_id": "e_0009",
+      "to_edge_id": "e_0091",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -4615,13 +4615,13 @@
         0.545
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0012_f_00_n_0119_entry_anchor",
+        "anchor_id": "ln_e_0009_f_00_n_0063_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0012_f_00",
-        "edge_id": "e_0012",
-        "node_id": "n_0119",
-        "pose_id": "j_040_e_0012_entry",
+        "lane_id": "ln_e_0009_f_00",
+        "edge_id": "e_0009",
+        "node_id": "n_0063",
+        "pose_id": "j_040_e_0009_entry",
         "point_xz": [
           143.422,
           11.879
@@ -4636,13 +4636,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0150_b_00_n_0116_exit_anchor",
+        "anchor_id": "ln_e_0091_b_00_n_0062_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0150_b_00",
-        "edge_id": "e_0150",
-        "node_id": "n_0116",
-        "pose_id": "j_039_e_0150_entry",
+        "lane_id": "ln_e_0091_b_00",
+        "edge_id": "e_0091",
+        "node_id": "n_0062",
+        "pose_id": "j_039_e_0091_entry",
         "point_xz": [
           138.112,
           4.328
@@ -4881,20 +4881,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00259",
       "exit_lane_link_id": "ll_00270",
-      "internal_bridge_lane_id": "ln_e_0120_f_00",
+      "internal_bridge_lane_id": "ln_e_0072_f_00",
       "internal_bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
-      "entry_junction_node_id": "n_0129",
-      "exit_junction_node_id": "n_0133",
+      "entry_junction_node_id": "n_0067",
+      "exit_junction_node_id": "n_0070",
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
-      "from_lane_id": "ln_e_0119_f_00",
-      "to_lane_id": "ln_e_0121_f_00",
-      "from_edge_id": "e_0119",
-      "to_edge_id": "e_0121",
+      "from_lane_id": "ln_e_0071_f_00",
+      "to_lane_id": "ln_e_0073_f_00",
+      "from_edge_id": "e_0071",
+      "to_edge_id": "e_0073",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -4915,13 +4915,13 @@
         0.835
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0119_f_00_n_0129_entry_anchor",
+        "anchor_id": "ln_e_0071_f_00_n_0067_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0119_f_00",
-        "edge_id": "e_0119",
-        "node_id": "n_0129",
-        "pose_id": "j_041_e_0119_entry",
+        "lane_id": "ln_e_0071_f_00",
+        "edge_id": "e_0071",
+        "node_id": "n_0067",
+        "pose_id": "j_041_e_0071_entry",
         "point_xz": [
           185.288,
           64.539
@@ -4936,13 +4936,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0121_f_00_n_0133_exit_anchor",
+        "anchor_id": "ln_e_0073_f_00_n_0070_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0121_f_00",
-        "edge_id": "e_0121",
-        "node_id": "n_0133",
-        "pose_id": "j_043_e_0121_entry",
+        "lane_id": "ln_e_0073_f_00",
+        "edge_id": "e_0073",
+        "node_id": "n_0070",
+        "pose_id": "j_043_e_0073_entry",
         "point_xz": [
           195.725,
           79.925
@@ -5179,20 +5179,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00259",
       "exit_lane_link_id": "ll_00271",
-      "internal_bridge_lane_id": "ln_e_0120_f_00",
+      "internal_bridge_lane_id": "ln_e_0072_f_00",
       "internal_bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
-      "entry_junction_node_id": "n_0129",
-      "exit_junction_node_id": "n_0133",
+      "entry_junction_node_id": "n_0067",
+      "exit_junction_node_id": "n_0070",
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
-      "from_lane_id": "ln_e_0119_f_00",
-      "to_lane_id": "ln_e_0010_b_00",
-      "from_edge_id": "e_0119",
-      "to_edge_id": "e_0010",
+      "from_lane_id": "ln_e_0071_f_00",
+      "to_lane_id": "ln_e_0007_b_00",
+      "from_edge_id": "e_0071",
+      "to_edge_id": "e_0007",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -5213,13 +5213,13 @@
         0.523
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0119_f_00_n_0129_entry_anchor",
+        "anchor_id": "ln_e_0071_f_00_n_0067_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0119_f_00",
-        "edge_id": "e_0119",
-        "node_id": "n_0129",
-        "pose_id": "j_041_e_0119_entry",
+        "lane_id": "ln_e_0071_f_00",
+        "edge_id": "e_0071",
+        "node_id": "n_0067",
+        "pose_id": "j_041_e_0071_entry",
         "point_xz": [
           185.288,
           64.539
@@ -5234,13 +5234,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0010_b_00_n_0133_exit_anchor",
+        "anchor_id": "ln_e_0007_b_00_n_0070_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0010_b_00",
-        "edge_id": "e_0010",
-        "node_id": "n_0133",
-        "pose_id": "j_043_e_0010_entry",
+        "lane_id": "ln_e_0007_b_00",
+        "edge_id": "e_0007",
+        "node_id": "n_0070",
+        "pose_id": "j_043_e_0007_entry",
         "point_xz": [
           187.393,
           75.717
@@ -5479,20 +5479,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00261",
       "exit_lane_link_id": "ll_00270",
-      "internal_bridge_lane_id": "ln_e_0120_f_00",
+      "internal_bridge_lane_id": "ln_e_0072_f_00",
       "internal_bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
-      "entry_junction_node_id": "n_0129",
-      "exit_junction_node_id": "n_0133",
+      "entry_junction_node_id": "n_0067",
+      "exit_junction_node_id": "n_0070",
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
-      "from_lane_id": "ln_e_0047_b_00",
-      "to_lane_id": "ln_e_0121_f_00",
-      "from_edge_id": "e_0047",
-      "to_edge_id": "e_0121",
+      "from_lane_id": "ln_e_0031_b_00",
+      "to_lane_id": "ln_e_0073_f_00",
+      "from_edge_id": "e_0031",
+      "to_edge_id": "e_0073",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -5513,13 +5513,13 @@
         0.835
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0047_b_00_n_0129_entry_anchor",
+        "anchor_id": "ln_e_0031_b_00_n_0067_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0047_b_00",
-        "edge_id": "e_0047",
-        "node_id": "n_0129",
-        "pose_id": "j_041_e_0047_entry",
+        "lane_id": "ln_e_0031_b_00",
+        "edge_id": "e_0031",
+        "node_id": "n_0067",
+        "pose_id": "j_041_e_0031_entry",
         "point_xz": [
           194.547,
           64.023
@@ -5534,13 +5534,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0121_f_00_n_0133_exit_anchor",
+        "anchor_id": "ln_e_0073_f_00_n_0070_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0121_f_00",
-        "edge_id": "e_0121",
-        "node_id": "n_0133",
-        "pose_id": "j_043_e_0121_entry",
+        "lane_id": "ln_e_0073_f_00",
+        "edge_id": "e_0073",
+        "node_id": "n_0070",
+        "pose_id": "j_043_e_0073_entry",
         "point_xz": [
           195.725,
           79.925
@@ -5777,20 +5777,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00261",
       "exit_lane_link_id": "ll_00271",
-      "internal_bridge_lane_id": "ln_e_0120_f_00",
+      "internal_bridge_lane_id": "ln_e_0072_f_00",
       "internal_bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
-      "entry_junction_node_id": "n_0129",
-      "exit_junction_node_id": "n_0133",
+      "entry_junction_node_id": "n_0067",
+      "exit_junction_node_id": "n_0070",
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
-      "from_lane_id": "ln_e_0047_b_00",
-      "to_lane_id": "ln_e_0010_b_00",
-      "from_edge_id": "e_0047",
-      "to_edge_id": "e_0010",
+      "from_lane_id": "ln_e_0031_b_00",
+      "to_lane_id": "ln_e_0007_b_00",
+      "from_edge_id": "e_0031",
+      "to_edge_id": "e_0007",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -5811,13 +5811,13 @@
         0.523
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0047_b_00_n_0129_entry_anchor",
+        "anchor_id": "ln_e_0031_b_00_n_0067_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0047_b_00",
-        "edge_id": "e_0047",
-        "node_id": "n_0129",
-        "pose_id": "j_041_e_0047_entry",
+        "lane_id": "ln_e_0031_b_00",
+        "edge_id": "e_0031",
+        "node_id": "n_0067",
+        "pose_id": "j_041_e_0031_entry",
         "point_xz": [
           194.547,
           64.023
@@ -5832,13 +5832,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0010_b_00_n_0133_exit_anchor",
+        "anchor_id": "ln_e_0007_b_00_n_0070_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0010_b_00",
-        "edge_id": "e_0010",
-        "node_id": "n_0133",
-        "pose_id": "j_043_e_0010_entry",
+        "lane_id": "ln_e_0007_b_00",
+        "edge_id": "e_0007",
+        "node_id": "n_0070",
+        "pose_id": "j_043_e_0007_entry",
         "point_xz": [
           187.393,
           75.717
@@ -6075,20 +6075,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00272",
       "exit_lane_link_id": "ll_00262",
-      "internal_bridge_lane_id": "ln_e_0120_b_00",
+      "internal_bridge_lane_id": "ln_e_0072_b_00",
       "internal_bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
-      "entry_junction_node_id": "n_0133",
-      "exit_junction_node_id": "n_0129",
+      "entry_junction_node_id": "n_0070",
+      "exit_junction_node_id": "n_0067",
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
-      "from_lane_id": "ln_e_0121_b_00",
-      "to_lane_id": "ln_e_0119_b_00",
-      "from_edge_id": "e_0121",
-      "to_edge_id": "e_0119",
+      "from_lane_id": "ln_e_0073_b_00",
+      "to_lane_id": "ln_e_0071_b_00",
+      "from_edge_id": "e_0073",
+      "to_edge_id": "e_0071",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -6109,13 +6109,13 @@
         -0.825
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0121_b_00_n_0133_entry_anchor",
+        "anchor_id": "ln_e_0073_b_00_n_0070_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0121_b_00",
-        "edge_id": "e_0121",
-        "node_id": "n_0133",
-        "pose_id": "j_043_e_0121_entry",
+        "lane_id": "ln_e_0073_b_00",
+        "edge_id": "e_0073",
+        "node_id": "n_0070",
+        "pose_id": "j_043_e_0073_entry",
         "point_xz": [
           198.399,
           78.167
@@ -6130,13 +6130,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0119_b_00_n_0129_exit_anchor",
+        "anchor_id": "ln_e_0071_b_00_n_0067_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0119_b_00",
-        "edge_id": "e_0119",
-        "node_id": "n_0129",
-        "pose_id": "j_041_e_0119_entry",
+        "lane_id": "ln_e_0071_b_00",
+        "edge_id": "e_0071",
+        "node_id": "n_0067",
+        "pose_id": "j_041_e_0071_entry",
         "point_xz": [
           187.926,
           62.729
@@ -6373,20 +6373,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00272",
       "exit_lane_link_id": "ll_00263",
-      "internal_bridge_lane_id": "ln_e_0120_b_00",
+      "internal_bridge_lane_id": "ln_e_0072_b_00",
       "internal_bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
-      "entry_junction_node_id": "n_0133",
-      "exit_junction_node_id": "n_0129",
+      "entry_junction_node_id": "n_0070",
+      "exit_junction_node_id": "n_0067",
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
-      "from_lane_id": "ln_e_0121_b_00",
-      "to_lane_id": "ln_e_0047_f_00",
-      "from_edge_id": "e_0121",
-      "to_edge_id": "e_0047",
+      "from_lane_id": "ln_e_0073_b_00",
+      "to_lane_id": "ln_e_0031_f_00",
+      "from_edge_id": "e_0073",
+      "to_edge_id": "e_0031",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -6407,13 +6407,13 @@
         -0.551
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0121_b_00_n_0133_entry_anchor",
+        "anchor_id": "ln_e_0073_b_00_n_0070_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0121_b_00",
-        "edge_id": "e_0121",
-        "node_id": "n_0133",
-        "pose_id": "j_043_e_0121_entry",
+        "lane_id": "ln_e_0073_b_00",
+        "edge_id": "e_0073",
+        "node_id": "n_0070",
+        "pose_id": "j_043_e_0073_entry",
         "point_xz": [
           198.399,
           78.167
@@ -6428,13 +6428,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0047_f_00_n_0129_exit_anchor",
+        "anchor_id": "ln_e_0031_f_00_n_0067_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0047_f_00",
-        "edge_id": "e_0047",
-        "node_id": "n_0129",
-        "pose_id": "j_041_e_0047_entry",
+        "lane_id": "ln_e_0031_f_00",
+        "edge_id": "e_0031",
+        "node_id": "n_0067",
+        "pose_id": "j_041_e_0031_entry",
         "point_xz": [
           196.311,
           66.693
@@ -6671,20 +6671,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00274",
       "exit_lane_link_id": "ll_00262",
-      "internal_bridge_lane_id": "ln_e_0120_b_00",
+      "internal_bridge_lane_id": "ln_e_0072_b_00",
       "internal_bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
-      "entry_junction_node_id": "n_0133",
-      "exit_junction_node_id": "n_0129",
+      "entry_junction_node_id": "n_0070",
+      "exit_junction_node_id": "n_0067",
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
-      "from_lane_id": "ln_e_0010_f_00",
-      "to_lane_id": "ln_e_0119_b_00",
-      "from_edge_id": "e_0010",
-      "to_edge_id": "e_0119",
+      "from_lane_id": "ln_e_0007_f_00",
+      "to_lane_id": "ln_e_0071_b_00",
+      "from_edge_id": "e_0007",
+      "to_edge_id": "e_0071",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -6705,13 +6705,13 @@
         -0.825
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0010_f_00_n_0133_entry_anchor",
+        "anchor_id": "ln_e_0007_f_00_n_0070_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0010_f_00",
-        "edge_id": "e_0010",
-        "node_id": "n_0133",
-        "pose_id": "j_043_e_0010_entry",
+        "lane_id": "ln_e_0007_f_00",
+        "edge_id": "e_0007",
+        "node_id": "n_0070",
+        "pose_id": "j_043_e_0007_entry",
         "point_xz": [
           189.067,
           78.443
@@ -6726,13 +6726,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0119_b_00_n_0129_exit_anchor",
+        "anchor_id": "ln_e_0071_b_00_n_0067_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0119_b_00",
-        "edge_id": "e_0119",
-        "node_id": "n_0129",
-        "pose_id": "j_041_e_0119_entry",
+        "lane_id": "ln_e_0071_b_00",
+        "edge_id": "e_0071",
+        "node_id": "n_0067",
+        "pose_id": "j_041_e_0071_entry",
         "point_xz": [
           187.926,
           62.729
@@ -6969,20 +6969,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00274",
       "exit_lane_link_id": "ll_00263",
-      "internal_bridge_lane_id": "ln_e_0120_b_00",
+      "internal_bridge_lane_id": "ln_e_0072_b_00",
       "internal_bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
-      "entry_junction_node_id": "n_0133",
-      "exit_junction_node_id": "n_0129",
+      "entry_junction_node_id": "n_0070",
+      "exit_junction_node_id": "n_0067",
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
-      "from_lane_id": "ln_e_0010_f_00",
-      "to_lane_id": "ln_e_0047_f_00",
-      "from_edge_id": "e_0010",
-      "to_edge_id": "e_0047",
+      "from_lane_id": "ln_e_0007_f_00",
+      "to_lane_id": "ln_e_0031_f_00",
+      "from_edge_id": "e_0007",
+      "to_edge_id": "e_0031",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -7003,13 +7003,13 @@
         -0.551
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0010_f_00_n_0133_entry_anchor",
+        "anchor_id": "ln_e_0007_f_00_n_0070_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0010_f_00",
-        "edge_id": "e_0010",
-        "node_id": "n_0133",
-        "pose_id": "j_043_e_0010_entry",
+        "lane_id": "ln_e_0007_f_00",
+        "edge_id": "e_0007",
+        "node_id": "n_0070",
+        "pose_id": "j_043_e_0007_entry",
         "point_xz": [
           189.067,
           78.443
@@ -7024,13 +7024,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0047_f_00_n_0129_exit_anchor",
+        "anchor_id": "ln_e_0031_f_00_n_0067_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0047_f_00",
-        "edge_id": "e_0047",
-        "node_id": "n_0129",
-        "pose_id": "j_041_e_0047_entry",
+        "lane_id": "ln_e_0031_f_00",
+        "edge_id": "e_0031",
+        "node_id": "n_0067",
+        "pose_id": "j_041_e_0031_entry",
         "point_xz": [
           196.311,
           66.693

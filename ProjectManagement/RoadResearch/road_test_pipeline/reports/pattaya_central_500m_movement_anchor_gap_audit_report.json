@@ -4,29 +4,26 @@
   "status": "warn",
   "counts": {
     "movement_corridor_cases": 306,
-    "planned_virtual_anchors": 20,
-    "remaining_capacity_limited_anchors": 36,
-    "unique_remaining_approaches": 9,
+    "planned_virtual_anchors": 8,
+    "remaining_capacity_limited_anchors": 32,
+    "unique_remaining_approaches": 8,
     "classification_counts": {
       "adjacent_junction_short_link": 24,
-      "dead_end_stub_capacity_limited": 8,
-      "low_value_short_edge_absorption": 4
+      "dead_end_stub_capacity_limited": 8
     },
     "recommended_action_counts": {
       "compound_junction_merge": 24,
-      "defer": 4,
       "keep_qa": 8
     },
     "corridor_counts_by_classification": {
       "adjacent_junction_short_link": 24,
-      "dead_end_stub_capacity_limited": 8,
-      "low_value_short_edge_absorption": 4
+      "dead_end_stub_capacity_limited": 8
     }
   },
   "top_remaining_approaches": [
     {
-      "junction_node_id": "n_0081",
-      "edge_id": "e_0169",
+      "junction_node_id": "n_0038",
+      "edge_id": "e_0099",
       "classification": "adjacent_junction_short_link",
       "recommended_action": "compound_junction_merge",
       "road_class": "secondary",
@@ -40,8 +37,8 @@
       "corridor_count": 4
     },
     {
-      "junction_node_id": "n_0082",
-      "edge_id": "e_0169",
+      "junction_node_id": "n_0039",
+      "edge_id": "e_0099",
       "classification": "adjacent_junction_short_link",
       "recommended_action": "compound_junction_merge",
       "road_class": "secondary",
@@ -55,8 +52,8 @@
       "corridor_count": 4
     },
     {
-      "junction_node_id": "n_0116",
-      "edge_id": "e_0118",
+      "junction_node_id": "n_0062",
+      "edge_id": "e_0070",
       "classification": "adjacent_junction_short_link",
       "recommended_action": "compound_junction_merge",
       "road_class": "secondary",
@@ -70,8 +67,8 @@
       "corridor_count": 4
     },
     {
-      "junction_node_id": "n_0119",
-      "edge_id": "e_0118",
+      "junction_node_id": "n_0063",
+      "edge_id": "e_0070",
       "classification": "adjacent_junction_short_link",
       "recommended_action": "compound_junction_merge",
       "road_class": "secondary",
@@ -85,8 +82,8 @@
       "corridor_count": 4
     },
     {
-      "junction_node_id": "n_0129",
-      "edge_id": "e_0120",
+      "junction_node_id": "n_0067",
+      "edge_id": "e_0072",
       "classification": "adjacent_junction_short_link",
       "recommended_action": "compound_junction_merge",
       "road_class": "secondary",
@@ -100,8 +97,8 @@
       "corridor_count": 4
     },
     {
-      "junction_node_id": "n_0133",
-      "edge_id": "e_0120",
+      "junction_node_id": "n_0070",
+      "edge_id": "e_0072",
       "classification": "adjacent_junction_short_link",
       "recommended_action": "compound_junction_merge",
       "road_class": "secondary",
@@ -115,27 +112,8 @@
       "corridor_count": 4
     },
     {
-      "junction_node_id": "n_0073",
-      "edge_id": "e_0104",
-      "classification": "low_value_short_edge_absorption",
-      "recommended_action": "defer",
-      "road_class": "service",
-      "edge_length_m": 4.865,
-      "desired_trim_m": 6.3,
-      "entry_trim_m": 4.365,
-      "trim_deficit_m": 1.935,
-      "other_node_kind": "connector",
-      "short_edge_absorption_status": "blocked",
-      "short_edge_absorption_issues": [
-        "chain_angle_too_large",
-        "low_trim_recovery",
-        "remaining_trim_deficit"
-      ],
-      "corridor_count": 4
-    },
-    {
-      "junction_node_id": "n_0073",
-      "edge_id": "e_0105",
+      "junction_node_id": "n_0031",
+      "edge_id": "e_0060",
       "classification": "dead_end_stub_capacity_limited",
       "recommended_action": "keep_qa",
       "road_class": "service",
@@ -149,8 +127,8 @@
       "corridor_count": 4
     },
     {
-      "junction_node_id": "n_0077",
-      "edge_id": "e_0146",
+      "junction_node_id": "n_0034",
+      "edge_id": "e_0088",
       "classification": "dead_end_stub_capacity_limited",
       "recommended_action": "keep_qa",
       "road_class": "service",

@@ -9,14 +9,14 @@
     "candidate_scores": 990,
     "reference_errors": 0,
     "scored_candidate_ratio": 1.0,
-    "qa_ready_cases": 165,
-    "qa_ready_case_ratio": 0.5,
-    "collision_risk_candidate_ratio": 0.686,
-    "swept_margin_candidate_ratio": 0.068,
-    "curvature_risk_candidate_ratio": 0.633,
-    "avg_overall_score": 48.838,
-    "min_overall_score": 3.91,
-    "max_overall_score": 92.01,
+    "qa_ready_cases": 175,
+    "qa_ready_case_ratio": 0.53,
+    "collision_risk_candidate_ratio": 0.663,
+    "swept_margin_candidate_ratio": 0.066,
+    "curvature_risk_candidate_ratio": 0.632,
+    "avg_overall_score": 50.744,
+    "min_overall_score": 8.58,
+    "max_overall_score": 100.0,
     "candidate_family_counts": {
       "bezier_g1_preview": 306,
       "compound_bezier_g1_preview": 24,
@@ -26,22 +26,22 @@
       "topology_straight_baseline": 306
     },
     "best_scored_family_counts": {
-      "bezier_g1_preview": 105,
+      "bezier_g1_preview": 101,
       "compound_bezier_g1_preview": 2,
       "compound_param_poly3_hermite_proxy": 1,
       "compound_topology_straight_baseline": 21,
-      "param_poly3_hermite_proxy": 8,
-      "topology_straight_baseline": 193
+      "param_poly3_hermite_proxy": 7,
+      "topology_straight_baseline": 198
     },
     "candidate_status_counts": {
-      "needs_review": 660,
-      "scored_qa_candidate": 330
+      "needs_review": 635,
+      "scored_qa_candidate": 355
     },
     "scoring_issue_counts": {
-      "collision_risk_non_target_lane_centerline": 679,
-      "curvature_radius_below_scoring_min": 627,
-      "curvature_reversal": 200,
-      "swept_envelope_margin_low": 67
+      "collision_risk_non_target_lane_centerline": 656,
+      "curvature_radius_below_scoring_min": 626,
+      "curvature_reversal": 198,
+      "swept_envelope_margin_low": 65
     },
     "publish_ready_candidates": 0,
     "destructive_writeback_ready": false

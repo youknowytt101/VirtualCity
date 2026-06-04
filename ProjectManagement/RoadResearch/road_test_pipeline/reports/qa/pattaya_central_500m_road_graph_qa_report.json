@@ -6,14 +6,14 @@
     {
       "id": "nodes",
       "status": "pass",
-      "value": 161,
+      "value": 90,
       "threshold": 40,
       "message": "Road graph should contain enough nodes for junction and lane graph research."
     },
     {
       "id": "edges",
       "status": "pass",
-      "value": 171,
+      "value": 100,
       "threshold": 40,
       "message": "Road graph should contain enough edges for a useful test sample."
     },
@@ -48,7 +48,7 @@
     {
       "id": "dead_end_ratio",
       "status": "warn",
-      "value": 0.174,
+      "value": 0.311,
       "threshold": 0.12,
       "message": "Internal dead ends remain high after boundary classification; review endpoint clusters visually."
     },
@@ -62,51 +62,51 @@
     {
       "id": "lanes_fallback_ratio",
       "status": "pass",
-      "value": 0.38,
+      "value": 0.36,
       "threshold": 0.6,
       "message": "Many edges use lane-count defaults; lane graph will need inference."
     }
   ],
   "metrics": {
     "counts": {
-      "input_features": 171,
-      "nodes": 161,
-      "edges": 171,
+      "input_features": 100,
+      "nodes": 90,
+      "edges": 100,
       "skipped_empty_geometry": 0,
       "zero_length_edges": 0,
       "orphan_edges": 0
     },
     "node_kind_counts": {
       "boundary": 3,
-      "connector": 81,
+      "connector": 10,
       "dead_end": 28,
       "junction": 49
     },
     "node_degree_counts": {
       "1": 31,
-      "2": 81,
+      "2": 10,
       "3": 47,
       "4": 2
     },
     "edge_highway_counts": {
-      "service": 63,
-      "secondary": 62,
-      "residential": 46
+      "service": 34,
+      "secondary": 34,
+      "residential": 32
     },
     "lanes_source_counts": {
-      "default": 65,
-      "tag": 106
+      "default": 36,
+      "tag": 64
     },
     "width_source_counts": {
-      "default": 171
+      "default": 100
     },
     "graph_metrics": {
-      "dead_end_ratio": 0.174,
-      "boundary_ratio": 0.019,
-      "junction_ratio": 0.304,
+      "dead_end_ratio": 0.311,
+      "boundary_ratio": 0.033,
+      "junction_ratio": 0.544,
       "width_fallback_ratio": 1.0,
-      "lanes_fallback_ratio": 0.38,
-      "total_length_m": 8325.879
+      "lanes_fallback_ratio": 0.36,
+      "total_length_m": 8325.882
     }
   },
   "inputs": {

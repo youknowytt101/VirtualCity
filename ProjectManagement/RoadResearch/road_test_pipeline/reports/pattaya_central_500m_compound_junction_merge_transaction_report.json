@@ -48,11 +48,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0081",
-        "n_0082"
+        "n_0038",
+        "n_0039"
       ],
       "bridge_edge_ids": [
-        "e_0169"
+        "e_0099"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -77,11 +77,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0116",
-        "n_0119"
+        "n_0062",
+        "n_0063"
       ],
       "bridge_edge_ids": [
-        "e_0118"
+        "e_0070"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -106,11 +106,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0129",
-        "n_0133"
+        "n_0067",
+        "n_0070"
       ],
       "bridge_edge_ids": [
-        "e_0120"
+        "e_0072"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
