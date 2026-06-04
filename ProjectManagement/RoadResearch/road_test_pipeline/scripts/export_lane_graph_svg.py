@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -78,6 +79,90 @@ def points_from_compound_transactions(compound_transactions: dict[str, Any] | No
             for point in candidate.get("centerline_xz") or []:
                 if len(point) >= 2:
                     points.append((float(point[0]), float(point[1])))
+    return points
+
+
+def local_projector_from_metadata(fc: dict[str, Any]) -> tuple[float, float]:
+    meta = fc.get("metadata") or {}
+    origin_lon = meta.get("origin_lon")
+    origin_lat = meta.get("origin_lat")
+    if origin_lon is not None and origin_lat is not None:
+        return float(origin_lon), float(origin_lat)
+
+    bbox = meta.get("bbox_swen")
+    if bbox and len(bbox) == 4:
+        south, west, north, east = [float(value) for value in bbox]
+        return (west + east) * 0.5, (south + north) * 0.5
+
+    coords: list[list[float]] = []
+    for feature in fc.get("features", []):
+        geom = feature.get("geometry") or {}
+        if geom.get("type") == "LineString":
+            coords.extend(geom.get("coordinates") or [])
+        elif geom.get("type") == "MultiLineString":
+            for line in geom.get("coordinates") or []:
+                coords.extend(line)
+    if not coords:
+        return 0.0, 0.0
+    valid_coords = [coord for coord in coords if len(coord) >= 2]
+    if not valid_coords:
+        return 0.0, 0.0
+    lon = sum(float(coord[0]) for coord in valid_coords) / len(valid_coords)
+    lat = sum(float(coord[1]) for coord in valid_coords) / len(valid_coords)
+    return lon, lat
+
+
+def to_local(lon: float, lat: float, origin_lon: float, origin_lat: float) -> tuple[float, float]:
+    m_per_deg_lat = 111_320.0
+    m_per_deg_lon = 111_320.0 * math.cos(math.radians(origin_lat))
+    return (lon - origin_lon) * m_per_deg_lon, (lat - origin_lat) * m_per_deg_lat
+
+
+def raw_road_feature_lines(feature: dict[str, Any]) -> list[list[list[float]]]:
+    geom = feature.get("geometry") or {}
+    geom_type = str(geom.get("type") or "")
+    if geom_type == "LineString":
+        return [geom.get("coordinates") or []]
+    if geom_type == "MultiLineString":
+        return [line for line in geom.get("coordinates") or [] if isinstance(line, list)]
+    return []
+
+
+def raw_road_local_lines(raw_roads: dict[str, Any] | None) -> list[dict[str, Any]]:
+    if not raw_roads:
+        return []
+    origin_lon, origin_lat = local_projector_from_metadata(raw_roads)
+    lines: list[dict[str, Any]] = []
+    for index, feature in enumerate(raw_roads.get("features", [])):
+        props = feature.get("properties") or {}
+        source_id = str(props.get("source_feature_id") or props.get("id") or f"raw_{index:04d}")
+        for part_index, coords in enumerate(raw_road_feature_lines(feature)):
+            points: list[list[float]] = []
+            for coord in coords:
+                if len(coord) < 2:
+                    continue
+                x, z = to_local(float(coord[0]), float(coord[1]), origin_lon, origin_lat)
+                points.append([x, z])
+            if len(points) < 2:
+                continue
+            lines.append({
+                "raw_road_id": f"{source_id}:{part_index}",
+                "source_feature_id": source_id,
+                "part_index": part_index,
+                "highway": str(props.get("highway") or ""),
+                "name": str(props.get("name") or ""),
+                "lanes": str(props.get("lanes") or ""),
+                "oneway": str(props.get("oneway") or ""),
+                "points": points,
+            })
+    return lines
+
+
+def points_from_raw_roads(raw_roads: dict[str, Any] | None) -> list[tuple[float, float]]:
+    points: list[tuple[float, float]] = []
+    for line in raw_road_local_lines(raw_roads):
+        for point in line["points"]:
+            points.append((float(point[0]), float(point[1])))
     return points
 
 
@@ -402,15 +487,63 @@ def lane_link_preview_lines(
     return link_lines, rendered_links
 
 
+def raw_road_lines(
+    *,
+    raw_roads: dict[str, Any],
+    transform: Any,
+    max_raw_roads: int,
+) -> tuple[list[str], dict[str, Any]]:
+    lines: list[str] = []
+    class_counts: dict[str, int] = {}
+    rendered = 0
+    for raw_line in raw_road_local_lines(raw_roads):
+        if rendered >= max_raw_roads:
+            break
+        points = raw_line["points"]
+        if len(points) < 2:
+            continue
+        highway = str(raw_line.get("highway") or "unknown")
+        class_counts[highway] = class_counts.get(highway, 0) + 1
+        name = str(raw_line.get("name") or "")
+        tooltip = (
+            f"raw_road={raw_line.get('source_feature_id', '')}; highway={highway}; "
+            f"name={name}; lanes={raw_line.get('lanes', '')}; oneway={raw_line.get('oneway', '')}"
+        )
+        attrs = svg_attrs({
+            "kind": "raw_road",
+            "layer": "raw_roads",
+            "source": "roads_raw.geojson",
+            "id": raw_line.get("raw_road_id", ""),
+            "source_feature_id": raw_line.get("source_feature_id", ""),
+            "part_index": raw_line.get("part_index", ""),
+            "highway": highway,
+            "road_name": name,
+            "lanes": raw_line.get("lanes", ""),
+            "oneway": raw_line.get("oneway", ""),
+        })
+        lines.append(
+            f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
+            f'stroke="#111827" stroke-width="1.15" stroke-opacity="0.44" stroke-dasharray="7 4" '
+            f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
+        )
+        rendered += 1
+    return lines, {
+        "raw_roads_rendered": rendered,
+        "raw_road_class_counts": dict(sorted(class_counts.items())),
+    }
+
+
 def build_svg(
     *,
     lane_graph: dict[str, Any],
     movement_corridors: dict[str, Any] | None,
     compound_transactions: dict[str, Any] | None,
+    raw_roads: dict[str, Any] | None,
     area_id: str,
     width_px: int,
     max_height_px: int,
     max_lane_links: int,
+    max_raw_roads: int,
 ) -> tuple[str, dict[str, Any]]:
     lanes = lane_graph.get("lanes", [])
     links = lane_graph.get("lane_links", [])
@@ -419,6 +552,7 @@ def build_svg(
         points_from_lanes(lane_graph)
         + points_from_movement_corridors(movement_corridors)
         + points_from_compound_transactions(compound_transactions)
+        + points_from_raw_roads(raw_roads)
     )
     svg_w, svg_h, transform = scale_transform(
         all_points,
@@ -508,6 +642,19 @@ def build_svg(
             "compound_visual_candidate_issue_counts": {},
         }
 
+    if raw_roads:
+        raw_lines, raw_metrics = raw_road_lines(
+            raw_roads=raw_roads,
+            transform=transform,
+            max_raw_roads=max_raw_roads,
+        )
+    else:
+        raw_lines = []
+        raw_metrics = {
+            "raw_roads_rendered": 0,
+            "raw_road_class_counts": {},
+        }
+
     title = html.escape(f"{area_id} lane graph (车道拓扑图) visualization")
     subtitle = html.escape(
         "SVG is visualization（可视化） only; JSON artifacts remain source truth（源数据真值）. "
@@ -531,18 +678,22 @@ def build_svg(
         '<g id="compound-movement-corridors">',
         *compound_lines,
         '</g>',
+        '<g id="raw-roads" data-vc-layer="raw_roads" style="display:none">',
+        *raw_lines,
+        '</g>',
         '<g id="movement-anchors">',
         *anchor_marks,
         *compound_anchor_marks,
         '</g>',
         '<g id="legend" font-family="Arial, sans-serif" font-size="12" fill="#334155">',
-        '<rect x="24" y="64" width="360" height="136" fill="#ffffff" stroke="#cbd5e1" />',
+        '<rect x="24" y="64" width="360" height="160" fill="#ffffff" stroke="#cbd5e1" />',
         '<line x1="40" y1="86" x2="84" y2="86" stroke="#0f766e" stroke-width="2" /><text x="94" y="90">forward lane（正向车道）</text>',
         '<line x1="40" y1="106" x2="84" y2="106" stroke="#6d28d9" stroke-width="2" /><text x="94" y="110">backward lane（反向车道）</text>',
         '<line x1="40" y1="126" x2="84" y2="126" stroke="#f97316" stroke-width="2" /><text x="94" y="130">turn corridor preview（转向走廊预览）</text>',
         '<line x1="40" y1="146" x2="84" y2="146" stroke="#0ea5e9" stroke-width="2" /><text x="94" y="150">through corridor preview（直行走廊预览）</text>',
         '<line x1="40" y1="166" x2="84" y2="166" stroke="#ec4899" stroke-width="2" stroke-dasharray="4 2" /><text x="94" y="170">compound trial corridor（复合试运行走廊）</text>',
         '<circle cx="47" cy="185" r="3" fill="#22c55e" stroke="#111827" stroke-width="0.5" /><text x="94" y="189">entry / exit anchors（入口 / 出口锚点）</text>',
+        '<line x1="40" y1="206" x2="84" y2="206" stroke="#111827" stroke-width="2" stroke-opacity="0.55" stroke-dasharray="7 4" /><text x="94" y="210">raw road data（原始道路数据）</text>',
         '</g>',
         '</svg>',
     ])
@@ -556,6 +707,7 @@ def build_svg(
             "junction_connections_rendered": rendered_links,
             **movement_metrics,
             **compound_metrics,
+            **raw_metrics,
         },
         "style": {
             "svg_width_px": svg_w,
@@ -564,6 +716,7 @@ def build_svg(
             "anchor_marker_stroke_width_px": ANCHOR_MARKER_STROKE_WIDTH_PX,
             "lane_casing": "enabled（已启用）",
             "visual_mode": "review_drawing（审图线稿）",
+            "raw_roads_overlay": "available_hidden_by_default（可用，默认隐藏）" if raw_roads else "missing（缺失）",
         },
         "link_source": link_source,
         "compound_link_source": "compound_junction_merge_transactions" if compound_transactions else "",
@@ -582,13 +735,16 @@ def main() -> int:
     parser.add_argument("--lane-graph", default="")
     parser.add_argument("--movement-corridors", default="", help="Optional movement_corridor_candidates.json. Defaults to processed/<area_id> file if present.")
     parser.add_argument("--compound-transactions", default="", help="Optional compound_junction_merge_transactions.json overlay.")
+    parser.add_argument("--raw-roads", default="", help="Optional roads_raw.geojson overlay. Defaults to processed/<area_id> file if present.")
     parser.add_argument("--no-movement-corridors", action="store_true", help="Do not auto-load movement corridor overlay.")
     parser.add_argument("--no-compound-transactions", action="store_true", help="Do not auto-load compound junction merge transaction overlay.")
+    parser.add_argument("--no-raw-roads", action="store_true", help="Do not auto-load raw road source overlay.")
     parser.add_argument("--output", default="")
     parser.add_argument("--report", default="")
     parser.add_argument("--width-px", type=int, default=DEFAULT_REVIEW_WIDTH_PX)
     parser.add_argument("--max-height-px", type=int, default=DEFAULT_MAX_HEIGHT_PX)
     parser.add_argument("--max-lane-links", type=int, default=900)
+    parser.add_argument("--max-raw-roads", type=int, default=1200)
     args = parser.parse_args()
 
     root = pipeline_root_from_script(Path(__file__))
@@ -611,6 +767,14 @@ def main() -> int:
         else processed / f"{args.area_id}_compound_junction_merge_transactions.json"
     )
     compound_transactions = read_json(compound_transactions_path) if compound_transactions_path and compound_transactions_path.exists() else None
+    raw_roads_path = (
+        None
+        if args.no_raw_roads
+        else Path(args.raw_roads)
+        if args.raw_roads
+        else processed / f"{args.area_id}_roads_raw.geojson"
+    )
+    raw_roads = read_json(raw_roads_path) if raw_roads_path and raw_roads_path.exists() else None
     output_path = Path(args.output) if args.output else reports / "visualizations" / f"{args.area_id}_lane_graph_topology.svg"
     report_path = Path(args.report) if args.report else reports / f"{args.area_id}_lane_graph_svg_report.json"
 
@@ -618,15 +782,18 @@ def main() -> int:
         lane_graph=read_json(lane_graph_path),
         movement_corridors=movement_corridors,
         compound_transactions=compound_transactions,
+        raw_roads=raw_roads,
         area_id=args.area_id,
         width_px=args.width_px,
         max_height_px=args.max_height_px,
         max_lane_links=args.max_lane_links,
+        max_raw_roads=args.max_raw_roads,
     )
     report["inputs"] = {
         "lane_graph": str(lane_graph_path),
         "movement_corridors": str(movement_corridors_path) if movement_corridors_path and movement_corridors is not None else "",
         "compound_junction_merge_transactions": str(compound_transactions_path) if compound_transactions_path and compound_transactions is not None else "",
+        "raw_roads": str(raw_roads_path) if raw_roads_path and raw_roads is not None else "",
     }
     report["outputs"] = {"svg": str(output_path), "report": str(report_path)}
     write_text(output_path, svg)

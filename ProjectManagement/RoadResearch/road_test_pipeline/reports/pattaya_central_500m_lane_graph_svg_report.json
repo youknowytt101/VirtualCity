@@ -46,6 +46,12 @@
       "low_confidence_to_lane": 24,
       "outgoing_turn_lanes_missing": 24,
       "radius_proxy_below_lane_min": 4
+    },
+    "raw_roads_rendered": 44,
+    "raw_road_class_counts": {
+      "residential": 14,
+      "secondary": 3,
+      "service": 27
     }
   },
   "style": {
@@ -54,15 +60,17 @@
     "anchor_marker_radius_px": 0.55,
     "anchor_marker_stroke_width_px": 0.12,
     "lane_casing": "enabled（已启用）",
-    "visual_mode": "review_drawing（审图线稿）"
+    "visual_mode": "review_drawing（审图线稿）",
+    "raw_roads_overlay": "available_hidden_by_default（可用，默认隐藏）"
   },
   "link_source": "movement_corridor_anchors",
   "compound_link_source": "compound_junction_merge_transactions",
   "note": "SVG visualization（可视化） only. lane_graph.json, movement_corridor_candidates.json and compound_junction_merge_transactions.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
   "inputs": {
     "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-    "compound_junction_merge_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json"
+    "movement_corridors": "data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "compound_junction_merge_transactions": "data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
+    "raw_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson"
   },
   "outputs": {
     "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",

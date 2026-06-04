@@ -602,6 +602,10 @@
       <input id="autoRefresh" type="checkbox" checked>
       <span>Auto</span>
     </label>
+    <label class="toggle" title="显示原始道路数据线">
+      <input id="rawRoadsToggle" type="checkbox">
+      <span>Raw</span>
+    </label>
     <label class="field" title="刷新间隔">
       <span>ms</span>
       <input id="intervalInput" type="number" min="500" step="500" value="1500">
@@ -633,6 +637,7 @@
         <div class="legend-item" style="color:#0ea5e9"><span class="legend-line"></span><span>through corridor（直行走廊）</span></div>
         <div class="legend-item" style="color:#ec4899"><span class="legend-line dashed"></span><span>compound trial（复合试运行）</span></div>
         <div class="legend-item" style="color:#334155"><span class="legend-dot"></span><span>entry / exit anchors（入口 / 出口锚点）</span></div>
+        <div class="legend-item" style="color:#111827"><span class="legend-line dashed"></span><span>raw roads（原始道路）</span></div>
       </div>
     </section>
     <section id="mapInspector" class="map-inspector" aria-label="SVG inspection panel">
@@ -665,6 +670,7 @@
     const scaleReadout = document.getElementById("scaleReadout");
     const intervalInput = document.getElementById("intervalInput");
     const autoRefresh = document.getElementById("autoRefresh");
+    const rawRoadsToggle = document.getElementById("rawRoadsToggle");
     const mapInspector = document.getElementById("mapInspector");
     const inspectorKicker = document.getElementById("inspectorKicker");
     const inspectorTitle = document.getElementById("inspectorTitle");
@@ -705,6 +711,7 @@
       movement_anchor: "Movement anchor（通行锚点）",
       compound_corridor: "Compound corridor（复合通行走廊）",
       compound_anchor: "Compound anchor（复合锚点）",
+      raw_road: "Raw road（原始道路）",
       lane_link_preview: "Lane link preview（车道连接预览）"
     };
 
@@ -713,6 +720,12 @@
       id: "ID（编号）",
       laneId: "lane_id（车道编号）",
       edgeId: "edge_id（道路边编号）",
+      sourceFeatureId: "source_feature_id（源要素编号）",
+      partIndex: "part_index（分段编号）",
+      highway: "highway（道路等级）",
+      roadName: "name（道路名称）",
+      lanes: "lanes（源车道数）",
+      oneway: "oneway（源单行标记）",
       corridorId: "corridor_id（走廊编号）",
       compoundCaseId: "compound_case_id（复合案例编号）",
       fromLaneId: "from_lane_id（起点车道）",
@@ -745,6 +758,12 @@
       "id",
       "laneId",
       "edgeId",
+      "sourceFeatureId",
+      "partIndex",
+      "highway",
+      "roadName",
+      "lanes",
+      "oneway",
       "corridorId",
       "compoundCaseId",
       "fromLaneId",
@@ -1213,6 +1232,21 @@
       svg.appendChild(hitLayer);
     }
 
+    function setRawRoadLayerVisible(visible) {
+      if (!state.svg) {
+        return;
+      }
+      state.svg.querySelectorAll('[data-vc-layer="raw_roads"], [data-vc-kind="raw_road"][data-vc-hit="true"]').forEach((node) => {
+        node.style.display = visible ? "" : "none";
+      });
+      const hasRawRoads = !!state.svg.querySelector('[data-vc-kind="raw_road"]:not([data-vc-hit])');
+      rawRoadsToggle.disabled = !hasRawRoads;
+      rawRoadsToggle.parentElement.style.opacity = hasRawRoads ? "1" : "0.55";
+      if (!visible && state.selectedRef?.kind === "raw_road") {
+        clearInspection();
+      }
+    }
+
     function prepareSvg(svg) {
       absorbSvgHeader(svg);
       createHitTargets(svg);
@@ -1250,6 +1284,7 @@
       mapLayer.replaceChildren(document.importNode(svg, true));
       state.svg = mapLayer.querySelector("svg");
       state.sourceView = sourceView;
+      setRawRoadLayerVisible(rawRoadsToggle.checked);
       emptyState.classList.remove("visible");
       restoreInspection();
 
@@ -1468,6 +1503,7 @@
     document.getElementById("reloadBtn").addEventListener("click", () => loadSvg(true));
     autoRefresh.addEventListener("change", schedulePolling);
     intervalInput.addEventListener("change", schedulePolling);
+    rawRoadsToggle.addEventListener("change", () => setRawRoadLayerVisible(rawRoadsToggle.checked));
     window.addEventListener("resize", () => {
       if (!state.hasLoaded) {
         return;
