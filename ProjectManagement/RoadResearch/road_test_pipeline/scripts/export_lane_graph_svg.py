@@ -523,8 +523,8 @@ def raw_road_lines(
         })
         lines.append(
             f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
-            f'stroke="#111827" stroke-width="1.15" stroke-opacity="0.44" stroke-dasharray="7 4" '
-            f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
+            f'stroke="#000000" stroke-width="0.55" stroke-opacity="1" '
+            f'stroke-linecap="butt" stroke-linejoin="miter">{svg_title(tooltip)}</polyline>'
         )
         rendered += 1
     return lines, {
@@ -693,7 +693,7 @@ def build_svg(
         '<line x1="40" y1="146" x2="84" y2="146" stroke="#0ea5e9" stroke-width="2" /><text x="94" y="150">through corridor preview（直行走廊预览）</text>',
         '<line x1="40" y1="166" x2="84" y2="166" stroke="#ec4899" stroke-width="2" stroke-dasharray="4 2" /><text x="94" y="170">compound trial corridor（复合试运行走廊）</text>',
         '<circle cx="47" cy="185" r="3" fill="#22c55e" stroke="#111827" stroke-width="0.5" /><text x="94" y="189">entry / exit anchors（入口 / 出口锚点）</text>',
-        '<line x1="40" y1="206" x2="84" y2="206" stroke="#111827" stroke-width="2" stroke-opacity="0.55" stroke-dasharray="7 4" /><text x="94" y="210">raw road data（原始道路数据）</text>',
+        '<line x1="40" y1="206" x2="84" y2="206" stroke="#000000" stroke-width="1" /><text x="94" y="210">raw road data（原始道路数据）</text>',
         '</g>',
         '</svg>',
     ])
@@ -716,7 +716,7 @@ def build_svg(
             "anchor_marker_stroke_width_px": ANCHOR_MARKER_STROKE_WIDTH_PX,
             "lane_casing": "enabled（已启用）",
             "visual_mode": "review_drawing（审图线稿）",
-            "raw_roads_overlay": "available_hidden_by_default（可用，默认隐藏）" if raw_roads else "missing（缺失）",
+            "raw_roads_overlay": "thin_black_solid_hidden_by_default（细黑实线，默认隐藏）" if raw_roads else "missing（缺失）",
         },
         "link_source": link_source,
         "compound_link_source": "compound_junction_merge_transactions" if compound_transactions else "",
