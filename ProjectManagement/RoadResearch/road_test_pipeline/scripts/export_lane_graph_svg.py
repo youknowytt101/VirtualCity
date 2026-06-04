@@ -494,8 +494,10 @@ def raw_road_lines(
     max_raw_roads: int,
 ) -> tuple[list[str], list[str], dict[str, Any]]:
     lines: list[str] = []
-    endpoint_marks: list[str] = []
+    point_marks: list[str] = []
     class_counts: dict[str, int] = {}
+    endpoint_count = 0
+    internal_vertex_count = 0
     rendered = 0
     for raw_line in raw_road_local_lines(raw_roads):
         if rendered >= max_raw_roads:
@@ -528,35 +530,54 @@ def raw_road_lines(
             f'stroke-linecap="butt" stroke-linejoin="miter">{svg_title(tooltip)}</polyline>'
         )
 
-        for endpoint_role, point in (("start", points[0]), ("end", points[-1])):
+        for vertex_index, point in enumerate(points):
+            if vertex_index == 0:
+                vertex_role = "start"
+                kind = "raw_road_endpoint"
+                radius = 1.45
+                endpoint_count += 1
+            elif vertex_index == len(points) - 1:
+                vertex_role = "end"
+                kind = "raw_road_endpoint"
+                radius = 1.45
+                endpoint_count += 1
+            else:
+                vertex_role = "internal"
+                kind = "raw_road_vertex"
+                radius = 0.95
+                internal_vertex_count += 1
             sx, sy = transform(float(point[0]), float(point[1]))
-            endpoint_tooltip = (
-                f"raw_endpoint={endpoint_role}; raw_road={raw_line.get('source_feature_id', '')}; "
+            point_tooltip = (
+                f"raw_vertex={vertex_role}; index={vertex_index}; raw_road={raw_line.get('source_feature_id', '')}; "
                 f"highway={highway}; name={name}; lanes={raw_line.get('lanes', '')}; "
                 f"oneway={raw_line.get('oneway', '')}"
             )
-            endpoint_attrs = svg_attrs({
-                "kind": "raw_road_endpoint",
+            point_attrs = svg_attrs({
+                "kind": kind,
                 "layer": "raw_roads",
                 "source": "roads_raw.geojson",
-                "id": f"{raw_line.get('raw_road_id', '')}:{endpoint_role}",
+                "id": f"{raw_line.get('raw_road_id', '')}:v{vertex_index:03d}",
                 "source_feature_id": raw_line.get("source_feature_id", ""),
                 "part_index": raw_line.get("part_index", ""),
-                "endpoint_role": endpoint_role,
+                "endpoint_role": vertex_role if vertex_role in {"start", "end"} else "",
+                "vertex_role": vertex_role,
+                "vertex_index": vertex_index,
                 "highway": highway,
                 "road_name": name,
                 "lanes": raw_line.get("lanes", ""),
                 "oneway": raw_line.get("oneway", ""),
                 "point_xz": f"{float(point[0]):.3f}, {float(point[1]):.3f}",
             })
-            endpoint_marks.append(
-                f'<circle {endpoint_attrs} cx="{sx}" cy="{sy}" r="1.45" fill="#000000" fill-opacity="1" '
-                f'stroke="#ffffff" stroke-width="0.35">{svg_title(endpoint_tooltip)}</circle>'
+            point_marks.append(
+                f'<circle {point_attrs} cx="{sx}" cy="{sy}" r="{radius}" fill="#000000" fill-opacity="1" '
+                f'stroke="#ffffff" stroke-width="0.28">{svg_title(point_tooltip)}</circle>'
             )
         rendered += 1
-    return lines, endpoint_marks, {
+    return lines, point_marks, {
         "raw_roads_rendered": rendered,
-        "raw_road_endpoint_markers_rendered": len(endpoint_marks),
+        "raw_road_endpoint_markers_rendered": endpoint_count,
+        "raw_road_internal_vertex_markers_rendered": internal_vertex_count,
+        "raw_road_vertex_markers_rendered": len(point_marks),
         "raw_road_class_counts": dict(sorted(class_counts.items())),
     }
 
@@ -682,6 +703,8 @@ def build_svg(
         raw_metrics = {
             "raw_roads_rendered": 0,
             "raw_road_endpoint_markers_rendered": 0,
+            "raw_road_internal_vertex_markers_rendered": 0,
+            "raw_road_vertex_markers_rendered": 0,
             "raw_road_class_counts": {},
         }
 
@@ -725,7 +748,7 @@ def build_svg(
         '<line x1="40" y1="166" x2="84" y2="166" stroke="#ec4899" stroke-width="2" stroke-dasharray="4 2" /><text x="94" y="170">compound trial corridor（复合试运行走廊）</text>',
         '<circle cx="47" cy="185" r="3" fill="#22c55e" stroke="#111827" stroke-width="0.5" /><text x="94" y="189">entry / exit anchors（入口 / 出口锚点）</text>',
         '<line x1="40" y1="206" x2="84" y2="206" stroke="#000000" stroke-width="1" /><text x="94" y="210">raw road data（原始道路数据）</text>',
-        '<circle cx="47" cy="226" r="3" fill="#000000" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="230">raw endpoints（原始道路断点）</text>',
+        '<circle cx="47" cy="226" r="3" fill="#000000" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="230">raw vertices（原始全部断点）</text>',
         '</g>',
         '</svg>',
     ])
@@ -749,8 +772,8 @@ def build_svg(
             "lane_casing": "enabled（已启用）",
             "visual_mode": "review_drawing（审图线稿）",
             "raw_roads_overlay": (
-                "thin_black_solid_with_endpoint_markers_hidden_by_default"
-                "（细黑实线 + 断点标记，默认隐藏）"
+                "thin_black_solid_with_all_vertex_markers_hidden_by_default"
+                "（细黑实线 + 全部原始顶点/断点标记，默认隐藏）"
             ) if raw_roads else "missing（缺失）",
         },
         "link_source": link_source,

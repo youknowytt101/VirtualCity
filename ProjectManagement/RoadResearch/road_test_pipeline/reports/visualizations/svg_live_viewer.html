@@ -638,7 +638,7 @@
         <div class="legend-item" style="color:#ec4899"><span class="legend-line dashed"></span><span>compound trial（复合试运行）</span></div>
         <div class="legend-item" style="color:#334155"><span class="legend-dot"></span><span>entry / exit anchors（入口 / 出口锚点）</span></div>
         <div class="legend-item" style="color:#000000"><span class="legend-line"></span><span>raw roads（原始道路）</span></div>
-        <div class="legend-item" style="color:#000000"><span class="legend-dot" style="background:#000000;border-color:#ffffff;box-shadow:0 0 0 1px #000000"></span><span>raw endpoints（原始断点）</span></div>
+        <div class="legend-item" style="color:#000000"><span class="legend-dot" style="background:#000000;border-color:#ffffff;box-shadow:0 0 0 1px #000000"></span><span>raw vertices（原始全部断点）</span></div>
       </div>
     </section>
     <section id="mapInspector" class="map-inspector" aria-label="SVG inspection panel">
@@ -714,6 +714,7 @@
       compound_anchor: "Compound anchor（复合锚点）",
       raw_road: "Raw road（原始道路）",
       raw_road_endpoint: "Raw endpoint（原始断点）",
+      raw_road_vertex: "Raw vertex（原始顶点 / 断点）",
       lane_link_preview: "Lane link preview（车道连接预览）"
     };
 
@@ -729,6 +730,8 @@
       lanes: "lanes（源车道数）",
       oneway: "oneway（源单行标记）",
       endpointRole: "endpoint_role（端点角色）",
+      vertexRole: "vertex_role（顶点角色）",
+      vertexIndex: "vertex_index（顶点序号）",
       pointXz: "point_xz（本地坐标）",
       corridorId: "corridor_id（走廊编号）",
       compoundCaseId: "compound_case_id（复合案例编号）",
@@ -769,6 +772,8 @@
       "lanes",
       "oneway",
       "endpointRole",
+      "vertexRole",
+      "vertexIndex",
       "pointXz",
       "corridorId",
       "compoundCaseId",
@@ -1248,7 +1253,7 @@
       const hasRawRoads = !!state.svg.querySelector('[data-vc-kind="raw_road"]:not([data-vc-hit])');
       rawRoadsToggle.disabled = !hasRawRoads;
       rawRoadsToggle.parentElement.style.opacity = hasRawRoads ? "1" : "0.55";
-      if (!visible && ["raw_road", "raw_road_endpoint"].includes(state.selectedRef?.kind)) {
+      if (!visible && ["raw_road", "raw_road_endpoint", "raw_road_vertex"].includes(state.selectedRef?.kind)) {
         clearInspection();
       }
     }
