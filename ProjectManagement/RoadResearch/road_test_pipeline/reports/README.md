@@ -20,6 +20,7 @@ pattaya_central_500m_lane_attribute_model_report.json
 pattaya_central_500m_lane_graph_report.json
 pattaya_central_500m_lane_graph_svg_report.json
 pattaya_central_500m_movement_corridor_report.json
+pattaya_central_500m_movement_corridor_scoring_report.json
 pattaya_central_500m_movement_anchor_gap_audit_report.json
 pattaya_central_500m_compound_junction_merge_report.json
 pattaya_central_500m_road_skeleton_repair_report.json
@@ -100,6 +101,12 @@ movement_corridor_solver_v1
   当前是 non-destructive staging solver（非破坏式暂存求解器），不替换 clean skeleton（干净道路骨架）。
   如果 SVG 里 corridor endpoint（走廊端点）落到多车道整体中轴，这应作为 lane-level anchoring（车道级锚点）
   的下一步问题处理，不应解读为最终车道几何正确。
+
+movement_corridor_scoring_v1
+  movement corridor scoring（通行走廊评分）报告；给普通 movement corridor（通行走廊）和
+  staged compound corridor（暂存复合走廊）生成 collision_score（碰撞评分）、
+  swept_envelope_score（扫掠包络评分）和 curvature_score（曲率评分）。
+  这是 non-destructive QA scoring（非破坏式质检评分），不是 clean skeleton writeback（干净道路骨架写回）证明。
 
 movement_anchor_gap_audit_v1
   通行锚点缺口审计报告；解释 planned virtual anchors（规划虚拟锚点）后仍偏近的锚点。

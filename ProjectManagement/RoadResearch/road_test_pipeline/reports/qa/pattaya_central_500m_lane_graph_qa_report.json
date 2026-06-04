@@ -134,9 +134,9 @@
     }
   },
   "inputs": {
-    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "lane_graph_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
-    "rules": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "lane_graph_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
+    "rules": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
   },
   "next_action": "Use lane_graph as the topology contract for movement corridor solver; do not treat offset previews as final lane geometry."
 }

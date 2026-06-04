@@ -1,8 +1,8 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "topology_repair_v2",
-  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
-  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
   "parameters": {
     "snap_endpoint_m": 4.0,
     "snap_edge_m": 5.0,
@@ -14,10 +14,10 @@
     "review_min_confidence": 0.45,
     "high_confidence_promotion_min": 0.75,
     "apply_high_confidence": false,
-    "manual_overrides_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\pattaya_central_500m.manual_overrides.json",
-    "repair_candidates_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_candidates.json",
-    "repair_decisions_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_decisions.json",
-    "repair_casebook_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_casebook.json"
+    "manual_overrides_path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\pattaya_central_500m.manual_overrides.json",
+    "repair_candidates_path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_candidates.json",
+    "repair_decisions_path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_decisions.json",
+    "repair_casebook_path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_casebook.json"
   },
   "counts": {
     "input_features": 44,
@@ -47,7 +47,7 @@
     "high_confidence_promotions_skipped": 0
   },
   "repair_candidate_artifact": {
-    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_candidates.json",
+    "path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_candidates.json",
     "candidate_count": 0,
     "counts": {
       "endpoint_bridge": 0,
@@ -56,14 +56,14 @@
     }
   },
   "repair_decision_artifact": {
-    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_decisions.json",
+    "path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_decisions.json",
     "decision_count": 1,
     "decision_status_counts": {
       "recorded": 1
     }
   },
   "repair_casebook_artifact": {
-    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_casebook.json",
+    "path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_casebook.json",
     "case_count": 1,
     "case_type_counts": {
       "manual_override_regression": 1
@@ -564,7 +564,7 @@
   },
   "manual_overrides": {
     "enabled": true,
-    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\pattaya_central_500m.manual_overrides.json",
+    "path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\pattaya_central_500m.manual_overrides.json",
     "exists": true,
     "loaded": 1,
     "result_counts": {

@@ -6,10 +6,10 @@
     "coord_domain": "local_xz_m",
     "contract": "Non-destructive QA（非破坏式质检） for remaining capacity-limited lane-level movement anchors（车道级通行锚点）. It classifies why anchors remain close after transaction-ready short-edge absorption（事务就绪短边吸收） has been previewed as planned virtual anchors（规划虚拟锚点）.",
     "inputs": {
-      "movement_corridors": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-      "junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
-      "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-      "short_edge_absorption_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+      "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+      "junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+      "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+      "short_edge_absorption_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
     }
   },
   "remaining_anchor_records": [

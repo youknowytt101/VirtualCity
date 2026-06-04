@@ -82,12 +82,12 @@
   },
   "next_action": "Use lane_graph（车道拓扑图） as the topology contract（拓扑契约） for movement corridor solver（通行走廊求解器）. Do not treat offset centerlines as final lane geometry（最终车道几何）.",
   "inputs": {
-    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "lane_attribute_model": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_attribute_model.json",
-    "junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json"
+    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "lane_attribute_model": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_attribute_model.json",
+    "junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json"
   },
   "outputs": {
-    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json"
+    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json"
   }
 }

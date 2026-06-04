@@ -5,15 +5,15 @@
     "schema": "road_test_pipeline.lane_graph.topology.v1",
     "coord_domain": "local_xz_m",
     "traffic_side_assumption": "left",
-    "source_road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "source_road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
     "source_lane_attribute_model_schema": "road_test_pipeline.lane_attribute_model.v1",
     "source_junction_semantics_schema": "road_test_pipeline.junction_semantics.v1",
     "artifact_contract": "lane_graph（车道拓扑图） is structured graph data. PNG/SVG/image exports are visualization（可视化） only and must not be treated as source truth（源数据真值）.",
     "geometry_contract": "centerline_xz is an approximate offset preview（近似偏移预览） for QA. Final lane geometry（最终车道几何） belongs to movement corridor and surface stages.",
     "inputs": {
-      "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-      "lane_attribute_model": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_attribute_model.json",
-      "junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json"
+      "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+      "lane_attribute_model": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_attribute_model.json",
+      "junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json"
     }
   },
   "edge_lane_groups": [

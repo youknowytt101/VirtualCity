@@ -4,8 +4,8 @@
     "area_id": "pattaya_central_500m",
     "schema": "road_test_pipeline.junction_areas.v1",
     "coord_domain": "local_xz_m",
-    "source_road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
-    "source_junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "source_road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+    "source_junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
     "note": "Regularized junction conflict zones and approach entry/exit poses for connector solvers."
   },
   "junction_areas": [

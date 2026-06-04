@@ -127,6 +127,17 @@ def svg_title(value: str) -> str:
     return f"<title>{html.escape(value)}</title>"
 
 
+def svg_attrs(values: dict[str, Any]) -> str:
+    attrs: list[str] = []
+    for key, value in values.items():
+        if value is None or value == "":
+            continue
+        attr_key = key.replace("_", "-")
+        attr_value = html.escape(str(value), quote=True)
+        attrs.append(f'data-vc-{attr_key}="{attr_value}"')
+    return " ".join(attrs)
+
+
 def endpoint(lane: dict[str, Any], side: str) -> tuple[float, float] | None:
     points = lane.get("centerline_xz") or []
     if not points:
@@ -195,8 +206,20 @@ def movement_case_lines(
             f"corridor_id={case.get('corridor_id', '')}; "
             f"movement={movement_kind}; family={family}; confidence={confidence:.3f}"
         )
+        attrs = svg_attrs({
+            "kind": "movement_corridor",
+            "source": "movement_corridor_candidates.json",
+            "id": case.get("corridor_id", ""),
+            "corridor_id": case.get("corridor_id", ""),
+            "from_lane_id": case.get("from_lane_id", ""),
+            "to_lane_id": case.get("to_lane_id", ""),
+            "movement": movement_kind,
+            "family": family,
+            "confidence": f"{confidence:.3f}",
+            "issues": ", ".join(str(issue) for issue in candidate.get("issues") or []),
+        })
         corridor_lines.append(
-            f'<polyline points="{polyline(points, transform)}" fill="none" '
+            f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
             f'stroke="{color}" stroke-width="{width}" stroke-opacity="{opacity:.2f}" '
             f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
         )
@@ -213,8 +236,19 @@ def movement_case_lines(
                 f"{anchor_key}; lane={anchor.get('lane_id', '')}; edge={anchor.get('edge_id', '')}; "
                 f"source={source}; trim={anchor.get('entry_trim_m', '')}"
             )
+            attrs = svg_attrs({
+                "kind": "movement_anchor",
+                "source": "movement_corridor_candidates.json",
+                "id": f"{case.get('corridor_id', '')}:{anchor_key}",
+                "corridor_id": case.get("corridor_id", ""),
+                "anchor_key": anchor_key,
+                "lane_id": anchor.get("lane_id", ""),
+                "edge_id": anchor.get("edge_id", ""),
+                "anchor_source": source,
+                "trim_m": anchor.get("entry_trim_m", ""),
+            })
             anchor_marks.append(
-                f'<circle cx="{sx}" cy="{sy}" r="{ANCHOR_MARKER_RADIUS_PX}" fill="{fill}" fill-opacity="0.76" '
+                f'<circle {attrs} cx="{sx}" cy="{sy}" r="{ANCHOR_MARKER_RADIUS_PX}" fill="{fill}" fill-opacity="0.76" '
                 f'stroke="#0f172a" stroke-width="{ANCHOR_MARKER_STROKE_WIDTH_PX}">{svg_title(tooltip)}</circle>'
             )
         rendered += 1
@@ -271,8 +305,20 @@ def compound_case_lines(
             f"movement={movement_kind}; family={family}; status={status}; "
             f"from={case.get('from_lane_id', '')}; to={case.get('to_lane_id', '')}"
         )
+        attrs = svg_attrs({
+            "kind": "compound_corridor",
+            "source": "compound_junction_merge_transactions.json",
+            "id": case.get("compound_case_id", ""),
+            "compound_case_id": case.get("compound_case_id", ""),
+            "from_lane_id": case.get("from_lane_id", ""),
+            "to_lane_id": case.get("to_lane_id", ""),
+            "movement": movement_kind,
+            "family": family,
+            "status": status,
+            "issues": ", ".join(str(issue) for issue in candidate.get("issues") or []),
+        })
         corridor_lines.append(
-            f'<polyline points="{polyline(points, transform)}" fill="none" '
+            f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
             f'stroke="{color}" stroke-width="1.65" stroke-opacity="0.88" stroke-dasharray="4 2" '
             f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
         )
@@ -287,8 +333,19 @@ def compound_case_lines(
                 f"compound {anchor_key}; lane={anchor.get('lane_id', '')}; edge={anchor.get('edge_id', '')}; "
                 f"source={anchor.get('source', '')}; trim={anchor.get('entry_trim_m', '')}"
             )
+            attrs = svg_attrs({
+                "kind": "compound_anchor",
+                "source": "compound_junction_merge_transactions.json",
+                "id": f"{case.get('compound_case_id', '')}:{anchor_key}",
+                "compound_case_id": case.get("compound_case_id", ""),
+                "anchor_key": anchor_key,
+                "lane_id": anchor.get("lane_id", ""),
+                "edge_id": anchor.get("edge_id", ""),
+                "anchor_source": anchor.get("source", ""),
+                "trim_m": anchor.get("entry_trim_m", ""),
+            })
             anchor_marks.append(
-                f'<circle cx="{sx}" cy="{sy}" r="{ANCHOR_MARKER_RADIUS_PX + 0.12}" fill="{fill}" fill-opacity="0.88" '
+                f'<circle {attrs} cx="{sx}" cy="{sy}" r="{ANCHOR_MARKER_RADIUS_PX + 0.12}" fill="{fill}" fill-opacity="0.88" '
                 f'stroke="#0f172a" stroke-width="{ANCHOR_MARKER_STROKE_WIDTH_PX + 0.04}">{svg_title(tooltip)}</circle>'
             )
         rendered += 1
@@ -329,8 +386,16 @@ def lane_link_preview_lines(
         ex, ey = transform(end[0], end[1])
         confidence = float(link.get("confidence") or 0.0)
         opacity = 0.2 + min(0.5, confidence * 0.5)
+        attrs = svg_attrs({
+            "kind": "lane_link_preview",
+            "source": "lane_graph.json",
+            "id": link.get("lane_link_id", ""),
+            "from_lane_id": link.get("from_lane_id", ""),
+            "to_lane_id": link.get("to_lane_id", ""),
+            "confidence": f"{confidence:.3f}",
+        })
         link_lines.append(
-            f'<line x1="{sx}" y1="{sy}" x2="{ex}" y2="{ey}" '
+            f'<line {attrs} x1="{sx}" y1="{sy}" x2="{ex}" y2="{ey}" '
             f'stroke="#d97706" stroke-width="0.7" stroke-opacity="{opacity:.2f}" />'
         )
         rendered_links += 1
@@ -380,12 +445,23 @@ def build_svg(
             f"direction={direction}; confidence={confidence:.3f}; "
             f"policy={lane.get('traffic_direction_policy', '')}"
         )
+        attrs = svg_attrs({
+            "kind": "lane",
+            "source": "lane_graph.json",
+            "id": lane.get("lane_id", ""),
+            "lane_id": lane.get("lane_id", ""),
+            "edge_id": lane.get("edge_id", ""),
+            "direction": direction,
+            "confidence": f"{confidence:.3f}",
+            "policy": lane.get("traffic_direction_policy", ""),
+            "issues": ", ".join(str(issue) for issue in lane.get("issues") or []),
+        })
         lane_casing_lines.append(
-            f'<polyline points="{points_attr}" fill="none" stroke="#d8e6e2" stroke-width="{casing_width}" '
+            f'<polyline {attrs} points="{points_attr}" fill="none" stroke="#d8e6e2" stroke-width="{casing_width}" '
             f'stroke-opacity="0.72" stroke-linecap="round" stroke-linejoin="round" />'
         )
         lane_lines.append(
-            f'<polyline points="{points_attr}" fill="none" '
+            f'<polyline {attrs} points="{points_attr}" fill="none" '
             f'stroke="{color}" stroke-width="{width}" stroke-opacity="{opacity:.2f}" '
             f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
         )

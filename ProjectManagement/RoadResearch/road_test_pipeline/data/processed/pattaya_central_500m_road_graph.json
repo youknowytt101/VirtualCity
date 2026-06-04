@@ -5,7 +5,7 @@
     "schema": "road_test_pipeline.road_graph.v1",
     "coord_domain": "local_xz_m",
     "axes": "x east, z north",
-    "source": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+    "source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
     "origin_lon": 100.8837,
     "origin_lat": 12.93425,
     "node_eps_m": 0.35,

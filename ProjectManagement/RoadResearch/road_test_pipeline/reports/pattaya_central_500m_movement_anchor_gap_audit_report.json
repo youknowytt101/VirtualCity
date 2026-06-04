@@ -164,13 +164,13 @@
   ],
   "next_action": "Do not force these anchors through short-edge absorption. compound_junction_merge（复合路口合并） cases need a separate transaction family; dead_end_stub_capacity_limited（死端短支路退让受限） should stay low-priority QA unless a better source proves the stub continues.",
   "inputs": {
-    "movement_corridors": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-    "junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
-    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "short_edge_absorption_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+    "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "short_edge_absorption_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
   },
   "outputs": {
-    "audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_anchor_gap_audit.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_anchor_gap_audit_report.json"
+    "audit": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_anchor_gap_audit.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_anchor_gap_audit_report.json"
   }
 }

@@ -83,6 +83,14 @@ solve_movement_corridors.py
   只用于预览 junction-zone expansion（路口影响区扩张）后的退让距离。
   best_candidate_family（最佳候选曲线族）仍只是 preview score（预览评分），不能作为发布选择。
 
+score_movement_corridors.py
+  L8.6 movement corridor scoring（通行走廊评分）v1。
+  读取 lane_graph.json（车道拓扑图 JSON）、movement_corridor_candidates.json（通行走廊候选 JSON）
+  和 compound_junction_merge_transactions.json（复合路口合并事务 JSON）。
+  输出 movement_corridor_scoring.json（通行走廊评分 JSON）和 movement_corridor_scoring_report.json（评分报告）。
+  当前评分包括 collision_score（碰撞评分）、swept_envelope_score（扫掠包络评分）和
+  curvature_score（曲率评分）。这是 non-destructive QA scoring（非破坏式质检评分），不写回 clean skeleton（干净道路骨架）。
+
 audit_movement_anchors.py
   L8.2 movement anchor gap audit（通行锚点缺口审计）v1。
   读取 movement_corridor_candidates.json、junction_areas.json、road_graph.json、short_edge_absorption_candidates.json。

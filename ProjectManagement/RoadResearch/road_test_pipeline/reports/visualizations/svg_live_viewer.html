@@ -1,0 +1,1276 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VirtualCity Road SVG Viewer</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #eef1f5;
+      --panel: #ffffff;
+      --panel-strong: #f7f9fc;
+      --ink: #1d2733;
+      --muted: #657282;
+      --line: #d5dce5;
+      --accent: #0f766e;
+      --accent-strong: #0b5d57;
+      --warn: #b45309;
+      --danger: #b42318;
+      --shadow: 0 8px 24px rgba(35, 48, 67, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: 52px 1fr;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      min-width: 0;
+      z-index: 5;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 182px;
+      font-size: 14px;
+      font-weight: 650;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--accent);
+      background:
+        linear-gradient(90deg, transparent 47%, rgba(15, 118, 110, 0.28) 48%, rgba(15, 118, 110, 0.28) 52%, transparent 53%),
+        linear-gradient(0deg, transparent 47%, rgba(180, 83, 9, 0.28) 48%, rgba(180, 83, 9, 0.28) 52%, transparent 53%),
+        #fbfdff;
+      border-radius: 6px;
+      flex: 0 0 auto;
+    }
+
+    .divider {
+      width: 1px;
+      height: 28px;
+      background: var(--line);
+      flex: 0 0 auto;
+    }
+
+    .button-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 0 0 auto;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--panel-strong);
+      color: var(--ink);
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 7px;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    button:hover {
+      border-color: #aeb9c7;
+      background: #fff;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.primary {
+      border-color: rgba(15, 118, 110, 0.5);
+      background: #e9f6f4;
+      color: var(--accent-strong);
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 34px;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-strong);
+      color: var(--ink);
+      font-size: 13px;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      margin: 0;
+    }
+
+    .field {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 34px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-strong);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .field input {
+      width: 62px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      text-align: right;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--warn);
+      flex: 0 0 auto;
+    }
+
+    .status-dot.ready {
+      background: var(--accent);
+    }
+
+    .status-dot.error {
+      background: var(--danger);
+    }
+
+    .status-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: min(52vw, 720px);
+    }
+
+    .viewport {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(29, 39, 51, 0.045) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(29, 39, 51, 0.045) 1px, transparent 1px),
+        #f7f9fb;
+      background-size: 32px 32px;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    .viewport.dragging {
+      cursor: grabbing;
+    }
+
+    .map-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(29, 39, 51, 0.08);
+    }
+
+    .map-layer svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      shape-rendering: geometricPrecision;
+      text-rendering: geometricPrecision;
+    }
+
+    .map-layer .svg-inspector-selected {
+      filter: drop-shadow(0 0 3px rgba(244, 63, 94, 0.88));
+      outline: none;
+    }
+
+    .map-info {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      width: min(548px, calc(100% - 24px));
+      border: 1px solid rgba(213, 220, 229, 0.86);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow:
+        0 12px 30px rgba(35, 48, 67, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px) saturate(1.12);
+      color: var(--ink);
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .map-info-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid rgba(213, 220, 229, 0.66);
+      background: rgba(247, 249, 252, 0.76);
+    }
+
+    .map-info-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .map-info-token {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex: 0 0 auto;
+      box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+    }
+
+    .map-info-title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 14px;
+      font-weight: 650;
+      line-height: 1.25;
+    }
+
+    .map-info-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 8px;
+      border: 1px solid rgba(15, 118, 110, 0.26);
+      border-radius: 999px;
+      background: rgba(233, 246, 244, 0.88);
+      color: var(--accent-strong);
+      flex: 0 0 auto;
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .map-info-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 8px 12px 0;
+    }
+
+    .map-info-meta span {
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+      max-width: 100%;
+      height: 21px;
+      padding: 0 7px;
+      border: 1px solid rgba(213, 220, 229, 0.74);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.68);
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px 14px;
+      margin-top: 8px;
+      padding: 0 12px 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      color: #334155;
+      font-size: 11px;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+
+    .legend-line {
+      width: 30px;
+      height: 0;
+      border-top: 2px solid currentColor;
+      flex: 0 0 auto;
+    }
+
+    .legend-line.dashed {
+      border-top-style: dashed;
+    }
+
+    .legend-dot {
+      width: 7px;
+      height: 7px;
+      margin-left: 11px;
+      margin-right: 12px;
+      border-radius: 50%;
+      background: #22c55e;
+      border: 1px solid #0f172a;
+      flex: 0 0 auto;
+    }
+
+    .legend-item span:last-child,
+    .legend-label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .empty-state {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--muted);
+      font-size: 13px;
+      box-shadow: var(--shadow);
+      pointer-events: none;
+    }
+
+    .empty-state.visible {
+      display: flex;
+    }
+
+    .scale-readout {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--muted);
+      font-size: 12px;
+      box-shadow: 0 4px 14px rgba(35, 48, 67, 0.08);
+      pointer-events: none;
+    }
+
+    .map-inspector {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      width: min(390px, calc(100% - 24px));
+      max-height: calc(100% - 24px);
+      display: none;
+      border: 1px solid rgba(213, 220, 229, 0.86);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow:
+        0 12px 30px rgba(35, 48, 67, 0.13),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(14px) saturate(1.12);
+      color: var(--ink);
+      overflow: hidden;
+      pointer-events: auto;
+      z-index: 3;
+    }
+
+    .map-inspector.visible {
+      display: block;
+    }
+
+    .inspector-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid rgba(213, 220, 229, 0.66);
+      background: rgba(247, 249, 252, 0.78);
+    }
+
+    .inspector-title-wrap {
+      min-width: 0;
+    }
+
+    .inspector-kicker {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 650;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+
+    .inspector-title {
+      min-width: 0;
+      margin-top: 3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .inspector-close {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .inspector-body {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 0;
+      max-height: min(48vh, 430px);
+      overflow: auto;
+      padding: 8px 0;
+      font-size: 11px;
+    }
+
+    .inspector-label,
+    .inspector-value {
+      min-width: 0;
+      padding: 5px 12px;
+      border-bottom: 1px solid rgba(213, 220, 229, 0.45);
+      line-height: 1.35;
+    }
+
+    .inspector-label {
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .inspector-value {
+      color: #263445;
+      overflow-wrap: anywhere;
+    }
+
+    .inspector-value.code {
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 10.5px;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        grid-template-rows: auto 1fr;
+      }
+
+      .toolbar {
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+
+      .brand {
+        min-width: 150px;
+      }
+
+      .status {
+        flex: 1 1 100%;
+        margin-left: 0;
+      }
+
+      .status-text {
+        max-width: 100%;
+      }
+
+      .map-info {
+        left: 8px;
+        top: 8px;
+        width: calc(100% - 16px);
+      }
+
+      .legend-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .map-inspector {
+        left: 8px;
+        right: 8px;
+        top: auto;
+        bottom: 8px;
+        width: auto;
+        max-height: 45%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="toolbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>Road SVG</span>
+    </div>
+    <div class="divider" aria-hidden="true"></div>
+    <div class="button-group" aria-label="视图控制">
+      <button id="zoomOutBtn" title="缩小" aria-label="缩小">-</button>
+      <button id="zoomInBtn" title="放大" aria-label="放大">+</button>
+      <button id="fitBtn" class="primary" title="适配窗口" aria-label="适配窗口">[]</button>
+      <button id="actualBtn" title="原始比例" aria-label="原始比例">1:1</button>
+      <button id="reloadBtn" title="重新加载" aria-label="重新加载">R</button>
+    </div>
+    <label class="toggle" title="自动刷新">
+      <input id="autoRefresh" type="checkbox" checked>
+      <span>Auto</span>
+    </label>
+    <label class="field" title="刷新间隔">
+      <span>ms</span>
+      <input id="intervalInput" type="number" min="500" step="500" value="1500">
+    </label>
+    <div class="status" aria-live="polite">
+      <span id="statusDot" class="status-dot"></span>
+      <span id="statusText" class="status-text">loading</span>
+    </div>
+  </header>
+  <main id="viewport" class="viewport">
+    <div id="mapLayer" class="map-layer"></div>
+    <section class="map-info" aria-label="SVG 图例">
+      <div class="map-info-head">
+        <div class="map-info-title-wrap">
+          <span class="map-info-token" aria-hidden="true"></span>
+          <div id="mapInfoTitle" class="map-info-title">Road lane graph</div>
+        </div>
+        <span class="map-info-badge">Vector</span>
+      </div>
+      <div id="mapInfoMeta" class="map-info-meta">
+        <span>SVG visual layer</span>
+        <span>JSON source truth</span>
+        <span>movement_corridor_anchors</span>
+      </div>
+      <div class="legend-grid">
+        <div class="legend-item" style="color:#0f766e"><span class="legend-line"></span><span>forward lane（正向车道）</span></div>
+        <div class="legend-item" style="color:#6d28d9"><span class="legend-line"></span><span>backward lane（反向车道）</span></div>
+        <div class="legend-item" style="color:#f97316"><span class="legend-line"></span><span>turn corridor（转向走廊）</span></div>
+        <div class="legend-item" style="color:#0ea5e9"><span class="legend-line"></span><span>through corridor（直行走廊）</span></div>
+        <div class="legend-item" style="color:#ec4899"><span class="legend-line dashed"></span><span>compound trial（复合试运行）</span></div>
+        <div class="legend-item" style="color:#334155"><span class="legend-dot"></span><span>entry / exit anchors（入口 / 出口锚点）</span></div>
+      </div>
+    </section>
+    <section id="mapInspector" class="map-inspector" aria-label="SVG inspection panel">
+      <div class="inspector-head">
+        <div class="inspector-title-wrap">
+          <div id="inspectorKicker" class="inspector-kicker">Inspector（检查器）</div>
+          <div id="inspectorTitle" class="inspector-title">No selection（未选中）</div>
+        </div>
+        <button id="inspectorClose" class="inspector-close" title="关闭检查器" aria-label="关闭检查器">×</button>
+      </div>
+      <div id="inspectorBody" class="inspector-body"></div>
+    </section>
+    <div id="emptyState" class="empty-state">SVG unavailable</div>
+    <div id="scaleReadout" class="scale-readout">100%</div>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const svgPath = params.get("svg") || "pattaya_central_500m_lane_graph_topology.svg";
+    const intervalParam = Number(params.get("interval"));
+
+    const viewport = document.getElementById("viewport");
+    const mapLayer = document.getElementById("mapLayer");
+    const mapInfoTitle = document.getElementById("mapInfoTitle");
+    const mapInfoMeta = document.getElementById("mapInfoMeta");
+    const emptyState = document.getElementById("emptyState");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+    const scaleReadout = document.getElementById("scaleReadout");
+    const intervalInput = document.getElementById("intervalInput");
+    const autoRefresh = document.getElementById("autoRefresh");
+    const mapInspector = document.getElementById("mapInspector");
+    const inspectorKicker = document.getElementById("inspectorKicker");
+    const inspectorTitle = document.getElementById("inspectorTitle");
+    const inspectorBody = document.getElementById("inspectorBody");
+    const inspectorClose = document.getElementById("inspectorClose");
+
+    if (Number.isFinite(intervalParam) && intervalParam >= 500) {
+      intervalInput.value = String(intervalParam);
+    }
+
+    const state = {
+      svg: null,
+      sourceView: { x: 0, y: 0, width: 1, height: 1 },
+      view: { x: 0, y: 0, width: 1, height: 1 },
+      lastSignature: "",
+      hasLoaded: false,
+      fitPending: true,
+      dragging: false,
+      dragStartX: 0,
+      dragStartY: 0,
+      dragMoved: false,
+      pointerDownTarget: null,
+      dragOrigin: { x: 0, y: 0, width: 1, height: 1 },
+      pollTimer: 0,
+      loadInFlight: false,
+      selectedElement: null,
+      selectedRef: null
+    };
+
+    const KIND_LABELS = {
+      lane: "Lane（车道）",
+      movement_corridor: "Movement corridor（通行走廊）",
+      movement_anchor: "Movement anchor（通行锚点）",
+      compound_corridor: "Compound corridor（复合通行走廊）",
+      compound_anchor: "Compound anchor（复合锚点）",
+      lane_link_preview: "Lane link preview（车道连接预览）"
+    };
+
+    const FIELD_LABELS = {
+      source: "Source JSON（来源数据）",
+      id: "ID（编号）",
+      laneId: "lane_id（车道编号）",
+      edgeId: "edge_id（道路边编号）",
+      corridorId: "corridor_id（走廊编号）",
+      compoundCaseId: "compound_case_id（复合案例编号）",
+      fromLaneId: "from_lane_id（起点车道）",
+      toLaneId: "to_lane_id（终点车道）",
+      anchorKey: "anchor_key（锚点类型）",
+      anchorSource: "anchor_source（锚点来源）",
+      trimM: "trim_m（退让距离）",
+      movement: "movement（通行动作）",
+      family: "family（曲线族）",
+      confidence: "confidence（置信度）",
+      status: "status（状态）",
+      direction: "direction（方向）",
+      policy: "policy（策略）",
+      issues: "issues（问题标记）",
+      tooltip: "title（悬停说明）"
+    };
+
+    const INSPECT_FIELD_ORDER = [
+      "source",
+      "id",
+      "laneId",
+      "edgeId",
+      "corridorId",
+      "compoundCaseId",
+      "fromLaneId",
+      "toLaneId",
+      "anchorKey",
+      "anchorSource",
+      "trimM",
+      "movement",
+      "family",
+      "confidence",
+      "status",
+      "direction",
+      "policy",
+      "issues",
+      "tooltip"
+    ];
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function rounded(value) {
+      return Math.round(value * 1000) / 1000;
+    }
+
+    function signature(text) {
+      let hash = 2166136261;
+      for (let index = 0; index < text.length; index += 1) {
+        hash ^= text.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+      }
+      return `${text.length}:${hash >>> 0}`;
+    }
+
+    function viewportSize() {
+      const rect = viewport.getBoundingClientRect();
+      return {
+        width: Math.max(1, rect.width),
+        height: Math.max(1, rect.height)
+      };
+    }
+
+    function viewportAspect() {
+      const size = viewportSize();
+      return size.width / size.height;
+    }
+
+    function parseNumberAttribute(value, fallback) {
+      if (!value) {
+        return fallback;
+      }
+      const parsed = Number(String(value).replace("px", ""));
+      return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+    }
+
+    function measureSvg(svg) {
+      const viewBox = svg.getAttribute("viewBox");
+      if (viewBox) {
+        const parts = viewBox.trim().split(/\s+/).map(Number);
+        if (parts.length === 4 && parts.every(Number.isFinite) && parts[2] > 0 && parts[3] > 0) {
+          return { x: parts[0], y: parts[1], width: parts[2], height: parts[3] };
+        }
+      }
+      return {
+        x: 0,
+        y: 0,
+        width: parseNumberAttribute(svg.getAttribute("width"), 3200),
+        height: parseNumberAttribute(svg.getAttribute("height"), 2400)
+      };
+    }
+
+    function setStatus(kind, text) {
+      statusDot.className = `status-dot ${kind}`;
+      statusText.textContent = text;
+    }
+
+    function cssEscape(value) {
+      if (window.CSS && typeof window.CSS.escape === "function") {
+        return window.CSS.escape(value);
+      }
+      return String(value).replace(/["\\]/g, "\\$&");
+    }
+
+    function inspectableElement(target) {
+      if (!(target instanceof Element)) {
+        return null;
+      }
+      return target.closest("[data-vc-kind]");
+    }
+
+    function titleText(element) {
+      return element.querySelector("title")?.textContent?.trim() || "";
+    }
+
+    function selectedRefFrom(element) {
+      const kind = element.dataset.vcKind || "";
+      const id = element.dataset.vcId || "";
+      if (!kind || !id) {
+        return null;
+      }
+      return { kind, id };
+    }
+
+    function findElementByRef(ref) {
+      if (!state.svg || !ref) {
+        return null;
+      }
+      return state.svg.querySelector(
+        `[data-vc-kind="${cssEscape(ref.kind)}"][data-vc-id="${cssEscape(ref.id)}"]:not([data-vc-hit])`
+      );
+    }
+
+    function visibleElementFor(element) {
+      const ref = selectedRefFrom(element);
+      return findElementByRef(ref) || element;
+    }
+
+    function setSelectedElement(element) {
+      if (state.selectedElement && state.selectedElement !== element) {
+        state.selectedElement.classList.remove("svg-inspector-selected");
+      }
+      state.selectedElement = element;
+      if (state.selectedElement) {
+        state.selectedElement.classList.add("svg-inspector-selected");
+      }
+    }
+
+    function appendInspectorRow(label, value, code = true) {
+      if (value === undefined || value === null || value === "") {
+        return;
+      }
+      const labelNode = document.createElement("div");
+      labelNode.className = "inspector-label";
+      labelNode.textContent = label;
+      const valueNode = document.createElement("div");
+      valueNode.className = code ? "inspector-value code" : "inspector-value";
+      valueNode.textContent = String(value);
+      inspectorBody.append(labelNode, valueNode);
+    }
+
+    function showInspection(element) {
+      const data = { ...element.dataset };
+      const visibleElement = visibleElementFor(element);
+      const kind = data.vcKind || "unknown";
+      const typeLabel = KIND_LABELS[kind] || `${kind}（未知类型）`;
+      data.tooltip = titleText(visibleElement) || titleText(element);
+      setSelectedElement(visibleElement);
+      state.selectedRef = selectedRefFrom(element);
+      inspectorKicker.textContent = typeLabel;
+      inspectorTitle.textContent = data.vcId || data.vcLaneId || data.vcCorridorId || "Selection（选中项）";
+      inspectorBody.replaceChildren();
+      for (const key of INSPECT_FIELD_ORDER) {
+        const datasetKey = `vc${key[0].toUpperCase()}${key.slice(1)}`;
+        appendInspectorRow(FIELD_LABELS[key] || key, data[datasetKey] || data[key]);
+      }
+      mapInspector.classList.add("visible");
+    }
+
+    function clearInspection() {
+      setSelectedElement(null);
+      state.selectedRef = null;
+      mapInspector.classList.remove("visible");
+      inspectorTitle.textContent = "No selection（未选中）";
+      inspectorBody.replaceChildren();
+    }
+
+    function restoreInspection() {
+      const element = findElementByRef(state.selectedRef);
+      if (element) {
+        showInspection(element);
+      } else if (state.selectedRef) {
+        clearInspection();
+      }
+    }
+
+    function viewBoxString(view) {
+      return `${rounded(view.x)} ${rounded(view.y)} ${rounded(view.width)} ${rounded(view.height)}`;
+    }
+
+    function parseViewBoxString(value) {
+      if (!value) {
+        return null;
+      }
+      const parts = value.trim().split(/\s+/).map(Number);
+      if (parts.length !== 4 || !parts.every(Number.isFinite) || parts[2] <= 0 || parts[3] <= 0) {
+        return null;
+      }
+      return { x: parts[0], y: parts[1], width: parts[2], height: parts[3] };
+    }
+
+    function syncViewFromSvg() {
+      if (!state.svg) {
+        return;
+      }
+      const current = parseViewBoxString(state.svg.getAttribute("viewBox"));
+      if (current) {
+        state.view = current;
+      }
+    }
+
+    function updateViewBox() {
+      if (!state.svg) {
+        return;
+      }
+      state.svg.setAttribute("viewBox", viewBoxString(state.view));
+      const size = viewportSize();
+      const screenScale = size.width / Math.max(1e-6, state.view.width);
+      scaleReadout.textContent = `${Math.round(screenScale * 100)}%`;
+    }
+
+    function viewCenter() {
+      return {
+        x: state.view.x + state.view.width / 2,
+        y: state.view.y + state.view.height / 2
+      };
+    }
+
+    function setViewByCenterAndWidth(centerX, centerY, width) {
+      const aspect = viewportAspect();
+      const nextWidth = clamp(width, 4, state.sourceView.width * 20);
+      const nextHeight = nextWidth / aspect;
+      state.view = {
+        x: centerX - nextWidth / 2,
+        y: centerY - nextHeight / 2,
+        width: nextWidth,
+        height: nextHeight
+      };
+      updateViewBox();
+    }
+
+    function fitToViewport() {
+      const source = state.sourceView;
+      const aspect = viewportAspect();
+      const sourceAspect = source.width / source.height;
+      let width = source.width;
+      let height = source.height;
+      if (aspect > sourceAspect) {
+        width = source.height * aspect;
+      } else {
+        height = source.width / aspect;
+      }
+      state.view = {
+        x: source.x - (width - source.width) / 2,
+        y: source.y - (height - source.height) / 2,
+        width,
+        height
+      };
+      updateViewBox();
+    }
+
+    function svgPointFromClient(clientX, clientY) {
+      const rect = viewport.getBoundingClientRect();
+      const px = clamp(clientX - rect.left, 0, rect.width);
+      const py = clamp(clientY - rect.top, 0, rect.height);
+      return {
+        x: state.view.x + (px / Math.max(1, rect.width)) * state.view.width,
+        y: state.view.y + (py / Math.max(1, rect.height)) * state.view.height,
+        px,
+        py,
+        rect
+      };
+    }
+
+    function zoomAt(clientX, clientY, factor) {
+      if (!state.hasLoaded) {
+        return;
+      }
+      syncViewFromSvg();
+      const anchor = svgPointFromClient(clientX, clientY);
+      const nextWidth = clamp(state.view.width / factor, 4, state.sourceView.width * 20);
+      const nextHeight = nextWidth / viewportAspect();
+      state.view = {
+        x: anchor.x - (anchor.px / Math.max(1, anchor.rect.width)) * nextWidth,
+        y: anchor.y - (anchor.py / Math.max(1, anchor.rect.height)) * nextHeight,
+        width: nextWidth,
+        height: nextHeight
+      };
+      state.fitPending = false;
+      updateViewBox();
+    }
+
+    function zoomCenter(factor) {
+      const rect = viewport.getBoundingClientRect();
+      zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, factor);
+    }
+
+    function setActualSize() {
+      if (!state.hasLoaded) {
+        return;
+      }
+      syncViewFromSvg();
+      const center = viewCenter();
+      setViewByCenterAndWidth(center.x, center.y, viewportSize().width);
+      state.fitPending = false;
+    }
+
+    function sanitizeSvg(doc) {
+      doc.querySelectorAll("script, foreignObject").forEach((node) => node.remove());
+      return doc;
+    }
+
+    function setMapInfoMeta(subtitle) {
+      const normalized = (subtitle || "").replace(/\s+/g, " ").trim();
+      const items = ["SVG visual layer", "JSON source truth"];
+      const linkMatch = normalized.match(/Link source:\s*([^.;]+)/i);
+      items.push(linkMatch ? linkMatch[1].trim() : "movement_corridor_anchors");
+      mapInfoMeta.replaceChildren(...items.map((item) => {
+        const span = document.createElement("span");
+        span.textContent = item;
+        return span;
+      }));
+    }
+
+    function absorbSvgHeader(svg) {
+      const directTextNodes = Array.from(svg.children).filter((node) => node.tagName.toLowerCase() === "text");
+      const title = directTextNodes[0]?.textContent?.trim();
+      const subtitle = directTextNodes[1]?.textContent?.trim();
+      if (title) {
+        mapInfoTitle.textContent = title.replace(" visualization", "");
+      }
+      setMapInfoMeta(subtitle);
+      directTextNodes.slice(0, 2).forEach((node) => node.remove());
+      svg.querySelector("#legend")?.remove();
+    }
+
+    function createHitTargets(svg) {
+      svg.querySelector("#vc-hit-targets")?.remove();
+      const doc = svg.ownerDocument;
+      const hitLayer = doc.createElementNS("http://www.w3.org/2000/svg", "g");
+      hitLayer.setAttribute("id", "vc-hit-targets");
+      hitLayer.setAttribute("aria-hidden", "true");
+
+      svg.querySelectorAll("[data-vc-kind]:not([data-vc-hit])").forEach((element) => {
+        const tag = element.tagName.toLowerCase();
+        if (!["polyline", "line", "circle"].includes(tag)) {
+          return;
+        }
+        const clone = element.cloneNode(false);
+        clone.setAttribute("data-vc-hit", "true");
+        clone.setAttribute("opacity", "0");
+        clone.setAttribute("pointer-events", tag === "circle" ? "all" : "stroke");
+        clone.removeAttribute("id");
+        clone.removeAttribute("filter");
+        clone.removeAttribute("class");
+        if (tag === "circle") {
+          const radius = Math.max(Number(element.getAttribute("r")) * 4 || 0, 5);
+          clone.setAttribute("r", String(radius));
+          clone.setAttribute("fill", "#000");
+          clone.removeAttribute("stroke");
+        } else {
+          const width = Math.max(Number(element.getAttribute("stroke-width")) * 5 || 0, 8);
+          clone.setAttribute("fill", "none");
+          clone.setAttribute("stroke", "#000");
+          clone.setAttribute("stroke-width", String(width));
+          clone.setAttribute("stroke-linecap", "round");
+          clone.setAttribute("stroke-linejoin", "round");
+        }
+        hitLayer.appendChild(clone);
+      });
+
+      svg.appendChild(hitLayer);
+    }
+
+    function prepareSvg(svg) {
+      absorbSvgHeader(svg);
+      createHitTargets(svg);
+      svg.setAttribute("width", "100%");
+      svg.setAttribute("height", "100%");
+      svg.setAttribute("preserveAspectRatio", "none");
+      svg.style.width = "100%";
+      svg.style.height = "100%";
+      svg.style.display = "block";
+    }
+
+    function preserveViewForNewSource(oldSource, oldView, newSource) {
+      const oldZoom = oldSource.width / Math.max(1e-6, oldView.width);
+      const centerRatioX = (oldView.x + oldView.width / 2 - oldSource.x) / oldSource.width;
+      const centerRatioY = (oldView.y + oldView.height / 2 - oldSource.y) / oldSource.height;
+      const newCenterX = newSource.x + newSource.width * centerRatioX;
+      const newCenterY = newSource.y + newSource.height * centerRatioY;
+      const newWidth = newSource.width / Math.max(0.001, oldZoom);
+      setViewByCenterAndWidth(newCenterX, newCenterY, newWidth);
+    }
+
+    function renderSvg(text) {
+      const doc = sanitizeSvg(new DOMParser().parseFromString(text, "image/svg+xml"));
+      const parserError = doc.querySelector("parsererror");
+      const svg = doc.documentElement;
+      if (parserError || !svg || svg.tagName.toLowerCase() !== "svg") {
+        throw new Error("invalid_svg");
+      }
+
+      const oldSource = { ...state.sourceView };
+      const oldView = { ...state.view };
+      const hadLoaded = state.hasLoaded;
+      const sourceView = measureSvg(svg);
+      prepareSvg(svg);
+      mapLayer.replaceChildren(document.importNode(svg, true));
+      state.svg = mapLayer.querySelector("svg");
+      state.sourceView = sourceView;
+      emptyState.classList.remove("visible");
+      restoreInspection();
+
+      if (state.fitPending || !hadLoaded) {
+        fitToViewport();
+      } else {
+        preserveViewForNewSource(oldSource, oldView, sourceView);
+      }
+      state.hasLoaded = true;
+    }
+
+    async function loadSvg(force = false) {
+      if (state.loadInFlight) {
+        return;
+      }
+      state.loadInFlight = true;
+      try {
+        const response = await fetch(`${svgPath}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const text = await response.text();
+        const nextSignature = signature(text);
+        if (force || nextSignature !== state.lastSignature) {
+          renderSvg(text);
+          state.lastSignature = nextSignature;
+          setStatus("ready", `vector viewBox updated ${new Date().toLocaleTimeString()} · ${svgPath}`);
+        } else {
+          setStatus("ready", `watching vector SVG ${new Date().toLocaleTimeString()} · ${svgPath}`);
+        }
+      } catch (error) {
+        emptyState.classList.add("visible");
+        setStatus("error", `load failed · ${svgPath}`);
+      } finally {
+        state.loadInFlight = false;
+      }
+    }
+
+    function schedulePolling() {
+      window.clearInterval(state.pollTimer);
+      const interval = clamp(Number(intervalInput.value) || 1500, 500, 60000);
+      intervalInput.value = String(interval);
+      if (autoRefresh.checked) {
+        state.pollTimer = window.setInterval(() => loadSvg(false), interval);
+      }
+    }
+
+    viewport.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const factor = event.deltaY < 0 ? 1.18 : 1 / 1.18;
+      zoomAt(event.clientX, event.clientY, factor);
+    }, { passive: false });
+
+    viewport.addEventListener("pointerdown", (event) => {
+      viewport.setPointerCapture(event.pointerId);
+      viewport.classList.add("dragging");
+      syncViewFromSvg();
+      state.dragging = true;
+      state.dragStartX = event.clientX;
+      state.dragStartY = event.clientY;
+      state.dragMoved = false;
+      state.pointerDownTarget = event.target;
+      state.dragOrigin = { ...state.view };
+    });
+
+    viewport.addEventListener("mousedown", (event) => {
+      state.pointerDownTarget = event.target;
+      state.dragStartX = event.clientX;
+      state.dragStartY = event.clientY;
+      state.dragMoved = false;
+    });
+
+    viewport.addEventListener("pointermove", (event) => {
+      if (!state.dragging) {
+        return;
+      }
+      if (event.buttons === 0) {
+        endDrag(event);
+        return;
+      }
+      if (Math.hypot(event.clientX - state.dragStartX, event.clientY - state.dragStartY) > 3) {
+        state.dragMoved = true;
+      }
+      const rect = viewport.getBoundingClientRect();
+      const dx = (event.clientX - state.dragStartX) / Math.max(1, rect.width) * state.dragOrigin.width;
+      const dy = (event.clientY - state.dragStartY) / Math.max(1, rect.height) * state.dragOrigin.height;
+      state.view = {
+        ...state.dragOrigin,
+        x: state.dragOrigin.x - dx,
+        y: state.dragOrigin.y - dy
+      };
+      state.fitPending = false;
+      updateViewBox();
+    });
+
+    function endDrag(event) {
+      if (state.dragging) {
+        state.dragging = false;
+        viewport.classList.remove("dragging");
+      }
+      if (event && event.pointerId !== undefined && viewport.hasPointerCapture(event.pointerId)) {
+        viewport.releasePointerCapture(event.pointerId);
+      }
+    }
+
+    viewport.addEventListener("pointerup", (event) => {
+      const target = state.pointerDownTarget;
+      const wasDrag = state.dragMoved;
+      endDrag(event);
+      state.pointerDownTarget = null;
+      if (!wasDrag) {
+        const element = inspectableElement(target);
+        if (element) {
+          showInspection(element);
+        }
+      }
+    });
+    viewport.addEventListener("mouseup", (event) => {
+      const target = inspectableElement(event.target) ? event.target : state.pointerDownTarget;
+      const distance = Math.hypot(event.clientX - state.dragStartX, event.clientY - state.dragStartY);
+      if (distance <= 3) {
+        const element = inspectableElement(target);
+        if (element) {
+          showInspection(element);
+        }
+      }
+    });
+    viewport.addEventListener("click", (event) => {
+      if (state.dragMoved) {
+        state.dragMoved = false;
+        return;
+      }
+      const element = inspectableElement(event.target);
+      if (element) {
+        showInspection(element);
+      }
+    });
+    viewport.addEventListener("pointercancel", endDrag);
+    viewport.addEventListener("lostpointercapture", endDrag);
+    window.addEventListener("pointerup", endDrag);
+    window.addEventListener("blur", () => endDrag());
+    viewport.addEventListener("dblclick", (event) => zoomAt(event.clientX, event.clientY, 1.7));
+    mapInspector.addEventListener("pointerdown", (event) => event.stopPropagation());
+    mapInspector.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
+    inspectorClose.addEventListener("click", clearInspection);
+
+    document.getElementById("zoomOutBtn").addEventListener("click", () => zoomCenter(1 / 1.35));
+    document.getElementById("zoomInBtn").addEventListener("click", () => zoomCenter(1.35));
+    document.getElementById("fitBtn").addEventListener("click", () => {
+      state.fitPending = true;
+      fitToViewport();
+    });
+    document.getElementById("actualBtn").addEventListener("click", setActualSize);
+    document.getElementById("reloadBtn").addEventListener("click", () => loadSvg(true));
+    autoRefresh.addEventListener("change", schedulePolling);
+    intervalInput.addEventListener("change", schedulePolling);
+    window.addEventListener("resize", () => {
+      if (!state.hasLoaded) {
+        return;
+      }
+      if (state.fitPending) {
+        fitToViewport();
+      } else {
+        const center = viewCenter();
+        setViewByCenterAndWidth(center.x, center.y, state.view.width);
+      }
+    });
+
+    loadSvg(true);
+    schedulePolling();
+  </script>
+</body>
+</html>

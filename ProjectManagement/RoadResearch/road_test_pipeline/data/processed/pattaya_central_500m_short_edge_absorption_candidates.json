@@ -5,10 +5,10 @@
     "schema": "road_test_pipeline.short_edge_absorption_candidates.v1",
     "planning_domain": "junction-zone expansion（路口影响区扩张）",
     "coord_domain": "local_xz_m",
-    "source_road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "source_junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+    "source_road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "source_junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
     "note": "Planner output only. short-edge absorption（短边吸收） is treated as a junction-zone expansion（路口影响区扩张） candidate; no graph, centerline, or Houdini geometry is modified here.",
-    "source_connector_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json"
+    "source_connector_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json"
   },
   "candidates": [
     {

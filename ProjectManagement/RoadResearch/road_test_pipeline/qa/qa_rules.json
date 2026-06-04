@@ -68,5 +68,13 @@
     "max_capacity_limited_anchor_cases": 0,
     "warn_accepted_transaction_ratio_below": 1.0,
     "warn_affected_corridor_replacement_ratio_below": 1.0
+  },
+  "movement_corridor_scoring": {
+    "min_cases_scored": 1,
+    "min_candidate_scores": 1,
+    "max_reference_errors": 0,
+    "warn_scored_candidate_ratio_below": 1.0,
+    "warn_qa_ready_case_ratio_below": 0.25,
+    "warn_collision_risk_candidate_ratio_above": 0.95
   }
 }

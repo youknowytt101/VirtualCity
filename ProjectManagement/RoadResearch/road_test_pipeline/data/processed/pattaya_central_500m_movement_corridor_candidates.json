@@ -6,9 +6,9 @@
     "source": "lane_graph（车道拓扑图） + engineering_reference_lines（工程参考线）",
     "contract": "Non-destructive movement corridor candidates（非破坏式通行走廊候选）. Candidate endpoints use lane-level entry/exit anchors（车道级入口/出口锚点） when engineering entry poses（工程入口姿态） are available. Do not treat candidate centerlines or best_candidate_family（最佳候选曲线族） as final lane geometry（最终车道几何）.",
     "inputs": {
-      "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-      "engineering_reference_lines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
-      "short_edge_absorption_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+      "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+      "engineering_reference_lines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
+      "short_edge_absorption_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
     }
   },
   "cases": [

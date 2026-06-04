@@ -1,0 +1,59 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "movement_corridor_scoring_v1",
+  "status": "warn",
+  "metrics": {
+    "cases_scored": 330,
+    "movement_cases_scored": 306,
+    "compound_cases_scored": 24,
+    "candidate_scores": 990,
+    "reference_errors": 0,
+    "scored_candidate_ratio": 1.0,
+    "qa_ready_cases": 107,
+    "qa_ready_case_ratio": 0.324,
+    "collision_risk_candidate_ratio": 0.809,
+    "swept_margin_candidate_ratio": 0.058,
+    "curvature_risk_candidate_ratio": 0.633,
+    "avg_overall_score": 40.113,
+    "min_overall_score": 4.68,
+    "max_overall_score": 91.99,
+    "candidate_family_counts": {
+      "bezier_g1_preview": 306,
+      "compound_bezier_g1_preview": 24,
+      "compound_param_poly3_hermite_proxy": 24,
+      "compound_topology_straight_baseline": 24,
+      "param_poly3_hermite_proxy": 306,
+      "topology_straight_baseline": 306
+    },
+    "best_scored_family_counts": {
+      "bezier_g1_preview": 130,
+      "compound_bezier_g1_preview": 3,
+      "compound_param_poly3_hermite_proxy": 1,
+      "compound_topology_straight_baseline": 20,
+      "param_poly3_hermite_proxy": 9,
+      "topology_straight_baseline": 167
+    },
+    "candidate_status_counts": {
+      "needs_review": 781,
+      "scored_qa_candidate": 209
+    },
+    "scoring_issue_counts": {
+      "collision_risk_non_target_lane_centerline": 801,
+      "curvature_radius_below_scoring_min": 627,
+      "curvature_reversal": 199,
+      "swept_envelope_margin_low": 57
+    },
+    "publish_ready_candidates": 0,
+    "destructive_writeback_ready": false
+  },
+  "next_action": "Review low scoring movement corridors（通行走廊） in the SVG viewer（SVG 查看器） before any destructive writeback（写入式回写）.",
+  "inputs": {
+    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "compound_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json"
+  },
+  "outputs": {
+    "scoring": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_scoring.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_corridor_scoring_report.json"
+  }
+}

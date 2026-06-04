@@ -37,10 +37,10 @@
   },
   "next_action": "Use this model as the input contract for lane_graph and lane-level junction reconstruction. Do not treat inferred/default lane attributes as source truth.",
   "inputs": {
-    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json"
+    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json"
   },
   "outputs": {
-    "lane_attribute_model": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_attribute_model.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_attribute_model_report.json"
+    "lane_attribute_model": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_attribute_model.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_attribute_model_report.json"
   }
 }

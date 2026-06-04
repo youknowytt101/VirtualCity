@@ -636,6 +636,72 @@ def run_compound_junction_merge_transaction_qa(root: Path, area_id: str) -> dict
     return report
 
 
+def run_movement_corridor_scoring_qa(root: Path, area_id: str) -> dict:
+    rules = read_json(root / "qa" / "qa_rules.json")["movement_corridor_scoring"]
+    scoring_path = root / "data" / "processed" / f"{area_id}_movement_corridor_scoring.json"
+    report_path = root / "reports" / f"{area_id}_movement_corridor_scoring_report.json"
+    scoring_report = read_json(report_path)
+    metrics = scoring_report["metrics"]
+
+    checks = [
+        check_min(
+            "cases_scored",
+            metrics.get("cases_scored", 0),
+            rules["min_cases_scored"],
+            "Movement corridor scoring should score staged movement and compound corridor cases.",
+        ),
+        check_min(
+            "candidate_scores",
+            metrics.get("candidate_scores", 0),
+            rules["min_candidate_scores"],
+            "Movement corridor scoring should emit candidate-level scores.",
+        ),
+        check_max(
+            "reference_errors",
+            metrics.get("reference_errors", 0),
+            rules["max_reference_errors"],
+            "Movement corridor scoring should preserve all lane and candidate references.",
+        ),
+        check_warn_below(
+            "scored_candidate_ratio",
+            metrics.get("scored_candidate_ratio", 0.0),
+            rules["warn_scored_candidate_ratio_below"],
+            "Every candidate curve should receive QA scores before visual review.",
+        ),
+        check_warn_below(
+            "qa_ready_case_ratio",
+            metrics.get("qa_ready_case_ratio", 0.0),
+            rules["warn_qa_ready_case_ratio_below"],
+            "Few corridor cases have a best candidate above the QA scoring threshold.",
+        ),
+        check_warn_above(
+            "collision_risk_candidate_ratio",
+            metrics.get("collision_risk_candidate_ratio", 0.0),
+            rules["warn_collision_risk_candidate_ratio_above"],
+            "Most corridor candidates are collision-risk candidates; review scoring thresholds and SVG locations.",
+        ),
+    ]
+
+    report = qa_report(
+        area_id=area_id,
+        stage="movement_corridor_scoring",
+        checks=checks,
+        metrics=metrics,
+        inputs={
+            "movement_corridor_scoring": str(scoring_path),
+            "movement_corridor_scoring_report": str(report_path),
+            "rules": str(root / "qa" / "qa_rules.json"),
+        },
+        next_action=(
+            "Use Inspector（检查器） in the SVG viewer（SVG 查看器） to review low-score corridors（低分通行走廊） "
+            "before destructive writeback（写入式回写）."
+        ),
+    )
+    output_path = root / "reports" / "qa" / f"{area_id}_movement_corridor_scoring_qa_report.json"
+    write_json(output_path, report)
+    return report
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run auto QA for a road test stage.")
     parser.add_argument(
@@ -647,6 +713,7 @@ def main() -> int:
             "road_graph",
             "lane_graph",
             "movement_corridor",
+            "movement_corridor_scoring",
             "compound_junction_merge",
             "compound_junction_merge_transaction",
         ],
@@ -665,6 +732,8 @@ def main() -> int:
         report = run_lane_graph_qa(root, args.area_id)
     elif args.stage == "movement_corridor":
         report = run_movement_corridor_qa(root, args.area_id)
+    elif args.stage == "movement_corridor_scoring":
+        report = run_movement_corridor_scoring_qa(root, args.area_id)
     elif args.stage == "compound_junction_merge":
         report = run_compound_junction_merge_qa(root, args.area_id)
     elif args.stage == "compound_junction_merge_transaction":

@@ -67,9 +67,9 @@
     "transaction_candidate_ratio": 1.0
   },
   "inputs": {
-    "compound_junction_merge_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_candidates.json",
-    "compound_junction_merge_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_report.json",
-    "rules": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+    "compound_junction_merge_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_candidates.json",
+    "compound_junction_merge_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_report.json",
+    "rules": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
   },
   "next_action": "Use transaction_candidate（事务候选） compound junction merges（复合路口合并） for trial transaction（试运行事务） only; regenerate entry poses（入口姿态） and movement corridors（通行走廊） before accepting any rewrite."
 }

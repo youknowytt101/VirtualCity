@@ -1,14 +1,14 @@
-[RoadSkeleton] started 2026-06-04 03:07:40
+[RoadSkeleton] started 2026-06-04 12:17:20
 
-[2026-06-04 03:07:40] L3 topology repair
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\topology_repair.py --area-id pattaya_central_500m
+[2026-06-04 12:17:20] L3 topology repair
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\topology_repair.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
-  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
-  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_repair_report.json",
-  "repair_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_candidates.json",
-  "repair_decisions": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_decisions.json",
-  "repair_casebook": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_casebook.json",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+  "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_repair_report.json",
+  "repair_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_candidates.json",
+  "repair_decisions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_decisions.json",
+  "repair_casebook": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_casebook.json",
   "counts": {
     "input_features": 44,
     "output_edges": 243,
@@ -44,20 +44,20 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
 }
 [exit] 0
 
-[2026-06-04 03:07:40] L3 repaired-road analysis
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_repaired.geojson --output E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_repaired_analysis.json
+[2026-06-04 12:17:20] L3 repaired-road analysis
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_repaired.geojson --output D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_repaired_analysis.json
 {
   "area_id": "pattaya_central_500m",
-  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
-  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_repaired_analysis.json",
+  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_repaired_analysis.json",
   "feature_count": 243,
   "possible_unsplit_crossings": 0,
   "dangling_endpoint_clusters": 31
 }
 [exit] 0
 
-[2026-06-04 03:07:40] L3 topology repair QA
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage topology_repair --area-id pattaya_central_500m
+[2026-06-04 12:17:21] L3 topology repair QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage topology_repair --area-id pattaya_central_500m
 topology_repair QA status: pass
 [pass] output_edges: 243 / 40
 [pass] empty_geometry: 0 / 0
@@ -68,24 +68,24 @@ topology_repair QA status: pass
 [pass] repair_ops_when_dangling_high: 0 / 0
 [exit] 0
 
-[2026-06-04 03:07:41] L3 repair casebook QA
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_repair_casebook.py --area-id pattaya_central_500m
+[2026-06-04 12:17:21] L3 repair casebook QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_repair_casebook.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "pass",
   "case_count": 1,
   "pass_count": 1,
   "fail_count": 0,
-  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_repair_casebook_qa_report.json"
+  "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_repair_casebook_qa_report.json"
 }
 [exit] 0
 
-[2026-06-04 03:07:41] L4 road graph
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m
+[2026-06-04 12:17:22] L4 road graph
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
-  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_road_graph_report.json",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+  "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_road_graph_report.json",
   "counts": {
     "input_features": 243,
     "nodes": 233,
@@ -103,8 +103,8 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
 }
 [exit] 0
 
-[2026-06-04 03:07:41] L4 road graph QA
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage road_graph --area-id pattaya_central_500m
+[2026-06-04 12:17:22] L4 road graph QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage road_graph --area-id pattaya_central_500m
 road_graph QA status: warn
 [pass] nodes: 233 / 40
 [pass] edges: 243 / 40
@@ -117,12 +117,12 @@ road_graph QA status: warn
 [pass] lanes_fallback_ratio: 0.37 / 0.6
 [exit] 0
 
-[2026-06-04 03:07:41] L5 junction semantics
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_junction_semantics.py --area-id pattaya_central_500m
+[2026-06-04 12:17:24] L5 junction semantics
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_junction_semantics.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
-  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
-  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_semantics_report.json",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
+  "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_semantics_report.json",
   "counts": {
     "junctions": 49,
     "approaches": 149,
@@ -142,8 +142,8 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
 }
 [exit] 0
 
-[2026-06-04 03:07:41] L5.5 junction area regularization
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\regularize_junction_areas.py --area-id pattaya_central_500m
+[2026-06-04 12:17:24] L5.5 junction area regularization
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\regularize_junction_areas.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -155,19 +155,19 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     "short_edge_absorption_candidate": 26
   },
   "outputs": {
-    "junction_areas": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
-    "engineering_reference_lines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_area_regularization_report.json"
+    "junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+    "engineering_reference_lines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_area_regularization_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:41] L6 engineering centerline
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\optimize_junction_centerlines.py --area-id pattaya_central_500m
+[2026-06-04 12:17:25] L6 engineering centerline
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\optimize_junction_centerlines.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
-  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_optimized_centerlines_report.json",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+  "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_optimized_centerlines_report.json",
   "counts": {
     "input_edges": 243,
     "optimized_approaches": 243,
@@ -205,12 +205,12 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
 }
 [exit] 0
 
-[2026-06-04 03:07:41] L6 junction geometry audit
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\junction_geometry_audit.py --area-id pattaya_central_500m
+[2026-06-04 12:17:25] L6 junction geometry audit
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\junction_geometry_audit.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
-  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_geometry_audit_report.json",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_geometry_audit_report.json",
   "metrics": {
     "junctions_with_connectors": 49,
     "junctions_with_issues": 42,
@@ -237,8 +237,8 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
 }
 [exit] 0
 
-[2026-06-04 03:07:41] L6.5 junction connector solver candidates
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_junction_connectors.py --area-id pattaya_central_500m
+[2026-06-04 12:17:26] L6.5 junction connector solver candidates
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_junction_connectors.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -300,14 +300,14 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     }
   },
   "outputs": {
-    "candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_solver_report.json"
+    "candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_solver_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:41] L6.6 connector replacement transaction
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\apply_connector_replacements.py --area-id pattaya_central_500m
+[2026-06-04 12:17:26] L6.6 connector replacement transaction
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\apply_connector_replacements.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "accepted",
@@ -369,20 +369,20 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     }
   ],
   "outputs": {
-    "optimized_centerlines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_report.json",
-    "trial_audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_trial_audit_report.json",
-    "baseline_audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_baseline_audit_report.json"
+    "optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_report.json",
+    "trial_audit": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_trial_audit_report.json",
+    "baseline_audit": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_baseline_audit_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:41] L6.7 junction geometry audit after replacement
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\junction_geometry_audit.py --area-id pattaya_central_500m
+[2026-06-04 12:17:28] L6.7 junction geometry audit after replacement
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\junction_geometry_audit.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
-  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_geometry_audit_report.json",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_geometry_audit_report.json",
   "metrics": {
     "junctions_with_connectors": 49,
     "junctions_with_issues": 42,
@@ -411,8 +411,8 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
 }
 [exit] 0
 
-[2026-06-04 03:07:42] L6.8 junction connector solver candidates refresh
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_junction_connectors.py --area-id pattaya_central_500m
+[2026-06-04 12:17:28] L6.8 junction connector solver candidates refresh
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_junction_connectors.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -474,14 +474,14 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     }
   },
   "outputs": {
-    "candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_solver_report.json"
+    "candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_solver_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:42] L6.9 junction-zone expansion planner
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\plan_short_edge_absorptions.py --area-id pattaya_central_500m
+[2026-06-04 12:17:29] L6.9 junction-zone expansion planner
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\plan_short_edge_absorptions.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -504,14 +504,14 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     "max_trim_recovery_m": 3.745
   },
   "outputs": {
-    "candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_short_edge_absorption_report.json"
+    "candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_short_edge_absorption_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:42] L7.0 lane attribute model
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_attribute_model.py --area-id pattaya_central_500m
+[2026-06-04 12:17:29] L7.0 lane attribute model
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_attribute_model.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -548,14 +548,14 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     "direction_policy_override_ratio": 1.0
   },
   "outputs": {
-    "lane_attribute_model": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_attribute_model.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_attribute_model_report.json"
+    "lane_attribute_model": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_attribute_model.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_attribute_model_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:42] L7.1 lane graph topology
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_graph.py --area-id pattaya_central_500m --traffic-side left
+[2026-06-04 12:17:30] L7.1 lane graph topology
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_graph.py --area-id pattaya_central_500m --traffic-side left
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -601,14 +601,14 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     "temporary_bidirectional_two_lane_policy_lane_ratio": 1.0
   },
   "outputs": {
-    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json"
+    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:42] L7.1 lane graph QA
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage lane_graph --area-id pattaya_central_500m
+[2026-06-04 12:17:31] L7.1 lane graph QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage lane_graph --area-id pattaya_central_500m
 lane_graph QA status: pass
 [pass] lanes: 486 / 40
 [pass] junctions: 49 / 1
@@ -621,8 +621,8 @@ lane_graph QA status: pass
 [pass] avg_lane_links_per_junction: 6.245 / 1.0
 [exit] 0
 
-[2026-06-04 03:07:42] L8.0 movement corridor candidates
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_movement_corridors.py --area-id pattaya_central_500m --short-edge-absorptions E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_short_edge_absorption_candidates.json
+[2026-06-04 12:17:32] L8.0 movement corridor candidates
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\solve_movement_corridors.py --area-id pattaya_central_500m --short-edge-absorptions D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_short_edge_absorption_candidates.json
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -705,14 +705,14 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     "planned_virtual_anchor_ratio": 0.124
   },
   "outputs": {
-    "movement_corridor_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_corridor_report.json"
+    "movement_corridor_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_corridor_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:42] L8.1 anchored movement corridor SVG visualization
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\export_lane_graph_svg.py --area-id pattaya_central_500m --movement-corridors E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_movement_corridor_candidates.json --no-compound-transactions --width-px 3200 --max-height-px 9000
+[2026-06-04 12:17:32] L8.1 anchored movement corridor SVG visualization
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\export_lane_graph_svg.py --area-id pattaya_central_500m --movement-corridors D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_movement_corridor_candidates.json --no-compound-transactions --width-px 3200 --max-height-px 9000
 {
   "area_id": "pattaya_central_500m",
   "stage": "lane_graph_svg_visualization",
@@ -761,19 +761,19 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
   "compound_link_source": "",
   "note": "SVG visualization（可视化） only. lane_graph.json, movement_corridor_candidates.json and compound_junction_merge_transactions.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
   "inputs": {
-    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "movement_corridors": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
     "compound_junction_merge_transactions": ""
   },
   "outputs": {
-    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_svg_report.json"
+    "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_svg_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:42] L8.0 movement corridor QA
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage movement_corridor --area-id pattaya_central_500m
+[2026-06-04 12:17:33] L8.0 movement corridor QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage movement_corridor --area-id pattaya_central_500m
 movement_corridor QA status: warn
 [pass] corridor_cases: 306 / 1
 [pass] candidate_curves: 918 / 1
@@ -786,8 +786,8 @@ movement_corridor QA status: warn
 [warn] ready_ratio: 0.0 / 0.05
 [exit] 0
 
-[2026-06-04 03:07:42] L8.2 movement anchor gap audit
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\audit_movement_anchors.py --area-id pattaya_central_500m
+[2026-06-04 12:17:33] L8.2 movement anchor gap audit
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\audit_movement_anchors.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -813,14 +813,14 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     }
   },
   "outputs": {
-    "audit": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_anchor_gap_audit.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_anchor_gap_audit_report.json"
+    "audit": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_anchor_gap_audit.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_anchor_gap_audit_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:42] L8.3 compound junction merge planner
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\plan_compound_junction_merges.py --area-id pattaya_central_500m
+[2026-06-04 12:17:35] L8.3 compound junction merge planner
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\plan_compound_junction_merges.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -848,14 +848,14 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     "max_bridge_edges_per_candidate": 1
   },
   "outputs": {
-    "compound_junction_merge_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_candidates.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_report.json"
+    "compound_junction_merge_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_candidates.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:43] L8.3 compound junction merge QA
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage compound_junction_merge --area-id pattaya_central_500m
+[2026-06-04 12:17:35] L8.3 compound junction merge QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage compound_junction_merge --area-id pattaya_central_500m
 compound_junction_merge QA status: pass
 [pass] reference_errors: 0 / 0
 [pass] blocked_candidates: 0 / 0
@@ -864,8 +864,8 @@ compound_junction_merge QA status: pass
 [pass] transaction_candidate_ratio: 1.0 / 0.5
 [exit] 0
 
-[2026-06-04 03:07:43] L8.4 compound junction merge transaction
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\apply_compound_junction_merges.py --area-id pattaya_central_500m
+[2026-06-04 12:17:36] L8.4 compound junction merge transaction
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\apply_compound_junction_merges.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -911,14 +911,14 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
     "capacity_limited_anchor_cases": 0
   },
   "outputs": {
-    "compound_junction_merge_transactions": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_transaction_report.json"
+    "compound_junction_merge_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_transaction_report.json"
   }
 }
 [exit] 0
 
-[2026-06-04 03:07:43] L8.4 compound junction merge transaction QA
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage compound_junction_merge_transaction --area-id pattaya_central_500m
+[2026-06-04 12:17:36] L8.4 compound junction merge transaction QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage compound_junction_merge_transaction --area-id pattaya_central_500m
 compound_junction_merge_transaction QA status: pass
 [pass] reference_errors: 0 / 0
 [pass] exposed_bridge_edge_cases: 0 / 0
@@ -927,8 +927,8 @@ compound_junction_merge_transaction QA status: pass
 [pass] affected_corridor_replacement_ratio: 1.0 / 1.0
 [exit] 0
 
-[2026-06-04 03:07:43] L8.5 staged compound movement SVG visualization
-C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\export_lane_graph_svg.py --area-id pattaya_central_500m --movement-corridors E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_movement_corridor_candidates.json --compound-transactions E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_compound_junction_merge_transactions.json --width-px 3200 --max-height-px 9000
+[2026-06-04 12:17:37] L8.5 staged compound movement SVG visualization
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\export_lane_graph_svg.py --area-id pattaya_central_500m --movement-corridors D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_movement_corridor_candidates.json --compound-transactions D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_compound_junction_merge_transactions.json --width-px 3200 --max-height-px 9000
 {
   "area_id": "pattaya_central_500m",
   "stage": "lane_graph_svg_visualization",
@@ -991,13 +991,87 @@ C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\pyth
   "compound_link_source": "compound_junction_merge_transactions",
   "note": "SVG visualization（可视化） only. lane_graph.json, movement_corridor_candidates.json and compound_junction_merge_transactions.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
   "inputs": {
-    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "movement_corridors": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-    "compound_junction_merge_transactions": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json"
+    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "compound_junction_merge_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json"
   },
   "outputs": {
-    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",
-    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_svg_report.json"
+    "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_svg_report.json"
   }
 }
+[exit] 0
+
+[2026-06-04 12:17:37] L8.6 movement corridor scoring
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\score_movement_corridors.py --area-id pattaya_central_500m
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "movement_corridor_scoring_v1",
+  "status": "warn",
+  "metrics": {
+    "cases_scored": 330,
+    "movement_cases_scored": 306,
+    "compound_cases_scored": 24,
+    "candidate_scores": 990,
+    "reference_errors": 0,
+    "scored_candidate_ratio": 1.0,
+    "qa_ready_cases": 107,
+    "qa_ready_case_ratio": 0.324,
+    "collision_risk_candidate_ratio": 0.809,
+    "swept_margin_candidate_ratio": 0.058,
+    "curvature_risk_candidate_ratio": 0.633,
+    "avg_overall_score": 40.113,
+    "min_overall_score": 4.68,
+    "max_overall_score": 91.99,
+    "candidate_family_counts": {
+      "bezier_g1_preview": 306,
+      "compound_bezier_g1_preview": 24,
+      "compound_param_poly3_hermite_proxy": 24,
+      "compound_topology_straight_baseline": 24,
+      "param_poly3_hermite_proxy": 306,
+      "topology_straight_baseline": 306
+    },
+    "best_scored_family_counts": {
+      "bezier_g1_preview": 130,
+      "compound_bezier_g1_preview": 3,
+      "compound_param_poly3_hermite_proxy": 1,
+      "compound_topology_straight_baseline": 20,
+      "param_poly3_hermite_proxy": 9,
+      "topology_straight_baseline": 167
+    },
+    "candidate_status_counts": {
+      "needs_review": 781,
+      "scored_qa_candidate": 209
+    },
+    "scoring_issue_counts": {
+      "collision_risk_non_target_lane_centerline": 801,
+      "curvature_radius_below_scoring_min": 627,
+      "curvature_reversal": 199,
+      "swept_envelope_margin_low": 57
+    },
+    "publish_ready_candidates": 0,
+    "destructive_writeback_ready": false
+  },
+  "next_action": "Review low scoring movement corridors（通行走廊） in the SVG viewer（SVG 查看器） before any destructive writeback（写入式回写）.",
+  "inputs": {
+    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "compound_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json"
+  },
+  "outputs": {
+    "scoring": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_scoring.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_corridor_scoring_report.json"
+  }
+}
+[exit] 0
+
+[2026-06-04 12:17:42] L8.6 movement corridor scoring QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage movement_corridor_scoring --area-id pattaya_central_500m
+movement_corridor_scoring QA status: pass
+[pass] cases_scored: 330 / 1
+[pass] candidate_scores: 990 / 1
+[pass] reference_errors: 0 / 0
+[pass] scored_candidate_ratio: 1.0 / 1.0
+[pass] qa_ready_case_ratio: 0.324 / 0.25
+[pass] collision_risk_candidate_ratio: 0.809 / 0.95
 [exit] 0

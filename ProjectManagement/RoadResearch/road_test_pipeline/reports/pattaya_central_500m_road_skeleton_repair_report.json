@@ -2,8 +2,8 @@
   "area_id": "pattaya_central_500m",
   "stage": "road_repair_clean_skeleton",
   "status": "warn",
-  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_clean_skeleton.geojson",
+  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_clean_skeleton.geojson",
   "feature_count": 413,
   "part_counts": {
     "optimized_approach_centerline": 243,

@@ -414,6 +414,9 @@ def main() -> int:
     lane_graph_svg_report = reports / f"{args.area_id}_lane_graph_svg_report.json"
     movement_corridor_report = reports / f"{args.area_id}_movement_corridor_report.json"
     movement_corridor_qa = reports / "qa" / f"{args.area_id}_movement_corridor_qa_report.json"
+    movement_corridor_scoring = processed / f"{args.area_id}_movement_corridor_scoring.json"
+    movement_corridor_scoring_report = reports / f"{args.area_id}_movement_corridor_scoring_report.json"
+    movement_corridor_scoring_qa = reports / "qa" / f"{args.area_id}_movement_corridor_scoring_qa_report.json"
     movement_anchor_gap_audit = processed / f"{args.area_id}_movement_anchor_gap_audit.json"
     movement_anchor_gap_audit_report = reports / f"{args.area_id}_movement_anchor_gap_audit_report.json"
     compound_junction_merge_candidates = processed / f"{args.area_id}_compound_junction_merge_candidates.json"
@@ -520,6 +523,11 @@ def main() -> int:
                 "9000",
             ],
         ),
+        ("L8.6 movement corridor scoring", [python_cmd(), str(root / "scripts" / "score_movement_corridors.py"), "--area-id", args.area_id]),
+        (
+            "L8.6 movement corridor scoring QA",
+            [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "movement_corridor_scoring", "--area-id", args.area_id],
+        ),
     ])
 
     for name, cmd in steps:
@@ -591,6 +599,9 @@ def main() -> int:
             "lane_graph_svg_report": str(lane_graph_svg_report),
             "movement_corridor_report": str(movement_corridor_report),
             "movement_corridor_qa": str(movement_corridor_qa),
+            "movement_corridor_scoring": str(movement_corridor_scoring),
+            "movement_corridor_scoring_report": str(movement_corridor_scoring_report),
+            "movement_corridor_scoring_qa": str(movement_corridor_scoring_qa),
             "movement_anchor_gap_audit": str(movement_anchor_gap_audit),
             "movement_anchor_gap_audit_report": str(movement_anchor_gap_audit_report),
             "compound_junction_merge_candidates": str(compound_junction_merge_candidates),
@@ -609,9 +620,9 @@ def main() -> int:
             "traffic_side": args.traffic_side,
         },
         "next_stage": (
-            "compound_junction_merge_transactions（复合路口合并事务） are accepted for staging preview. "
-            "Next review staged compound movement corridors（暂存复合通行走廊） in SVG, then add "
-            "collision（碰撞） and swept-envelope（扫掠包络） scoring before destructive writeback（写入式回写）."
+            "movement_corridor_scoring（通行走廊评分） is available as non-destructive QA（非破坏式质检）. "
+            "Next use the SVG viewer Inspector（检查器） to review low-score corridors（低分通行走廊） "
+            "before any destructive writeback（写入式回写）."
         ),
     }
     summary_path = reports / f"{args.area_id}_road_skeleton_repair_summary.json"
