@@ -8,7 +8,7 @@
     "application_id": "corner_optimization_application_v0001",
     "policy": "low_risk_degree2_connector_only_v1"
   },
-  "source_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_candidates.json",
+  "source_candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json",
   "selection_policy": {
     "candidate_ids": [
       "corner_0001"
@@ -73,5 +73,5 @@
     ]
   },
   "planned_package_version": "lane_package_v0007",
-  "log": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_corner_optimization_application_v0001.log"
+  "log": "reports/pattaya_central_500m_corner_optimization_application_v0001.log"
 }

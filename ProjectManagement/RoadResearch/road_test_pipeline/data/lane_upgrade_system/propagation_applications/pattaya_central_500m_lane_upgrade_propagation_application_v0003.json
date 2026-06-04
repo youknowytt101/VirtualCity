@@ -7,7 +7,7 @@
     "version": "v0003",
     "policy": "short_edge_absorption_only_v1"
   },
-  "source_plan": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_system\\propagation\\pattaya_central_500m_lane_upgrade_propagation_plan_v0003.json",
+  "source_plan": "data/lane_upgrade_system/propagation/pattaya_central_500m_lane_upgrade_propagation_plan_v0003.json",
   "selection_policy": {
     "candidate_ids": [
       "prop_0000"
@@ -72,5 +72,5 @@
     }
   },
   "planned_package_version": "lane_package_v0006",
-  "log": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_upgrade_propagation_application_v0003.log"
+  "log": "reports/pattaya_central_500m_lane_upgrade_propagation_application_v0003.log"
 }

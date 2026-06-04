@@ -21,7 +21,7 @@
   },
   "resolution": {
     "policy": "road_graph_edge_lookup_v1",
-    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json"
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json"
   },
   "affected_scope": {
     "scope_policy": "direct_edge_endpoints_v1",

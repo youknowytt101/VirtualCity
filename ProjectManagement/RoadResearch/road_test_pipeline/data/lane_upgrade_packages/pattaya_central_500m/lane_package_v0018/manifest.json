@@ -1,0 +1,196 @@
+{
+  "type": "standard_lane_package_manifest",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "lane_upgrade_system.standard_lane_package.v1",
+    "system": "LaneForge",
+    "package_version": "lane_package_v0018",
+    "path_policy": "portable_lane_package_paths_v1",
+    "source_pipeline_root": "",
+    "source_pipeline_root_policy": "not_embedded_for_portable_package",
+    "qa_status": "pass",
+    "lane_geometry_rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+    "lane_geometry_rounding_style": {
+      "style_id": "unified_lane_geometry_rounding_style_v1",
+      "primary_curve_family": "tangent_circular_arc",
+      "straight_curve_family": "straight_infinite_radius",
+      "sample_strategy": "arc_angle_limited_min_profile_samples",
+      "sample_angle_deg": 5.0,
+      "lane_level_straight_sweep_deg": 0.1,
+      "min_samples": {
+        "optimized_corner_fillet": 9,
+        "micro_bend": 5,
+        "hard_bend_lane_level_rounding": 9
+      },
+      "endpoint_lock": "preserve_lane_endpoints_and_trim_local_bend_windows",
+      "semantic_boundary": "geometry_style_only_no_traffic_semantics_inference",
+      "truth_layers_unchanged": [
+        "raw",
+        "repaired",
+        "canonical",
+        "road_graph"
+      ]
+    }
+  },
+  "human_model": "raw map data -> LaneForge lane upgrade system -> standard lane package -> Houdini construction pipeline",
+  "contents": {
+    "standard_lanes": "standard_lanes.json",
+    "standard_junctions": "standard_junctions.json",
+    "standard_lane_surfaces": "standard_lane_surfaces.geojson",
+    "standard_lane_surfaces_obj": "standard_lane_surfaces.obj",
+    "lane_debug_geometry": "lane_debug_geometry.geojson",
+    "qa_report": "qa_report.json",
+    "lane_graph_report": "lane_graph_report.json",
+    "lane_surface_report": "lane_surface_report.json",
+    "active_lane_upgrades": "active_lane_upgrades.json",
+    "active_corner_optimizations": "active_corner_optimizations.json",
+    "corner_optimization_candidates": "corner_optimization_candidates.json",
+    "corner_optimization_report": "corner_optimization_report.json",
+    "lane_upgrade_propagation_plan": "lane_upgrade_propagation_plan.json",
+    "lane_upgrade_propagation_report": "lane_upgrade_propagation_report.json",
+    "houdini_manifest": "houdini_manifest.json"
+  },
+  "counts": {
+    "lanes": 204,
+    "junctions": 49,
+    "lane_links": 308,
+    "continuity_links": 20,
+    "junction_envelope_surfaces": 49,
+    "active_lane_upgrades": 4,
+    "active_corner_optimizations": 4,
+    "corner_optimization_candidates": 19,
+    "corner_optimization_accepted_active": 4,
+    "corner_optimization_accepted_active_candidates": 3,
+    "corner_optimization_accepted_active_overrides": 4,
+    "lane_upgrade_propagation_candidates": 10,
+    "lane_upgrade_propagation_high_confidence": 3
+  },
+  "metrics": {
+    "lane_graph": {
+      "junctions_with_connections_ratio": 1.0,
+      "fan_fallback_ratio": 0.0,
+      "avg_lane_links_per_junction": 6.286,
+      "lane_link_reference_errors": 0,
+      "blocked_lane_links": 0,
+      "empty_connection_curves": 0,
+      "avg_lane_link_confidence": 0.82,
+      "min_lane_link_confidence": 0.82,
+      "avg_curve_length_m": 20.459,
+      "max_curve_length_m": 29.564,
+      "avg_continuity_curve_length_m": 1.262,
+      "max_continuity_curve_length_m": 7.299,
+      "avg_lane_width_m": 3.2,
+      "min_lane_width_m": 3.2,
+      "max_lane_width_m": 3.2,
+      "avg_lane_width_confidence": 0.45,
+      "max_lane_width_start_end_delta_m": 0.0,
+      "derived_lane_centerline_smoothed_lanes": 37,
+      "derived_lane_centerline_smoothed_bends": 71,
+      "derived_lane_centerline_inserted_sample_points": 581,
+      "derived_lane_centerline_max_derivation_offset_m": 2.037,
+      "derived_lane_centerline_max_source_bend_offset_m": 19.978,
+      "derived_lane_centerline_smoothing_curve_family_counts": {
+        "tangent_circular_arc": 71
+      },
+      "derived_lane_centerline_smoothing_arc_fit_status_counts": {
+        "exact_tangent_arc": 71
+      },
+      "continuity_rounding_style_counts": {
+        "unified_lane_geometry_rounding_style_v1": 20
+      },
+      "continuity_rounding_curve_family_counts": {
+        "straight_infinite_radius": 14,
+        "tangent_circular_arc": 6
+      }
+    },
+    "lane_surface": {
+      "trim_start_lane_count": 131,
+      "trim_end_lane_count": 130,
+      "junction_trim_m": 8.0,
+      "approach_centerlines_trimmed": true,
+      "corner_continuity_trimmed_lane_count": 36,
+      "lane_geometry_rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+      "lane_geometry_rounding_curve_family": "tangent_circular_arc",
+      "derived_lane_centerline_smoothing_policy": "derived_lane_centerline_smoothing_v1",
+      "derived_lane_centerline_smoothed_lanes": 37,
+      "derived_lane_centerline_smoothed_bends": 71,
+      "derived_lane_centerline_inserted_sample_points": 581,
+      "derived_lane_centerline_max_derivation_offset_m": 2.037,
+      "derived_lane_centerline_smoothing_profile_counts": {
+        "hard_bend_lane_level_rounding": 29,
+        "micro_bend": 42
+      },
+      "derived_lane_centerline_smoothing_curve_family_counts": {
+        "tangent_circular_arc": 71
+      },
+      "derived_lane_centerline_smoothing_arc_fit_status_counts": {
+        "exact_tangent_arc": 71
+      },
+      "continuity_rounding_style_counts": {
+        "unified_lane_geometry_rounding_style_v1": 20
+      },
+      "continuity_rounding_curve_family_counts": {
+        "straight_infinite_radius": 14,
+        "tangent_circular_arc": 6
+      },
+      "avg_lane_surface_width_m": 3.2,
+      "avg_turn_surface_width_m": 3.2,
+      "avg_continuity_surface_width_m": 3.2,
+      "avg_junction_envelope_area_m2": 314.362,
+      "max_junction_envelope_area_m2": 644.432,
+      "junction_envelope_padding_m": 0.25,
+      "area_by_part_m2": {
+        "lane_surface_v1": 42014.89,
+        "junction_envelope_surface_v1": 15403.743,
+        "lane_turn_surface_v1": 20105.434,
+        "lane_continuity_surface_v1": 80.676
+      },
+      "total_area_m2": 77604.743
+    },
+    "pipeline_audit": {
+      "road_graph": {
+        "nodes": 90,
+        "edges": 100
+      },
+      "junctions": 49,
+      "allowed_movements": 306,
+      "blocked_movements": 0,
+      "lanes": 204,
+      "lane_connections": 306,
+      "lane_links": 308,
+      "continuity_links": 20,
+      "lane_curve_gap_metrics": {
+        "max_lane_link_start_gap_m": 0.000679,
+        "max_lane_link_end_gap_m": 0.00068,
+        "max_continuity_start_gap_m": 0.0,
+        "max_continuity_end_gap_m": 0.0
+      },
+      "lane_link_curve_source_counts": {
+        "junction_lane_endpoint_bezier": 308
+      },
+      "optimized_features": 252,
+      "optimized_corner_fillets": 3,
+      "optimized_junction_connectors": 149,
+      "optimized_points": 2202,
+      "preview_points": 2202,
+      "preview_obj_vertices": 2202,
+      "lane_debug_obj_vertices": 12118,
+      "lane_debug_obj_faces": 532,
+      "lane_surface_v1_obj_vertices": 8617,
+      "lane_surface_v1_obj_faces": 581,
+      "junction_envelope_surfaces": 49,
+      "qa_statuses": {
+        "topology_repair": "warn",
+        "road_graph": "warn",
+        "lane_graph": "pass"
+      }
+    }
+  },
+  "publish_policy": {
+    "source_map_data_immutable": true,
+    "manual_lane_upgrades_are_transactions": true,
+    "derived_lane_centerline_smoothing_is_downstream_geometry": true,
+    "unified_lane_geometry_rounding_style_is_downstream_geometry": true,
+    "houdini_consumes_package_outputs_only": true
+  }
+}

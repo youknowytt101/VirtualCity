@@ -21,7 +21,7 @@ lane graph truth, or geometry mutation into `svg_live_viewer.html`.
 ## Workspace
 
 ```text
-repo: D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline
+repo: E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline
 browser: http://localhost:8765/svg_live_viewer.html
 area_id: pattaya_central_500m
 ```
@@ -59,22 +59,32 @@ data/lane_upgrade_packages/pattaya_central_500m/latest.json
 Latest package:
 
 ```text
-data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0009/
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0026/
 ```
 
 Latest manifest facts:
 
 ```text
 qa_status: pass
-lanes: 204
+qa_gate_status: manual_review_required
+qa_warning_summary: publishable_warn=0, manual_review_required=3, blocker=0
+path_policy: portable_lane_package_paths_v1
+lanes: 200
 junctions: 49
-lane_links: 308
-continuity_links: 6
+lane_links: 306
+continuity_links: 20
+micro_seam_continuity_links: 12
+surface_continuity_links: 8
+direct_connector_continuity_links: 14
 junction_envelope_surfaces: 49
 active_lane_upgrades: 4
-active_corner_optimizations: 3
-corner_optimization_candidates: 20
-corner_optimization_accepted_active: 3
+active_lane_upgrades_applied: 0
+active_lane_upgrades_deferred: 4
+active_corner_optimizations: 4
+corner_optimization_candidates: 19
+corner_optimization_accepted_active: 4
+corner_optimization_accepted_active_candidates: 3
+corner_optimization_accepted_active_overrides: 4
 lane_upgrade_propagation_candidates: 10
 lane_upgrade_propagation_high_confidence: 3
 ```
@@ -83,9 +93,14 @@ Important audit metrics:
 
 ```text
 pipeline_audit: pass
+qa_gate_status: manual_review_required
+qa_warning_summary:
+  publishable_warn: 0
+  manual_review_required: 3
+  blocker: 0
 lane_curves_match_trimmed_lane_endpoints: pass
 max_lane_link_start_gap_m: 0.000679
-max_lane_link_end_gap_m: 0.000679
+max_lane_link_end_gap_m: 0.000680
 max_continuity_start_gap_m: 0.0
 max_continuity_end_gap_m: 0.0
 ```
@@ -93,7 +108,7 @@ max_continuity_end_gap_m: 0.0
 Houdini handoff:
 
 ```text
-data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0009/houdini_manifest.json
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0026/houdini_manifest.json
 ```
 
 Houdini should read package outputs only:
@@ -104,6 +119,45 @@ standard_junctions.json
 standard_lane_surfaces.geojson
 standard_lane_surfaces.obj
 ```
+
+`latest.json`, `manifest.json`, and `houdini_manifest.json` now use package-
+relative paths. Houdini cook entrypoints resolve the latest package manifest and
+do not read `data/processed/*_lane_graph.json` or `data/preview/*_lane_surfaces`
+directly.
+
+Lane graph continuity note:
+
+```text
+degree2_connector_through_continuity_v1
+```
+
+Near-straight degree-2 connector nodes now receive direct through continuity
+links. Example fixed case: `e_0082_f_1 -> e_0078_f_1` via
+`n_0064_through_cl_01_00`; this is not a corner optimization transaction.
+
+Short connector hard-bend note:
+
+```text
+derived_lane_centerline_smoothing_v1 now allows short connector hard bends when
+local derivation offset remains within the hard-bend limit.
+```
+
+Example fixed case: `e_0079_f_1 / e_0079_b_1`. These were skipped because one
+adjacent segment was shorter than the old 8m micro-bend threshold; they now use
+`hard_bend_lane_level_rounding` in the derived lane graph only.
+
+Degree-2 micro-seam note:
+
+```text
+degree2_connector_micro_seam_endpoint_snap_v1
+```
+
+Example fixed case: `n_0069_through_cl_01_00`. The original endpoint gap was
+0.063m, which created a visible tiny continuity segment in SVG/surface output.
+The current derived lane graph snaps the two lane endpoints to one seam point,
+keeps the topology continuity link with `micro_seam_absorbed=true`, and skips
+that seam in SVG/debug/surface geometry. This does not mutate
+raw/repaired/canonical/road_graph truth layers.
 
 ## Active Lane Upgrades
 
@@ -122,14 +176,31 @@ e_0014 / cr_0014 -> 3 physical lanes
 e_0015 / cr_0015 -> 3 physical lanes
 ```
 
+Important current geometry policy:
+
+```text
+defer_lane_upgrade_overrides_keep_all_roads_bidirectional_two_lane_v1
+```
+
+The transaction records above still load and remain auditable, but they do not
+alter lane count in the current lane graph. Current geometry output is:
+
+```text
+100 roads
+200 lanes
+0 non-two-lane roads
+```
+
 How they got here:
 
 - `e_0015` came from the first web-menu execution smoke test.
 - `e_0014` and `e_0013` came from controlled through-pair propagation.
 - `e_0005` came from controlled short-edge absorption.
 
-Do not assume extra lanes such as `e_0013_f_2` are test debris. They are active
-LaneForge outputs caused by these versioned upgrades.
+Do not delete the active lane upgrade transactions unless the user explicitly
+asks. Also do not re-enable their geometry effect casually; the user currently
+wants all roads to remain bidirectional two-lane until semantics are promoted
+from temporary assumptions to rule inputs.
 
 ## Active Corner Optimizations
 
@@ -145,31 +216,41 @@ Accepted active corners:
 corner_0000: degree2_connector_corner, node n_0032, e_0039 -> e_0040
 corner_0001: degree2_connector_corner, node n_0035, e_0040 -> e_0041
 corner_0002: degree2_connector_corner, node n_0078, e_0080 -> e_0081
+corner_0003: internal_centerline_bend, e_0017 / cr_0017, point_index=1
 ```
 
-All three were applied one at a time through:
+The first three degree-2 connector corners were applied one at a time through:
 
 ```powershell
 python scripts\apply_corner_optimization.py --area-id pattaya_central_500m --candidate-id <corner_id> --reason "accepted low-risk degree2 connector corner"
+```
+
+`corner_0003` was applied through the new internal bend policy:
+
+```powershell
+python scripts\apply_corner_optimization.py --area-id pattaya_central_500m --candidate-id corner_0003 --policy low_risk_internal_centerline_bend_smoothing_v1 --reason "accepted low-risk internal centerline bend smoothing"
 ```
 
 Current corner report:
 
 ```text
 reports/pattaya_central_500m_corner_optimization_report.json
-candidates: 20
-accepted_active: 3
-candidate_review: 17
+candidates: 19
+accepted_active: 4
+accepted_active_candidates: 3
+accepted_active_overrides: 4
+candidate_review: 16
 degree2_connector_corner: 3
-internal_centerline_bend: 17
-low risk: 9
+internal_centerline_bend: 16
+low risk: 8
 medium risk: 11
 high risk: 0
+candidate_id_reassignments: 16
 ```
 
-The remaining 17 `internal_centerline_bend` candidates need a separate
-controlled policy. The existing degree-2 connector policy must not be reused
-for them.
+Important: `corner_0003` is an active transaction ID and is intentionally not
+reused by the current candidate list. After the smoothing changed the shape,
+new review candidates on `e_0017` start at `corner_0004`.
 
 ## Propagation State
 
@@ -190,6 +271,11 @@ high_confidence_candidates: 3
 review_candidates: 5
 context_review_candidates: 2
 ```
+
+The current `lane_package_v0026` copies the latest propagation plan/report into
+the package. Historical `D:\VirtualCity` latest pointers are rebased to the
+current pipeline root during package publish, and newly written propagation
+latest/report paths are root-relative.
 
 Rules currently in use:
 
@@ -223,31 +309,29 @@ reports/pattaya_central_500m_lane_graph_svg_report.json
 Current viewer behavior:
 
 - Toolbar toggles: `Auto`, `Raw`, `Repaired`, `Canonical`, `Corners`.
+- Brand text is `LaneForge（道路升级系统）`.
+- Key English UI labels have Chinese annotations.
 - Cursor: simplified small black triangle.
 - Marker and hit-target sizing is fixed in screen pixels, map-app style.
 - Zoom lag introduced by fixed markers was fixed with scale caching,
   `requestAnimationFrame` coalescing, and `vector-effect: non-scaling-stroke`.
-- Inspector prioritizes action panels and collapses technical details.
+- Inspector is a right-side vertical rail panel; it prioritizes action panels
+  and collapses technical details.
 - Overlap picker is quiet by default.
 
 Latest SVG report:
 
 ```text
-lanes: 204
+lanes: 200
 movement_corridors_rendered: 306
-compound_corridors_rendered: 24
-corner_candidates_rendered: 20
+continuity_links_rendered: 20
+compound_corridor_overlay: removed
+corner_candidates_rendered: 19
 corner_candidate_status_counts:
   accepted_active: 3
-  candidate_review: 17
+  candidate_review: 16
 canonical_roads_rendered: 100
 canonical_roads_road_graph_edge_mapped: 100
-```
-
-Last viewer QA screenshot:
-
-```text
-reports/visualizations/laneforge_interaction_simplified_v0009.png
 ```
 
 ## Main Commands
@@ -300,18 +384,25 @@ Apply one low-risk degree-2 corner:
 python scripts\apply_corner_optimization.py --area-id pattaya_central_500m --candidate-id corner_0001 --reason "accepted low-risk degree2 connector corner"
 ```
 
+Apply one low-risk internal bend:
+
+```powershell
+python scripts\apply_corner_optimization.py --area-id pattaya_central_500m --candidate-id corner_0004 --policy low_risk_internal_centerline_bend_smoothing_v1 --reason "accepted low-risk internal centerline bend smoothing"
+```
+
 ## Verification Set
 
 For code changes in this pipeline, run the focused test set:
 
 ```powershell
-pytest D:\VirtualCity\tests\test_corner_optimization.py D:\VirtualCity\tests\test_lane_upgrade_system.py D:\VirtualCity\tests\test_lane_model_builder.py D:\VirtualCity\tests\test_lane_surface_v1.py D:\VirtualCity\tests\test_canonical_roads.py
+pytest E:\VirtualCity\tests\test_corner_optimization.py E:\VirtualCity\tests\test_lane_upgrade_system.py E:\VirtualCity\tests\test_lane_model_builder.py E:\VirtualCity\tests\test_lane_surface_v1.py E:\VirtualCity\tests\test_canonical_roads.py
 ```
 
-Last known focused result:
+Last known full result:
 
 ```text
-25 passed
+148 passed
+pytest E:\VirtualCity\tests
 ```
 
 For docs-only changes, at minimum run:
@@ -322,28 +413,33 @@ git diff --check
 
 ## Recommended Next Step
 
-Implement a separate controlled path for low-risk `internal_centerline_bend`
-smoothing candidates.
+Implement `road_semantics_rule_inputs_v1`.
+
+Goal: move road semantics from temporary assumptions toward auditable rule
+inputs before re-enabling richer lane-count geometry. Current package output is
+stable, package-boundary-safe, and QA-gated, but traffic organization is still
+too dependent on fallback assumptions.
+
+```text
+oneway
+width
+lanes
+turn:lanes
+```
 
 Suggested shape:
 
-1. Extend or create an apply path with a new explicit policy:
-   `low_risk_internal_centerline_bend_smoothing_v1`.
-2. Require explicit `--candidate-id` by default.
-3. Support `--dry-run`.
-4. Apply one candidate only.
-5. Rebuild:
-
-   ```powershell
-   python scripts\rebuild_road_test.py --area-id pattaya_central_500m --skip-houdini
-   ```
-
-6. Confirm `pipeline_audit: pass`.
-7. Refresh SVG and inspect the exact bend in the browser.
-
-Important: internal bends change road interior shape. They are not the same
-as degree-2 connector corner fillets. Keep the policy separate and visually
-review the first application before widening scope.
+1. Keep the current temporary policy:
+   `defer_lane_upgrade_overrides_keep_all_roads_bidirectional_two_lane_v1`.
+2. Add a road semantics rule-input layer/report that records source,
+   confidence, fallback reason, and production readiness for `oneway`, `width`,
+   `lanes`, and `turn:lanes`.
+3. Feed those rule-input metrics into `qa_warning_severity_tiers_v1`, especially
+   the current `width_fallback_ratio=1.0` manual-review warning.
+4. Do not immediately change lane counts or traffic direction geometry. First
+   publish the rule inputs in reports/package manifest for review.
+5. Keep Houdini manifest-driven and package-only. Houdini should consume the
+   resulting standard package, not infer or repair semantics itself.
 
 ## Known Non-Blockers
 
@@ -351,8 +447,9 @@ review the first application before widening scope.
   topology repair and road graph width fallback warnings.
 - `source_oneway` is currently observational only; temporary bidirectional lane
   policy is still active.
-- Movement corridor and compound corridor curves are preview/QA candidates, not
-  final lane geometry.
+- Movement corridor curves are preview/QA candidates, not final lane geometry.
+- The rejected compound corridor overlay/strategy has been removed from the
+  main SVG QA viewer and scoring path.
 - `repair_road_skeleton.py` exists as an older structural/Houdini path. For
   LaneForge package work, prefer `rebuild_road_test.py`.
 
@@ -362,5 +459,7 @@ review the first application before widening scope.
   data repair.
 - Do not let browser code mutate GeoJSON, lane graph, or active overrides.
 - Do not let Houdini discover random internal paths; use package manifests.
+- Keep package artifacts portable: no drive-letter paths in latest/package JSON.
 - Do not bulk-apply propagation or corner candidates.
+- Do not use `corner_optimization` to smooth every visual polyline kink.
 - Keep all AI rules/audits versioned and reproducible.

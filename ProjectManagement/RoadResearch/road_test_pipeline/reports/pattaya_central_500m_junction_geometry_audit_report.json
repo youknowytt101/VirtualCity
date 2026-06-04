@@ -1657,8 +1657,8 @@
     }
   ],
   "inputs": {
-    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson"
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+    "optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson"
   },
   "next_action": "Use this report to regularize T/cross junction geometry with a shared junction area and design-radius-driven connector solving."
 }

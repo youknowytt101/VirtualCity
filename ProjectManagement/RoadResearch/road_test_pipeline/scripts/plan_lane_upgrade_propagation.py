@@ -19,6 +19,7 @@ SYSTEM_NAME = "LaneForge"
 PLAN_SCHEMA = "lane_upgrade_system.propagation_plan.v2"
 REPORT_SCHEMA = "lane_upgrade_system.propagation_report.v2"
 DEFAULT_SHORT_EDGE_THRESHOLD_M = 35.0
+PATH_POLICY = "pipeline_root_relative_paths_v1"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -32,6 +33,13 @@ def write_json(path: Path, data: dict[str, Any]) -> None:
 
 def pipeline_root_from_script(script_path: Path) -> Path:
     return script_path.resolve().parents[1]
+
+
+def rel(path: Path, root: Path) -> str:
+    try:
+        return str(path.relative_to(root)).replace("\\", "/")
+    except ValueError:
+        return str(path)
 
 
 def next_versioned_path(directory: Path, prefix: str) -> tuple[str, Path]:
@@ -279,6 +287,7 @@ def plan_propagation(
             "schema": PLAN_SCHEMA,
             "system": SYSTEM_NAME,
             "version": version,
+            "path_policy": PATH_POLICY,
             "policy": "proposal_only_no_active_override",
             "short_edge_threshold_m": short_edge_threshold_m,
         },
@@ -289,15 +298,16 @@ def plan_propagation(
         "area_id": area_id,
         "stage": "lane_upgrade_propagation_v2",
         "schema": REPORT_SCHEMA,
+        "path_policy": PATH_POLICY,
         "status": "pass",
         "inputs": {
-            "road_graph": str(road_graph_path),
-            "junction_semantics": str(junction_semantics_path),
-            "active_overrides": str(active_overrides_path),
+            "road_graph": rel(road_graph_path, root),
+            "junction_semantics": rel(junction_semantics_path, root),
+            "active_overrides": rel(active_overrides_path, root),
         },
         "outputs": {
-            "plan": str(output_path),
-            "report": str(report_path),
+            "plan": rel(output_path, root),
+            "report": rel(report_path, root),
         },
         "counts": {
             "active_upgrades": len(active),
@@ -317,8 +327,9 @@ def plan_propagation(
         "area_id": area_id,
         "system": SYSTEM_NAME,
         "latest_plan_version": version,
-        "latest_plan": str(output_path),
-        "latest_report": str(report_path),
+        "path_policy": PATH_POLICY,
+        "latest_plan": rel(output_path, root),
+        "latest_report": rel(report_path, root),
     }
     write_json(output_path.parent / f"{area_id}_latest.json", latest)
     return report

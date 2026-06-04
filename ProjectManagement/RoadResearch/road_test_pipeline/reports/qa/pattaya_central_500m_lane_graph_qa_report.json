@@ -6,7 +6,7 @@
     {
       "id": "lanes",
       "status": "pass",
-      "value": 204,
+      "value": 200,
       "threshold": 40,
       "message": "Lane graph should expose enough directed lane records for junction connection research."
     },
@@ -27,7 +27,7 @@
     {
       "id": "lane_links",
       "status": "pass",
-      "value": 308,
+      "value": 306,
       "threshold": 1,
       "message": "Allowed movements should produce laneLinks for downstream movement corridor research."
     },
@@ -62,28 +62,34 @@
     {
       "id": "avg_lane_links_per_junction",
       "status": "pass",
-      "value": 6.286,
+      "value": 6.245,
       "threshold": 1.0,
       "message": "LaneLink density is low; review oneway, lane count and movement inference."
     }
   ],
   "metrics": {
     "counts": {
-      "lanes": 204,
+      "lanes": 200,
       "junctions": 49,
       "approach_lane_records": 149,
       "connections": 306,
-      "lane_links": 308,
-      "continuity_links": 6,
+      "lane_links": 306,
+      "continuity_links": 20,
       "optimized_approach_centerlines": 100,
       "optimized_approach_centerlines_applied": 100,
       "optimized_junction_connectors": 149,
       "optimized_junction_connector_lane_links": 0,
       "optimized_corner_fillet_links": 6,
+      "direct_connector_continuity_links": 14,
       "active_lane_upgrades": 4,
-      "active_lane_upgrades_applied": 4,
+      "active_lane_upgrades_applied": 0,
+      "active_lane_upgrades_deferred": 4,
       "active_lane_upgrades_missing_roads": 0,
       "active_lane_upgrades_ignored": 0,
+      "derived_lane_centerline_smoothed_lanes": 38,
+      "derived_lane_centerline_smoothed_bends": 72,
+      "derived_lane_centerline_inserted_sample_points": 615,
+      "lane_level_radius_regularized_continuity_links": 1,
       "fan_fallback_junctions": 0
     },
     "turn_counts": {
@@ -92,15 +98,14 @@
       "through": 102
     },
     "lane_source_counts": {
-      "lane_upgrade_system_manual_override": 12,
-      "temporary_bidirectional_two_lane_policy": 192
+      "temporary_bidirectional_two_lane_policy": 200
     },
     "traffic_direction_policy_counts": {},
     "connection_source_counts": {
       "geometry_inferred_from_osm_plus_temporary_bidirectional_two_lane_policy": 306
     },
     "lane_link_source_counts": {
-      "junction_semantics": 308
+      "junction_semantics": 306
     },
     "fallback_counts": {
       "not_generated_layer3_lane_graph_only": 49
@@ -108,27 +113,47 @@
     "lane_graph_metrics": {
       "junctions_with_connections_ratio": 1.0,
       "fan_fallback_ratio": 0.0,
-      "avg_lane_links_per_junction": 6.286,
+      "avg_lane_links_per_junction": 6.245,
       "lane_link_reference_errors": 0,
       "blocked_lane_links": 0,
       "empty_connection_curves": 0,
       "avg_lane_link_confidence": 0.82,
       "min_lane_link_confidence": 0.82,
-      "avg_curve_length_m": 20.459,
-      "max_curve_length_m": 29.564,
-      "avg_continuity_curve_length_m": 4.152,
+      "avg_curve_length_m": 20.363,
+      "max_curve_length_m": 28.802,
+      "avg_continuity_curve_length_m": 1.406,
       "max_continuity_curve_length_m": 7.299,
       "avg_lane_width_m": 3.2,
       "min_lane_width_m": 3.2,
       "max_lane_width_m": 3.2,
       "avg_lane_width_confidence": 0.45,
-      "max_lane_width_start_end_delta_m": 0.0
+      "max_lane_width_start_end_delta_m": 0.0,
+      "derived_lane_centerline_smoothed_lanes": 38,
+      "derived_lane_centerline_smoothed_bends": 72,
+      "derived_lane_centerline_inserted_sample_points": 615,
+      "derived_lane_centerline_max_derivation_offset_m": 2.39,
+      "derived_lane_centerline_max_source_bend_offset_m": 80.416,
+      "derived_lane_centerline_smoothing_curve_family_counts": {
+        "tangent_circular_arc": 72
+      },
+      "derived_lane_centerline_smoothing_arc_fit_status_counts": {
+        "exact_tangent_arc": 72
+      },
+      "continuity_rounding_style_counts": {
+        "unified_lane_geometry_rounding_style_v1": 20
+      },
+      "continuity_rounding_curve_family_counts": {
+        "straight_infinite_radius": 14,
+        "tangent_circular_arc": 6
+      },
+      "lane_level_radius_regularized_continuity_links": 1,
+      "min_optimized_corner_continuity_radius_m": 0.645
     }
   },
   "inputs": {
-    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "lane_graph_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
-    "rules": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+    "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
+    "lane_graph_report": "reports/pattaya_central_500m_lane_graph_report.json",
+    "rules": "qa/qa_rules.json"
   },
   "next_action": "Use lane_graph as the topology contract for movement corridor solver; do not treat offset previews as final lane geometry."
 }

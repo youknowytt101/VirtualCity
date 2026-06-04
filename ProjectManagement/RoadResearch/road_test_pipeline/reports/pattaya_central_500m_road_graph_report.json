@@ -1,8 +1,8 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "road_graph_v1",
-  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
-  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+  "input": "data/processed/pattaya_central_500m_roads_canonical.geojson",
+  "output": "data/processed/pattaya_central_500m_road_graph.json",
   "counts": {
     "input_features": 100,
     "nodes": 90,

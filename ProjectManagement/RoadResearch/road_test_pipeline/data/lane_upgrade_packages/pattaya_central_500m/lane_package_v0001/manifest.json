@@ -5,7 +5,7 @@
     "schema": "lane_upgrade_system.standard_lane_package.v1",
     "system": "LaneForge",
     "package_version": "lane_package_v0001",
-    "source_pipeline_root": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline",
+    "source_pipeline_root": ".",
     "qa_status": "pass"
   },
   "human_model": "raw map data -> LaneForge lane upgrade system -> standard lane package -> Houdini construction pipeline",
@@ -22,8 +22,8 @@
     "active_corner_optimizations": "active_corner_optimizations.json",
     "corner_optimization_candidates": "corner_optimization_candidates.json",
     "corner_optimization_report": "corner_optimization_report.json",
-    "lane_upgrade_propagation_plan": "lane_upgrade_propagation_plan.json",
-    "lane_upgrade_propagation_report": "lane_upgrade_propagation_report.json",
+    "lane_upgrade_propagation_plan": "",
+    "lane_upgrade_propagation_report": "",
     "houdini_manifest": "houdini_manifest.json"
   },
   "counts": {
@@ -33,11 +33,11 @@
     "continuity_links": 6,
     "junction_envelope_surfaces": 49,
     "active_lane_upgrades": 4,
-    "active_corner_optimizations": 3,
-    "corner_optimization_candidates": 20,
+    "active_corner_optimizations": 4,
+    "corner_optimization_candidates": 19,
     "corner_optimization_accepted_active": 3,
-    "lane_upgrade_propagation_candidates": 10,
-    "lane_upgrade_propagation_high_confidence": 3
+    "lane_upgrade_propagation_candidates": 0,
+    "lane_upgrade_propagation_high_confidence": 0
   },
   "metrics": {
     "lane_graph": {
@@ -68,16 +68,16 @@
       "avg_lane_surface_width_m": 3.2,
       "avg_turn_surface_width_m": 3.2,
       "avg_continuity_surface_width_m": 3.2,
-      "avg_junction_envelope_area_m2": 314.359,
+      "avg_junction_envelope_area_m2": 314.361,
       "max_junction_envelope_area_m2": 644.432,
       "junction_envelope_padding_m": 0.25,
       "area_by_part_m2": {
-        "lane_surface_v1": 41666.995,
-        "junction_envelope_surface_v1": 15403.58,
-        "lane_turn_surface_v1": 20105.328,
+        "lane_surface_v1": 41684.016,
+        "junction_envelope_surface_v1": 15403.697,
+        "lane_turn_surface_v1": 20105.332,
         "lane_continuity_surface_v1": 79.652
       },
-      "total_area_m2": 77255.556
+      "total_area_m2": 77272.698
     },
     "pipeline_audit": {
       "road_graph": {
@@ -103,12 +103,12 @@
       "optimized_features": 252,
       "optimized_corner_fillets": 3,
       "optimized_junction_connectors": 149,
-      "optimized_points": 2193,
-      "preview_points": 2193,
-      "preview_obj_vertices": 2193,
-      "lane_debug_obj_vertices": 10221,
+      "optimized_points": 2202,
+      "preview_points": 2202,
+      "preview_obj_vertices": 2202,
+      "lane_debug_obj_vertices": 10275,
       "lane_debug_obj_faces": 518,
-      "lane_surface_v1_obj_vertices": 7353,
+      "lane_surface_v1_obj_vertices": 7389,
       "lane_surface_v1_obj_faces": 567,
       "junction_envelope_surfaces": 49,
       "qa_statuses": {

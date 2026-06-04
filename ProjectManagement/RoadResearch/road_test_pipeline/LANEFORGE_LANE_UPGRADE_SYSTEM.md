@@ -32,7 +32,7 @@ data/lane_upgrade_packages/<area_id>/latest.json
 当前样本最新包：
 
 ```text
-data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0009/
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0015/
 ```
 
 核心文件：
@@ -57,6 +57,22 @@ lane_upgrade_propagation_report.json
 ```
 
 `manifest.json` 是外部系统总入口；Houdini 优先读取 `houdini_manifest.json`。
+
+路径契约：
+
+```text
+path_policy: portable_lane_package_paths_v1
+latest.json -> latest_package_dir: lane_package_vXXXX
+latest.json -> manifest: manifest.json
+houdini_manifest.json inputs -> package-relative file names
+```
+
+Houdini cook 入口只解析最新 package manifest，不直接读取
+`data/processed/*_lane_graph.json` 或 `data/preview/*_lane_surfaces_v1.geojson`。
+
+Lane graph 对近直线 degree-2 connector 使用
+`degree2_connector_through_continuity_v1` 生成直接连续关系；真实转角仍走
+corner optimization / optimized corner fillet。
 
 ## 车道升级
 
@@ -164,17 +180,20 @@ python scripts\plan_corner_optimization.py --area-id pattaya_central_500m
 当前候选：
 
 ```text
-20 candidates
+19 candidates
 3 degree2_connector_corner
-17 internal_centerline_bend
-3 accepted_active
-17 candidate_review
+16 internal_centerline_bend
+4 accepted_active
+3 accepted_active candidates visible in the candidate list
+4 accepted_active overrides in active transactions
+16 candidate_review
 ```
 
 已完成的受控策略：
 
 ```text
 low_risk_degree2_connector_only_v1
+low_risk_internal_centerline_bend_smoothing_v1
 ```
 
 已应用：
@@ -183,15 +202,18 @@ low_risk_degree2_connector_only_v1
 corner_0000
 corner_0001
 corner_0002
+corner_0003 -> internal_centerline_bend, e_0017 / cr_0017 point_index=1
 ```
 
-下一步要新建独立策略：
+注意：
 
 ```text
-low_risk_internal_centerline_bend_smoothing_v1
+corner_0003 已经是 active transaction id，当前候选列表不会复用它。
+后续 e_0017 上仍待审的折弯从 corner_0004 开始。
 ```
 
 不要用 degree-2 connector 的 apply policy 批量处理 internal bends。
+也不要把轻微视觉折线强行塞进 corner optimization。
 
 ## Viewer 合约
 
@@ -225,15 +247,24 @@ lane surface v1 matches lane graph
 junction envelope surfaces have area
 ```
 
-当前样本 `lane_package_v0009` 已通过这些门禁。
+当前样本 `lane_package_v0015` 已通过这些门禁。
 
 ## 推荐下一步
 
-从剩余 `internal_centerline_bend` 中挑一个低风险候选，建立新的
-`low_risk_internal_centerline_bend_smoothing_v1` 受控策略：
+建立 `qa_warning_severity_tiers_v1`：
 
 ```text
-dry-run -> apply one candidate -> rebuild -> audit -> publish -> SVG/browser review
+audit warn
+  -> publishable_warn / manual_review_required / blocker
+  -> package manifest QA tier summary
 ```
 
-只有浏览器视觉检查和 pipeline audit 都稳定后，再考虑扩大策略范围。
+设计边界：
+
+- 保持现有研究期 pass/fail 流程可用。
+- 将 topology repair、road graph dead ends、dangling endpoint ratio、
+  width fallback ratio 等 warn 显式分级。
+- `publishable_warn` 可以发布，`manual_review_required` 要在 package 中亮明，
+  `blocker` 默认拒绝发布。
+- 不改 raw / repaired / canonical / road_graph 真值。
+- 不让 Houdini 绕过 package 边界。

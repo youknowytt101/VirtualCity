@@ -83,9 +83,9 @@
     "affected_corridor_replacement_ratio": 1.0
   },
   "inputs": {
-    "compound_junction_merge_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
-    "compound_junction_merge_transaction_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_transaction_report.json",
-    "rules": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+    "compound_junction_merge_transactions": "data/processed/pattaya_central_500m_compound_junction_merge_transactions.json",
+    "compound_junction_merge_transaction_report": "reports/pattaya_central_500m_compound_junction_merge_transaction_report.json",
+    "rules": "qa/qa_rules.json"
   },
   "next_action": "Use staged compound movement corridors（暂存复合通行走廊） for SVG review and collision（碰撞） / swept-envelope（扫掠包络） scoring before any destructive writeback（写入式回写）."
 }

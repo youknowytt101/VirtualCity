@@ -4,34 +4,34 @@
   "schema": "road_upgrade_system.corner_optimization_report.v1",
   "status": "pass",
   "inputs": {
-    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-    "corner_overrides": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_overrides.json"
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+    "optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "corner_overrides": "data/processed/pattaya_central_500m_corner_optimization_overrides.json"
   },
   "outputs": {
-    "candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_candidates.json",
-    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_corner_optimization_report.json"
+    "candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json",
+    "report": "reports/pattaya_central_500m_corner_optimization_report.json"
   },
   "counts": {
-    "candidates": 20,
+    "candidates": 19,
     "degree2_connector_corner": 3,
-    "internal_centerline_bend": 17,
-    "low_risk": 9,
+    "internal_centerline_bend": 16,
+    "low_risk": 8,
     "medium_risk": 11,
     "high_risk": 0,
     "accepted_active": 3
   },
   "type_counts": {
     "degree2_connector_corner": 3,
-    "internal_centerline_bend": 17
+    "internal_centerline_bend": 16
   },
   "risk_counts": {
-    "low": 9,
+    "low": 8,
     "medium": 11
   },
   "status_counts": {
     "accepted_active": 3,
-    "candidate_review": 17
+    "candidate_review": 16
   },
   "note": "Corner optimization candidates are proposal records; accepted_active items are driven by versioned geometry transactions."
 }

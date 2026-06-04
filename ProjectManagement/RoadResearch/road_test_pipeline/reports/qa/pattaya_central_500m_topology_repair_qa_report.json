@@ -122,9 +122,9 @@
     }
   },
   "inputs": {
-    "repair_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_repair_report.json",
-    "analysis": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_repaired_analysis.json",
-    "rules": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+    "repair_report": "reports/pattaya_central_500m_repair_report.json",
+    "analysis": "reports/pattaya_central_500m_repaired_analysis.json",
+    "rules": "qa/qa_rules.json"
   },
   "next_action": "Cook Houdini repaired preview and visually inspect endpoint continuity and road junction joins."
 }

@@ -1,14 +1,25 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "optimized_centerlines_v1",
-  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-  "movement_debug_output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_movements_debug.geojson",
+  "input": "data/processed/pattaya_central_500m_road_graph.json",
+  "output": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+  "movement_debug_output": "data/processed/pattaya_central_500m_junction_movements_debug.geojson",
+  "lane_geometry_rounding_style": {
+    "style_id": "unified_lane_geometry_rounding_style_v1",
+    "primary_curve_family": "tangent_circular_arc",
+    "fallback_curve_families": [
+      "straight_infinite_radius",
+      "tangent_continuous_bezier_fallback"
+    ],
+    "sample_strategy": "arc_angle_limited_min_profile_samples",
+    "sample_angle_deg": 5.0,
+    "semantic_boundary": "geometry_style_only_no_traffic_semantics_inference"
+  },
   "regularization_inputs": {
-    "junction_areas_path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+    "junction_areas_path": "data/processed/pattaya_central_500m_junction_areas.json",
     "junction_areas_loaded": true,
     "junction_area_count": 49,
-    "engineering_reference_path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
+    "engineering_reference_path": "data/processed/pattaya_central_500m_engineering_reference_lines.json",
     "engineering_reference_loaded": true,
     "engineering_reference_entry_poses": 149,
     "regularized_entry_pose_trims": 149,
@@ -37,6 +48,8 @@
     "corner_fillets": 3,
     "corner_transaction_fillets": 3,
     "corner_heuristic_fillets": 0,
+    "internal_bend_smoothing_applied": 1,
+    "internal_bend_smoothing_skipped": 0,
     "corner_circular_arcs": 3,
     "corner_bezier_tangent_fallback": 0,
     "corner_straight_infinite_radius": 0,
@@ -53,8 +66,10 @@
     "junction_common_trim_max_lower_m": 0.0,
     "junction_common_trim_avg_lower_m": 0.0,
     "junction_common_trim_skipped_regularized_nodes": 49,
-    "corner_override_records": 3,
-    "active_corner_overrides": 3,
+    "corner_override_records": 4,
+    "active_corner_overrides": 4,
+    "active_degree2_corner_overrides": 3,
+    "active_internal_bend_overrides": 1,
     "corner_override_issue_counts": {}
   },
   "junction_degree_counts": {
@@ -78,6 +93,25 @@
   },
   "corner_arc_geometry_counts": {
     "circular_arc": 3
+  },
+  "internal_bend_smoothing_by_edge": {
+    "e_0017": [
+      {
+        "candidate_id": "corner_0003",
+        "corner_optimization_id": "corner_optimization_application_v0006_corner_0000",
+        "application_id": "corner_optimization_application_v0006",
+        "policy": "low_risk_internal_centerline_bend_smoothing_v1",
+        "source_edge_id": "e_0017",
+        "point_index": 1,
+        "cut_m": 1.95,
+        "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+        "rounding_curve_family": "tangent_circular_arc",
+        "arc_geometry": "circular_arc",
+        "arc_fit_status": "exact_tangent_arc",
+        "arc_radius_m": 5.17,
+        "status": "applied"
+      }
+    ]
   },
   "corner_fillet_metrics": {
     "min_turn_deg": 87.416,

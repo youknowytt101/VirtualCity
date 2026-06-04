@@ -5,7 +5,7 @@
     "schema": "lane_upgrade_system.standard_lane_package.v1",
     "system": "LaneForge",
     "package_version": "lane_package_v0007",
-    "source_pipeline_root": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline",
+    "source_pipeline_root": ".",
     "qa_status": "pass"
   },
   "human_model": "raw map data -> LaneForge lane upgrade system -> standard lane package -> Houdini construction pipeline",

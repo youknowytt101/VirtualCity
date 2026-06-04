@@ -171,27 +171,53 @@ def corner_match_key(candidate: dict[str, Any]) -> tuple[str, tuple[str, str]]:
     return node_id, (a, b)
 
 
-def active_corner_override_index(overrides_doc: dict[str, Any]) -> dict[tuple[str, tuple[str, str]], dict[str, Any]]:
-    indexed: dict[tuple[str, tuple[str, str]], dict[str, Any]] = {}
+def internal_bend_match_key(candidate: dict[str, Any]) -> tuple[str, int]:
+    try:
+        point_index = int(candidate.get("point_index"))
+    except (TypeError, ValueError):
+        point_index = -1
+    return str(candidate.get("source_edge_id") or ""), point_index
+
+
+def active_corner_override_index(
+    overrides_doc: dict[str, Any],
+) -> tuple[dict[tuple[str, tuple[str, str]], dict[str, Any]], dict[tuple[str, int], dict[str, Any]]]:
+    degree2_indexed: dict[tuple[str, tuple[str, str]], dict[str, Any]] = {}
+    internal_indexed: dict[tuple[str, int], dict[str, Any]] = {}
     for item in overrides_doc.get("active_corner_optimizations", []):
         if not bool(item.get("enabled", True)):
+            continue
+        candidate_type = str(item.get("candidate_type") or "")
+        if candidate_type == "internal_centerline_bend":
+            try:
+                point_index = int(item.get("point_index"))
+            except (TypeError, ValueError):
+                point_index = -1
+            source_edge_id = str(item.get("source_edge_id") or "")
+            if not source_edge_id or point_index < 1:
+                continue
+            internal_indexed[(source_edge_id, point_index)] = item
             continue
         node_id = str(item.get("node_id") or "")
         edge_ids = [str(item.get("from_edge_id") or ""), str(item.get("to_edge_id") or "")]
         if not node_id or not all(edge_ids):
             continue
         a, b = sorted(edge_ids)
-        indexed[(node_id, (a, b))] = item
-    return indexed
+        degree2_indexed[(node_id, (a, b))] = item
+    return degree2_indexed, internal_indexed
 
 
 def annotate_active_corner_overrides(candidates: list[dict[str, Any]], overrides_doc: dict[str, Any]) -> int:
-    active = active_corner_override_index(overrides_doc)
+    degree2_active, internal_active = active_corner_override_index(overrides_doc)
     applied = 0
     for candidate in candidates:
-        if str(candidate.get("candidate_type") or "") != "degree2_connector_corner":
-            continue
-        override = active.get(corner_match_key(candidate))
+        candidate_type = str(candidate.get("candidate_type") or "")
+        if candidate_type == "degree2_connector_corner":
+            override = degree2_active.get(corner_match_key(candidate))
+        elif candidate_type == "internal_centerline_bend":
+            override = internal_active.get(internal_bend_match_key(candidate))
+        else:
+            override = None
         if override is None:
             continue
         candidate["status"] = "accepted_active"
@@ -201,6 +227,61 @@ def annotate_active_corner_overrides(candidates: list[dict[str, Any]], overrides
         candidate["corner_optimization_policy"] = str(override.get("policy") or "")
         applied += 1
     return applied
+
+
+def active_corner_override_counts(overrides_doc: dict[str, Any]) -> dict[str, int]:
+    degree2_active, internal_active = active_corner_override_index(overrides_doc)
+    return {
+        "degree2_connector_corner": len(degree2_active),
+        "internal_centerline_bend": len(internal_active),
+        "total": len(degree2_active) + len(internal_active),
+    }
+
+
+def active_override_candidate_ids(overrides_doc: dict[str, Any]) -> set[str]:
+    ids: set[str] = set()
+    for item in overrides_doc.get("active_corner_optimizations", []):
+        if not bool(item.get("enabled", True)):
+            continue
+        candidate_id = str(item.get("candidate_id") or "")
+        if candidate_id:
+            ids.add(candidate_id)
+    return ids
+
+
+def next_candidate_id(index: int) -> str:
+    return f"corner_{index:04d}"
+
+
+def stabilize_candidate_ids(candidates: list[dict[str, Any]], overrides_doc: dict[str, Any]) -> int:
+    active_ids = active_override_candidate_ids(overrides_doc)
+    used: set[str] = set()
+    next_index = 0
+    reassignments = 0
+    for candidate in candidates:
+        old_id = str(candidate.get("candidate_id") or "")
+        keep_active_id = (
+            old_id
+            and old_id in active_ids
+            and str(candidate.get("status") or "") == "accepted_active"
+            and old_id not in used
+        )
+        if keep_active_id:
+            used.add(old_id)
+            continue
+        while True:
+            candidate_id = next_candidate_id(next_index)
+            next_index += 1
+            if candidate_id in used or candidate_id in active_ids:
+                continue
+            break
+        if old_id != candidate_id:
+            candidate["candidate_id_reassigned_from"] = old_id
+            candidate["candidate_id_reassignment_reason"] = "avoid_active_corner_override_candidate_id_reuse"
+            reassignments += 1
+        candidate["candidate_id"] = candidate_id
+        used.add(candidate_id)
+    return reassignments
 
 
 def add_degree2_connector_candidates(
@@ -351,6 +432,8 @@ def plan_corner_optimization(
         road_graph=road_graph,
     )
     active_applied = annotate_active_corner_overrides(candidates, corner_overrides)
+    candidate_id_reassignments = stabilize_candidate_ids(candidates, corner_overrides)
+    active_override_counts = active_corner_override_counts(corner_overrides)
     type_counts = Counter(str(candidate.get("candidate_type") or "") for candidate in candidates)
     risk_counts = Counter(str(candidate.get("risk_level") or "") for candidate in candidates)
     status_counts = Counter(str(candidate.get("status") or "") for candidate in candidates)
@@ -375,12 +458,17 @@ def plan_corner_optimization(
             "low_risk": risk_counts.get("low", 0),
             "medium_risk": risk_counts.get("medium", 0),
             "high_risk": risk_counts.get("high", 0),
-            "accepted_active": active_applied,
+            "accepted_active": active_override_counts["total"],
+            "accepted_active_candidates": active_applied,
+            "accepted_active_overrides": active_override_counts["total"],
+            "active_degree2_corner_overrides": active_override_counts["degree2_connector_corner"],
+            "active_internal_bend_overrides": active_override_counts["internal_centerline_bend"],
+            "candidate_id_reassignments": candidate_id_reassignments,
         },
         "type_counts": dict(sorted(type_counts.items())),
         "risk_counts": dict(sorted(risk_counts.items())),
         "status_counts": dict(sorted(status_counts.items())),
-        "note": "Corner optimization candidates are proposal records; accepted_active items are driven by versioned geometry transactions.",
+        "note": "Corner optimization candidates are proposal records; accepted_active counts active geometry transactions, including internal bends that no longer appear as candidates after smoothing.",
     }
     payload = {
         "type": "corner_optimization_candidates",

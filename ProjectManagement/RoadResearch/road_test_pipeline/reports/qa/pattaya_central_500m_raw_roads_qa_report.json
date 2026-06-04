@@ -122,8 +122,8 @@
     }
   },
   "inputs": {
-    "analysis": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_raw_analysis.json",
-    "rules": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+    "analysis": "reports/pattaya_central_500m_raw_analysis.json",
+    "rules": "qa/qa_rules.json"
   },
   "next_action": "Run topology_repair.py, then cook a Houdini debug view for dangling endpoints and possible crossings."
 }

@@ -1,9 +1,9 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "lane_graph_v1",
-  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-  "junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
-  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+  "input": "data/processed/pattaya_central_500m_road_graph.json",
+  "junction_semantics": "data/processed/pattaya_central_500m_junction_semantics.json",
+  "output": "data/processed/pattaya_central_500m_lane_graph.json",
   "counts": {
     "lanes": 204,
     "junctions": 49,
@@ -24,7 +24,7 @@
   },
   "lane_upgrade_system": {
     "system": "LaneForge",
-    "overrides_source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_upgrade_overrides.json",
+    "overrides_source": "data/processed/pattaya_central_500m_lane_upgrade_overrides.json",
     "applied_road_ids": [
       "e_0005",
       "e_0013",

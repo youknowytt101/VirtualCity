@@ -1,0 +1,103 @@
+{
+  "type": "corner_optimization_application",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "lane_upgrade_system.corner_optimization_application.v1",
+    "system": "LaneForge",
+    "version": "v0005",
+    "application_id": "corner_optimization_application_v0005",
+    "policy": "low_risk_internal_centerline_bend_smoothing_v1"
+  },
+  "source_candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json",
+  "selection_policy": {
+    "candidate_ids": [
+      "corner_0003"
+    ],
+    "all_matching_policy": false,
+    "policy": "low_risk_internal_centerline_bend_smoothing_v1"
+  },
+  "status": "dry_run",
+  "selected_candidates": [
+    {
+      "candidate_id": "corner_0003",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0017",
+      "canonical_road_id": "cr_0017",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 41.331,
+      "interior_angle_deg": 138.669,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 80.442,
+      "center_xz": [
+        -167.094,
+        -237.557
+      ],
+      "context_polyline_xz": [
+        [
+          -110.195,
+          -285.092
+        ],
+        [
+          -167.094,
+          -237.557
+        ],
+        [
+          -170.197,
+          -217.497
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    }
+  ],
+  "before_corner_snapshot": {
+    "corner_fillets": 3,
+    "matched_corner_fillets": [
+      {
+        "corner_node_id": "n_0032",
+        "corner_id": "n_0032_fillet",
+        "from_edge_id": "e_0039",
+        "to_edge_id": "e_0040",
+        "cut_m": 2.43,
+        "arc_radius_m": 2.542,
+        "corner_optimization_source": "corner_optimization_transaction",
+        "corner_optimization_candidate_id": "corner_0000"
+      },
+      {
+        "corner_node_id": "n_0035",
+        "corner_id": "n_0035_fillet",
+        "from_edge_id": "e_0040",
+        "to_edge_id": "e_0041",
+        "cut_m": 2.43,
+        "arc_radius_m": 2.462,
+        "corner_optimization_source": "corner_optimization_transaction",
+        "corner_optimization_candidate_id": "corner_0001"
+      },
+      {
+        "corner_node_id": "n_0078",
+        "corner_id": "n_0078_fillet",
+        "from_edge_id": "e_0080",
+        "to_edge_id": "e_0081",
+        "cut_m": 3.051,
+        "arc_radius_m": 2.971,
+        "corner_optimization_source": "corner_optimization_transaction",
+        "corner_optimization_candidate_id": "corner_0002"
+      }
+    ],
+    "internal_bend_approaches": 1,
+    "matched_internal_bend_approaches": [
+      {
+        "source_edge_id": "e_0017",
+        "coordinate_count": 7,
+        "internal_bend_smoothing_count": 0,
+        "internal_bend_smoothing_candidate_ids": ""
+      }
+    ]
+  },
+  "planned_package_version": "lane_package_v0010",
+  "log": "reports/pattaya_central_500m_corner_optimization_application_v0005.log"
+}

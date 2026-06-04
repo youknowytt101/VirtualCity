@@ -1,11 +1,11 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "lane_surface_v1",
-  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+  "input": "data/processed/pattaya_central_500m_lane_graph.json",
   "outputs": {
-    "geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.geojson",
-    "obj": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.obj",
-    "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.svg"
+    "geojson": "data/preview/pattaya_central_500m_lane_surfaces_v1.geojson",
+    "obj": "data/preview/pattaya_central_500m_lane_surfaces_v1.obj",
+    "svg": "data/preview/pattaya_central_500m_lane_surfaces_v1.svg"
   },
   "counts": {
     "lanes": 201,

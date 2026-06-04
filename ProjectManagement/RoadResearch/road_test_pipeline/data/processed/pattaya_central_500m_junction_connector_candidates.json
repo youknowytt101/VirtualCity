@@ -4,9 +4,9 @@
     "area_id": "pattaya_central_500m",
     "schema": "road_test_pipeline.junction_connector_candidates.v1",
     "coord_domain": "local_xz_m",
-    "source_road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "source_optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-    "source_engineering_reference": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
+    "source_road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+    "source_optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "source_engineering_reference": "data/processed/pattaya_central_500m_engineering_reference_lines.json",
     "note": "Candidate curves and scores only; this stage does not replace clean skeleton geometry."
   },
   "cases": [

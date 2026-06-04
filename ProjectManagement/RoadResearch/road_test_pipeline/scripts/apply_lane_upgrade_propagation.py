@@ -28,6 +28,7 @@ from typing import Any
 
 
 APPLICATION_SCHEMA = "lane_upgrade_system.propagation_application.v1"
+PATH_POLICY = "pipeline_root_relative_paths_v1"
 DEFAULT_RULES = ["through_pair_lane_count_continuity_v2"]
 DEFAULT_STATUSES = ["candidate_high_confidence"]
 DEFAULT_MIN_CONFIDENCE = 0.8
@@ -52,6 +53,70 @@ POLICY_CONFIGS: dict[str, dict[str, Any]] = {
 
 def pipeline_root_from_script(script_path: Path) -> Path:
     return script_path.resolve().parents[1]
+
+
+def rel(path: Path, root: Path) -> str:
+    try:
+        return str(path.relative_to(root)).replace("\\", "/")
+    except ValueError:
+        return str(path)
+
+
+def is_windows_absolute_path(value: str) -> bool:
+    return bool(re.match(r"^[A-Za-z]:[\\/]", value)) or value.startswith("\\\\")
+
+
+def rebase_legacy_root_path(path: Path, root: Path) -> Path | None:
+    raw_parts = re.split(r"[\\/]+", str(path))
+    parts = [part for part in raw_parts if part and not re.match(r"^[A-Za-z]:$", part)]
+    root_name = root.name.lower()
+    for index, part in enumerate(parts):
+        if str(part).lower() != root_name:
+            continue
+        return root.joinpath(*parts[index + 1 :])
+    return None
+
+
+def resolve_artifact_path(value: str, root: Path, *, base_dir: Path | None = None) -> Path:
+    text = str(value or "").strip()
+    if not text:
+        raise ValueError("artifact path is empty")
+    path = Path(text)
+    candidates: list[Path] = []
+    if path.is_absolute() or is_windows_absolute_path(text):
+        candidates.append(path)
+        rebased = rebase_legacy_root_path(path, root)
+        if rebased is not None:
+            candidates.append(rebased)
+    else:
+        if base_dir is not None:
+            candidates.append(base_dir / path)
+        candidates.append(root / path)
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[-1]
+
+
+def portable_path_string(value: str, root: Path) -> str:
+    text = str(value)
+    if not is_windows_absolute_path(text) and not Path(text).is_absolute():
+        return text
+    candidate = resolve_artifact_path(text, root)
+    try:
+        return str(candidate.resolve().relative_to(root.resolve())).replace("\\", "/")
+    except ValueError:
+        return text
+
+
+def portable_json_paths(value: Any, *, root: Path) -> Any:
+    if isinstance(value, dict):
+        return {key: portable_json_paths(item, root=root) for key, item in value.items()}
+    if isinstance(value, list):
+        return [portable_json_paths(item, root=root) for item in value]
+    if isinstance(value, str):
+        return portable_path_string(value, root)
+    return value
 
 
 def python_cmd() -> str:
@@ -106,7 +171,7 @@ def latest_plan_path(root: Path, area_id: str) -> Path:
     if not latest.exists():
         raise FileNotFoundError(f"Missing latest propagation pointer: {latest}")
     data = read_json(latest)
-    path = Path(str(data.get("latest_plan") or ""))
+    path = resolve_artifact_path(str(data.get("latest_plan") or ""), root, base_dir=latest.parent)
     if not path.exists():
         raise FileNotFoundError(f"Missing latest propagation plan: {path}")
     return path
@@ -250,9 +315,10 @@ def apply_propagation(
             "schema": APPLICATION_SCHEMA,
             "system": "LaneForge",
             "version": version,
+            "path_policy": PATH_POLICY,
             "policy": policy_name,
         },
-        "source_plan": str(plan_path),
+        "source_plan": rel(plan_path, root),
         "selection_policy": {
             "candidate_ids": sorted(candidate_ids),
             "allowed_rules": sorted(allowed_rules),
@@ -266,11 +332,12 @@ def apply_propagation(
         "skipped_existing_active_road_ids": sorted(existing_active),
         "before_lane_snapshot": before_snapshot,
         "planned_package_version": package_version,
-        "log": str(log_path),
+        "log": rel(log_path, root),
     }
 
     if dry_run or not selected:
         application["status"] = "dry_run" if dry_run else "no_candidates"
+        application = portable_json_paths(application, root=root)
         write_json(application_path, application)
         return application
 
@@ -303,6 +370,7 @@ def apply_propagation(
             "status": "applied_without_rebuild",
             "transactions": transactions,
         })
+        application = portable_json_paths(application, root=root)
         write_json(application_path, application)
         return application
 
@@ -335,6 +403,7 @@ def apply_propagation(
         "next_propagation_report": json.loads(propagation_stdout),
         "published_package": json.loads(package_stdout),
     })
+    application = portable_json_paths(application, root=root)
     write_json(application_path, application)
     return application
 

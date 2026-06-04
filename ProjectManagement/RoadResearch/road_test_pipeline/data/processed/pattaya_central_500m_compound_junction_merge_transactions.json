@@ -6,10 +6,10 @@
     "coord_domain": "local_xz_m",
     "contract": "Trial compound junction merge transaction（复合路口合并试运行事务）. It composes external lane movements across internal bridge edges（内部桥接短边） and emits compound movement corridor candidates（复合通行走廊候选） without mutating road_graph（道路图） or clean skeleton（干净道路骨架）.",
     "inputs": {
-      "compound_junction_merge_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_candidates.json",
-      "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-      "engineering_reference_lines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
-      "short_edge_absorption_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+      "compound_junction_merge_candidates": "data/processed/pattaya_central_500m_compound_junction_merge_candidates.json",
+      "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
+      "engineering_reference_lines": "data/processed/pattaya_central_500m_engineering_reference_lines.json",
+      "short_edge_absorption_candidates": "data/processed/pattaya_central_500m_short_edge_absorption_candidates.json"
     }
   },
   "transactions": [

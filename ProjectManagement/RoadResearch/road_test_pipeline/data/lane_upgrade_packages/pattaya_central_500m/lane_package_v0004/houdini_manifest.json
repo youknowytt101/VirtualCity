@@ -7,10 +7,10 @@
     "package_version": "lane_package_v0004"
   },
   "inputs": {
-    "standard_lanes": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\pattaya_central_500m\\lane_package_v0004\\standard_lanes.json",
-    "standard_junctions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\pattaya_central_500m\\lane_package_v0004\\standard_junctions.json",
-    "standard_lane_surfaces": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\pattaya_central_500m\\lane_package_v0004\\standard_lane_surfaces.geojson",
-    "standard_lane_surfaces_obj": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\pattaya_central_500m\\lane_package_v0004\\standard_lane_surfaces.obj"
+    "standard_lanes": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0004/standard_lanes.json",
+    "standard_junctions": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0004/standard_junctions.json",
+    "standard_lane_surfaces": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0004/standard_lane_surfaces.geojson",
+    "standard_lane_surfaces_obj": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0004/standard_lane_surfaces.obj"
   },
   "expected_houdini_outputs": [
     "OUT_roads_centerlines",

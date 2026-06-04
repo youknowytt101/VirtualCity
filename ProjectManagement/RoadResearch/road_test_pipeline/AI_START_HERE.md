@@ -33,7 +33,7 @@ area_id: pattaya_central_500m
 最新标准包：
 
 ```text
-data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0009/
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0026/
 data/lane_upgrade_packages/pattaya_central_500m/latest.json
 ```
 
@@ -41,20 +41,30 @@ data/lane_upgrade_packages/pattaya_central_500m/latest.json
 
 ```text
 pipeline_audit: pass
-lanes: 204
+qa_gate_status: manual_review_required
+qa_warning_summary: publishable_warn=0, manual_review_required=3, blocker=0
+path_policy: portable_lane_package_paths_v1
+lanes: 200
 junctions: 49
-lane_links: 308
-continuity_links: 6
+lane_links: 306
+continuity_links: 20
+micro_seam_continuity_links: 12
+surface_continuity_links: 8
+direct_connector_continuity_links: 14
 junction_envelope_surfaces: 49
 active_lane_upgrades: 4
-active_corner_optimizations: 3
-corner_optimization_candidates: 20
-corner_optimization_accepted_active: 3
+active_lane_upgrades_applied: 0
+active_lane_upgrades_deferred: 4
+active_corner_optimizations: 4
+corner_optimization_candidates: 19
+corner_optimization_accepted_active: 4
+corner_optimization_accepted_active_candidates: 3
+corner_optimization_accepted_active_overrides: 4
 lane_upgrade_propagation_candidates: 10
 lane_upgrade_propagation_high_confidence: 3
 ```
 
-当前 active lane upgrades：
+当前 active lane upgrades（事务记录仍保留，但几何输出暂时全部 defer）：
 
 ```text
 e_0005 / cr_0005 -> 3 physical lanes
@@ -63,16 +73,26 @@ e_0014 / cr_0014 -> 3 physical lanes
 e_0015 / cr_0015 -> 3 physical lanes
 ```
 
+当前 lane graph 几何输出遵守临时策略：
+
+```text
+defer_lane_upgrade_overrides_keep_all_roads_bidirectional_two_lane_v1
+100 roads -> 200 lanes
+```
+
 当前 active corner optimizations：
 
 ```text
 corner_0000 -> accepted_active, degree2_connector_corner
 corner_0001 -> accepted_active, degree2_connector_corner
 corner_0002 -> accepted_active, degree2_connector_corner
+corner_0003 -> accepted_for_geometry_apply, internal_centerline_bend, e_0017 / cr_0017 point_index=1
 ```
 
-剩余 17 个 `internal_centerline_bend` 仍是 review 候选，不要用现有
-`degree2_connector_corner` 策略批量套用。
+`corner_0003` 已通过独立的
+`low_risk_internal_centerline_bend_smoothing_v1` 策略应用。当前候选列表
+不再复用 `corner_0003` 这个已占用事务 ID；新的 `e_0017` 后续待审折弯从
+`corner_0004` 开始。
 
 ## 当前网页
 
@@ -92,11 +112,10 @@ reports/visualizations/pattaya_central_500m_lane_graph_topology.svg
 当前交互状态：
 
 - Toolbar 有 `Auto`、`Raw`、`Repaired`、`Canonical`、`Corners`。
+- 左上角品牌为 `LaneForge（道路升级系统）`，关键英文 UI 后面已加中文注释。
 - 鼠标光标已经简化为小黑三角。
 - 线路、点、转角候选的 hit target 已做固定屏幕尺寸，不随缩放变得不可点。
-- Inspector 已简化：常用 LaneForge 动作优先，技术详情折叠。
-- 截图参考：
-  `reports/visualizations/laneforge_interaction_simplified_v0009.png`
+- Inspector 已改成页面右侧长条状面板；常用 LaneForge 动作优先，技术详情折叠。
 
 ## 主命令
 
@@ -144,28 +163,44 @@ python scripts\apply_corner_optimization.py --area-id pattaya_central_500m --can
 下一步最适合做：
 
 ```text
-Controlled internal_centerline_bend smoothing policy v1
+road_semantics_rule_inputs_v1
 ```
 
 原因：
 
-- 用户指出的道路转角问题已经进入 LaneForge 主流程。
-- 3 个低风险 `degree2_connector_corner` 已经受控应用并通过 QA。
-- 剩余问题主要是道路内部折角 / 局部折线平滑，属于另一类风险，必须单独建策略。
+- `derived_lane_centerline_smoothing_v1` 已完成，派生车道中心线平滑不改
+  `raw` / `repaired` / `canonical` / `road_graph` 真值。
+- Houdini cook 已改为 manifest-driven，只读最新 LaneForge package。
+- `lane_package_v0026` 已采用 `portable_lane_package_paths_v1`，package JSON
+  和 latest pointer 不再写入盘符绝对路径。
+- `degree2_connector_through_continuity_v1` 已补上近直线 degree-2 connector
+  的显式车道连续关系，例如 `e_0082_f_1 -> e_0078_f_1`。
+- `derived_lane_centerline_smoothing_v1` 已覆盖短连接段硬折角，例如
+  `e_0079_f_1 / e_0079_b_1`，不改 truth layers。
+- `degree2_connector_micro_seam_endpoint_snap_v1` 已吸收 degree-2 through
+  connector 的厘米级微缝，例如 `n_0069_through_cl_01_00`，保留拓扑连续
+  link，但不再生成可见小桥 surface/SVG。
+- `qa_warning_severity_tiers_v1` 已完成，当前 package 标记
+  `manual_review_required`，原因是 dangling endpoint、dead end 和 width fallback。
+- 下一阶段要把 `oneway`、`width`、`lanes`、`turn:lanes` 从观察值/临时策略
+  提升为可审计的规则输入。
 
 建议做法：
 
-1. 先读取 `corner_optimization_candidates.json`，筛出低风险 `internal_centerline_bend`。
-2. 新增独立 policy，例如 `low_risk_internal_centerline_bend_smoothing_v1`。
-3. 先支持 dry-run 和单个 `--candidate-id`。
-4. 只应用一个候选，重建、QA、刷新 SVG。
-5. 在浏览器里对比该位置是否真的变顺，避免把真实道路形状抹平。
+1. 保持当前临时双向双车道输出，不直接重新启用 active lane upgrade 几何。
+2. 建立 road semantics rule input 层，显式记录 `oneway`、`width`、`lanes`、
+   `turn:lanes` 的来源、置信度和 fallback 原因。
+3. 先让规则进入报告/manifest，不急着改变 lane count 或交通组织几何。
+4. 把 `width_fallback_ratio=1.0` 这类 manual review 项指向可改进的规则输入。
+5. 保持 Houdini 只读 package manifest，不让语义推断绕过标准包边界。
 
 不要做：
 
-- 不要一次性应用全部 internal bends。
+- 不要把所有轻微折线都塞进 `corner_optimization`。
+- 不要直接修改 `raw` / `repaired` / `canonical` / `road_graph` 真值。
 - 不要把转角结果直接写进浏览器代码。
 - 不要绕过 `rebuild_road_test.py`、`audit_road_pipeline.py` 和标准包发布。
+- 不要在 package/latest JSON 里重新写入 `E:\` / `D:\` 这类盘符路径。
 
 ## 必看文件
 
@@ -174,7 +209,7 @@ NEXT_AI_HANDOFF_CURRENT.md
 LANEFORGE_LANE_UPGRADE_SYSTEM.md
 scripts/README.md
 data/lane_upgrade_packages/pattaya_central_500m/latest.json
-data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0009/manifest.json
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0026/manifest.json
 reports/pattaya_central_500m_pipeline_audit_report.json
 reports/pattaya_central_500m_corner_optimization_report.json
 reports/pattaya_central_500m_lane_upgrade_propagation_report.json

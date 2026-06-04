@@ -45,6 +45,10 @@ def points_from_lanes(lane_graph: dict[str, Any]) -> list[tuple[float, float]]:
         for point in lane.get("centerline_xz") or []:
             if len(point) >= 2:
                 points.append((float(point[0]), float(point[1])))
+    for link in lane_graph.get("continuity_links", []):
+        for point in link.get("connecting_curve_xz") or []:
+            if len(point) >= 2:
+                points.append((float(point[0]), float(point[1])))
     return points
 
 
@@ -53,23 +57,6 @@ def points_from_movement_corridors(movement_corridors: dict[str, Any] | None) ->
     if not movement_corridors:
         return points
     for case in movement_corridors.get("cases", []):
-        for anchor_key in ("lane_entry_anchor", "lane_exit_anchor"):
-            anchor = case.get(anchor_key) or {}
-            point = anchor.get("point_xz") or []
-            if len(point) >= 2:
-                points.append((float(point[0]), float(point[1])))
-        for candidate in case.get("candidates", []):
-            for point in candidate.get("centerline_xz") or []:
-                if len(point) >= 2:
-                    points.append((float(point[0]), float(point[1])))
-    return points
-
-
-def points_from_compound_transactions(compound_transactions: dict[str, Any] | None) -> list[tuple[float, float]]:
-    points: list[tuple[float, float]] = []
-    if not compound_transactions:
-        return points
-    for case in compound_transactions.get("compound_movement_corridor_cases", []):
         for anchor_key in ("lane_entry_anchor", "lane_exit_anchor"):
             anchor = case.get(anchor_key) or {}
             point = anchor.get("point_xz") or []
@@ -461,103 +448,6 @@ def movement_case_lines(
     return corridor_lines, anchor_marks, metrics
 
 
-def compound_case_lines(
-    *,
-    compound_transactions: dict[str, Any],
-    transform: Any,
-    max_cases: int,
-) -> tuple[list[str], list[str], dict[str, Any]]:
-    corridor_lines: list[str] = []
-    anchor_marks: list[str] = []
-    rendered = 0
-    family_counts: dict[str, int] = {}
-    issue_counts: dict[str, int] = {}
-    status_counts: dict[str, int] = {}
-
-    for case in compound_transactions.get("compound_movement_corridor_cases", []):
-        if rendered >= max_cases:
-            break
-        candidate = candidate_for_visual(case)
-        if candidate is None:
-            continue
-        points = candidate.get("centerline_xz") or []
-        if len(points) < 2:
-            continue
-
-        family = str(candidate.get("family") or "unknown")
-        family_counts[family] = family_counts.get(family, 0) + 1
-        status = str(case.get("status") or "unknown")
-        status_counts[status] = status_counts.get(status, 0) + 1
-        for issue in candidate.get("issues") or []:
-            issue = str(issue)
-            issue_counts[issue] = issue_counts.get(issue, 0) + 1
-
-        movement_kind = str(case.get("movement_kind") or "unknown")
-        color = {
-            "through": "#06b6d4",
-            "left": "#ec4899",
-            "right": "#8b5cf6",
-        }.get(movement_kind, "#f43f5e")
-        tooltip = (
-            f"compound_case_id={case.get('compound_case_id', '')}; "
-            f"movement={movement_kind}; family={family}; status={status}; "
-            f"from={case.get('from_lane_id', '')}; to={case.get('to_lane_id', '')}"
-        )
-        attrs = svg_attrs({
-            "kind": "compound_corridor",
-            "source": "compound_junction_merge_transactions.json",
-            "id": case.get("compound_case_id", ""),
-            "compound_case_id": case.get("compound_case_id", ""),
-            "from_lane_id": case.get("from_lane_id", ""),
-            "to_lane_id": case.get("to_lane_id", ""),
-            "movement": movement_kind,
-            "family": family,
-            "status": status,
-            "issues": ", ".join(str(issue) for issue in candidate.get("issues") or []),
-        })
-        corridor_lines.append(
-            f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
-            f'stroke="{color}" stroke-width="1.65" stroke-opacity="0.88" stroke-dasharray="4 2" '
-            f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
-        )
-
-        for anchor_key, fill in (("lane_entry_anchor", "#16a34a"), ("lane_exit_anchor", "#dc2626")):
-            anchor = case.get(anchor_key) or {}
-            point = anchor.get("point_xz") or []
-            if len(point) < 2:
-                continue
-            sx, sy = transform(float(point[0]), float(point[1]))
-            tooltip = (
-                f"compound {anchor_key}; lane={anchor.get('lane_id', '')}; edge={anchor.get('edge_id', '')}; "
-                f"source={anchor.get('source', '')}; trim={anchor.get('entry_trim_m', '')}"
-            )
-            attrs = svg_attrs({
-                "kind": "compound_anchor",
-                "source": "compound_junction_merge_transactions.json",
-                "id": f"{case.get('compound_case_id', '')}:{anchor_key}",
-                "compound_case_id": case.get("compound_case_id", ""),
-                "anchor_key": anchor_key,
-                "lane_id": anchor.get("lane_id", ""),
-                "edge_id": anchor.get("edge_id", ""),
-                "anchor_source": anchor.get("source", ""),
-                "trim_m": anchor.get("entry_trim_m", ""),
-            })
-            anchor_marks.append(
-                f'<circle {attrs} cx="{sx}" cy="{sy}" r="{ANCHOR_MARKER_RADIUS_PX + 0.12}" fill="{fill}" fill-opacity="0.88" '
-                f'stroke="#0f172a" stroke-width="{ANCHOR_MARKER_STROKE_WIDTH_PX + 0.04}">{svg_title(tooltip)}</circle>'
-            )
-        rendered += 1
-
-    metrics = {
-        "compound_corridors_rendered": rendered,
-        "compound_anchor_markers_rendered": len(anchor_marks),
-        "compound_case_status_counts": dict(sorted(status_counts.items())),
-        "compound_visual_candidate_family_counts": dict(sorted(family_counts.items())),
-        "compound_visual_candidate_issue_counts": dict(sorted(issue_counts.items())),
-    }
-    return corridor_lines, anchor_marks, metrics
-
-
 def lane_link_preview_lines(
     *,
     links: list[dict[str, Any]],
@@ -598,6 +488,73 @@ def lane_link_preview_lines(
         )
         rendered_links += 1
     return link_lines, rendered_links
+
+
+def continuity_link_lines(
+    *,
+    links: list[dict[str, Any]],
+    transform: Any,
+) -> tuple[list[str], dict[str, Any]]:
+    lines: list[str] = []
+    source_counts: dict[str, int] = {}
+    rendered = 0
+    skipped_micro_seams = 0
+    for link in links:
+        if bool(link.get("micro_seam_absorbed")):
+            skipped_micro_seams += 1
+            continue
+        points = link.get("connecting_curve_xz") or []
+        if len(points) < 2:
+            continue
+        source = str(link.get("source") or "unknown")
+        source_counts[source] = source_counts.get(source, 0) + 1
+        color = "#059669" if source == "degree2_connector_through_continuity_v1" else "#0ea5e9"
+        dasharray = "2 2" if source == "degree2_connector_through_continuity_v1" else ""
+        tooltip = (
+            f"continuity={link.get('continuity_link_id', '')}; "
+            f"from={link.get('from_lane', '')}; to={link.get('to_lane', '')}; "
+            f"source={source}; style={link.get('rounding_style_id', '')}; "
+            f"gap={link.get('endpoint_gap_m', '')}; turn={link.get('turn_angle_deg', '')}"
+        )
+        attrs = svg_attrs({
+            "kind": "continuity_link",
+            "source": "lane_graph.json",
+            "id": link.get("continuity_link_id", ""),
+            "continuity_link_id": link.get("continuity_link_id", ""),
+            "from_lane_id": link.get("from_lane", ""),
+            "to_lane_id": link.get("to_lane", ""),
+            "from_road": link.get("from_road", ""),
+            "to_road": link.get("to_road", ""),
+            "corner_node_id": link.get("corner_node_id", ""),
+            "link_source": source,
+            "turn": link.get("turn", ""),
+            "turn_angle_deg": link.get("turn_angle_deg", ""),
+            "endpoint_gap_m": link.get("endpoint_gap_m", ""),
+            "rounding_style_id": link.get("rounding_style_id", ""),
+            "rounding_curve_family": link.get("rounding_curve_family", ""),
+            "rounding_application": link.get("rounding_application", ""),
+            "lane_level_radius_regularized": link.get("lane_level_radius_regularized", ""),
+            "lane_level_curve_min_radius_m": link.get("lane_level_curve_min_radius_m", ""),
+            "lane_level_observed_min_radius_m": link.get("lane_level_observed_min_radius_m", ""),
+            "lane_level_from_extra_trim_m": link.get("lane_level_from_extra_trim_m", ""),
+            "lane_level_to_extra_trim_m": link.get("lane_level_to_extra_trim_m", ""),
+            "lane_level_radius_regularization_skip_reason": link.get("lane_level_radius_regularization_skip_reason", ""),
+            "micro_seam_absorbed": link.get("micro_seam_absorbed", ""),
+            "micro_seam_policy": link.get("micro_seam_policy", ""),
+            "original_endpoint_gap_m": link.get("original_endpoint_gap_m", ""),
+        })
+        dash = f' stroke-dasharray="{dasharray}"' if dasharray else ""
+        lines.append(
+            f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
+            f'stroke="{color}" stroke-width="2.2" stroke-opacity="0.78"{dash} '
+            f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
+        )
+        rendered += 1
+    return lines, {
+        "continuity_links_rendered": rendered,
+        "continuity_micro_seams_skipped": skipped_micro_seams,
+        "continuity_link_source_counts": dict(sorted(source_counts.items())),
+    }
 
 
 def raw_road_lines(
@@ -960,12 +917,12 @@ def build_svg(
 ) -> tuple[str, dict[str, Any]]:
     lanes = lane_graph.get("lanes", [])
     links = lane_graph.get("lane_links", [])
+    continuity_links = lane_graph.get("continuity_links", [])
     lanes_by_id = lane_by_id(lane_graph)
     road_graph_edge_by_canonical = road_graph_edge_ids_by_canonical(road_graph)
     all_points = (
         points_from_lanes(lane_graph)
         + points_from_movement_corridors(movement_corridors)
-        + points_from_compound_transactions(compound_transactions)
         + points_from_raw_roads(raw_roads)
         + points_from_road_layer(repaired_roads, "repaired")
         + points_from_road_layer(canonical_roads, "canonical")
@@ -993,11 +950,17 @@ def build_svg(
         width = 1.05 if confidence < 0.5 else 1.35
         casing_width = 3.25 if confidence < 0.5 else 3.85
         points_attr = polyline(points, transform)
+        smoothing = lane.get("derived_centerline_smoothing") or {}
+        smoothing_profiles = ", ".join(
+            f"{key}:{value}"
+            for key, value in sorted((smoothing.get("profile_counts") or {}).items())
+        )
         tooltip = (
             f"lane={lane.get('lane_id', '')}; road={road_id}; "
             f"direction={direction}; confidence={confidence:.3f}; "
             f"policy={lane.get('traffic_direction_policy', '')}; "
-            f"upgrade={lane.get('lane_upgrade_id', '')}; target={lane.get('lane_upgrade_target_physical_lane_count', '')}"
+            f"upgrade={lane.get('lane_upgrade_id', '')}; target={lane.get('lane_upgrade_target_physical_lane_count', '')}; "
+            f"smoothing={lane.get('centerline_derivation_policy', '')}; style={smoothing.get('rounding_style_id', '')}"
         )
         attrs = svg_attrs({
             "kind": "lane",
@@ -1016,6 +979,13 @@ def build_svg(
             "lane_source": lane.get("source", ""),
             "physical_lane_shared": lane.get("physical_lane_shared", ""),
             "road_width_m": lane.get("road_width_m", ""),
+            "centerline_derivation_policy": lane.get("centerline_derivation_policy", ""),
+            "centerline_derived_from": lane.get("centerline_derived_from", ""),
+            "centerline_smoothing_bends": smoothing.get("smoothed_bends", ""),
+            "centerline_smoothing_profiles": smoothing_profiles,
+            "centerline_smoothing_max_derivation_offset_m": smoothing.get("max_derivation_offset_m", ""),
+            "centerline_smoothing_rounding_style_id": smoothing.get("rounding_style_id", ""),
+            "centerline_smoothing_curve_family": smoothing.get("curve_family", ""),
             "source_observation_lanes": (lane.get("source_observation") or {}).get("lanes", ""),
             "source_observation_lanes_source": (lane.get("source_observation") or {}).get("lanes_source", ""),
             "issues": ", ".join(str(issue) for issue in lane.get("issues") or []),
@@ -1029,6 +999,11 @@ def build_svg(
             f'stroke="{color}" stroke-width="{width}" stroke-opacity="{opacity:.2f}" '
             f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
         )
+
+    continuity_lines, continuity_metrics = continuity_link_lines(
+        links=continuity_links,
+        transform=transform,
+    )
 
     if movement_corridors:
         link_lines, anchor_marks, movement_metrics = movement_case_lines(
@@ -1054,23 +1029,6 @@ def build_svg(
             "visual_candidate_issue_counts": {},
         }
         link_source = "lane_graph_endpoint_preview"
-
-    if compound_transactions:
-        compound_lines, compound_anchor_marks, compound_metrics = compound_case_lines(
-            compound_transactions=compound_transactions,
-            transform=transform,
-            max_cases=max_lane_links,
-        )
-    else:
-        compound_lines = []
-        compound_anchor_marks = []
-        compound_metrics = {
-            "compound_corridors_rendered": 0,
-            "compound_anchor_markers_rendered": 0,
-            "compound_case_status_counts": {},
-            "compound_visual_candidate_family_counts": {},
-            "compound_visual_candidate_issue_counts": {},
-        }
 
     if raw_roads:
         raw_lines, raw_endpoint_marks, raw_metrics = raw_road_lines(
@@ -1186,11 +1144,11 @@ def build_svg(
         '<g id="lanes">',
         *lane_lines,
         '</g>',
+        '<g id="lane-continuity-links">',
+        *continuity_lines,
+        '</g>',
         '<g id="lane-links">',
         *link_lines,
-        '</g>',
-        '<g id="compound-movement-corridors">',
-        *compound_lines,
         '</g>',
         '<g id="raw-roads" data-vc-layer="raw_roads" style="display:none">',
         *raw_lines,
@@ -1202,21 +1160,20 @@ def build_svg(
         '</g>',
         '<g id="movement-anchors">',
         *anchor_marks,
-        *compound_anchor_marks,
         '</g>',
         '<g id="legend" font-family="Arial, sans-serif" font-size="12" fill="#334155">',
-        '<rect x="24" y="64" width="360" height="228" fill="#ffffff" stroke="#cbd5e1" />',
+        '<rect x="24" y="64" width="360" height="258" fill="#ffffff" stroke="#cbd5e1" />',
         '<line x1="40" y1="86" x2="84" y2="86" stroke="#0f766e" stroke-width="2" /><text x="94" y="90">forward lane（正向车道）</text>',
         '<line x1="40" y1="106" x2="84" y2="106" stroke="#6d28d9" stroke-width="2" /><text x="94" y="110">backward lane（反向车道）</text>',
-        '<line x1="40" y1="126" x2="84" y2="126" stroke="#f97316" stroke-width="2" /><text x="94" y="130">turn corridor preview（转向走廊预览）</text>',
-        '<line x1="40" y1="146" x2="84" y2="146" stroke="#0ea5e9" stroke-width="2" /><text x="94" y="150">through corridor preview（直行走廊预览）</text>',
-        '<line x1="40" y1="166" x2="84" y2="166" stroke="#ec4899" stroke-width="2" stroke-dasharray="4 2" /><text x="94" y="170">compound trial corridor（复合试运行走廊）</text>',
+        '<line x1="40" y1="126" x2="84" y2="126" stroke="#059669" stroke-width="2.2" stroke-dasharray="2 2" /><text x="94" y="130">direct continuity（直接连续）</text>',
+        '<line x1="40" y1="146" x2="84" y2="146" stroke="#f97316" stroke-width="2" /><text x="94" y="150">turn corridor preview（转向走廊预览）</text>',
+        '<line x1="40" y1="166" x2="84" y2="166" stroke="#0ea5e9" stroke-width="2" /><text x="94" y="170">through corridor preview（直行走廊预览）</text>',
         '<circle cx="47" cy="185" r="3" fill="#22c55e" stroke="#111827" stroke-width="0.5" /><text x="94" y="189">entry / exit anchors（入口 / 出口锚点）</text>',
-        '<line x1="40" y1="206" x2="84" y2="206" stroke="#000000" stroke-width="1" /><text x="94" y="210">raw road data（原始道路数据）</text>',
-        '<circle cx="47" cy="226" r="3" fill="#000000" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="230">raw vertices（原始全部断点）</text>',
-        '<circle cx="47" cy="242" r="3" fill="#ef4444" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="246">topology issue（拓扑问题）</text>',
-        '<line x1="40" y1="262" x2="84" y2="262" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="5 3" /><text x="94" y="266">repaired roads</text>',
-        '<line x1="40" y1="282" x2="84" y2="282" stroke="#e11d48" stroke-width="1.8" /><text x="94" y="286">canonical roads</text>',
+        '<line x1="40" y1="226" x2="84" y2="226" stroke="#000000" stroke-width="1" /><text x="94" y="230">raw road data（原始道路数据）</text>',
+        '<circle cx="47" cy="246" r="3" fill="#000000" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="250">raw vertices（原始全部断点）</text>',
+        '<circle cx="47" cy="262" r="3" fill="#ef4444" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="266">topology issue（拓扑问题）</text>',
+        '<line x1="40" y1="282" x2="84" y2="282" stroke="#2563eb" stroke-width="1.4" stroke-dasharray="5 3" /><text x="94" y="286">repaired roads</text>',
+        '<line x1="40" y1="302" x2="84" y2="302" stroke="#e11d48" stroke-width="1.8" /><text x="94" y="306">canonical roads</text>',
         '</g>',
         '</svg>',
     ])
@@ -1227,9 +1184,10 @@ def build_svg(
         "counts": {
             "lanes": len(lanes),
             "lane_links_total": len(links),
+            "continuity_links_total": len(continuity_links),
             "junction_connections_rendered": rendered_links,
+            **continuity_metrics,
             **movement_metrics,
-            **compound_metrics,
             **raw_metrics,
             **raw_issue_metrics,
             **corner_metrics,
@@ -1252,10 +1210,9 @@ def build_svg(
             "canonical_roads_overlay": "rose_solid_hidden_by_default" if canonical_roads else "missing",
         },
         "link_source": link_source,
-        "compound_link_source": "compound_junction_merge_transactions" if compound_transactions else "",
         "note": (
-            "SVG visualization（可视化） only. lane_graph.json, movement_corridor_candidates.json and "
-            "compound_junction_merge_transactions.json are structured artifacts（结构化产物）. "
+            "SVG visualization（可视化） only. lane_graph.json and movement_corridor_candidates.json "
+            "are structured artifacts（结构化产物）. "
             "Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）."
         ),
     }
@@ -1267,7 +1224,7 @@ def main() -> int:
     parser.add_argument("--area-id", default="pattaya_central_500m")
     parser.add_argument("--lane-graph", default="")
     parser.add_argument("--movement-corridors", default="", help="Optional movement_corridor_candidates.json. Defaults to processed/<area_id> file if present.")
-    parser.add_argument("--compound-transactions", default="", help="Optional compound_junction_merge_transactions.json overlay.")
+    parser.add_argument("--compound-transactions", default="", help="Deprecated no-op; compound corridor overlay is no longer rendered.")
     parser.add_argument("--raw-roads", default="", help="Optional roads_raw.geojson overlay. Defaults to processed/<area_id> file if present.")
     parser.add_argument("--repaired-roads", default="", help="Optional roads_repaired.geojson overlay. Defaults to processed/<area_id> file if present.")
     parser.add_argument("--canonical-roads", default="", help="Optional roads_canonical.geojson overlay. Defaults to processed/<area_id> file if present.")
@@ -1275,7 +1232,7 @@ def main() -> int:
     parser.add_argument("--raw-topology-diagnostics", default="", help="Optional raw_topology_diagnostics.json issue overlay.")
     parser.add_argument("--corner-candidates", default="", help="Optional corner_optimization_candidates.json overlay.")
     parser.add_argument("--no-movement-corridors", action="store_true", help="Do not auto-load movement corridor overlay.")
-    parser.add_argument("--no-compound-transactions", action="store_true", help="Do not auto-load compound junction merge transaction overlay.")
+    parser.add_argument("--no-compound-transactions", action="store_true", help="Deprecated no-op; compound corridor overlay is no longer rendered.")
     parser.add_argument("--no-raw-roads", action="store_true", help="Do not auto-load raw road source overlay.")
     parser.add_argument("--no-repaired-roads", action="store_true", help="Do not auto-load repaired road overlay.")
     parser.add_argument("--no-canonical-roads", action="store_true", help="Do not auto-load canonical road overlay.")
@@ -1302,14 +1259,8 @@ def main() -> int:
         else processed / f"{args.area_id}_movement_corridor_candidates.json"
     )
     movement_corridors = read_json(movement_corridors_path) if movement_corridors_path and movement_corridors_path.exists() else None
-    compound_transactions_path = (
-        None
-        if args.no_compound_transactions
-        else Path(args.compound_transactions)
-        if args.compound_transactions
-        else processed / f"{args.area_id}_compound_junction_merge_transactions.json"
-    )
-    compound_transactions = read_json(compound_transactions_path) if compound_transactions_path and compound_transactions_path.exists() else None
+    compound_transactions_path = None
+    compound_transactions = None
     raw_roads_path = (
         None
         if args.no_raw_roads
@@ -1383,7 +1334,6 @@ def main() -> int:
     report["inputs"] = {
         "lane_graph": str(lane_graph_path),
         "movement_corridors": str(movement_corridors_path) if movement_corridors_path and movement_corridors is not None else "",
-        "compound_junction_merge_transactions": str(compound_transactions_path) if compound_transactions_path and compound_transactions is not None else "",
         "raw_roads": str(raw_roads_path) if raw_roads_path and raw_roads is not None else "",
         "repaired_roads": str(repaired_roads_path) if repaired_roads_path and repaired_roads is not None else "",
         "canonical_roads": str(canonical_roads_path) if canonical_roads_path and canonical_roads is not None else "",

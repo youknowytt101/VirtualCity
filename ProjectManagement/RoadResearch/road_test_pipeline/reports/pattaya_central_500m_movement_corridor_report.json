@@ -77,12 +77,12 @@
   "next_action": "Next add collision（碰撞） and swept envelope（扫掠包络） scoring, then promote only transaction-ready（事务就绪） junction-zone expansion（路口影响区扩张） candidates through a replacement transaction（替换事务）.",
   "candidate_selection_contract": "best_candidate_family（最佳候选曲线族） is diagnostic preview（诊断预览） only; do not publish it until collision（碰撞）, swept envelope（扫掠包络） and curvature scoring（曲率评分） exist.",
   "inputs": {
-    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "engineering_reference_lines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
-    "short_edge_absorption_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+    "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
+    "engineering_reference_lines": "data/processed/pattaya_central_500m_engineering_reference_lines.json",
+    "short_edge_absorption_candidates": "data/processed/pattaya_central_500m_short_edge_absorption_candidates.json"
   },
   "outputs": {
-    "movement_corridor_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_corridor_report.json"
+    "movement_corridor_candidates": "data/processed/pattaya_central_500m_movement_corridor_candidates.json",
+    "report": "reports/pattaya_central_500m_movement_corridor_report.json"
   }
 }

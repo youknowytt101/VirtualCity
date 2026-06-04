@@ -14,6 +14,45 @@ from typing import Any
 
 
 JUNCTION_TYPES = {"T", "cross", "Y", "offset", "complex"}
+QA_WARNING_SEVERITY_POLICY_ID = "qa_warning_severity_tiers_v1"
+QA_WARNING_TIERS = ("publishable_warn", "manual_review_required", "blocker")
+QA_GATE_STATUS_ORDER = {
+    "pass": 0,
+    "publishable_warn": 1,
+    "manual_review_required": 2,
+    "blocker": 3,
+}
+
+QA_WARNING_RULES: dict[tuple[str, str], dict[str, Any]] = {
+    ("topology_repair", "dangling_endpoint_ratio"): {
+        "tier": "manual_review_required",
+        "blocker_above": 0.45,
+        "reason": "Topology still has enough dangling endpoints that autonomous production should stop for review.",
+    },
+    ("road_graph", "dead_end_ratio"): {
+        "tier": "manual_review_required",
+        "blocker_above": 0.50,
+        "reason": "Road graph contains a high dead-end ratio; review endpoint classification before unattended production.",
+    },
+    ("road_graph", "width_fallback_ratio"): {
+        "tier": "manual_review_required",
+        "reason": "All or most road widths are inferred from defaults; output is publishable for research but needs semantic review.",
+    },
+    ("road_graph", "lanes_fallback_ratio"): {
+        "tier": "manual_review_required",
+        "blocker_above": 0.95,
+        "reason": "Lane-count defaults dominate the road graph; production output needs review before use.",
+    },
+    ("lane_graph", "fan_fallback_ratio"): {
+        "tier": "manual_review_required",
+        "blocker_above": 0.95,
+        "reason": "Lane graph still depends heavily on fallback fan connections.",
+    },
+    ("lane_graph", "avg_lane_links_per_junction"): {
+        "tier": "manual_review_required",
+        "reason": "Junction lane connectivity is sparse enough to require manual review.",
+    },
+}
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -46,6 +85,107 @@ def worst_status(checks: list[dict[str, Any]]) -> str:
         if order[check["status"]] > order[status]:
             status = check["status"]
     return status
+
+
+def as_float(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int | float):
+        return float(value)
+    if isinstance(value, str):
+        try:
+            return float(value)
+        except ValueError:
+            return None
+    return None
+
+
+def classify_warning_tier(stage: str, check: dict[str, Any]) -> tuple[str, str]:
+    status = str(check.get("status") or "")
+    if status == "fail":
+        return "blocker", "QA check failed."
+    if status != "warn":
+        return "", ""
+
+    rule = QA_WARNING_RULES.get((stage, str(check.get("id") or "")), {})
+    tier = str(rule.get("tier") or "publishable_warn")
+    reason = str(rule.get("reason") or "Warning is publishable for research and should be tracked.")
+    value = as_float(check.get("value"))
+    blocker_above = as_float(rule.get("blocker_above"))
+    blocker_below = as_float(rule.get("blocker_below"))
+    if value is not None and blocker_above is not None and value > blocker_above:
+        return "blocker", reason
+    if value is not None and blocker_below is not None and value < blocker_below:
+        return "blocker", reason
+    return tier, reason
+
+
+def make_gate_entry(stage: str, check: dict[str, Any], tier: str, reason: str) -> dict[str, Any]:
+    return {
+        "stage": stage,
+        "check_id": str(check.get("id") or ""),
+        "source_status": str(check.get("status") or ""),
+        "tier": tier,
+        "value": check.get("value"),
+        "threshold": check.get("threshold"),
+        "message": check.get("message", ""),
+        "reason": reason,
+    }
+
+
+def build_qa_warning_gate(
+    *,
+    stage_reports: dict[str, dict[str, Any]],
+    audit_checks: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    entries: list[dict[str, Any]] = []
+    for stage, report in stage_reports.items():
+        for check in report.get("checks", []):
+            tier, reason = classify_warning_tier(stage, check)
+            if tier:
+                entries.append(make_gate_entry(stage, check, tier, reason))
+        if report.get("status") == "fail" and not any(check.get("status") == "fail" for check in report.get("checks", [])):
+            entries.append({
+                "stage": stage,
+                "check_id": "stage_status",
+                "source_status": "fail",
+                "tier": "blocker",
+                "value": report.get("status"),
+                "threshold": "not_fail",
+                "message": "Stage QA report status is fail.",
+                "reason": "Stage QA failed without an individual failed check in the report.",
+            })
+
+    for check in audit_checks or []:
+        status = str(check.get("status") or "")
+        if status not in {"warn", "fail"}:
+            continue
+        tier = "blocker" if status == "fail" else "manual_review_required"
+        reason = "Pipeline audit contract warning requires review."
+        if status == "fail":
+            reason = "Pipeline audit contract failed."
+        entries.append(make_gate_entry("pipeline_audit", check, tier, reason))
+
+    summary = {tier: 0 for tier in QA_WARNING_TIERS}
+    gate_status = "pass"
+    for entry in entries:
+        tier = str(entry.get("tier") or "publishable_warn")
+        summary[tier] = summary.get(tier, 0) + 1
+        if QA_GATE_STATUS_ORDER[tier] > QA_GATE_STATUS_ORDER[gate_status]:
+            gate_status = tier
+
+    return {
+        "policy_id": QA_WARNING_SEVERITY_POLICY_ID,
+        "status": gate_status,
+        "summary": summary,
+        "entries": entries,
+        "publish_decision": {
+            "research_publish_allowed": gate_status != "blocker",
+            "autonomous_production_allowed": gate_status in {"pass", "publishable_warn"},
+            "manual_review_required": gate_status == "manual_review_required",
+            "blocker": gate_status == "blocker",
+        },
+    }
 
 
 def geometry_type_counts(fc: dict[str, Any]) -> dict[str, int]:
@@ -276,7 +416,14 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         missing,
     ))
     if missing:
-        report = {"area_id": area_id, "stage": "pipeline_audit", "status": "fail", "checks": checks}
+        qa_gate = build_qa_warning_gate(stage_reports={}, audit_checks=checks)
+        report = {
+            "area_id": area_id,
+            "stage": "pipeline_audit",
+            "status": "fail",
+            "checks": checks,
+            "qa_gate": qa_gate,
+        }
         write_json(output_path, report)
         return report
 
@@ -353,6 +500,16 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         for link in connection.get("lane_links", [])
     ]
     continuity_links = list(lane_graph.get("continuity_links", []))
+    micro_seam_continuity_links = [
+        link
+        for link in continuity_links
+        if bool(link.get("micro_seam_absorbed"))
+    ]
+    continuity_geometry_links = [
+        link
+        for link in continuity_links
+        if not bool(link.get("micro_seam_absorbed"))
+    ]
     bad_refs = [
         link.get("lane_link_id", "")
         for link in lane_links
@@ -500,14 +657,17 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         and lane_debug_counts.get("lane_link_curves") == len(lane_links)
         and lane_debug_counts.get("lane_link_ribbons") == len(lane_links)
         and lane_debug_counts.get("continuity_links", 0) == len(continuity_links)
-        and lane_debug_counts.get("lane_continuity_curves", 0) == len(continuity_links)
-        and lane_debug_counts.get("lane_continuity_ribbons", 0) == len(continuity_links),
-        "Lane debug geometry should expose every lane, every laneLink and every corner continuity curve/ribbon.",
+        and lane_debug_counts.get("lane_continuity_curves", 0) == len(continuity_geometry_links)
+        and lane_debug_counts.get("lane_continuity_ribbons", 0) == len(continuity_geometry_links)
+        and lane_debug_counts.get("skipped_micro_seam_continuity_curve", 0) == len(micro_seam_continuity_links),
+        "Lane debug geometry should expose every lane, every laneLink and every non-micro continuity curve/ribbon.",
         {
             "debug_counts": lane_debug_counts,
             "lane_graph_lanes": len(lane_graph.get("lanes", [])),
             "lane_graph_lane_links": len(lane_links),
             "lane_graph_continuity_links": len(continuity_links),
+            "lane_graph_micro_seam_continuity_links": len(micro_seam_continuity_links),
+            "lane_graph_rendered_continuity_links": len(continuity_geometry_links),
         },
     ))
     lane_debug_metrics = lane_debug_report.get("metrics", {})
@@ -547,14 +707,17 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "lane_surface_v1_matches_lane_graph",
         lane_surface_counts.get("lane_surfaces") == len(lane_graph.get("lanes", []))
         and lane_surface_counts.get("lane_turn_surfaces") == len(lane_links)
-        and lane_surface_counts.get("lane_continuity_surfaces", 0) == len(continuity_links)
+        and lane_surface_counts.get("lane_continuity_surfaces", 0) == len(continuity_geometry_links)
+        and lane_surface_counts.get("skipped_micro_seam_continuity_surface", 0) == len(micro_seam_continuity_links)
         and lane_surface_counts.get("junction_envelope_surfaces", 0) == junctions_with_lane_links,
-        "Lane surface v1 should generate approach, turn, continuity and junction envelope surfaces from the lane graph.",
+        "Lane surface v1 should generate approach, turn, non-micro continuity and junction envelope surfaces from the lane graph.",
         {
             "surface_counts": lane_surface_counts,
             "lane_graph_lanes": len(lane_graph.get("lanes", [])),
             "lane_graph_lane_links": len(lane_links),
             "lane_graph_continuity_links": len(continuity_links),
+            "lane_graph_micro_seam_continuity_links": len(micro_seam_continuity_links),
+            "lane_graph_surface_continuity_links": len(continuity_geometry_links),
             "junctions_with_lane_links": junctions_with_lane_links,
         },
     ))
@@ -591,7 +754,11 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         token in script
         for script in (houdini_build, houdini_open)
         for token in (
-            "python_import_roads_geojson",
+            "resolve_latest_houdini_package",
+            "python_import_standard_lanes",
+            "standard_lanes_path",
+            "standard_junctions_path",
+            "standard_lane_surfaces_path",
             "OUT_roads_centerlines",
             "OUT_lane_connections_debug",
             "OUT_lane_surfaces_v1",
@@ -600,9 +767,9 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         )
     )
     checks.append(make_check(
-        "houdini_default_output_centerline_only",
+        "houdini_default_output_manifest_driven",
         houdini_contract_ok,
-        "Houdini default output should import GeoJSON and display OUT_roads_centerlines from the retained centerline node.",
+        "Houdini default output should resolve the latest LaneForge package manifest and read package standard outputs only.",
         houdini_contract_ok,
     ))
 
@@ -614,10 +781,17 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     checks.append(make_check(
         "qa_reports_have_no_failures",
         all(status != "fail" for status in qa_statuses.values()),
-        "Stage QA reports should have no failures; warnings are kept for data-quality issues.",
+        "Stage QA reports should have no failures; warnings are tiered by the QA publish gate.",
         qa_statuses,
-        warn=True,
     ))
+    qa_gate = build_qa_warning_gate(
+        stage_reports={
+            "topology_repair": topology_qa,
+            "road_graph": road_graph_qa,
+            "lane_graph": lane_graph_qa,
+        },
+        audit_checks=checks,
+    )
 
     metrics = {
         "road_graph": road_counts,
@@ -628,6 +802,8 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "lane_connections": len(connection_ids),
         "lane_links": len(lane_links),
         "continuity_links": len(continuity_links),
+        "micro_seam_continuity_links": len(micro_seam_continuity_links),
+        "surface_continuity_links": len(continuity_geometry_links),
         "lane_curve_gap_metrics": gap_metrics,
         "lane_link_curve_source_counts": lane_link_curve_source_counts,
         "optimized_features": len(optimized.get("features", [])),
@@ -642,12 +818,20 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "lane_surface_v1_obj_faces": lane_surface_obj_stats["faces"],
         "junction_envelope_surfaces": lane_surface_counts.get("junction_envelope_surfaces", 0),
         "qa_statuses": qa_statuses,
+        "qa_gate_status": qa_gate.get("status"),
+        "qa_warning_summary": qa_gate.get("summary", {}),
     }
     report = {
         "area_id": area_id,
         "stage": "pipeline_audit",
         "status": worst_status(checks),
         "checks": checks,
+        "qa_warning_severity_policy": {
+            "policy_id": QA_WARNING_SEVERITY_POLICY_ID,
+            "tiers": list(QA_WARNING_TIERS),
+            "default_warn_tier": "publishable_warn",
+        },
+        "qa_gate": qa_gate,
         "metrics": metrics,
         "inputs": {name: str(path) for name, path in paths.items()},
         "next_action": "Use this audit as the automated gate before curb, island, marking and swept-envelope geometry.",
@@ -668,6 +852,8 @@ def main() -> int:
     print(json.dumps({
         "area_id": args.area_id,
         "status": report["status"],
+        "qa_gate_status": (report.get("qa_gate") or {}).get("status"),
+        "qa_warning_summary": (report.get("qa_gate") or {}).get("summary", {}),
         "output": str(output_path),
         "metrics": report.get("metrics", {}),
         "failed_or_warn_checks": [

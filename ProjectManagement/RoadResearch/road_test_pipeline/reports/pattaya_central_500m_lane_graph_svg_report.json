@@ -3,9 +3,16 @@
   "stage": "lane_graph_svg_visualization",
   "status": "pass",
   "counts": {
-    "lanes": 204,
+    "lanes": 200,
     "lane_links_total": 0,
+    "continuity_links_total": 20,
     "junction_connections_rendered": 306,
+    "continuity_links_rendered": 8,
+    "continuity_micro_seams_skipped": 12,
+    "continuity_link_source_counts": {
+      "degree2_connector_through_continuity_v1": 2,
+      "optimized_corner_fillet": 6
+    },
     "movement_corridors_rendered": 306,
     "anchor_markers_rendered": 612,
     "anchor_source_counts": {
@@ -26,23 +33,6 @@
       "outgoing_turn_lanes_missing": 306,
       "radius_proxy_below_lane_min": 15
     },
-    "compound_corridors_rendered": 24,
-    "compound_anchor_markers_rendered": 48,
-    "compound_case_status_counts": {
-      "qa_candidate": 24
-    },
-    "compound_visual_candidate_family_counts": {
-      "compound_bezier_g1_preview": 14,
-      "compound_topology_straight_baseline": 10
-    },
-    "compound_visual_candidate_issue_counts": {
-      "compound_junction_merge_trial": 24,
-      "inferred_without_turn_lanes": 24,
-      "low_confidence_from_lane": 24,
-      "low_confidence_to_lane": 24,
-      "outgoing_turn_lanes_missing": 24,
-      "radius_proxy_below_lane_min": 4
-    },
     "raw_roads_rendered": 44,
     "raw_road_endpoint_markers_rendered": 88,
     "raw_road_internal_vertex_markers_rendered": 215,
@@ -60,18 +50,18 @@
     "raw_topology_issue_severity_counts": {
       "review": 30
     },
-    "corner_candidates_rendered": 20,
+    "corner_candidates_rendered": 19,
     "corner_candidate_type_counts": {
       "degree2_connector_corner": 3,
-      "internal_centerline_bend": 17
+      "internal_centerline_bend": 16
     },
     "corner_candidate_risk_counts": {
-      "low": 9,
+      "low": 8,
       "medium": 11
     },
     "corner_candidate_status_counts": {
       "accepted_active": 3,
-      "candidate_review": 17
+      "candidate_review": 16
     },
     "repaired_roads_rendered": 171,
     "repaired_roads_class_counts": {
@@ -103,21 +93,19 @@
     "canonical_roads_overlay": "rose_solid_hidden_by_default"
   },
   "link_source": "movement_corridor_anchors",
-  "compound_link_source": "compound_junction_merge_transactions",
-  "note": "SVG visualization（可视化） only. lane_graph.json, movement_corridor_candidates.json and compound_junction_merge_transactions.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
+  "note": "SVG visualization（可视化） only. lane_graph.json and movement_corridor_candidates.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
   "inputs": {
-    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-    "compound_junction_merge_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
-    "raw_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
-    "repaired_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
-    "canonical_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
-    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "raw_topology_diagnostics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_raw_topology_diagnostics.json",
-    "corner_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_candidates.json"
+    "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
+    "movement_corridors": "data/processed/pattaya_central_500m_movement_corridor_candidates.json",
+    "raw_roads": "data/processed/pattaya_central_500m_roads_raw.geojson",
+    "repaired_roads": "data/processed/pattaya_central_500m_roads_repaired.geojson",
+    "canonical_roads": "data/processed/pattaya_central_500m_roads_canonical.geojson",
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+    "raw_topology_diagnostics": "data/processed/pattaya_central_500m_raw_topology_diagnostics.json",
+    "corner_candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json"
   },
   "outputs": {
-    "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",
-    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_svg_report.json"
+    "svg": "reports/visualizations/pattaya_central_500m_lane_graph_topology.svg",
+    "report": "reports/pattaya_central_500m_lane_graph_svg_report.json"
   }
 }

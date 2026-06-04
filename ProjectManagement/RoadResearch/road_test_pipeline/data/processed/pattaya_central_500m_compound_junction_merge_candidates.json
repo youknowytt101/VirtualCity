@@ -7,9 +7,9 @@
     "planning_domain": "compound junction merge（复合路口合并）",
     "contract": "Non-destructive planner（非破坏式规划器） for adjacent_junction_short_link（相邻路口短连接） records from movement_anchor_gap_audit（通行锚点缺口审计）. It groups short junction-to-junction bridge edges（桥接短边） into compound junction merge candidates（复合路口合并候选） and does not modify road_graph（道路图）, clean skeleton（干净道路骨架） or Houdini（胡迪尼） geometry.",
     "inputs": {
-      "movement_anchor_gap_audit": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_anchor_gap_audit.json",
-      "junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
-      "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json"
+      "movement_anchor_gap_audit": "data/processed/pattaya_central_500m_movement_anchor_gap_audit.json",
+      "junction_areas": "data/processed/pattaya_central_500m_junction_areas.json",
+      "road_graph": "data/processed/pattaya_central_500m_road_graph.json"
     }
   },
   "candidates": [

@@ -55,18 +55,11 @@ def main() -> None:
     config_path = root / "config" / "pattaya_central_500m.area.json"
     cfg = json.loads(config_path.read_text(encoding="utf-8"))
     area_id = cfg["area_id"]
-    center = cfg["center"]
-
-    optimized_geojson_path = root / "data" / "processed" / f"{area_id}_roads_optimized_centerlines.geojson"
-    repaired_geojson_path = root / "data" / "processed" / f"{area_id}_roads_repaired.geojson"
-    raw_geojson_path = root / "data" / "processed" / f"{area_id}_roads_raw.geojson"
-    lane_graph_path = root / "data" / "processed" / f"{area_id}_lane_graph.json"
-    lane_surface_geojson_path = root / "data" / "preview" / f"{area_id}_lane_surfaces_v1.geojson"
-    geojson_path = optimized_geojson_path if optimized_geojson_path.exists() else repaired_geojson_path if repaired_geojson_path.exists() else raw_geojson_path
-    if not geojson_path.exists():
-        raise hou.NodeError(f"Missing road sample GeoJSON: {geojson_path}")
-
     builder = load_builder_module(this_file)
+    package_inputs = builder.resolve_latest_houdini_package(root, area_id)
+    standard_lanes_path = package_inputs["standard_lanes_path"]
+    standard_junctions_path = package_inputs["standard_junctions_path"]
+    lane_surface_geojson_path = package_inputs["standard_lane_surfaces_path"]
     builder.remove_test_materials()
 
     obj = hou.node("/obj")
@@ -81,14 +74,8 @@ def main() -> None:
     geo = obj.createNode("geo", node_name=geo_name)
     builder.clear_children(geo)
 
-    import_node = create_or_get(geo, "python", "python_import_roads_geojson")
-    import_node.parm("python").set(
-        builder.python_import_code(
-            geojson_path=geojson_path,
-            origin_lon=float(center["lon"]),
-            origin_lat=float(center["lat"]),
-        )
-    )
+    import_node = create_or_get(geo, "python", "python_import_standard_lanes")
+    import_node.parm("python").set(builder.python_import_standard_lanes_code(standard_lanes_path))
 
     center_null = create_or_get(geo, "null", "OUT_centerlines")
     center_null.setInput(0, import_node)
@@ -104,16 +91,20 @@ def main() -> None:
 
     lane_debug_node = None
     lane_debug_out = None
-    if lane_graph_path.exists():
-        lane_debug_node = create_or_get(geo, "python", "python_lane_geometry_debug")
-        lane_debug_node.parm("python").set(builder.python_lane_debug_code(lane_graph_path))
-        lane_debug_node.setDisplayFlag(False)
-        lane_debug_node.setRenderFlag(False)
+    lane_debug_node = create_or_get(geo, "python", "python_lane_geometry_debug")
+    lane_debug_node.parm("python").set(
+        builder.python_lane_debug_code(
+            standard_lanes_path=standard_lanes_path,
+            standard_junctions_path=standard_junctions_path,
+        )
+    )
+    lane_debug_node.setDisplayFlag(False)
+    lane_debug_node.setRenderFlag(False)
 
-        lane_debug_out = create_or_get(geo, "null", "OUT_lane_connections_debug")
-        lane_debug_out.setInput(0, lane_debug_node)
-        lane_debug_out.setDisplayFlag(False)
-        lane_debug_out.setRenderFlag(False)
+    lane_debug_out = create_or_get(geo, "null", "OUT_lane_connections_debug")
+    lane_debug_out.setInput(0, lane_debug_node)
+    lane_debug_out.setDisplayFlag(False)
+    lane_debug_out.setRenderFlag(False)
 
     lane_surface_node = None
     lane_surface_out = None
@@ -132,6 +123,7 @@ def main() -> None:
     note.setText(
         "Open-session road test cook\\n"
         f"Area: {area_id}\\n"
+        f"Package: {package_inputs['package_version']}\\n"
         "Mode: centerlines only\\n"
         "Debug: OUT_lane_connections_debug\\n"
         "Surface: OUT_lane_surfaces_v1\\n"
@@ -157,7 +149,7 @@ def main() -> None:
     report_path = report_dir / f"{area_id}_open_session_cook_report.json"
     preview_report_path = report_dir / f"{area_id}_road_preview_report.json"
     qa_report_path = report_dir / "qa" / f"{area_id}_topology_repair_qa_report.json"
-    stats = builder.load_geojson_stats(geojson_path)
+    stats = builder.load_standard_lane_package_stats(standard_lanes_path, standard_junctions_path, lane_surface_geojson_path)
     lane_debug_geo = lane_debug_out.geometry() if lane_debug_out is not None else None
     lane_surface_geo = lane_surface_out.geometry() if lane_surface_out is not None else None
     report = {
@@ -167,11 +159,24 @@ def main() -> None:
         "refresh_behavior": "replace_existing_road_test_object",
         "obj_node": geo.path(),
         "display_node": out_node.path(),
-        "geojson_path": str(geojson_path),
-        "geojson_mode": "optimized_centerlines" if geojson_path == optimized_geojson_path else "repaired" if geojson_path == repaired_geojson_path else "raw",
+        "input_mode": package_inputs["mode"],
+        "package_version": package_inputs["package_version"],
+        "package_dir": str(package_inputs["package_dir"]),
+        "package_manifest": str(package_inputs["package_manifest_path"]),
+        "houdini_manifest": str(package_inputs["houdini_manifest_path"]),
+        "standard_lanes": str(standard_lanes_path),
+        "standard_junctions": str(standard_junctions_path),
+        "standard_lane_surfaces": str(lane_surface_geojson_path),
         "preview_report": str(preview_report_path) if preview_report_path.exists() else "",
         "qa_report": str(qa_report_path) if qa_report_path.exists() else "",
         "input_features": stats["feature_count"],
+        "package_counts": {
+            "standard_lanes": stats["standard_lane_count"],
+            "standard_roads": stats["standard_road_count"],
+            "standard_junctions": stats["standard_junction_count"],
+            "standard_surface_features": stats["standard_surface_count"],
+            "lane_direction_counts": stats["lane_direction_counts"],
+        },
         "centerline_prims": len(center_null.geometry().prims()),
         "preview_output_prims": len(out_node.geometry().prims()),
         "preview_output_points": len(out_node.geometry().points()),

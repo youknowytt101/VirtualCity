@@ -6,7 +6,7 @@
     "source": "road_graph",
     "active_lane_policy": "temporary_all_roads_bidirectional_two_lane_v1",
     "note": "Confidence-tagged lane attributes for lane-level junction reconstruction; this artifact does not contain lane geometry.",
-    "source_road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json"
+    "source_road_graph": "data/processed/pattaya_central_500m_road_graph.json"
   },
   "source_levels": {
     "source_tag": "地图 API 原始字段明确给出。",

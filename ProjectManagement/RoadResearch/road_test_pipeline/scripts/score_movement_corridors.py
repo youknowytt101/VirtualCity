@@ -354,11 +354,7 @@ def score_document(
         score_case(case, "movement_corridor", lanes_by_id)
         for case in movement_corridors.get("cases", [])
     ]
-    compound_cases = [
-        score_case(case, "compound_corridor", lanes_by_id)
-        for case in (compound_transactions or {}).get("compound_movement_corridor_cases", [])
-    ]
-    all_cases = cases + compound_cases
+    all_cases = cases
     all_candidates = [candidate for case in all_cases for candidate in case["candidate_scores"]]
     issue_counts = Counter(issue for candidate in all_candidates for issue in candidate["scoring_issues"])
     family_counts = Counter(candidate["candidate_family"] for candidate in all_candidates)
@@ -372,7 +368,6 @@ def score_document(
     metrics = {
         "cases_scored": len(all_cases),
         "movement_cases_scored": len(cases),
-        "compound_cases_scored": len(compound_cases),
         "candidate_scores": len(all_candidates),
         "reference_errors": 0,
         "scored_candidate_ratio": rounded(len(all_candidates) / max(1, len(all_cases) * 3)),
@@ -490,7 +485,7 @@ def main() -> int:
     parser.add_argument("--area-id", default="pattaya_central_500m")
     parser.add_argument("--lane-graph", default="")
     parser.add_argument("--movement-corridors", default="")
-    parser.add_argument("--compound-transactions", default="")
+    parser.add_argument("--compound-transactions", default="", help="Deprecated no-op; compound corridor scoring is no longer included.")
     parser.add_argument("--output", default="")
     parser.add_argument("--report", default="")
     parser.add_argument("--viewer-output", default="")
@@ -505,11 +500,6 @@ def main() -> int:
         if args.movement_corridors
         else processed / f"{args.area_id}_movement_corridor_candidates.json"
     )
-    compound_path = (
-        Path(args.compound_transactions)
-        if args.compound_transactions
-        else processed / f"{args.area_id}_compound_junction_merge_transactions.json"
-    )
     output_path = Path(args.output) if args.output else processed / f"{args.area_id}_movement_corridor_scoring.json"
     report_path = Path(args.report) if args.report else reports / f"{args.area_id}_movement_corridor_scoring_report.json"
     viewer_output_path = (
@@ -518,17 +508,15 @@ def main() -> int:
         else reports / "visualizations" / f"{args.area_id}_movement_corridor_scoring_viewer.json"
     )
 
-    compound_transactions = read_json(compound_path) if compound_path.exists() else None
     scoring_doc, report = score_document(
         area_id=args.area_id,
         lane_graph=read_json(lane_graph_path),
         movement_corridors=read_json(movement_corridors_path),
-        compound_transactions=compound_transactions,
+        compound_transactions=None,
     )
     report["inputs"] = {
         "lane_graph": str(lane_graph_path),
         "movement_corridors": str(movement_corridors_path),
-        "compound_transactions": str(compound_path) if compound_transactions else "",
     }
     report["outputs"] = {
         "scoring": str(output_path),

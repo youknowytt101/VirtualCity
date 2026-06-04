@@ -23,6 +23,9 @@ MAX_TRIM_M = 9.0
 CONNECTOR_SAMPLES = 7
 CONNECTOR_CENTER_WEIGHT = 0.65
 ARC_SAMPLE_DEG = 5.0
+LANE_GEOMETRY_ROUNDING_STYLE_ID = "unified_lane_geometry_rounding_style_v1"
+ROUNDING_PRIMARY_CURVE_FAMILY = "tangent_circular_arc"
+ROUNDING_SAMPLE_STRATEGY = "arc_angle_limited_min_profile_samples"
 ARC_RADIUS_TOLERANCE_M = 0.05
 MAX_ARC_RADIUS_M = 10000.0
 STRAIGHT_SWEEP_DEG = 2.0
@@ -458,6 +461,35 @@ def arc_properties(arc: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def rounding_style_properties(arc: dict[str, Any]) -> dict[str, Any]:
+    geometry = str(arc.get("geometry") or "")
+    if geometry == "circular_arc":
+        curve_family = ROUNDING_PRIMARY_CURVE_FAMILY
+    elif geometry == "bezier_tangent_fallback":
+        curve_family = "tangent_continuous_bezier_fallback"
+    elif geometry == "straight_infinite_radius":
+        curve_family = "straight_infinite_radius"
+    else:
+        curve_family = geometry or "unknown"
+    return {
+        "rounding_style_id": LANE_GEOMETRY_ROUNDING_STYLE_ID,
+        "rounding_curve_family": curve_family,
+        "rounding_sample_strategy": ROUNDING_SAMPLE_STRATEGY,
+        "rounding_sample_angle_deg": ARC_SAMPLE_DEG,
+    }
+
+
+def lane_geometry_rounding_style_metadata() -> dict[str, Any]:
+    return {
+        "style_id": LANE_GEOMETRY_ROUNDING_STYLE_ID,
+        "primary_curve_family": ROUNDING_PRIMARY_CURVE_FAMILY,
+        "fallback_curve_families": ["straight_infinite_radius", "tangent_continuous_bezier_fallback"],
+        "sample_strategy": ROUNDING_SAMPLE_STRATEGY,
+        "sample_angle_deg": ARC_SAMPLE_DEG,
+        "semantic_boundary": "geometry_style_only_no_traffic_semantics_inference",
+    }
+
+
 def road_class_min_turn_radius(edge: dict[str, Any]) -> float:
     road_class = str(edge.get("road_class") or edge.get("highway") or "unclassified")
     return JUNCTION_TURN_MIN_RADIUS_BY_CLASS.get(road_class, JUNCTION_TURN_MIN_RADIUS_M)
@@ -647,15 +679,38 @@ def corner_override_key(node_id: str, edge_ids: list[str]) -> tuple[str, tuple[s
     return node_id, (a, b)
 
 
-def corner_override_index(overrides_doc: dict[str, Any]) -> tuple[dict[tuple[str, tuple[str, str]], dict[str, Any]], dict[str, Any]]:
+def internal_bend_override_key(source_edge_id: str, point_index: int) -> tuple[str, int]:
+    return source_edge_id, point_index
+
+
+def corner_override_index(
+    overrides_doc: dict[str, Any],
+) -> tuple[dict[tuple[str, tuple[str, str]], dict[str, Any]], dict[tuple[str, int], dict[str, Any]], dict[str, Any]]:
     indexed: dict[tuple[str, tuple[str, str]], dict[str, Any]] = {}
+    internal_indexed: dict[tuple[str, int], dict[str, Any]] = {}
     issue_counts: Counter[str] = Counter()
     raw_count = 0
     active_count = 0
+    active_degree2_count = 0
+    active_internal_count = 0
     for item in overrides_doc.get("active_corner_optimizations", []):
         raw_count += 1
         if not bool(item.get("enabled", True)):
             issue_counts["disabled"] += 1
+            continue
+        candidate_type = str(item.get("candidate_type") or "")
+        if candidate_type == "internal_centerline_bend":
+            source_edge_id = str(item.get("source_edge_id") or "")
+            try:
+                point_index = int(item.get("point_index"))
+            except (TypeError, ValueError):
+                point_index = -1
+            if not source_edge_id or point_index < 1:
+                issue_counts["missing_source_edge_or_point_index"] += 1
+                continue
+            internal_indexed[internal_bend_override_key(source_edge_id, point_index)] = item
+            active_count += 1
+            active_internal_count += 1
             continue
         node_id = str(item.get("node_id") or "")
         edge_ids = [str(item.get("from_edge_id") or ""), str(item.get("to_edge_id") or "")]
@@ -664,9 +719,12 @@ def corner_override_index(overrides_doc: dict[str, Any]) -> tuple[dict[tuple[str
             continue
         indexed[corner_override_key(node_id, edge_ids)] = item
         active_count += 1
-    return indexed, {
+        active_degree2_count += 1
+    return indexed, internal_indexed, {
         "corner_override_records": raw_count,
         "active_corner_overrides": active_count,
+        "active_degree2_corner_overrides": active_degree2_count,
+        "active_internal_bend_overrides": active_internal_count,
         "corner_override_issue_counts": dict(sorted(issue_counts.items())),
     }
 
@@ -680,6 +738,84 @@ def override_cut_m(override: dict[str, Any], fallback: float, edge_a: dict[str, 
     cut = min(cut, CORNER_MAX_CUT_M)
     cut = min(cut, float(edge_a["length_m"]) * CORNER_EDGE_LENGTH_FACTOR, float(edge_b["length_m"]) * CORNER_EDGE_LENGTH_FACTOR)
     return max(0.0, cut)
+
+
+def internal_bend_cut_m(override: dict[str, Any], previous: tuple[float, float], center: tuple[float, float], nxt: tuple[float, float]) -> float:
+    try:
+        cut = float(override.get("suggested_cut_m") or override.get("cut_m") or 0.0)
+    except (TypeError, ValueError):
+        cut = 0.0
+    cut = max(0.25, cut)
+    cut = min(cut, distance(previous, center) * 0.45, distance(center, nxt) * 0.45)
+    return max(0.0, cut)
+
+
+def smooth_internal_bends_for_edge(
+    points: list[tuple[float, float]],
+    edge_id: str,
+    overrides_by_key: dict[tuple[str, int], dict[str, Any]],
+) -> tuple[list[tuple[float, float]], list[dict[str, Any]]]:
+    selected = [
+        (point_index, override)
+        for (source_edge_id, point_index), override in overrides_by_key.items()
+        if source_edge_id == edge_id
+    ]
+    if not selected or len(points) < 3:
+        return points, []
+
+    smoothed = points[:]
+    applied: list[dict[str, Any]] = []
+    for point_index, override in sorted(selected, key=lambda item: item[0], reverse=True):
+        if point_index <= 0 or point_index >= len(smoothed) - 1:
+            applied.append({
+                "candidate_id": str(override.get("candidate_id") or ""),
+                "source_edge_id": edge_id,
+                "point_index": point_index,
+                "status": "skipped_point_index_out_of_range",
+            })
+            continue
+        previous = smoothed[point_index - 1]
+        center = smoothed[point_index]
+        nxt = smoothed[point_index + 1]
+        cut = internal_bend_cut_m(override, previous, center, nxt)
+        if cut <= 0.05:
+            applied.append({
+                "candidate_id": str(override.get("candidate_id") or ""),
+                "source_edge_id": edge_id,
+                "point_index": point_index,
+                "status": "skipped_degenerate_cut",
+            })
+            continue
+        incoming = normalize((center[0] - previous[0], center[1] - previous[1]))
+        outgoing = normalize((nxt[0] - center[0], nxt[1] - center[1]))
+        if incoming == (0.0, 0.0) or outgoing == (0.0, 0.0):
+            applied.append({
+                "candidate_id": str(override.get("candidate_id") or ""),
+                "source_edge_id": edge_id,
+                "point_index": point_index,
+                "status": "skipped_zero_tangent",
+            })
+            continue
+        start = (center[0] - incoming[0] * cut, center[1] - incoming[1] * cut)
+        end = (center[0] + outgoing[0] * cut, center[1] + outgoing[1] * cut)
+        arc = connector_arc_from_tangents(start, incoming, end, outgoing, CORNER_SAMPLES)
+        smoothed = smoothed[:point_index] + arc["points"] + smoothed[point_index + 1 :]
+        applied.append({
+            "candidate_id": str(override.get("candidate_id") or ""),
+            "corner_optimization_id": str(override.get("corner_optimization_id") or ""),
+            "application_id": str(override.get("application_id") or ""),
+            "policy": str(override.get("policy") or ""),
+            "source_edge_id": edge_id,
+            "point_index": point_index,
+            "cut_m": round(cut, 3),
+            "rounding_style_id": LANE_GEOMETRY_ROUNDING_STYLE_ID,
+            "rounding_curve_family": rounding_style_properties(arc)["rounding_curve_family"],
+            "arc_geometry": arc["geometry"],
+            "arc_fit_status": arc["fit_status"],
+            "arc_radius_m": round(float(arc["radius_m"]), 3),
+            "status": "applied",
+        })
+    return smoothed, list(reversed(applied))
 
 
 def reference_entry_pose_index(
@@ -976,7 +1112,7 @@ def optimize_centerlines(
         nodes,
         edges,
     )
-    active_corner_overrides, corner_override_metrics = corner_override_index(corner_overrides_doc)
+    active_corner_overrides, active_internal_bend_overrides, corner_override_metrics = corner_override_index(corner_overrides_doc)
     locked_trim_keys = set(regularized_entry_by_key)
 
     trim_by_edge_node: dict[tuple[str, str], float] = {}
@@ -1041,6 +1177,9 @@ def optimize_centerlines(
     dropped_short = 0
     regularized_endpoint_exact = 0
     regularized_endpoint_scaled = 0
+    internal_bend_smoothing_applied = 0
+    internal_bend_smoothing_skipped = 0
+    internal_bend_smoothing_by_edge: dict[str, list[dict[str, Any]]] = {}
     for edge in graph["edges"]:
         points = edge_points(edge)
         start_key = (edge["edge_id"], edge["from_node"])
@@ -1084,8 +1223,18 @@ def optimize_centerlines(
                 regularized_endpoint_exact += 1
             elif source == "regularized_scaled_for_edge_length":
                 regularized_endpoint_scaled += 1
+        smoothed, bend_applications = smooth_internal_bends_for_edge(
+            trimmed,
+            str(edge["edge_id"]),
+            active_internal_bend_overrides,
+        )
+        if bend_applications:
+            trimmed = smoothed
+            internal_bend_smoothing_by_edge[str(edge["edge_id"])] = bend_applications
+            internal_bend_smoothing_applied += sum(1 for item in bend_applications if item.get("status") == "applied")
+            internal_bend_smoothing_skipped += sum(1 for item in bend_applications if item.get("status") != "applied")
         kept_approaches += 1
-        features.append(feature(trimmed, {
+        approach_props = {
             "vc_part": "optimized_approach_centerline",
             "source_edge_id": edge["edge_id"],
             "source_feature_id": edge.get("source_feature_id", ""),
@@ -1098,7 +1247,16 @@ def optimize_centerlines(
             "end_trim_source": trimmed_endpoint_source.get(end_key, "none"),
             "start_entry_pose_id": regularized_entry_by_key.get(start_key, {}).get("pose_id", ""),
             "end_entry_pose_id": regularized_entry_by_key.get(end_key, {}).get("pose_id", ""),
-        }, origin_lon, origin_lat))
+        }
+        applied_bends = [item for item in bend_applications if item.get("status") == "applied"]
+        if applied_bends:
+            approach_props.update({
+                "internal_bend_smoothing_count": len(applied_bends),
+                "internal_bend_smoothing_candidate_ids": ",".join(str(item.get("candidate_id") or "") for item in applied_bends),
+                "internal_bend_smoothing_point_indices": ",".join(str(item.get("point_index") or "") for item in applied_bends),
+                "internal_bend_smoothing_policies": ",".join(sorted({str(item.get("policy") or "") for item in applied_bends})),
+            })
+        features.append(feature(trimmed, approach_props, origin_lon, origin_lat))
 
     corner_fillet_count = 0
     corner_turn_degrees: list[float] = []
@@ -1142,6 +1300,7 @@ def optimize_centerlines(
             "corner_optimization_policy": corner["corner_optimization_policy"],
             "oneway": False,
         }
+        props.update(rounding_style_properties(arc))
         props.update(arc_properties(arc))
         features.append(feature(arc["points"], props, origin_lon, origin_lat))
         corner_fillet_count += 1
@@ -1234,6 +1393,7 @@ def optimize_centerlines(
                 "from_trim_source": trimmed_endpoint_source.get((current["edge"]["edge_id"], node["node_id"]), ""),
                 "to_trim_source": trimmed_endpoint_source.get((nxt["edge"]["edge_id"], node["node_id"]), ""),
             }
+            props.update(rounding_style_properties(arc))
             props.update(arc_properties(arc))
             features.append(feature(connector, props, origin_lon, origin_lat))
             connector_count += 1
@@ -1283,6 +1443,7 @@ def optimize_centerlines(
             "source_junction_areas": str(junction_areas_path) if junction_areas_path and junction_areas_path.exists() else "",
             "source_engineering_reference": str(engineering_reference_path) if engineering_reference_path and engineering_reference_path.exists() else "",
             "source_corner_overrides": str(corner_overrides_path) if corner_overrides_path and corner_overrides_path.exists() else "",
+            "lane_geometry_rounding_style": lane_geometry_rounding_style_metadata(),
             "strategy": "use regularized junction entry poses where available, trim approaches, add tangent circular-arc junction connectors and corner fillets, then extrude widths",
         },
         "features": features,
@@ -1310,6 +1471,7 @@ def optimize_centerlines(
         "input": str(input_path),
         "output": str(output_path),
         "movement_debug_output": str(movement_debug_path),
+        "lane_geometry_rounding_style": lane_geometry_rounding_style_metadata(),
         "regularization_inputs": {
             "junction_areas_path": str(junction_areas_path) if junction_areas_path else "",
             "junction_areas_loaded": bool(junction_areas_doc),
@@ -1337,6 +1499,8 @@ def optimize_centerlines(
             "corner_fillets": corner_fillet_count,
             "corner_transaction_fillets": sum(1 for corner in corner_nodes.values() if corner.get("optimization_source") == "corner_optimization_transaction"),
             "corner_heuristic_fillets": sum(1 for corner in corner_nodes.values() if corner.get("optimization_source") == "heuristic_degree2_connector_fillet"),
+            "internal_bend_smoothing_applied": internal_bend_smoothing_applied,
+            "internal_bend_smoothing_skipped": internal_bend_smoothing_skipped,
             "corner_circular_arcs": corner_arc_geometry_counts.get("circular_arc", 0),
             "corner_bezier_tangent_fallback": corner_arc_geometry_counts.get("bezier_tangent_fallback", 0),
             "corner_straight_infinite_radius": corner_arc_geometry_counts.get("straight_infinite_radius", 0),
@@ -1350,6 +1514,7 @@ def optimize_centerlines(
         "junction_connector_arc_geometry_counts": dict(sorted(connector_arc_geometry_counts.items())),
         "junction_connector_arc_fit_status_counts": dict(sorted(connector_arc_fit_status_counts.items())),
         "corner_arc_geometry_counts": dict(sorted(corner_arc_geometry_counts.items())),
+        "internal_bend_smoothing_by_edge": internal_bend_smoothing_by_edge,
         "corner_fillet_metrics": {
             "min_turn_deg": round(min(corner_turn_degrees), 3) if corner_turn_degrees else 0.0,
             "max_turn_deg": round(max(corner_turn_degrees), 3) if corner_turn_degrees else 0.0,

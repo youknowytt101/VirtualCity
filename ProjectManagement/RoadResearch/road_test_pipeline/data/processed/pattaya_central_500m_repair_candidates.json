@@ -2,7 +2,7 @@
   "area_id": "pattaya_central_500m",
   "stage": "topology_repair_candidates_v1",
   "schema": "road_test_pipeline.repair_candidates.v1",
-  "source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
+  "source": "data/processed/pattaya_central_500m_roads_raw.geojson",
   "candidate_count": 0,
   "counts": {
     "endpoint_bridge": 0,

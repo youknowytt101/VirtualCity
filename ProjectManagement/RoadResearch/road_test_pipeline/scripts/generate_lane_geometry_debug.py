@@ -198,6 +198,10 @@ def continuity_link_records(lane_graph: dict[str, Any]) -> list[dict[str, Any]]:
     return [dict(link) for link in lane_graph.get("continuity_links", [])]
 
 
+def is_micro_seam_continuity(link: dict[str, Any]) -> bool:
+    return bool(link.get("micro_seam_absorbed"))
+
+
 def lane_trim_distances(
     lane_graph: dict[str, Any],
     lane_links: list[dict[str, Any]],
@@ -352,6 +356,9 @@ def geojson_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], 
         counts["lane_link_curves"] += 1
 
     for link in continuity_links:
+        if is_micro_seam_continuity(link):
+            counts["skipped_micro_seam_continuity_curve"] += 1
+            continue
         points = as_points(link.get("connecting_curve_xz") or [])
         if len(points) < 2:
             counts["skipped_empty_continuity_curve"] += 1
@@ -468,6 +475,8 @@ def write_obj(path: Path, lane_graph: dict[str, Any]) -> dict[str, int]:
             faces_out.append(("lane_link_debug_ribbon", face))
 
     for link in continuity_links:
+        if is_micro_seam_continuity(link):
+            continue
         points = as_points(link.get("connecting_curve_xz") or [])
         if len(points) < 2:
             continue
@@ -523,7 +532,11 @@ def write_svg(path: Path, area_id: str, lane_graph: dict[str, Any]) -> None:
     trim_by_lane = lane_trim_distances(lane_graph, lane_links, continuity_links)
     lane_lines = [trimmed_lane_points(lane, trim_by_lane) for lane in lane_graph.get("lanes", [])]
     link_items = [(link, as_points(link.get("connecting_curve_xz") or [])) for link in lane_links]
-    continuity_items = [(link, as_points(link.get("connecting_curve_xz") or [])) for link in continuity_links]
+    continuity_items = [
+        (link, as_points(link.get("connecting_curve_xz") or []))
+        for link in continuity_links
+        if not is_micro_seam_continuity(link)
+    ]
     all_lines = (
         [line for line in lane_lines if len(line) >= 2]
         + [line for _link, line in link_items if len(line) >= 2]

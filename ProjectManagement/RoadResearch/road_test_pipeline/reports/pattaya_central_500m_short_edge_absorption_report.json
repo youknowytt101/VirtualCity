@@ -159,12 +159,12 @@
   ],
   "next_action": "Build the destructive junction-zone expansion transaction from transaction_ready candidates only. The transaction must regenerate engineering reference lines / optimized centerlines and pass junction_geometry_audit without protected issue regression.",
   "inputs": {
-    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
-    "connector_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json"
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+    "junction_areas": "data/processed/pattaya_central_500m_junction_areas.json",
+    "connector_candidates": "data/processed/pattaya_central_500m_junction_connector_candidates.json"
   },
   "outputs": {
-    "candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json",
-    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_short_edge_absorption_report.json"
+    "candidates": "data/processed/pattaya_central_500m_short_edge_absorption_candidates.json",
+    "report": "reports/pattaya_central_500m_short_edge_absorption_report.json"
   }
 }

@@ -19,8 +19,8 @@
   "endpoint_used": "https://overpass-api.de/api/interpreter",
   "endpoint_errors": [],
   "outputs": {
-    "osm_xml": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\raw\\pattaya_central_500m_roads.osm",
-    "roads_raw_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson"
+    "osm_xml": "data/raw/pattaya_central_500m_roads.osm",
+    "roads_raw_geojson": "data/processed/pattaya_central_500m_roads_raw.geojson"
   },
   "counts": {
     "nodes": 268,

@@ -2,11 +2,11 @@
   "area_id": "pattaya_central_500m",
   "stage": "repair_casebook_qa",
   "status": "pass",
-  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
-  "casebook": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_repair_casebook.json",
+  "input": "data/processed/pattaya_central_500m_roads_raw.geojson",
+  "casebook": "data/processed/pattaya_central_500m_repair_casebook.json",
   "manual_overrides": {
     "enabled": true,
-    "path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\pattaya_central_500m.manual_overrides.json",
+    "path": "config/pattaya_central_500m.manual_overrides.json",
     "exists": true,
     "loaded": 1
   },

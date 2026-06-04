@@ -4,7 +4,7 @@
     "area_id": "pattaya_central_500m",
     "schema": "lane_upgrade_system.corner_optimization_overrides.v1",
     "system": "LaneForge",
-    "updated_at_local": "2026-06-04T19:07:43"
+    "updated_at_local": "2026-06-04T21:12:15"
   },
   "active_corner_optimizations": [
     {
@@ -69,6 +69,43 @@
       "reviewer": "codex",
       "status": "accepted_for_geometry_apply",
       "created_at_local": "2026-06-04T19:07:43"
+    },
+    {
+      "enabled": true,
+      "corner_optimization_id": "corner_optimization_application_v0006_corner_0000",
+      "application_id": "corner_optimization_application_v0006",
+      "candidate_id": "corner_0003",
+      "candidate_type": "internal_centerline_bend",
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "turn_angle_deg": 41.331,
+      "policy": "low_risk_internal_centerline_bend_smoothing_v1",
+      "reason": "accepted low-risk internal centerline bend smoothing",
+      "reviewer": "codex",
+      "status": "accepted_for_geometry_apply",
+      "created_at_local": "2026-06-04T21:12:15",
+      "source_edge_id": "e_0017",
+      "canonical_road_id": "cr_0017",
+      "point_index": 1,
+      "center_xz": [
+        -167.094,
+        -237.557
+      ],
+      "context_polyline_xz": [
+        [
+          -110.195,
+          -285.092
+        ],
+        [
+          -167.094,
+          -237.557
+        ],
+        [
+          -170.197,
+          -217.497
+        ]
+      ],
+      "target_geometry": "optimized_internal_centerline_bend_smoothing"
     }
   ]
 }

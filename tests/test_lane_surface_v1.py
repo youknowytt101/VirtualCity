@@ -93,6 +93,55 @@ class TestLaneSurfaceV1(unittest.TestCase):
             "connections": [],
         }))
 
+    def test_surface_metrics_include_derived_centerline_smoothing(self):
+        lane_graph = {
+            "metadata": {
+                "junction_trim_m": 8.0,
+                "lane_geometry_rounding_style": {
+                    "style_id": "unified_lane_geometry_rounding_style_v1",
+                    "primary_curve_family": "tangent_circular_arc",
+                },
+                "derived_lane_centerline_smoothing": {
+                    "policy": "derived_lane_centerline_smoothing_v1",
+                    "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+                    "curve_family": "tangent_circular_arc",
+                    "smoothed_lane_count": 1,
+                    "smoothed_bend_count": 1,
+                    "inserted_sample_points": 4,
+                    "max_derivation_offset_m": 0.032,
+                    "curve_family_counts": {"tangent_circular_arc": 1},
+                    "arc_fit_status_counts": {"exact_tangent_arc": 1},
+                },
+            },
+            "lanes": [
+                {
+                    "lane_id": "a_f_1",
+                    "road_id": "a",
+                    "direction": "forward",
+                    "centerline_xz": [[0.0, 0.0], [5.0, 0.1], [10.0, 0.0]],
+                },
+            ],
+            "junctions": [],
+            "continuity_links": [],
+        }
+
+        _features, stats = surface_builder.build_features(lane_graph)
+
+        self.assertEqual(
+            stats["metrics"]["derived_lane_centerline_smoothing_policy"],
+            "derived_lane_centerline_smoothing_v1",
+        )
+        self.assertEqual(
+            stats["metrics"]["lane_geometry_rounding_style_id"],
+            "unified_lane_geometry_rounding_style_v1",
+        )
+        self.assertEqual(
+            stats["metrics"]["derived_lane_centerline_smoothing_curve_family_counts"],
+            {"tangent_circular_arc": 1},
+        )
+        self.assertEqual(stats["metrics"]["derived_lane_centerline_smoothed_lanes"], 1)
+        self.assertEqual(stats["metrics"]["derived_lane_centerline_inserted_sample_points"], 4)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

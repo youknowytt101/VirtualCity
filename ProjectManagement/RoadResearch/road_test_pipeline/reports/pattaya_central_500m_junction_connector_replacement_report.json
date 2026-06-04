@@ -3,14 +3,14 @@
   "stage": "junction_connector_replacement_transaction_v1",
   "status": "accepted",
   "inputs": {
-    "optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-    "candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_connector_candidates.json"
+    "optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "candidates": "data/processed/pattaya_central_500m_junction_connector_candidates.json"
   },
   "outputs": {
-    "optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_report.json",
-    "trial_audit": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_trial_audit_report.json",
-    "baseline_audit": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_junction_connector_replacement_baseline_audit_report.json"
+    "optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "report": "reports/pattaya_central_500m_junction_connector_replacement_report.json",
+    "trial_audit": "reports/pattaya_central_500m_junction_connector_replacement_trial_audit_report.json",
+    "baseline_audit": "reports/pattaya_central_500m_junction_connector_replacement_baseline_audit_report.json"
   },
   "counts": {
     "replacement_ready_cases": 7,

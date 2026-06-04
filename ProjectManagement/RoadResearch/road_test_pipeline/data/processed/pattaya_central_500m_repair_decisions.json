@@ -2,8 +2,8 @@
   "area_id": "pattaya_central_500m",
   "stage": "topology_repair_decisions_v1",
   "schema": "road_test_pipeline.repair_decisions.v1",
-  "source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
-  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+  "source": "data/processed/pattaya_central_500m_roads_raw.geojson",
+  "output": "data/processed/pattaya_central_500m_roads_repaired.geojson",
   "base_repair_summary": {
     "duplicate_points_removed": 0,
     "endpoint_snaps": 2,

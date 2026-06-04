@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 from pathlib import Path
 from typing import Any
@@ -18,7 +19,9 @@ from typing import Any
 
 SYSTEM_NAME = "LaneForge"
 PACKAGE_SCHEMA = "lane_upgrade_system.standard_lane_package.v1"
-DEFAULT_PACKAGE_VERSION = "lane_package_v0001"
+DEFAULT_PACKAGE_VERSION = "auto"
+PATH_POLICY = "portable_lane_package_paths_v1"
+QA_WARNING_SEVERITY_POLICY_ID = "qa_warning_severity_tiers_v1"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -34,8 +37,10 @@ def pipeline_root_from_script(script_path: Path) -> Path:
     return script_path.resolve().parents[1]
 
 
-def copy_json(src: Path, dst: Path) -> dict[str, Any]:
+def copy_json(src: Path, dst: Path, *, root: Path | None = None) -> dict[str, Any]:
     data = read_json(src)
+    if root is not None:
+        data = portable_json_paths(data, root=root)
     write_json(dst, data)
     return data
 
@@ -47,12 +52,117 @@ def rel(path: Path, root: Path) -> str:
         return str(path)
 
 
+def is_windows_absolute_path(value: str) -> bool:
+    return bool(re.match(r"^[A-Za-z]:[\\/]", value)) or value.startswith("\\\\")
+
+
+def rebase_legacy_root_path(path: Path, root: Path) -> Path | None:
+    raw_parts = re.split(r"[\\/]+", str(path))
+    parts = [part for part in raw_parts if part and not re.match(r"^[A-Za-z]:$", part)]
+    root_name = root.name.lower()
+    for index, part in enumerate(parts):
+        if str(part).lower() != root_name:
+            continue
+        tail = parts[index + 1 :]
+        return root.joinpath(*tail)
+    return None
+
+
+def resolve_artifact_path(value: str, root: Path, *, base_dir: Path | None = None) -> Path | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    path = Path(text)
+    candidates: list[Path] = []
+    if path.is_absolute() or is_windows_absolute_path(text):
+        candidates.append(path)
+        rebased = rebase_legacy_root_path(path, root)
+        if rebased is not None:
+            candidates.append(rebased)
+    else:
+        if base_dir is not None:
+            candidates.append(base_dir / path)
+        candidates.append(root / path)
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[-1] if candidates else None
+
+
+def portable_path_string(value: str, root: Path) -> str:
+    text = str(value)
+    if not is_windows_absolute_path(text) and not Path(text).is_absolute():
+        return text
+    candidate = resolve_artifact_path(text, root)
+    if candidate is None:
+        return text
+    try:
+        return str(candidate.resolve().relative_to(root.resolve())).replace("\\", "/")
+    except ValueError:
+        return text
+
+
+def portable_json_paths(value: Any, *, root: Path) -> Any:
+    if isinstance(value, dict):
+        return {key: portable_json_paths(item, root=root) for key, item in value.items()}
+    if isinstance(value, list):
+        return [portable_json_paths(item, root=root) for item in value]
+    if isinstance(value, str):
+        return portable_path_string(value, root)
+    return value
+
+
+def next_versioned_name(directory: Path, *, prefix: str, width: int = 4) -> str:
+    highest = 0
+    if directory.exists():
+        for path in directory.iterdir():
+            match = re.match(rf"^{re.escape(prefix)}v(\d+)(?:\..*)?$", path.name)
+            if not match:
+                continue
+            highest = max(highest, int(match.group(1)))
+    return f"{prefix}v{highest + 1:0{width}d}"
+
+
+def next_package_version(root: Path, area_id: str) -> str:
+    return next_versioned_name(root / "data" / "lane_upgrade_packages" / area_id, prefix="lane_package_")
+
+
+def qa_gate_from_audit(audit: dict[str, Any]) -> dict[str, Any]:
+    gate = audit.get("qa_gate")
+    if isinstance(gate, dict) and gate.get("status"):
+        return gate
+
+    audit_status = str(audit.get("status") or "pass")
+    gate_status = "pass"
+    if audit_status == "fail":
+        gate_status = "blocker"
+    elif audit_status == "warn":
+        gate_status = "publishable_warn"
+    return {
+        "policy_id": f"{QA_WARNING_SEVERITY_POLICY_ID}.legacy_audit_status_fallback",
+        "status": gate_status,
+        "summary": {
+            "publishable_warn": 1 if gate_status == "publishable_warn" else 0,
+            "manual_review_required": 0,
+            "blocker": 1 if gate_status == "blocker" else 0,
+        },
+        "entries": [],
+        "publish_decision": {
+            "research_publish_allowed": gate_status != "blocker",
+            "autonomous_production_allowed": gate_status in {"pass", "publishable_warn"},
+            "manual_review_required": gate_status == "manual_review_required",
+            "blocker": gate_status == "blocker",
+        },
+    }
+
+
 def build_package(
     *,
     area_id: str,
     root: Path,
     package_version: str,
     allow_warn: bool = True,
+    allow_manual_review: bool = True,
 ) -> dict[str, Any]:
     processed = root / "data" / "processed"
     preview = root / "data" / "preview"
@@ -87,13 +197,24 @@ def build_package(
         raise FileNotFoundError("Missing package inputs: " + ", ".join(str(path) for path in missing))
 
     audit = read_json(audit_path)
-    if audit.get("status") == "fail" or (audit.get("status") == "warn" and not allow_warn):
+    qa_gate = qa_gate_from_audit(audit)
+    qa_gate_status = str(qa_gate.get("status") or "pass")
+    if audit.get("status") == "fail":
         raise RuntimeError(f"Pipeline audit status is {audit.get('status')}; refusing to publish package.")
+    if qa_gate_status == "blocker":
+        raise RuntimeError("Pipeline QA gate status is blocker; refusing to publish package.")
+    if (audit.get("status") == "warn" or qa_gate_status != "pass") and not allow_warn:
+        raise RuntimeError(f"Pipeline QA gate status is {qa_gate_status}; refusing to publish package.")
+    if qa_gate_status == "manual_review_required" and not allow_manual_review:
+        raise RuntimeError("Pipeline QA gate requires manual review; refusing to publish package.")
 
     lane_graph = read_json(lane_graph_path)
     lanes = lane_graph.get("lanes", [])
     junctions = lane_graph.get("junctions", [])
     continuity_links = lane_graph.get("continuity_links", [])
+    lane_graph_metadata = lane_graph.get("metadata") or {}
+    derived_smoothing = lane_graph_metadata.get("derived_lane_centerline_smoothing") or {}
+    rounding_style = lane_graph_metadata.get("lane_geometry_rounding_style") or derived_smoothing.get("rounding_style") or {}
     lane_links = [
         link
         for junction in junctions
@@ -109,6 +230,8 @@ def build_package(
             "system": SYSTEM_NAME,
             "package_version": package_version,
             "source": rel(lane_graph_path, root),
+            "lane_geometry_rounding_style": rounding_style,
+            "derived_lane_centerline_smoothing": derived_smoothing,
         },
         "lanes": lanes,
         "continuity_links": continuity_links,
@@ -126,29 +249,38 @@ def build_package(
     }
     write_json(package_dir / "standard_lanes.json", standard_lanes)
     write_json(package_dir / "standard_junctions.json", standard_junctions)
-    copy_json(lane_surface_path, package_dir / "standard_lane_surfaces.geojson")
-    copy_json(lane_debug_path, package_dir / "lane_debug_geometry.geojson")
-    copy_json(audit_path, package_dir / "qa_report.json")
-    copy_json(lane_report_path, package_dir / "lane_graph_report.json")
-    copy_json(surface_report_path, package_dir / "lane_surface_report.json")
+    copy_json(lane_surface_path, package_dir / "standard_lane_surfaces.geojson", root=root)
+    copy_json(lane_debug_path, package_dir / "lane_debug_geometry.geojson", root=root)
+    copy_json(audit_path, package_dir / "qa_report.json", root=root)
+    copy_json(lane_report_path, package_dir / "lane_graph_report.json", root=root)
+    copy_json(surface_report_path, package_dir / "lane_surface_report.json", root=root)
     shutil.copyfile(lane_surface_obj_path, package_dir / "standard_lane_surfaces.obj")
-    active_overrides = copy_json(active_overrides_path, package_dir / "active_lane_upgrades.json") if active_overrides_path.exists() else None
-    active_corner_overrides = copy_json(active_corner_overrides_path, package_dir / "active_corner_optimizations.json") if active_corner_overrides_path.exists() else None
-    corner_candidates = copy_json(corner_candidates_path, package_dir / "corner_optimization_candidates.json") if corner_candidates_path.exists() else None
-    corner_report = copy_json(corner_report_path, package_dir / "corner_optimization_report.json") if corner_report_path.exists() else None
+    active_overrides = copy_json(active_overrides_path, package_dir / "active_lane_upgrades.json", root=root) if active_overrides_path.exists() else None
+    active_corner_overrides = copy_json(active_corner_overrides_path, package_dir / "active_corner_optimizations.json", root=root) if active_corner_overrides_path.exists() else None
+    corner_candidates = copy_json(corner_candidates_path, package_dir / "corner_optimization_candidates.json", root=root) if corner_candidates_path.exists() else None
+    corner_report = copy_json(corner_report_path, package_dir / "corner_optimization_report.json", root=root) if corner_report_path.exists() else None
     propagation_plan = None
     propagation_report = None
     if propagation_latest_path.exists():
         propagation_latest = read_json(propagation_latest_path)
-        propagation_plan_path = Path(str(propagation_latest.get("latest_plan") or ""))
-        propagation_report_path = Path(str(propagation_latest.get("latest_report") or ""))
-        if propagation_plan_path.exists():
-            propagation_plan = copy_json(propagation_plan_path, package_dir / "lane_upgrade_propagation_plan.json")
-        if propagation_report_path.exists():
-            propagation_report = copy_json(propagation_report_path, package_dir / "lane_upgrade_propagation_report.json")
+        propagation_plan_path = resolve_artifact_path(
+            str(propagation_latest.get("latest_plan") or ""),
+            root,
+            base_dir=propagation_latest_path.parent,
+        )
+        propagation_report_path = resolve_artifact_path(
+            str(propagation_latest.get("latest_report") or ""),
+            root,
+            base_dir=propagation_latest_path.parent,
+        )
+        if propagation_plan_path is not None and propagation_plan_path.exists():
+            propagation_plan = copy_json(propagation_plan_path, package_dir / "lane_upgrade_propagation_plan.json", root=root)
+        if propagation_report_path is not None and propagation_report_path.exists():
+            propagation_report = copy_json(propagation_report_path, package_dir / "lane_upgrade_propagation_report.json", root=root)
 
     surface_report = read_json(surface_report_path)
     lane_report = read_json(lane_report_path)
+    corner_report_counts = (corner_report or {}).get("counts", {})
     manifest = {
         "type": "standard_lane_package_manifest",
         "metadata": {
@@ -156,8 +288,14 @@ def build_package(
             "schema": PACKAGE_SCHEMA,
             "system": SYSTEM_NAME,
             "package_version": package_version,
-            "source_pipeline_root": str(root),
+            "path_policy": PATH_POLICY,
+            "source_pipeline_root": "",
+            "source_pipeline_root_policy": "not_embedded_for_portable_package",
             "qa_status": audit.get("status"),
+            "qa_gate_status": qa_gate_status,
+            "qa_warning_severity_policy_id": qa_gate.get("policy_id", QA_WARNING_SEVERITY_POLICY_ID),
+            "lane_geometry_rounding_style_id": str(rounding_style.get("style_id") or derived_smoothing.get("rounding_style_id") or ""),
+            "lane_geometry_rounding_style": rounding_style,
         },
         "human_model": "raw map data -> LaneForge lane upgrade system -> standard lane package -> Houdini construction pipeline",
         "contents": {
@@ -186,7 +324,9 @@ def build_package(
             "active_lane_upgrades": len((active_overrides or {}).get("active_upgrades", [])),
             "active_corner_optimizations": len((active_corner_overrides or {}).get("active_corner_optimizations", [])),
             "corner_optimization_candidates": len((corner_candidates or {}).get("candidates", [])),
-            "corner_optimization_accepted_active": (corner_report or {}).get("counts", {}).get("accepted_active", 0),
+            "corner_optimization_accepted_active": corner_report_counts.get("accepted_active", 0),
+            "corner_optimization_accepted_active_candidates": corner_report_counts.get("accepted_active_candidates", 0),
+            "corner_optimization_accepted_active_overrides": corner_report_counts.get("accepted_active_overrides", 0),
             "lane_upgrade_propagation_candidates": len((propagation_plan or {}).get("candidates", [])),
             "lane_upgrade_propagation_high_confidence": (propagation_report or {}).get("counts", {}).get("high_confidence_candidates", 0),
         },
@@ -195,10 +335,16 @@ def build_package(
             "lane_surface": surface_report.get("metrics", {}),
             "pipeline_audit": audit.get("metrics", {}),
         },
+        "qa_gate": qa_gate,
         "publish_policy": {
             "source_map_data_immutable": True,
             "manual_lane_upgrades_are_transactions": True,
+            "derived_lane_centerline_smoothing_is_downstream_geometry": True,
+            "unified_lane_geometry_rounding_style_is_downstream_geometry": True,
             "houdini_consumes_package_outputs_only": True,
+            "qa_warning_severity_tiers": True,
+            "blocker_warnings_refuse_package_publish": True,
+            "manual_review_required_warnings_are_marked": True,
         },
     }
     houdini_manifest = {
@@ -208,12 +354,15 @@ def build_package(
             "schema": "lane_upgrade_system.houdini_manifest.v1",
             "system": SYSTEM_NAME,
             "package_version": package_version,
+            "path_policy": PATH_POLICY,
+            "qa_gate_status": qa_gate_status,
+            "lane_geometry_rounding_style_id": str(rounding_style.get("style_id") or derived_smoothing.get("rounding_style_id") or ""),
         },
         "inputs": {
-            "standard_lanes": str(package_dir / "standard_lanes.json"),
-            "standard_junctions": str(package_dir / "standard_junctions.json"),
-            "standard_lane_surfaces": str(package_dir / "standard_lane_surfaces.geojson"),
-            "standard_lane_surfaces_obj": str(package_dir / "standard_lane_surfaces.obj"),
+            "standard_lanes": "standard_lanes.json",
+            "standard_junctions": "standard_junctions.json",
+            "standard_lane_surfaces": "standard_lane_surfaces.geojson",
+            "standard_lane_surfaces_obj": "standard_lane_surfaces.obj",
         },
         "expected_houdini_outputs": [
             "OUT_roads_centerlines",
@@ -233,33 +382,42 @@ def build_package(
         "area_id": area_id,
         "system": SYSTEM_NAME,
         "latest_package_version": package_version,
-        "latest_package_dir": str(package_dir),
-        "manifest": str(package_dir / "manifest.json"),
+        "path_policy": PATH_POLICY,
+        "latest_package_dir": package_version,
+        "manifest": "manifest.json",
+        "qa_gate_status": qa_gate_status,
+        "qa_warning_summary": qa_gate.get("summary", {}),
     }
     write_json(package_dir.parent / "latest.json", latest)
     return {
         "area_id": area_id,
         "package_version": package_version,
-        "package_dir": str(package_dir),
-        "manifest": str(package_dir / "manifest.json"),
+        "package_dir": rel(package_dir, root),
+        "manifest": rel(package_dir / "manifest.json", root),
+        "path_policy": PATH_POLICY,
         "counts": manifest["counts"],
         "qa_status": audit.get("status"),
+        "qa_gate_status": qa_gate_status,
+        "qa_warning_summary": qa_gate.get("summary", {}),
     }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Publish a LaneForge standard lane package.")
     parser.add_argument("--area-id", default="pattaya_central_500m")
-    parser.add_argument("--version", default=DEFAULT_PACKAGE_VERSION)
+    parser.add_argument("--version", default=DEFAULT_PACKAGE_VERSION, help="Package version, or 'auto' for the next lane_package_vXXXX.")
     parser.add_argument("--fail-on-warn", action="store_true")
+    parser.add_argument("--fail-on-manual-review", action="store_true")
     args = parser.parse_args()
 
     root = pipeline_root_from_script(Path(__file__))
+    package_version = next_package_version(root, args.area_id) if args.version == "auto" else args.version
     result = build_package(
         area_id=args.area_id,
         root=root,
-        package_version=args.version,
+        package_version=package_version,
         allow_warn=not args.fail_on_warn,
+        allow_manual_review=not args.fail_on_manual_review,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0

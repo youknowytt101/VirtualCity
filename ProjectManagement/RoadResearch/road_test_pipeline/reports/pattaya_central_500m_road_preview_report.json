@@ -1,12 +1,12 @@
 {
   "area_id": "pattaya_central_500m",
-  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+  "input": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
   "input_mode": "optimized_centerlines",
   "outputs": {
-    "centerline_geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview_surfaces.geojson",
-    "legacy_surface_geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview_surfaces.geojson",
-    "obj": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.obj",
-    "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.svg"
+    "centerline_geojson": "data/preview/pattaya_central_500m_roads_preview_surfaces.geojson",
+    "legacy_surface_geojson": "data/preview/pattaya_central_500m_roads_preview_surfaces.geojson",
+    "obj": "data/preview/pattaya_central_500m_roads_preview.obj",
+    "svg": "data/preview/pattaya_central_500m_roads_preview.svg"
   },
   "counts": {
     "edges": 252,
@@ -19,7 +19,7 @@
     "road_centerline_features": 252,
     "junction_patch_polygons": 0,
     "junction_clustered_nodes": 0,
-    "obj_vertices": 2193,
+    "obj_vertices": 2202,
     "obj_faces": 0,
     "obj_centerlines": 252,
     "obj_junction_patches": 0

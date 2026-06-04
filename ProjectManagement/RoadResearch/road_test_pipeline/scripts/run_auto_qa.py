@@ -649,7 +649,7 @@ def run_movement_corridor_scoring_qa(root: Path, area_id: str) -> dict:
             "cases_scored",
             metrics.get("cases_scored", 0),
             rules["min_cases_scored"],
-            "Movement corridor scoring should score staged movement and compound corridor cases.",
+            "Movement corridor scoring should score staged movement corridor cases.",
         ),
         check_min(
             "candidate_scores",

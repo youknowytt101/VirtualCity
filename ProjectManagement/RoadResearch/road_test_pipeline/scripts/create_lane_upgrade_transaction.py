@@ -22,6 +22,7 @@ LANE_UPGRADE_SYSTEM_NAME = "LaneForge"
 TRANSACTION_SCHEMA = "lane_upgrade_system.transaction.v1"
 ACTIVE_OVERRIDE_SCHEMA = "lane_upgrade_system.active_overrides.v1"
 DEFAULT_DISTRIBUTION_POLICY = "balanced_bidirectional_left_traffic_v1"
+PATH_POLICY = "pipeline_root_relative_paths_v1"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -37,6 +38,13 @@ def write_json(path: Path, data: dict[str, Any]) -> None:
 
 def pipeline_root_from_script(script_path: Path) -> Path:
     return script_path.resolve().parents[1]
+
+
+def rel(path: Path, root: Path) -> str:
+    try:
+        return str(path.relative_to(root)).replace("\\", "/")
+    except ValueError:
+        return str(path)
 
 
 def road_graph_path(root: Path, area_id: str) -> Path:
@@ -103,7 +111,7 @@ def resolve_road_reference(
     return {
         "road_id": road_id,
         "canonical_road_id": canonical_road_id,
-        "road_graph_path": str(graph_path),
+        "road_graph_path": rel(graph_path, root),
         "road_graph": road_graph,
         "edge": edge,
         "resolution_policy": "road_graph_edge_lookup_v1",
@@ -250,6 +258,7 @@ def create_transaction(
             "area_id": area_id,
             "schema": TRANSACTION_SCHEMA,
             "system": LANE_UPGRADE_SYSTEM_NAME,
+            "path_policy": PATH_POLICY,
         },
         "transaction_id": transaction_id,
         "version": version,
@@ -290,8 +299,8 @@ def create_transaction(
 
     return {
         "transaction": transaction,
-        "transaction_path": str(transaction_path),
-        "active_overrides_path": str(active_path) if activate else "",
+        "transaction_path": rel(transaction_path, root),
+        "active_overrides_path": rel(active_path, root) if activate else "",
         "active_overrides": active,
     }
 
@@ -332,6 +341,7 @@ def create_restore_transaction(
             "area_id": area_id,
             "schema": TRANSACTION_SCHEMA,
             "system": LANE_UPGRADE_SYSTEM_NAME,
+            "path_policy": PATH_POLICY,
         },
         "transaction_id": transaction_id,
         "version": version,
@@ -372,8 +382,8 @@ def create_restore_transaction(
 
     return {
         "transaction": transaction,
-        "transaction_path": str(transaction_path),
-        "active_overrides_path": str(active_path) if activate else "",
+        "transaction_path": rel(transaction_path, root),
+        "active_overrides_path": rel(active_path, root) if activate else "",
         "active_overrides": active,
     }
 

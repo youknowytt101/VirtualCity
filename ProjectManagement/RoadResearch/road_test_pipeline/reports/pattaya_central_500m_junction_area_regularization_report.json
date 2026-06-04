@@ -20,8 +20,8 @@
     "Short-edge absorption is currently a candidate flag, not a destructive graph edit.",
     "Connector solvers should use these entry poses before fitting circular, clothoid or paramPoly3 curves."
   ],
-  "input_road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-  "input_junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
-  "junction_areas_output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
-  "engineering_reference_output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json"
+  "input_road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+  "input_junction_semantics": "data/processed/pattaya_central_500m_junction_semantics.json",
+  "junction_areas_output": "data/processed/pattaya_central_500m_junction_areas.json",
+  "engineering_reference_output": "data/processed/pattaya_central_500m_engineering_reference_lines.json"
 }

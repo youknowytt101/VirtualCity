@@ -27,12 +27,20 @@ from typing import Any
 APPLICATION_SCHEMA = "lane_upgrade_system.corner_optimization_application.v1"
 OVERRIDE_SCHEMA = "lane_upgrade_system.corner_optimization_overrides.v1"
 DEFAULT_POLICY = "low_risk_degree2_connector_only_v1"
+INTERNAL_BEND_POLICY = "low_risk_internal_centerline_bend_smoothing_v1"
 POLICY_CONFIGS: dict[str, dict[str, Any]] = {
     DEFAULT_POLICY: {
         "candidate_types": {"degree2_connector_corner"},
         "risk_levels": {"low"},
         "allowed_actions": {"candidate_for_auto_fillet_after_review", "active_geometry_transaction"},
         "min_turn_angle_deg": 18.0,
+        "max_nearest_junction_distance_m": None,
+    },
+    INTERNAL_BEND_POLICY: {
+        "candidate_types": {"internal_centerline_bend"},
+        "risk_levels": {"low"},
+        "allowed_actions": {"candidate_for_smoothing_after_review", "active_geometry_transaction"},
+        "min_turn_angle_deg": 28.0,
         "max_nearest_junction_distance_m": None,
     },
 }
@@ -86,18 +94,64 @@ def policy_config(policy_name: str) -> dict[str, Any]:
     return POLICY_CONFIGS[policy_name]
 
 
-def candidate_key(candidate: dict[str, Any]) -> tuple[str, tuple[str, str]]:
+def degree2_candidate_key(candidate: dict[str, Any]) -> tuple[str, tuple[str, str]]:
     node_id = str(candidate.get("node_id") or "")
     edge_ids = [str(candidate.get("from_edge_id") or ""), str(candidate.get("to_edge_id") or "")]
     a, b = sorted(edge_ids)
     return node_id, (a, b)
 
 
-def active_override_key(item: dict[str, Any]) -> tuple[str, tuple[str, str]]:
+def degree2_active_override_key(item: dict[str, Any]) -> tuple[str, tuple[str, str]]:
     node_id = str(item.get("node_id") or "")
     edge_ids = [str(item.get("from_edge_id") or ""), str(item.get("to_edge_id") or "")]
     a, b = sorted(edge_ids)
     return node_id, (a, b)
+
+
+def internal_bend_candidate_key(candidate: dict[str, Any]) -> tuple[str, int]:
+    source_edge_id = str(candidate.get("source_edge_id") or "")
+    try:
+        point_index = int(candidate.get("point_index"))
+    except (TypeError, ValueError):
+        point_index = -1
+    return source_edge_id, point_index
+
+
+def internal_bend_active_override_key(item: dict[str, Any]) -> tuple[str, int]:
+    source_edge_id = str(item.get("source_edge_id") or "")
+    try:
+        point_index = int(item.get("point_index"))
+    except (TypeError, ValueError):
+        point_index = -1
+    return source_edge_id, point_index
+
+
+def candidate_key(candidate: dict[str, Any]) -> tuple[Any, ...]:
+    candidate_type = str(candidate.get("candidate_type") or "")
+    if candidate_type == "internal_centerline_bend":
+        source_edge_id, point_index = internal_bend_candidate_key(candidate)
+        return candidate_type, source_edge_id, point_index
+    node_id, edge_pair = degree2_candidate_key(candidate)
+    return candidate_type or "degree2_connector_corner", node_id, edge_pair[0], edge_pair[1]
+
+
+def active_override_key(item: dict[str, Any]) -> tuple[Any, ...]:
+    candidate_type = str(item.get("candidate_type") or "")
+    if candidate_type == "internal_centerline_bend":
+        source_edge_id, point_index = internal_bend_active_override_key(item)
+        return candidate_type, source_edge_id, point_index
+    node_id, edge_pair = degree2_active_override_key(item)
+    return candidate_type or "degree2_connector_corner", node_id, edge_pair[0], edge_pair[1]
+
+
+def candidate_has_required_geometry(candidate: dict[str, Any]) -> bool:
+    candidate_type = str(candidate.get("candidate_type") or "")
+    if candidate_type == "internal_centerline_bend":
+        source_edge_id, point_index = internal_bend_candidate_key(candidate)
+        context = candidate.get("context_polyline_xz") or []
+        return bool(source_edge_id and point_index >= 1 and len(context) >= 3)
+    node_id, edge_pair = degree2_candidate_key(candidate)
+    return bool(node_id and all(edge_pair))
 
 
 def candidate_matches_policy(candidate: dict[str, Any], config: dict[str, Any]) -> bool:
@@ -113,8 +167,7 @@ def candidate_matches_policy(candidate: dict[str, Any], config: dict[str, Any]) 
     if max_junction_distance is not None:
         if float(candidate.get("nearest_junction_distance_m") or 0.0) > float(max_junction_distance):
             return False
-    node_id, edge_pair = candidate_key(candidate)
-    return bool(node_id and all(edge_pair))
+    return candidate_has_required_geometry(candidate)
 
 
 def selected_candidates(
@@ -171,26 +224,23 @@ def upsert_active_overrides(
     created: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
     for index, candidate in enumerate(selected):
+        candidate_type = str(candidate.get("candidate_type") or "")
         key = candidate_key(candidate)
         if key in active_keys:
             skipped.append({
                 "candidate_id": candidate.get("candidate_id"),
-                "node_id": candidate.get("node_id"),
+                "node_id": candidate.get("node_id", ""),
+                "source_edge_id": candidate.get("source_edge_id", ""),
+                "point_index": candidate.get("point_index", ""),
                 "reason": "corner_already_active",
             })
             continue
-        item = {
+        common = {
             "enabled": True,
             "corner_optimization_id": f"{application_id}_corner_{index:04d}",
             "application_id": application_id,
             "candidate_id": str(candidate.get("candidate_id") or ""),
-            "candidate_type": str(candidate.get("candidate_type") or ""),
-            "node_id": str(candidate.get("node_id") or ""),
-            "from_edge_id": str(candidate.get("from_edge_id") or ""),
-            "to_edge_id": str(candidate.get("to_edge_id") or ""),
-            "from_canonical_road_id": str(candidate.get("from_canonical_road_id") or ""),
-            "to_canonical_road_id": str(candidate.get("to_canonical_road_id") or ""),
-            "target_geometry": "optimized_corner_fillet",
+            "candidate_type": candidate_type,
             "suggested_cut_m": float(candidate.get("suggested_cut_m") or 0.0),
             "suggested_radius_m": float(candidate.get("suggested_radius_m") or 0.0),
             "turn_angle_deg": float(candidate.get("turn_angle_deg") or 0.0),
@@ -200,6 +250,26 @@ def upsert_active_overrides(
             "status": "accepted_for_geometry_apply",
             "created_at_local": time.strftime("%Y-%m-%dT%H:%M:%S"),
         }
+        if candidate_type == "internal_centerline_bend":
+            item = {
+                **common,
+                "source_edge_id": str(candidate.get("source_edge_id") or ""),
+                "canonical_road_id": str(candidate.get("canonical_road_id") or ""),
+                "point_index": int(candidate.get("point_index") or 0),
+                "center_xz": candidate.get("center_xz") or [],
+                "context_polyline_xz": candidate.get("context_polyline_xz") or [],
+                "target_geometry": "optimized_internal_centerline_bend_smoothing",
+            }
+        else:
+            item = {
+                **common,
+                "node_id": str(candidate.get("node_id") or ""),
+                "from_edge_id": str(candidate.get("from_edge_id") or ""),
+                "to_edge_id": str(candidate.get("to_edge_id") or ""),
+                "from_canonical_road_id": str(candidate.get("from_canonical_road_id") or ""),
+                "to_canonical_road_id": str(candidate.get("to_canonical_road_id") or ""),
+                "target_geometry": "optimized_corner_fillet",
+            }
         data.setdefault("active_corner_optimizations", []).append(item)
         active_keys.add(key)
         created.append(item)
@@ -235,30 +305,51 @@ def run_command(name: str, cmd: list[str], cwd: Path, log_path: Path) -> str:
     return proc.stdout or ""
 
 
-def corner_geometry_snapshot(path: Path, node_ids: set[str]) -> dict[str, Any]:
+def corner_geometry_snapshot(path: Path, selected: list[dict[str, Any]]) -> dict[str, Any]:
     if not path.exists():
         return {}
     data = read_json(path)
+    node_ids = {str(candidate.get("node_id") or "") for candidate in selected if str(candidate.get("node_id") or "")}
+    edge_ids = {
+        str(candidate.get("source_edge_id") or "")
+        for candidate in selected
+        if str(candidate.get("candidate_type") or "") == "internal_centerline_bend"
+        and str(candidate.get("source_edge_id") or "")
+    }
     matches: list[dict[str, Any]] = []
+    approach_matches: list[dict[str, Any]] = []
     for feature in data.get("features", []):
         props = feature.get("properties") or {}
-        if str(props.get("vc_part") or "") != "optimized_corner_fillet":
-            continue
-        if node_ids and str(props.get("corner_node_id") or "") not in node_ids:
-            continue
-        matches.append({
-            "corner_node_id": props.get("corner_node_id"),
-            "corner_id": props.get("corner_id"),
-            "from_edge_id": props.get("from_edge_id"),
-            "to_edge_id": props.get("to_edge_id"),
-            "cut_m": props.get("cut_m"),
-            "arc_radius_m": props.get("arc_radius_m"),
-            "corner_optimization_source": props.get("corner_optimization_source"),
-            "corner_optimization_candidate_id": props.get("corner_optimization_candidate_id"),
-        })
+        part = str(props.get("vc_part") or "")
+        if part == "optimized_corner_fillet":
+            if node_ids and str(props.get("corner_node_id") or "") not in node_ids:
+                continue
+            matches.append({
+                "corner_node_id": props.get("corner_node_id"),
+                "corner_id": props.get("corner_id"),
+                "from_edge_id": props.get("from_edge_id"),
+                "to_edge_id": props.get("to_edge_id"),
+                "cut_m": props.get("cut_m"),
+                "arc_radius_m": props.get("arc_radius_m"),
+                "corner_optimization_source": props.get("corner_optimization_source"),
+                "corner_optimization_candidate_id": props.get("corner_optimization_candidate_id"),
+            })
+        elif part == "optimized_approach_centerline":
+            source_edge_id = str(props.get("source_edge_id") or "")
+            if source_edge_id not in edge_ids:
+                continue
+            coords = (feature.get("geometry") or {}).get("coordinates") or []
+            approach_matches.append({
+                "source_edge_id": source_edge_id,
+                "coordinate_count": len(coords),
+                "internal_bend_smoothing_count": props.get("internal_bend_smoothing_count", 0),
+                "internal_bend_smoothing_candidate_ids": props.get("internal_bend_smoothing_candidate_ids", ""),
+            })
     return {
         "corner_fillets": len(matches),
         "matched_corner_fillets": matches,
+        "internal_bend_approaches": len(approach_matches),
+        "matched_internal_bend_approaches": approach_matches,
     }
 
 
@@ -284,7 +375,6 @@ def apply_corner_optimizations(
         config=config,
         all_matching_policy=all_matching_policy,
     )
-    selected_node_ids = {str(candidate.get("node_id") or "") for candidate in selected if str(candidate.get("node_id") or "")}
     version, application_path = next_versioned_path(
         root / "data" / "lane_upgrade_system" / "corner_applications",
         f"{area_id}_corner_optimization_application_",
@@ -298,7 +388,7 @@ def apply_corner_optimizations(
     active_overrides_path = processed / f"{area_id}_corner_optimization_overrides.json"
     optimized_centerlines_path = processed / f"{area_id}_roads_optimized_centerlines.geojson"
     package_version = next_package_version(root, area_id)
-    before_snapshot = corner_geometry_snapshot(optimized_centerlines_path, selected_node_ids)
+    before_snapshot = corner_geometry_snapshot(optimized_centerlines_path, selected)
 
     application: dict[str, Any] = {
         "type": "corner_optimization_application",
@@ -373,7 +463,7 @@ def apply_corner_optimizations(
     svg_report_path = reports / f"{area_id}_lane_graph_svg_report.json"
     application.update({
         "status": "completed",
-        "after_corner_snapshot": corner_geometry_snapshot(optimized_centerlines_path, selected_node_ids),
+        "after_corner_snapshot": corner_geometry_snapshot(optimized_centerlines_path, selected),
         "pipeline_audit": read_json(audit_path) if audit_path.exists() else {},
         "corner_optimization_report": read_json(corner_report_path) if corner_report_path.exists() else {},
         "published_package": json.loads(package_stdout),

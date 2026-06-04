@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -44,6 +45,21 @@ def python_cmd() -> str:
     return sys.executable
 
 
+def next_versioned_name(directory: Path, *, prefix: str, width: int = 4) -> str:
+    highest = 0
+    if directory.exists():
+        for path in directory.iterdir():
+            match = re.match(rf"^{re.escape(prefix)}v(\d+)(?:\..*)?$", path.name)
+            if not match:
+                continue
+            highest = max(highest, int(match.group(1)))
+    return f"{prefix}v{highest + 1:0{width}d}"
+
+
+def next_package_version(root: Path, area_id: str) -> str:
+    return next_versioned_name(root / "data" / "lane_upgrade_packages" / area_id, prefix="lane_package_")
+
+
 def rpyc_cook_cmd(root: Path, area_id: str) -> list[str] | None:
     script = root / "scripts" / "houdini_cook_rpyc.py"
     if importlib.util.find_spec("rpyc") is not None:
@@ -75,6 +91,7 @@ def main() -> int:
     optimized_centerlines = root / "data" / "processed" / f"{args.area_id}_roads_optimized_centerlines.geojson"
     lane_graph = root / "data" / "processed" / f"{args.area_id}_lane_graph.json"
     config = root / "config" / f"{args.area_id}.area.json"
+    package_version = next_package_version(root, args.area_id)
 
     steps: list[tuple[str, list[str]]] = []
     if not raw_geojson.exists():
@@ -120,7 +137,7 @@ def main() -> int:
         ("Generating lane-level debug geometry", [python_cmd(), str(root / "scripts" / "generate_lane_geometry_debug.py"), "--area-id", args.area_id]),
         ("Generating lane surface v1 geometry", [python_cmd(), str(root / "scripts" / "generate_lane_surface_v1.py"), "--area-id", args.area_id]),
         ("Auditing road pipeline contracts", [python_cmd(), str(root / "scripts" / "audit_road_pipeline.py"), "--area-id", args.area_id]),
-        ("Publishing LaneForge standard lane package", [python_cmd(), str(root / "scripts" / "build_lane_upgrade_package.py"), "--area-id", args.area_id]),
+        ("Publishing LaneForge standard lane package", [python_cmd(), str(root / "scripts" / "build_lane_upgrade_package.py"), "--area-id", args.area_id, "--version", package_version]),
     ])
 
     for name, cmd in steps:
@@ -146,6 +163,7 @@ def main() -> int:
         "area_id": args.area_id,
         "status": "completed",
         "houdini_status": houdini_status,
+        "package_version": package_version,
         "outputs": {
             "repaired_geojson": str(repaired_geojson),
             "canonical_geojson": str(canonical_geojson),
@@ -158,7 +176,7 @@ def main() -> int:
             "lane_geometry_debug_report": str(reports / f"{args.area_id}_lane_geometry_debug_report.json"),
             "lane_surface_v1_report": str(reports / f"{args.area_id}_lane_surface_v1_report.json"),
             "pipeline_audit_report": str(reports / f"{args.area_id}_pipeline_audit_report.json"),
-            "lane_package_manifest": str(root / "data" / "lane_upgrade_packages" / args.area_id / "lane_package_v0001" / "manifest.json"),
+            "lane_package_manifest": str(root / "data" / "lane_upgrade_packages" / args.area_id / package_version / "manifest.json"),
             "topology_qa_report": str(reports / "qa" / f"{args.area_id}_topology_repair_qa_report.json"),
             "road_graph_qa_report": str(reports / "qa" / f"{args.area_id}_road_graph_qa_report.json"),
             "lane_graph_qa_report": str(reports / "qa" / f"{args.area_id}_lane_graph_qa_report.json"),

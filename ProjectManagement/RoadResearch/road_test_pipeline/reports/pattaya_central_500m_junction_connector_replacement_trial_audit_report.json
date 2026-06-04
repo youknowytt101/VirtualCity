@@ -1657,7 +1657,7 @@
     }
   ],
   "inputs": {
-    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
     "optimized_centerlines": "temporary_connector_replacement_trial.geojson",
     "optimized_centerlines_note": "The trial GeoJSON is created in a temporary directory; the random local temp path is omitted for reproducible reports."
   },

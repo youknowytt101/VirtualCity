@@ -2,6 +2,7 @@
 
 import importlib.util
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -10,6 +11,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PIPELINE = ROOT / "ProjectManagement" / "RoadResearch" / "road_test_pipeline"
+DRIVE_PATH_RE = re.compile(r"[A-Za-z]:[\\/]")
 
 
 def load_script(module_name: str, relative_path: str):
@@ -30,10 +32,105 @@ execute_lane_upgrade = load_script("execute_lane_upgrade", "execute_lane_upgrade
 plan_lane_upgrade_propagation = load_script("plan_lane_upgrade_propagation", "plan_lane_upgrade_propagation.py")
 apply_lane_upgrade_propagation = load_script("apply_lane_upgrade_propagation", "apply_lane_upgrade_propagation.py")
 build_lane_upgrade_package = load_script("build_lane_upgrade_package", "build_lane_upgrade_package.py")
+audit_road_pipeline = load_script("audit_road_pipeline", "audit_road_pipeline.py")
 export_lane_graph_svg = load_script("export_lane_graph_svg", "export_lane_graph_svg.py")
 
 
 class TestLaneUpgradeSystem(unittest.TestCase):
+    def assert_no_drive_paths(self, value):
+        self.assertIsNone(DRIVE_PATH_RE.search(json.dumps(value, ensure_ascii=False)))
+
+    def write_minimal_package_inputs(self, root: Path, area_id: str, audit: dict):
+        processed = root / "data" / "processed"
+        preview = root / "data" / "preview"
+        reports = root / "reports"
+        processed.mkdir(parents=True, exist_ok=True)
+        preview.mkdir(parents=True, exist_ok=True)
+        reports.mkdir(parents=True, exist_ok=True)
+        (processed / f"{area_id}_lane_graph.json").write_text(json.dumps({
+            "lanes": [{"lane_id": "l0", "road_id": "e0"}],
+            "junctions": [],
+            "continuity_links": [],
+        }), encoding="utf-8")
+        (preview / f"{area_id}_lane_surfaces_v1.geojson").write_text(json.dumps({"features": []}), encoding="utf-8")
+        (preview / f"{area_id}_lane_surfaces_v1.obj").write_text("# obj\n", encoding="utf-8")
+        (preview / f"{area_id}_lane_geometry_debug.geojson").write_text(json.dumps({"features": []}), encoding="utf-8")
+        (reports / f"{area_id}_pipeline_audit_report.json").write_text(json.dumps(audit), encoding="utf-8")
+        (reports / f"{area_id}_lane_graph_report.json").write_text(json.dumps({"metrics": {}}), encoding="utf-8")
+        (reports / f"{area_id}_lane_surface_v1_report.json").write_text(json.dumps({"counts": {}, "metrics": {}}), encoding="utf-8")
+
+    def test_qa_warning_gate_tiers_manual_review_and_blocker(self):
+        gate = audit_road_pipeline.build_qa_warning_gate(
+            stage_reports={
+                "topology_repair": {
+                    "status": "warn",
+                    "checks": [
+                        {
+                            "id": "dangling_endpoint_ratio",
+                            "status": "warn",
+                            "value": 0.193,
+                            "threshold": 0.15,
+                            "message": "dangling",
+                        }
+                    ],
+                },
+                "road_graph": {
+                    "status": "warn",
+                    "checks": [
+                        {
+                            "id": "width_fallback_ratio",
+                            "status": "warn",
+                            "value": 1.0,
+                            "threshold": 0.8,
+                            "message": "width fallback",
+                        },
+                        {
+                            "id": "dead_end_ratio",
+                            "status": "warn",
+                            "value": 0.55,
+                            "threshold": 0.12,
+                            "message": "dead ends",
+                        },
+                    ],
+                },
+                "lane_graph": {"status": "pass", "checks": []},
+            },
+        )
+
+        self.assertEqual(gate["policy_id"], "qa_warning_severity_tiers_v1")
+        self.assertEqual(gate["status"], "blocker")
+        self.assertEqual(gate["summary"]["manual_review_required"], 2)
+        self.assertEqual(gate["summary"]["blocker"], 1)
+        self.assertFalse(gate["publish_decision"]["research_publish_allowed"])
+        self.assertFalse(gate["publish_decision"]["autonomous_production_allowed"])
+
+    def test_package_refuses_blocker_qa_gate(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            self.write_minimal_package_inputs(root, "unit", {
+                "status": "pass",
+                "metrics": {},
+                "qa_gate": {
+                    "policy_id": "qa_warning_severity_tiers_v1",
+                    "status": "blocker",
+                    "summary": {"publishable_warn": 0, "manual_review_required": 0, "blocker": 1},
+                    "entries": [],
+                    "publish_decision": {
+                        "research_publish_allowed": False,
+                        "autonomous_production_allowed": False,
+                        "manual_review_required": False,
+                        "blocker": True,
+                    },
+                },
+            })
+
+            with self.assertRaisesRegex(RuntimeError, "QA gate status is blocker"):
+                build_lane_upgrade_package.build_package(
+                    area_id="unit",
+                    root=root,
+                    package_version="lane_package_v0001",
+                )
+
     def test_transaction_resolves_canonical_id_and_records_adjacent_junction_scope(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -72,6 +169,8 @@ class TestLaneUpgradeSystem(unittest.TestCase):
 
         self.assertEqual(transaction["request"]["road_id"], "e_0042")
         self.assertEqual(transaction["request"]["canonical_road_id"], "cr_0042")
+        self.assertEqual(transaction["resolution"]["road_graph"], "data/processed/unit_road_graph.json")
+        self.assert_no_drive_paths(transaction)
         self.assertEqual(transaction["affected_scope"]["endpoint_node_ids"], ["n0", "n1"])
         self.assertEqual(transaction["affected_scope"]["adjacent_junction_node_ids"], ["n0"])
         self.assertEqual(active["active_upgrades"][0]["road_id"], "e_0042")
@@ -109,9 +208,30 @@ class TestLaneUpgradeSystem(unittest.TestCase):
                         "road_id": "e_0042",
                         "direction": "forward",
                         "centerline_xz": [[0.0, 0.0], [10.0, 0.0]],
+                    },
+                    {
+                        "lane_id": "e_0043_f_1",
+                        "road_id": "e_0043",
+                        "direction": "forward",
+                        "centerline_xz": [[10.1, 0.0], [20.0, 0.0]],
                     }
                 ],
                 "lane_links": [],
+                "continuity_links": [
+                    {
+                        "continuity_link_id": "n0_through_cl_00_00",
+                        "from_lane": "e_0042_f_1",
+                        "to_lane": "e_0043_f_1",
+                        "from_road": "e_0042",
+                        "to_road": "e_0043",
+                        "corner_node_id": "n0",
+                        "turn": "through",
+                        "source": "degree2_connector_through_continuity_v1",
+                        "turn_angle_deg": 1.0,
+                        "endpoint_gap_m": 0.1,
+                        "connecting_curve_xz": [[10.0, 0.0], [10.1, 0.0]],
+                    }
+                ],
             },
             movement_corridors=None,
             compound_transactions=None,
@@ -145,7 +265,10 @@ class TestLaneUpgradeSystem(unittest.TestCase):
 
         self.assertIn('data-vc-road-id="e_0042"', svg)
         self.assertIn('data-vc-road-graph-edge-id="e_0042"', svg)
+        self.assertIn('data-vc-kind="continuity_link"', svg)
+        self.assertIn('data-vc-continuity-link-id="n0_through_cl_00_00"', svg)
         self.assertEqual(report["counts"]["canonical_roads_road_graph_edge_mapped"], 1)
+        self.assertEqual(report["counts"]["continuity_links_rendered"], 1)
 
     def test_execution_chooses_next_package_version(self):
         with tempfile.TemporaryDirectory() as td:
@@ -155,6 +278,7 @@ class TestLaneUpgradeSystem(unittest.TestCase):
             (package_root / "lane_package_v0002").mkdir()
 
             self.assertEqual(execute_lane_upgrade.next_package_version(root, "unit"), "lane_package_v0003")
+            self.assertEqual(build_lane_upgrade_package.next_package_version(root, "unit"), "lane_package_v0003")
 
     def test_execution_transaction_command_includes_road_and_canonical_ids(self):
         cmd = execute_lane_upgrade.command_for_transaction(
@@ -303,16 +427,45 @@ class TestLaneUpgradeSystem(unittest.TestCase):
                 short_edge_threshold_m=35.0,
             )
             plan = json.loads(output_path.read_text(encoding="utf-8"))
+            report_data = json.loads(report_path.read_text(encoding="utf-8"))
+            latest = json.loads((output_path.parent / "unit_latest.json").read_text(encoding="utf-8"))
 
         rules_by_road = {candidate["candidate_road_id"]: candidate["rule_id"] for candidate in plan["candidates"]}
         self.assertEqual(report["counts"]["candidates"], 2)
         self.assertEqual(rules_by_road["e1"], "through_pair_lane_count_continuity_v2")
         self.assertEqual(rules_by_road["e2"], "short_edge_absorption_lane_count_v2")
         self.assertEqual(report["counts"]["high_confidence_candidates"], 2)
+        self.assertEqual(report_data["inputs"]["road_graph"], "data/processed/unit_road_graph.json")
+        self.assertEqual(report_data["outputs"]["plan"], "data/lane_upgrade_system/propagation/unit_lane_upgrade_propagation_plan_v0001.json")
+        self.assertEqual(latest["latest_plan"], "data/lane_upgrade_system/propagation/unit_lane_upgrade_propagation_plan_v0001.json")
+        self.assertEqual(latest["latest_report"], "reports/unit_lane_upgrade_propagation_report.json")
+        self.assert_no_drive_paths(report_data)
+        self.assert_no_drive_paths(latest)
+
+    def test_apply_propagation_latest_plan_path_resolves_relative_and_legacy_root(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / "road_test_pipeline"
+            propagation = root / "data" / "lane_upgrade_system" / "propagation"
+            propagation.mkdir(parents=True)
+            plan_path = propagation / "unit_lane_upgrade_propagation_plan_v0001.json"
+            plan_path.write_text(json.dumps({"candidates": []}), encoding="utf-8")
+            latest_path = propagation / "unit_latest.json"
+            latest_path.write_text(json.dumps({
+                "latest_plan": "data/lane_upgrade_system/propagation/unit_lane_upgrade_propagation_plan_v0001.json",
+            }), encoding="utf-8")
+
+            relative_resolved = apply_lane_upgrade_propagation.latest_plan_path(root, "unit")
+            legacy_prefix = "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\"
+            legacy_plan = legacy_prefix + "data\\lane_upgrade_system\\propagation\\unit_lane_upgrade_propagation_plan_v0001.json"
+            latest_path.write_text(json.dumps({"latest_plan": legacy_plan}), encoding="utf-8")
+            legacy_resolved = apply_lane_upgrade_propagation.latest_plan_path(root, "unit")
+
+        self.assertEqual(relative_resolved.resolve(), plan_path.resolve())
+        self.assertEqual(legacy_resolved.resolve(), plan_path.resolve())
 
     def test_package_copies_latest_propagation_plan_when_present(self):
         with tempfile.TemporaryDirectory() as td:
-            root = Path(td)
+            root = Path(td) / "road_test_pipeline"
             area_id = "unit"
             processed = root / "data" / "processed"
             preview = root / "data" / "preview"
@@ -323,6 +476,16 @@ class TestLaneUpgradeSystem(unittest.TestCase):
             reports.mkdir()
             propagation.mkdir(parents=True)
             (processed / f"{area_id}_lane_graph.json").write_text(json.dumps({
+                "metadata": {
+                    "lane_geometry_rounding_style": {
+                        "style_id": "unified_lane_geometry_rounding_style_v1",
+                        "primary_curve_family": "tangent_circular_arc",
+                    },
+                    "derived_lane_centerline_smoothing": {
+                        "policy": "derived_lane_centerline_smoothing_v1",
+                        "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+                    },
+                },
                 "lanes": [{"lane_id": "l0", "road_id": "e0"}],
                 "junctions": [],
                 "continuity_links": [],
@@ -330,16 +493,47 @@ class TestLaneUpgradeSystem(unittest.TestCase):
             (preview / f"{area_id}_lane_surfaces_v1.geojson").write_text(json.dumps({"features": []}), encoding="utf-8")
             (preview / f"{area_id}_lane_surfaces_v1.obj").write_text("# obj\n", encoding="utf-8")
             (preview / f"{area_id}_lane_geometry_debug.geojson").write_text(json.dumps({"features": []}), encoding="utf-8")
-            (reports / f"{area_id}_pipeline_audit_report.json").write_text(json.dumps({"status": "pass", "metrics": {}}), encoding="utf-8")
+            qa_gate = {
+                "policy_id": "qa_warning_severity_tiers_v1",
+                "status": "manual_review_required",
+                "summary": {"publishable_warn": 0, "manual_review_required": 1, "blocker": 0},
+                "entries": [
+                    {
+                        "stage": "road_graph",
+                        "check_id": "width_fallback_ratio",
+                        "source_status": "warn",
+                        "tier": "manual_review_required",
+                        "value": 1.0,
+                        "threshold": 0.8,
+                        "message": "width fallback",
+                        "reason": "semantic review",
+                    }
+                ],
+                "publish_decision": {
+                    "research_publish_allowed": True,
+                    "autonomous_production_allowed": False,
+                    "manual_review_required": True,
+                    "blocker": False,
+                },
+            }
+            (reports / f"{area_id}_pipeline_audit_report.json").write_text(json.dumps({
+                "status": "pass",
+                "metrics": {},
+                "qa_gate": qa_gate,
+            }), encoding="utf-8")
             (reports / f"{area_id}_lane_graph_report.json").write_text(json.dumps({"metrics": {}}), encoding="utf-8")
             (reports / f"{area_id}_lane_surface_v1_report.json").write_text(json.dumps({"counts": {}, "metrics": {}}), encoding="utf-8")
             plan_path = propagation / f"{area_id}_lane_upgrade_propagation_plan_v0001.json"
             report_path = reports / f"{area_id}_lane_upgrade_propagation_report.json"
             plan_path.write_text(json.dumps({"candidates": [{"candidate_id": "prop_0000"}]}), encoding="utf-8")
-            report_path.write_text(json.dumps({"counts": {"high_confidence_candidates": 1}}), encoding="utf-8")
+            report_path.write_text(json.dumps({
+                "inputs": {"road_graph": str(processed / f"{area_id}_road_graph.json")},
+                "counts": {"high_confidence_candidates": 1},
+            }), encoding="utf-8")
+            legacy_prefix = "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\"
             (propagation / f"{area_id}_latest.json").write_text(json.dumps({
-                "latest_plan": str(plan_path),
-                "latest_report": str(report_path),
+                "latest_plan": legacy_prefix + "data\\lane_upgrade_system\\propagation\\unit_lane_upgrade_propagation_plan_v0001.json",
+                "latest_report": legacy_prefix + "reports\\unit_lane_upgrade_propagation_report.json",
             }), encoding="utf-8")
 
             result = build_lane_upgrade_package.build_package(
@@ -347,11 +541,39 @@ class TestLaneUpgradeSystem(unittest.TestCase):
                 root=root,
                 package_version="lane_package_v0001",
             )
-            manifest = json.loads(Path(result["manifest"]).read_text(encoding="utf-8"))
+            package_dir = root / result["package_dir"]
+            manifest = json.loads((root / result["manifest"]).read_text(encoding="utf-8"))
+            houdini_manifest = json.loads((package_dir / "houdini_manifest.json").read_text(encoding="utf-8"))
+            latest = json.loads((package_dir.parent / "latest.json").read_text(encoding="utf-8"))
+            propagation_report = json.loads((package_dir / "lane_upgrade_propagation_report.json").read_text(encoding="utf-8"))
+            standard_lanes = json.loads((package_dir / "standard_lanes.json").read_text(encoding="utf-8"))
+            package_json_docs = [
+                json.loads(json_path.read_text(encoding="utf-8"))
+                for json_path in package_dir.glob("*.json")
+            ]
 
         self.assertEqual(manifest["contents"]["lane_upgrade_propagation_plan"], "lane_upgrade_propagation_plan.json")
+        self.assertEqual(manifest["metadata"]["path_policy"], "portable_lane_package_paths_v1")
+        self.assertEqual(manifest["metadata"]["qa_gate_status"], "manual_review_required")
+        self.assertEqual(manifest["qa_gate"]["summary"]["manual_review_required"], 1)
+        self.assertEqual(manifest["metadata"]["lane_geometry_rounding_style_id"], "unified_lane_geometry_rounding_style_v1")
+        self.assertEqual(
+            standard_lanes["metadata"]["lane_geometry_rounding_style"]["style_id"],
+            "unified_lane_geometry_rounding_style_v1",
+        )
+        self.assertEqual(houdini_manifest["metadata"]["lane_geometry_rounding_style_id"], "unified_lane_geometry_rounding_style_v1")
+        self.assertEqual(houdini_manifest["metadata"]["qa_gate_status"], "manual_review_required")
+        self.assertEqual(houdini_manifest["inputs"]["standard_lanes"], "standard_lanes.json")
+        self.assertEqual(houdini_manifest["inputs"]["standard_lane_surfaces"], "standard_lane_surfaces.geojson")
+        self.assertEqual(latest["latest_package_dir"], "lane_package_v0001")
+        self.assertEqual(latest["manifest"], "manifest.json")
+        self.assertEqual(latest["qa_gate_status"], "manual_review_required")
+        self.assertEqual(propagation_report["inputs"]["road_graph"], "data/processed/unit_road_graph.json")
         self.assertEqual(manifest["counts"]["lane_upgrade_propagation_candidates"], 1)
         self.assertEqual(manifest["counts"]["lane_upgrade_propagation_high_confidence"], 1)
+        for document in package_json_docs:
+            self.assert_no_drive_paths(document)
+        self.assert_no_drive_paths(latest)
 
     def test_apply_propagation_selects_only_high_confidence_through_pair_by_default(self):
         plan = {

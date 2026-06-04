@@ -290,6 +290,10 @@ def continuity_link_records(lane_graph: dict[str, Any]) -> list[dict[str, Any]]:
     return [dict(link) for link in lane_graph.get("continuity_links", [])]
 
 
+def is_micro_seam_continuity(link: dict[str, Any]) -> bool:
+    return bool(link.get("micro_seam_absorbed"))
+
+
 def junction_lane_link_records(junction: dict[str, Any]) -> list[dict[str, Any]]:
     records = []
     for connection in junction.get("connections", []):
@@ -442,6 +446,8 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
     continuity_links = continuity_link_records(lane_graph)
     metadata = lane_graph.get("metadata", {})
     trim_m = float(metadata.get("junction_trim_m") or DEFAULT_JUNCTION_TRIM_M)
+    smoothing = metadata.get("derived_lane_centerline_smoothing") or {}
+    rounding_style = metadata.get("lane_geometry_rounding_style") or smoothing.get("rounding_style") or {}
     trim_by_lane, corner_trimmed_lanes = lane_trim_distances(lane_graph, lane_links, continuity_links)
 
     counts: Counter = Counter()
@@ -469,6 +475,7 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         width = DEFAULT_LANE_WIDTH_M
         width_start = DEFAULT_LANE_WIDTH_M
         width_end = DEFAULT_LANE_WIDTH_M
+        lane_smoothing = lane.get("derived_centerline_smoothing") or {}
         polygon = ribbon_polygon(trimmed, width)
         if not polygon:
             counts["skipped_lane_surface_polygon"] += 1
@@ -490,6 +497,8 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
                 "road_width_end_m": float(lane.get("road_width_end_m") or lane.get("road_width_m") or DEFAULT_LANE_WIDTH_M),
                 "width_source": "fixed_default",
                 "width_confidence": 0.45,
+                "rounding_style_id": lane_smoothing.get("rounding_style_id", ""),
+                "rounding_curve_family": lane_smoothing.get("curve_family", ""),
                 "trim_start_m": round(trim_start, 3),
                 "trim_end_m": round(trim_end, 3),
                 "length_m": round(polyline_length(trimmed), 3),
@@ -552,6 +561,9 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         area_by_part["lane_turn_surface_v1"] += area
 
     for link in continuity_links:
+        if is_micro_seam_continuity(link):
+            counts["skipped_micro_seam_continuity_surface"] += 1
+            continue
         points = as_points(link.get("connecting_curve_xz") or [])
         if len(points) < 2:
             counts["skipped_empty_continuity_curve"] += 1
@@ -578,6 +590,9 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
                 "to_road": link.get("to_road", ""),
                 "turn": link.get("turn", "corner"),
                 "source": link.get("source", "unknown"),
+                "rounding_style_id": link.get("rounding_style_id", ""),
+                "rounding_curve_family": link.get("rounding_curve_family", ""),
+                "rounding_application": link.get("rounding_application", ""),
                 "width_m": width,
                 "width_start_m": width_start,
                 "width_end_m": width_end,
@@ -596,6 +611,28 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         "junction_trim_m": trim_m,
         "approach_centerlines_trimmed": bool(metadata.get("approach_centerlines_trimmed")),
         "corner_continuity_trimmed_lane_count": len(corner_trimmed_lanes),
+        "lane_geometry_rounding_style_id": str(rounding_style.get("style_id") or smoothing.get("rounding_style_id") or ""),
+        "lane_geometry_rounding_curve_family": str(rounding_style.get("primary_curve_family") or smoothing.get("curve_family") or ""),
+        "derived_lane_centerline_smoothing_policy": str(smoothing.get("policy") or ""),
+        "derived_lane_centerline_smoothed_lanes": int(smoothing.get("smoothed_lane_count") or 0),
+        "derived_lane_centerline_smoothed_bends": int(smoothing.get("smoothed_bend_count") or 0),
+        "derived_lane_centerline_inserted_sample_points": int(smoothing.get("inserted_sample_points") or 0),
+        "derived_lane_centerline_max_derivation_offset_m": round(float(smoothing.get("max_derivation_offset_m") or 0.0), 3),
+        "derived_lane_centerline_smoothing_profile_counts": smoothing.get("profile_counts") or {},
+        "derived_lane_centerline_smoothing_curve_family_counts": smoothing.get("curve_family_counts") or {},
+        "derived_lane_centerline_smoothing_arc_fit_status_counts": smoothing.get("arc_fit_status_counts") or {},
+        "continuity_rounding_style_counts": dict(sorted(Counter(str(link.get("rounding_style_id") or "none") for link in continuity_links).items())),
+        "continuity_rounding_curve_family_counts": dict(sorted(Counter(str(link.get("rounding_curve_family") or "none") for link in continuity_links).items())),
+        "lane_level_radius_regularized_continuity_links": sum(1 for link in continuity_links if bool(link.get("lane_level_radius_regularized"))),
+        "min_optimized_corner_continuity_radius_m": round(min(
+            (
+                float(link.get("lane_level_curve_min_radius_m") or 0.0)
+                for link in continuity_links
+                if str(link.get("source") or "") == "optimized_corner_fillet"
+                and float(link.get("lane_level_curve_min_radius_m") or 0.0) > 0.0
+            ),
+            default=0.0,
+        ), 3),
         "avg_lane_surface_width_m": round(
             sum(float(feature.get("properties", {}).get("width_m", 0.0)) for feature in features if feature.get("properties", {}).get("vc_part") == "lane_surface_v1")
             / max(1, counts["lane_surfaces"]),
@@ -632,6 +669,8 @@ def write_geojson(path: Path, area_id: str, lane_graph: dict[str, Any]) -> dict[
             "schema": "road_test_pipeline.lane_surfaces_v1",
             "coord_domain": "local_xz_m",
             "source": "lane_graph.json",
+            "lane_geometry_rounding_style": (lane_graph.get("metadata") or {}).get("lane_geometry_rounding_style") or {},
+            "derived_lane_centerline_smoothing": (lane_graph.get("metadata") or {}).get("derived_lane_centerline_smoothing") or {},
             "design_note": "First lane-level surface pass with conservative junction envelopes; curbs, islands and markings are deferred.",
         },
         "features": features,

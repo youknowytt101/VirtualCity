@@ -132,13 +132,13 @@
   ],
   "next_action": "Use these staged compound movement corridors（暂存复合通行走廊） for SVG review and collision（碰撞） / swept-envelope（扫掠包络） scoring before any destructive clean skeleton rewrite（写入式干净骨架改写）.",
   "inputs": {
-    "compound_junction_merge_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_candidates.json",
-    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "engineering_reference_lines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
-    "short_edge_absorption_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_short_edge_absorption_candidates.json"
+    "compound_junction_merge_candidates": "data/processed/pattaya_central_500m_compound_junction_merge_candidates.json",
+    "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
+    "engineering_reference_lines": "data/processed/pattaya_central_500m_engineering_reference_lines.json",
+    "short_edge_absorption_candidates": "data/processed/pattaya_central_500m_short_edge_absorption_candidates.json"
   },
   "outputs": {
-    "compound_junction_merge_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
-    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_transaction_report.json"
+    "compound_junction_merge_transactions": "data/processed/pattaya_central_500m_compound_junction_merge_transactions.json",
+    "report": "reports/pattaya_central_500m_compound_junction_merge_transaction_report.json"
   }
 }

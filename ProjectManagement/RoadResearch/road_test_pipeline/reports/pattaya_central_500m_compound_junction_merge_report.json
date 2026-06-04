@@ -518,12 +518,12 @@
   ],
   "next_action": "Use transaction_candidate（事务候选） items to design a compound junction merge transaction（复合路口合并事务）. The transaction must trial-regenerate entry poses（入口姿态）, movement corridors（通行走廊） and QA reports（质检报告） before any clean skeleton（干净道路骨架） rewrite is accepted.",
   "inputs": {
-    "movement_anchor_gap_audit": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_anchor_gap_audit.json",
-    "junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
-    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json"
+    "movement_anchor_gap_audit": "data/processed/pattaya_central_500m_movement_anchor_gap_audit.json",
+    "junction_areas": "data/processed/pattaya_central_500m_junction_areas.json",
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json"
   },
   "outputs": {
-    "compound_junction_merge_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_candidates.json",
-    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_compound_junction_merge_report.json"
+    "compound_junction_merge_candidates": "data/processed/pattaya_central_500m_compound_junction_merge_candidates.json",
+    "report": "reports/pattaya_central_500m_compound_junction_merge_report.json"
   }
 }

@@ -8,7 +8,7 @@
     "application_id": "corner_optimization_application_v0003",
     "policy": "low_risk_degree2_connector_only_v1"
   },
-  "source_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_candidates.json",
+  "source_candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json",
   "selection_policy": {
     "candidate_ids": [
       "corner_0000"
@@ -73,7 +73,7 @@
     ]
   },
   "planned_package_version": "lane_package_v0008",
-  "log": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_corner_optimization_application_v0003.log",
+  "log": "reports/pattaya_central_500m_corner_optimization_application_v0003.log",
   "created_overrides": [
     {
       "enabled": true,
@@ -98,7 +98,7 @@
     }
   ],
   "skipped_existing": [],
-  "active_overrides_path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_overrides.json",
+  "active_overrides_path": "data/processed/pattaya_central_500m_corner_optimization_overrides.json",
   "after_corner_snapshot": {
     "corner_fillets": 1,
     "matched_corner_fillets": [
@@ -397,26 +397,26 @@
       }
     },
     "inputs": {
-      "raw_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
-      "repaired_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
-      "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-      "junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
-      "optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-      "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-      "preview_geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview_surfaces.geojson",
-      "preview_obj": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.obj",
-      "preview_svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.svg",
-      "lane_geometry_debug_geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.geojson",
-      "lane_geometry_debug_obj": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.obj",
-      "lane_geometry_debug_svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.svg",
-      "lane_geometry_debug_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_geometry_debug_report.json",
-      "lane_surface_v1_geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.geojson",
-      "lane_surface_v1_obj": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.obj",
-      "lane_surface_v1_svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.svg",
-      "lane_surface_v1_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_surface_v1_report.json",
-      "topology_qa": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_topology_repair_qa_report.json",
-      "road_graph_qa": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_road_graph_qa_report.json",
-      "lane_graph_qa": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_lane_graph_qa_report.json"
+      "raw_roads": "data/processed/pattaya_central_500m_roads_raw.geojson",
+      "repaired_roads": "data/processed/pattaya_central_500m_roads_repaired.geojson",
+      "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+      "junction_semantics": "data/processed/pattaya_central_500m_junction_semantics.json",
+      "optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+      "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
+      "preview_geojson": "data/preview/pattaya_central_500m_roads_preview_surfaces.geojson",
+      "preview_obj": "data/preview/pattaya_central_500m_roads_preview.obj",
+      "preview_svg": "data/preview/pattaya_central_500m_roads_preview.svg",
+      "lane_geometry_debug_geojson": "data/preview/pattaya_central_500m_lane_geometry_debug.geojson",
+      "lane_geometry_debug_obj": "data/preview/pattaya_central_500m_lane_geometry_debug.obj",
+      "lane_geometry_debug_svg": "data/preview/pattaya_central_500m_lane_geometry_debug.svg",
+      "lane_geometry_debug_report": "reports/pattaya_central_500m_lane_geometry_debug_report.json",
+      "lane_surface_v1_geojson": "data/preview/pattaya_central_500m_lane_surfaces_v1.geojson",
+      "lane_surface_v1_obj": "data/preview/pattaya_central_500m_lane_surfaces_v1.obj",
+      "lane_surface_v1_svg": "data/preview/pattaya_central_500m_lane_surfaces_v1.svg",
+      "lane_surface_v1_report": "reports/pattaya_central_500m_lane_surface_v1_report.json",
+      "topology_qa": "reports/qa/pattaya_central_500m_topology_repair_qa_report.json",
+      "road_graph_qa": "reports/qa/pattaya_central_500m_road_graph_qa_report.json",
+      "lane_graph_qa": "reports/qa/pattaya_central_500m_lane_graph_qa_report.json"
     },
     "next_action": "Use this audit as the automated gate before curb, island, marking and swept-envelope geometry."
   },
@@ -426,13 +426,13 @@
     "schema": "road_upgrade_system.corner_optimization_report.v1",
     "status": "pass",
     "inputs": {
-      "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-      "optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-      "corner_overrides": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_overrides.json"
+      "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+      "optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+      "corner_overrides": "data/processed/pattaya_central_500m_corner_optimization_overrides.json"
     },
     "outputs": {
-      "candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_candidates.json",
-      "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_corner_optimization_report.json"
+      "candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json",
+      "report": "reports/pattaya_central_500m_corner_optimization_report.json"
     },
     "counts": {
       "candidates": 20,
@@ -460,8 +460,8 @@
   "published_package": {
     "area_id": "pattaya_central_500m",
     "package_version": "lane_package_v0008",
-    "package_dir": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\pattaya_central_500m\\lane_package_v0008",
-    "manifest": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\pattaya_central_500m\\lane_package_v0008\\manifest.json",
+    "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0008",
+    "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0008/manifest.json",
     "counts": {
       "lanes": 204,
       "junctions": 49,
@@ -585,19 +585,19 @@
     "compound_link_source": "compound_junction_merge_transactions",
     "note": "SVG visualization（可视化） only. lane_graph.json, movement_corridor_candidates.json and compound_junction_merge_transactions.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
     "inputs": {
-      "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-      "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-      "compound_junction_merge_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
-      "raw_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
-      "repaired_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
-      "canonical_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
-      "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-      "raw_topology_diagnostics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_raw_topology_diagnostics.json",
-      "corner_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_candidates.json"
+      "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
+      "movement_corridors": "data/processed/pattaya_central_500m_movement_corridor_candidates.json",
+      "compound_junction_merge_transactions": "data/processed/pattaya_central_500m_compound_junction_merge_transactions.json",
+      "raw_roads": "data/processed/pattaya_central_500m_roads_raw.geojson",
+      "repaired_roads": "data/processed/pattaya_central_500m_roads_repaired.geojson",
+      "canonical_roads": "data/processed/pattaya_central_500m_roads_canonical.geojson",
+      "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+      "raw_topology_diagnostics": "data/processed/pattaya_central_500m_raw_topology_diagnostics.json",
+      "corner_candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json"
     },
     "outputs": {
-      "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",
-      "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_svg_report.json"
+      "svg": "reports/visualizations/pattaya_central_500m_lane_graph_topology.svg",
+      "report": "reports/pattaya_central_500m_lane_graph_svg_report.json"
     }
   }
 }

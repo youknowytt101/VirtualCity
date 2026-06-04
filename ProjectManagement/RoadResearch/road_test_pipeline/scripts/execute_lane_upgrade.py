@@ -23,10 +23,89 @@ from typing import Any
 
 
 EXECUTION_SCHEMA = "lane_upgrade_system.execution.v1"
+PATH_POLICY = "pipeline_root_relative_paths_v1"
 
 
 def pipeline_root_from_script(script_path: Path) -> Path:
     return script_path.resolve().parents[1]
+
+
+def rel(path: Path, root: Path) -> str:
+    try:
+        return str(path.relative_to(root)).replace("\\", "/")
+    except ValueError:
+        return str(path)
+
+
+def is_windows_absolute_path(value: str) -> bool:
+    return bool(re.match(r"^[A-Za-z]:[\\/]", value)) or value.startswith("\\\\")
+
+
+def rebase_legacy_root_path(path: Path, root: Path) -> Path | None:
+    raw_parts = re.split(r"[\\/]+", str(path))
+    parts = [part for part in raw_parts if part and not re.match(r"^[A-Za-z]:$", part)]
+    root_name = root.name.lower()
+    for index, part in enumerate(parts):
+        if str(part).lower() != root_name:
+            continue
+        return root.joinpath(*parts[index + 1 :])
+    return None
+
+
+def resolve_artifact_path(value: str, root: Path) -> Path | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    path = Path(text)
+    candidates: list[Path] = []
+    if path.is_absolute() or is_windows_absolute_path(text):
+        candidates.append(path)
+        rebased = rebase_legacy_root_path(path, root)
+        if rebased is not None:
+            candidates.append(rebased)
+    else:
+        candidates.append(root / path)
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[-1] if candidates else None
+
+
+def portable_path_string(value: str, root: Path) -> str:
+    text = str(value)
+    if not is_windows_absolute_path(text) and not Path(text).is_absolute():
+        return text
+    candidate = resolve_artifact_path(text, root)
+    if candidate is None:
+        return text
+    try:
+        return str(candidate.resolve().relative_to(root.resolve())).replace("\\", "/")
+    except ValueError:
+        return text
+
+
+def portable_json_paths(value: Any, *, root: Path) -> Any:
+    if isinstance(value, dict):
+        return {key: portable_json_paths(item, root=root) for key, item in value.items()}
+    if isinstance(value, list):
+        return [portable_json_paths(item, root=root) for item in value]
+    if isinstance(value, str):
+        return portable_path_string(value, root)
+    return value
+
+
+def portable_command(cmd: list[str], root: Path) -> list[str]:
+    portable: list[str] = []
+    for index, item in enumerate(cmd):
+        text = str(item)
+        path = Path(text)
+        if index == 0 and path.name.lower() in {"python", "python.exe", "hython", "hython.exe"}:
+            portable.append(path.stem.lower())
+        elif path.is_absolute():
+            portable.append(rel(path, root))
+        else:
+            portable.append(text)
+    return portable
 
 
 def python_cmd() -> str:
@@ -181,6 +260,7 @@ def execute_upgrade(
             "schema": EXECUTION_SCHEMA,
             "system": "LaneForge",
             "execution_id": execution_id,
+            "path_policy": PATH_POLICY,
             "created_at_local": time.strftime("%Y-%m-%dT%H:%M:%S"),
         },
         "request": {
@@ -194,23 +274,24 @@ def execute_upgrade(
         },
         "planned_outputs": {
             "package_version": package_version,
-            "package_manifest": str(root / "data" / "lane_upgrade_packages" / area_id / package_version / "manifest.json"),
-            "propagation_report": str(root / "reports" / f"{area_id}_lane_upgrade_propagation_report.json"),
-            "svg": str(root / "reports" / "visualizations" / f"{area_id}_lane_graph_topology.svg"),
-            "execution_report": str(execution_path),
-            "log": str(log_path),
+            "package_manifest": rel(root / "data" / "lane_upgrade_packages" / area_id / package_version / "manifest.json", root),
+            "propagation_report": rel(root / "reports" / f"{area_id}_lane_upgrade_propagation_report.json", root),
+            "svg": rel(root / "reports" / "visualizations" / f"{area_id}_lane_graph_topology.svg", root),
+            "execution_report": rel(execution_path, root),
+            "log": rel(log_path, root),
         },
         "commands": {
-            "create_transaction": transaction_cmd,
-            "rebuild": rebuild_cmd,
-            "plan_propagation": propagation_cmd,
-            "publish_package": package_cmd,
-            "export_svg": svg_cmd,
+            "create_transaction": portable_command(transaction_cmd, root),
+            "rebuild": portable_command(rebuild_cmd, root),
+            "plan_propagation": portable_command(propagation_cmd, root),
+            "publish_package": portable_command(package_cmd, root),
+            "export_svg": portable_command(svg_cmd, root),
         },
         "status": "dry_run" if dry_run else "running",
     }
 
     if dry_run:
+        execution = portable_json_paths(execution, root=root)
         write_json(execution_path, execution)
         return execution
 
@@ -229,12 +310,13 @@ def execute_upgrade(
     execution.update({
         "status": "completed",
         "transaction": transaction_summary,
-        "rebuild_report": str(rebuild_report_path),
+        "rebuild_report": rel(rebuild_report_path, root),
         "pipeline_audit": read_json(audit_report_path) if audit_report_path.exists() else {},
         "propagation_report": propagation_summary,
         "published_package": package_summary,
         "svg_report": read_json(svg_report_path) if svg_report_path.exists() else {},
     })
+    execution = portable_json_paths(execution, root=root)
     write_json(execution_path, execution)
     return execution
 

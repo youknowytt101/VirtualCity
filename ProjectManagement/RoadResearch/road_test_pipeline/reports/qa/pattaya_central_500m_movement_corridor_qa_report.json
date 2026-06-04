@@ -142,9 +142,9 @@
     }
   },
   "inputs": {
-    "movement_corridor_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-    "movement_corridor_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_movement_corridor_report.json",
-    "rules": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+    "movement_corridor_candidates": "data/processed/pattaya_central_500m_movement_corridor_candidates.json",
+    "movement_corridor_report": "reports/pattaya_central_500m_movement_corridor_report.json",
+    "rules": "qa/qa_rules.json"
   },
   "next_action": "Add collision（碰撞） and swept envelope（扫掠包络） scoring, then run only transaction-ready（事务就绪） destructive transactions（写入式事务）."
 }

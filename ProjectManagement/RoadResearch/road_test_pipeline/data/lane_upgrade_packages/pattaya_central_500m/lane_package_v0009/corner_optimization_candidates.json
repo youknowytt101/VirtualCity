@@ -4,9 +4,9 @@
     "area_id": "pattaya_central_500m",
     "schema": "road_upgrade_system.corner_optimization_candidates.v1",
     "policy": "proposal_only_no_geometry_mutation",
-    "source_road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "source_optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
-    "source_corner_overrides": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_overrides.json"
+    "source_road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+    "source_optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "source_corner_overrides": "data/processed/pattaya_central_500m_corner_optimization_overrides.json"
   },
   "candidates": [
     {

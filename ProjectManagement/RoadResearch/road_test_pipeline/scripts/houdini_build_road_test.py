@@ -59,6 +59,96 @@ def load_geojson_stats(path: Path) -> dict[str, Any]:
     }
 
 
+def resolve_package_path(value: str, package_dir: Path) -> Path:
+    path = Path(str(value or ""))
+    if not path.is_absolute():
+        path = package_dir / path
+    resolved = path.resolve()
+    package_root = package_dir.resolve()
+    try:
+        resolved.relative_to(package_root)
+    except ValueError as exc:
+        raise ValueError(f"Houdini package input escapes package dir: {resolved}") from exc
+    return resolved
+
+
+def resolve_latest_houdini_package(root: Path, area_id: str) -> dict[str, Any]:
+    latest_path = root / "data" / "lane_upgrade_packages" / area_id / "latest.json"
+    if not latest_path.exists():
+        raise FileNotFoundError(f"Missing LaneForge latest package pointer: {latest_path}")
+    latest = read_json(latest_path)
+    package_dir = Path(str(latest.get("latest_package_dir") or ""))
+    if not package_dir.is_absolute():
+        package_dir = latest_path.parent / package_dir
+    package_dir = package_dir.resolve()
+
+    package_manifest_path = Path(str(latest.get("manifest") or ""))
+    if not package_manifest_path.is_absolute():
+        package_manifest_path = package_dir / (str(latest.get("manifest") or "manifest.json"))
+    package_manifest_path = package_manifest_path.resolve()
+    try:
+        package_manifest_path.relative_to(package_dir)
+    except ValueError as exc:
+        raise ValueError(f"LaneForge latest manifest escapes package dir: {package_manifest_path}") from exc
+    package_manifest = read_json(package_manifest_path)
+    contents = package_manifest.get("contents") or {}
+
+    houdini_manifest_path = resolve_package_path(str(contents.get("houdini_manifest") or "houdini_manifest.json"), package_dir)
+    houdini_manifest = read_json(houdini_manifest_path)
+    inputs = houdini_manifest.get("inputs") or {}
+    required_inputs = {
+        "standard_lanes": "standard_lanes_path",
+        "standard_junctions": "standard_junctions_path",
+        "standard_lane_surfaces": "standard_lane_surfaces_path",
+        "standard_lane_surfaces_obj": "standard_lane_surfaces_obj_path",
+    }
+    resolved_inputs: dict[str, Path] = {}
+    missing_keys = [key for key in required_inputs if not inputs.get(key)]
+    if missing_keys:
+        raise KeyError(f"Houdini manifest missing required inputs: {missing_keys}")
+    for input_key, result_key in required_inputs.items():
+        input_path = resolve_package_path(str(inputs.get(input_key)), package_dir)
+        if not input_path.exists():
+            raise FileNotFoundError(f"Missing Houdini package input {input_key}: {input_path}")
+        resolved_inputs[result_key] = input_path
+
+    return {
+        "mode": "lane_upgrade_package_houdini_manifest",
+        "area_id": area_id,
+        "package_version": str((houdini_manifest.get("metadata") or package_manifest.get("metadata") or {}).get("package_version") or ""),
+        "latest_path": latest_path,
+        "package_dir": package_dir,
+        "package_manifest_path": package_manifest_path,
+        "houdini_manifest_path": houdini_manifest_path,
+        "package_manifest": package_manifest,
+        "houdini_manifest": houdini_manifest,
+        **resolved_inputs,
+    }
+
+
+def load_standard_lane_package_stats(standard_lanes_path: Path, standard_junctions_path: Path, standard_surface_path: Path) -> dict[str, Any]:
+    standard_lanes = read_json(standard_lanes_path)
+    standard_junctions = read_json(standard_junctions_path)
+    standard_surfaces = read_json(standard_surface_path)
+    lanes = standard_lanes.get("lanes", [])
+    road_ids = {str(lane.get("road_id") or "") for lane in lanes if lane.get("road_id")}
+    directions: dict[str, int] = {}
+    for lane in lanes:
+        direction = str(lane.get("direction") or "unknown")
+        directions[direction] = directions.get(direction, 0) + 1
+    return {
+        "feature_count": len(lanes),
+        "highway_counts": {"standard_lane": len(lanes)},
+        "features_with_lanes": len(lanes),
+        "features_with_oneway": 0,
+        "standard_lane_count": len(lanes),
+        "standard_road_count": len(road_ids),
+        "standard_junction_count": len(standard_junctions.get("junctions", [])),
+        "standard_surface_count": len(standard_surfaces.get("features", [])),
+        "lane_direction_counts": dict(sorted(directions.items())),
+    }
+
+
 def python_import_code(geojson_path: Path, origin_lon: float, origin_lat: float) -> str:
     return f'''import json
 import math
@@ -205,6 +295,73 @@ for i, feat in enumerate(fc.get("features", [])):
     poly.setAttribValue("arc_radius_margin_m", float(props.get("arc_radius_margin_m") or 0.0))
     road_group.add(poly)
 '''
+
+
+def python_import_standard_lanes_code(standard_lanes_path: Path) -> str:
+    template = r'''import json
+import hou
+
+STANDARD_LANES_PATH = __STANDARD_LANES_PATH__
+
+node = hou.pwd()
+geo = node.geometry()
+geo.clear()
+
+geo.addAttrib(hou.attribType.Prim, "source_provider", "")
+geo.addAttrib(hou.attribType.Prim, "source_feature_id", "")
+geo.addAttrib(hou.attribType.Prim, "highway", "")
+geo.addAttrib(hou.attribType.Prim, "name", "")
+geo.addAttrib(hou.attribType.Prim, "lanes", 0)
+geo.addAttrib(hou.attribType.Prim, "osm_width", 0.0)
+geo.addAttrib(hou.attribType.Prim, "half_width", 0.0)
+geo.addAttrib(hou.attribType.Prim, "oneway", 0)
+geo.addAttrib(hou.attribType.Prim, "seg_id", -1)
+geo.addAttrib(hou.attribType.Prim, "vc_part", "")
+geo.addAttrib(hou.attribType.Prim, "lane_id", "")
+geo.addAttrib(hou.attribType.Prim, "road_id", "")
+geo.addAttrib(hou.attribType.Prim, "direction", "")
+geo.addAttrib(hou.attribType.Prim, "lane_width_m", 0.0)
+geo.addAttrib(hou.attribType.Prim, "road_width_m", 0.0)
+
+road_group = geo.createPrimGroup("roads_centerline")
+lane_group = geo.createPrimGroup("standard_lane_centerline")
+
+with open(STANDARD_LANES_PATH, encoding="utf-8") as f:
+    standard_lanes = json.load(f)
+
+for index, lane in enumerate(standard_lanes.get("lanes", [])):
+    coords = lane.get("centerline_xz") or []
+    if len(coords) < 2:
+        continue
+    lane_id = str(lane.get("lane_id") or "")
+    road_id = str(lane.get("road_id") or "")
+    width = float(lane.get("width_m") or 3.2)
+
+    poly = geo.createPolygon(is_closed=False)
+    for x, z in coords:
+        pt = geo.createPoint()
+        pt.setPosition(hou.Vector3(float(x), 0.0, -float(z)))
+        poly.addVertex(pt)
+
+    poly.setAttribValue("source_provider", "LaneForge")
+    poly.setAttribValue("source_feature_id", lane_id)
+    poly.setAttribValue("highway", "standard_lane")
+    poly.setAttribValue("name", lane_id)
+    poly.setAttribValue("lanes", 1)
+    poly.setAttribValue("osm_width", width)
+    poly.setAttribValue("half_width", width * 0.5)
+    poly.setAttribValue("oneway", 1)
+    poly.setAttribValue("seg_id", index)
+    poly.setAttribValue("vc_part", "standard_lane_centerline")
+    poly.setAttribValue("lane_id", lane_id)
+    poly.setAttribValue("road_id", road_id)
+    poly.setAttribValue("direction", str(lane.get("direction") or ""))
+    poly.setAttribValue("lane_width_m", width)
+    poly.setAttribValue("road_width_m", float(lane.get("road_width_m") or width))
+    road_group.add(poly)
+    lane_group.add(poly)
+'''
+    return template.replace("__STANDARD_LANES_PATH__", json.dumps(str(standard_lanes_path).replace("\\", "/")))
 
 
 def python_surface_code() -> str:
@@ -568,6 +725,9 @@ geo.addAttrib(hou.attribType.Prim, "seg_id", -1)
 geo.addAttrib(hou.attribType.Prim, "is_junction", 0)
 geo.addAttrib(hou.attribType.Prim, "vc_part", "")
 geo.addAttrib(hou.attribType.Prim, "width", 0.35)
+geo.addAttrib(hou.attribType.Prim, "lane_id", "")
+geo.addAttrib(hou.attribType.Prim, "road_id", "")
+geo.addAttrib(hou.attribType.Prim, "direction", "")
 
 centerline_group = geo.createPrimGroup("road_centerline")
 CENTERLINE_Y = 0.12
@@ -608,16 +768,26 @@ for prim in src.prims():
     line.setAttribValue("is_junction", 0)
     line.setAttribValue("vc_part", "road_centerline")
     line.setAttribValue("width", 0.35)
+    line.setAttribValue("lane_id", str(prim_attr(prim, "lane_id", "")))
+    line.setAttribValue("road_id", str(prim_attr(prim, "road_id", "")))
+    line.setAttribValue("direction", str(prim_attr(prim, "direction", "")))
     centerline_group.add(line)
 '''
 
 
-def python_lane_debug_code(lane_graph_path: Path) -> str:
+def python_lane_debug_code(
+    lane_graph_path: Path | None = None,
+    *,
+    standard_lanes_path: Path | None = None,
+    standard_junctions_path: Path | None = None,
+) -> str:
     template = r'''import hou
 import json
 import math
 
 LANE_GRAPH_PATH = __LANE_GRAPH_PATH__
+STANDARD_LANES_PATH = __STANDARD_LANES_PATH__
+STANDARD_JUNCTIONS_PATH = __STANDARD_JUNCTIONS_PATH__
 LANE_RIBBON_WIDTH_M = 0.7
 LANE_LINK_RIBBON_WIDTH_M = 1.0
 LANE_LINE_Y = 0.18
@@ -864,8 +1034,20 @@ def add_ribbon(points, width, part, debug_id, y, group, turn="", from_lane="", t
     return prim
 
 
-with open(LANE_GRAPH_PATH, encoding="utf-8") as f:
-    lane_graph = json.load(f)
+if LANE_GRAPH_PATH:
+    with open(LANE_GRAPH_PATH, encoding="utf-8") as f:
+        lane_graph = json.load(f)
+else:
+    with open(STANDARD_LANES_PATH, encoding="utf-8") as f:
+        standard_lanes = json.load(f)
+    with open(STANDARD_JUNCTIONS_PATH, encoding="utf-8") as f:
+        standard_junctions = json.load(f)
+    lane_graph = {
+        "metadata": standard_lanes.get("metadata") or {},
+        "lanes": standard_lanes.get("lanes", []),
+        "continuity_links": standard_lanes.get("continuity_links", []),
+        "junctions": standard_junctions.get("junctions", []),
+    }
 
 lane_links = lane_link_records(lane_graph)
 continuity_links = [dict(link) for link in lane_graph.get("continuity_links", [])]
@@ -899,7 +1081,16 @@ for link in lane_graph.get("continuity_links", []):
     add_line(points, "lane_continuity_debug_curve", continuity_link_id, LANE_LINK_LINE_Y, LANE_LINK_RIBBON_WIDTH_M, continuity_line_group, turn, from_lane, to_lane, confidence)
     add_ribbon(points, LANE_LINK_RIBBON_WIDTH_M, "lane_continuity_debug_ribbon", continuity_link_id, RIBBON_Y + 0.02, continuity_ribbon_group, turn, from_lane, to_lane, confidence)
 '''
-    return template.replace("__LANE_GRAPH_PATH__", json.dumps(str(lane_graph_path).replace("\\", "/")))
+    if lane_graph_path is None and (standard_lanes_path is None or standard_junctions_path is None):
+        raise ValueError("python_lane_debug_code requires lane_graph_path or standard package lane/junction paths")
+    replacements = {
+        "__LANE_GRAPH_PATH__": json.dumps(str(lane_graph_path).replace("\\", "/")) if lane_graph_path is not None else "None",
+        "__STANDARD_LANES_PATH__": json.dumps(str(standard_lanes_path).replace("\\", "/")) if standard_lanes_path is not None else "None",
+        "__STANDARD_JUNCTIONS_PATH__": json.dumps(str(standard_junctions_path).replace("\\", "/")) if standard_junctions_path is not None else "None",
+    }
+    for token, value in replacements.items():
+        template = template.replace(token, value)
+    return template
 
 
 def python_lane_surface_import_code(surface_geojson_path: Path) -> str:
@@ -1031,16 +1222,10 @@ def create_or_get(parent: hou.Node, node_type: str, name: str) -> hou.Node:
 def build_scene(root: Path, config_path: Path) -> dict[str, Any]:
     cfg = read_json(config_path)
     area_id = cfg["area_id"]
-    center = cfg["center"]
-
-    optimized_geojson_path = root / "data" / "processed" / f"{area_id}_roads_optimized_centerlines.geojson"
-    repaired_geojson_path = root / "data" / "processed" / f"{area_id}_roads_repaired.geojson"
-    raw_geojson_path = root / "data" / "processed" / f"{area_id}_roads_raw.geojson"
-    lane_graph_path = root / "data" / "processed" / f"{area_id}_lane_graph.json"
-    lane_surface_geojson_path = root / "data" / "preview" / f"{area_id}_lane_surfaces_v1.geojson"
-    geojson_path = optimized_geojson_path if optimized_geojson_path.exists() else repaired_geojson_path if repaired_geojson_path.exists() else raw_geojson_path
-    if not geojson_path.exists():
-        raise FileNotFoundError(f"Missing road sample GeoJSON: {geojson_path}")
+    package_inputs = resolve_latest_houdini_package(root, area_id)
+    standard_lanes_path = package_inputs["standard_lanes_path"]
+    standard_junctions_path = package_inputs["standard_junctions_path"]
+    lane_surface_geojson_path = package_inputs["standard_lane_surfaces_path"]
 
     hip_dir = ensure_dir(root / "houdini")
     report_dir = ensure_dir(root / "reports")
@@ -1055,14 +1240,8 @@ def build_scene(root: Path, config_path: Path) -> dict[str, Any]:
     geo = obj.createNode("geo", node_name=f"road_test_{area_id}")
     clear_children(geo)
 
-    import_node = create_or_get(geo, "python", "python_import_roads_geojson")
-    import_node.parm("python").set(
-        python_import_code(
-            geojson_path=geojson_path,
-            origin_lon=float(center["lon"]),
-            origin_lat=float(center["lat"]),
-        )
-    )
+    import_node = create_or_get(geo, "python", "python_import_standard_lanes")
+    import_node.parm("python").set(python_import_standard_lanes_code(standard_lanes_path))
     import_node.setDisplayFlag(False)
 
     center_null = create_or_get(geo, "null", "OUT_centerlines")
@@ -1081,16 +1260,20 @@ def build_scene(root: Path, config_path: Path) -> dict[str, Any]:
 
     lane_debug_node = None
     lane_debug_out = None
-    if lane_graph_path.exists():
-        lane_debug_node = create_or_get(geo, "python", "python_lane_geometry_debug")
-        lane_debug_node.parm("python").set(python_lane_debug_code(lane_graph_path))
-        lane_debug_node.setDisplayFlag(False)
-        lane_debug_node.setRenderFlag(False)
+    lane_debug_node = create_or_get(geo, "python", "python_lane_geometry_debug")
+    lane_debug_node.parm("python").set(
+        python_lane_debug_code(
+            standard_lanes_path=standard_lanes_path,
+            standard_junctions_path=standard_junctions_path,
+        )
+    )
+    lane_debug_node.setDisplayFlag(False)
+    lane_debug_node.setRenderFlag(False)
 
-        lane_debug_out = create_or_get(geo, "null", "OUT_lane_connections_debug")
-        lane_debug_out.setInput(0, lane_debug_node)
-        lane_debug_out.setDisplayFlag(False)
-        lane_debug_out.setRenderFlag(False)
+    lane_debug_out = create_or_get(geo, "null", "OUT_lane_connections_debug")
+    lane_debug_out.setInput(0, lane_debug_node)
+    lane_debug_out.setDisplayFlag(False)
+    lane_debug_out.setRenderFlag(False)
 
     lane_surface_node = None
     lane_surface_out = None
@@ -1109,7 +1292,8 @@ def build_scene(root: Path, config_path: Path) -> dict[str, Any]:
     note.setText(
         "Isolated road_test_pipeline cook\\n"
         f"Area: {area_id}\\n"
-        "Input: data/processed/*_roads_optimized_centerlines.geojson\\n"
+        f"Package: {package_inputs['package_version']}\\n"
+        "Input: lane_upgrade_packages/latest -> houdini_manifest.json\\n"
         "Output: OUT_roads_centerlines\\n"
         "Debug: OUT_lane_connections_debug\\n"
         "Surface: OUT_lane_surfaces_v1\\n"
@@ -1127,7 +1311,7 @@ def build_scene(root: Path, config_path: Path) -> dict[str, Any]:
     for node in cook_nodes:
         node.cook(force=True)
 
-    stats = load_geojson_stats(geojson_path)
+    stats = load_standard_lane_package_stats(standard_lanes_path, standard_junctions_path, lane_surface_geojson_path)
     center_geo = center_null.geometry()
     out_geo = out_node.geometry()
     lane_debug_geo = lane_debug_out.geometry() if lane_debug_out is not None else None
@@ -1136,12 +1320,25 @@ def build_scene(root: Path, config_path: Path) -> dict[str, Any]:
         "area_id": area_id,
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
         "hip_path": str(hip_path),
-        "geojson_path": str(geojson_path),
-        "geojson_mode": "optimized_centerlines" if geojson_path == optimized_geojson_path else "repaired" if geojson_path == repaired_geojson_path else "raw",
+        "input_mode": package_inputs["mode"],
+        "package_version": package_inputs["package_version"],
+        "package_dir": str(package_inputs["package_dir"]),
+        "package_manifest": str(package_inputs["package_manifest_path"]),
+        "houdini_manifest": str(package_inputs["houdini_manifest_path"]),
+        "standard_lanes": str(standard_lanes_path),
+        "standard_junctions": str(standard_junctions_path),
+        "standard_lane_surfaces": str(lane_surface_geojson_path),
         "input_features": stats["feature_count"],
         "input_highway_counts": stats["highway_counts"],
         "input_features_with_lanes": stats["features_with_lanes"],
         "input_features_with_oneway": stats["features_with_oneway"],
+        "package_counts": {
+            "standard_lanes": stats["standard_lane_count"],
+            "standard_roads": stats["standard_road_count"],
+            "standard_junctions": stats["standard_junction_count"],
+            "standard_surface_features": stats["standard_surface_count"],
+            "lane_direction_counts": stats["lane_direction_counts"],
+        },
         "houdini": {
             "centerline_prims": len(center_geo.prims()),
             "preview_output_prims": len(out_geo.prims()),
@@ -1156,10 +1353,10 @@ def build_scene(root: Path, config_path: Path) -> dict[str, Any]:
             "lane_surface_node": lane_surface_out.path() if lane_surface_out is not None else "",
         },
         "notes": [
-            "Centerline-only mode removes road surfaces, junction fan polygons and debug junction point primitives.",
-            "The displayed output contains the optimized centerline skeleton used for road-width extrusion experiments.",
+            "Houdini cook is manifest-driven and reads only the latest LaneForge package outputs.",
+            "The displayed output contains standard lane centerlines from standard_lanes.json.",
             "Lane-level debug geometry is available on OUT_lane_connections_debug but is not the display node.",
-            "Lane surface v1 geometry is available on OUT_lane_surfaces_v1 but is not the display node.",
+            "Lane surface geometry is imported from standard_lane_surfaces.geojson and is available on OUT_lane_surfaces_v1.",
         ],
     }
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

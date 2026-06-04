@@ -66,8 +66,10 @@ plan_corner_optimization.py
 
 apply_corner_optimization.py
   受控应用转角候选。
-  当前已实现 policy：low_risk_degree2_connector_only_v1。
-  下一步应新增 internal_centerline_bend 的独立 policy。
+  当前已实现 policy：low_risk_degree2_connector_only_v1、
+  low_risk_internal_centerline_bend_smoothing_v1。
+  轻微视觉折线不应强行进入 corner optimization；下一步应在派生
+  lane centerline / lane surface 层实现 derived_lane_centerline_smoothing_v1。
 ```
 
 ## 底层阶段脚本
@@ -125,7 +127,7 @@ Houdini 应读取 `lane_package_vXXXX/houdini_manifest.json`，不要从内部�
 代码变更的常用 focused tests：
 
 ```powershell
-pytest D:\VirtualCity\tests\test_corner_optimization.py D:\VirtualCity\tests\test_lane_upgrade_system.py D:\VirtualCity\tests\test_lane_model_builder.py D:\VirtualCity\tests\test_lane_surface_v1.py D:\VirtualCity\tests\test_canonical_roads.py
+pytest E:\VirtualCity\tests\test_corner_optimization.py E:\VirtualCity\tests\test_lane_upgrade_system.py E:\VirtualCity\tests\test_lane_model_builder.py E:\VirtualCity\tests\test_lane_surface_v1.py E:\VirtualCity\tests\test_canonical_roads.py
 ```
 
 改核心管线后重建：

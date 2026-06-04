@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>VirtualCity Road SVG Viewer</title>
+  <title>VirtualCity Road SVG Viewer（道路 SVG 查看器）</title>
   <style>
     :root {
       color-scheme: light;
@@ -57,7 +57,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      min-width: 182px;
+      min-width: 204px;
       font-size: 14px;
       font-weight: 650;
       color: var(--ink);
@@ -461,11 +461,14 @@
 
     .map-inspector {
       position: absolute;
+      left: auto;
       right: 12px;
       top: 12px;
+      bottom: 12px;
       width: min(390px, calc(100% - 24px));
-      max-height: calc(100% - 24px);
+      max-height: none;
       display: none;
+      flex-direction: column;
       border: 1px solid rgba(213, 220, 229, 0.86);
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.86);
@@ -480,7 +483,7 @@
     }
 
     .map-inspector.visible {
-      display: block;
+      display: flex;
     }
 
     .inspector-head {
@@ -488,6 +491,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
+      flex: 0 0 auto;
       padding: 10px 12px 8px;
       border-bottom: 1px solid rgba(213, 220, 229, 0.66);
       background: rgba(247, 249, 252, 0.78);
@@ -528,7 +532,9 @@
       display: grid;
       grid-template-columns: 112px minmax(0, 1fr);
       gap: 0;
-      max-height: min(48vh, 430px);
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
       overflow: auto;
       padding: 8px 0;
       font-size: 11px;
@@ -809,7 +815,7 @@
   <header class="toolbar">
     <div class="brand">
       <span class="brand-mark" aria-hidden="true"></span>
-      <span>Road SVG</span>
+      <span>LaneForge（道路升级系统）</span>
     </div>
     <div class="divider" aria-hidden="true"></div>
     <div class="button-group" aria-label="视图控制">
@@ -819,33 +825,33 @@
       <button id="actualBtn" title="原始比例" aria-label="原始比例">1:1</button>
       <button id="reloadBtn" title="重新加载" aria-label="重新加载">R</button>
     </div>
-    <label class="toggle" title="自动刷新">
+    <label class="toggle" title="Auto refresh（自动刷新）">
       <input id="autoRefresh" type="checkbox" checked>
-      <span>Auto</span>
+      <span>Auto（自动）</span>
     </label>
-    <label class="toggle" title="显示原始道路数据线">
+    <label class="toggle" title="Raw roads（显示原始道路数据线）">
       <input id="rawRoadsToggle" type="checkbox">
-      <span>Raw</span>
+      <span>Raw（原始）</span>
     </label>
-    <label class="toggle" title="Show topology-repaired roads">
+    <label class="toggle" title="Repaired roads（显示拓扑修复道路）">
       <input id="repairedRoadsToggle" type="checkbox">
-      <span>Repaired</span>
+      <span>Repaired（修复）</span>
     </label>
-    <label class="toggle" title="Show canonical roads">
+    <label class="toggle" title="Canonical roads（显示标准道路）">
       <input id="canonicalRoadsToggle" type="checkbox" checked>
-      <span>Canonical</span>
+      <span>Canonical（标准）</span>
     </label>
-    <label class="toggle" title="Show corner optimization candidates">
+    <label class="toggle" title="Corner candidates（显示转角优化候选）">
       <input id="cornerCandidatesToggle" type="checkbox" checked>
-      <span>Corners</span>
+      <span>Corners（转角）</span>
     </label>
-    <label class="field" title="刷新间隔">
-      <span>ms</span>
+    <label class="field" title="Refresh interval（刷新间隔）">
+      <span>ms（毫秒）</span>
       <input id="intervalInput" type="number" min="500" step="500" value="1500">
     </label>
     <div class="status" aria-live="polite">
       <span id="statusDot" class="status-dot"></span>
-      <span id="statusText" class="status-text">loading</span>
+      <span id="statusText" class="status-text">loading（加载中）</span>
     </div>
   </header>
   <main id="viewport" class="viewport">
@@ -854,30 +860,29 @@
       <div class="map-info-head">
         <div class="map-info-title-wrap">
           <span class="map-info-token" aria-hidden="true"></span>
-          <div id="mapInfoTitle" class="map-info-title">Road lane graph</div>
+          <div id="mapInfoTitle" class="map-info-title">Road lane graph（车道拓扑图）</div>
         </div>
-        <span class="map-info-badge">Vector</span>
+        <span class="map-info-badge">Vector（矢量）</span>
       </div>
       <div id="mapInfoMeta" class="map-info-meta">
-        <span>SVG visual layer</span>
-        <span>JSON source truth</span>
-        <span>movement_corridor_anchors</span>
+        <span>SVG visual layer（SVG 可视图层）</span>
+        <span>JSON source truth（JSON 数据真值）</span>
+        <span>movement_corridor_anchors（通行走廊锚点）</span>
       </div>
       <div class="legend-grid">
         <div class="legend-item" style="color:#0f766e"><span class="legend-line"></span><span>forward lane（正向车道）</span></div>
         <div class="legend-item" style="color:#6d28d9"><span class="legend-line"></span><span>backward lane（反向车道）</span></div>
         <div class="legend-item" style="color:#f97316"><span class="legend-line"></span><span>turn corridor（转向走廊）</span></div>
         <div class="legend-item" style="color:#0ea5e9"><span class="legend-line"></span><span>through corridor（直行走廊）</span></div>
-        <div class="legend-item" style="color:#ec4899"><span class="legend-line dashed"></span><span>compound trial（复合试运行）</span></div>
         <div class="legend-item" style="color:#334155"><span class="legend-dot"></span><span>entry / exit anchors（入口 / 出口锚点）</span></div>
         <div class="legend-item" style="color:#000000"><span class="legend-line"></span><span>raw roads（原始道路）</span></div>
         <div class="legend-item" style="color:#000000"><span class="legend-dot" style="background:#000000;border-color:#ffffff;box-shadow:0 0 0 1px #000000"></span><span>raw vertices（原始全部断点）</span></div>
         <div class="legend-item" style="color:#ef4444"><span class="legend-dot" style="background:#ef4444;border-color:#ffffff;box-shadow:0 0 0 1px #ef4444"></span><span>topology issues（拓扑问题）</span></div>
-        <div class="legend-item" style="color:#2563eb"><span class="legend-line dashed"></span><span>repaired roads</span></div>
-        <div class="legend-item" style="color:#e11d48"><span class="legend-line"></span><span>canonical roads</span></div>
+        <div class="legend-item" style="color:#2563eb"><span class="legend-line dashed"></span><span>repaired roads（修复道路）</span></div>
+        <div class="legend-item" style="color:#e11d48"><span class="legend-line"></span><span>canonical roads（标准道路）</span></div>
       </div>
     </section>
-    <section id="mapInspector" class="map-inspector" aria-label="SVG inspection panel">
+    <section id="mapInspector" class="map-inspector" aria-label="SVG inspection panel（SVG 检查面板）">
       <div class="inspector-head">
         <div class="inspector-title-wrap">
           <div id="inspectorKicker" class="inspector-kicker">Inspector（检查器）</div>
@@ -887,7 +892,7 @@
       </div>
       <div id="inspectorBody" class="inspector-body"></div>
     </section>
-    <div id="emptyState" class="empty-state">SVG unavailable</div>
+    <div id="emptyState" class="empty-state">SVG unavailable（SVG 不可用）</div>
     <div id="scaleReadout" class="scale-readout">100%</div>
   </main>
 
@@ -958,57 +963,63 @@
       lane: "Lane（车道）",
       movement_corridor: "Movement corridor（通行走廊）",
       movement_anchor: "Movement anchor（通行锚点）",
-      compound_corridor: "Compound corridor（复合通行走廊）",
-      compound_anchor: "Compound anchor（复合锚点）",
       raw_road: "Raw road（原始道路）",
-      repaired_road: "Repaired road",
-      canonical_road: "Canonical road",
+      repaired_road: "Repaired road（修复道路）",
+      canonical_road: "Canonical road（标准道路）",
       corner_candidate: "Corner candidate（转角候选）",
       raw_road_endpoint: "Raw endpoint（原始断点）",
       raw_road_vertex: "Raw vertex（原始顶点 / 断点）",
       raw_topology_issue: "Raw topology issue（原始拓扑问题）",
-      lane_link_preview: "Lane link preview（车道连接预览）"
+      lane_link_preview: "Lane link preview（车道连接预览）",
+      continuity_link: "Continuity link（连续连接）"
     };
 
     const FIELD_LABELS = {
       source: "Source JSON（来源数据）",
       id: "ID（编号）",
+      continuityLinkId: "continuity_link_id（连续连接编号）",
       laneId: "lane_id（车道编号）",
       edgeId: "edge_id（道路边编号）",
-      roadGraphEdgeId: "road_graph_edge_id",
+      roadGraphEdgeId: "road_graph_edge_id（路网边编号）",
       sourceFeatureId: "source_feature_id（源要素编号）",
-      canonicalRoadId: "canonical_road_id",
-      sourceFeatureIds: "source_feature_ids",
-      repairedSourceFeatureIds: "repaired_source_feature_ids",
-      repairEdgeIds: "repair_edge_ids",
+      canonicalRoadId: "canonical_road_id（标准道路编号）",
+      sourceFeatureIds: "source_feature_ids（源要素编号组）",
+      repairedSourceFeatureIds: "repaired_source_feature_ids（修复来源要素组）",
+      repairEdgeIds: "repair_edge_ids（修复边编号组）",
       partIndex: "part_index（分段编号）",
       pointIndex: "point_index（点序号）",
       highway: "highway（道路等级）",
-      roadClass: "road_class",
+      roadClass: "road_class（道路类型）",
       roadName: "name（道路名称）",
       lanes: "lanes（源车道数）",
-      widthM: "width_m",
+      widthM: "width_m（道路宽度/米）",
       oneway: "oneway（源单行标记）",
-      canonicalEdgeCount: "canonical_edge_count",
-      canonicalLengthM: "canonical_length_m",
-      canonicalOps: "canonical_ops",
-      repairOps: "repair_ops",
+      canonicalEdgeCount: "canonical_edge_count（标准边数量）",
+      canonicalLengthM: "canonical_length_m（标准道路长度/米）",
+      canonicalOps: "canonical_ops（标准化操作）",
+      repairOps: "repair_ops（修复操作）",
       diagnosticId: "diagnostic_id（诊断编号）",
-      cornerId: "corner_id",
-      candidateType: "candidate_type",
-      riskLevel: "risk_level",
-      recommendedAction: "recommended_action",
-      nodeId: "node_id",
-      fromEdgeId: "from_edge_id",
-      toEdgeId: "to_edge_id",
-      sourceEdgeId: "source_edge_id",
-      fromCanonicalRoadId: "from_canonical_road_id",
-      toCanonicalRoadId: "to_canonical_road_id",
-      turnAngleDeg: "turn_angle_deg",
-      interiorAngleDeg: "interior_angle_deg",
-      suggestedCutM: "suggested_cut_m",
-      suggestedRadiusM: "suggested_radius_m",
-      nearestJunctionDistanceM: "nearest_junction_distance_m",
+      cornerId: "corner_id（转角编号）",
+      candidateType: "candidate_type（候选类型）",
+      riskLevel: "risk_level（风险等级）",
+      recommendedAction: "recommended_action（建议动作）",
+      nodeId: "node_id（节点编号）",
+      cornerNodeId: "corner_node_id（转角节点）",
+      fromEdgeId: "from_edge_id（起始边）",
+      toEdgeId: "to_edge_id（目标边）",
+      sourceEdgeId: "source_edge_id（来源边）",
+      fromRoad: "from_road（起始道路边）",
+      toRoad: "to_road（目标道路边）",
+      fromCanonicalRoadId: "from_canonical_road_id（起始标准道路）",
+      toCanonicalRoadId: "to_canonical_road_id（目标标准道路）",
+      turnAngleDeg: "turn_angle_deg（转向角/度）",
+      turn: "turn（转向类型）",
+      linkSource: "link_source（连接来源）",
+      endpointGapM: "endpoint_gap_m（端点间距/米）",
+      interiorAngleDeg: "interior_angle_deg（内角/度）",
+      suggestedCutM: "suggested_cut_m（建议裁切/米）",
+      suggestedRadiusM: "suggested_radius_m（建议半径/米）",
+      nearestJunctionDistanceM: "nearest_junction_distance_m（最近路口距离/米）",
       classification: "classification（分类）",
       severity: "severity（严重度）",
       issueType: "issue_type（问题类型）",
@@ -1017,7 +1028,6 @@
       vertexIndex: "vertex_index（顶点序号）",
       pointXz: "point_xz（本地坐标）",
       corridorId: "corridor_id（走廊编号）",
-      compoundCaseId: "compound_case_id（复合案例编号）",
       fromLaneId: "from_lane_id（起点车道）",
       toLaneId: "to_lane_id（终点车道）",
       anchorKey: "anchor_key（锚点类型）",
@@ -1046,6 +1056,7 @@
     const INSPECT_FIELD_ORDER = [
       "source",
       "id",
+      "continuityLinkId",
       "laneId",
       "edgeId",
       "roadGraphEdgeId",
@@ -1061,12 +1072,18 @@
       "riskLevel",
       "recommendedAction",
       "nodeId",
+      "cornerNodeId",
       "fromEdgeId",
       "toEdgeId",
       "sourceEdgeId",
+      "fromRoad",
+      "toRoad",
       "fromCanonicalRoadId",
       "toCanonicalRoadId",
       "turnAngleDeg",
+      "turn",
+      "linkSource",
+      "endpointGapM",
       "interiorAngleDeg",
       "suggestedCutM",
       "suggestedRadiusM",
@@ -1090,7 +1107,6 @@
       "vertexIndex",
       "pointXz",
       "corridorId",
-      "compoundCaseId",
       "fromLaneId",
       "toLaneId",
       "anchorKey",
@@ -1107,15 +1123,20 @@
     ];
 
     Object.assign(FIELD_LABELS, {
-      laneIndex: "lane_index",
-      laneUpgradeId: "lane_upgrade_id",
-      laneUpgradeTargetPhysicalLaneCount: "upgrade_target_lanes",
-      laneUpgradeDistributionPolicy: "upgrade_distribution",
-      laneSource: "lane_source",
-      physicalLaneShared: "physical_lane_shared",
-      roadWidthM: "road_width_m",
-      sourceObservationLanes: "source_lanes",
-      sourceObservationLanesSource: "source_lanes_source"
+      laneIndex: "lane_index（车道序号）",
+      laneUpgradeId: "lane_upgrade_id（车道升级编号）",
+      laneUpgradeTargetPhysicalLaneCount: "upgrade_target_lanes（升级目标车道数）",
+      laneUpgradeDistributionPolicy: "upgrade_distribution（车道分配策略）",
+      laneSource: "lane_source（车道来源）",
+      physicalLaneShared: "physical_lane_shared（物理车道共享）",
+      roadWidthM: "road_width_m（道路宽度/米）",
+      centerlineDerivationPolicy: "centerline_derivation_policy（中心线派生策略）",
+      centerlineDerivedFrom: "centerline_derived_from（中心线来源）",
+      centerlineSmoothingBends: "centerline_smoothing_bends（平滑折点数）",
+      centerlineSmoothingProfiles: "centerline_smoothing_profiles（平滑类型统计）",
+      centerlineSmoothingMaxDerivationOffsetM: "centerline_smoothing_max_derivation_offset_m（最大派生偏移/米）",
+      sourceObservationLanes: "source_lanes（源观测车道数）",
+      sourceObservationLanesSource: "source_lanes_source（源车道数来源）"
     });
     INSPECT_FIELD_ORDER.splice(
       4,
@@ -1127,6 +1148,11 @@
       "laneSource",
       "physicalLaneShared",
       "roadWidthM",
+      "centerlineDerivationPolicy",
+      "centerlineDerivedFrom",
+      "centerlineSmoothingBends",
+      "centerlineSmoothingProfiles",
+      "centerlineSmoothingMaxDerivationOffsetM",
       "sourceObservationLanes",
       "sourceObservationLanesSource"
     );
@@ -1192,7 +1218,7 @@
 
     function circleVisualRadiusPx(element) {
       const kind = element.dataset.vcKind || "";
-      if (kind === "movement_anchor" || kind === "compound_anchor") {
+      if (kind === "movement_anchor") {
         return 4.2;
       }
       if (kind === "corner_candidate") {
@@ -1218,7 +1244,7 @@
       if (kind === "raw_road_endpoint") {
         return 1.0;
       }
-      if (kind === "movement_anchor" || kind === "compound_anchor") {
+      if (kind === "movement_anchor") {
         return 1.3;
       }
       if (kind === "corner_candidate") {
@@ -1235,7 +1261,7 @@
       if (kind === "corner_candidate") {
         return 16;
       }
-      if (kind === "movement_anchor" || kind === "compound_anchor") {
+      if (kind === "movement_anchor") {
         return 13;
       }
       if (kind === "raw_road_endpoint" || kind === "raw_road_vertex") {
@@ -1253,7 +1279,7 @@
       if (layer === "repaired_roads" || layer === "raw_roads") {
         return 14;
       }
-      if (kind === "movement_corridor" || kind === "compound_corridor") {
+      if (kind === "movement_corridor") {
         return 15;
       }
       if (kind === "corner_candidate") {
@@ -1405,7 +1431,7 @@
     function stackLabel(element, index) {
       const data = element.dataset || {};
       const kind = data.vcKind || "";
-      const label = KIND_LABELS[kind] || kind || "Object";
+      const label = KIND_LABELS[kind] || kind || "Object（对象）";
       const id = data.vcId || data.vcLaneId || data.vcCorridorId || data.vcCompoundCaseId || "";
       const score = scoringForData(data);
       const scoreText = score ? ` · ${formatScore(score.best_overall_score)}` : "";
@@ -1731,7 +1757,7 @@
       const note = document.createElement("div");
       note.className = "lane-upgrade-note";
       if (roadId) {
-        note.textContent = `Road ${roadId}：选择 1/2/3/4 物理车道，生成升级事务请求。网页只发起事务，不直接改道路真值。`;
+        note.textContent = `Road（道路） ${roadId}：选择 1/2/3/4 物理车道，生成升级事务请求。网页只发起事务，不直接改道路真值。`;
       } else {
         note.textContent = "请优先选择 Canonical road；当前对象缺少可映射到 road_graph 的 road_id。";
       }
@@ -1868,8 +1894,8 @@
       const note = document.createElement("div");
       note.className = "lane-upgrade-note";
       note.textContent = roadId
-        ? `Road ${roadId}：选择目标车道数，或恢复默认。网页只生成事务命令，不直接改道路真值。`
-        : "请优先选择 lane 或 canonical road；当前对象缺少 road_graph road_id。";
+        ? `Road（道路） ${roadId}：选择目标车道数，或恢复默认。网页只生成事务命令，不直接改道路真值。`
+        : "请优先选择 lane（车道）或 canonical road（标准道路）；当前对象缺少 road_graph road_id。";
       panel.append(note);
 
       if (!roadId) {
@@ -1881,14 +1907,14 @@
       const laneUpgradeId = data.vcLaneUpgradeId || "";
       const sourceLanes = data.vcSourceObservationLanes || "";
       const sourceLaneText = sourceLanes ? `${sourceLanes}（源数据）` : "默认规则";
-      const currentText = activeTarget > 0 ? `${activeTarget} 车道（active）` : sourceLaneText;
+      const currentText = activeTarget > 0 ? `${activeTarget} 车道（active / 激活）` : sourceLaneText;
       const selectedLaneText = data.vcLaneId
         ? `${data.vcLaneId}${data.vcDirection ? ` / ${data.vcDirection}` : ""}`
-        : "road selection";
+        : "road selection（道路选择）";
 
       const status = document.createElement("div");
       status.className = "lane-upgrade-status";
-      for (const [label, value] of [["当前", currentText], ["选中", selectedLaneText], ["事务", laneUpgradeId || "无 active override"]]) {
+      for (const [label, value] of [["当前", currentText], ["选中", selectedLaneText], ["事务", laneUpgradeId || "无 active override（无激活覆盖）"]]) {
         const key = document.createElement("strong");
         key.textContent = label;
         const val = document.createElement("span");
@@ -2033,8 +2059,8 @@
       note.className = "lane-upgrade-note";
       const status = data.vcStatus || "candidate_review";
       note.textContent = status === "accepted_active"
-        ? `Corner ${candidateId} 已进入 active geometry transaction；可以复制命令复查或重新跑 QA。`
-        : `Corner ${candidateId}：复制应用命令后，后端会创建几何事务、重建、QA、发布 package，并刷新 SVG。`;
+        ? `Corner（转角） ${candidateId} 已进入 active geometry transaction（激活几何事务）；可以复制命令复查或重新跑 QA。`
+        : `Corner（转角） ${candidateId}：复制应用命令后，后端会创建几何事务、重建、QA、发布 package，并刷新 SVG。`;
 
       const output = document.createElement("textarea");
       output.className = "lane-upgrade-output";
@@ -2093,8 +2119,7 @@
       const kind = data.vcKind || "";
       return (
         data.vcCorridorId ||
-        data.vcCompoundCaseId ||
-        (kind === "movement_corridor" || kind === "compound_corridor" ? data.vcId : "")
+        (kind === "movement_corridor" ? data.vcId : "")
       );
     }
 
@@ -2164,7 +2189,7 @@
       state.selectedRef = selectedRefFrom(element);
       inspectorKicker.textContent = typeLabel;
       inspectorTitle.textContent = caseScore
-        ? `${caseIdFromData(data)} · score ${formatScore(caseScore.best_overall_score)}`
+        ? `${caseIdFromData(data)} · score（评分） ${formatScore(caseScore.best_overall_score)}`
         : data.vcId || data.vcLaneId || data.vcCorridorId || "Selection（选中项）";
       inspectorBody.replaceChildren();
       appendLaneUpgradePanelV2(data);
@@ -2385,10 +2410,11 @@
 
     function setMapInfoMeta(subtitle) {
       const normalized = (subtitle || "").replace(/\s+/g, " ").trim();
-      const items = ["SVG visual layer", "JSON source truth"];
+      const items = ["SVG visual layer（SVG 可视图层）", "JSON source truth（JSON 数据真值）"];
       const linkMatch = normalized.match(/Link source:\s*([^.;]+)/i);
-      items.push(linkMatch ? linkMatch[1].trim() : "movement_corridor_anchors");
-      items.push("raw / repaired / canonical overlays");
+      const linkSource = linkMatch ? linkMatch[1].trim() : "movement_corridor_anchors";
+      items.push(`${linkSource}${linkSource.includes("（") ? "" : "（通行走廊锚点）"}`);
+      items.push("raw / repaired / canonical overlays（原始 / 修复 / 标准叠加层）");
       mapInfoMeta.replaceChildren(...items.map((item) => {
         const span = document.createElement("span");
         span.textContent = item;
@@ -2396,12 +2422,26 @@
       }));
     }
 
+    function annotatedMapTitle(title) {
+      const cleanTitle = String(title || "").replace(" visualization", "").trim();
+      if (!cleanTitle || /[（(][^）)]*[\u4e00-\u9fff][^）)]*[）)]/.test(cleanTitle)) {
+        return cleanTitle;
+      }
+      if (/lane graph/i.test(cleanTitle)) {
+        return `${cleanTitle}（车道拓扑图）`;
+      }
+      if (/road/i.test(cleanTitle)) {
+        return `${cleanTitle}（道路图）`;
+      }
+      return cleanTitle;
+    }
+
     function absorbSvgHeader(svg) {
       const directTextNodes = Array.from(svg.children).filter((node) => node.tagName.toLowerCase() === "text");
       const title = directTextNodes[0]?.textContent?.trim();
       const subtitle = directTextNodes[1]?.textContent?.trim();
       if (title) {
-        mapInfoTitle.textContent = title.replace(" visualization", "");
+        mapInfoTitle.textContent = annotatedMapTitle(title);
       }
       setMapInfoMeta(subtitle);
       directTextNodes.slice(0, 2).forEach((node) => node.remove());
@@ -2558,13 +2598,13 @@
         if (force || nextSignature !== state.lastSignature) {
           renderSvg(text);
           state.lastSignature = nextSignature;
-          setStatus("ready", `vector viewBox updated ${new Date().toLocaleTimeString()} · ${svgPath}${scoringStatusText()}`);
+          setStatus("ready", `vector viewBox updated（矢量视图框已更新） ${new Date().toLocaleTimeString()} · ${svgPath}${scoringStatusText()}`);
         } else {
-          setStatus("ready", `watching vector SVG ${new Date().toLocaleTimeString()} · ${svgPath}${scoringStatusText()}`);
+          setStatus("ready", `watching vector SVG（监听矢量 SVG） ${new Date().toLocaleTimeString()} · ${svgPath}${scoringStatusText()}`);
         }
       } catch (error) {
         emptyState.classList.add("visible");
-        setStatus("error", `load failed · ${svgPath}`);
+        setStatus("error", `load failed（加载失败） · ${svgPath}`);
       } finally {
         state.loadInFlight = false;
       }
@@ -2575,15 +2615,15 @@
         return "";
       }
       if (state.scoringState === "ready") {
-        return ` · scores ${state.scoringByCase.size}`;
+        return ` · scores（评分） ${state.scoringByCase.size}`;
       }
       if (state.scoringState === "missing") {
-        return " · no scores";
+        return " · no scores（无评分）";
       }
       if (state.scoringState === "error") {
-        return " · score load failed";
+        return " · score load failed（评分加载失败）";
       }
-      return " · scores loading";
+      return " · scores loading（评分加载中）";
     }
 
     function applyScoringDocument(data) {

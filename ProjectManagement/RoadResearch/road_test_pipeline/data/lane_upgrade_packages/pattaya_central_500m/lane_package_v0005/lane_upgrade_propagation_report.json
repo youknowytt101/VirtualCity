@@ -4,13 +4,13 @@
   "schema": "lane_upgrade_system.propagation_report.v2",
   "status": "pass",
   "inputs": {
-    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
-    "junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
-    "active_overrides": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_upgrade_overrides.json"
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+    "junction_semantics": "data/processed/pattaya_central_500m_junction_semantics.json",
+    "active_overrides": "data/processed/pattaya_central_500m_lane_upgrade_overrides.json"
   },
   "outputs": {
-    "plan": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_system\\propagation\\pattaya_central_500m_lane_upgrade_propagation_plan_v0003.json",
-    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_upgrade_propagation_report.json"
+    "plan": "data/lane_upgrade_system/propagation/pattaya_central_500m_lane_upgrade_propagation_plan_v0003.json",
+    "report": "reports/pattaya_central_500m_lane_upgrade_propagation_report.json"
   },
   "counts": {
     "active_upgrades": 3,
