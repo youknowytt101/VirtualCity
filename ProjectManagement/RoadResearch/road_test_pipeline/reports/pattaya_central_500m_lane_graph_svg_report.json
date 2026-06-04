@@ -48,6 +48,7 @@
       "radius_proxy_below_lane_min": 4
     },
     "raw_roads_rendered": 44,
+    "raw_road_endpoint_markers_rendered": 88,
     "raw_road_class_counts": {
       "residential": 14,
       "secondary": 3,
@@ -61,7 +62,7 @@
     "anchor_marker_stroke_width_px": 0.12,
     "lane_casing": "enabled（已启用）",
     "visual_mode": "review_drawing（审图线稿）",
-    "raw_roads_overlay": "thin_black_solid_hidden_by_default（细黑实线，默认隐藏）"
+    "raw_roads_overlay": "thin_black_solid_with_endpoint_markers_hidden_by_default（细黑实线 + 断点标记，默认隐藏）"
   },
   "link_source": "movement_corridor_anchors",
   "compound_link_source": "compound_junction_merge_transactions",
