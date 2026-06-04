@@ -1,43 +1,45 @@
-# LaneForge 车道升级系统
+# LaneForge 道路自动升级系统
 
-LaneForge 是 road_test_pipeline 中间处理环节的统一系统名。
-
-人类心智模型：
+LaneForge 是 `road_test_pipeline` 中间处理环节的系统名。
 
 ```text
 地图原始数据输入
-  -> LaneForge 车道升级系统
-      -> 标准化 / 修复 / 车道升级 / 路口升级 / 自动 QA / 版本发布
+  -> LaneForge 道路自动升级系统
+      -> 标准化 / 拓扑修复 / 车道升级 / 路口联动 / 转角优化 / 自动 QA / 版本发布
   -> 标准车道数据包
   -> Houdini 构建管线
 ```
 
-Houdini 不负责修路，也不负责判断道路真值。Houdini 只消费 LaneForge 发布的标准车道数据包，并把这些数据构建成可见的真实车道、路口面和调试层。
+Houdini 不修路、不判断道路真值，只读取 LaneForge 发布的数据包并构建可见车道、
+路口面和调试层。
 
-## 第一版边界
+## 系统边界
 
-当前第一版目标不是一次性解决所有转角，而是建立可迭代系统骨架：
+- 原始地图数据不可变。
+- 人工选择、AI 建议、网页点击、传播规则、转角优化都必须进入版本化记录。
+- 浏览器只提交请求或复制命令，不直接改 GeoJSON、lane graph 或 package。
+- 每次应用都必须重建、QA、发布新版本包。
+- QA 失败时不发布，失败案例应该留作后续规则/casebook。
 
-- 原始地图数据保持不可变。
-- 车道数、人为修正、AI 建议都进入 versioned transaction。
-- transaction 只是一条升级请求，不直接成为 source truth。
-- lane graph 重建时消费 active overrides。
-- 相邻路口 laneLinks 和 surfaces 自动随 lane graph 重建。
-- 自动 QA 通过后发布标准车道数据包。
-- QA 失败时回滚或禁用 active override，再把失败事务留作 casebook。
+## 标准车道包
 
-## 标准车道数据包
-
-默认发布目录：
+最新包指针：
 
 ```text
-data/lane_upgrade_packages/<area_id>/lane_package_v0001/
+data/lane_upgrade_packages/<area_id>/latest.json
+```
+
+当前样本最新包：
+
+```text
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0009/
 ```
 
 核心文件：
 
 ```text
 manifest.json
+houdini_manifest.json
 standard_lanes.json
 standard_junctions.json
 standard_lane_surfaces.geojson
@@ -46,330 +48,192 @@ lane_debug_geometry.geojson
 qa_report.json
 lane_graph_report.json
 lane_surface_report.json
-houdini_manifest.json
 active_lane_upgrades.json
+active_corner_optimizations.json
+corner_optimization_candidates.json
+corner_optimization_report.json
+lane_upgrade_propagation_plan.json
+lane_upgrade_propagation_report.json
 ```
 
-`manifest.json` 是外部系统入口。Houdini 构建管线优先读取 `houdini_manifest.json`，不要从内部临时报告里猜路径。
+`manifest.json` 是外部系统总入口；Houdini 优先读取 `houdini_manifest.json`。
 
-## 网页点击升级模型
+## 车道升级
 
-未来网页点击某条道路时，菜单可以直接显示：
+网页点击道路或车道后，用户看到：
 
 ```text
 1车道 / 2车道 / 3车道 / 4车道
 ```
 
-点击后不直接改 GeoJSON 或 lane graph，而是生成：
-
-```text
-data/lane_upgrade_system/transactions/<area_id>_lane_upgrade_transaction_vXXXX.json
-data/processed/<area_id>_lane_upgrade_overrides.json
-```
-
-然后重建：
-
-```text
-lane_upgrade_overrides.json
-  -> lane_model_builder.py
-  -> lane_graph.json
-  -> lane surfaces / junction envelopes
-  -> audit_road_pipeline.py
-  -> build_lane_upgrade_package.py
-```
-
-第一版影响范围是这条 road edge 和它两端直接路口。短边、复合路口、连续相邻路口扩散，后续作为 LaneForge 规则升级。
-
-## 车道数分配策略 v1
-
-当前 `balanced_bidirectional_left_traffic_v1`：
-
-```text
-1 physical lane -> shared bidirectional lane representation
-2 physical lanes -> 1 forward + 1 backward
-3 physical lanes -> 2 forward + 1 backward
-4 physical lanes -> 2 forward + 2 backward
-```
-
-这只是初版结构化策略，后续可以升级为：
-
-- 根据 oneway 恢复真实方向。
-- 根据 turn:lanes 恢复转向专用车道。
-- 根据 road class 和路口类型自动调整 approaching lanes。
-- 对复合路口做局部事务重建。
-
-## AI 自动迭代规则
-
-AI 可以提出规则，但不能直接发布为真值。
-
-推荐闭环：
-
-```text
-AI proposes rule
-  -> dry run transaction
-  -> rebuild affected lane graph / junctions / surfaces
-  -> automated QA
-  -> report
-  -> accept into rule set or keep as rejected case
-```
-
-规则也需要版本：
-
-```text
-lane_rule_set_v0001
-lane_upgrade_transaction_v0001
-lane_package_v0001
-```
-
-## 当前命令
-
-创建一条车道升级事务：
-
-```powershell
-python scripts\create_lane_upgrade_transaction.py --area-id pattaya_central_500m --road-id e_0012 --canonical-road-id cr_0012 --target-lane-count 3 --reason "web menu test"
-```
-
-重建并发布标准车道包：
-
-```powershell
-python scripts\rebuild_road_test.py --area-id pattaya_central_500m --skip-houdini
-```
-
-只发布当前已通过 QA 的标准车道包：
-
-```powershell
-python scripts\build_lane_upgrade_package.py --area-id pattaya_central_500m
-```
-
-## Viewer transaction contract v1
-
-The SVG viewer remains an inspection surface. It does not edit GeoJSON or
-lane_graph truth directly.
-
-Current click flow:
-
-```text
-canonical road click
-  -> reads data-vc-road-graph-edge-id from the exported SVG
-  -> shows 1 / 2 / 3 / 4 physical lane buttons
-  -> emits a LaneForge transaction request JSON
-  -> backend create_lane_upgrade_transaction.py validates road_id and canonical_road_id against road_graph.json
-  -> transaction records the direct endpoint junction scope
-  -> rebuild_road_test.py rebuilds lanes / laneLinks / surfaces and publishes only after QA passes
-```
-
-The direct endpoint junction scope is intentionally v1:
-
-```text
-affected road edge + its two endpoint nodes + endpoint nodes classified as junction
-```
-
-Compound junction expansion, nearby short-edge absorption, turn-lane semantics
-and multi-road corridor effects should be added as versioned LaneForge rules
-instead of hidden viewer behavior.
-
-## Execution v1 command
-
-Run the full audited upgrade loop:
+点击后应该生成 LaneForge 请求，而不是直接修改数据。后端入口：
 
 ```powershell
 python scripts\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0012 --canonical-road-id cr_0012 --target-lane-count 3 --reason "web menu lane upgrade"
 ```
 
-This command creates the active transaction, rebuilds the structured road/lane
-pipeline, runs the automated QA gate, publishes the next `lane_package_vXXXX`,
-and refreshes the SVG QA view.
-
-## Execution v1 smoke test
-
-Completed one real end-to-end upgrade:
+执行链路：
 
 ```text
-road_id: e_0015
-canonical_road_id: cr_0015
-target_physical_lane_count: 3
-transaction: lane_upgrade_transaction_v0001
-package: lane_package_v0002
-pipeline_audit: pass
+execute_lane_upgrade.py
+  -> create_lane_upgrade_transaction.py
+  -> lane_upgrade_overrides.json
+  -> rebuild_road_test.py
+  -> lane_model_builder.py
+  -> lane graph / junction laneLinks / lane surfaces
+  -> audit_road_pipeline.py
+  -> build_lane_upgrade_package.py
+  -> export_lane_graph_svg.py
 ```
 
-The upgraded road now publishes:
+当前车道分配策略：
 
 ```text
-e_0015_f_1
-e_0015_f_2
-e_0015_b_1
+balanced_bidirectional_left_traffic_v1
+
+1 physical lane -> shared bidirectional representation
+2 physical lanes -> 1 forward + 1 backward
+3 physical lanes -> 2 forward + 1 backward
+4 physical lanes -> 2 forward + 2 backward
 ```
 
-This proves v1 can rebuild the affected road, direct endpoint junction
-laneLinks, lane surfaces and junction envelopes, then publish a standard lane
-package after QA passes.
+当前 active upgrades：
 
-## Junction propagation rules v2
+```text
+e_0005 / cr_0005 -> 3 lanes
+e_0013 / cr_0013 -> 3 lanes
+e_0014 / cr_0014 -> 3 lanes
+e_0015 / cr_0015 -> 3 lanes
+```
 
-Propagation v2 is proposal-only. It reads active upgrades and proposes nearby
-roads that may need the same lane-count target, but it does not edit active
-overrides directly.
+## 传播规则
 
-Run:
+传播规划是 proposal-only，默认不改 active overrides。
 
 ```powershell
 python scripts\plan_lane_upgrade_propagation.py --area-id pattaya_central_500m
 ```
 
-Current v2 rules:
+当前规则：
 
 ```text
 through_pair_lane_count_continuity_v2
 short_edge_absorption_lane_count_v2
-same_role_same_class_junction_balance_v2
 same_class_adjacent_approach_review_v2
 adjacent_junction_context_review_v2
 ```
 
-For the `e_0015 -> 3 lanes` smoke test, v2 produced:
+受控应用策略：
 
 ```text
-prop_0000: e_0014 / cr_0014, high confidence, through continuation
-prop_0001: e_0019 / cr_0019, review, same-class adjacent approach
-prop_0002: e_0020 / cr_0020, review, same-class adjacent approach
+through_pair_only_v1
+short_edge_absorption_only_v1
 ```
 
-The latest package that includes this propagation plan is:
-
-```text
-lane_package_v0003
-```
-
-## Propagation application v1
-
-Propagation application v1 is the controlled accept path for proposal-only
-candidates.
-
-Default accept policy:
-
-```text
-status == candidate_high_confidence
-rule_id == through_pair_lane_count_continuity_v2
-confidence >= 0.8
-```
-
-Run:
+示例：
 
 ```powershell
-python scripts\apply_lane_upgrade_propagation.py --area-id pattaya_central_500m --candidate-id prop_0000 --reason "accepted high-confidence through-pair propagation"
-```
-
-Current accepted propagation:
-
-```text
-candidate: prop_0000
-road_id: e_0014
-canonical_road_id: cr_0014
-transaction: lane_upgrade_transaction_v0002
-target_physical_lane_count: 3
-pipeline_audit: pass
-package: lane_package_v0004
-```
-
-The paired upgraded roads now publish:
-
-```text
-e_0014_f_1, e_0014_f_2, e_0014_b_1
-e_0015_f_1, e_0015_f_2, e_0015_b_1
-```
-
-## Short-edge absorption application v1
-
-Short-edge absorption is intentionally not part of the default propagation
-application policy. It has a separate accept policy:
-
-```text
-policy == short_edge_absorption_only_v1
-status == candidate_high_confidence
-rule_id == short_edge_absorption_lane_count_v2
-confidence >= 0.74
-candidate_length_m <= 12.0
-candidate_road_class == source_road_class
-```
-
-Run:
-
-```powershell
+python scripts\apply_lane_upgrade_propagation.py --area-id pattaya_central_500m --candidate-id prop_0000 --reason "accepted through-pair propagation"
 python scripts\apply_lane_upgrade_propagation.py --area-id pattaya_central_500m --candidate-id prop_0000 --policy short_edge_absorption_only_v1 --reason "accepted controlled short-edge absorption"
 ```
 
-This keeps short connector absorption reviewable and auditable before it
-becomes an active lane upgrade.
+规则：一次只应用一个 candidate，然后重建、QA、刷新 SVG。
 
-## Corner optimization candidates v1
+## 转角优化
 
-Road corner optimization belongs inside the LaneForge / road upgrade system,
-between optimized centerlines and lane graph construction:
+转角优化属于 LaneForge 主流程，不属于 Houdini，也不是浏览器真值。
+
+位置：
 
 ```text
 optimized centerlines
   -> corner optimization candidates
-  -> lane graph
+  -> active corner overrides
+  -> lane graph continuity
   -> lane surfaces
   -> QA
   -> standard lane package
 ```
 
-The first version is proposal-only. It does not mutate road geometry.
-
-Run:
+规划：
 
 ```powershell
 python scripts\plan_corner_optimization.py --area-id pattaya_central_500m
 ```
 
-Outputs:
+当前候选：
 
 ```text
-data/processed/<area_id>_corner_optimization_candidates.json
-reports/<area_id>_corner_optimization_report.json
+20 candidates
+3 degree2_connector_corner
+17 internal_centerline_bend
+3 accepted_active
+17 candidate_review
 ```
 
-Candidate families:
+已完成的受控策略：
 
 ```text
-degree2_connector_corner
-internal_centerline_bend
+low_risk_degree2_connector_only_v1
 ```
 
-The SVG viewer has a `Corners` overlay. Clicking a candidate shows its source
-edge, candidate type, risk level, turn angle, suggested cut distance and
-suggested radius. Accepted candidates should later become versioned geometry
-transactions, then rebuild and pass QA before publishing.
-
-## Corner optimization application v1
-
-Corner optimization now has a controlled apply path. The default accept policy
-is intentionally narrow:
+已应用：
 
 ```text
-policy == low_risk_degree2_connector_only_v1
-candidate_type == degree2_connector_corner
-risk_level == low
-candidate id is explicit
+corner_0000
+corner_0001
+corner_0002
 ```
 
-Command:
-
-```powershell
-python scripts\apply_corner_optimization.py --area-id pattaya_central_500m --candidate-id corner_0001 --reason "accepted low-risk corner"
-```
-
-This writes:
+下一步要新建独立策略：
 
 ```text
-data/processed/<area_id>_corner_optimization_overrides.json
-data/lane_upgrade_system/corner_applications/<area_id>_corner_optimization_application_vXXXX.json
+low_risk_internal_centerline_bend_smoothing_v1
 ```
 
-Then it rebuilds, audits, publishes the next LaneForge package and refreshes
-the SVG. `optimize_junction_centerlines.py` consumes active corner overrides
-and annotates matching `optimized_corner_fillet` features with transaction
-metadata, so the accepted turn can be traced from candidate -> centerline ->
-lane graph continuity -> package.
+不要用 degree-2 connector 的 apply policy 批量处理 internal bends。
+
+## Viewer 合约
+
+`reports/visualizations/svg_live_viewer.html` 的职责：
+
+- 加载 SVG。
+- 提供 Raw / Repaired / Canonical / Corners QA 图层。
+- 点击道路时显示 LaneForge 车道升级动作。
+- 点击转角候选时显示 LaneForge 转角优化动作。
+- 复制 JSON 或 CLI 命令。
+- 展示技术详情。
+
+它不应该：
+
+- 直接写 active overrides。
+- 直接改 GeoJSON。
+- 直接改 lane graph。
+- 直接发布 package。
+
+## QA 合约
+
+最小发布门禁：
+
+```text
+audit_road_pipeline.py status == pass
+required outputs exist
+lane link references valid
+continuity link references valid
+lane curves match trimmed lane endpoints
+lane surface v1 matches lane graph
+junction envelope surfaces have area
+```
+
+当前样本 `lane_package_v0009` 已通过这些门禁。
+
+## 推荐下一步
+
+从剩余 `internal_centerline_bend` 中挑一个低风险候选，建立新的
+`low_risk_internal_centerline_bend_smoothing_v1` 受控策略：
+
+```text
+dry-run -> apply one candidate -> rebuild -> audit -> publish -> SVG/browser review
+```
+
+只有浏览器视觉检查和 pipeline audit 都稳定后，再考虑扩大策略范围。
