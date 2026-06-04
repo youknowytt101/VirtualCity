@@ -565,8 +565,8 @@
             12.9359836
           ],
           [
-            100.8825104,
-            12.9359582
+            100.8826328,
+            12.9358799
           ]
         ]
       },
@@ -603,7 +603,9 @@
         "repair_parent_id": "27443575",
         "repair_edge_id": 11,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -612,12 +614,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8825104,
-            12.9359582
-          ],
-          [
             100.8826328,
             12.9358799
+          ],
+          [
+            100.8850622,
+            12.9343135
           ]
         ]
       },
@@ -654,109 +656,9 @@
         "repair_parent_id": "27443575",
         "repair_edge_id": 12,
         "repair_segment_index": 1,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8826328,
-            12.9358799
-          ],
-          [
-            100.8834671,
-            12.9353422
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "27443575_seg_2",
-        "seg_id": 1,
-        "highway": "residential",
-        "name": "ซอยพัทยา 9",
-        "lanes": "1",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "1",
-          "maxspeed:type": "TH:urban",
-          "name": "ซอยพัทยา 9",
-          "name:en": "Soi Pattaya 9",
-          "name:ja": "ソイパタヤ9",
-          "name:th": "ซอยพัทยา 9",
-          "narrow": "yes",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "27443575",
-        "repair_edge_id": 13,
-        "repair_segment_index": 2,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8834671,
-            12.9353422
-          ],
-          [
-            100.8850622,
-            12.9343135
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "27443575_seg_3",
-        "seg_id": 1,
-        "highway": "residential",
-        "name": "ซอยพัทยา 9",
-        "lanes": "1",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "1",
-          "maxspeed:type": "TH:urban",
-          "name": "ซอยพัทยา 9",
-          "name:en": "Soi Pattaya 9",
-          "name:ja": "ソイパタヤ9",
-          "name:th": "ซอยพัทยา 9",
-          "narrow": "yes",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "27443575",
-        "repair_edge_id": 14,
-        "repair_segment_index": 3,
-        "repair_ops": []
       }
     },
     {
@@ -803,9 +705,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443579",
-        "repair_edge_id": 15,
+        "repair_edge_id": 13,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -852,9 +756,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443579",
-        "repair_edge_id": 16,
+        "repair_edge_id": 14,
         "repair_segment_index": 1,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -901,9 +807,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443579",
-        "repair_edge_id": 17,
+        "repair_edge_id": 15,
         "repair_segment_index": 2,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -916,8 +824,8 @@
             12.9333869
           ],
           [
-            100.8809932,
-            12.9335787
+            100.8809517,
+            12.9336086
           ]
         ]
       },
@@ -950,58 +858,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443579",
-        "repair_edge_id": 18,
+        "repair_edge_id": 16,
         "repair_segment_index": 3,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8809932,
-            12.9335787
-          ],
-          [
-            100.8809517,
-            12.9336086
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "27443579_seg_4",
-        "seg_id": 2,
-        "highway": "residential",
-        "name": "ซอยพัทยา 10",
-        "lanes": "2",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "2",
-          "name": "ซอยพัทยา 10",
-          "name:en": "Soi Pattaya 10",
-          "name:ja": "ソイパタヤ10",
-          "name:th": "ซอยพัทยา 10",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "27443579",
-        "repair_edge_id": 19,
-        "repair_segment_index": 4,
-        "repair_ops": []
       }
     },
     {
@@ -1048,7 +909,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443587",
-        "repair_edge_id": 20,
+        "repair_edge_id": 17,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -1097,7 +958,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443587",
-        "repair_edge_id": 21,
+        "repair_edge_id": 18,
         "repair_segment_index": 1,
         "repair_ops": []
       }
@@ -1143,7 +1004,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443601",
-        "repair_edge_id": 22,
+        "repair_edge_id": 19,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -1189,7 +1050,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443601",
-        "repair_edge_id": 23,
+        "repair_edge_id": 20,
         "repair_segment_index": 1,
         "repair_ops": []
       }
@@ -1235,7 +1096,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443601",
-        "repair_edge_id": 24,
+        "repair_edge_id": 21,
         "repair_segment_index": 2,
         "repair_ops": []
       }
@@ -1281,7 +1142,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443601",
-        "repair_edge_id": 25,
+        "repair_edge_id": 22,
         "repair_segment_index": 3,
         "repair_ops": []
       }
@@ -1327,7 +1188,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27443601",
-        "repair_edge_id": 26,
+        "repair_edge_id": 23,
         "repair_segment_index": 4,
         "repair_ops": []
       }
@@ -1371,7 +1232,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27444194",
-        "repair_edge_id": 27,
+        "repair_edge_id": 24,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -1415,7 +1276,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "27444194",
-        "repair_edge_id": 28,
+        "repair_edge_id": 25,
         "repair_segment_index": 1,
         "repair_ops": []
       }
@@ -1459,7 +1320,7 @@
           "note": "Tipp Plaza"
         },
         "repair_parent_id": "27444620",
-        "repair_edge_id": 29,
+        "repair_edge_id": 26,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -1503,7 +1364,7 @@
           "note": "Tipp Plaza"
         },
         "repair_parent_id": "27444620",
-        "repair_edge_id": 30,
+        "repair_edge_id": 27,
         "repair_segment_index": 1,
         "repair_ops": []
       }
@@ -1553,9 +1414,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129296",
-        "repair_edge_id": 31,
+        "repair_edge_id": 28,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -1568,8 +1431,8 @@
             12.9360473
           ],
           [
-            100.8851533,
-            12.9361964
+            100.8849872,
+            12.9362732
           ]
         ]
       },
@@ -1603,9 +1466,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129296",
-        "repair_edge_id": 32,
+        "repair_edge_id": 29,
         "repair_segment_index": 1,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -1614,12 +1479,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8851533,
-            12.9361964
-          ],
-          [
             100.8849872,
             12.9362732
+          ],
+          [
+            100.8845393,
+            12.9364728
           ]
         ]
       },
@@ -1653,9 +1518,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129296",
-        "repair_edge_id": 33,
+        "repair_edge_id": 30,
         "repair_segment_index": 2,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -1664,12 +1531,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8849872,
-            12.9362732
-          ],
-          [
             100.8845393,
             12.9364728
+          ],
+          [
+            100.8844663,
+            12.9365053
           ]
         ]
       },
@@ -1703,9 +1570,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129296",
-        "repair_edge_id": 34,
+        "repair_edge_id": 31,
         "repair_segment_index": 3,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -1714,12 +1583,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8845393,
-            12.9364728
-          ],
-          [
             100.8844663,
             12.9365053
+          ],
+          [
+            100.8842791,
+            12.9365932
           ]
         ]
       },
@@ -1753,9 +1622,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129296",
-        "repair_edge_id": 35,
+        "repair_edge_id": 32,
         "repair_segment_index": 4,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -1764,12 +1635,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8844663,
-            12.9365053
-          ],
-          [
             100.8842791,
             12.9365932
+          ],
+          [
+            100.883974,
+            12.9367293
           ]
         ]
       },
@@ -1803,9 +1674,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129296",
-        "repair_edge_id": 36,
+        "repair_edge_id": 33,
         "repair_segment_index": 5,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -1814,12 +1687,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8842791,
-            12.9365932
-          ],
-          [
             100.883974,
             12.9367293
+          ],
+          [
+            100.883067,
+            12.937147
           ]
         ]
       },
@@ -1853,159 +1726,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129296",
-        "repair_edge_id": 37,
+        "repair_edge_id": 34,
         "repair_segment_index": 6,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.883974,
-            12.9367293
-          ],
-          [
-            100.8835704,
-            12.9369151
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35129296_seg_7",
-        "seg_id": 7,
-        "highway": "residential",
-        "name": "ซอยพัทยา 7",
-        "lanes": "2",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "crossing": "traffic_signals",
-          "highway": "residential",
-          "lanes": "2",
-          "name": "ซอยพัทยา 7",
-          "name:en": "Soi Pattaya 7",
-          "name:ja": "ソイ パタヤ7",
-          "name:th": "ซอยพัทยา 7",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35129296",
-        "repair_edge_id": 38,
-        "repair_segment_index": 7,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8835704,
-            12.9369151
-          ],
-          [
-            100.883098,
-            12.9371327
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35129296_seg_8",
-        "seg_id": 7,
-        "highway": "residential",
-        "name": "ซอยพัทยา 7",
-        "lanes": "2",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "crossing": "traffic_signals",
-          "highway": "residential",
-          "lanes": "2",
-          "name": "ซอยพัทยา 7",
-          "name:en": "Soi Pattaya 7",
-          "name:ja": "ソイ パタヤ7",
-          "name:th": "ซอยพัทยา 7",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35129296",
-        "repair_edge_id": 39,
-        "repair_segment_index": 8,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.883098,
-            12.9371327
-          ],
-          [
-            100.883067,
-            12.937147
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35129296_seg_9",
-        "seg_id": 7,
-        "highway": "residential",
-        "name": "ซอยพัทยา 7",
-        "lanes": "2",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "crossing": "traffic_signals",
-          "highway": "residential",
-          "lanes": "2",
-          "name": "ซอยพัทยา 7",
-          "name:en": "Soi Pattaya 7",
-          "name:ja": "ソイ パタヤ7",
-          "name:th": "ซอยพัทยา 7",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35129296",
-        "repair_edge_id": 40,
-        "repair_segment_index": 9,
-        "repair_ops": []
       }
     },
     {
@@ -2018,8 +1743,8 @@
             12.9323852
           ],
           [
-            100.8836169,
-            12.9323391
+            100.8843686,
+            12.9316819
           ]
         ]
       },
@@ -2049,10 +1774,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129317",
-        "repair_edge_id": 41,
+        "repair_edge_id": 35,
         "repair_segment_index": 0,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -2062,12 +1787,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8836169,
-            12.9323391
+            100.8843686,
+            12.9316819
           ],
           [
-            100.8843487,
-            12.9316983
+            100.8845819,
+            12.931492
           ]
         ]
       },
@@ -2097,10 +1822,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129317",
-        "repair_edge_id": 42,
+        "repair_edge_id": 36,
         "repair_segment_index": 1,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -2110,12 +1835,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8843487,
-            12.9316983
-          ],
-          [
             100.8845819,
             12.931492
+          ],
+          [
+            100.8847642,
+            12.9313452
           ]
         ]
       },
@@ -2145,10 +1870,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129317",
-        "repair_edge_id": 43,
+        "repair_edge_id": 37,
         "repair_segment_index": 2,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -2158,12 +1883,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8845819,
-            12.931492
-          ],
-          [
             100.8847642,
             12.9313452
+          ],
+          [
+            100.8848831,
+            12.9312766
           ]
         ]
       },
@@ -2193,10 +1918,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129317",
-        "repair_edge_id": 44,
+        "repair_edge_id": 38,
         "repair_segment_index": 3,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -2206,12 +1931,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8847642,
-            12.9313452
-          ],
-          [
             100.8848831,
             12.9312766
+          ],
+          [
+            100.8859377,
+            12.9306785
           ]
         ]
       },
@@ -2241,10 +1966,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129317",
-        "repair_edge_id": 45,
+        "repair_edge_id": 39,
         "repair_segment_index": 4,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -2254,12 +1979,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8848831,
-            12.9312766
+            100.8859377,
+            12.9306785
           ],
           [
-            100.884952,
-            12.9312361
+            100.8859843,
+            12.9306504
           ]
         ]
       },
@@ -2289,202 +2014,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129317",
-        "repair_edge_id": 46,
+        "repair_edge_id": 40,
         "repair_segment_index": 5,
         "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.884952,
-            12.9312361
-          ],
-          [
-            100.885606,
-            12.9308662
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35129317_seg_6",
-        "seg_id": 8,
-        "highway": "residential",
-        "name": "พัทยาสายสอง 9",
-        "lanes": "2",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "2",
-          "name": "พัทยาสายสอง 9",
-          "name:en": "Soi Skaw Beach (Pattaya Sai Song 9)",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35129317",
-        "repair_edge_id": 47,
-        "repair_segment_index": 6,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.885606,
-            12.9308662
-          ],
-          [
-            100.8857317,
-            12.9307951
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35129317_seg_7",
-        "seg_id": 8,
-        "highway": "residential",
-        "name": "พัทยาสายสอง 9",
-        "lanes": "2",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "2",
-          "name": "พัทยาสายสอง 9",
-          "name:en": "Soi Skaw Beach (Pattaya Sai Song 9)",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35129317",
-        "repair_edge_id": 48,
-        "repair_segment_index": 7,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8857317,
-            12.9307951
-          ],
-          [
-            100.8859377,
-            12.9306785
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35129317_seg_8",
-        "seg_id": 8,
-        "highway": "residential",
-        "name": "พัทยาสายสอง 9",
-        "lanes": "2",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "2",
-          "name": "พัทยาสายสอง 9",
-          "name:en": "Soi Skaw Beach (Pattaya Sai Song 9)",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35129317",
-        "repair_edge_id": 49,
-        "repair_segment_index": 8,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8859377,
-            12.9306785
-          ],
-          [
-            100.8859843,
-            12.9306504
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35129317_seg_9",
-        "seg_id": 8,
-        "highway": "residential",
-        "name": "พัทยาสายสอง 9",
-        "lanes": "2",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "2",
-          "name": "พัทยาสายสอง 9",
-          "name:en": "Soi Skaw Beach (Pattaya Sai Song 9)",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35129317",
-        "repair_edge_id": 50,
-        "repair_segment_index": 9,
-        "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -2498,8 +2031,8 @@
             12.9338634
           ],
           [
-            100.884786,
-            12.9338243
+            100.8854817,
+            12.933346
           ]
         ]
       },
@@ -2529,55 +2062,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35129321",
-        "repair_edge_id": 51,
+        "repair_edge_id": 41,
         "repair_segment_index": 0,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.884786,
-            12.9338243
-          ],
-          [
-            100.8854817,
-            12.933346
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35129321_seg_1",
-        "seg_id": 9,
-        "highway": "residential",
-        "name": "พัทยาสายสอง 8",
-        "lanes": "1",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "1",
-          "name": "พัทยาสายสอง 8",
-          "name:en": "Pattaya Sai Song 8",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35129321",
-        "repair_edge_id": 52,
-        "repair_segment_index": 1,
-        "repair_ops": []
       }
     },
     {
@@ -2619,9 +2108,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35400897",
-        "repair_edge_id": 53,
+        "repair_edge_id": 42,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -2663,9 +2154,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35400897",
-        "repair_edge_id": 54,
+        "repair_edge_id": 43,
         "repair_segment_index": 1,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -2678,8 +2171,8 @@
             12.9341361
           ],
           [
-            100.8843579,
-            12.9334944
+            100.8844226,
+            12.9334499
           ]
         ]
       },
@@ -2707,53 +2200,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35400897",
-        "repair_edge_id": 55,
+        "repair_edge_id": 44,
         "repair_segment_index": 2,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8843579,
-            12.9334944
-          ],
-          [
-            100.8844226,
-            12.9334499
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35400897_seg_3",
-        "seg_id": 10,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35400897",
-        "repair_edge_id": 56,
-        "repair_segment_index": 3,
-        "repair_ops": []
       }
     },
     {
@@ -2766,8 +2217,8 @@
             12.9320967
           ],
           [
-            100.8832863,
-            12.9320623
+            100.8845655,
+            12.9309591
           ]
         ]
       },
@@ -2797,147 +2248,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "35536298",
-        "repair_edge_id": 57,
+        "repair_edge_id": 45,
         "repair_segment_index": 0,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8832863,
-            12.9320623
-          ],
-          [
-            100.8841092,
-            12.931352
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35536298_seg_1",
-        "seg_id": 11,
-        "highway": "residential",
-        "name": "พัทยาสายสอง 10",
-        "lanes": "1",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "1",
-          "name": "พัทยาสายสอง 10",
-          "name:en": "Pattaya Sai Song 10",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35536298",
-        "repair_edge_id": 58,
-        "repair_segment_index": 1,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8841092,
-            12.931352
-          ],
-          [
-            100.8842681,
-            12.9312148
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35536298_seg_2",
-        "seg_id": 11,
-        "highway": "residential",
-        "name": "พัทยาสายสอง 10",
-        "lanes": "1",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "1",
-          "name": "พัทยาสายสอง 10",
-          "name:en": "Pattaya Sai Song 10",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35536298",
-        "repair_edge_id": 59,
-        "repair_segment_index": 2,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8842681,
-            12.9312148
-          ],
-          [
-            100.8845655,
-            12.9309591
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "35536298_seg_3",
-        "seg_id": 11,
-        "highway": "residential",
-        "name": "พัทยาสายสอง 10",
-        "lanes": "1",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "1",
-          "name": "พัทยาสายสอง 10",
-          "name:en": "Pattaya Sai Song 10",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "35536298",
-        "repair_edge_id": 60,
-        "repair_segment_index": 3,
-        "repair_ops": []
       }
     },
     {
@@ -2950,8 +2265,8 @@
             12.9353934
           ],
           [
-            100.8858433,
-            12.9353699
+            100.8865452,
+            12.9350088
           ]
         ]
       },
@@ -2981,55 +2296,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "151000018",
-        "repair_edge_id": 61,
+        "repair_edge_id": 46,
         "repair_segment_index": 0,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8858433,
-            12.9353699
-          ],
-          [
-            100.8865452,
-            12.9350088
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "151000018_seg_1",
-        "seg_id": 12,
-        "highway": "residential",
-        "name": "พัทยาสายสอง 7",
-        "lanes": "1",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "1",
-          "name": "พัทยาสายสอง 7",
-          "name:en": "Pattaya Sai Song 7",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "151000018",
-        "repair_edge_id": 62,
-        "repair_segment_index": 1,
-        "repair_ops": []
       }
     },
     {
@@ -3042,8 +2313,8 @@
             12.9348683
           ],
           [
-            100.8855079,
-            12.9348333
+            100.8855832,
+            12.9347844
           ]
         ]
       },
@@ -3071,9 +2342,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "169556497",
-        "repair_edge_id": 63,
+        "repair_edge_id": 47,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -3082,12 +2355,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8855079,
-            12.9348333
+            100.8855832,
+            12.9347844
           ],
           [
-            100.8855317,
-            12.9348182
+            100.886001,
+            12.9345346
           ]
         ]
       },
@@ -3115,97 +2388,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "169556497",
-        "repair_edge_id": 64,
+        "repair_edge_id": 48,
         "repair_segment_index": 1,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8855317,
-            12.9348182
-          ],
-          [
-            100.8855832,
-            12.9347844
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "169556497_seg_2",
-        "seg_id": 13,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "169556497",
-        "repair_edge_id": 65,
-        "repair_segment_index": 2,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8855832,
-            12.9347844
-          ],
-          [
-            100.886001,
-            12.9345346
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "169556497_seg_3",
-        "seg_id": 13,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "169556497",
-        "repair_edge_id": 66,
-        "repair_segment_index": 3,
-        "repair_ops": []
       }
     },
     {
@@ -3247,7 +2434,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "174587497",
-        "repair_edge_id": 67,
+        "repair_edge_id": 49,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -3291,7 +2478,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "174587497",
-        "repair_edge_id": 68,
+        "repair_edge_id": 50,
         "repair_segment_index": 1,
         "repair_ops": []
       }
@@ -3335,7 +2522,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "174587497",
-        "repair_edge_id": 69,
+        "repair_edge_id": 51,
         "repair_segment_index": 2,
         "repair_ops": []
       }
@@ -3350,8 +2537,8 @@
             12.9335235
           ],
           [
-            100.884542,
-            12.9334795
+            100.885011,
+            12.9331542
           ]
         ]
       },
@@ -3379,9 +2566,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "273672874",
-        "repair_edge_id": 70,
+        "repair_edge_id": 52,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -3390,12 +2579,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.884542,
-            12.9334795
+            100.885011,
+            12.9331542
           ],
           [
-            100.8846105,
-            12.9334319
+            100.8851472,
+            12.9333006
           ]
         ]
       },
@@ -3423,9 +2612,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "273672874",
-        "repair_edge_id": 71,
+        "repair_edge_id": 53,
         "repair_segment_index": 1,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -3434,12 +2625,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8846105,
-            12.9334319
+            100.8851472,
+            12.9333006
           ],
           [
-            100.885011,
-            12.9331542
+            100.8854318,
+            12.9331086
           ]
         ]
       },
@@ -3467,9 +2658,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "273672874",
-        "repair_edge_id": 72,
+        "repair_edge_id": 54,
         "repair_segment_index": 2,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -3478,12 +2671,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.885011,
-            12.9331542
+            100.8854318,
+            12.9331086
           ],
           [
-            100.8851472,
-            12.9333006
+            100.8854574,
+            12.9329611
           ]
         ]
       },
@@ -3511,9 +2704,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "273672874",
-        "repair_edge_id": 73,
+        "repair_edge_id": 55,
         "repair_segment_index": 3,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -3522,12 +2717,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8851472,
-            12.9333006
+            100.8854574,
+            12.9329611
           ],
           [
-            100.8854318,
-            12.9331086
+            100.8853985,
+            12.9328615
           ]
         ]
       },
@@ -3555,9 +2750,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "273672874",
-        "repair_edge_id": 74,
+        "repair_edge_id": 56,
         "repair_segment_index": 4,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -3566,12 +2763,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8854318,
-            12.9331086
+            100.8853985,
+            12.9328615
           ],
           [
-            100.8854574,
-            12.9329611
+            100.885445,
+            12.9327833
           ]
         ]
       },
@@ -3599,97 +2796,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "273672874",
-        "repair_edge_id": 75,
+        "repair_edge_id": 57,
         "repair_segment_index": 5,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8854574,
-            12.9329611
-          ],
-          [
-            100.8853985,
-            12.9328615
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "273672874_seg_6",
-        "seg_id": 15,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "273672874",
-        "repair_edge_id": 76,
-        "repair_segment_index": 6,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8853985,
-            12.9328615
-          ],
-          [
-            100.885445,
-            12.9327833
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "273672874_seg_7",
-        "seg_id": 15,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "273672874",
-        "repair_edge_id": 77,
-        "repair_segment_index": 7,
-        "repair_ops": []
       }
     },
     {
@@ -3729,7 +2840,7 @@
           "highway": "service"
         },
         "repair_parent_id": "317141440",
-        "repair_edge_id": 78,
+        "repair_edge_id": 58,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -3771,7 +2882,7 @@
           "highway": "service"
         },
         "repair_parent_id": "317141440",
-        "repair_edge_id": 79,
+        "repair_edge_id": 59,
         "repair_segment_index": 1,
         "repair_ops": []
       }
@@ -3813,7 +2924,7 @@
           "highway": "service"
         },
         "repair_parent_id": "317141441",
-        "repair_edge_id": 80,
+        "repair_edge_id": 60,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -3855,7 +2966,7 @@
           "highway": "service"
         },
         "repair_parent_id": "317141441",
-        "repair_edge_id": 81,
+        "repair_edge_id": 61,
         "repair_segment_index": 1,
         "repair_ops": []
       }
@@ -3897,7 +3008,7 @@
           "highway": "service"
         },
         "repair_parent_id": "317141442",
-        "repair_edge_id": 82,
+        "repair_edge_id": 62,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -3939,7 +3050,7 @@
           "highway": "service"
         },
         "repair_parent_id": "317141442",
-        "repair_edge_id": 83,
+        "repair_edge_id": 63,
         "repair_segment_index": 1,
         "repair_ops": []
       }
@@ -3981,7 +3092,7 @@
           "highway": "service"
         },
         "repair_parent_id": "317141442",
-        "repair_edge_id": 84,
+        "repair_edge_id": 64,
         "repair_segment_index": 2,
         "repair_ops": []
       }
@@ -4025,7 +3136,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "347104620",
-        "repair_edge_id": 85,
+        "repair_edge_id": 65,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -4040,8 +3151,8 @@
             12.9375943
           ],
           [
-            100.8832114,
-            12.9374714
+            100.883067,
+            12.937147
           ]
         ]
       },
@@ -4082,10 +3193,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 86,
+        "repair_edge_id": 66,
         "repair_segment_index": 0,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4095,12 +3206,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8832114,
-            12.9374714
+            100.883067,
+            12.937147
           ],
           [
-            100.8831997,
-            12.9374454
+            100.8828581,
+            12.9367211
           ]
         ]
       },
@@ -4141,10 +3252,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 87,
+        "repair_edge_id": 67,
         "repair_segment_index": 1,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4154,12 +3265,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8831997,
-            12.9374454
+            100.8828581,
+            12.9367211
           ],
           [
-            100.8831606,
-            12.9373579
+            100.8827666,
+            12.9365484
           ]
         ]
       },
@@ -4200,10 +3311,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 88,
+        "repair_edge_id": 68,
         "repair_segment_index": 2,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4213,12 +3324,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8831606,
-            12.9373579
+            100.8827666,
+            12.9365484
           ],
           [
-            100.883067,
-            12.937147
+            100.8825496,
+            12.936137
           ]
         ]
       },
@@ -4259,10 +3370,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 89,
+        "repair_edge_id": 69,
         "repair_segment_index": 3,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4272,12 +3383,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.883067,
-            12.937147
+            100.8825496,
+            12.936137
           ],
           [
-            100.8828581,
-            12.9367211
+            100.882472,
+            12.9359836
           ]
         ]
       },
@@ -4318,10 +3429,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 90,
+        "repair_edge_id": 70,
         "repair_segment_index": 4,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4331,12 +3442,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8828581,
-            12.9367211
+            100.882472,
+            12.9359836
           ],
           [
-            100.8827666,
-            12.9365484
+            100.8824388,
+            12.9359205
           ]
         ]
       },
@@ -4377,10 +3488,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 91,
+        "repair_edge_id": 71,
         "repair_segment_index": 5,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4390,12 +3501,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8827666,
-            12.9365484
+            100.8824388,
+            12.9359205
           ],
           [
-            100.8825496,
-            12.936137
+            100.8820002,
+            12.9351373
           ]
         ]
       },
@@ -4436,10 +3547,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 92,
+        "repair_edge_id": 72,
         "repair_segment_index": 6,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4449,12 +3560,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8825496,
-            12.936137
+            100.8820002,
+            12.9351373
           ],
           [
-            100.8825351,
-            12.9361082
+            100.8819063,
+            12.9349919
           ]
         ]
       },
@@ -4495,10 +3606,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 93,
+        "repair_edge_id": 73,
         "repair_segment_index": 7,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4508,12 +3619,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8825351,
-            12.9361082
+            100.8819063,
+            12.9349919
           ],
           [
-            100.882472,
-            12.9359836
+            100.8818589,
+            12.9349185
           ]
         ]
       },
@@ -4554,10 +3665,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 94,
+        "repair_edge_id": 74,
         "repair_segment_index": 8,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4567,12 +3678,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.882472,
-            12.9359836
+            100.8818589,
+            12.9349185
           ],
           [
-            100.8824388,
-            12.9359205
+            100.8815875,
+            12.9344982
           ]
         ]
       },
@@ -4613,10 +3724,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 95,
+        "repair_edge_id": 75,
         "repair_segment_index": 9,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4626,12 +3737,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8824388,
-            12.9359205
+            100.8815875,
+            12.9344982
           ],
           [
-            100.8820002,
-            12.9351373
+            100.8811547,
+            12.9338956
           ]
         ]
       },
@@ -4672,10 +3783,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 96,
+        "repair_edge_id": 76,
         "repair_segment_index": 10,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4685,12 +3796,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8820002,
-            12.9351373
+            100.8811547,
+            12.9338956
           ],
           [
-            100.8819063,
-            12.9349919
+            100.8809517,
+            12.9336086
           ]
         ]
       },
@@ -4731,10 +3842,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 97,
+        "repair_edge_id": 77,
         "repair_segment_index": 11,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4744,12 +3855,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8819063,
-            12.9349919
+            100.8809517,
+            12.9336086
           ],
           [
-            100.8818589,
-            12.9349185
+            100.8806788,
+            12.9332479
           ]
         ]
       },
@@ -4790,10 +3901,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 98,
+        "repair_edge_id": 78,
         "repair_segment_index": 12,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4803,12 +3914,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8818589,
-            12.9349185
+            100.8806788,
+            12.9332479
           ],
           [
-            100.8815875,
-            12.9344982
+            100.8805276,
+            12.9330451
           ]
         ]
       },
@@ -4849,10 +3960,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 99,
+        "repair_edge_id": 79,
         "repair_segment_index": 13,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4862,12 +3973,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8815875,
-            12.9344982
+            100.8805276,
+            12.9330451
           ],
           [
-            100.8811715,
-            12.933919
+            100.8801837,
+            12.9326335
           ]
         ]
       },
@@ -4908,10 +4019,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 100,
+        "repair_edge_id": 80,
         "repair_segment_index": 14,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4921,12 +4032,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8811715,
-            12.933919
+            100.8801837,
+            12.9326335
           ],
           [
-            100.8811547,
-            12.9338956
+            100.8795602,
+            12.9318647
           ]
         ]
       },
@@ -4967,10 +4078,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 101,
+        "repair_edge_id": 81,
         "repair_segment_index": 15,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -4980,12 +4091,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8811547,
-            12.9338956
+            100.8795602,
+            12.9318647
           ],
           [
-            100.8809517,
-            12.9336086
+            100.8791286,
+            12.9313964
           ]
         ]
       },
@@ -5026,10 +4137,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 102,
+        "repair_edge_id": 82,
         "repair_segment_index": 16,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -5039,12 +4150,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8809517,
-            12.9336086
+            100.8791286,
+            12.9313964
           ],
           [
-            100.8807619,
-            12.9333592
+            100.8786179,
+            12.9308621
           ]
         ]
       },
@@ -5085,10 +4196,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 103,
+        "repair_edge_id": 83,
         "repair_segment_index": 17,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -5098,12 +4209,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8807619,
-            12.9333592
+            100.8786179,
+            12.9308621
           ],
           [
-            100.8806788,
-            12.9332479
+            100.8771866,
+            12.9295354
           ]
         ]
       },
@@ -5144,10 +4255,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 104,
+        "repair_edge_id": 84,
         "repair_segment_index": 18,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -5157,12 +4268,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8806788,
-            12.9332479
+            100.8771866,
+            12.9295354
           ],
           [
-            100.8805276,
-            12.9330451
+            100.877063,
+            12.9294257
           ]
         ]
       },
@@ -5203,10 +4314,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 105,
+        "repair_edge_id": 85,
         "repair_segment_index": 19,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -5216,12 +4327,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8805276,
-            12.9330451
+            100.877063,
+            12.9294257
           ],
           [
-            100.8804983,
-            12.9330096
+            100.8766753,
+            12.9290899
           ]
         ]
       },
@@ -5262,10 +4373,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 106,
+        "repair_edge_id": 86,
         "repair_segment_index": 20,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -5275,12 +4386,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8804983,
-            12.9330096
+            100.8766753,
+            12.9290899
           ],
           [
-            100.8801837,
-            12.9326335
+            100.8761869,
+            12.9286825
           ]
         ]
       },
@@ -5321,10 +4432,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 107,
+        "repair_edge_id": 87,
         "repair_segment_index": 21,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -5334,12 +4445,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8801837,
-            12.9326335
+            100.8761869,
+            12.9286825
           ],
           [
-            100.8800047,
-            12.9324128
+            100.875812,
+            12.9283615
           ]
         ]
       },
@@ -5380,10 +4491,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 108,
+        "repair_edge_id": 88,
         "repair_segment_index": 22,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -5393,12 +4504,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8800047,
-            12.9324128
+            100.875812,
+            12.9283615
           ],
           [
-            100.8795602,
-            12.9318647
+            100.875189,
+            12.9278537
           ]
         ]
       },
@@ -5439,10 +4550,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 109,
+        "repair_edge_id": 89,
         "repair_segment_index": 23,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -5452,12 +4563,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8795602,
-            12.9318647
+            100.875189,
+            12.9278537
           ],
           [
-            100.8791286,
-            12.9313964
+            100.8749463,
+            12.9276663
           ]
         ]
       },
@@ -5498,10 +4609,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 110,
+        "repair_edge_id": 90,
         "repair_segment_index": 24,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -5511,12 +4622,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8791286,
-            12.9313964
+            100.8749463,
+            12.9276663
           ],
           [
-            100.8786179,
-            12.9308621
+            100.8746867,
+            12.9274469
           ]
         ]
       },
@@ -5557,1131 +4668,10 @@
           "wikidata": "Q2495649"
         },
         "repair_parent_id": "350135618",
-        "repair_edge_id": 111,
+        "repair_edge_id": 91,
         "repair_segment_index": 25,
         "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8786179,
-            12.9308621
-          ],
-          [
-            100.8785078,
-            12.9307606
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_26",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 112,
-        "repair_segment_index": 26,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8785078,
-            12.9307606
-          ],
-          [
-            100.8783547,
-            12.9306194
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_27",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 113,
-        "repair_segment_index": 27,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8783547,
-            12.9306194
-          ],
-          [
-            100.8780714,
-            12.9303554
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_28",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 114,
-        "repair_segment_index": 28,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8780714,
-            12.9303554
-          ],
-          [
-            100.8775084,
-            12.9298336
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_29",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 115,
-        "repair_segment_index": 29,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8775084,
-            12.9298336
-          ],
-          [
-            100.8774883,
-            12.929815
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_30",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 116,
-        "repair_segment_index": 30,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8774883,
-            12.929815
-          ],
-          [
-            100.8774161,
-            12.929748
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_31",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 117,
-        "repair_segment_index": 31,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8774161,
-            12.929748
-          ],
-          [
-            100.8773755,
-            12.9297104
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_32",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 118,
-        "repair_segment_index": 32,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8773755,
-            12.9297104
-          ],
-          [
-            100.8771866,
-            12.9295354
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_33",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 119,
-        "repair_segment_index": 33,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8771866,
-            12.9295354
-          ],
-          [
-            100.877063,
-            12.9294257
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_34",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 120,
-        "repair_segment_index": 34,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.877063,
-            12.9294257
-          ],
-          [
-            100.8766753,
-            12.9290899
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_35",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 121,
-        "repair_segment_index": 35,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8766753,
-            12.9290899
-          ],
-          [
-            100.8762577,
-            12.9287416
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_36",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 122,
-        "repair_segment_index": 36,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8762577,
-            12.9287416
-          ],
-          [
-            100.8761869,
-            12.9286825
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_37",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 123,
-        "repair_segment_index": 37,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8761869,
-            12.9286825
-          ],
-          [
-            100.875847,
-            12.92839
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_38",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 124,
-        "repair_segment_index": 38,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.875847,
-            12.92839
-          ],
-          [
-            100.875812,
-            12.9283615
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_39",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 125,
-        "repair_segment_index": 39,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.875812,
-            12.9283615
-          ],
-          [
-            100.8755565,
-            12.9281529
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_40",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 126,
-        "repair_segment_index": 40,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8755565,
-            12.9281529
-          ],
-          [
-            100.8753539,
-            12.9279876
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_41",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 127,
-        "repair_segment_index": 41,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8753539,
-            12.9279876
-          ],
-          [
-            100.875205,
-            12.9278661
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_42",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 128,
-        "repair_segment_index": 42,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.875205,
-            12.9278661
-          ],
-          [
-            100.8749463,
-            12.9276663
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_43",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 129,
-        "repair_segment_index": 43,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8749463,
-            12.9276663
-          ],
-          [
-            100.8746867,
-            12.9274469
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "350135618_seg_44",
-        "seg_id": 20,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายหนึ่ง",
-        "lanes": "3",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "40",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "ถนนเลียบหาดพัทยา",
-          "alt_name:de": "Pattaya Beach Road (Sai 1)",
-          "alt_name:en": "Pattaya Beach Road (Sai 1)",
-          "alt_name:ja": "ビーチロード",
-          "alt_name:ru": "Пляжная улица",
-          "alt_name:th": "ถนนเลียบหาดพัทยา",
-          "highway": "secondary",
-          "lanes": "3",
-          "lit": "yes",
-          "maxspeed": "40",
-          "name": "ถนนพัทยาสายหนึ่ง",
-          "name:en": "Pattaya Sai Nueng Road",
-          "oneway": "yes",
-          "sidewalk": "right",
-          "surface": "concrete",
-          "wikidata": "Q2495649"
-        },
-        "repair_parent_id": "350135618",
-        "repair_edge_id": 130,
-        "repair_segment_index": 44,
-        "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -6725,9 +4715,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "355438653",
-        "repair_edge_id": 131,
+        "repair_edge_id": 92,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -6770,9 +4762,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "355438653",
-        "repair_edge_id": 132,
+        "repair_edge_id": 93,
         "repair_segment_index": 1,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -6815,9 +4809,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "355438653",
-        "repair_edge_id": 133,
+        "repair_edge_id": 94,
         "repair_segment_index": 2,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -6830,8 +4826,8 @@
             12.932116
           ],
           [
-            100.8826996,
-            12.9316766
+            100.8827289,
+            12.9316527
           ]
         ]
       },
@@ -6860,54 +4856,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "355438653",
-        "repair_edge_id": 134,
+        "repair_edge_id": 95,
         "repair_segment_index": 3,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8826996,
-            12.9316766
-          ],
-          [
-            100.8827289,
-            12.9316527
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "355438653_seg_4",
-        "seg_id": 21,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "access": "private",
-          "highway": "service",
-          "note": "Tipp Plaza",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "355438653",
-        "repair_edge_id": 135,
-        "repair_segment_index": 4,
-        "repair_ops": []
       }
     },
     {
@@ -6920,8 +4873,8 @@
             12.9344926
           ],
           [
-            100.8863253,
-            12.9345645
+            100.8860049,
+            12.9347496
           ]
         ]
       },
@@ -6950,9 +4903,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "695055372",
-        "repair_edge_id": 136,
+        "repair_edge_id": 96,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -6961,12 +4916,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8863253,
-            12.9345645
-          ],
-          [
             100.8860049,
             12.9347496
+          ],
+          [
+            100.8855513,
+            12.9350119
           ]
         ]
       },
@@ -6995,99 +4950,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "695055372",
-        "repair_edge_id": 137,
+        "repair_edge_id": 97,
         "repair_segment_index": 1,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8860049,
-            12.9347496
-          ],
-          [
-            100.8856058,
-            12.9349804
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "695055372_seg_2",
-        "seg_id": 22,
-        "highway": "residential",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "name:en": "Soi New Plaza",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "695055372",
-        "repair_edge_id": 138,
-        "repair_segment_index": 2,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8856058,
-            12.9349804
-          ],
-          [
-            100.8855513,
-            12.9350119
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "695055372_seg_3",
-        "seg_id": 22,
-        "highway": "residential",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "name:en": "Soi New Plaza",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "695055372",
-        "repair_edge_id": 139,
-        "repair_segment_index": 3,
-        "repair_ops": []
       }
     },
     {
@@ -7100,8 +4967,8 @@
             12.9351049
           ],
           [
-            100.8856643,
-            12.9350771
+            100.8865059,
+            12.9346095
           ]
         ]
       },
@@ -7130,189 +4997,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "695055373",
-        "repair_edge_id": 140,
+        "repair_edge_id": 98,
         "repair_segment_index": 0,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8856643,
-            12.9350771
-          ],
-          [
-            100.8860758,
-            12.9348484
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "695055373_seg_1",
-        "seg_id": 23,
-        "highway": "residential",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "name:en": "Soi New Plaza",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "695055373",
-        "repair_edge_id": 141,
-        "repair_segment_index": 1,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8860758,
-            12.9348484
-          ],
-          [
-            100.8863975,
-            12.9346697
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "695055373_seg_2",
-        "seg_id": 23,
-        "highway": "residential",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "name:en": "Soi New Plaza",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "695055373",
-        "repair_edge_id": 142,
-        "repair_segment_index": 2,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8863975,
-            12.9346697
-          ],
-          [
-            100.8864263,
-            12.9346537
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "695055373_seg_3",
-        "seg_id": 23,
-        "highway": "residential",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "name:en": "Soi New Plaza",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "695055373",
-        "repair_edge_id": 143,
-        "repair_segment_index": 3,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8864263,
-            12.9346537
-          ],
-          [
-            100.8865059,
-            12.9346095
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "695055373_seg_4",
-        "seg_id": 23,
-        "highway": "residential",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "name:en": "Soi New Plaza",
-          "oneway": "yes",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "695055373",
-        "repair_edge_id": 144,
-        "repair_segment_index": 4,
-        "repair_ops": []
       }
     },
     {
@@ -7325,8 +5014,8 @@
             12.9324549
           ],
           [
-            100.8833507,
-            12.932449
+            100.883338,
+            12.9324457
           ]
         ]
       },
@@ -7354,9 +5043,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724095739",
-        "repair_edge_id": 145,
+        "repair_edge_id": 99,
         "repair_segment_index": 0,
         "repair_ops": [
+          "raw_shape_vertex_simplification",
           "short_edge_collapse"
         ]
       }
@@ -7367,8 +5057,8 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8833507,
-            12.932449
+            100.883338,
+            12.9324457
           ],
           [
             100.8833072,
@@ -7400,9 +5090,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724095739",
-        "repair_edge_id": 146,
+        "repair_edge_id": 100,
         "repair_segment_index": 1,
         "repair_ops": [
+          "raw_shape_vertex_simplification",
           "short_edge_collapse"
         ]
       }
@@ -7446,9 +5137,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724095739",
-        "repair_edge_id": 147,
+        "repair_edge_id": 101,
         "repair_segment_index": 2,
         "repair_ops": [
+          "raw_shape_vertex_simplification",
           "short_edge_collapse"
         ]
       }
@@ -7492,9 +5184,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724095739",
-        "repair_edge_id": 148,
+        "repair_edge_id": 102,
         "repair_segment_index": 3,
         "repair_ops": [
+          "raw_shape_vertex_simplification",
           "short_edge_collapse"
         ]
       }
@@ -7509,8 +5202,8 @@
             12.9323486
           ],
           [
-            100.8834332,
-            12.9324327
+            100.8834212,
+            12.9324425
           ]
         ]
       },
@@ -7538,9 +5231,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724095740",
-        "repair_edge_id": 149,
+        "repair_edge_id": 103,
         "repair_segment_index": 0,
         "repair_ops": [
+          "raw_shape_vertex_simplification",
           "short_edge_collapse"
         ]
       }
@@ -7551,8 +5245,8 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8834332,
-            12.9324327
+            100.8834212,
+            12.9324425
           ],
           [
             100.8833782,
@@ -7584,9 +5278,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724095740",
-        "repair_edge_id": 150,
+        "repair_edge_id": 104,
         "repair_segment_index": 1,
         "repair_ops": [
+          "raw_shape_vertex_simplification",
           "short_edge_collapse"
         ]
       }
@@ -7630,9 +5325,10 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724095740",
-        "repair_edge_id": 151,
+        "repair_edge_id": 105,
         "repair_segment_index": 2,
         "repair_ops": [
+          "raw_shape_vertex_simplification",
           "short_edge_collapse"
         ]
       }
@@ -7647,8 +5343,8 @@
             12.9331969
           ],
           [
-            100.8841589,
-            12.9332479
+            100.8838794,
+            12.9334386
           ]
         ]
       },
@@ -7676,9 +5372,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724100785",
-        "repair_edge_id": 152,
+        "repair_edge_id": 106,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -7687,12 +5385,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8841589,
-            12.9332479
-          ],
-          [
             100.8838794,
             12.9334386
+          ],
+          [
+            100.8837625,
+            12.9334979
           ]
         ]
       },
@@ -7720,9 +5418,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724100785",
-        "repair_edge_id": 153,
+        "repair_edge_id": 107,
         "repair_segment_index": 1,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -7731,12 +5431,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8838794,
-            12.9334386
-          ],
-          [
             100.8837625,
             12.9334979
+          ],
+          [
+            100.882492,
+            12.9343425
           ]
         ]
       },
@@ -7764,53 +5464,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "724100785",
-        "repair_edge_id": 154,
+        "repair_edge_id": 108,
         "repair_segment_index": 2,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8837625,
-            12.9334979
-          ],
-          [
-            100.882492,
-            12.9343425
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "724100785_seg_3",
-        "seg_id": 26,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "724100785",
-        "repair_edge_id": 155,
-        "repair_segment_index": 3,
-        "repair_ops": []
       }
     },
     {
@@ -7823,8 +5481,8 @@
             12.9314552
           ],
           [
-            100.8864116,
-            12.9314802
+            100.885346,
+            12.9320825
           ]
         ]
       },
@@ -7851,9 +5509,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "727879443",
-        "repair_edge_id": 156,
+        "repair_edge_id": 109,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -7862,12 +5522,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8864116,
-            12.9314802
+            100.885346,
+            12.9320825
           ],
           [
-            100.8859266,
-            12.9317543
+            100.8848831,
+            12.9312766
           ]
         ]
       },
@@ -7894,95 +5554,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "727879443",
-        "repair_edge_id": 157,
+        "repair_edge_id": 110,
         "repair_segment_index": 1,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8859266,
-            12.9317543
-          ],
-          [
-            100.885346,
-            12.9320825
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "727879443_seg_2",
-        "seg_id": 27,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "727879443",
-        "repair_edge_id": 158,
-        "repair_segment_index": 2,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.885346,
-            12.9320825
-          ],
-          [
-            100.8848831,
-            12.9312766
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "727879443_seg_3",
-        "seg_id": 27,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "727879443",
-        "repair_edge_id": 159,
-        "repair_segment_index": 3,
-        "repair_ops": []
       }
     },
     {
@@ -7995,8 +5571,8 @@
             12.9325728
           ],
           [
-            100.8840887,
-            12.9329986
+            100.8841581,
+            12.9330921
           ]
         ]
       },
@@ -8032,9 +5608,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 160,
+        "repair_edge_id": 111,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8043,12 +5621,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8840887,
-            12.9329986
-          ],
-          [
             100.8841581,
             12.9330921
+          ],
+          [
+            100.8842351,
+            12.9331969
           ]
         ]
       },
@@ -8084,9 +5662,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 161,
+        "repair_edge_id": 112,
         "repair_segment_index": 1,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8095,12 +5675,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8841581,
-            12.9330921
-          ],
-          [
             100.8842351,
             12.9331969
+          ],
+          [
+            100.8844226,
+            12.9334499
           ]
         ]
       },
@@ -8136,9 +5716,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 162,
+        "repair_edge_id": 113,
         "repair_segment_index": 2,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8147,12 +5729,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8842351,
-            12.9331969
+            100.8844226,
+            12.9334499
           ],
           [
-            100.8842717,
-            12.9332485
+            100.8844785,
+            12.9335235
           ]
         ]
       },
@@ -8188,9 +5770,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 163,
+        "repair_edge_id": 114,
         "repair_segment_index": 3,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8199,12 +5783,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8842717,
-            12.9332485
+            100.8844785,
+            12.9335235
           ],
           [
-            100.8843024,
-            12.9332895
+            100.8847291,
+            12.9338634
           ]
         ]
       },
@@ -8240,9 +5824,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 164,
+        "repair_edge_id": 115,
         "repair_segment_index": 4,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8251,12 +5837,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8843024,
-            12.9332895
+            100.8847291,
+            12.9338634
           ],
           [
-            100.8844226,
-            12.9334499
+            100.8848699,
+            12.934051
           ]
         ]
       },
@@ -8292,9 +5878,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 165,
+        "repair_edge_id": 116,
         "repair_segment_index": 5,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8303,12 +5891,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8844226,
-            12.9334499
+            100.8848699,
+            12.934051
           ],
           [
-            100.8844785,
-            12.9335235
+            100.8850297,
+            12.9342701
           ]
         ]
       },
@@ -8344,9 +5932,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 166,
+        "repair_edge_id": 117,
         "repair_segment_index": 6,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8355,12 +5945,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8844785,
-            12.9335235
+            100.8850297,
+            12.9342701
           ],
           [
-            100.8847291,
-            12.9338634
+            100.8850622,
+            12.9343135
           ]
         ]
       },
@@ -8396,9 +5986,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 167,
+        "repair_edge_id": 118,
         "repair_segment_index": 7,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8407,12 +5999,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8847291,
-            12.9338634
+            100.8850622,
+            12.9343135
           ],
           [
-            100.8848144,
-            12.9339773
+            100.8854528,
+            12.9348683
           ]
         ]
       },
@@ -8448,9 +6040,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 168,
+        "repair_edge_id": 119,
         "repair_segment_index": 8,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8459,12 +6053,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8848144,
-            12.9339773
+            100.8854528,
+            12.9348683
           ],
           [
-            100.8848699,
-            12.934051
+            100.8854844,
+            12.9349128
           ]
         ]
       },
@@ -8500,9 +6094,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 169,
+        "repair_edge_id": 120,
         "repair_segment_index": 9,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8511,12 +6107,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8848699,
-            12.934051
+            100.8854844,
+            12.9349128
           ],
           [
-            100.8850297,
-            12.9342701
+            100.8855513,
+            12.9350119
           ]
         ]
       },
@@ -8552,9 +6148,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 170,
+        "repair_edge_id": 121,
         "repair_segment_index": 10,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8563,12 +6161,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8850297,
-            12.9342701
+            100.8855513,
+            12.9350119
           ],
           [
-            100.8850622,
-            12.9343135
+            100.8856143,
+            12.9351049
           ]
         ]
       },
@@ -8604,9 +6202,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 171,
+        "repair_edge_id": 122,
         "repair_segment_index": 11,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8615,12 +6215,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8850622,
-            12.9343135
+            100.8856143,
+            12.9351049
           ],
           [
-            100.8854528,
-            12.9348683
+            100.8857976,
+            12.9353934
           ]
         ]
       },
@@ -8656,9 +6256,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 172,
+        "repair_edge_id": 123,
         "repair_segment_index": 12,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8667,12 +6269,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8854528,
-            12.9348683
+            100.8857976,
+            12.9353934
           ],
           [
-            100.8854844,
-            12.9349128
+            100.8860457,
+            12.9357971
           ]
         ]
       },
@@ -8708,9 +6310,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 173,
+        "repair_edge_id": 124,
         "repair_segment_index": 13,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8719,12 +6323,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8854844,
-            12.9349128
+            100.8860457,
+            12.9357971
           ],
           [
-            100.8855513,
-            12.9350119
+            100.8863098,
+            12.9362574
           ]
         ]
       },
@@ -8760,9 +6364,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 174,
+        "repair_edge_id": 125,
         "repair_segment_index": 14,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8771,12 +6377,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8855513,
-            12.9350119
+            100.8863098,
+            12.9362574
           ],
           [
-            100.8856143,
-            12.9351049
+            100.886439,
+            12.9364631
           ]
         ]
       },
@@ -8812,9 +6418,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 175,
+        "repair_edge_id": 126,
         "repair_segment_index": 15,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -8823,12 +6431,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8856143,
-            12.9351049
+            100.886439,
+            12.9364631
           ],
           [
-            100.8857976,
-            12.9353934
+            100.8865079,
+            12.9366531
           ]
         ]
       },
@@ -8864,217 +6472,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "945012935",
-        "repair_edge_id": 176,
+        "repair_edge_id": 127,
         "repair_segment_index": 16,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8857976,
-            12.9353934
-          ],
-          [
-            100.8860457,
-            12.9357971
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "945012935_seg_17",
-        "seg_id": 28,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "lit": "yes",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "945012935",
-        "repair_edge_id": 177,
-        "repair_segment_index": 17,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8860457,
-            12.9357971
-          ],
-          [
-            100.8863098,
-            12.9362574
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "945012935_seg_18",
-        "seg_id": 28,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "lit": "yes",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "945012935",
-        "repair_edge_id": 178,
-        "repair_segment_index": 18,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8863098,
-            12.9362574
-          ],
-          [
-            100.886439,
-            12.9364631
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "945012935_seg_19",
-        "seg_id": 28,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "lit": "yes",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "945012935",
-        "repair_edge_id": 179,
-        "repair_segment_index": 19,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.886439,
-            12.9364631
-          ],
-          [
-            100.8865079,
-            12.9366531
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "945012935_seg_20",
-        "seg_id": 28,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "lit": "yes",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "945012935",
-        "repair_edge_id": 180,
-        "repair_segment_index": 20,
-        "repair_ops": []
       }
     },
     {
@@ -9087,8 +6489,8 @@
             12.9325134
           ],
           [
-            100.8861599,
-            12.9322728
+            100.8867846,
+            12.9320787
           ]
         ]
       },
@@ -9118,55 +6520,11 @@
           "surface": "concrete"
         },
         "repair_parent_id": "1088913687",
-        "repair_edge_id": 181,
+        "repair_edge_id": 128,
         "repair_segment_index": 0,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8861599,
-            12.9322728
-          ],
-          [
-            100.8867846,
-            12.9320787
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1088913687_seg_1",
-        "seg_id": 29,
-        "highway": "residential",
-        "name": "ซอยเมดอินไทยแลนด์",
-        "lanes": "2",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "residential",
-          "lanes": "2",
-          "name": "ซอยเมดอินไทยแลนด์",
-          "name:en": "Soi Made In Thailand",
-          "surface": "concrete"
-        },
-        "repair_parent_id": "1088913687",
-        "repair_edge_id": 182,
-        "repair_segment_index": 1,
-        "repair_ops": []
       }
     },
     {
@@ -9179,8 +6537,8 @@
             12.934051
           ],
           [
-            100.8849309,
-            12.9340098
+            100.8858054,
+            12.9334191
           ]
         ]
       },
@@ -9207,9 +6565,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1197567955",
-        "repair_edge_id": 183,
+        "repair_edge_id": 129,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -9218,12 +6578,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8849309,
-            12.9340098
-          ],
-          [
             100.8858054,
             12.9334191
+          ],
+          [
+            100.88585,
+            12.9334904
           ]
         ]
       },
@@ -9250,9 +6610,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1197567955",
-        "repair_edge_id": 184,
+        "repair_edge_id": 130,
         "repair_segment_index": 1,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -9261,12 +6623,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8858054,
-            12.9334191
-          ],
-          [
             100.88585,
             12.9334904
+          ],
+          [
+            100.8859641,
+            12.9336729
           ]
         ]
       },
@@ -9293,9 +6655,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1197567955",
-        "repair_edge_id": 185,
+        "repair_edge_id": 131,
         "repair_segment_index": 2,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -9304,12 +6668,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88585,
-            12.9334904
-          ],
-          [
             100.8859641,
             12.9336729
+          ],
+          [
+            100.8863477,
+            12.9334312
           ]
         ]
       },
@@ -9336,9 +6700,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1197567955",
-        "repair_edge_id": 186,
+        "repair_edge_id": 132,
         "repair_segment_index": 3,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -9347,12 +6713,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8859641,
-            12.9336729
-          ],
-          [
             100.8863477,
             12.9334312
+          ],
+          [
+            100.8862845,
+            12.9333201
           ]
         ]
       },
@@ -9379,9 +6745,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1197567955",
-        "repair_edge_id": 187,
+        "repair_edge_id": 133,
         "repair_segment_index": 4,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -9390,12 +6758,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8863477,
-            12.9334312
-          ],
-          [
             100.8862845,
             12.9333201
+          ],
+          [
+            100.88585,
+            12.9334904
           ]
         ]
       },
@@ -9422,52 +6790,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1197567955",
-        "repair_edge_id": 188,
+        "repair_edge_id": 134,
         "repair_segment_index": 5,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8862845,
-            12.9333201
-          ],
-          [
-            100.88585,
-            12.9334904
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1197567955_seg_6",
-        "seg_id": 30,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway"
-        },
-        "repair_parent_id": "1197567955",
-        "repair_edge_id": 189,
-        "repair_segment_index": 6,
-        "repair_ops": []
       }
     },
     {
@@ -9480,8 +6807,8 @@
             12.9330921
           ],
           [
-            100.8842133,
-            12.9330549
+            100.8847261,
+            12.9327116
           ]
         ]
       },
@@ -9507,10 +6834,10 @@
           "highway": "service"
         },
         "repair_parent_id": "1208214302",
-        "repair_edge_id": 190,
+        "repair_edge_id": 135,
         "repair_segment_index": 0,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -9520,12 +6847,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8842133,
-            12.9330549
+            100.8847261,
+            12.9327116
           ],
           [
-            100.8842523,
-            12.9330289
+            100.8852045,
+            12.9323985
           ]
         ]
       },
@@ -9551,10 +6878,10 @@
           "highway": "service"
         },
         "repair_parent_id": "1208214302",
-        "repair_edge_id": 191,
+        "repair_edge_id": 136,
         "repair_segment_index": 1,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -9564,12 +6891,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8842523,
-            12.9330289
+            100.8852045,
+            12.9323985
           ],
           [
-            100.8844934,
-            12.9328675
+            100.8852903,
+            12.9325398
           ]
         ]
       },
@@ -9595,10 +6922,10 @@
           "highway": "service"
         },
         "repair_parent_id": "1208214302",
-        "repair_edge_id": 192,
+        "repair_edge_id": 137,
         "repair_segment_index": 2,
         "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -9608,12 +6935,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8844934,
-            12.9328675
+            100.8852903,
+            12.9325398
           ],
           [
-            100.8847261,
-            12.9327116
+            100.8853849,
+            12.9325134
           ]
         ]
       },
@@ -9639,186 +6966,10 @@
           "highway": "service"
         },
         "repair_parent_id": "1208214302",
-        "repair_edge_id": 193,
+        "repair_edge_id": 138,
         "repair_segment_index": 3,
         "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8847261,
-            12.9327116
-          ],
-          [
-            100.8849274,
-            12.9325793
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1208214302_seg_4",
-        "seg_id": 31,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service"
-        },
-        "repair_parent_id": "1208214302",
-        "repair_edge_id": 194,
-        "repair_segment_index": 4,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8849274,
-            12.9325793
-          ],
-          [
-            100.8852045,
-            12.9323985
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1208214302_seg_5",
-        "seg_id": 31,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service"
-        },
-        "repair_parent_id": "1208214302",
-        "repair_edge_id": 195,
-        "repair_segment_index": 5,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8852045,
-            12.9323985
-          ],
-          [
-            100.8852903,
-            12.9325398
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1208214302_seg_6",
-        "seg_id": 31,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service"
-        },
-        "repair_parent_id": "1208214302",
-        "repair_edge_id": 196,
-        "repair_segment_index": 6,
-        "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8852903,
-            12.9325398
-          ],
-          [
-            100.8853849,
-            12.9325134
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1208214302_seg_7",
-        "seg_id": 31,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service"
-        },
-        "repair_parent_id": "1208214302",
-        "repair_edge_id": 197,
-        "repair_segment_index": 7,
-        "repair_ops": [
-          "short_edge_collapse"
+          "raw_shape_vertex_simplification"
         ]
       }
     },
@@ -9863,9 +7014,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1209258524",
-        "repair_edge_id": 198,
+        "repair_edge_id": 139,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -9878,8 +7031,8 @@
             12.9354675
           ],
           [
-            100.8848433,
-            12.9355718
+            100.8846548,
+            12.935675
           ]
         ]
       },
@@ -9909,101 +7062,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1209258524",
-        "repair_edge_id": 199,
+        "repair_edge_id": 140,
         "repair_segment_index": 1,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8848433,
-            12.9355718
-          ],
-          [
-            100.8846917,
-            12.9356548
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1209258524_seg_2",
-        "seg_id": 33,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "bicycle": "customers",
-          "foot": "yes",
-          "highway": "service",
-          "motor_vehicle": "customers",
-          "service": "driveway"
-        },
-        "repair_parent_id": "1209258524",
-        "repair_edge_id": 200,
-        "repair_segment_index": 2,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8846917,
-            12.9356548
-          ],
-          [
-            100.8846548,
-            12.935675
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1209258524_seg_3",
-        "seg_id": 33,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "bicycle": "customers",
-          "foot": "yes",
-          "highway": "service",
-          "motor_vehicle": "customers",
-          "service": "driveway"
-        },
-        "repair_parent_id": "1209258524",
-        "repair_edge_id": 201,
-        "repair_segment_index": 3,
-        "repair_ops": []
       }
     },
     {
@@ -10016,8 +7079,8 @@
             12.936137
           ],
           [
-            100.8825901,
-            12.9361133
+            100.8827283,
+            12.9360323
           ]
         ]
       },
@@ -10044,9 +7107,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1209258529",
-        "repair_edge_id": 202,
+        "repair_edge_id": 141,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -10055,12 +7120,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8825901,
-            12.9361133
-          ],
-          [
             100.8827283,
             12.9360323
+          ],
+          [
+            100.8826328,
+            12.9358799
           ]
         ]
       },
@@ -10087,52 +7152,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1209258529",
-        "repair_edge_id": 203,
+        "repair_edge_id": 142,
         "repair_segment_index": 1,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8827283,
-            12.9360323
-          ],
-          [
-            100.8826328,
-            12.9358799
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1209258529_seg_2",
-        "seg_id": 34,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway"
-        },
-        "repair_parent_id": "1209258529",
-        "repair_edge_id": 204,
-        "repair_segment_index": 2,
-        "repair_ops": []
       }
     },
     {
@@ -10173,7 +7197,7 @@
           "service": "driveway"
         },
         "repair_parent_id": "1209258533",
-        "repair_edge_id": 205,
+        "repair_edge_id": 143,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -10215,7 +7239,7 @@
           "highway": "service"
         },
         "repair_parent_id": "1209258534",
-        "repair_edge_id": 206,
+        "repair_edge_id": 144,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -10258,7 +7282,7 @@
           "service": "driveway"
         },
         "repair_parent_id": "1209268124",
-        "repair_edge_id": 207,
+        "repair_edge_id": 145,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -10301,7 +7325,7 @@
           "service": "driveway"
         },
         "repair_parent_id": "1209276004",
-        "repair_edge_id": 208,
+        "repair_edge_id": 146,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -10316,8 +7340,8 @@
             12.9349185
           ],
           [
-            100.8818971,
-            12.9348944
+            100.8819852,
+            12.9348114
           ]
         ]
       },
@@ -10344,54 +7368,10 @@
           "service": "driveway"
         },
         "repair_parent_id": "1210036649",
-        "repair_edge_id": 209,
+        "repair_edge_id": 147,
         "repair_segment_index": 0,
         "repair_ops": [
-          "short_edge_collapse"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8818971,
-            12.9348944
-          ],
-          [
-            100.8819852,
-            12.9348114
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1210036649_seg_1",
-        "seg_id": 39,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway"
-        },
-        "repair_parent_id": "1210036649",
-        "repair_edge_id": 210,
-        "repair_segment_index": 1,
-        "repair_ops": [
+          "raw_shape_vertex_simplification",
           "short_edge_collapse"
         ]
       }
@@ -10406,8 +7386,8 @@
             12.9349919
           ],
           [
-            100.8819445,
-            12.9349706
+            100.8819737,
+            12.9349543
           ]
         ]
       },
@@ -10434,52 +7414,11 @@
           "service": "driveway"
         },
         "repair_parent_id": "1210036650",
-        "repair_edge_id": 211,
+        "repair_edge_id": 148,
         "repair_segment_index": 0,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8819445,
-            12.9349706
-          ],
-          [
-            100.8819737,
-            12.9349543
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1210036650_seg_1",
-        "seg_id": 40,
-        "highway": "service",
-        "name": "",
-        "lanes": "",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "highway": "service",
-          "service": "driveway"
-        },
-        "repair_parent_id": "1210036650",
-        "repair_edge_id": 212,
-        "repair_segment_index": 1,
-        "repair_ops": []
       }
     },
     {
@@ -10521,7 +7460,7 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1210710015",
-        "repair_edge_id": 213,
+        "repair_edge_id": 149,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -10565,7 +7504,7 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1210710015",
-        "repair_edge_id": 214,
+        "repair_edge_id": 150,
         "repair_segment_index": 1,
         "repair_ops": []
       }
@@ -10610,7 +7549,7 @@
           "surface": "concrete"
         },
         "repair_parent_id": "1211501574",
-        "repair_edge_id": 215,
+        "repair_edge_id": 151,
         "repair_segment_index": 0,
         "repair_ops": []
       }
@@ -10625,8 +7564,8 @@
             12.929365
           ],
           [
-            100.8804489,
-            12.9296395
+            100.8805106,
+            12.9296972
           ]
         ]
       },
@@ -10662,9 +7601,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 216,
+        "repair_edge_id": 152,
         "repair_segment_index": 0,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -10673,12 +7614,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8804489,
-            12.9296395
-          ],
-          [
             100.8805106,
             12.9296972
+          ],
+          [
+            100.8806522,
+            12.9298297
           ]
         ]
       },
@@ -10714,9 +7655,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 217,
+        "repair_edge_id": 153,
         "repair_segment_index": 1,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -10725,12 +7668,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8805106,
-            12.9296972
-          ],
-          [
             100.8806522,
             12.9298297
+          ],
+          [
+            100.880835,
+            12.929993
           ]
         ]
       },
@@ -10766,9 +7709,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 218,
+        "repair_edge_id": 154,
         "repair_segment_index": 2,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -10777,12 +7722,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8806522,
-            12.9298297
-          ],
-          [
             100.880835,
             12.929993
+          ],
+          [
+            100.8808868,
+            12.9300444
           ]
         ]
       },
@@ -10818,9 +7763,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 219,
+        "repair_edge_id": 155,
         "repair_segment_index": 3,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -10829,12 +7776,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.880835,
-            12.929993
-          ],
-          [
             100.8808868,
             12.9300444
+          ],
+          [
+            100.8810068,
+            12.9301569
           ]
         ]
       },
@@ -10870,9 +7817,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 220,
+        "repair_edge_id": 156,
         "repair_segment_index": 4,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -10881,12 +7830,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8808868,
-            12.9300444
-          ],
-          [
             100.8810068,
             12.9301569
+          ],
+          [
+            100.8811386,
+            12.9302742
           ]
         ]
       },
@@ -10922,9 +7871,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 221,
+        "repair_edge_id": 157,
         "repair_segment_index": 5,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -10933,12 +7884,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8810068,
-            12.9301569
-          ],
-          [
             100.8811386,
             12.9302742
+          ],
+          [
+            100.8813554,
+            12.9304761
           ]
         ]
       },
@@ -10974,9 +7925,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 222,
+        "repair_edge_id": 158,
         "repair_segment_index": 6,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -10985,12 +7938,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8811386,
-            12.9302742
-          ],
-          [
             100.8813554,
             12.9304761
+          ],
+          [
+            100.8817099,
+            12.9307687
           ]
         ]
       },
@@ -11026,9 +7979,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 223,
+        "repair_edge_id": 159,
         "repair_segment_index": 7,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11037,12 +7992,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8813554,
-            12.9304761
+            100.8817099,
+            12.9307687
           ],
           [
-            100.881593,
-            12.9306744
+            100.881955,
+            12.9309765
           ]
         ]
       },
@@ -11078,9 +8033,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 224,
+        "repair_edge_id": 160,
         "repair_segment_index": 8,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11089,12 +8046,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.881593,
-            12.9306744
+            100.881955,
+            12.9309765
           ],
           [
-            100.8816662,
-            12.9307334
+            100.8820419,
+            12.9310449
           ]
         ]
       },
@@ -11130,9 +8087,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 225,
+        "repair_edge_id": 161,
         "repair_segment_index": 9,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11141,12 +8100,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8816662,
-            12.9307334
+            100.8820419,
+            12.9310449
           ],
           [
-            100.8817099,
-            12.9307687
+            100.8824587,
+            12.9314166
           ]
         ]
       },
@@ -11182,9 +8141,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 226,
+        "repair_edge_id": 162,
         "repair_segment_index": 10,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11193,12 +8154,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8817099,
-            12.9307687
+            100.8824587,
+            12.9314166
           ],
           [
-            100.8818279,
-            12.93087
+            100.8827289,
+            12.9316527
           ]
         ]
       },
@@ -11234,9 +8195,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 227,
+        "repair_edge_id": 163,
         "repair_segment_index": 11,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11245,12 +8208,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8818279,
-            12.93087
+            100.8827289,
+            12.9316527
           ],
           [
-            100.8818829,
-            12.9309166
+            100.8830045,
+            12.9318857
           ]
         ]
       },
@@ -11286,9 +8249,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 228,
+        "repair_edge_id": 164,
         "repair_segment_index": 12,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11297,12 +8262,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8818829,
-            12.9309166
+            100.8830045,
+            12.9318857
           ],
           [
-            100.881955,
-            12.9309765
+            100.8831155,
+            12.9319856
           ]
         ]
       },
@@ -11338,9 +8303,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 229,
+        "repair_edge_id": 165,
         "repair_segment_index": 13,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11349,12 +8316,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.881955,
-            12.9309765
+            100.8831155,
+            12.9319856
           ],
           [
-            100.8820419,
-            12.9310449
+            100.8832465,
+            12.9320967
           ]
         ]
       },
@@ -11390,9 +8357,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 230,
+        "repair_edge_id": 166,
         "repair_segment_index": 14,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11401,12 +8370,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8820419,
-            12.9310449
+            100.8832465,
+            12.9320967
           ],
           [
-            100.8823972,
-            12.9313615
+            100.8834288,
+            12.9322631
           ]
         ]
       },
@@ -11442,9 +8411,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 231,
+        "repair_edge_id": 167,
         "repair_segment_index": 15,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11453,12 +8424,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8823972,
-            12.9313615
+            100.8834288,
+            12.9322631
           ],
           [
-            100.8824587,
-            12.9314166
+            100.8835242,
+            12.9323486
           ]
         ]
       },
@@ -11494,9 +8465,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 232,
+        "repair_edge_id": 168,
         "repair_segment_index": 16,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11505,12 +8478,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8824587,
-            12.9314166
+            100.8835242,
+            12.9323486
           ],
           [
-            100.8827289,
-            12.9316527
+            100.8835642,
+            12.9323852
           ]
         ]
       },
@@ -11546,9 +8519,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 233,
+        "repair_edge_id": 169,
         "repair_segment_index": 17,
-        "repair_ops": []
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
+        ]
       }
     },
     {
@@ -11557,12 +8532,12 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8827289,
-            12.9316527
+            100.8835642,
+            12.9323852
           ],
           [
-            100.8827656,
-            12.9316831
+            100.8837721,
+            12.9325728
           ]
         ]
       },
@@ -11598,425 +8573,11 @@
           "surface": "asphalt"
         },
         "repair_parent_id": "1219573624",
-        "repair_edge_id": 234,
+        "repair_edge_id": 170,
         "repair_segment_index": 18,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8827656,
-            12.9316831
-          ],
-          [
-            100.8828084,
-            12.9317186
-          ]
+        "repair_ops": [
+          "raw_shape_vertex_simplification"
         ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1219573624_seg_19",
-        "seg_id": 43,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "sidewalk": "both",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "1219573624",
-        "repair_edge_id": 235,
-        "repair_segment_index": 19,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8828084,
-            12.9317186
-          ],
-          [
-            100.8830045,
-            12.9318857
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1219573624_seg_20",
-        "seg_id": 43,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "sidewalk": "both",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "1219573624",
-        "repair_edge_id": 236,
-        "repair_segment_index": 20,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8830045,
-            12.9318857
-          ],
-          [
-            100.8831155,
-            12.9319856
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1219573624_seg_21",
-        "seg_id": 43,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "sidewalk": "both",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "1219573624",
-        "repair_edge_id": 237,
-        "repair_segment_index": 21,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8831155,
-            12.9319856
-          ],
-          [
-            100.8832465,
-            12.9320967
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1219573624_seg_22",
-        "seg_id": 43,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "sidewalk": "both",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "1219573624",
-        "repair_edge_id": 238,
-        "repair_segment_index": 22,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8832465,
-            12.9320967
-          ],
-          [
-            100.8834288,
-            12.9322631
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1219573624_seg_23",
-        "seg_id": 43,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "sidewalk": "both",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "1219573624",
-        "repair_edge_id": 239,
-        "repair_segment_index": 23,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8834288,
-            12.9322631
-          ],
-          [
-            100.8835242,
-            12.9323486
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1219573624_seg_24",
-        "seg_id": 43,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "sidewalk": "both",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "1219573624",
-        "repair_edge_id": 240,
-        "repair_segment_index": 24,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8835242,
-            12.9323486
-          ],
-          [
-            100.8835642,
-            12.9323852
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1219573624_seg_25",
-        "seg_id": 43,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "sidewalk": "both",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "1219573624",
-        "repair_edge_id": 241,
-        "repair_segment_index": 25,
-        "repair_ops": []
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8835642,
-            12.9323852
-          ],
-          [
-            100.8837721,
-            12.9325728
-          ]
-        ]
-      },
-      "properties": {
-        "source_provider": "openstreetmap_overpass",
-        "source_feature_id": "1219573624_seg_26",
-        "seg_id": 43,
-        "highway": "secondary",
-        "name": "ถนนพัทยาสายสอง",
-        "lanes": "4",
-        "lanes_forward": "",
-        "lanes_backward": "",
-        "turn_lanes": "",
-        "turn_lanes_forward": "",
-        "turn_lanes_backward": "",
-        "width_m": "",
-        "oneway": "yes",
-        "maxspeed": "",
-        "bridge": "",
-        "tunnel": "",
-        "layer": "",
-        "provider_tags": {
-          "alt_name": "Pattaya 2nd Road",
-          "bicycle": "yes",
-          "highway": "secondary",
-          "lanes": "4",
-          "name": "ถนนพัทยาสายสอง",
-          "name:en": "Pattaya Sai Song Road",
-          "name:ru": "Вторая улица",
-          "name:th": "ถนนพัทยาสายสอง",
-          "oneway": "yes",
-          "sidewalk": "both",
-          "surface": "asphalt"
-        },
-        "repair_parent_id": "1219573624",
-        "repair_edge_id": 242,
-        "repair_segment_index": 26,
-        "repair_ops": []
       }
     }
   ]

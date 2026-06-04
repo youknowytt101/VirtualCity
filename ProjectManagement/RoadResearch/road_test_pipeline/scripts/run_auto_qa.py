@@ -134,6 +134,7 @@ def run_topology_repair_qa(root: Path, area_id: str) -> dict:
         + counts.get("endpoint_to_edge_snaps", 0)
         + counts.get("intersection_split_insertions", 0)
         + counts.get("duplicate_points_removed", 0)
+        + counts.get("raw_shape_vertices_removed", 0)
     )
 
     checks = [

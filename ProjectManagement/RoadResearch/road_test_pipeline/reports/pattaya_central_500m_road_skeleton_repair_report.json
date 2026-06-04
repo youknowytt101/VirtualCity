@@ -4,18 +4,18 @@
   "status": "warn",
   "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_clean_skeleton.geojson",
-  "feature_count": 413,
+  "feature_count": 340,
   "part_counts": {
-    "optimized_approach_centerline": 243,
-    "optimized_corner_fillet": 21,
+    "optimized_approach_centerline": 171,
+    "optimized_corner_fillet": 20,
     "optimized_junction_connector": 149
   },
   "arc_geometry_counts": {
-    "bezier_tangent_fallback": 52,
-    "circular_arc": 75,
+    "bezier_tangent_fallback": 31,
+    "circular_arc": 95,
     "param_poly3_hermite": 1,
     "straight_infinite_radius": 42
   },
-  "radius_violation_features": 78,
+  "radius_violation_features": 75,
   "note": "Radius violations stay visible as skeleton diagnostics; they are not fixed in Houdini."
 }

@@ -19,11 +19,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
       "bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -48,11 +48,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
       "bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -77,11 +77,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
       "bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -108,20 +108,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00132",
       "exit_lane_link_id": "ll_00138",
-      "internal_bridge_lane_id": "ln_e_0241_f_00",
+      "internal_bridge_lane_id": "ln_e_0169_f_00",
       "internal_bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
-      "entry_junction_node_id": "n_0117",
-      "exit_junction_node_id": "n_0118",
+      "entry_junction_node_id": "n_0081",
+      "exit_junction_node_id": "n_0082",
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
-      "from_lane_id": "ln_e_0240_f_00",
-      "to_lane_id": "ln_e_0041_f_00",
-      "from_edge_id": "e_0240",
-      "to_edge_id": "e_0041",
+      "from_lane_id": "ln_e_0168_f_00",
+      "to_lane_id": "ln_e_0035_f_00",
+      "from_edge_id": "e_0168",
+      "to_edge_id": "e_0035",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -131,7 +131,7 @@
       ],
       "end_xz": [
         -8.976,
-        -210.607
+        -210.606
       ],
       "start_tangent_xz": [
         0.736,
@@ -142,13 +142,13 @@
         -0.668
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0240_f_00_n_0117_entry_anchor",
+        "anchor_id": "ln_e_0168_f_00_n_0081_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0240_f_00",
-        "edge_id": "e_0240",
-        "node_id": "n_0117",
-        "pose_id": "j_022_e_0240_entry",
+        "lane_id": "ln_e_0168_f_00",
+        "edge_id": "e_0168",
+        "node_id": "n_0081",
+        "pose_id": "j_022_e_0168_entry",
         "point_xz": [
           -24.794,
           -214.75
@@ -163,16 +163,16 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0041_f_00_n_0118_exit_anchor",
+        "anchor_id": "ln_e_0035_f_00_n_0082_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0041_f_00",
-        "edge_id": "e_0041",
-        "node_id": "n_0118",
-        "pose_id": "j_023_e_0041_entry",
+        "lane_id": "ln_e_0035_f_00",
+        "edge_id": "e_0035",
+        "node_id": "n_0082",
+        "pose_id": "j_023_e_0035_entry",
         "point_xz": [
           -8.976,
-          -210.607
+          -210.606
         ],
         "tangent_xz": [
           0.744,
@@ -181,12 +181,10 @@
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
-        "issues": [
-          "exit_anchor_short_edge_absorption_candidate"
-        ]
+        "issues": []
       },
-      "chord_length_m": 16.351,
-      "tangent_delta_deg": 84.505,
+      "chord_length_m": 16.352,
+      "tangent_delta_deg": 84.496,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -197,7 +195,7 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 16.351,
+          "length_m": 16.352,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
@@ -206,12 +204,11 @@
             ],
             [
               -8.976,
-              -210.607
+              -210.606
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -225,8 +222,8 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 17.758,
-          "min_radius_proxy_m": 5.79,
+          "length_m": 17.759,
+          "min_radius_proxy_m": 5.791,
           "centerline_xz": [
             [
               -24.794,
@@ -258,48 +255,47 @@
             ],
             [
               -17.987,
-              -210.222
+              -210.221
             ],
             [
               -16.903,
-              -209.793
+              -209.792
             ],
             [
               -15.818,
-              -209.454
+              -209.453
             ],
             [
               -14.742,
-              -209.217
+              -209.216
             ],
             [
               -13.684,
-              -209.094
+              -209.093
             ],
             [
               -12.652,
-              -209.097
+              -209.096
             ],
             [
-              -11.657,
-              -209.238
+              -11.656,
+              -209.237
             ],
             [
               -10.706,
-              -209.529
+              -209.528
             ],
             [
-              -9.81,
-              -209.981
+              -9.809,
+              -209.98
             ],
             [
               -8.976,
-              -210.607
+              -210.606
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -314,14 +310,14 @@
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
           "length_m": 18.79,
-          "min_radius_proxy_m": 5.604,
+          "min_radius_proxy_m": 5.605,
           "centerline_xz": [
             [
               -24.794,
               -214.75
             ],
             [
-              -23.692,
+              -23.691,
               -213.732
             ],
             [
@@ -342,7 +338,7 @@
             ],
             [
               -18.749,
-              -209.568
+              -209.567
             ],
             [
               -17.827,
@@ -350,44 +346,43 @@
             ],
             [
               -16.91,
-              -208.556
+              -208.555
             ],
             [
               -15.993,
               -208.237
             ],
             [
-              -15.069,
+              -15.068,
               -208.059
             ],
             [
               -14.129,
-              -208.034
+              -208.033
             ],
             [
-              -13.169,
-              -208.173
+              -13.168,
+              -208.172
             ],
             [
               -12.18,
-              -208.488
+              -208.487
             ],
             [
               -11.156,
-              -208.991
+              -208.99
             ],
             [
-              -10.091,
-              -209.693
+              -10.09,
+              -209.692
             ],
             [
               -8.976,
-              -210.607
+              -210.606
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -398,7 +393,6 @@
       ],
       "issues": [
         "compound_junction_merge_trial",
-        "exit_anchor_short_edge_absorption_candidate",
         "inferred_without_turn_lanes",
         "low_confidence_from_lane",
         "low_confidence_to_lane",
@@ -412,20 +406,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00132",
       "exit_lane_link_id": "ll_00139",
-      "internal_bridge_lane_id": "ln_e_0241_f_00",
+      "internal_bridge_lane_id": "ln_e_0169_f_00",
       "internal_bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
-      "entry_junction_node_id": "n_0117",
-      "exit_junction_node_id": "n_0118",
+      "entry_junction_node_id": "n_0081",
+      "exit_junction_node_id": "n_0082",
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
-      "from_lane_id": "ln_e_0240_f_00",
-      "to_lane_id": "ln_e_0242_f_00",
-      "from_edge_id": "e_0240",
-      "to_edge_id": "e_0242",
+      "from_lane_id": "ln_e_0168_f_00",
+      "to_lane_id": "ln_e_0170_f_00",
+      "from_edge_id": "e_0168",
+      "to_edge_id": "e_0170",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -446,13 +440,13 @@
         0.679
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0240_f_00_n_0117_entry_anchor",
+        "anchor_id": "ln_e_0168_f_00_n_0081_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0240_f_00",
-        "edge_id": "e_0240",
-        "node_id": "n_0117",
-        "pose_id": "j_022_e_0240_entry",
+        "lane_id": "ln_e_0168_f_00",
+        "edge_id": "e_0168",
+        "node_id": "n_0081",
+        "pose_id": "j_022_e_0168_entry",
         "point_xz": [
           -24.794,
           -214.75
@@ -467,13 +461,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0242_f_00_n_0118_exit_anchor",
+        "anchor_id": "ln_e_0170_f_00_n_0082_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0242_f_00",
-        "edge_id": "e_0242",
-        "node_id": "n_0118",
-        "pose_id": "j_023_e_0242_entry",
+        "lane_id": "ln_e_0170_f_00",
+        "edge_id": "e_0170",
+        "node_id": "n_0082",
+        "pose_id": "j_023_e_0170_entry",
         "point_xz": [
           -11.198,
           -202.136
@@ -710,54 +704,54 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00137",
       "exit_lane_link_id": "ll_00138",
-      "internal_bridge_lane_id": "ln_e_0241_f_00",
+      "internal_bridge_lane_id": "ln_e_0169_f_00",
       "internal_bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
-      "entry_junction_node_id": "n_0117",
-      "exit_junction_node_id": "n_0118",
+      "entry_junction_node_id": "n_0081",
+      "exit_junction_node_id": "n_0082",
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
-      "from_lane_id": "ln_e_0149_b_00",
-      "to_lane_id": "ln_e_0041_f_00",
-      "from_edge_id": "e_0149",
-      "to_edge_id": "e_0041",
+      "from_lane_id": "ln_e_0103_b_00",
+      "to_lane_id": "ln_e_0035_f_00",
+      "from_edge_id": "e_0103",
+      "to_edge_id": "e_0035",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
       "start_xz": [
-        -22.545,
-        -206.168
+        -22.582,
+        -206.192
       ],
       "end_xz": [
         -8.976,
-        -210.607
+        -210.606
       ],
       "start_tangent_xz": [
-        0.726,
-        -0.688
+        0.73,
+        -0.683
       ],
       "end_tangent_xz": [
         0.744,
         -0.668
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0149_b_00_n_0117_entry_anchor",
+        "anchor_id": "ln_e_0103_b_00_n_0081_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0149_b_00",
-        "edge_id": "e_0149",
-        "node_id": "n_0117",
-        "pose_id": "j_022_e_0149_entry",
+        "lane_id": "ln_e_0103_b_00",
+        "edge_id": "e_0103",
+        "node_id": "n_0081",
+        "pose_id": "j_022_e_0103_entry",
         "point_xz": [
-          -22.545,
-          -206.168
+          -22.582,
+          -206.192
         ],
         "tangent_xz": [
-          0.726,
-          -0.688
+          0.73,
+          -0.683
         ],
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
@@ -765,16 +759,16 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0041_f_00_n_0118_exit_anchor",
+        "anchor_id": "ln_e_0035_f_00_n_0082_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0041_f_00",
-        "edge_id": "e_0041",
-        "node_id": "n_0118",
-        "pose_id": "j_023_e_0041_entry",
+        "lane_id": "ln_e_0035_f_00",
+        "edge_id": "e_0035",
+        "node_id": "n_0082",
+        "pose_id": "j_023_e_0035_entry",
         "point_xz": [
           -8.976,
-          -210.607
+          -210.606
         ],
         "tangent_xz": [
           0.744,
@@ -783,12 +777,10 @@
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
-        "issues": [
-          "exit_anchor_short_edge_absorption_candidate"
-        ]
+        "issues": []
       },
-      "chord_length_m": 14.276,
-      "tangent_delta_deg": 1.575,
+      "chord_length_m": 14.305,
+      "tangent_delta_deg": 1.194,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -799,21 +791,20 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.276,
+          "length_m": 14.305,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
-              -22.545,
-              -206.168
+              -22.582,
+              -206.192
             ],
             [
               -8.976,
-              -210.607
+              -210.606
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -827,81 +818,80 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.542,
-          "min_radius_proxy_m": 6.394,
+          "length_m": 14.569,
+          "min_radius_proxy_m": 6.444,
           "centerline_xz": [
             [
-              -22.545,
-              -206.168
+              -22.582,
+              -206.192
             ],
             [
-              -21.836,
-              -206.748
+              -21.868,
+              -206.768
             ],
             [
-              -21.074,
-              -207.209
+              -21.1,
+              -207.226
             ],
             [
-              -20.265,
-              -207.568
+              -20.288,
+              -207.582
             ],
             [
-              -19.418,
-              -207.843
+              -19.438,
+              -207.854
             ],
             [
-              -18.54,
-              -208.049
+              -18.557,
+              -208.058
             ],
             [
-              -17.639,
-              -208.204
+              -17.653,
+              -208.21
             ],
             [
-              -16.722,
-              -208.323
+              -16.733,
+              -208.328
             ],
             [
-              -15.796,
-              -208.425
+              -15.805,
+              -208.428
             ],
             [
-              -14.869,
-              -208.526
+              -14.877,
+              -208.527
             ],
             [
-              -13.948,
-              -208.643
+              -13.954,
+              -208.642
             ],
             [
-              -13.041,
-              -208.791
+              -13.046,
+              -208.79
             ],
             [
-              -12.156,
-              -208.989
+              -12.16,
+              -208.987
             ],
             [
-              -11.299,
-              -209.253
+              -11.302,
+              -209.25
             ],
             [
-              -10.478,
-              -209.599
+              -10.48,
+              -209.597
             ],
             [
               -9.702,
-              -210.045
+              -210.043
             ],
             [
               -8.976,
-              -210.607
+              -210.606
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -915,81 +905,80 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.779,
-          "min_radius_proxy_m": 6.612,
+          "length_m": 14.806,
+          "min_radius_proxy_m": 6.677,
           "centerline_xz": [
             [
-              -22.545,
-              -206.168
+              -22.582,
+              -206.192
             ],
             [
-              -21.597,
-              -206.975
+              -21.627,
+              -206.994
             ],
             [
-              -20.693,
-              -207.573
+              -20.716,
+              -207.588
             ],
             [
-              -19.825,
-              -207.993
+              -19.843,
+              -208.004
             ],
             [
-              -18.987,
-              -208.263
+              -19.001,
+              -208.271
             ],
             [
-              -18.173,
-              -208.414
+              -18.184,
+              -208.418
             ],
             [
-              -17.376,
-              -208.474
+              -17.385,
+              -208.476
             ],
             [
-              -16.591,
+              -16.598,
               -208.473
             ],
             [
-              -15.811,
-              -208.442
+              -15.817,
+              -208.44
             ],
             [
-              -15.029,
-              -208.408
+              -15.034,
+              -208.405
             ],
             [
-              -14.239,
-              -208.403
+              -14.243,
+              -208.399
             ],
             [
-              -13.434,
-              -208.454
+              -13.438,
+              -208.45
             ],
             [
-              -12.609,
-              -208.593
+              -12.613,
+              -208.588
             ],
             [
-              -11.758,
-              -208.848
+              -11.761,
+              -208.844
             ],
             [
-              -10.872,
-              -209.249
+              -10.875,
+              -209.245
             ],
             [
-              -9.947,
-              -209.826
+              -9.948,
+              -209.823
             ],
             [
               -8.976,
-              -210.607
+              -210.606
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -1000,7 +989,6 @@
       ],
       "issues": [
         "compound_junction_merge_trial",
-        "exit_anchor_short_edge_absorption_candidate",
         "inferred_without_turn_lanes",
         "low_confidence_from_lane",
         "low_confidence_to_lane",
@@ -1014,54 +1002,54 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00137",
       "exit_lane_link_id": "ll_00139",
-      "internal_bridge_lane_id": "ln_e_0241_f_00",
+      "internal_bridge_lane_id": "ln_e_0169_f_00",
       "internal_bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
-      "entry_junction_node_id": "n_0117",
-      "exit_junction_node_id": "n_0118",
+      "entry_junction_node_id": "n_0081",
+      "exit_junction_node_id": "n_0082",
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
-      "from_lane_id": "ln_e_0149_b_00",
-      "to_lane_id": "ln_e_0242_f_00",
-      "from_edge_id": "e_0149",
-      "to_edge_id": "e_0242",
+      "from_lane_id": "ln_e_0103_b_00",
+      "to_lane_id": "ln_e_0170_f_00",
+      "from_edge_id": "e_0103",
+      "to_edge_id": "e_0170",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
       "start_xz": [
-        -22.545,
-        -206.168
+        -22.582,
+        -206.192
       ],
       "end_xz": [
         -11.198,
         -202.136
       ],
       "start_tangent_xz": [
-        0.726,
-        -0.688
+        0.73,
+        -0.683
       ],
       "end_tangent_xz": [
         0.734,
         0.679
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0149_b_00_n_0117_entry_anchor",
+        "anchor_id": "ln_e_0103_b_00_n_0081_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0149_b_00",
-        "edge_id": "e_0149",
-        "node_id": "n_0117",
-        "pose_id": "j_022_e_0149_entry",
+        "lane_id": "ln_e_0103_b_00",
+        "edge_id": "e_0103",
+        "node_id": "n_0081",
+        "pose_id": "j_022_e_0103_entry",
         "point_xz": [
-          -22.545,
-          -206.168
+          -22.582,
+          -206.192
         ],
         "tangent_xz": [
-          0.726,
-          -0.688
+          0.73,
+          -0.683
         ],
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
@@ -1069,13 +1057,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0242_f_00_n_0118_exit_anchor",
+        "anchor_id": "ln_e_0170_f_00_n_0082_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0242_f_00",
-        "edge_id": "e_0242",
-        "node_id": "n_0118",
-        "pose_id": "j_023_e_0242_entry",
+        "lane_id": "ln_e_0170_f_00",
+        "edge_id": "e_0170",
+        "node_id": "n_0082",
+        "pose_id": "j_023_e_0170_entry",
         "point_xz": [
           -11.198,
           -202.136
@@ -1089,8 +1077,8 @@
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 12.042,
-      "tangent_delta_deg": 86.273,
+      "chord_length_m": 12.085,
+      "tangent_delta_deg": 85.883,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -1101,12 +1089,12 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 12.042,
+          "length_m": 12.085,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
-              -22.545,
-              -206.168
+              -22.582,
+              -206.192
             ],
             [
               -11.198,
@@ -1128,72 +1116,72 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 13.134,
-          "min_radius_proxy_m": 3.477,
+          "length_m": 13.173,
+          "min_radius_proxy_m": 3.518,
           "centerline_xz": [
             [
-              -22.545,
-              -206.168
+              -22.582,
+              -206.192
             ],
             [
-              -21.948,
-              -206.632
+              -21.979,
+              -206.654
             ],
             [
-              -21.306,
-              -206.945
+              -21.333,
+              -206.965
             ],
             [
-              -20.627,
-              -207.118
+              -20.65,
+              -207.136
             ],
             [
-              -19.917,
-              -207.164
+              -19.937,
+              -207.181
             ],
             [
-              -19.181,
-              -207.095
+              -19.198,
+              -207.11
             ],
             [
-              -18.426,
-              -206.922
+              -18.441,
+              -206.936
             ],
             [
-              -17.659,
-              -206.657
+              -17.671,
+              -206.67
             ],
             [
-              -16.884,
-              -206.313
+              -16.896,
+              -206.325
             ],
             [
-              -16.11,
-              -205.902
+              -16.12,
+              -205.912
             ],
             [
-              -15.341,
-              -205.435
+              -15.349,
+              -205.444
             ],
             [
-              -14.584,
-              -204.924
+              -14.591,
+              -204.932
             ],
             [
-              -13.846,
-              -204.382
+              -13.852,
+              -204.388
             ],
             [
-              -13.132,
-              -203.82
+              -13.136,
+              -203.825
             ],
             [
-              -12.448,
-              -203.25
+              -12.452,
+              -203.254
             ],
             [
-              -11.801,
-              -202.685
+              -11.803,
+              -202.687
             ],
             [
               -11.198,
@@ -1215,72 +1203,72 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 13.935,
-          "min_radius_proxy_m": 3.464,
+          "length_m": 13.971,
+          "min_radius_proxy_m": 3.492,
           "centerline_xz": [
             [
-              -22.545,
-              -206.168
+              -22.582,
+              -206.192
             ],
             [
-              -21.746,
-              -206.85
+              -21.776,
+              -206.871
             ],
             [
-              -20.984,
-              -207.352
+              -21.008,
+              -207.371
             ],
             [
-              -20.254,
-              -207.685
+              -20.273,
+              -207.702
             ],
             [
-              -19.55,
-              -207.861
+              -19.565,
+              -207.876
             ],
             [
-              -18.867,
-              -207.893
+              -18.879,
+              -207.907
             ],
             [
-              -18.2,
-              -207.791
+              -18.21,
+              -207.805
             ],
             [
-              -17.542,
-              -207.57
+              -17.551,
+              -207.582
             ],
             [
-              -16.89,
-              -207.24
+              -16.898,
+              -207.251
             ],
             [
-              -16.237,
-              -206.813
+              -16.244,
+              -206.823
             ],
             [
-              -15.578,
-              -206.302
+              -15.585,
+              -206.311
             ],
             [
-              -14.908,
-              -205.718
+              -14.914,
+              -205.727
             ],
             [
-              -14.221,
-              -205.074
+              -14.227,
+              -205.082
             ],
             [
-              -13.511,
-              -204.382
+              -13.517,
+              -204.388
             ],
             [
-              -12.775,
-              -203.654
+              -12.779,
+              -203.658
             ],
             [
-              -12.006,
-              -202.901
+              -12.008,
+              -202.903
             ],
             [
               -11.198,
@@ -1312,26 +1300,26 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00140",
       "exit_lane_link_id": "ll_00134",
-      "internal_bridge_lane_id": "ln_e_0241_b_00",
+      "internal_bridge_lane_id": "ln_e_0169_b_00",
       "internal_bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
-      "entry_junction_node_id": "n_0118",
-      "exit_junction_node_id": "n_0117",
+      "entry_junction_node_id": "n_0082",
+      "exit_junction_node_id": "n_0081",
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
-      "from_lane_id": "ln_e_0041_b_00",
-      "to_lane_id": "ln_e_0240_b_00",
-      "from_edge_id": "e_0041",
-      "to_edge_id": "e_0240",
+      "from_lane_id": "ln_e_0035_b_00",
+      "to_lane_id": "ln_e_0168_b_00",
+      "from_edge_id": "e_0035",
+      "to_edge_id": "e_0168",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
       "start_xz": [
-        -11.114,
-        -212.989
+        -11.112,
+        -212.988
       ],
       "end_xz": [
         -22.628,
@@ -1346,16 +1334,16 @@
         -0.677
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0041_b_00_n_0118_entry_anchor",
+        "anchor_id": "ln_e_0035_b_00_n_0082_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0041_b_00",
-        "edge_id": "e_0041",
-        "node_id": "n_0118",
-        "pose_id": "j_023_e_0041_entry",
+        "lane_id": "ln_e_0035_b_00",
+        "edge_id": "e_0035",
+        "node_id": "n_0082",
+        "pose_id": "j_023_e_0035_entry",
         "point_xz": [
-          -11.114,
-          -212.989
+          -11.112,
+          -212.988
         ],
         "tangent_xz": [
           -0.744,
@@ -1364,18 +1352,16 @@
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
-        "issues": [
-          "entry_anchor_short_edge_absorption_candidate"
-        ]
+        "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0240_b_00_n_0117_exit_anchor",
+        "anchor_id": "ln_e_0168_b_00_n_0081_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0240_b_00",
-        "edge_id": "e_0240",
-        "node_id": "n_0117",
-        "pose_id": "j_022_e_0240_entry",
+        "lane_id": "ln_e_0168_b_00",
+        "edge_id": "e_0168",
+        "node_id": "n_0081",
+        "pose_id": "j_022_e_0168_entry",
         "point_xz": [
           -22.628,
           -217.106
@@ -1389,8 +1375,8 @@
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 12.228,
-      "tangent_delta_deg": 84.505,
+      "chord_length_m": 12.23,
+      "tangent_delta_deg": 84.496,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -1401,12 +1387,12 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 12.228,
+          "length_m": 12.23,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
-              -11.114,
-              -212.989
+              -11.112,
+              -212.988
             ],
             [
               -22.628,
@@ -1415,7 +1401,6 @@
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -1429,48 +1414,48 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 13.301,
-          "min_radius_proxy_m": 3.652,
+          "length_m": 13.302,
+          "min_radius_proxy_m": 3.653,
           "centerline_xz": [
             [
-              -11.114,
-              -212.989
+              -11.112,
+              -212.988
             ],
             [
-              -11.733,
-              -212.532
+              -11.732,
+              -212.531
             ],
             [
-              -12.394,
-              -212.226
+              -12.393,
+              -212.225
             ],
             [
-              -13.089,
-              -212.059
+              -13.088,
+              -212.058
             ],
             [
-              -13.814,
-              -212.019
+              -13.813,
+              -212.018
             ],
             [
               -14.561,
-              -212.094
+              -212.093
             ],
             [
-              -15.326,
+              -15.325,
               -212.271
             ],
             [
               -16.102,
-              -212.541
+              -212.54
             ],
             [
               -16.884,
-              -212.889
+              -212.888
             ],
             [
               -17.665,
-              -213.305
+              -213.304
             ],
             [
               -18.44,
@@ -1503,7 +1488,6 @@
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -1517,56 +1501,56 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.089,
-          "min_radius_proxy_m": 3.583,
+          "length_m": 14.09,
+          "min_radius_proxy_m": 3.584,
           "centerline_xz": [
             [
-              -11.114,
-              -212.989
+              -11.112,
+              -212.988
             ],
             [
-              -11.943,
-              -212.317
+              -11.942,
+              -212.316
             ],
             [
-              -12.73,
-              -211.824
+              -12.729,
+              -211.823
             ],
             [
               -13.48,
-              -211.498
+              -211.497
             ],
             [
-              -14.2,
+              -14.199,
               -211.327
             ],
             [
               -14.894,
-              -211.301
+              -211.3
             ],
             [
               -15.57,
-              -211.406
+              -211.405
             ],
             [
               -16.233,
-              -211.631
+              -211.63
             ],
             [
-              -16.89,
-              -211.964
+              -16.889,
+              -211.963
             ],
             [
-              -17.546,
-              -212.394
+              -17.545,
+              -212.393
             ],
             [
               -18.207,
-              -212.908
+              -212.907
             ],
             [
-              -18.88,
-              -213.495
+              -18.879,
+              -213.494
             ],
             [
               -19.57,
@@ -1591,7 +1575,6 @@
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -1602,7 +1585,6 @@
       ],
       "issues": [
         "compound_junction_merge_trial",
-        "entry_anchor_short_edge_absorption_candidate",
         "inferred_without_turn_lanes",
         "low_confidence_from_lane",
         "low_confidence_to_lane",
@@ -1616,50 +1598,50 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00140",
       "exit_lane_link_id": "ll_00135",
-      "internal_bridge_lane_id": "ln_e_0241_b_00",
+      "internal_bridge_lane_id": "ln_e_0169_b_00",
       "internal_bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
-      "entry_junction_node_id": "n_0118",
-      "exit_junction_node_id": "n_0117",
+      "entry_junction_node_id": "n_0082",
+      "exit_junction_node_id": "n_0081",
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
-      "from_lane_id": "ln_e_0041_b_00",
-      "to_lane_id": "ln_e_0149_f_00",
-      "from_edge_id": "e_0041",
-      "to_edge_id": "e_0149",
+      "from_lane_id": "ln_e_0035_b_00",
+      "to_lane_id": "ln_e_0103_f_00",
+      "from_edge_id": "e_0035",
+      "to_edge_id": "e_0103",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
       "start_xz": [
-        -11.114,
-        -212.989
+        -11.112,
+        -212.988
       ],
       "end_xz": [
-        -24.747,
-        -208.49
+        -24.768,
+        -208.528
       ],
       "start_tangent_xz": [
         -0.744,
         0.668
       ],
       "end_tangent_xz": [
-        -0.726,
-        0.688
+        -0.73,
+        0.683
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0041_b_00_n_0118_entry_anchor",
+        "anchor_id": "ln_e_0035_b_00_n_0082_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0041_b_00",
-        "edge_id": "e_0041",
-        "node_id": "n_0118",
-        "pose_id": "j_023_e_0041_entry",
+        "lane_id": "ln_e_0035_b_00",
+        "edge_id": "e_0035",
+        "node_id": "n_0082",
+        "pose_id": "j_023_e_0035_entry",
         "point_xz": [
-          -11.114,
-          -212.989
+          -11.112,
+          -212.988
         ],
         "tangent_xz": [
           -0.744,
@@ -1668,33 +1650,31 @@
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
-        "issues": [
-          "entry_anchor_short_edge_absorption_candidate"
-        ]
+        "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0149_f_00_n_0117_exit_anchor",
+        "anchor_id": "ln_e_0103_f_00_n_0081_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0149_f_00",
-        "edge_id": "e_0149",
-        "node_id": "n_0117",
-        "pose_id": "j_022_e_0149_entry",
+        "lane_id": "ln_e_0103_f_00",
+        "edge_id": "e_0103",
+        "node_id": "n_0081",
+        "pose_id": "j_022_e_0103_entry",
         "point_xz": [
-          -24.747,
-          -208.49
+          -24.768,
+          -208.528
         ],
         "tangent_xz": [
-          -0.726,
-          0.688
+          -0.73,
+          0.683
         ],
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 14.356,
-      "tangent_delta_deg": 1.575,
+      "chord_length_m": 14.365,
+      "tangent_delta_deg": 1.194,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -1705,21 +1685,20 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.356,
+          "length_m": 14.365,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
-              -11.114,
-              -212.989
+              -11.112,
+              -212.988
             ],
             [
-              -24.747,
-              -208.49
+              -24.768,
+              -208.528
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -1733,20 +1712,20 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.62,
-          "min_radius_proxy_m": 6.47,
+          "length_m": 14.629,
+          "min_radius_proxy_m": 6.502,
           "centerline_xz": [
             [
-              -11.114,
-              -212.989
+              -11.112,
+              -212.988
             ],
             [
-              -11.843,
-              -212.423
+              -11.842,
+              -212.422
             ],
             [
-              -12.624,
-              -211.974
+              -12.623,
+              -211.973
             ],
             [
               -13.448,
@@ -1754,60 +1733,59 @@
             ],
             [
               -14.309,
-              -211.356
+              -211.358
             ],
             [
               -15.198,
-              -211.155
+              -211.158
             ],
             [
-              -16.109,
-              -211.002
+              -16.11,
+              -211.007
             ],
             [
-              -17.034,
-              -210.882
+              -17.035,
+              -210.889
             ],
             [
-              -17.965,
-              -210.778
+              -17.967,
+              -210.787
             ],
             [
-              -18.895,
-              -210.672
+              -18.898,
+              -210.684
             ],
             [
-              -19.817,
-              -210.548
+              -19.82,
+              -210.564
             ],
             [
-              -20.722,
-              -210.39
+              -20.728,
+              -210.409
             ],
             [
-              -21.604,
-              -210.18
+              -21.612,
+              -210.202
             ],
             [
-              -22.455,
-              -209.901
+              -22.465,
+              -209.928
             ],
             [
-              -23.268,
-              -209.538
+              -23.281,
+              -209.569
             ],
             [
-              -24.034,
-              -209.073
+              -24.051,
+              -209.108
             ],
             [
-              -24.747,
-              -208.49
+              -24.768,
+              -208.528
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -1821,81 +1799,80 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.857,
-          "min_radius_proxy_m": 6.682,
+          "length_m": 14.865,
+          "min_radius_proxy_m": 6.73,
           "centerline_xz": [
             [
-              -11.114,
-              -212.989
+              -11.112,
+              -212.988
             ],
             [
-              -12.09,
-              -212.203
+              -12.089,
+              -212.201
             ],
             [
-              -13.02,
-              -211.622
+              -13.019,
+              -211.621
             ],
             [
               -13.909,
-              -211.217
+              -211.216
             ],
             [
-              -14.765,
+              -14.764,
               -210.958
             ],
             [
-              -15.594,
-              -210.816
+              -15.592,
+              -210.817
             ],
             [
-              -16.402,
-              -210.761
-            ],
-            [
-              -17.195,
+              -16.4,
               -210.763
             ],
             [
-              -17.98,
-              -210.794
+              -17.193,
+              -210.767
             ],
             [
-              -18.764,
-              -210.823
+              -17.978,
+              -210.8
             ],
             [
-              -19.553,
-              -210.82
+              -18.762,
+              -210.831
+            ],
+            [
+              -19.552,
+              -210.831
             ],
             [
               -20.353,
-              -210.756
+              -210.771
             ],
             [
-              -21.171,
-              -210.603
+              -21.173,
+              -210.621
             ],
             [
-              -22.012,
-              -210.328
+              -22.018,
+              -210.351
             ],
             [
-              -22.885,
-              -209.905
+              -22.894,
+              -209.932
             ],
             [
-              -23.794,
-              -209.302
+              -23.809,
+              -209.334
             ],
             [
-              -24.747,
-              -208.49
+              -24.768,
+              -208.528
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -1906,7 +1883,6 @@
       ],
       "issues": [
         "compound_junction_merge_trial",
-        "entry_anchor_short_edge_absorption_candidate",
         "inferred_without_turn_lanes",
         "low_confidence_from_lane",
         "low_confidence_to_lane",
@@ -1920,20 +1896,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00142",
       "exit_lane_link_id": "ll_00134",
-      "internal_bridge_lane_id": "ln_e_0241_b_00",
+      "internal_bridge_lane_id": "ln_e_0169_b_00",
       "internal_bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
-      "entry_junction_node_id": "n_0118",
-      "exit_junction_node_id": "n_0117",
+      "entry_junction_node_id": "n_0082",
+      "exit_junction_node_id": "n_0081",
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
-      "from_lane_id": "ln_e_0242_b_00",
-      "to_lane_id": "ln_e_0240_b_00",
-      "from_edge_id": "e_0242",
-      "to_edge_id": "e_0240",
+      "from_lane_id": "ln_e_0170_b_00",
+      "to_lane_id": "ln_e_0168_b_00",
+      "from_edge_id": "e_0170",
+      "to_edge_id": "e_0168",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -1954,13 +1930,13 @@
         -0.677
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0242_b_00_n_0118_entry_anchor",
+        "anchor_id": "ln_e_0170_b_00_n_0082_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0242_b_00",
-        "edge_id": "e_0242",
-        "node_id": "n_0118",
-        "pose_id": "j_023_e_0242_entry",
+        "lane_id": "ln_e_0170_b_00",
+        "edge_id": "e_0170",
+        "node_id": "n_0082",
+        "pose_id": "j_023_e_0170_entry",
         "point_xz": [
           -9.024,
           -204.484
@@ -1975,13 +1951,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0240_b_00_n_0117_exit_anchor",
+        "anchor_id": "ln_e_0168_b_00_n_0081_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0240_b_00",
-        "edge_id": "e_0240",
-        "node_id": "n_0117",
-        "pose_id": "j_022_e_0240_entry",
+        "lane_id": "ln_e_0168_b_00",
+        "edge_id": "e_0168",
+        "node_id": "n_0081",
+        "pose_id": "j_022_e_0168_entry",
         "point_xz": [
           -22.628,
           -217.106
@@ -2218,20 +2194,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00142",
       "exit_lane_link_id": "ll_00135",
-      "internal_bridge_lane_id": "ln_e_0241_b_00",
+      "internal_bridge_lane_id": "ln_e_0169_b_00",
       "internal_bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
-      "entry_junction_node_id": "n_0118",
-      "exit_junction_node_id": "n_0117",
+      "entry_junction_node_id": "n_0082",
+      "exit_junction_node_id": "n_0081",
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
-      "from_lane_id": "ln_e_0242_b_00",
-      "to_lane_id": "ln_e_0149_f_00",
-      "from_edge_id": "e_0242",
-      "to_edge_id": "e_0149",
+      "from_lane_id": "ln_e_0170_b_00",
+      "to_lane_id": "ln_e_0103_f_00",
+      "from_edge_id": "e_0170",
+      "to_edge_id": "e_0103",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -2240,25 +2216,25 @@
         -204.484
       ],
       "end_xz": [
-        -24.747,
-        -208.49
+        -24.768,
+        -208.528
       ],
       "start_tangent_xz": [
         -0.734,
         -0.679
       ],
       "end_tangent_xz": [
-        -0.726,
-        0.688
+        -0.73,
+        0.683
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0242_b_00_n_0118_entry_anchor",
+        "anchor_id": "ln_e_0170_b_00_n_0082_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0242_b_00",
-        "edge_id": "e_0242",
-        "node_id": "n_0118",
-        "pose_id": "j_023_e_0242_entry",
+        "lane_id": "ln_e_0170_b_00",
+        "edge_id": "e_0170",
+        "node_id": "n_0082",
+        "pose_id": "j_023_e_0170_entry",
         "point_xz": [
           -9.024,
           -204.484
@@ -2273,28 +2249,28 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0149_f_00_n_0117_exit_anchor",
+        "anchor_id": "ln_e_0103_f_00_n_0081_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0149_f_00",
-        "edge_id": "e_0149",
-        "node_id": "n_0117",
-        "pose_id": "j_022_e_0149_entry",
+        "lane_id": "ln_e_0103_f_00",
+        "edge_id": "e_0103",
+        "node_id": "n_0081",
+        "pose_id": "j_022_e_0103_entry",
         "point_xz": [
-          -24.747,
-          -208.49
+          -24.768,
+          -208.528
         ],
         "tangent_xz": [
-          -0.726,
-          0.688
+          -0.73,
+          0.683
         ],
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 16.225,
-      "tangent_delta_deg": 86.273,
+      "chord_length_m": 16.255,
+      "tangent_delta_deg": 85.883,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -2305,7 +2281,7 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 16.225,
+          "length_m": 16.255,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
@@ -2313,8 +2289,8 @@
               -204.484
             ],
             [
-              -24.747,
-              -208.49
+              -24.768,
+              -208.528
             ]
           ],
           "issues": [
@@ -2332,76 +2308,76 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 17.669,
-          "min_radius_proxy_m": 5.601,
+          "length_m": 17.691,
+          "min_radius_proxy_m": 5.646,
           "centerline_xz": [
             [
               -9.024,
               -204.484
             ],
             [
-              -9.842,
-              -205.208
+              -9.843,
+              -205.209
             ],
             [
-              -10.727,
-              -205.924
+              -10.729,
+              -205.927
             ],
             [
-              -11.669,
-              -206.621
+              -11.671,
+              -206.626
             ],
             [
-              -12.659,
-              -207.287
+              -12.661,
+              -207.293
             ],
             [
-              -13.687,
-              -207.91
+              -13.689,
+              -207.918
             ],
             [
-              -14.744,
-              -208.477
+              -14.745,
+              -208.487
             ],
             [
               -15.819,
-              -208.978
+              -208.99
             ],
             [
               -16.903,
-              -209.399
+              -209.413
             ],
             [
-              -17.986,
-              -209.729
+              -17.987,
+              -209.746
             ],
             [
-              -19.06,
-              -209.957
+              -19.061,
+              -209.976
             ],
             [
-              -20.114,
-              -210.069
+              -20.116,
+              -210.091
             ],
             [
-              -21.138,
-              -210.055
+              -21.142,
+              -210.08
             ],
             [
-              -22.123,
-              -209.902
+              -22.13,
+              -209.93
             ],
             [
-              -23.059,
-              -209.598
+              -23.07,
+              -209.629
             ],
             [
-              -23.937,
-              -209.131
+              -23.952,
+              -209.166
             ],
             [
-              -24.747,
-              -208.49
+              -24.768,
+              -208.528
             ]
           ],
           "issues": [
@@ -2419,76 +2395,76 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 18.726,
-          "min_radius_proxy_m": 5.491,
+          "length_m": 18.742,
+          "min_radius_proxy_m": 5.519,
           "centerline_xz": [
             [
               -9.024,
               -204.484
             ],
             [
-              -10.117,
-              -205.499
+              -10.118,
+              -205.5
             ],
             [
-              -11.167,
-              -206.468
+              -11.169,
+              -206.471
             ],
             [
-              -12.181,
-              -207.379
+              -12.183,
+              -207.383
             ],
             [
-              -13.164,
-              -208.22
+              -13.165,
+              -208.226
             ],
             [
               -14.123,
-              -208.98
+              -208.987
             ],
             [
-              -15.063,
-              -209.645
+              -15.061,
+              -209.654
             ],
             [
-              -15.99,
-              -210.205
+              -15.987,
+              -210.215
             ],
             [
-              -16.91,
-              -210.647
+              -16.907,
+              -210.659
             ],
             [
-              -17.83,
-              -210.959
+              -17.826,
+              -210.973
             ],
             [
-              -18.755,
-              -211.129
-            ],
-            [
-              -19.691,
+              -18.751,
               -211.145
             ],
             [
-              -20.644,
-              -210.994
+              -19.688,
+              -211.163
             ],
             [
-              -21.62,
-              -210.665
+              -20.643,
+              -211.015
             ],
             [
-              -22.625,
-              -210.147
+              -21.622,
+              -210.69
             ],
             [
-              -23.666,
-              -209.425
+              -22.632,
+              -210.175
             ],
             [
-              -24.747,
-              -208.49
+              -23.679,
+              -209.459
+            ],
+            [
+              -24.768,
+              -208.528
             ]
           ],
           "issues": [
@@ -2516,20 +2492,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00246",
       "exit_lane_link_id": "ll_00252",
-      "internal_bridge_lane_id": "ln_e_0171_f_00",
+      "internal_bridge_lane_id": "ln_e_0118_f_00",
       "internal_bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
-      "entry_junction_node_id": "n_0173",
-      "exit_junction_node_id": "n_0176",
+      "entry_junction_node_id": "n_0116",
+      "exit_junction_node_id": "n_0119",
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
-      "from_lane_id": "ln_e_0170_f_00",
-      "to_lane_id": "ln_e_0172_f_00",
-      "from_edge_id": "e_0170",
-      "to_edge_id": "e_0172",
+      "from_lane_id": "ln_e_0117_f_00",
+      "to_lane_id": "ln_e_0119_f_00",
+      "from_edge_id": "e_0117",
+      "to_edge_id": "e_0119",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -2550,13 +2526,13 @@
         0.825
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0170_f_00_n_0173_entry_anchor",
+        "anchor_id": "ln_e_0117_f_00_n_0116_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0170_f_00",
-        "edge_id": "e_0170",
-        "node_id": "n_0173",
-        "pose_id": "j_039_e_0170_entry",
+        "lane_id": "ln_e_0117_f_00",
+        "edge_id": "e_0117",
+        "node_id": "n_0116",
+        "pose_id": "j_039_e_0117_entry",
         "point_xz": [
           139.313,
           -1.97
@@ -2571,13 +2547,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0172_f_00_n_0176_exit_anchor",
+        "anchor_id": "ln_e_0119_f_00_n_0119_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0172_f_00",
-        "edge_id": "e_0172",
-        "node_id": "n_0176",
-        "pose_id": "j_040_e_0172_entry",
+        "lane_id": "ln_e_0119_f_00",
+        "edge_id": "e_0119",
+        "node_id": "n_0119",
+        "pose_id": "j_040_e_0119_entry",
         "point_xz": [
           150.038,
           13.169
@@ -2814,20 +2790,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00246",
       "exit_lane_link_id": "ll_00253",
-      "internal_bridge_lane_id": "ln_e_0171_f_00",
+      "internal_bridge_lane_id": "ln_e_0118_f_00",
       "internal_bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
-      "entry_junction_node_id": "n_0173",
-      "exit_junction_node_id": "n_0176",
+      "entry_junction_node_id": "n_0116",
+      "exit_junction_node_id": "n_0119",
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
-      "from_lane_id": "ln_e_0170_f_00",
-      "to_lane_id": "ln_e_0014_b_00",
-      "from_edge_id": "e_0170",
-      "to_edge_id": "e_0014",
+      "from_lane_id": "ln_e_0117_f_00",
+      "to_lane_id": "ln_e_0012_b_00",
+      "from_edge_id": "e_0117",
+      "to_edge_id": "e_0012",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -2837,7 +2813,7 @@
       ],
       "end_xz": [
         141.656,
-        9.212
+        9.211
       ],
       "start_tangent_xz": [
         0.579,
@@ -2848,13 +2824,13 @@
         0.552
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0170_f_00_n_0173_entry_anchor",
+        "anchor_id": "ln_e_0117_f_00_n_0116_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0170_f_00",
-        "edge_id": "e_0170",
-        "node_id": "n_0173",
-        "pose_id": "j_039_e_0170_entry",
+        "lane_id": "ln_e_0117_f_00",
+        "edge_id": "e_0117",
+        "node_id": "n_0116",
+        "pose_id": "j_039_e_0117_entry",
         "point_xz": [
           139.313,
           -1.97
@@ -2869,16 +2845,16 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0014_b_00_n_0176_exit_anchor",
+        "anchor_id": "ln_e_0012_b_00_n_0119_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0014_b_00",
-        "edge_id": "e_0014",
-        "node_id": "n_0176",
-        "pose_id": "j_040_e_0014_entry",
+        "lane_id": "ln_e_0012_b_00",
+        "edge_id": "e_0012",
+        "node_id": "n_0119",
+        "pose_id": "j_040_e_0012_entry",
         "point_xz": [
           141.656,
-          9.212
+          9.211
         ],
         "tangent_xz": [
           -0.834,
@@ -2889,8 +2865,8 @@
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 11.425,
-      "tangent_delta_deg": 91.914,
+      "chord_length_m": 11.424,
+      "tangent_delta_deg": 91.92,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -2901,7 +2877,7 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 11.425,
+          "length_m": 11.424,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
@@ -2910,7 +2886,7 @@
             ],
             [
               141.656,
-              9.212
+              9.211
             ]
           ],
           "issues": [
@@ -2928,7 +2904,7 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 12.571,
+          "length_m": 12.57,
           "min_radius_proxy_m": 2.904,
           "centerline_xz": [
             [
@@ -2952,7 +2928,7 @@
               0.842
             ],
             [
-              141.555,
+              141.554,
               1.623
             ],
             [
@@ -2961,15 +2937,15 @@
             ],
             [
               142.305,
-              3.219
+              3.218
             ],
             [
               142.604,
-              4.016
+              4.015
             ],
             [
               142.836,
-              4.8
+              4.799
             ],
             [
               142.991,
@@ -2977,27 +2953,27 @@
             ],
             [
               143.057,
-              6.297
+              6.296
             ],
             [
               143.023,
-              6.992
+              6.991
             ],
             [
               142.877,
-              7.64
+              7.639
             ],
             [
               142.608,
-              8.231
+              8.23
             ],
             [
               142.205,
-              8.758
+              8.757
             ],
             [
               141.656,
-              9.212
+              9.211
             ]
           ],
           "issues": [
@@ -3016,8 +2992,8 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 13.407,
-          "min_radius_proxy_m": 3.014,
+          "length_m": 13.406,
+          "min_radius_proxy_m": 3.013,
           "centerline_xz": [
             [
               139.313,
@@ -3033,7 +3009,7 @@
             ],
             [
               141.166,
-              0.521
+              0.52
             ],
             [
               141.745,
@@ -3041,7 +3017,7 @@
             ],
             [
               142.282,
-              2.052
+              2.051
             ],
             [
               142.765,
@@ -3053,7 +3029,7 @@
             ],
             [
               143.512,
-              4.185
+              4.184
             ],
             [
               143.75,
@@ -3073,19 +3049,19 @@
             ],
             [
               143.492,
-              7.408
+              7.407
             ],
             [
               143.059,
-              8.017
+              8.016
             ],
             [
               142.451,
-              8.618
+              8.617
             ],
             [
               141.656,
-              9.212
+              9.211
             ]
           ],
           "issues": [
@@ -3113,20 +3089,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00251",
       "exit_lane_link_id": "ll_00252",
-      "internal_bridge_lane_id": "ln_e_0171_f_00",
+      "internal_bridge_lane_id": "ln_e_0118_f_00",
       "internal_bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
-      "entry_junction_node_id": "n_0173",
-      "exit_junction_node_id": "n_0176",
+      "entry_junction_node_id": "n_0116",
+      "exit_junction_node_id": "n_0119",
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
-      "from_lane_id": "ln_e_0214_f_00",
-      "to_lane_id": "ln_e_0172_f_00",
-      "from_edge_id": "e_0214",
-      "to_edge_id": "e_0172",
+      "from_lane_id": "ln_e_0150_f_00",
+      "to_lane_id": "ln_e_0119_f_00",
+      "from_edge_id": "e_0150",
+      "to_edge_id": "e_0119",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -3147,13 +3123,13 @@
         0.825
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0214_f_00_n_0173_entry_anchor",
+        "anchor_id": "ln_e_0150_f_00_n_0116_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0214_f_00",
-        "edge_id": "e_0214",
-        "node_id": "n_0173",
-        "pose_id": "j_039_e_0214_entry",
+        "lane_id": "ln_e_0150_f_00",
+        "edge_id": "e_0150",
+        "node_id": "n_0116",
+        "pose_id": "j_039_e_0150_entry",
         "point_xz": [
           139.856,
           7.012
@@ -3168,13 +3144,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0172_f_00_n_0176_exit_anchor",
+        "anchor_id": "ln_e_0119_f_00_n_0119_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0172_f_00",
-        "edge_id": "e_0172",
-        "node_id": "n_0176",
-        "pose_id": "j_040_e_0172_entry",
+        "lane_id": "ln_e_0119_f_00",
+        "edge_id": "e_0119",
+        "node_id": "n_0119",
+        "pose_id": "j_040_e_0119_entry",
         "point_xz": [
           150.038,
           13.169
@@ -3411,20 +3387,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00251",
       "exit_lane_link_id": "ll_00253",
-      "internal_bridge_lane_id": "ln_e_0171_f_00",
+      "internal_bridge_lane_id": "ln_e_0118_f_00",
       "internal_bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
-      "entry_junction_node_id": "n_0173",
-      "exit_junction_node_id": "n_0176",
+      "entry_junction_node_id": "n_0116",
+      "exit_junction_node_id": "n_0119",
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
-      "from_lane_id": "ln_e_0214_f_00",
-      "to_lane_id": "ln_e_0014_b_00",
-      "from_edge_id": "e_0214",
-      "to_edge_id": "e_0014",
+      "from_lane_id": "ln_e_0150_f_00",
+      "to_lane_id": "ln_e_0012_b_00",
+      "from_edge_id": "e_0150",
+      "to_edge_id": "e_0012",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -3434,7 +3410,7 @@
       ],
       "end_xz": [
         141.656,
-        9.212
+        9.211
       ],
       "start_tangent_xz": [
         0.839,
@@ -3445,13 +3421,13 @@
         0.552
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0214_f_00_n_0173_entry_anchor",
+        "anchor_id": "ln_e_0150_f_00_n_0116_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0214_f_00",
-        "edge_id": "e_0214",
-        "node_id": "n_0173",
-        "pose_id": "j_039_e_0214_entry",
+        "lane_id": "ln_e_0150_f_00",
+        "edge_id": "e_0150",
+        "node_id": "n_0116",
+        "pose_id": "j_039_e_0150_entry",
         "point_xz": [
           139.856,
           7.012
@@ -3466,16 +3442,16 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0014_b_00_n_0176_exit_anchor",
+        "anchor_id": "ln_e_0012_b_00_n_0119_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0014_b_00",
-        "edge_id": "e_0014",
-        "node_id": "n_0176",
-        "pose_id": "j_040_e_0014_entry",
+        "lane_id": "ln_e_0012_b_00",
+        "edge_id": "e_0012",
+        "node_id": "n_0119",
+        "pose_id": "j_040_e_0012_entry",
         "point_xz": [
           141.656,
-          9.212
+          9.211
         ],
         "tangent_xz": [
           -0.834,
@@ -3486,8 +3462,8 @@
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 2.843,
-      "tangent_delta_deg": 179.517,
+      "chord_length_m": 2.842,
+      "tangent_delta_deg": 179.523,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -3498,7 +3474,7 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 2.843,
+          "length_m": 2.842,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
@@ -3507,7 +3483,7 @@
             ],
             [
               141.656,
-              9.212
+              9.211
             ]
           ],
           "issues": [
@@ -3562,11 +3538,11 @@
             ],
             [
               141.38,
-              7.703
+              7.702
             ],
             [
               141.538,
-              7.914
+              7.913
             ],
             [
               141.671,
@@ -3574,27 +3550,27 @@
             ],
             [
               141.774,
-              8.349
+              8.348
             ],
             [
               141.842,
-              8.56
+              8.559
             ],
             [
               141.87,
-              8.758
+              8.757
             ],
             [
               141.851,
-              8.937
+              8.936
             ],
             [
               141.782,
-              9.091
+              9.089
             ],
             [
               141.656,
-              9.212
+              9.211
             ]
           ],
           "issues": [
@@ -3613,8 +3589,8 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 3.953,
-          "min_radius_proxy_m": 0.794,
+          "length_m": 3.952,
+          "min_radius_proxy_m": 0.793,
           "centerline_xz": [
             [
               139.856,
@@ -3633,7 +3609,7 @@
               6.86
             ],
             [
-              140.807,
+              140.806,
               6.918
             ],
             [
@@ -3646,7 +3622,7 @@
             ],
             [
               141.466,
-              7.332
+              7.331
             ],
             [
               141.647,
@@ -3658,31 +3634,31 @@
             ],
             [
               141.922,
-              7.967
+              7.966
             ],
             [
               142.004,
-              8.198
+              8.197
             ],
             [
               142.042,
-              8.428
+              8.427
             ],
             [
               142.032,
-              8.651
+              8.65
             ],
             [
               141.968,
-              8.86
+              8.859
             ],
             [
               141.844,
-              9.049
+              9.048
             ],
             [
               141.656,
-              9.212
+              9.211
             ]
           ],
           "issues": [
@@ -3711,20 +3687,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00254",
       "exit_lane_link_id": "ll_00248",
-      "internal_bridge_lane_id": "ln_e_0171_b_00",
+      "internal_bridge_lane_id": "ln_e_0118_b_00",
       "internal_bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
-      "entry_junction_node_id": "n_0176",
-      "exit_junction_node_id": "n_0173",
+      "entry_junction_node_id": "n_0119",
+      "exit_junction_node_id": "n_0116",
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
-      "from_lane_id": "ln_e_0172_b_00",
-      "to_lane_id": "ln_e_0170_b_00",
-      "from_edge_id": "e_0172",
-      "to_edge_id": "e_0170",
+      "from_lane_id": "ln_e_0119_b_00",
+      "to_lane_id": "ln_e_0117_b_00",
+      "from_edge_id": "e_0119",
+      "to_edge_id": "e_0117",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -3745,13 +3721,13 @@
         -0.815
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0172_b_00_n_0176_entry_anchor",
+        "anchor_id": "ln_e_0119_b_00_n_0119_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0172_b_00",
-        "edge_id": "e_0172",
-        "node_id": "n_0176",
-        "pose_id": "j_040_e_0172_entry",
+        "lane_id": "ln_e_0119_b_00",
+        "edge_id": "e_0119",
+        "node_id": "n_0119",
+        "pose_id": "j_040_e_0119_entry",
         "point_xz": [
           152.676,
           11.359
@@ -3766,13 +3742,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0170_b_00_n_0173_exit_anchor",
+        "anchor_id": "ln_e_0117_b_00_n_0116_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0170_b_00",
-        "edge_id": "e_0170",
-        "node_id": "n_0173",
-        "pose_id": "j_039_e_0170_entry",
+        "lane_id": "ln_e_0117_b_00",
+        "edge_id": "e_0117",
+        "node_id": "n_0116",
+        "pose_id": "j_039_e_0117_entry",
         "point_xz": [
           141.921,
           -3.824
@@ -4009,20 +3985,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00254",
       "exit_lane_link_id": "ll_00249",
-      "internal_bridge_lane_id": "ln_e_0171_b_00",
+      "internal_bridge_lane_id": "ln_e_0118_b_00",
       "internal_bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
-      "entry_junction_node_id": "n_0176",
-      "exit_junction_node_id": "n_0173",
+      "entry_junction_node_id": "n_0119",
+      "exit_junction_node_id": "n_0116",
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
-      "from_lane_id": "ln_e_0172_b_00",
-      "to_lane_id": "ln_e_0214_b_00",
-      "from_edge_id": "e_0172",
-      "to_edge_id": "e_0214",
+      "from_lane_id": "ln_e_0119_b_00",
+      "to_lane_id": "ln_e_0150_b_00",
+      "from_edge_id": "e_0119",
+      "to_edge_id": "e_0150",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -4043,13 +4019,13 @@
         0.545
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0172_b_00_n_0176_entry_anchor",
+        "anchor_id": "ln_e_0119_b_00_n_0119_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0172_b_00",
-        "edge_id": "e_0172",
-        "node_id": "n_0176",
-        "pose_id": "j_040_e_0172_entry",
+        "lane_id": "ln_e_0119_b_00",
+        "edge_id": "e_0119",
+        "node_id": "n_0119",
+        "pose_id": "j_040_e_0119_entry",
         "point_xz": [
           152.676,
           11.359
@@ -4064,13 +4040,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0214_b_00_n_0173_exit_anchor",
+        "anchor_id": "ln_e_0150_b_00_n_0116_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0214_b_00",
-        "edge_id": "e_0214",
-        "node_id": "n_0173",
-        "pose_id": "j_039_e_0214_entry",
+        "lane_id": "ln_e_0150_b_00",
+        "edge_id": "e_0150",
+        "node_id": "n_0116",
+        "pose_id": "j_039_e_0150_entry",
         "point_xz": [
           138.112,
           4.328
@@ -4307,26 +4283,26 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00256",
       "exit_lane_link_id": "ll_00248",
-      "internal_bridge_lane_id": "ln_e_0171_b_00",
+      "internal_bridge_lane_id": "ln_e_0118_b_00",
       "internal_bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
-      "entry_junction_node_id": "n_0176",
-      "exit_junction_node_id": "n_0173",
+      "entry_junction_node_id": "n_0119",
+      "exit_junction_node_id": "n_0116",
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
-      "from_lane_id": "ln_e_0014_f_00",
-      "to_lane_id": "ln_e_0170_b_00",
-      "from_edge_id": "e_0014",
-      "to_edge_id": "e_0170",
+      "from_lane_id": "ln_e_0012_f_00",
+      "to_lane_id": "ln_e_0117_b_00",
+      "from_edge_id": "e_0012",
+      "to_edge_id": "e_0117",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
       "start_xz": [
         143.422,
-        11.88
+        11.879
       ],
       "end_xz": [
         141.921,
@@ -4341,16 +4317,16 @@
         -0.815
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0014_f_00_n_0176_entry_anchor",
+        "anchor_id": "ln_e_0012_f_00_n_0119_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0014_f_00",
-        "edge_id": "e_0014",
-        "node_id": "n_0176",
-        "pose_id": "j_040_e_0014_entry",
+        "lane_id": "ln_e_0012_f_00",
+        "edge_id": "e_0012",
+        "node_id": "n_0119",
+        "pose_id": "j_040_e_0012_entry",
         "point_xz": [
           143.422,
-          11.88
+          11.879
         ],
         "tangent_xz": [
           0.834,
@@ -4362,13 +4338,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0170_b_00_n_0173_exit_anchor",
+        "anchor_id": "ln_e_0117_b_00_n_0116_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0170_b_00",
-        "edge_id": "e_0170",
-        "node_id": "n_0173",
-        "pose_id": "j_039_e_0170_entry",
+        "lane_id": "ln_e_0117_b_00",
+        "edge_id": "e_0117",
+        "node_id": "n_0116",
+        "pose_id": "j_039_e_0117_entry",
         "point_xz": [
           141.921,
           -3.824
@@ -4382,8 +4358,8 @@
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 15.776,
-      "tangent_delta_deg": 91.914,
+      "chord_length_m": 15.775,
+      "tangent_delta_deg": 91.92,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -4394,12 +4370,12 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 15.776,
+          "length_m": 15.775,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
               143.422,
-              11.88
+              11.879
             ],
             [
               141.921,
@@ -4421,16 +4397,16 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 17.331,
-          "min_radius_proxy_m": 4.977,
+          "length_m": 17.33,
+          "min_radius_proxy_m": 4.976,
           "centerline_xz": [
             [
               143.422,
-              11.88
+              11.879
             ],
             [
               144.199,
-              11.251
+              11.25
             ],
             [
               144.811,
@@ -4442,10 +4418,10 @@
             ],
             [
               145.58,
-              8.774
+              8.773
             ],
             [
-              145.759,
+              145.758,
               7.794
             ],
             [
@@ -4486,7 +4462,7 @@
             ],
             [
               142.516,
-              -2.939
+              -2.94
             ],
             [
               141.921,
@@ -4508,24 +4484,24 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 18.462,
+          "length_m": 18.461,
           "min_radius_proxy_m": 5.083,
           "centerline_xz": [
             [
               143.422,
-              11.88
+              11.879
             ],
             [
               144.539,
               11.057
             ],
             [
-              145.434,
-              10.22
+              145.433,
+              10.219
             ],
             [
               146.118,
-              9.366
+              9.365
             ],
             [
               146.605,
@@ -4537,11 +4513,11 @@
             ],
             [
               147.043,
-              6.694
+              6.693
             ],
             [
               147.019,
-              5.762
+              5.761
             ],
             [
               146.852,
@@ -4549,11 +4525,11 @@
             ],
             [
               146.554,
-              3.828
+              3.827
             ],
             [
               146.139,
-              2.823
+              2.822
             ],
             [
               145.619,
@@ -4568,7 +4544,7 @@
               -0.36
             ],
             [
-              143.568,
+              143.567,
               -1.482
             ],
             [
@@ -4605,26 +4581,26 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00256",
       "exit_lane_link_id": "ll_00249",
-      "internal_bridge_lane_id": "ln_e_0171_b_00",
+      "internal_bridge_lane_id": "ln_e_0118_b_00",
       "internal_bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
-      "entry_junction_node_id": "n_0176",
-      "exit_junction_node_id": "n_0173",
+      "entry_junction_node_id": "n_0119",
+      "exit_junction_node_id": "n_0116",
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
-      "from_lane_id": "ln_e_0014_f_00",
-      "to_lane_id": "ln_e_0214_b_00",
-      "from_edge_id": "e_0014",
-      "to_edge_id": "e_0214",
+      "from_lane_id": "ln_e_0012_f_00",
+      "to_lane_id": "ln_e_0150_b_00",
+      "from_edge_id": "e_0012",
+      "to_edge_id": "e_0150",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
       "start_xz": [
         143.422,
-        11.88
+        11.879
       ],
       "end_xz": [
         138.112,
@@ -4639,16 +4615,16 @@
         0.545
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0014_f_00_n_0176_entry_anchor",
+        "anchor_id": "ln_e_0012_f_00_n_0119_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0014_f_00",
-        "edge_id": "e_0014",
-        "node_id": "n_0176",
-        "pose_id": "j_040_e_0014_entry",
+        "lane_id": "ln_e_0012_f_00",
+        "edge_id": "e_0012",
+        "node_id": "n_0119",
+        "pose_id": "j_040_e_0012_entry",
         "point_xz": [
           143.422,
-          11.88
+          11.879
         ],
         "tangent_xz": [
           0.834,
@@ -4660,13 +4636,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0214_b_00_n_0173_exit_anchor",
+        "anchor_id": "ln_e_0150_b_00_n_0116_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0214_b_00",
-        "edge_id": "e_0214",
-        "node_id": "n_0173",
-        "pose_id": "j_039_e_0214_entry",
+        "lane_id": "ln_e_0150_b_00",
+        "edge_id": "e_0150",
+        "node_id": "n_0116",
+        "pose_id": "j_039_e_0150_entry",
         "point_xz": [
           138.112,
           4.328
@@ -4680,8 +4656,8 @@
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 9.232,
-      "tangent_delta_deg": 179.517,
+      "chord_length_m": 9.231,
+      "tangent_delta_deg": 179.523,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -4692,12 +4668,12 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 9.232,
+          "length_m": 9.231,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
               143.422,
-              11.88
+              11.879
             ],
             [
               138.112,
@@ -4719,20 +4695,20 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 11.399,
+          "length_m": 11.398,
           "min_radius_proxy_m": 1.582,
           "centerline_xz": [
             [
               143.422,
-              11.88
+              11.879
             ],
             [
               143.836,
               11.482
             ],
             [
-              144.079,
-              10.972
+              144.078,
+              10.971
             ],
             [
               144.165,
@@ -4740,30 +4716,30 @@
             ],
             [
               144.11,
-              9.701
+              9.7
             ],
             [
               143.93,
               8.984
             ],
             [
-              143.641,
+              143.64,
               8.243
             ],
             [
-              143.257,
-              7.5
+              143.256,
+              7.499
             ],
             [
               142.794,
-              6.776
+              6.775
             ],
             [
-              142.268,
+              142.267,
               6.093
             ],
             [
-              141.694,
+              141.693,
               5.474
             ],
             [
@@ -4807,16 +4783,16 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 12.845,
-          "min_radius_proxy_m": 2.831,
+          "length_m": 12.844,
+          "min_radius_proxy_m": 2.83,
           "centerline_xz": [
             [
               143.422,
-              11.88
+              11.879
             ],
             [
               144.039,
-              11.348
+              11.347
             ],
             [
               144.458,
@@ -4824,15 +4800,15 @@
             ],
             [
               144.693,
-              10.022
+              10.021
             ],
             [
-              144.761,
+              144.76,
               9.272
             ],
             [
               144.676,
-              8.494
+              8.493
             ],
             [
               144.454,
@@ -4840,7 +4816,7 @@
             ],
             [
               144.111,
-              6.939
+              6.938
             ],
             [
               143.662,
@@ -4863,7 +4839,7 @@
               4.089
             ],
             [
-              140.37,
+              140.369,
               3.873
             ],
             [
@@ -4905,20 +4881,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00259",
       "exit_lane_link_id": "ll_00270",
-      "internal_bridge_lane_id": "ln_e_0173_f_00",
+      "internal_bridge_lane_id": "ln_e_0120_f_00",
       "internal_bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
-      "entry_junction_node_id": "n_0187",
-      "exit_junction_node_id": "n_0191",
+      "entry_junction_node_id": "n_0129",
+      "exit_junction_node_id": "n_0133",
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
-      "from_lane_id": "ln_e_0172_f_00",
-      "to_lane_id": "ln_e_0174_f_00",
-      "from_edge_id": "e_0172",
-      "to_edge_id": "e_0174",
+      "from_lane_id": "ln_e_0119_f_00",
+      "to_lane_id": "ln_e_0121_f_00",
+      "from_edge_id": "e_0119",
+      "to_edge_id": "e_0121",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -4939,13 +4915,13 @@
         0.835
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0172_f_00_n_0187_entry_anchor",
+        "anchor_id": "ln_e_0119_f_00_n_0129_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0172_f_00",
-        "edge_id": "e_0172",
-        "node_id": "n_0187",
-        "pose_id": "j_041_e_0172_entry",
+        "lane_id": "ln_e_0119_f_00",
+        "edge_id": "e_0119",
+        "node_id": "n_0129",
+        "pose_id": "j_041_e_0119_entry",
         "point_xz": [
           185.288,
           64.539
@@ -4960,13 +4936,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0174_f_00_n_0191_exit_anchor",
+        "anchor_id": "ln_e_0121_f_00_n_0133_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0174_f_00",
-        "edge_id": "e_0174",
-        "node_id": "n_0191",
-        "pose_id": "j_043_e_0174_entry",
+        "lane_id": "ln_e_0121_f_00",
+        "edge_id": "e_0121",
+        "node_id": "n_0133",
+        "pose_id": "j_043_e_0121_entry",
         "point_xz": [
           195.725,
           79.925
@@ -5203,19 +5179,19 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00259",
       "exit_lane_link_id": "ll_00271",
-      "internal_bridge_lane_id": "ln_e_0173_f_00",
+      "internal_bridge_lane_id": "ln_e_0120_f_00",
       "internal_bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
-      "entry_junction_node_id": "n_0187",
-      "exit_junction_node_id": "n_0191",
+      "entry_junction_node_id": "n_0129",
+      "exit_junction_node_id": "n_0133",
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
-      "from_lane_id": "ln_e_0172_f_00",
+      "from_lane_id": "ln_e_0119_f_00",
       "to_lane_id": "ln_e_0010_b_00",
-      "from_edge_id": "e_0172",
+      "from_edge_id": "e_0119",
       "to_edge_id": "e_0010",
       "movement_kind": "left",
       "status": "qa_candidate",
@@ -5237,13 +5213,13 @@
         0.523
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0172_f_00_n_0187_entry_anchor",
+        "anchor_id": "ln_e_0119_f_00_n_0129_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0172_f_00",
-        "edge_id": "e_0172",
-        "node_id": "n_0187",
-        "pose_id": "j_041_e_0172_entry",
+        "lane_id": "ln_e_0119_f_00",
+        "edge_id": "e_0119",
+        "node_id": "n_0129",
+        "pose_id": "j_041_e_0119_entry",
         "point_xz": [
           185.288,
           64.539
@@ -5258,12 +5234,12 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0010_b_00_n_0191_exit_anchor",
+        "anchor_id": "ln_e_0010_b_00_n_0133_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
         "lane_id": "ln_e_0010_b_00",
         "edge_id": "e_0010",
-        "node_id": "n_0191",
+        "node_id": "n_0133",
         "pose_id": "j_043_e_0010_entry",
         "point_xz": [
           187.393,
@@ -5503,70 +5479,68 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00261",
       "exit_lane_link_id": "ll_00270",
-      "internal_bridge_lane_id": "ln_e_0173_f_00",
+      "internal_bridge_lane_id": "ln_e_0120_f_00",
       "internal_bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
-      "entry_junction_node_id": "n_0187",
-      "exit_junction_node_id": "n_0191",
+      "entry_junction_node_id": "n_0129",
+      "exit_junction_node_id": "n_0133",
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
-      "from_lane_id": "ln_e_0063_b_00",
-      "to_lane_id": "ln_e_0174_f_00",
-      "from_edge_id": "e_0063",
-      "to_edge_id": "e_0174",
+      "from_lane_id": "ln_e_0047_b_00",
+      "to_lane_id": "ln_e_0121_f_00",
+      "from_edge_id": "e_0047",
+      "to_edge_id": "e_0121",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
       "start_xz": [
-        194.575,
-        64.049
+        194.547,
+        64.023
       ],
       "end_xz": [
         195.725,
         79.925
       ],
       "start_tangent_xz": [
-        -0.838,
-        0.546
+        -0.835,
+        0.551
       ],
       "end_tangent_xz": [
         0.55,
         0.835
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0063_b_00_n_0187_entry_anchor",
+        "anchor_id": "ln_e_0047_b_00_n_0129_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0063_b_00",
-        "edge_id": "e_0063",
-        "node_id": "n_0187",
-        "pose_id": "j_041_e_0063_entry",
+        "lane_id": "ln_e_0047_b_00",
+        "edge_id": "e_0047",
+        "node_id": "n_0129",
+        "pose_id": "j_041_e_0047_entry",
         "point_xz": [
-          194.575,
-          64.049
+          194.547,
+          64.023
         ],
         "tangent_xz": [
-          -0.838,
-          0.546
+          -0.835,
+          0.551
         ],
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
-        "issues": [
-          "entry_anchor_short_edge_absorption_candidate"
-        ]
+        "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0174_f_00_n_0191_exit_anchor",
+        "anchor_id": "ln_e_0121_f_00_n_0133_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0174_f_00",
-        "edge_id": "e_0174",
-        "node_id": "n_0191",
-        "pose_id": "j_043_e_0174_entry",
+        "lane_id": "ln_e_0121_f_00",
+        "edge_id": "e_0121",
+        "node_id": "n_0133",
+        "pose_id": "j_043_e_0121_entry",
         "point_xz": [
           195.725,
           79.925
@@ -5580,8 +5554,8 @@
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 15.919,
-      "tangent_delta_deg": 90.251,
+      "chord_length_m": 15.946,
+      "tangent_delta_deg": 89.913,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -5592,12 +5566,12 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 15.919,
+          "length_m": 15.946,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
-              194.575,
-              64.049
+              194.547,
+              64.023
             ],
             [
               195.725,
@@ -5606,7 +5580,6 @@
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -5620,72 +5593,72 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 17.444,
-          "min_radius_proxy_m": 5.107,
+          "length_m": 17.465,
+          "min_radius_proxy_m": 5.142,
           "centerline_xz": [
             [
-              194.575,
-              64.049
+              194.547,
+              64.023
             ],
             [
-              193.785,
-              64.677
+              193.759,
+              64.657
             ],
             [
-              193.159,
-              65.413
+              193.135,
+              65.398
             ],
             [
-              192.686,
-              66.245
+              192.664,
+              66.233
             ],
             [
-              192.355,
-              67.158
+              192.335,
+              67.149
             ],
             [
-              192.157,
-              68.141
+              192.139,
+              68.135
             ],
             [
-              192.081,
-              69.182
+              192.064,
+              69.176
             ],
             [
-              192.116,
-              70.266
+              192.101,
+              70.262
             ],
             [
-              192.252,
-              71.382
+              192.239,
+              71.379
             ],
             [
-              192.478,
-              72.517
+              192.468,
+              72.514
             ],
             [
-              192.785,
-              73.659
+              192.776,
+              73.656
             ],
             [
-              193.161,
-              74.793
+              193.155,
+              74.79
             ],
             [
-              193.597,
-              75.909
+              193.592,
+              75.906
             ],
             [
-              194.082,
-              76.993
+              194.078,
+              76.99
             ],
             [
-              194.605,
-              78.032
+              194.603,
+              78.03
             ],
             [
-              195.157,
-              79.014
+              195.155,
+              79.012
             ],
             [
               195.725,
@@ -5694,7 +5667,6 @@
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -5708,72 +5680,72 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 18.555,
-          "min_radius_proxy_m": 5.148,
+          "length_m": 18.572,
+          "min_radius_proxy_m": 5.171,
           "centerline_xz": [
             [
-              194.575,
-              64.049
+              194.547,
+              64.023
             ],
             [
-              193.441,
-              64.87
+              193.416,
+              64.852
             ],
             [
-              192.531,
-              65.706
+              192.508,
+              65.694
             ],
             [
-              191.83,
-              66.558
+              191.81,
+              66.551
             ],
             [
-              191.327,
-              67.428
+              191.308,
+              67.424
             ],
             [
-              191.006,
-              68.317
+              190.989,
+              68.316
             ],
             [
-              190.855,
+              190.841,
               69.229
             ],
             [
-              190.861,
-              70.163
+              190.848,
+              70.164
             ],
             [
-              191.009,
-              71.123
+              190.998,
+              71.124
             ],
             [
-              191.287,
+              191.277,
               72.11
             ],
             [
-              191.681,
-              73.126
+              191.672,
+              73.125
             ],
             [
-              192.177,
-              74.172
+              192.17,
+              74.17
             ],
             [
-              192.762,
-              75.251
+              192.757,
+              75.248
             ],
             [
-              193.423,
-              76.364
+              193.419,
+              76.361
             ],
             [
-              194.146,
-              77.513
+              194.144,
+              77.51
             ],
             [
-              194.918,
-              78.699
+              194.917,
+              78.698
             ],
             [
               195.725,
@@ -5782,7 +5754,6 @@
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -5793,7 +5764,6 @@
       ],
       "issues": [
         "compound_junction_merge_trial",
-        "entry_anchor_short_edge_absorption_candidate",
         "inferred_without_turn_lanes",
         "low_confidence_from_lane",
         "low_confidence_to_lane",
@@ -5807,69 +5777,67 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00261",
       "exit_lane_link_id": "ll_00271",
-      "internal_bridge_lane_id": "ln_e_0173_f_00",
+      "internal_bridge_lane_id": "ln_e_0120_f_00",
       "internal_bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
-      "entry_junction_node_id": "n_0187",
-      "exit_junction_node_id": "n_0191",
+      "entry_junction_node_id": "n_0129",
+      "exit_junction_node_id": "n_0133",
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
-      "from_lane_id": "ln_e_0063_b_00",
+      "from_lane_id": "ln_e_0047_b_00",
       "to_lane_id": "ln_e_0010_b_00",
-      "from_edge_id": "e_0063",
+      "from_edge_id": "e_0047",
       "to_edge_id": "e_0010",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
       "start_xz": [
-        194.575,
-        64.049
+        194.547,
+        64.023
       ],
       "end_xz": [
         187.393,
         75.717
       ],
       "start_tangent_xz": [
-        -0.838,
-        0.546
+        -0.835,
+        0.551
       ],
       "end_tangent_xz": [
         -0.852,
         0.523
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0063_b_00_n_0187_entry_anchor",
+        "anchor_id": "ln_e_0047_b_00_n_0129_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0063_b_00",
-        "edge_id": "e_0063",
-        "node_id": "n_0187",
-        "pose_id": "j_041_e_0063_entry",
+        "lane_id": "ln_e_0047_b_00",
+        "edge_id": "e_0047",
+        "node_id": "n_0129",
+        "pose_id": "j_041_e_0047_entry",
         "point_xz": [
-          194.575,
-          64.049
+          194.547,
+          64.023
         ],
         "tangent_xz": [
-          -0.838,
-          0.546
+          -0.835,
+          0.551
         ],
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
-        "issues": [
-          "entry_anchor_short_edge_absorption_candidate"
-        ]
+        "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0010_b_00_n_0191_exit_anchor",
+        "anchor_id": "ln_e_0010_b_00_n_0133_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
         "lane_id": "ln_e_0010_b_00",
         "edge_id": "e_0010",
-        "node_id": "n_0191",
+        "node_id": "n_0133",
         "pose_id": "j_043_e_0010_entry",
         "point_xz": [
           187.393,
@@ -5884,8 +5852,8 @@
         "confidence": 0.42,
         "issues": []
       },
-      "chord_length_m": 13.702,
-      "tangent_delta_deg": 1.542,
+      "chord_length_m": 13.709,
+      "tangent_delta_deg": 1.88,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -5896,12 +5864,12 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 13.702,
+          "length_m": 13.709,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
-              194.575,
-              64.049
+              194.547,
+              64.023
             ],
             [
               187.393,
@@ -5910,7 +5878,6 @@
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -5924,63 +5891,63 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 13.986,
-          "min_radius_proxy_m": 5.772,
+          "length_m": 13.994,
+          "min_radius_proxy_m": 5.762,
           "centerline_xz": [
             [
-              194.575,
-              64.049
+              194.547,
+              64.023
             ],
             [
-              193.878,
-              64.584
+              193.852,
+              64.562
             ],
             [
-              193.281,
-              65.199
+              193.258,
+              65.181
             ],
             [
-              192.771,
-              65.883
+              192.751,
+              65.868
             ],
             [
-              192.333,
-              66.623
+              192.315,
+              66.612
             ],
             [
-              191.952,
-              67.41
+              191.937,
+              67.401
             ],
             [
-              191.615,
-              68.229
+              191.602,
+              68.222
             ],
             [
-              191.305,
-              69.071
+              191.295,
+              69.066
             ],
             [
-              191.01,
-              69.923
+              191.002,
+              69.919
             ],
             [
-              190.714,
-              70.774
+              190.708,
+              70.771
             ],
             [
-              190.402,
-              71.612
+              190.398,
+              71.61
             ],
             [
-              190.06,
-              72.426
+              190.057,
+              72.424
             ],
             [
-              189.674,
-              73.203
+              189.673,
+              73.202
             ],
             [
-              189.229,
+              189.228,
               73.932
             ],
             [
@@ -5989,7 +5956,7 @@
             ],
             [
               188.103,
-              75.201
+              75.2
             ],
             [
               187.393,
@@ -5998,7 +5965,6 @@
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -6012,56 +5978,56 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.239,
-          "min_radius_proxy_m": 6.048,
+          "length_m": 14.246,
+          "min_radius_proxy_m": 6.031,
           "centerline_xz": [
             [
-              194.575,
-              64.049
+              194.547,
+              64.023
             ],
             [
-              193.613,
-              64.757
+              193.589,
+              64.737
             ],
             [
-              192.858,
-              65.477
+              192.837,
+              65.462
             ],
             [
-              192.282,
-              66.207
+              192.264,
+              66.197
             ],
             [
-              191.853,
-              66.946
+              191.838,
+              66.939
             ],
             [
-              191.542,
-              67.69
+              191.53,
+              67.686
             ],
             [
-              191.32,
-              68.439
+              191.31,
+              68.437
             ],
             [
-              191.156,
-              69.19
+              191.149,
+              69.189
             ],
             [
-              191.021,
+              191.015,
               69.941
             ],
             [
-              190.885,
+              190.881,
               70.69
             ],
             [
-              190.718,
+              190.715,
               71.436
             ],
             [
-              190.49,
-              72.175
+              190.488,
+              72.176
             ],
             [
               190.171,
@@ -6072,11 +6038,11 @@
               73.629
             ],
             [
-              189.142,
+              189.143,
               74.339
             ],
             [
-              188.372,
+              188.373,
               75.036
             ],
             [
@@ -6086,7 +6052,6 @@
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "entry_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -6097,7 +6062,6 @@
       ],
       "issues": [
         "compound_junction_merge_trial",
-        "entry_anchor_short_edge_absorption_candidate",
         "inferred_without_turn_lanes",
         "low_confidence_from_lane",
         "low_confidence_to_lane",
@@ -6111,20 +6075,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00272",
       "exit_lane_link_id": "ll_00262",
-      "internal_bridge_lane_id": "ln_e_0173_b_00",
+      "internal_bridge_lane_id": "ln_e_0120_b_00",
       "internal_bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
-      "entry_junction_node_id": "n_0191",
-      "exit_junction_node_id": "n_0187",
+      "entry_junction_node_id": "n_0133",
+      "exit_junction_node_id": "n_0129",
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
-      "from_lane_id": "ln_e_0174_b_00",
-      "to_lane_id": "ln_e_0172_b_00",
-      "from_edge_id": "e_0174",
-      "to_edge_id": "e_0172",
+      "from_lane_id": "ln_e_0121_b_00",
+      "to_lane_id": "ln_e_0119_b_00",
+      "from_edge_id": "e_0121",
+      "to_edge_id": "e_0119",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -6145,13 +6109,13 @@
         -0.825
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0174_b_00_n_0191_entry_anchor",
+        "anchor_id": "ln_e_0121_b_00_n_0133_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0174_b_00",
-        "edge_id": "e_0174",
-        "node_id": "n_0191",
-        "pose_id": "j_043_e_0174_entry",
+        "lane_id": "ln_e_0121_b_00",
+        "edge_id": "e_0121",
+        "node_id": "n_0133",
+        "pose_id": "j_043_e_0121_entry",
         "point_xz": [
           198.399,
           78.167
@@ -6166,13 +6130,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0172_b_00_n_0187_exit_anchor",
+        "anchor_id": "ln_e_0119_b_00_n_0129_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0172_b_00",
-        "edge_id": "e_0172",
-        "node_id": "n_0187",
-        "pose_id": "j_041_e_0172_entry",
+        "lane_id": "ln_e_0119_b_00",
+        "edge_id": "e_0119",
+        "node_id": "n_0129",
+        "pose_id": "j_041_e_0119_entry",
         "point_xz": [
           187.926,
           62.729
@@ -6409,20 +6373,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00272",
       "exit_lane_link_id": "ll_00263",
-      "internal_bridge_lane_id": "ln_e_0173_b_00",
+      "internal_bridge_lane_id": "ln_e_0120_b_00",
       "internal_bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
-      "entry_junction_node_id": "n_0191",
-      "exit_junction_node_id": "n_0187",
+      "entry_junction_node_id": "n_0133",
+      "exit_junction_node_id": "n_0129",
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
-      "from_lane_id": "ln_e_0174_b_00",
-      "to_lane_id": "ln_e_0063_f_00",
-      "from_edge_id": "e_0174",
-      "to_edge_id": "e_0063",
+      "from_lane_id": "ln_e_0121_b_00",
+      "to_lane_id": "ln_e_0047_f_00",
+      "from_edge_id": "e_0121",
+      "to_edge_id": "e_0047",
       "movement_kind": "left",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -6431,25 +6395,25 @@
         78.167
       ],
       "end_xz": [
-        196.323,
-        66.729
+        196.311,
+        66.693
       ],
       "start_tangent_xz": [
         -0.55,
         -0.835
       ],
       "end_tangent_xz": [
-        0.838,
-        -0.546
+        0.835,
+        -0.551
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0174_b_00_n_0191_entry_anchor",
+        "anchor_id": "ln_e_0121_b_00_n_0133_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0174_b_00",
-        "edge_id": "e_0174",
-        "node_id": "n_0191",
-        "pose_id": "j_043_e_0174_entry",
+        "lane_id": "ln_e_0121_b_00",
+        "edge_id": "e_0121",
+        "node_id": "n_0133",
+        "pose_id": "j_043_e_0121_entry",
         "point_xz": [
           198.399,
           78.167
@@ -6464,30 +6428,28 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0063_f_00_n_0187_exit_anchor",
+        "anchor_id": "ln_e_0047_f_00_n_0129_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0063_f_00",
-        "edge_id": "e_0063",
-        "node_id": "n_0187",
-        "pose_id": "j_041_e_0063_entry",
+        "lane_id": "ln_e_0047_f_00",
+        "edge_id": "e_0047",
+        "node_id": "n_0129",
+        "pose_id": "j_041_e_0047_entry",
         "point_xz": [
-          196.323,
-          66.729
+          196.311,
+          66.693
         ],
         "tangent_xz": [
-          0.838,
-          -0.546
+          0.835,
+          -0.551
         ],
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
-        "issues": [
-          "exit_anchor_short_edge_absorption_candidate"
-        ]
+        "issues": []
       },
-      "chord_length_m": 11.624,
-      "tangent_delta_deg": 90.251,
+      "chord_length_m": 11.662,
+      "tangent_delta_deg": 89.913,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -6498,7 +6460,7 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 11.624,
+          "length_m": 11.662,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
@@ -6506,13 +6468,12 @@
               78.167
             ],
             [
-              196.323,
-              66.729
+              196.311,
+              66.693
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -6526,81 +6487,80 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 12.759,
-          "min_radius_proxy_m": 3.023,
+          "length_m": 12.794,
+          "min_radius_proxy_m": 3.055,
           "centerline_xz": [
             [
               198.399,
               78.167
             ],
             [
-              197.969,
-              77.502
+              197.968,
+              77.5
             ],
             [
-              197.528,
-              76.79
+              197.525,
+              76.787
             ],
             [
-              197.085,
-              76.039
+              197.081,
+              76.034
             ],
             [
-              196.651,
-              75.258
+              196.647,
+              75.252
             ],
             [
-              196.24,
-              74.455
+              196.234,
+              74.448
             ],
             [
-              195.86,
-              73.64
+              195.854,
+              73.631
             ],
             [
-              195.525,
-              72.821
+              195.517,
+              72.81
             ],
             [
-              195.244,
-              72.007
+              195.236,
+              71.995
             ],
             [
-              195.029,
-              71.206
+              195.021,
+              71.192
             ],
             [
-              194.892,
-              70.428
+              194.883,
+              70.413
             ],
             [
-              194.843,
-              69.682
+              194.834,
+              69.664
             ],
             [
-              194.895,
-              68.976
+              194.884,
+              68.955
             ],
             [
-              195.057,
-              68.319
+              195.046,
+              68.295
             ],
             [
-              195.341,
-              67.719
+              195.33,
+              67.692
             ],
             [
-              195.76,
-              67.187
+              195.748,
+              67.155
             ],
             [
-              196.323,
-              66.729
+              196.311,
+              66.693
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -6614,81 +6574,80 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 13.588,
-          "min_radius_proxy_m": 3.114,
+          "length_m": 13.621,
+          "min_radius_proxy_m": 3.144,
           "centerline_xz": [
             [
               198.399,
               78.167
             ],
             [
-              197.795,
-              77.273
+              197.794,
+              77.27
             ],
             [
-              197.192,
-              76.411
+              197.189,
+              76.407
             ],
             [
-              196.603,
-              75.58
+              196.599,
+              75.574
             ],
             [
-              196.042,
-              74.777
+              196.036,
+              74.771
             ],
             [
-              195.521,
-              74.002
+              195.514,
+              73.994
             ],
             [
-              195.054,
-              73.251
+              195.046,
+              73.243
             ],
             [
-              194.655,
-              72.523
+              194.647,
+              72.515
             ],
             [
-              194.337,
-              71.817
+              194.328,
+              71.808
             ],
             [
-              194.113,
-              71.131
+              194.104,
+              71.121
             ],
             [
-              193.997,
-              70.463
+              193.988,
+              70.451
             ],
             [
-              194.003,
-              69.81
+              193.993,
+              69.797
             ],
             [
-              194.144,
-              69.172
+              194.133,
+              69.156
             ],
             [
-              194.432,
-              68.547
+              194.422,
+              68.528
             ],
             [
-              194.883,
-              67.933
+              194.872,
+              67.909
             ],
             [
-              195.508,
-              67.328
+              195.497,
+              67.298
             ],
             [
-              196.323,
-              66.729
+              196.311,
+              66.693
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -6699,7 +6658,6 @@
       ],
       "issues": [
         "compound_junction_merge_trial",
-        "exit_anchor_short_edge_absorption_candidate",
         "inferred_without_turn_lanes",
         "low_confidence_from_lane",
         "low_confidence_to_lane",
@@ -6713,20 +6671,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00274",
       "exit_lane_link_id": "ll_00262",
-      "internal_bridge_lane_id": "ln_e_0173_b_00",
+      "internal_bridge_lane_id": "ln_e_0120_b_00",
       "internal_bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
-      "entry_junction_node_id": "n_0191",
-      "exit_junction_node_id": "n_0187",
+      "entry_junction_node_id": "n_0133",
+      "exit_junction_node_id": "n_0129",
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
       "from_lane_id": "ln_e_0010_f_00",
-      "to_lane_id": "ln_e_0172_b_00",
+      "to_lane_id": "ln_e_0119_b_00",
       "from_edge_id": "e_0010",
-      "to_edge_id": "e_0172",
+      "to_edge_id": "e_0119",
       "movement_kind": "right",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -6747,12 +6705,12 @@
         -0.825
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0010_f_00_n_0191_entry_anchor",
+        "anchor_id": "ln_e_0010_f_00_n_0133_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
         "lane_id": "ln_e_0010_f_00",
         "edge_id": "e_0010",
-        "node_id": "n_0191",
+        "node_id": "n_0133",
         "pose_id": "j_043_e_0010_entry",
         "point_xz": [
           189.067,
@@ -6768,13 +6726,13 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0172_b_00_n_0187_exit_anchor",
+        "anchor_id": "ln_e_0119_b_00_n_0129_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0172_b_00",
-        "edge_id": "e_0172",
-        "node_id": "n_0187",
-        "pose_id": "j_041_e_0172_entry",
+        "lane_id": "ln_e_0119_b_00",
+        "edge_id": "e_0119",
+        "node_id": "n_0129",
+        "pose_id": "j_041_e_0119_entry",
         "point_xz": [
           187.926,
           62.729
@@ -7011,20 +6969,20 @@
       "source": "compound_junction_merge_trial_transaction",
       "entry_lane_link_id": "ll_00274",
       "exit_lane_link_id": "ll_00263",
-      "internal_bridge_lane_id": "ln_e_0173_b_00",
+      "internal_bridge_lane_id": "ln_e_0120_b_00",
       "internal_bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
-      "entry_junction_node_id": "n_0191",
-      "exit_junction_node_id": "n_0187",
+      "entry_junction_node_id": "n_0133",
+      "exit_junction_node_id": "n_0129",
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
       "from_lane_id": "ln_e_0010_f_00",
-      "to_lane_id": "ln_e_0063_f_00",
+      "to_lane_id": "ln_e_0047_f_00",
       "from_edge_id": "e_0010",
-      "to_edge_id": "e_0063",
+      "to_edge_id": "e_0047",
       "movement_kind": "through",
       "status": "qa_candidate",
       "confidence": 0.42,
@@ -7033,24 +6991,24 @@
         78.443
       ],
       "end_xz": [
-        196.323,
-        66.729
+        196.311,
+        66.693
       ],
       "start_tangent_xz": [
         0.852,
         -0.523
       ],
       "end_tangent_xz": [
-        0.838,
-        -0.546
+        0.835,
+        -0.551
       ],
       "lane_entry_anchor": {
-        "anchor_id": "ln_e_0010_f_00_n_0191_entry_anchor",
+        "anchor_id": "ln_e_0010_f_00_n_0133_entry_anchor",
         "role": "entry",
         "source": "engineering_entry_pose_lateral_offset",
         "lane_id": "ln_e_0010_f_00",
         "edge_id": "e_0010",
-        "node_id": "n_0191",
+        "node_id": "n_0133",
         "pose_id": "j_043_e_0010_entry",
         "point_xz": [
           189.067,
@@ -7066,30 +7024,28 @@
         "issues": []
       },
       "lane_exit_anchor": {
-        "anchor_id": "ln_e_0063_f_00_n_0187_exit_anchor",
+        "anchor_id": "ln_e_0047_f_00_n_0129_exit_anchor",
         "role": "exit",
         "source": "engineering_entry_pose_lateral_offset",
-        "lane_id": "ln_e_0063_f_00",
-        "edge_id": "e_0063",
-        "node_id": "n_0187",
-        "pose_id": "j_041_e_0063_entry",
+        "lane_id": "ln_e_0047_f_00",
+        "edge_id": "e_0047",
+        "node_id": "n_0129",
+        "pose_id": "j_041_e_0047_entry",
         "point_xz": [
-          196.323,
-          66.729
+          196.311,
+          66.693
         ],
         "tangent_xz": [
-          0.838,
-          -0.546
+          0.835,
+          -0.551
         ],
         "lateral_offset_m": 1.6,
         "entry_trim_m": 6.3,
         "confidence": 0.42,
-        "issues": [
-          "exit_anchor_short_edge_absorption_candidate"
-        ]
+        "issues": []
       },
-      "chord_length_m": 13.779,
-      "tangent_delta_deg": 1.542,
+      "chord_length_m": 13.803,
+      "tangent_delta_deg": 1.88,
       "best_candidate_family": "compound_topology_straight_baseline",
       "best_score": 22.0,
       "publish_ready": false,
@@ -7100,7 +7056,7 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 13.779,
+          "length_m": 13.803,
           "min_radius_proxy_m": null,
           "centerline_xz": [
             [
@@ -7108,13 +7064,12 @@
               78.443
             ],
             [
-              196.323,
-              66.729
+              196.311,
+              66.693
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -7128,81 +7083,80 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.062,
-          "min_radius_proxy_m": 5.842,
+          "length_m": 14.086,
+          "min_radius_proxy_m": 5.847,
           "centerline_xz": [
             [
               189.067,
               78.443
             ],
             [
-              189.782,
-              77.925
+              189.783,
+              77.924
             ],
             [
-              190.393,
-              77.324
+              190.395,
+              77.322
             ],
             [
-              190.917,
-              76.651
+              190.919,
+              76.648
             ],
             [
-              191.366,
-              75.919
+              191.369,
+              75.915
             ],
             [
-              191.757,
-              75.139
+              191.759,
+              75.134
             ],
             [
-              192.104,
-              74.322
+              192.105,
+              74.317
             ],
             [
-              192.42,
-              73.481
+              192.421,
+              73.474
             ],
             [
               192.721,
-              72.628
+              72.619
             ],
             [
-              193.021,
-              71.772
+              193.02,
+              71.761
             ],
             [
-              193.335,
-              70.928
+              193.332,
+              70.914
             ],
             [
-              193.677,
-              70.105
+              193.673,
+              70.089
             ],
             [
-              194.062,
-              69.316
+              194.057,
+              69.297
             ],
             [
-              194.505,
-              68.572
+              194.498,
+              68.549
             ],
             [
-              195.019,
-              67.885
+              195.011,
+              67.859
             ],
             [
-              195.62,
-              67.267
+              195.61,
+              67.236
             ],
             [
-              196.323,
-              66.729
+              196.311,
+              66.693
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -7216,81 +7170,80 @@
           "score": 22.0,
           "score_contract": "preview_score_only_without_collision_or_swept_envelope（仅预览评分，未包含碰撞或扫掠包络）",
           "publish_ready": false,
-          "length_m": 14.313,
-          "min_radius_proxy_m": 6.119,
+          "length_m": 14.337,
+          "min_radius_proxy_m": 6.109,
           "centerline_xz": [
             [
               189.067,
               78.443
             ],
             [
-              190.053,
-              77.759
+              190.055,
+              77.758
             ],
             [
-              190.828,
-              77.059
+              190.831,
+              77.058
             ],
             [
-              191.422,
-              76.346
+              191.426,
+              76.344
             ],
             [
-              191.866,
-              75.621
+              191.87,
+              75.619
             ],
             [
-              192.189,
-              74.887
+              192.193,
+              74.884
             ],
             [
-              192.421,
-              74.145
+              192.425,
+              74.141
             ],
             [
-              192.592,
-              73.397
+              192.595,
+              73.393
             ],
             [
-              192.732,
-              72.645
+              192.734,
+              72.64
             ],
             [
-              192.871,
-              71.892
+              192.872,
+              71.885
             ],
             [
-              193.039,
-              71.138
+              193.038,
+              71.13
             ],
             [
-              193.265,
-              70.387
+              193.263,
+              70.376
             ],
             [
-              193.58,
-              69.64
+              193.576,
+              69.626
             ],
             [
-              194.013,
-              68.898
+              194.007,
+              68.88
             ],
             [
-              194.594,
-              68.165
+              194.587,
+              68.142
             ],
             [
-              195.354,
-              67.441
+              195.345,
+              67.412
             ],
             [
-              196.323,
-              66.729
+              196.311,
+              66.693
             ]
           ],
           "issues": [
             "compound_junction_merge_trial",
-            "exit_anchor_short_edge_absorption_candidate",
             "inferred_without_turn_lanes",
             "low_confidence_from_lane",
             "low_confidence_to_lane",
@@ -7301,7 +7254,6 @@
       ],
       "issues": [
         "compound_junction_merge_trial",
-        "exit_anchor_short_edge_absorption_candidate",
         "inferred_without_turn_lanes",
         "low_confidence_from_lane",
         "low_confidence_to_lane",

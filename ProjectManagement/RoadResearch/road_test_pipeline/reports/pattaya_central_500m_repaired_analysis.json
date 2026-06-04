@@ -5,45 +5,45 @@
     "lon": 100.8837,
     "lat": 12.93425
   },
-  "feature_count": 243,
+  "feature_count": 171,
   "geometry": {
     "empty_geometry": 0,
     "duplicate_point_features": 0,
     "too_short_features": 0,
-    "total_length_m": 8325.835,
-    "min_length_m": 3.007,
+    "total_length_m": 8325.886,
+    "min_length_m": 3.35,
     "max_length_m": 326.492
   },
   "tags": {
-    "lanes_count": 153,
-    "lanes_coverage_pct": 62.963,
+    "lanes_count": 106,
+    "lanes_coverage_pct": 61.988,
     "turn_lanes_count": 0,
     "turn_lanes_coverage_pct": 0.0,
     "width_count": 0,
     "width_coverage_pct": 0.0,
-    "oneway_count": 134,
-    "oneway_coverage_pct": 55.144,
-    "maxspeed_count": 45,
-    "maxspeed_coverage_pct": 18.519,
+    "oneway_count": 91,
+    "oneway_coverage_pct": 53.216,
+    "maxspeed_count": 26,
+    "maxspeed_coverage_pct": 15.205,
     "bridge_tunnel_layer_count": 0
   },
   "topology": {
-    "endpoint_clusters": 233,
+    "endpoint_clusters": 161,
     "endpoint_cluster_size_distribution": {
       "1": 31,
-      "2": 153,
+      "2": 81,
       "3": 47,
       "4": 2
     },
     "dangling_endpoint_clusters": 31,
-    "dangling_endpoint_ratio": 0.133,
+    "dangling_endpoint_ratio": 0.193,
     "low_confidence_endpoint_clusters": 2,
     "possible_unsplit_crossings": 0,
     "possible_unsplit_crossing_samples": []
   },
   "highway_class_counts": {
-    "secondary": 93,
-    "service": 82,
-    "residential": 68
+    "service": 63,
+    "secondary": 62,
+    "residential": 46
   }
 }

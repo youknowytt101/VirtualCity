@@ -166,6 +166,23 @@ def points_from_raw_roads(raw_roads: dict[str, Any] | None) -> list[tuple[float,
     return points
 
 
+def points_from_raw_topology_diagnostics(raw_topology_diagnostics: dict[str, Any] | None) -> list[tuple[float, float]]:
+    if not raw_topology_diagnostics:
+        return []
+    points: list[tuple[float, float]] = []
+    for vertex in raw_topology_diagnostics.get("vertices", []):
+        x = vertex.get("x")
+        z = vertex.get("z")
+        if x is not None and z is not None:
+            points.append((float(x), float(z)))
+    for crossing in raw_topology_diagnostics.get("unsplit_crossings", []):
+        x = crossing.get("x")
+        z = crossing.get("z")
+        if x is not None and z is not None:
+            points.append((float(x), float(z)))
+    return points
+
+
 def lane_by_id(lane_graph: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {str(lane.get("lane_id") or ""): lane for lane in lane_graph.get("lanes", [])}
 
@@ -582,17 +599,104 @@ def raw_road_lines(
     }
 
 
+def raw_topology_issue_markers(
+    *,
+    raw_topology_diagnostics: dict[str, Any],
+    transform: Any,
+    max_issues: int,
+) -> tuple[list[str], dict[str, Any]]:
+    markers: list[str] = []
+    classification_counts: dict[str, int] = {}
+    severity_counts: dict[str, int] = {}
+
+    for vertex in raw_topology_diagnostics.get("vertices", []):
+        if len(markers) >= max_issues:
+            break
+        severity = str(vertex.get("severity") or "info")
+        if severity == "info":
+            continue
+        classification = str(vertex.get("classification") or "unknown")
+        classification_counts[classification] = classification_counts.get(classification, 0) + 1
+        severity_counts[severity] = severity_counts.get(severity, 0) + 1
+        color = {
+            "dangling_endpoint": "#ef4444",
+            "internal_vertex_near_other_edge": "#2563eb",
+            "internal_vertex_on_other_edge": "#7c3aed",
+            "bbox_boundary_endpoint": "#64748b",
+        }.get(classification, "#f97316")
+        sx, sy = transform(float(vertex.get("x") or 0.0), float(vertex.get("z") or 0.0))
+        issues = vertex.get("issues") or []
+        issue_types = ", ".join(str(issue.get("issue_type") or "") for issue in issues if isinstance(issue, dict))
+        tooltip = (
+            f"raw_topology_issue={classification}; severity={severity}; "
+            f"raw_road={vertex.get('source_feature_id', '')}; point_index={vertex.get('point_index', '')}; "
+            f"issues={issue_types}"
+        )
+        attrs = svg_attrs({
+            "kind": "raw_topology_issue",
+            "layer": "raw_roads",
+            "source": "raw_topology_diagnostics.json",
+            "id": vertex.get("diagnostic_id", ""),
+            "diagnostic_id": vertex.get("diagnostic_id", ""),
+            "source_feature_id": vertex.get("source_feature_id", ""),
+            "point_index": vertex.get("point_index", ""),
+            "vertex_role": vertex.get("vertex_role", ""),
+            "classification": classification,
+            "severity": severity,
+            "issue_type": issue_types,
+            "highway": vertex.get("highway", ""),
+            "road_name": vertex.get("name", ""),
+            "point_xz": f"{float(vertex.get('x') or 0.0):.3f}, {float(vertex.get('z') or 0.0):.3f}",
+        })
+        markers.append(
+            f'<circle {attrs} cx="{sx}" cy="{sy}" r="3.4" fill="{color}" fill-opacity="0.86" '
+            f'stroke="#ffffff" stroke-width="0.65">{svg_title(tooltip)}</circle>'
+        )
+
+    for crossing in raw_topology_diagnostics.get("unsplit_crossings", []):
+        if len(markers) >= max_issues:
+            break
+        severity = str(crossing.get("severity") or "review")
+        severity_counts[severity] = severity_counts.get(severity, 0) + 1
+        classification_counts["unsplit_crossing"] = classification_counts.get("unsplit_crossing", 0) + 1
+        sx, sy = transform(float(crossing.get("x") or 0.0), float(crossing.get("z") or 0.0))
+        attrs = svg_attrs({
+            "kind": "raw_topology_issue",
+            "layer": "raw_roads",
+            "source": "raw_topology_diagnostics.json",
+            "id": crossing.get("issue_id", ""),
+            "diagnostic_id": crossing.get("issue_id", ""),
+            "classification": "unsplit_crossing",
+            "severity": severity,
+            "issue_type": "unsplit_crossing",
+            "point_xz": f"{float(crossing.get('x') or 0.0):.3f}, {float(crossing.get('z') or 0.0):.3f}",
+        })
+        tooltip = f"raw_topology_issue=unsplit_crossing; severity={severity}"
+        markers.append(
+            f'<circle {attrs} cx="{sx}" cy="{sy}" r="3.8" fill="#7c3aed" fill-opacity="0.90" '
+            f'stroke="#ffffff" stroke-width="0.7">{svg_title(tooltip)}</circle>'
+        )
+
+    return markers, {
+        "raw_topology_issue_markers_rendered": len(markers),
+        "raw_topology_issue_classification_counts": dict(sorted(classification_counts.items())),
+        "raw_topology_issue_severity_counts": dict(sorted(severity_counts.items())),
+    }
+
+
 def build_svg(
     *,
     lane_graph: dict[str, Any],
     movement_corridors: dict[str, Any] | None,
     compound_transactions: dict[str, Any] | None,
     raw_roads: dict[str, Any] | None,
+    raw_topology_diagnostics: dict[str, Any] | None,
     area_id: str,
     width_px: int,
     max_height_px: int,
     max_lane_links: int,
     max_raw_roads: int,
+    max_raw_topology_issues: int,
 ) -> tuple[str, dict[str, Any]]:
     lanes = lane_graph.get("lanes", [])
     links = lane_graph.get("lane_links", [])
@@ -602,6 +706,7 @@ def build_svg(
         + points_from_movement_corridors(movement_corridors)
         + points_from_compound_transactions(compound_transactions)
         + points_from_raw_roads(raw_roads)
+        + points_from_raw_topology_diagnostics(raw_topology_diagnostics)
     )
     svg_w, svg_h, transform = scale_transform(
         all_points,
@@ -708,6 +813,20 @@ def build_svg(
             "raw_road_class_counts": {},
         }
 
+    if raw_topology_diagnostics:
+        raw_issue_marks, raw_issue_metrics = raw_topology_issue_markers(
+            raw_topology_diagnostics=raw_topology_diagnostics,
+            transform=transform,
+            max_issues=max_raw_topology_issues,
+        )
+    else:
+        raw_issue_marks = []
+        raw_issue_metrics = {
+            "raw_topology_issue_markers_rendered": 0,
+            "raw_topology_issue_classification_counts": {},
+            "raw_topology_issue_severity_counts": {},
+        }
+
     title = html.escape(f"{area_id} lane graph (车道拓扑图) visualization")
     subtitle = html.escape(
         "SVG is visualization（可视化） only; JSON artifacts remain source truth（源数据真值）. "
@@ -734,6 +853,7 @@ def build_svg(
         '<g id="raw-roads" data-vc-layer="raw_roads" style="display:none">',
         *raw_lines,
         *raw_endpoint_marks,
+        *raw_issue_marks,
         '</g>',
         '<g id="movement-anchors">',
         *anchor_marks,
@@ -749,6 +869,7 @@ def build_svg(
         '<circle cx="47" cy="185" r="3" fill="#22c55e" stroke="#111827" stroke-width="0.5" /><text x="94" y="189">entry / exit anchors（入口 / 出口锚点）</text>',
         '<line x1="40" y1="206" x2="84" y2="206" stroke="#000000" stroke-width="1" /><text x="94" y="210">raw road data（原始道路数据）</text>',
         '<circle cx="47" cy="226" r="3" fill="#000000" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="230">raw vertices（原始全部断点）</text>',
+        '<circle cx="47" cy="242" r="3" fill="#ef4444" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="246">topology issue（拓扑问题）</text>',
         '</g>',
         '</svg>',
     ])
@@ -763,6 +884,7 @@ def build_svg(
             **movement_metrics,
             **compound_metrics,
             **raw_metrics,
+            **raw_issue_metrics,
         },
         "style": {
             "svg_width_px": svg_w,
@@ -775,6 +897,7 @@ def build_svg(
                 "thin_black_solid_with_all_vertex_markers_hidden_by_default"
                 "（细黑实线 + 全部原始顶点/断点标记，默认隐藏）"
             ) if raw_roads else "missing（缺失）",
+            "raw_topology_issue_overlay": "enabled_when_diagnostics_exist（诊断存在时启用）" if raw_topology_diagnostics else "missing（缺失）",
         },
         "link_source": link_source,
         "compound_link_source": "compound_junction_merge_transactions" if compound_transactions else "",
@@ -794,15 +917,18 @@ def main() -> int:
     parser.add_argument("--movement-corridors", default="", help="Optional movement_corridor_candidates.json. Defaults to processed/<area_id> file if present.")
     parser.add_argument("--compound-transactions", default="", help="Optional compound_junction_merge_transactions.json overlay.")
     parser.add_argument("--raw-roads", default="", help="Optional roads_raw.geojson overlay. Defaults to processed/<area_id> file if present.")
+    parser.add_argument("--raw-topology-diagnostics", default="", help="Optional raw_topology_diagnostics.json issue overlay.")
     parser.add_argument("--no-movement-corridors", action="store_true", help="Do not auto-load movement corridor overlay.")
     parser.add_argument("--no-compound-transactions", action="store_true", help="Do not auto-load compound junction merge transaction overlay.")
     parser.add_argument("--no-raw-roads", action="store_true", help="Do not auto-load raw road source overlay.")
+    parser.add_argument("--no-raw-topology-diagnostics", action="store_true", help="Do not auto-load raw topology diagnostics overlay.")
     parser.add_argument("--output", default="")
     parser.add_argument("--report", default="")
     parser.add_argument("--width-px", type=int, default=DEFAULT_REVIEW_WIDTH_PX)
     parser.add_argument("--max-height-px", type=int, default=DEFAULT_MAX_HEIGHT_PX)
     parser.add_argument("--max-lane-links", type=int, default=900)
     parser.add_argument("--max-raw-roads", type=int, default=1200)
+    parser.add_argument("--max-raw-topology-issues", type=int, default=600)
     args = parser.parse_args()
 
     root = pipeline_root_from_script(Path(__file__))
@@ -833,6 +959,18 @@ def main() -> int:
         else processed / f"{args.area_id}_roads_raw.geojson"
     )
     raw_roads = read_json(raw_roads_path) if raw_roads_path and raw_roads_path.exists() else None
+    raw_topology_diagnostics_path = (
+        None
+        if args.no_raw_topology_diagnostics
+        else Path(args.raw_topology_diagnostics)
+        if args.raw_topology_diagnostics
+        else processed / f"{args.area_id}_raw_topology_diagnostics.json"
+    )
+    raw_topology_diagnostics = (
+        read_json(raw_topology_diagnostics_path)
+        if raw_topology_diagnostics_path and raw_topology_diagnostics_path.exists()
+        else None
+    )
     output_path = Path(args.output) if args.output else reports / "visualizations" / f"{args.area_id}_lane_graph_topology.svg"
     report_path = Path(args.report) if args.report else reports / f"{args.area_id}_lane_graph_svg_report.json"
 
@@ -841,17 +979,20 @@ def main() -> int:
         movement_corridors=movement_corridors,
         compound_transactions=compound_transactions,
         raw_roads=raw_roads,
+        raw_topology_diagnostics=raw_topology_diagnostics,
         area_id=args.area_id,
         width_px=args.width_px,
         max_height_px=args.max_height_px,
         max_lane_links=args.max_lane_links,
         max_raw_roads=args.max_raw_roads,
+        max_raw_topology_issues=args.max_raw_topology_issues,
     )
     report["inputs"] = {
         "lane_graph": str(lane_graph_path),
         "movement_corridors": str(movement_corridors_path) if movement_corridors_path and movement_corridors is not None else "",
         "compound_junction_merge_transactions": str(compound_transactions_path) if compound_transactions_path and compound_transactions is not None else "",
         "raw_roads": str(raw_roads_path) if raw_roads_path and raw_roads is not None else "",
+        "raw_topology_diagnostics": str(raw_topology_diagnostics_path) if raw_topology_diagnostics_path and raw_topology_diagnostics is not None else "",
     }
     report["outputs"] = {"svg": str(output_path), "report": str(report_path)}
     write_text(output_path, svg)

@@ -4,26 +4,26 @@
   "active_lane_policy": "temporary_all_roads_bidirectional_two_lane_v1",
   "status": "warn",
   "counts": {
-    "edges": 243,
+    "edges": 171,
     "lane_source_counts": {
-      "stage_policy_override": 243
+      "stage_policy_override": 171
     },
     "width_source_counts": {
-      "stage_policy_override": 243
+      "stage_policy_override": 171
     },
     "turn_lanes_source_counts": {
-      "missing": 243
+      "missing": 171
     },
     "issue_counts": {
-      "direction_forced_bidirectional_two_lane_policy": 243,
-      "lane_count_forced_bidirectional_two_lane_policy": 243,
-      "lanes_inferred": 243,
-      "missing_turn_lanes": 243,
-      "source_lane_count_overridden_by_bidirectional_two_lane_policy": 234,
-      "source_oneway_overridden_by_bidirectional_two_lane_policy": 134,
-      "source_width_overridden_by_bidirectional_two_lane_policy": 243,
-      "width_forced_bidirectional_two_lane_policy": 243,
-      "width_inferred": 243
+      "direction_forced_bidirectional_two_lane_policy": 171,
+      "lane_count_forced_bidirectional_two_lane_policy": 171,
+      "lanes_inferred": 171,
+      "missing_turn_lanes": 171,
+      "source_lane_count_overridden_by_bidirectional_two_lane_policy": 168,
+      "source_oneway_overridden_by_bidirectional_two_lane_policy": 91,
+      "source_width_overridden_by_bidirectional_two_lane_policy": 171,
+      "width_forced_bidirectional_two_lane_policy": 171,
+      "width_inferred": 171
     }
   },
   "metrics": {

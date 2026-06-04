@@ -18,36 +18,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88050119,
-            12.93301311
+            100.88049094,
+            12.93300122
           ],
           [
-            100.88051076,
-            12.93302363
+            100.88050198,
+            12.93301379
           ],
           [
-            100.88051915,
-            12.93303038
+            100.88051162,
+            12.93302292
           ],
           [
-            100.88052684,
-            12.93303365
+            100.88052041,
+            12.93302868
           ],
           [
-            100.88053431,
-            12.93303374
+            100.88052894,
+            12.9330311
           ],
           [
-            100.88054207,
-            12.93303098
+            100.88053779,
+            12.93303026
           ],
           [
-            100.88055061,
-            12.93302566
+            100.88054752,
+            12.93302619
           ],
           [
-            100.88056041,
-            12.93301809
+            100.88055872,
+            12.93301895
           ],
           [
             100.88057196,
@@ -57,18 +57,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0028",
-        "movement_id": "n_0028_m_000",
+        "junction_node_id": "n_0014",
+        "movement_id": "n_0014_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0106",
-        "to_edge_id": "e_0021",
+        "from_edge_id": "e_0080",
+        "to_edge_id": "e_0018",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_000",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -79,36 +79,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88050119,
-            12.93301311
+            100.88049094,
+            12.93300122
           ],
           [
-            100.88051035,
-            12.93302426
+            100.88050164,
+            12.93301408
           ],
           [
-            100.88051829,
-            12.93303408
+            100.88051096,
+            12.93302537
           ],
           [
-            100.88052541,
-            12.93304301
+            100.88051931,
+            12.93303565
           ],
           [
-            100.88053207,
-            12.93305154
+            100.88052713,
+            12.93304546
           ],
           [
-            100.88053866,
-            12.93306013
+            100.88053486,
+            12.93305534
           ],
           [
-            100.88054555,
-            12.93306924
+            100.88054291,
+            12.93306584
           ],
           [
-            100.88055311,
-            12.93307933
+            100.88055172,
+            12.93307751
           ],
           [
             100.88056173,
@@ -118,18 +118,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0028",
-        "movement_id": "n_0028_m_001",
+        "junction_node_id": "n_0014",
+        "movement_id": "n_0014_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0106",
-        "to_edge_id": "e_0105",
+        "from_edge_id": "e_0080",
+        "to_edge_id": "e_0079",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_000",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -179,18 +179,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0028",
-        "movement_id": "n_0028_m_002",
+        "junction_node_id": "n_0014",
+        "movement_id": "n_0014_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0021",
-        "to_edge_id": "e_0105",
+        "from_edge_id": "e_0018",
+        "to_edge_id": "e_0079",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_000",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -240,11 +240,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0030",
-        "movement_id": "n_0030_m_000",
+        "junction_node_id": "n_0016",
+        "movement_id": "n_0016_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0105",
-        "to_edge_id": "e_0030",
+        "from_edge_id": "e_0079",
+        "to_edge_id": "e_0027",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -270,42 +270,42 @@
             12.93321551
           ],
           [
-            100.8806634,
+            100.88066341,
             12.93322723
           ],
           [
-            100.88067131,
-            12.93323784
+            100.88067134,
+            12.93323782
           ],
           [
-            100.88067881,
-            12.93324789
+            100.88067886,
+            12.93324785
           ],
           [
-            100.8806863,
-            12.93325794
+            100.8806864,
+            12.93325787
           ],
           [
-            100.88069422,
-            12.93326855
+            100.88069436,
+            12.93326844
           ],
           [
-            100.88070297,
-            12.93328027
+            100.88070318,
+            12.93328011
           ],
           [
-            100.88071296,
-            12.93329366
+            100.88071326,
+            12.93329344
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0030",
-        "movement_id": "n_0030_m_001",
+        "junction_node_id": "n_0016",
+        "movement_id": "n_0016_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0105",
-        "to_edge_id": "e_0104",
+        "from_edge_id": "e_0079",
+        "to_edge_id": "e_0078",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -327,46 +327,46 @@
             12.93321356
           ],
           [
-            100.88071145,
-            12.93322408
+            100.88071149,
+            12.93322405
           ],
           [
-            100.88070155,
-            12.93323321
+            100.88070163,
+            12.93323318
           ],
           [
-            100.88069518,
-            12.93324158
+            100.88069529,
+            12.93324156
           ],
           [
-            100.88069225,
-            12.93324981
+            100.88069238,
+            12.93324978
           ],
           [
-            100.88069265,
-            12.93325851
+            100.88069281,
+            12.93325847
           ],
           [
-            100.8806963,
-            12.9332683
+            100.8806965,
+            12.93326824
           ],
           [
-            100.8807031,
-            12.93327981
+            100.88070334,
+            12.93327969
           ],
           [
-            100.88071296,
-            12.93329366
+            100.88071326,
+            12.93329344
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0030",
-        "movement_id": "n_0030_m_002",
+        "junction_node_id": "n_0016",
+        "movement_id": "n_0016_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0030",
-        "to_edge_id": "e_0104",
+        "from_edge_id": "e_0027",
+        "to_edge_id": "e_0078",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -384,57 +384,57 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88091711,
-            12.93356314
+            100.88091724,
+            12.93356305
           ],
           [
-            100.88092662,
-            12.93357544
+            100.88092772,
+            12.93357624
           ],
           [
-            100.88093483,
-            12.93358507
+            100.88093691,
+            12.9335859
           ],
           [
-            100.88094232,
-            12.93359193
+            100.8809454,
+            12.93359214
           ],
           [
-            100.88094968,
-            12.93359593
+            100.8809538,
+            12.93359504
           ],
           [
-            100.88095749,
-            12.93359697
+            100.8809627,
+            12.93359468
           ],
           [
-            100.88096634,
-            12.93359495
+            100.88097271,
+            12.93359116
           ],
           [
-            100.88097681,
-            12.93358978
+            100.88098441,
+            12.93358456
           ],
           [
-            100.88098949,
-            12.93358137
+            100.88099841,
+            12.93357497
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0035",
-        "movement_id": "n_0035_m_000",
+        "junction_node_id": "n_0020",
+        "movement_id": "n_0020_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0103",
-        "to_edge_id": "e_0019",
+        "from_edge_id": "e_0078",
+        "to_edge_id": "e_0016",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_002",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -445,35 +445,35 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88091711,
-            12.93356314
+            100.88091724,
+            12.93356305
           ],
           [
-            100.88092722,
-            12.93357645
+            100.88092731,
+            12.93357639
           ],
           [
-            100.88093603,
-            12.93358813
+            100.88093609,
+            12.93358809
           ],
           [
-            100.88094395,
-            12.93359873
+            100.88094399,
+            12.9335987
           ],
           [
-            100.8809514,
-            12.93360881
+            100.88095143,
+            12.93360879
           ],
           [
-            100.88095879,
-            12.93361894
+            100.8809588,
+            12.93361893
           ],
           [
             100.88096652,
             12.93362967
           ],
           [
-            100.880975,
+            100.88097501,
             12.93364157
           ],
           [
@@ -484,18 +484,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0035",
-        "movement_id": "n_0035_m_001",
+        "junction_node_id": "n_0020",
+        "movement_id": "n_0020_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0103",
-        "to_edge_id": "e_0102",
+        "from_edge_id": "e_0078",
+        "to_edge_id": "e_0077",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_002",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -506,36 +506,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88098949,
-            12.93358137
+            100.88099841,
+            12.93357497
           ],
           [
-            100.88097732,
-            12.93359082
+            100.88098467,
+            12.93358532
           ],
           [
-            100.88096902,
-            12.9335991
+            100.88097458,
+            12.93359431
           ],
           [
-            100.88096429,
-            12.93360675
+            100.88096803,
+            12.93360257
           ],
           [
-            100.88096287,
-            12.93361434
+            100.88096492,
+            12.93361075
           ],
           [
-            100.88096448,
-            12.93362243
+            100.88096514,
+            12.93361946
           ],
           [
-            100.88096883,
-            12.93363156
+            100.88096857,
+            12.93362936
           ],
           [
-            100.88097565,
-            12.9336423
+            100.88097512,
+            12.93364105
           ],
           [
             100.88098466,
@@ -545,18 +545,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0035",
-        "movement_id": "n_0035_m_002",
+        "junction_node_id": "n_0020",
+        "movement_id": "n_0020_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0019",
-        "to_edge_id": "e_0102",
+        "from_edge_id": "e_0016",
+        "to_edge_id": "e_0077",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_002",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -571,53 +571,53 @@
             12.9348706
           ],
           [
-            100.88183596,
-            12.93488304
+            100.88183689,
+            12.93488338
           ],
           [
-            100.88184284,
-            12.93489319
+            100.8818452,
+            12.93489279
           ],
           [
-            100.88184918,
-            12.93490088
+            100.88185326,
+            12.93489888
           ],
           [
-            100.88185556,
-            12.93490595
+            100.88186144,
+            12.9349017
           ],
           [
-            100.88186258,
-            12.93490824
+            100.88187011,
+            12.9349013
           ],
           [
-            100.88187081,
-            12.93490759
+            100.88187963,
+            12.93489775
           ],
           [
-            100.88188084,
-            12.93490385
+            100.88189038,
+            12.93489108
           ],
           [
-            100.88189323,
-            12.93489684
+            100.88190271,
+            12.93488135
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0051",
-        "movement_id": "n_0051_m_000",
+        "junction_node_id": "n_0031",
+        "movement_id": "n_0031_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0099",
-        "to_edge_id": "e_0209",
+        "from_edge_id": "e_0075",
+        "to_edge_id": "e_0147",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_003",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -667,18 +667,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0051",
-        "movement_id": "n_0051_m_001",
+        "junction_node_id": "n_0031",
+        "movement_id": "n_0031_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0099",
-        "to_edge_id": "e_0098",
+        "from_edge_id": "e_0075",
+        "to_edge_id": "e_0074",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_003",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_scaled_for_edge_length"
       }
@@ -689,36 +689,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88189323,
-            12.93489684
+            100.88190271,
+            12.93488135
           ],
           [
-            100.88188309,
-            12.9349036
+            100.88189043,
+            12.93489158
           ],
           [
-            100.88187565,
-            12.9349096
+            100.88188064,
+            12.93489992
           ],
           [
-            100.88187081,
-            12.93491526
+            100.88187347,
+            12.93490715
           ],
           [
-            100.88186844,
-            12.93492101
+            100.88186905,
+            12.93491402
           ],
           [
-            100.88186843,
-            12.93492726
+            100.8818675,
+            12.9349213
           ],
           [
-            100.88187066,
-            12.93493445
+            100.88186895,
+            12.93492976
           ],
           [
-            100.88187502,
-            12.93494298
+            100.88187353,
+            12.93494017
           ],
           [
             100.88188138,
@@ -728,18 +728,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0051",
-        "movement_id": "n_0051_m_002",
+        "junction_node_id": "n_0031",
+        "movement_id": "n_0031_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0209",
-        "to_edge_id": "e_0098",
+        "from_edge_id": "e_0147",
+        "to_edge_id": "e_0074",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_003",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_scaled_for_edge_length"
       }
@@ -754,53 +754,53 @@
             12.9349571
           ],
           [
-            100.88189055,
-            12.93496715
+            100.88189229,
+            12.93496903
           ],
           [
-            100.88189644,
-            12.93497476
+            100.88189988,
+            12.93497702
           ],
           [
-            100.88190195,
-            12.93497998
+            100.88190713,
+            12.93498146
           ],
           [
-            100.88190758,
-            12.93498289
+            100.88191456,
+            12.93498272
           ],
           [
-            100.88191377,
-            12.93498357
+            100.88192271,
+            12.9349812
           ],
           [
-            100.88192101,
-            12.93498207
+            100.8819321,
+            12.93497728
           ],
           [
-            100.88192977,
-            12.93497846
+            100.88194325,
+            12.93497134
           ],
           [
-            100.88194051,
-            12.93497283
+            100.8819567,
+            12.93496379
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0054",
-        "movement_id": "n_0054_m_000",
+        "junction_node_id": "n_0032",
+        "movement_id": "n_0032_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0098",
-        "to_edge_id": "e_0211",
+        "from_edge_id": "e_0074",
+        "to_edge_id": "e_0148",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_004",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_scaled_for_edge_length",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -850,18 +850,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0054",
-        "movement_id": "n_0054_m_001",
+        "junction_node_id": "n_0032",
+        "movement_id": "n_0032_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0098",
-        "to_edge_id": "e_0097",
+        "from_edge_id": "e_0074",
+        "to_edge_id": "e_0073",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_004",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_scaled_for_edge_length",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -872,36 +872,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88194051,
-            12.93497283
+            100.8819567,
+            12.93496379
           ],
           [
-            100.88192881,
-            12.93498019
+            100.88194236,
+            12.9349723
           ],
           [
-            100.88192118,
-            12.93498705
+            100.88193168,
+            12.93498006
           ],
           [
-            100.88191721,
-            12.93499381
+            100.88192454,
+            12.9349876
           ],
           [
-            100.88191647,
-            12.93500086
+            100.8819208,
+            12.93499542
           ],
           [
-            100.88191853,
-            12.93500859
+            100.88192033,
+            12.93500404
           ],
           [
-            100.88192296,
-            12.93501739
+            100.881923,
+            12.93501397
           ],
           [
-            100.88192934,
-            12.93502766
+            100.88192868,
+            12.93502572
           ],
           [
             100.88193724,
@@ -911,18 +911,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0054",
-        "movement_id": "n_0054_m_002",
+        "junction_node_id": "n_0032",
+        "movement_id": "n_0032_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0211",
-        "to_edge_id": "e_0097",
+        "from_edge_id": "e_0148",
+        "to_edge_id": "e_0073",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_004",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -972,11 +972,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0059",
-        "movement_id": "n_0059_m_000",
+        "junction_node_id": "n_0036",
+        "movement_id": "n_0036_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0097",
-        "to_edge_id": "e_0053",
+        "from_edge_id": "e_0073",
+        "to_edge_id": "e_0042",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -1033,11 +1033,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0059",
-        "movement_id": "n_0059_m_001",
+        "junction_node_id": "n_0036",
+        "movement_id": "n_0036_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0097",
-        "to_edge_id": "e_0096",
+        "from_edge_id": "e_0073",
+        "to_edge_id": "e_0072",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -1094,11 +1094,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0059",
-        "movement_id": "n_0059_m_002",
+        "junction_node_id": "n_0036",
+        "movement_id": "n_0036_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0053",
-        "to_edge_id": "e_0096",
+        "from_edge_id": "e_0042",
+        "to_edge_id": "e_0072",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -1155,11 +1155,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0067",
-        "movement_id": "n_0067_m_000",
+        "junction_node_id": "n_0043",
+        "movement_id": "n_0043_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0096",
-        "to_edge_id": "e_0213",
+        "from_edge_id": "e_0072",
+        "to_edge_id": "e_0149",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -1216,11 +1216,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0067",
-        "movement_id": "n_0067_m_001",
+        "junction_node_id": "n_0043",
+        "movement_id": "n_0043_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0096",
-        "to_edge_id": "e_0095",
+        "from_edge_id": "e_0072",
+        "to_edge_id": "e_0071",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -1277,11 +1277,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0067",
-        "movement_id": "n_0067_m_002",
+        "junction_node_id": "n_0043",
+        "movement_id": "n_0043_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0213",
-        "to_edge_id": "e_0095",
+        "from_edge_id": "e_0149",
+        "to_edge_id": "e_0071",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -1299,32 +1299,32 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88241595,
-            12.9313783
+            100.88241586,
+            12.9313784
           ],
           [
-            100.88242846,
-            12.9313895
+            100.8824284,
+            12.93138957
           ],
           [
-            100.88243942,
-            12.9313993
+            100.88243938,
+            12.93139935
           ],
           [
-            100.88244936,
-            12.93140814
+            100.88244933,
+            12.93140817
           ],
           [
-            100.88245879,
-            12.93141651
+            100.88245877,
+            12.93141652
           ],
           [
             100.88246823,
-            12.93142485
+            12.93142486
           ],
           [
             100.88247822,
-            12.93143363
+            12.93143364
           ],
           [
             100.88248928,
@@ -1338,11 +1338,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0068",
-        "movement_id": "n_0068_m_000",
+        "junction_node_id": "n_0044",
+        "movement_id": "n_0044_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0232",
-        "to_edge_id": "e_0233",
+        "from_edge_id": "e_0162",
+        "to_edge_id": "e_0163",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -1360,36 +1360,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88241595,
-            12.9313783
+            100.88241586,
+            12.9313784
           ],
           [
-            100.88242752,
-            12.93138936
+            100.88242744,
+            12.93138942
           ],
           [
-            100.88243576,
-            12.93139912
+            100.88243569,
+            12.93139915
           ],
           [
-            100.88244066,
-            12.93140798
+            100.8824406,
+            12.931408
           ],
           [
-            100.88244221,
-            12.93141637
+            100.88244216,
+            12.93141639
           ],
           [
-            100.88244041,
-            12.93142471
+            100.88244037,
+            12.93142473
           ],
           [
-            100.88243525,
-            12.93143343
+            100.88243522,
+            12.93143345
           ],
           [
-            100.88242672,
-            12.93144295
+            100.88242671,
+            12.93144296
           ],
           [
             100.88241482,
@@ -1399,11 +1399,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0068",
-        "movement_id": "n_0068_m_001",
+        "junction_node_id": "n_0044",
+        "movement_id": "n_0044_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0232",
-        "to_edge_id": "e_0020",
+        "from_edge_id": "e_0162",
+        "to_edge_id": "e_0017",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -1460,11 +1460,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0068",
-        "movement_id": "n_0068_m_002",
+        "junction_node_id": "n_0044",
+        "movement_id": "n_0044_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0233",
-        "to_edge_id": "e_0020",
+        "from_edge_id": "e_0163",
+        "to_edge_id": "e_0017",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -1486,45 +1486,45 @@
             12.93595405
           ],
           [
-            100.88246165,
-            12.93596285
+            100.88246304,
+            12.93596473
           ],
           [
-            100.88246667,
-            12.93596898
+            100.88246943,
+            12.9359713
           ],
           [
-            100.88247176,
-            12.93597264
+            100.88247592,
+            12.93597427
           ],
           [
-            100.88247715,
-            12.93597403
+            100.88248282,
+            12.93597412
           ],
           [
-            100.88248309,
-            12.93597333
+            100.88249041,
+            12.93597135
           ],
           [
-            100.88248981,
-            12.93597075
+            100.88249901,
+            12.93596647
           ],
           [
-            100.88249757,
-            12.93596648
+            100.88250891,
+            12.93595998
           ],
           [
-            100.88250659,
-            12.93596073
+            100.88252042,
+            12.93595237
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0069",
-        "movement_id": "n_0069_m_000",
+        "junction_node_id": "n_0045",
+        "movement_id": "n_0045_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0095",
+        "from_edge_id": "e_0071",
         "to_edge_id": "e_0011",
         "highway": "junction",
         "road_class": "junction",
@@ -1532,7 +1532,7 @@
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_008",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_scaled_for_edge_length",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -1548,7 +1548,7 @@
           ],
           [
             100.88246259,
-            12.93596575
+            12.93596574
           ],
           [
             100.88246793,
@@ -1563,37 +1563,37 @@
             12.9359941
           ],
           [
-            100.88248178,
-            12.93600292
+            100.88248177,
+            12.93600293
           ],
           [
-            100.88248651,
+            100.8824865,
             12.93601225
           ],
           [
-            100.88249174,
-            12.93602256
+            100.88249171,
+            12.93602257
           ],
           [
-            100.8824977,
-            12.93603434
+            100.88249767,
+            12.93603435
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0069",
-        "movement_id": "n_0069_m_001",
+        "junction_node_id": "n_0045",
+        "movement_id": "n_0045_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0095",
-        "to_edge_id": "e_0094",
+        "from_edge_id": "e_0071",
+        "to_edge_id": "e_0070",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_008",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_scaled_for_edge_length",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -1604,57 +1604,57 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88250659,
-            12.93596073
+            100.88252042,
+            12.93595237
           ],
           [
-            100.88249415,
-            12.93596961
+            100.88250553,
+            12.9359623
           ],
           [
-            100.8824858,
-            12.93597732
+            100.8824945,
+            12.9359708
           ],
           [
-            100.88248112,
-            12.93598449
+            100.88248713,
+            12.93597863
           ],
           [
-            100.88247968,
-            12.93599176
+            100.88248319,
+            12.93598655
           ],
           [
-            100.88248105,
-            12.93599974
+            100.88248249,
+            12.93599532
           ],
           [
-            100.8824848,
-            12.93600908
+            100.88248481,
+            12.9360057
           ],
           [
-            100.88249049,
-            12.93602041
+            100.88248994,
+            12.93601846
           ],
           [
-            100.8824977,
-            12.93603434
+            100.88249767,
+            12.93603435
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0069",
-        "movement_id": "n_0069_m_002",
+        "junction_node_id": "n_0045",
+        "movement_id": "n_0045_m_002",
         "movement_kind": "turn",
         "from_edge_id": "e_0011",
-        "to_edge_id": "e_0094",
+        "to_edge_id": "e_0070",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_008",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -1665,57 +1665,57 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88253713,
-            12.93611223
+            100.88252392,
+            12.93608625
           ],
           [
-            100.88254202,
-            12.93612066
+            100.88253164,
+            12.93610041
           ],
           [
-            100.88254678,
-            12.93612616
+            100.88253893,
+            12.93611104
           ],
           [
-            100.88255165,
-            12.93612905
+            100.88254625,
+            12.93611826
           ],
           [
-            100.88255688,
-            12.93612965
+            100.88255406,
+            12.9361222
           ],
           [
-            100.8825627,
-            12.93612829
+            100.88256282,
+            12.936123
           ],
           [
-            100.88256936,
-            12.93612528
+            100.88257298,
+            12.93612079
           ],
           [
-            100.88257709,
-            12.93612095
+            100.88258501,
+            12.93611569
           ],
           [
-            100.88258615,
-            12.93611561
+            100.88259936,
+            12.93610784
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0074",
-        "movement_id": "n_0074_m_000",
+        "junction_node_id": "n_0048",
+        "movement_id": "n_0048_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0093",
-        "to_edge_id": "e_0202",
+        "from_edge_id": "e_0070",
+        "to_edge_id": "e_0141",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_009",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -1726,36 +1726,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88253713,
-            12.93611223
+            100.88252392,
+            12.93608625
           ],
           [
-            100.88254272,
-            12.93612329
+            100.88253145,
+            12.9361011
           ],
           [
-            100.88254764,
-            12.93613294
+            100.88253805,
+            12.93611408
           ],
           [
-            100.88255213,
-            12.93614165
+            100.88254405,
+            12.93612582
           ],
           [
-            100.88255641,
-            12.9361499
+            100.88254976,
+            12.93613692
           ],
           [
-            100.88256073,
-            12.93615812
+            100.88255551,
+            12.93614801
           ],
           [
-            100.8825653,
-            12.9361668
+            100.88256161,
+            12.9361597
           ],
           [
-            100.88257036,
-            12.93617638
+            100.88256839,
+            12.9361726
           ],
           [
             100.88257615,
@@ -1765,18 +1765,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0074",
-        "movement_id": "n_0074_m_001",
+        "junction_node_id": "n_0048",
+        "movement_id": "n_0048_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0093",
-        "to_edge_id": "e_0092",
+        "from_edge_id": "e_0070",
+        "to_edge_id": "e_0069",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_009",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -1787,36 +1787,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88258615,
-            12.93611561
+            100.88259936,
+            12.93610784
           ],
           [
-            100.88257352,
-            12.93612369
+            100.88258444,
+            12.93611697
           ],
           [
-            100.88256497,
-            12.93613095
+            100.88257335,
+            12.93612499
           ],
           [
-            100.88256009,
-            12.93613793
+            100.88256588,
+            12.93613258
           ],
           [
-            100.88255845,
-            12.93614517
+            100.88256184,
+            12.9361404
           ],
           [
-            100.88255965,
-            12.93615319
+            100.88256105,
+            12.93614912
           ],
           [
-            100.88256328,
-            12.93616254
+            100.8825633,
+            12.9361594
           ],
           [
-            100.88256891,
-            12.93617374
+            100.8825684,
+            12.93617192
           ],
           [
             100.88257615,
@@ -1826,18 +1826,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0074",
-        "movement_id": "n_0074_m_002",
+        "junction_node_id": "n_0048",
+        "movement_id": "n_0048_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0202",
-        "to_edge_id": "e_0092",
+        "from_edge_id": "e_0141",
+        "to_edge_id": "e_0069",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_009",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -1848,32 +1848,32 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88268124,
-            12.93584868
+            100.88268123,
+            12.93584867
           ],
           [
-            100.88266694,
-            12.93585833
+            100.88266693,
+            12.93585832
           ],
           [
             100.88265636,
-            12.9358668
+            12.93586679
           ],
           [
-            100.88264937,
-            12.93587472
+            100.88264936,
+            12.93587471
           ],
           [
             100.88264581,
             12.93588272
           ],
           [
-            100.88264555,
+            100.88264554,
             12.93589144
           ],
           [
             100.88264843,
-            12.93590151
+            12.9359015
           ],
           [
             100.88265432,
@@ -1887,11 +1887,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0076",
-        "movement_id": "n_0076_m_000",
+        "junction_node_id": "n_0049",
+        "movement_id": "n_0049_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0013",
-        "to_edge_id": "e_0204",
+        "from_edge_id": "e_0012",
+        "to_edge_id": "e_0142",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -1909,8 +1909,8 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88268124,
-            12.93584868
+            100.88268123,
+            12.93584867
           ],
           [
             100.88266706,
@@ -1922,37 +1922,37 @@
           ],
           [
             100.88264343,
-            12.93587303
+            12.93587304
           ],
           [
-            100.88263278,
-            12.93587987
+            100.8826328,
+            12.93587989
           ],
           [
-            100.88262214,
-            12.9358867
+            100.88262217,
+            12.93588675
           ],
           [
-            100.88261089,
-            12.9358939
+            100.88261095,
+            12.93589399
           ],
           [
-            100.88259846,
-            12.93590186
+            100.88259855,
+            12.93590198
           ],
           [
-            100.88258426,
-            12.93591095
+            100.88258438,
+            12.93591112
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0076",
-        "movement_id": "n_0076_m_001",
+        "junction_node_id": "n_0049",
+        "movement_id": "n_0049_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0013",
-        "to_edge_id": "e_0012",
+        "from_edge_id": "e_0012",
+        "to_edge_id": "e_0011",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -1974,46 +1974,46 @@
             12.9359282
           ],
           [
-            100.8826539,
-            12.9359144
+            100.88265391,
+            12.93591443
           ],
           [
-            100.88264563,
-            12.93590416
+            100.88264564,
+            12.93590421
           ],
           [
-            100.8826377,
-            12.93589737
+            100.88263771,
+            12.93589744
           ],
           [
-            100.88262957,
-            12.93589391
+            100.88262958,
+            12.93589399
           ],
           [
-            100.88262071,
-            12.93589366
+            100.88262072,
+            12.93589375
           ],
           [
-            100.88261056,
-            12.93589649
+            100.88261059,
+            12.9358966
           ],
           [
-            100.88259859,
-            12.93590229
+            100.88259866,
+            12.93590243
           ],
           [
-            100.88258426,
-            12.93591095
+            100.88258438,
+            12.93591112
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0076",
-        "movement_id": "n_0076_m_002",
+        "junction_node_id": "n_0049",
+        "movement_id": "n_0049_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0204",
-        "to_edge_id": "e_0012",
+        "from_edge_id": "e_0142",
+        "to_edge_id": "e_0011",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -2035,53 +2035,53 @@
             12.93161492
           ],
           [
-            100.88269674,
-            12.93162459
+            100.88269832,
+            12.93162597
           ],
           [
-            100.88270644,
-            12.93163305
+            100.88270941,
+            12.93163563
           ],
           [
-            100.88271524,
-            12.93164067
+            100.88271947,
+            12.93164434
           ],
           [
-            100.8827236,
-            12.93164787
+            100.88272902,
+            12.93165257
           ],
           [
-            100.882732,
-            12.93165502
+            100.88273859,
+            12.93166078
           ],
           [
-            100.8827409,
-            12.93166253
+            100.88274872,
+            12.93166941
           ],
           [
-            100.88275077,
-            12.93167079
+            100.88275993,
+            12.93167893
           ],
           [
-            100.88276209,
-            12.93168019
+            100.88277276,
+            12.93168979
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0078",
-        "movement_id": "n_0078_m_000",
+        "junction_node_id": "n_0050",
+        "movement_id": "n_0050_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0233",
-        "to_edge_id": "e_0234",
+        "from_edge_id": "e_0163",
+        "to_edge_id": "e_0164",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_011",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -2096,53 +2096,53 @@
             12.93161492
           ],
           [
-            100.88269596,
-            12.93162372
+            100.88269716,
+            12.9316257
           ],
           [
-            100.88270482,
-            12.93163137
+            100.88270534,
+            12.93163529
           ],
           [
-            100.88271181,
-            12.93163824
+            100.8827102,
+            12.93164406
           ],
           [
-            100.88271647,
-            12.93164469
+            100.88271172,
+            12.93165241
           ],
           [
-            100.88271838,
-            12.93165109
+            100.8827099,
+            12.9316607
           ],
           [
-            100.88271708,
-            12.93165782
+            100.88270473,
+            12.9316693
           ],
           [
-            100.88271215,
-            12.93166524
+            100.88269622,
+            12.93167861
           ],
           [
-            100.88270314,
-            12.93167372
+            100.88268434,
+            12.93168899
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0078",
-        "movement_id": "n_0078_m_001",
+        "junction_node_id": "n_0050",
+        "movement_id": "n_0050_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0233",
-        "to_edge_id": "e_0135",
+        "from_edge_id": "e_0163",
+        "to_edge_id": "e_0095",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_011",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -2153,57 +2153,57 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88276209,
-            12.93168019
+            100.88277276,
+            12.93168979
           ],
           [
-            100.88275267,
-            12.93167231
+            100.8827588,
+            12.93167829
           ],
           [
-            100.88274502,
-            12.93166615
+            100.88274739,
+            12.93167007
           ],
           [
-            100.88273856,
-            12.93166188
+            100.88273768,
+            12.93166511
           ],
           [
-            100.88273268,
-            12.93165962
+            100.8827288,
+            12.93166341
           ],
           [
-            100.8827268,
-            12.93165953
+            100.88271989,
+            12.93166495
           ],
           [
-            100.88272031,
-            12.93166176
+            100.88271008,
+            12.93166973
           ],
           [
-            100.88271262,
-            12.93166644
+            100.88269852,
+            12.93167775
           ],
           [
-            100.88270314,
-            12.93167372
+            100.88268434,
+            12.93168899
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0078",
-        "movement_id": "n_0078_m_002",
+        "junction_node_id": "n_0050",
+        "movement_id": "n_0050_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0234",
-        "to_edge_id": "e_0135",
+        "from_edge_id": "e_0164",
+        "to_edge_id": "e_0095",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_011",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -2253,10 +2253,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0081",
-        "movement_id": "n_0081_m_000",
+        "junction_node_id": "n_0052",
+        "movement_id": "n_0052_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0092",
+        "from_edge_id": "e_0069",
         "to_edge_id": "e_0000",
         "highway": "junction",
         "road_class": "junction",
@@ -2314,11 +2314,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0081",
-        "movement_id": "n_0081_m_001",
+        "junction_node_id": "n_0052",
+        "movement_id": "n_0052_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0092",
-        "to_edge_id": "e_0091",
+        "from_edge_id": "e_0069",
+        "to_edge_id": "e_0068",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -2375,11 +2375,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0081",
-        "movement_id": "n_0081_m_002",
+        "junction_node_id": "n_0052",
+        "movement_id": "n_0052_m_002",
         "movement_kind": "turn",
         "from_edge_id": "e_0000",
-        "to_edge_id": "e_0091",
+        "to_edge_id": "e_0068",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
@@ -2401,53 +2401,53 @@
             12.93709594
           ],
           [
-            100.8830477,
-            12.93710852
+            100.88304971,
+            12.93711085
           ],
           [
-            100.88305228,
-            12.93711938
+            100.88305687,
+            12.93712206
           ],
           [
-            100.88305639,
-            12.93712828
+            100.883064,
+            12.93712977
           ],
           [
-            100.88306071,
-            12.93713496
+            100.88307168,
+            12.93713418
           ],
           [
-            100.88306593,
-            12.93713919
+            100.88308049,
+            12.93713549
           ],
           [
-            100.88307274,
-            12.93714071
+            100.88309101,
+            12.9371339
           ],
           [
-            100.88308181,
-            12.93713927
+            100.88310382,
+            12.93712961
           ],
           [
-            100.88309383,
-            12.93713462
+            100.8831195,
+            12.93712283
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0089",
-        "movement_id": "n_0089_m_000",
+        "junction_node_id": "n_0059",
+        "movement_id": "n_0059_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0090",
-        "to_edge_id": "e_0040",
+        "from_edge_id": "e_0067",
+        "to_edge_id": "e_0034",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_013",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -2470,45 +2470,45 @@
             12.93712399
           ],
           [
-            100.88306131,
+            100.88306132,
             12.93713587
           ],
           [
-            100.88306663,
+            100.88306664,
             12.93714716
           ],
           [
-            100.88307187,
-            12.93715849
+            100.88307189,
+            12.93715848
           ],
           [
-            100.88307732,
-            12.93717047
+            100.88307736,
+            12.93717046
           ],
           [
-            100.88308329,
-            12.93718375
+            100.88308334,
+            12.93718373
           ],
           [
-            100.88309005,
-            12.93719894
+            100.88309012,
+            12.93719891
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0089",
-        "movement_id": "n_0089_m_001",
+        "junction_node_id": "n_0059",
+        "movement_id": "n_0059_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0090",
-        "to_edge_id": "e_0089",
+        "from_edge_id": "e_0067",
+        "to_edge_id": "e_0066",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_013",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -2519,57 +2519,57 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88309383,
-            12.93713462
+            100.8831195,
+            12.93712283
           ],
           [
-            100.88308236,
-            12.93714079
+            100.88310397,
+            12.93713038
           ],
           [
-            100.88307532,
-            12.93714672
+            100.88309228,
+            12.9371373
           ],
           [
-            100.88307206,
-            12.93715281
+            100.88308422,
+            12.93714417
           ],
           [
-            100.88307194,
-            12.93715944
+            100.88307955,
+            12.93715161
           ],
           [
-            100.88307433,
-            12.93716698
+            100.88307804,
+            12.9371602
           ],
           [
-            100.88307857,
-            12.93717583
+            100.88307945,
+            12.93717055
           ],
           [
-            100.88308402,
-            12.93718635
+            100.88308355,
+            12.93718325
           ],
           [
-            100.88309005,
-            12.93719894
+            100.88309012,
+            12.93719891
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0089",
-        "movement_id": "n_0089_m_002",
+        "junction_node_id": "n_0059",
+        "movement_id": "n_0059_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0040",
-        "to_edge_id": "e_0089",
+        "from_edge_id": "e_0034",
+        "to_edge_id": "e_0066",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 3,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_013",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -2619,11 +2619,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0092",
-        "movement_id": "n_0092_m_000",
+        "junction_node_id": "n_0061",
+        "movement_id": "n_0061_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0237",
-        "to_edge_id": "e_0238",
+        "from_edge_id": "e_0165",
+        "to_edge_id": "e_0166",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -2680,11 +2680,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0092",
-        "movement_id": "n_0092_m_001",
+        "junction_node_id": "n_0061",
+        "movement_id": "n_0061_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0237",
-        "to_edge_id": "e_0015",
+        "from_edge_id": "e_0165",
+        "to_edge_id": "e_0013",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -2741,11 +2741,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0092",
-        "movement_id": "n_0092_m_002",
+        "junction_node_id": "n_0061",
+        "movement_id": "n_0061_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0238",
-        "to_edge_id": "e_0015",
+        "from_edge_id": "e_0166",
+        "to_edge_id": "e_0013",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -2767,53 +2767,53 @@
             12.93205955
           ],
           [
-            100.8832154,
-            12.93207027
+            100.8832165,
+            12.93207091
           ],
           [
-            100.88322583,
-            12.93207843
+            100.88322785,
+            12.93207902
           ],
           [
-            100.88323474,
+            100.88323756,
             12.93208387
           ],
           [
-            100.88324289,
-            12.93208646
+            100.88324645,
+            12.93208547
           ],
           [
-            100.88325102,
-            12.93208604
+            100.88325532,
+            12.9320838
           ],
           [
-            100.88325988,
-            12.93208246
+            100.88326499,
+            12.93207887
           ],
           [
-            100.88327024,
-            12.93207559
+            100.88327627,
+            12.93207067
           ],
           [
-            100.88328285,
-            12.93206528
+            100.88328998,
+            12.9320592
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0097",
-        "movement_id": "n_0097_m_000",
+        "junction_node_id": "n_0063",
+        "movement_id": "n_0063_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0238",
-        "to_edge_id": "e_0057",
+        "from_edge_id": "e_0166",
+        "to_edge_id": "e_0045",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_015",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -2863,18 +2863,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0097",
-        "movement_id": "n_0097_m_001",
+        "junction_node_id": "n_0063",
+        "movement_id": "n_0063_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0238",
-        "to_edge_id": "e_0239",
+        "from_edge_id": "e_0166",
+        "to_edge_id": "e_0167",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_015",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -2885,36 +2885,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88328285,
-            12.93206528
+            100.88328998,
+            12.9320592
           ],
           [
-            100.88327216,
-            12.93207538
+            100.88327806,
+            12.93207014
           ],
           [
-            100.88326507,
-            12.93208425
+            100.88326952,
+            12.93207977
           ],
           [
-            100.88326143,
-            12.93209232
+            100.88326435,
+            12.93208855
           ],
           [
-            100.88326106,
-            12.93210001
+            100.88326255,
+            12.93209692
           ],
           [
-            100.88326379,
-            12.93210773
+            100.88326411,
+            12.93210534
           ],
           [
-            100.88326945,
-            12.93211592
+            100.88326902,
+            12.93211426
           ],
           [
-            100.88327787,
-            12.932125
+            100.88327728,
+            12.93212412
           ],
           [
             100.88328888,
@@ -2924,18 +2924,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0097",
-        "movement_id": "n_0097_m_002",
+        "junction_node_id": "n_0063",
+        "movement_id": "n_0063_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0057",
-        "to_edge_id": "e_0239",
+        "from_edge_id": "e_0045",
+        "to_edge_id": "e_0167",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_015",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -2985,11 +2985,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0099",
-        "movement_id": "n_0099_m_000",
+        "junction_node_id": "n_0065",
+        "movement_id": "n_0065_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0069",
-        "to_edge_id": "e_0148",
+        "from_edge_id": "e_0051",
+        "to_edge_id": "e_0102",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -3046,11 +3046,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0099",
-        "movement_id": "n_0099_m_001",
+        "junction_node_id": "n_0065",
+        "movement_id": "n_0065_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0069",
-        "to_edge_id": "e_0068",
+        "from_edge_id": "e_0051",
+        "to_edge_id": "e_0050",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -3107,11 +3107,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0099",
-        "movement_id": "n_0099_m_002",
+        "junction_node_id": "n_0065",
+        "movement_id": "n_0065_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0148",
-        "to_edge_id": "e_0068",
+        "from_edge_id": "e_0102",
+        "to_edge_id": "e_0050",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -3168,11 +3168,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0103",
-        "movement_id": "n_0103_m_000",
+        "junction_node_id": "n_0068",
+        "movement_id": "n_0068_m_000",
         "movement_kind": "turn",
         "from_edge_id": "e_0005",
-        "to_edge_id": "e_0084",
+        "to_edge_id": "e_0064",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -3229,8 +3229,8 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0103",
-        "movement_id": "n_0103_m_001",
+        "junction_node_id": "n_0068",
+        "movement_id": "n_0068_m_001",
         "movement_kind": "through",
         "from_edge_id": "e_0005",
         "to_edge_id": "e_0004",
@@ -3290,10 +3290,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0103",
-        "movement_id": "n_0103_m_002",
+        "junction_node_id": "n_0068",
+        "movement_id": "n_0068_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0084",
+        "from_edge_id": "e_0064",
         "to_edge_id": "e_0004",
         "highway": "junction",
         "road_class": "junction",
@@ -3351,10 +3351,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0107",
-        "movement_id": "n_0107_m_000",
+        "junction_node_id": "n_0072",
+        "movement_id": "n_0072_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0206",
+        "from_edge_id": "e_0144",
         "to_edge_id": "e_0006",
         "highway": "junction",
         "road_class": "junction",
@@ -3412,10 +3412,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0107",
-        "movement_id": "n_0107_m_001",
+        "junction_node_id": "n_0072",
+        "movement_id": "n_0072_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0206",
+        "from_edge_id": "e_0144",
         "to_edge_id": "e_0005",
         "highway": "junction",
         "road_class": "junction",
@@ -3473,8 +3473,8 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0107",
-        "movement_id": "n_0107_m_002",
+        "junction_node_id": "n_0072",
+        "movement_id": "n_0072_m_002",
         "movement_kind": "through",
         "from_edge_id": "e_0006",
         "to_edge_id": "e_0005",
@@ -3495,111 +3495,50 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.8833552,
-            12.93244996
+            100.88334248,
+            12.93244672
           ],
           [
-            100.88336382,
-            12.93245144
+            100.88335318,
+            12.93244895
           ],
           [
-            100.88337149,
-            12.932452
+            100.88336271,
+            12.93245041
           ],
           [
-            100.88337851,
-            12.93245171
+            100.88337146,
+            12.93245112
           ],
           [
-            100.88338517,
-            12.93245066
+            100.8833798,
+            12.9324511
           ],
           [
-            100.88339176,
-            12.93244892
+            100.88338813,
+            12.93245034
           ],
           [
-            100.88339859,
-            12.93244657
+            100.88339681,
+            12.93244886
           ],
           [
-            100.88340595,
-            12.9324437
+            100.88340624,
+            12.93244667
           ],
           [
-            100.88341414,
-            12.93244039
+            100.88341678,
+            12.93244377
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0108",
-        "movement_id": "n_0108_m_000",
+        "junction_node_id": "n_0073",
+        "movement_id": "n_0073_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0145",
-        "to_edge_id": "e_0150",
-        "highway": "junction",
-        "road_class": "junction",
-        "lanes": 1,
-        "width_m": 4.0,
-        "oneway": false,
-        "regularized_junction_id": "j_019",
-        "junction_area_status": "warn",
-        "from_trim_source": "regularized_entry_pose",
-        "to_trim_source": "regularized_scaled_for_edge_length"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
-            100.8833552,
-            12.93244996
-          ],
-          [
-            100.88336313,
-            12.93245203
-          ],
-          [
-            100.8833688,
-            12.93245441
-          ],
-          [
-            100.8833725,
-            12.9324573
-          ],
-          [
-            100.88337452,
-            12.93246088
-          ],
-          [
-            100.88337517,
-            12.93246534
-          ],
-          [
-            100.88337474,
-            12.93247085
-          ],
-          [
-            100.88337352,
-            12.93247761
-          ],
-          [
-            100.88337181,
-            12.9324858
-          ]
-        ]
-      },
-      "properties": {
-        "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0108",
-        "movement_id": "n_0108_m_001",
-        "movement_kind": "turn",
-        "from_edge_id": "e_0145",
-        "to_edge_id": "e_0151",
+        "from_edge_id": "e_0099",
+        "to_edge_id": "e_0104",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -3617,36 +3556,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88341414,
-            12.93244039
+            100.88334248,
+            12.93244672
           ],
           [
-            100.88340228,
-            12.93244499
+            100.8833526,
+            12.93244916
           ],
           [
-            100.8833934,
-            12.93244838
+            100.88336057,
+            12.93245158
           ],
           [
-            100.88338693,
-            12.93245132
+            100.88336654,
+            12.93245434
           ],
           [
-            100.88338234,
-            12.93245457
+            100.88337067,
+            12.9324578
           ],
           [
-            100.88337908,
-            12.93245888
+            100.88337311,
+            12.93246231
           ],
           [
-            100.88337661,
-            12.93246502
+            100.88337401,
+            12.93246824
           ],
           [
-            100.88337436,
-            12.93247374
+            100.88337353,
+            12.93247595
           ],
           [
             100.88337181,
@@ -3656,11 +3595,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0108",
-        "movement_id": "n_0108_m_002",
+        "junction_node_id": "n_0073",
+        "movement_id": "n_0073_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0150",
-        "to_edge_id": "e_0151",
+        "from_edge_id": "e_0099",
+        "to_edge_id": "e_0105",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -3668,7 +3607,68 @@
         "oneway": false,
         "regularized_junction_id": "j_019",
         "junction_area_status": "warn",
-        "from_trim_source": "regularized_scaled_for_edge_length",
+        "from_trim_source": "regularized_entry_pose",
+        "to_trim_source": "regularized_entry_pose"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            100.88341678,
+            12.93244377
+          ],
+          [
+            100.88340453,
+            12.93244713
+          ],
+          [
+            100.8833952,
+            12.93244966
+          ],
+          [
+            100.88338829,
+            12.93245203
+          ],
+          [
+            100.88338327,
+            12.93245495
+          ],
+          [
+            100.88337963,
+            12.9324591
+          ],
+          [
+            100.88337685,
+            12.93246516
+          ],
+          [
+            100.88337442,
+            12.93247383
+          ],
+          [
+            100.88337181,
+            12.9324858
+          ]
+        ]
+      },
+      "properties": {
+        "vc_part": "junction_movement_debug",
+        "junction_node_id": "n_0073",
+        "movement_id": "n_0073_m_002",
+        "movement_kind": "turn",
+        "from_edge_id": "e_0104",
+        "to_edge_id": "e_0105",
+        "highway": "junction",
+        "road_class": "junction",
+        "lanes": 1,
+        "width_m": 4.0,
+        "oneway": false,
+        "regularized_junction_id": "j_019",
+        "junction_area_status": "warn",
+        "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
     },
@@ -3717,11 +3717,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0110",
-        "movement_id": "n_0110_m_000",
+        "junction_node_id": "n_0076",
+        "movement_id": "n_0076_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0239",
-        "to_edge_id": "e_0240",
+        "from_edge_id": "e_0167",
+        "to_edge_id": "e_0168",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -3778,11 +3778,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0110",
-        "movement_id": "n_0110_m_001",
+        "junction_node_id": "n_0076",
+        "movement_id": "n_0076_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0239",
-        "to_edge_id": "e_0069",
+        "from_edge_id": "e_0167",
+        "to_edge_id": "e_0051",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -3839,11 +3839,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0110",
-        "movement_id": "n_0110_m_002",
+        "junction_node_id": "n_0076",
+        "movement_id": "n_0076_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0240",
-        "to_edge_id": "e_0069",
+        "from_edge_id": "e_0168",
+        "to_edge_id": "e_0051",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -3861,36 +3861,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88348414,
-            12.93410319
+            100.88348416,
+            12.93410321
           ],
           [
-            100.88347218,
-            12.93411124
+            100.8834722,
+            12.93411125
           ],
           [
-            100.88346209,
-            12.93411797
+            100.8834621,
+            12.93411798
           ],
           [
-            100.88345415,
-            12.93412396
+            100.88345416,
+            12.93412397
           ],
           [
-            100.88344865,
-            12.93412981
+            100.88344866,
+            12.93412982
           ],
           [
-            100.8834459,
+            100.88344591,
             12.93413611
           ],
           [
-            100.88344618,
-            12.93414343
+            100.88344619,
+            12.93414344
           ],
           [
             100.88344979,
-            12.93415238
+            12.93415239
           ],
           [
             100.88345702,
@@ -3900,11 +3900,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0112",
-        "movement_id": "n_0112_m_000",
+        "junction_node_id": "n_0077",
+        "movement_id": "n_0077_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0055",
-        "to_edge_id": "e_0208",
+        "from_edge_id": "e_0044",
+        "to_edge_id": "e_0146",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -3922,19 +3922,19 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88348414,
-            12.93410319
+            100.88348416,
+            12.93410321
           ],
           [
-            100.88347031,
-            12.93411282
+            100.88347033,
+            12.93411284
           ],
           [
-            100.88345822,
-            12.93412126
+            100.88345823,
+            12.93412127
           ],
           [
-            100.88344728,
+            100.88344729,
             12.9341289
           ],
           [
@@ -3943,7 +3943,7 @@
           ],
           [
             100.88342658,
-            12.93414339
+            12.9341434
           ],
           [
             100.88341566,
@@ -3961,11 +3961,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0112",
-        "movement_id": "n_0112_m_001",
+        "junction_node_id": "n_0077",
+        "movement_id": "n_0077_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0055",
-        "to_edge_id": "e_0054",
+        "from_edge_id": "e_0044",
+        "to_edge_id": "e_0043",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -4022,11 +4022,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0112",
-        "movement_id": "n_0112_m_002",
+        "junction_node_id": "n_0077",
+        "movement_id": "n_0077_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0208",
-        "to_edge_id": "e_0054",
+        "from_edge_id": "e_0146",
+        "to_edge_id": "e_0043",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -4083,11 +4083,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0117",
-        "movement_id": "n_0117_m_000",
+        "junction_node_id": "n_0081",
+        "movement_id": "n_0081_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0240",
-        "to_edge_id": "e_0241",
+        "from_edge_id": "e_0168",
+        "to_edge_id": "e_0169",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -4109,46 +4109,46 @@
             12.93231029
           ],
           [
-            100.88349333,
-            12.93232157
+            100.88349328,
+            12.93232154
           ],
           [
-            100.88350182,
-            12.93233141
+            100.88350174,
+            12.93233136
           ],
           [
-            100.88350694,
-            12.93234029
+            100.88350683,
+            12.93234025
           ],
           [
-            100.88350869,
-            12.93234872
+            100.88350855,
+            12.93234867
           ],
           [
-            100.88350707,
-            12.93235717
+            100.8835069,
+            12.9323571
           ],
           [
-            100.88350209,
-            12.93236613
+            100.88350189,
+            12.93236603
           ],
           [
-            100.88349375,
-            12.93237609
+            100.88349352,
+            12.93237592
           ],
           [
-            100.88348206,
-            12.93238754
+            100.88348179,
+            12.93238726
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0117",
-        "movement_id": "n_0117_m_001",
+        "junction_node_id": "n_0081",
+        "movement_id": "n_0081_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0240",
-        "to_edge_id": "e_0149",
+        "from_edge_id": "e_0168",
+        "to_edge_id": "e_0103",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -4170,46 +4170,46 @@
             12.93236536
           ],
           [
-            100.88353273,
-            12.93235754
+            100.88353271,
+            12.93235752
           ],
           [
-            100.88352484,
-            12.93235378
+            100.8835248,
+            12.93235373
           ],
           [
-            100.88351822,
-            12.93235355
+            100.88351817,
+            12.93235347
           ],
           [
-            100.88351223,
-            12.93235636
+            100.88351217,
+            12.93235625
           ],
           [
-            100.88350626,
-            12.93236167
+            100.88350617,
+            12.93236152
           ],
           [
-            100.88349966,
-            12.93236899
+            100.88349953,
+            12.9323688
           ],
           [
-            100.8834918,
-            12.93237778
+            100.88349161,
+            12.93237755
           ],
           [
-            100.88348206,
-            12.93238754
+            100.88348179,
+            12.93238726
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0117",
-        "movement_id": "n_0117_m_002",
+        "junction_node_id": "n_0081",
+        "movement_id": "n_0081_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0241",
-        "to_edge_id": "e_0149",
+        "from_edge_id": "e_0169",
+        "to_edge_id": "e_0103",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -4247,30 +4247,30 @@
             12.9323779
           ],
           [
-            100.88358249,
-            12.93237273
+            100.8835825,
+            12.93237274
           ],
           [
-            100.88358925,
-            12.93236558
+            100.88358926,
+            12.93236559
           ],
           [
-            100.88359734,
-            12.93235696
+            100.88359735,
+            12.93235697
           ],
           [
             100.88360742,
-            12.93234739
+            12.9323474
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0118",
-        "movement_id": "n_0118_m_000",
+        "junction_node_id": "n_0082",
+        "movement_id": "n_0082_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0241",
-        "to_edge_id": "e_0041",
+        "from_edge_id": "e_0169",
+        "to_edge_id": "e_0035",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -4327,11 +4327,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0118",
-        "movement_id": "n_0118_m_001",
+        "junction_node_id": "n_0082",
+        "movement_id": "n_0082_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0241",
-        "to_edge_id": "e_0242",
+        "from_edge_id": "e_0169",
+        "to_edge_id": "e_0170",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -4350,18 +4350,18 @@
         "coordinates": [
           [
             100.88360742,
-            12.93234739
+            12.9323474
           ],
           [
-            100.88359556,
-            12.93235842
+            100.88359557,
+            12.93235843
           ],
           [
-            100.88358708,
-            12.93236811
+            100.88358709,
+            12.93236812
           ],
           [
-            100.88358197,
+            100.88358198,
             12.93237693
           ],
           [
@@ -4388,11 +4388,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0118",
-        "movement_id": "n_0118_m_002",
+        "junction_node_id": "n_0082",
+        "movement_id": "n_0082_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0041",
-        "to_edge_id": "e_0242",
+        "from_edge_id": "e_0035",
+        "to_edge_id": "e_0170",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -4449,11 +4449,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0125",
-        "movement_id": "n_0125_m_000",
+        "junction_node_id": "n_0087",
+        "movement_id": "n_0087_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0081",
-        "to_edge_id": "e_0078",
+        "from_edge_id": "e_0061",
+        "to_edge_id": "e_0058",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -4510,11 +4510,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0125",
-        "movement_id": "n_0125_m_001",
+        "junction_node_id": "n_0087",
+        "movement_id": "n_0087_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0081",
-        "to_edge_id": "e_0080",
+        "from_edge_id": "e_0061",
+        "to_edge_id": "e_0060",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -4571,11 +4571,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0125",
-        "movement_id": "n_0125_m_002",
+        "junction_node_id": "n_0087",
+        "movement_id": "n_0087_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0078",
-        "to_edge_id": "e_0080",
+        "from_edge_id": "e_0058",
+        "to_edge_id": "e_0060",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -4632,11 +4632,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0127",
-        "movement_id": "n_0127_m_000",
+        "junction_node_id": "n_0089",
+        "movement_id": "n_0089_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0078",
-        "to_edge_id": "e_0037",
+        "from_edge_id": "e_0058",
+        "to_edge_id": "e_0033",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -4693,11 +4693,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0127",
-        "movement_id": "n_0127_m_001",
+        "junction_node_id": "n_0089",
+        "movement_id": "n_0089_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0078",
-        "to_edge_id": "e_0079",
+        "from_edge_id": "e_0058",
+        "to_edge_id": "e_0059",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -4739,26 +4739,26 @@
             12.93673215
           ],
           [
-            100.88394831,
+            100.88394832,
             12.93673907
           ],
           [
-            100.8839368,
+            100.88393681,
             12.93674599
           ],
           [
-            100.88392149,
+            100.8839215,
             12.93675348
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0127",
-        "movement_id": "n_0127_m_002",
+        "junction_node_id": "n_0089",
+        "movement_id": "n_0089_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0078",
-        "to_edge_id": "e_0038",
+        "from_edge_id": "e_0058",
+        "to_edge_id": "e_0034",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -4815,11 +4815,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0127",
-        "movement_id": "n_0127_m_003",
+        "junction_node_id": "n_0089",
+        "movement_id": "n_0089_m_003",
         "movement_kind": "turn",
-        "from_edge_id": "e_0037",
-        "to_edge_id": "e_0079",
+        "from_edge_id": "e_0033",
+        "to_edge_id": "e_0059",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -4845,7 +4845,7 @@
             12.93671265
           ],
           [
-            100.88399783,
+            100.88399784,
             12.9367187
           ],
           [
@@ -4853,7 +4853,7 @@
             12.93672419
           ],
           [
-            100.88397405,
+            100.88397406,
             12.93672942
           ],
           [
@@ -4862,25 +4862,25 @@
           ],
           [
             100.88395032,
-            12.93674024
+            12.93674023
           ],
           [
-            100.88393686,
+            100.88393687,
             12.93674641
           ],
           [
-            100.88392149,
+            100.8839215,
             12.93675348
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0127",
-        "movement_id": "n_0127_m_004",
+        "junction_node_id": "n_0089",
+        "movement_id": "n_0089_m_004",
         "movement_kind": "through",
-        "from_edge_id": "e_0037",
-        "to_edge_id": "e_0038",
+        "from_edge_id": "e_0033",
+        "to_edge_id": "e_0034",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -4911,14 +4911,14 @@
           ],
           [
             100.88397655,
-            12.93674705
+            12.93674706
           ],
           [
             100.88396896,
             12.93674256
           ],
           [
-            100.88396019,
+            100.8839602,
             12.93674115
           ],
           [
@@ -4926,22 +4926,22 @@
             12.93674263
           ],
           [
-            100.883937,
+            100.88393701,
             12.9367468
           ],
           [
-            100.88392149,
+            100.8839215,
             12.93675348
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0127",
-        "movement_id": "n_0127_m_005",
+        "junction_node_id": "n_0089",
+        "movement_id": "n_0089_m_005",
         "movement_kind": "turn",
-        "from_edge_id": "e_0079",
-        "to_edge_id": "e_0038",
+        "from_edge_id": "e_0059",
+        "to_edge_id": "e_0034",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -4959,57 +4959,57 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88412406,
-            12.93304625
+            100.88412404,
+            12.93304627
           ],
           [
             100.8841345,
-            12.93305968
+            12.93305971
           ],
           [
             100.88414362,
-            12.93306954
+            12.93306959
           ],
           [
             100.88415204,
-            12.93307595
+            12.93307601
           ],
           [
-            100.8841604,
-            12.93307902
+            100.88416041,
+            12.93307908
           ],
           [
             100.88416934,
-            12.93307884
+            12.93307892
           ],
           [
-            100.88417947,
-            12.93307552
+            100.88417949,
+            12.93307562
           ],
           [
-            100.88419144,
-            12.93306918
+            100.88419148,
+            12.93306929
           ],
           [
-            100.88420586,
-            12.93305991
+            100.88420596,
+            12.93306004
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0132",
-        "movement_id": "n_0132_m_000",
+        "junction_node_id": "n_0092",
+        "movement_id": "n_0092_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0161",
-        "to_edge_id": "e_0190",
+        "from_edge_id": "e_0111",
+        "to_edge_id": "e_0135",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_026",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -5020,24 +5020,24 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88412406,
-            12.93304625
+            100.88412404,
+            12.93304627
           ],
           [
-            100.88413402,
-            12.93305967
+            100.884134,
+            12.93305969
           ],
           [
-            100.88414273,
-            12.93307142
+            100.88414272,
+            12.93307143
           ],
           [
-            100.88415061,
-            12.93308205
+            100.8841506,
+            12.93308206
           ],
           [
-            100.88415806,
-            12.93309213
+            100.88415805,
+            12.93309214
           ],
           [
             100.8841655,
@@ -5059,18 +5059,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0132",
-        "movement_id": "n_0132_m_001",
+        "junction_node_id": "n_0092",
+        "movement_id": "n_0092_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0161",
-        "to_edge_id": "e_0162",
+        "from_edge_id": "e_0111",
+        "to_edge_id": "e_0112",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_026",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -5081,36 +5081,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88420586,
-            12.93305991
+            100.88420596,
+            12.93306004
           ],
           [
-            100.88419213,
-            12.93306967
+            100.88419222,
+            12.93306975
           ],
           [
-            100.88418203,
-            12.93307831
+            100.8841821,
+            12.93307837
           ],
           [
-            100.88417545,
-            12.93308641
+            100.88417551,
+            12.93308644
           ],
           [
-            100.88417229,
-            12.9330945
+            100.88417234,
+            12.93309453
           ],
           [
-            100.88417245,
-            12.93310317
+            100.8841725,
+            12.93310319
           ],
           [
-            100.88417585,
-            12.93311295
+            100.88417588,
+            12.93311297
           ],
           [
-            100.88418236,
-            12.93312441
+            100.88418238,
+            12.93312443
           ],
           [
             100.88419191,
@@ -5120,18 +5120,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0132",
-        "movement_id": "n_0132_m_002",
+        "junction_node_id": "n_0092",
+        "movement_id": "n_0092_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0190",
-        "to_edge_id": "e_0162",
+        "from_edge_id": "e_0135",
+        "to_edge_id": "e_0112",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_026",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -5146,53 +5146,53 @@
             12.93315089
           ],
           [
-            100.88421118,
-            12.93316436
+            100.88421119,
+            12.93316435
           ],
           [
-            100.88421981,
-            12.93317616
+            100.88421985,
+            12.93317613
           ],
           [
-            100.8842276,
-            12.93318685
+            100.8842277,
+            12.93318679
           ],
           [
-            100.88423496,
-            12.933197
+            100.88423514,
+            12.93319688
           ],
           [
-            100.88424228,
-            12.93320717
+            100.88424258,
+            12.93320696
           ],
           [
-            100.88424997,
-            12.93321793
+            100.88425045,
+            12.9332176
           ],
           [
-            100.88425845,
-            12.93322983
+            100.88425915,
+            12.93322935
           ],
           [
-            100.88426812,
-            12.93324345
+            100.8842691,
+            12.93324278
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0135",
-        "movement_id": "n_0135_m_000",
+        "junction_node_id": "n_0093",
+        "movement_id": "n_0093_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0162",
-        "to_edge_id": "e_0163",
+        "from_edge_id": "e_0112",
+        "to_edge_id": "e_0113",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_027",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -5207,53 +5207,53 @@
             12.93315089
           ],
           [
-            100.88421082,
-            12.93316457
+            100.88421086,
+            12.93316461
           ],
           [
-            100.88421732,
-            12.93317602
+            100.88421739,
+            12.93317608
           ],
           [
-            100.8842207,
-            12.9331858
+            100.8842208,
+            12.93318587
           ],
           [
-            100.88422085,
-            12.93319446
+            100.88422099,
+            12.93319454
           ],
           [
-            100.88421768,
-            12.93320255
+            100.88421785,
+            12.93320265
           ],
           [
-            100.88421109,
-            12.93321062
+            100.88421128,
+            12.93321076
           ],
           [
-            100.88420097,
-            12.93321923
+            100.88420118,
+            12.93321945
           ],
           [
-            100.88418724,
-            12.93322893
+            100.88418747,
+            12.93322927
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0135",
-        "movement_id": "n_0135_m_001",
+        "junction_node_id": "n_0093",
+        "movement_id": "n_0093_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0162",
-        "to_edge_id": "e_0152",
+        "from_edge_id": "e_0112",
+        "to_edge_id": "e_0106",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_027",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -5264,57 +5264,57 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88426812,
-            12.93324345
+            100.8842691,
+            12.93324278
           ],
           [
-            100.88425805,
-            12.93322994
+            100.88425869,
+            12.93322938
           ],
           [
-            100.88424916,
-            12.93321998
+            100.88424959,
+            12.93321953
           ],
           [
-            100.88424087,
-            12.93321347
+            100.88424117,
+            12.93321313
           ],
           [
-            100.88423257,
-            12.93321031
+            100.8842328,
+            12.93321008
           ],
           [
-            100.88422366,
-            12.93321038
+            100.88422388,
+            12.93321027
           ],
           [
-            100.88421353,
-            12.93321358
+            100.88421376,
+            12.9332136
           ],
           [
-            100.88420159,
-            12.9332198
+            100.88420183,
+            12.93321997
           ],
           [
-            100.88418724,
-            12.93322893
+            100.88418747,
+            12.93322927
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0135",
-        "movement_id": "n_0135_m_002",
+        "junction_node_id": "n_0093",
+        "movement_id": "n_0093_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0163",
-        "to_edge_id": "e_0152",
+        "from_edge_id": "e_0113",
+        "to_edge_id": "e_0106",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_027",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -5325,36 +5325,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88438835,
-            12.9334042
+            100.8843886,
+            12.93340402
           ],
           [
-            100.88439722,
-            12.93341603
+            100.8843974,
+            12.9334159
           ],
           [
-            100.88440498,
-            12.93342638
+            100.88440511,
+            12.93342629
           ],
           [
-            100.88441201,
-            12.93343574
+            100.8844121,
+            12.93343568
           ],
           [
-            100.88441868,
-            12.93344461
+            100.88441874,
+            12.93344457
           ],
           [
-            100.88442536,
-            12.93345346
+            100.88442539,
+            12.93345344
           ],
           [
-            100.88443242,
-            12.9334628
+            100.88443244,
+            12.93346279
           ],
           [
             100.88444024,
-            12.93347312
+            12.93347311
           ],
           [
             100.88444918,
@@ -5364,11 +5364,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0143",
-        "movement_id": "n_0143_m_000",
+        "junction_node_id": "n_0096",
+        "movement_id": "n_0096_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0165",
-        "to_edge_id": "e_0166",
+        "from_edge_id": "e_0113",
+        "to_edge_id": "e_0114",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -5386,50 +5386,50 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88438835,
-            12.9334042
+            100.8843886,
+            12.93340402
           ],
           [
-            100.88439803,
-            12.93341781
+            100.88439826,
+            12.93341775
           ],
           [
-            100.88440466,
+            100.88440488,
             12.93342921
           ],
           [
-            100.88440814,
-            12.93343896
+            100.88440837,
+            12.93343899
           ],
           [
-            100.8844084,
-            12.93344762
+            100.88440862,
+            12.93344767
           ],
           [
-            100.88440532,
-            12.93345575
+            100.88440554,
+            12.93345581
           ],
           [
-            100.88439882,
-            12.93346391
+            100.88439903,
+            12.933464
           ],
           [
-            100.8843888,
-            12.93347264
+            100.884389,
+            12.9334728
           ],
           [
-            100.88437516,
-            12.93348253
+            100.88437535,
+            12.9334828
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0143",
-        "movement_id": "n_0143_m_001",
+        "junction_node_id": "n_0096",
+        "movement_id": "n_0096_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0165",
-        "to_edge_id": "e_0056",
+        "from_edge_id": "e_0113",
+        "to_edge_id": "e_0044",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -5451,46 +5451,46 @@
             12.9334849
           ],
           [
-            100.8844397,
-            12.93347341
+            100.88443971,
+            12.93347344
           ],
           [
-            100.88443137,
-            12.93346572
+            100.88443139,
+            12.93346578
           ],
           [
-            100.88442365,
-            12.93346154
+            100.88442367,
+            12.93346163
           ],
           [
-            100.88441599,
-            12.93346055
+            100.88441602,
+            12.93346066
           ],
           [
-            100.88440786,
-            12.93346245
+            100.8844079,
+            12.9334626
           ],
           [
-            100.88439871,
-            12.93346695
+            100.88439877,
+            12.93346714
           ],
           [
-            100.88438799,
-            12.93347375
+            100.8843881,
+            12.93347397
           ],
           [
-            100.88437516,
-            12.93348253
+            100.88437535,
+            12.9334828
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0143",
-        "movement_id": "n_0143_m_002",
+        "junction_node_id": "n_0096",
+        "movement_id": "n_0096_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0166",
-        "to_edge_id": "e_0056",
+        "from_edge_id": "e_0114",
+        "to_edge_id": "e_0044",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -5517,41 +5517,41 @@
           ],
           [
             100.88446972,
-            12.93350764
+            12.93350763
           ],
           [
             100.88447744,
-            12.93351181
+            12.9335118
           ],
           [
             100.88448509,
-            12.93351278
+            12.93351277
           ],
           [
-            100.88449322,
-            12.93351085
+            100.88449321,
+            12.93351084
           ],
           [
-            100.88450236,
-            12.93350633
+            100.88450235,
+            12.93350632
           ],
           [
-            100.88451305,
-            12.93349951
+            100.88451303,
+            12.9334995
           ],
           [
-            100.88452583,
-            12.9334907
+            100.88452581,
+            12.93349068
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0145",
-        "movement_id": "n_0145_m_000",
+        "junction_node_id": "n_0098",
+        "movement_id": "n_0098_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0166",
-        "to_edge_id": "e_0070",
+        "from_edge_id": "e_0114",
+        "to_edge_id": "e_0052",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -5608,11 +5608,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0145",
-        "movement_id": "n_0145_m_001",
+        "junction_node_id": "n_0098",
+        "movement_id": "n_0098_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0166",
-        "to_edge_id": "e_0167",
+        "from_edge_id": "e_0114",
+        "to_edge_id": "e_0115",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -5630,32 +5630,32 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88452583,
-            12.9334907
+            100.88452581,
+            12.93349068
           ],
           [
-            100.88451215,
-            12.93350067
+            100.88451214,
+            12.93350066
           ],
           [
-            100.8845021,
-            12.93350946
+            100.88450209,
+            12.93350945
           ],
           [
-            100.88449557,
-            12.93351763
+            100.88449556,
+            12.93351762
           ],
           [
-            100.88449247,
+            100.88449246,
             12.93352576
           ],
           [
-            100.8844927,
-            12.93353444
+            100.88449269,
+            12.93353443
           ],
           [
             100.88449616,
-            12.93354423
+            12.93354422
           ],
           [
             100.88450275,
@@ -5669,11 +5669,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0145",
-        "movement_id": "n_0145_m_002",
+        "junction_node_id": "n_0098",
+        "movement_id": "n_0098_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0070",
-        "to_edge_id": "e_0167",
+        "from_edge_id": "e_0052",
+        "to_edge_id": "e_0115",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -5730,11 +5730,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0147",
-        "movement_id": "n_0147_m_000",
+        "junction_node_id": "n_0099",
+        "movement_id": "n_0099_m_000",
         "movement_kind": "turn",
         "from_edge_id": "e_0008",
-        "to_edge_id": "e_0022",
+        "to_edge_id": "e_0019",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -5791,8 +5791,8 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0147",
-        "movement_id": "n_0147_m_001",
+        "junction_node_id": "n_0099",
+        "movement_id": "n_0099_m_001",
         "movement_kind": "through",
         "from_edge_id": "e_0008",
         "to_edge_id": "e_0007",
@@ -5852,10 +5852,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0147",
-        "movement_id": "n_0147_m_002",
+        "junction_node_id": "n_0099",
+        "movement_id": "n_0099_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0022",
+        "from_edge_id": "e_0019",
         "to_edge_id": "e_0007",
         "highway": "junction",
         "road_class": "junction",
@@ -5913,11 +5913,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0148",
-        "movement_id": "n_0148_m_000",
+        "junction_node_id": "n_0100",
+        "movement_id": "n_0100_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0034",
-        "to_edge_id": "e_0207",
+        "from_edge_id": "e_0030",
+        "to_edge_id": "e_0145",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -5974,11 +5974,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0148",
-        "movement_id": "n_0148_m_001",
+        "junction_node_id": "n_0100",
+        "movement_id": "n_0100_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0034",
-        "to_edge_id": "e_0035",
+        "from_edge_id": "e_0030",
+        "to_edge_id": "e_0031",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -6035,11 +6035,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0148",
-        "movement_id": "n_0148_m_002",
+        "junction_node_id": "n_0100",
+        "movement_id": "n_0100_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0207",
-        "to_edge_id": "e_0035",
+        "from_edge_id": "e_0145",
+        "to_edge_id": "e_0031",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -6096,10 +6096,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0154",
-        "movement_id": "n_0154_m_000",
+        "junction_node_id": "n_0105",
+        "movement_id": "n_0105_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0205",
+        "from_edge_id": "e_0143",
         "to_edge_id": "e_0009",
         "highway": "junction",
         "road_class": "junction",
@@ -6157,10 +6157,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0154",
-        "movement_id": "n_0154_m_001",
+        "junction_node_id": "n_0105",
+        "movement_id": "n_0105_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0205",
+        "from_edge_id": "e_0143",
         "to_edge_id": "e_0008",
         "highway": "junction",
         "road_class": "junction",
@@ -6218,8 +6218,8 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0154",
-        "movement_id": "n_0154_m_002",
+        "junction_node_id": "n_0105",
+        "movement_id": "n_0105_m_002",
         "movement_kind": "through",
         "from_edge_id": "e_0009",
         "to_edge_id": "e_0008",
@@ -6244,53 +6244,53 @@
             12.93562689
           ],
           [
-            100.88463201,
-            12.93563945
+            100.88463372,
+            12.93564115
           ],
           [
-            100.8846385,
-            12.93564983
+            100.88464209,
+            12.93565174
           ],
           [
-            100.88464437,
-            12.93565786
+            100.88465,
+            12.93565881
           ],
           [
-            100.88465029,
-            12.93566337
+            100.8846581,
+            12.93566254
           ],
           [
-            100.88465692,
-            12.93566621
+            100.88466703,
+            12.93566309
           ],
           [
-            100.88466492,
-            12.93566621
+            100.88467747,
+            12.93566062
           ],
           [
-            100.88467496,
-            12.93566319
+            100.88469005,
+            12.93565529
           ],
           [
-            100.88468769,
-            12.935657
+            100.88470542,
+            12.93564728
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0156",
-        "movement_id": "n_0156_m_000",
+        "junction_node_id": "n_0106",
+        "movement_id": "n_0106_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0022",
-        "to_edge_id": "e_0201",
+        "from_edge_id": "e_0019",
+        "to_edge_id": "e_0140",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
         "width_m": 6.0,
         "oneway": false,
         "regularized_junction_id": "j_033",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -6340,18 +6340,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0156",
-        "movement_id": "n_0156_m_001",
+        "junction_node_id": "n_0106",
+        "movement_id": "n_0106_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0022",
-        "to_edge_id": "e_0023",
+        "from_edge_id": "e_0019",
+        "to_edge_id": "e_0020",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
         "width_m": 6.0,
         "oneway": false,
         "regularized_junction_id": "j_033",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -6362,36 +6362,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88468769,
-            12.935657
+            100.88470542,
+            12.93564728
           ],
           [
-            100.88467598,
-            12.93566425
+            100.88469081,
+            12.93565575
           ],
           [
-            100.88466841,
-            12.93567099
+            100.88467991,
+            12.93566345
           ],
           [
-            100.88466453,
-            12.93567765
+            100.88467257,
+            12.93567091
           ],
           [
-            100.88466385,
-            12.93568463
+            100.88466865,
+            12.93567868
           ],
           [
-            100.88466593,
-            12.93569233
+            100.88466798,
+            12.93568733
           ],
           [
-            100.88467028,
-            12.93570118
+            100.88467041,
+            12.93569738
           ],
           [
-            100.88467645,
-            12.93571158
+            100.88467579,
+            12.9357094
           ],
           [
             100.88468397,
@@ -6401,18 +6401,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0156",
-        "movement_id": "n_0156_m_002",
+        "junction_node_id": "n_0106",
+        "movement_id": "n_0106_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0201",
-        "to_edge_id": "e_0023",
+        "from_edge_id": "e_0140",
+        "to_edge_id": "e_0020",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
         "width_m": 6.0,
         "oneway": false,
         "regularized_junction_id": "j_033",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -6440,40 +6440,40 @@
           ],
           [
             100.88473141,
-            12.93385007
+            12.93385006
           ],
           [
-            100.88474033,
+            100.88474032,
             12.93384986
           ],
           [
-            100.88475042,
+            100.88475041,
             12.93384651
           ],
           [
-            100.88476229,
+            100.88476228,
             12.93384012
           ],
           [
-            100.88477656,
+            100.88477655,
             12.93383079
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0159",
-        "movement_id": "n_0159_m_000",
+        "junction_node_id": "n_0108",
+        "movement_id": "n_0108_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0167",
-        "to_edge_id": "e_0051",
+        "from_edge_id": "e_0115",
+        "to_edge_id": "e_0041",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_034",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -6493,48 +6493,48 @@
           ],
           [
             100.88471383,
-            12.93384266
+            12.93384265
           ],
           [
             100.8847217,
             12.93385329
           ],
           [
-            100.88472917,
-            12.93386336
+            100.88472918,
+            12.93386335
           ],
           [
-            100.88473665,
-            12.93387342
+            100.88473667,
+            12.93387341
           ],
           [
-            100.88474456,
-            12.93388402
+            100.88474459,
+            12.93388401
           ],
           [
-            100.88475332,
-            12.93389574
+            100.88475336,
+            12.93389571
           ],
           [
-            100.88476333,
-            12.93390912
+            100.88476339,
+            12.93390908
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0159",
-        "movement_id": "n_0159_m_001",
+        "junction_node_id": "n_0108",
+        "movement_id": "n_0108_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0167",
-        "to_edge_id": "e_0168",
+        "from_edge_id": "e_0115",
+        "to_edge_id": "e_0116",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_034",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -6545,7 +6545,7 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88477656,
+            100.88477655,
             12.93383079
           ],
           [
@@ -6557,45 +6557,45 @@
             12.9338494
           ],
           [
-            100.88474639,
+            100.8847464,
             12.93385755
           ],
           [
-            100.88474331,
+            100.88474333,
             12.93386568
           ],
           [
-            100.88474355,
+            100.88474358,
             12.93387434
           ],
           [
-            100.88474704,
+            100.88474707,
             12.93388409
           ],
           [
-            100.88475366,
-            12.9338955
+            100.88475371,
+            12.93389548
           ],
           [
-            100.88476333,
-            12.93390912
+            100.88476339,
+            12.93390908
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0159",
-        "movement_id": "n_0159_m_002",
+        "junction_node_id": "n_0108",
+        "movement_id": "n_0108_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0051",
-        "to_edge_id": "e_0168",
+        "from_edge_id": "e_0041",
+        "to_edge_id": "e_0116",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_034",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -6606,50 +6606,50 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88483554,
-            12.93400537
+            100.88483561,
+            12.93400532
           ],
           [
-            100.88484609,
-            12.93401876
+            100.88484614,
+            12.93401871
           ],
           [
-            100.88485528,
-            12.9340286
+            100.88485531,
+            12.93402855
           ],
           [
-            100.88486375,
-            12.93403498
+            100.88486377,
+            12.93403494
           ],
           [
-            100.88487213,
-            12.93403801
+            100.88487214,
+            12.93403798
           ],
           [
-            100.88488107,
-            12.93403781
+            100.88488108,
+            12.93403778
           ],
           [
-            100.8848912,
-            12.93403446
+            100.88489121,
+            12.93403444
           ],
           [
-            100.88490317,
-            12.93402808
+            100.88490318,
+            12.93402806
           ],
           [
             100.88491763,
-            12.93401877
+            12.93401876
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0165",
-        "movement_id": "n_0165_m_000",
+        "junction_node_id": "n_0111",
+        "movement_id": "n_0111_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0169",
-        "to_edge_id": "e_0183",
+        "from_edge_id": "e_0116",
+        "to_edge_id": "e_0129",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -6667,31 +6667,31 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88483554,
-            12.93400537
+            100.88483561,
+            12.93400532
           ],
           [
-            100.88484559,
-            12.93401873
+            100.88484564,
+            12.93401869
           ],
           [
-            100.88485437,
-            12.93403043
+            100.8848544,
+            12.9340304
           ],
           [
-            100.88486229,
-            12.93404103
+            100.88486231,
+            12.93404101
           ],
           [
-            100.88486977,
-            12.93405109
+            100.88486978,
+            12.93405108
           ],
           [
             100.88487722,
             12.93406117
           ],
           [
-            100.88488505,
+            100.88488506,
             12.93407183
           ],
           [
@@ -6706,11 +6706,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0165",
-        "movement_id": "n_0165_m_001",
+        "junction_node_id": "n_0111",
+        "movement_id": "n_0111_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0169",
-        "to_edge_id": "e_0170",
+        "from_edge_id": "e_0116",
+        "to_edge_id": "e_0117",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -6729,15 +6729,15 @@
         "coordinates": [
           [
             100.88491763,
-            12.93401877
+            12.93401876
           ],
           [
-            100.88490388,
-            12.93402855
+            100.88490387,
+            12.93402854
           ],
           [
             100.88489375,
-            12.93403721
+            12.9340372
           ],
           [
             100.88488716,
@@ -6748,7 +6748,7 @@
             12.9340534
           ],
           [
-            100.88488415,
+            100.88488414,
             12.93406207
           ],
           [
@@ -6767,11 +6767,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0165",
-        "movement_id": "n_0165_m_002",
+        "junction_node_id": "n_0111",
+        "movement_id": "n_0111_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0183",
-        "to_edge_id": "e_0170",
+        "from_edge_id": "e_0129",
+        "to_edge_id": "e_0117",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -6789,36 +6789,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88493282,
-            12.93124737
+            100.88493329,
+            12.93124813
           ],
           [
-            100.88491815,
-            12.93125642
+            100.88491858,
+            12.93125691
           ],
           [
-            100.88490724,
-            12.93126445
+            100.88490763,
+            12.93126477
           ],
           [
-            100.88489993,
-            12.93127208
+            100.88490027,
+            12.93127231
           ],
           [
-            100.88489605,
-            12.93127994
+            100.88489633,
+            12.93128012
           ],
           [
-            100.88489543,
-            12.93128864
+            100.88489565,
+            12.9312888
           ],
           [
-            100.88489791,
-            12.9312988
+            100.88489805,
+            12.93129894
           ],
           [
-            100.88490331,
-            12.93131104
+            100.88490338,
+            12.93131113
           ],
           [
             100.88491146,
@@ -6828,11 +6828,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0166",
-        "movement_id": "n_0166_m_000",
+        "junction_node_id": "n_0112",
+        "movement_id": "n_0112_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0046",
-        "to_edge_id": "e_0159",
+        "from_edge_id": "e_0039",
+        "to_edge_id": "e_0110",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -6850,36 +6850,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88493282,
-            12.93124737
+            100.88493329,
+            12.93124813
           ],
           [
-            100.88491827,
-            12.93125592
+            100.8849186,
+            12.93125646
           ],
           [
-            100.88490553,
-            12.93126339
+            100.88490575,
+            12.93126376
           ],
           [
-            100.88489399,
-            12.93127014
+            100.88489414,
+            12.93127038
           ],
           [
-            100.88488306,
-            12.93127652
+            100.88488314,
+            12.93127666
           ],
           [
-            100.88487211,
-            12.93128289
+            100.88487215,
+            12.93128296
           ],
           [
-            100.88486054,
-            12.93128959
+            100.88486056,
+            12.93128962
           ],
           [
             100.88484776,
-            12.93129698
+            12.93129699
           ],
           [
             100.88483313,
@@ -6889,11 +6889,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0166",
-        "movement_id": "n_0166_m_001",
+        "junction_node_id": "n_0112",
+        "movement_id": "n_0112_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0046",
-        "to_edge_id": "e_0045",
+        "from_edge_id": "e_0039",
+        "to_edge_id": "e_0038",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -6950,11 +6950,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0166",
-        "movement_id": "n_0166_m_002",
+        "junction_node_id": "n_0112",
+        "movement_id": "n_0112_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0159",
-        "to_edge_id": "e_0045",
+        "from_edge_id": "e_0110",
+        "to_edge_id": "e_0038",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -7011,11 +7011,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0167",
-        "movement_id": "n_0167_m_000",
+        "junction_node_id": "n_0113",
+        "movement_id": "n_0113_m_000",
         "movement_kind": "turn",
         "from_edge_id": "e_0010",
-        "to_edge_id": "e_0198",
+        "to_edge_id": "e_0139",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -7072,8 +7072,8 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0167",
-        "movement_id": "n_0167_m_001",
+        "junction_node_id": "n_0113",
+        "movement_id": "n_0113_m_001",
         "movement_kind": "through",
         "from_edge_id": "e_0010",
         "to_edge_id": "e_0009",
@@ -7133,10 +7133,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0167",
-        "movement_id": "n_0167_m_002",
+        "junction_node_id": "n_0113",
+        "movement_id": "n_0113_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0198",
+        "from_edge_id": "e_0139",
         "to_edge_id": "e_0009",
         "highway": "junction",
         "road_class": "junction",
@@ -7164,41 +7164,41 @@
           ],
           [
             100.88497631,
-            12.93624898
+            12.93624897
           ],
           [
-            100.88498366,
-            12.9362566
+            100.88498365,
+            12.93625658
           ],
           [
             100.88499145,
-            12.93626089
+            12.93626086
           ],
           [
             100.88500032,
-            12.93626206
+            12.93626203
           ],
           [
             100.88501089,
-            12.93626033
+            12.93626029
           ],
           [
-            100.88502379,
-            12.93625589
+            100.88502378,
+            12.93625584
           ],
           [
-            100.88503966,
-            12.93624895
+            100.88503963,
+            12.93624889
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0171",
-        "movement_id": "n_0171_m_000",
+        "junction_node_id": "n_0114",
+        "movement_id": "n_0114_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0024",
-        "to_edge_id": "e_0033",
+        "from_edge_id": "e_0021",
+        "to_edge_id": "e_0029",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -7255,11 +7255,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0171",
-        "movement_id": "n_0171_m_001",
+        "junction_node_id": "n_0114",
+        "movement_id": "n_0114_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0024",
-        "to_edge_id": "e_0025",
+        "from_edge_id": "e_0021",
+        "to_edge_id": "e_0022",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -7316,11 +7316,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0171",
-        "movement_id": "n_0171_m_002",
+        "junction_node_id": "n_0114",
+        "movement_id": "n_0114_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0024",
-        "to_edge_id": "e_0034",
+        "from_edge_id": "e_0021",
+        "to_edge_id": "e_0030",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -7338,35 +7338,35 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88503966,
-            12.93624895
+            100.88503963,
+            12.93624889
           ],
           [
-            100.8850266,
-            12.93625573
+            100.88502657,
+            12.93625568
           ],
           [
-            100.88501685,
-            12.93626257
+            100.88501682,
+            12.93626254
           ],
           [
-            100.88501036,
-            12.93626968
+            100.88501033,
+            12.93626965
           ],
           [
-            100.88500709,
-            12.93627723
+            100.88500706,
+            12.93627721
           ],
           [
-            100.885007,
-            12.93628543
+            100.88500698,
+            12.93628542
           ],
           [
-            100.88501005,
-            12.93629447
+            100.88501003,
+            12.93629446
           ],
           [
-            100.8850162,
+            100.88501619,
             12.93630453
           ],
           [
@@ -7377,11 +7377,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0171",
-        "movement_id": "n_0171_m_003",
+        "junction_node_id": "n_0114",
+        "movement_id": "n_0114_m_003",
         "movement_kind": "turn",
-        "from_edge_id": "e_0033",
-        "to_edge_id": "e_0025",
+        "from_edge_id": "e_0029",
+        "to_edge_id": "e_0022",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -7399,24 +7399,24 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88503966,
-            12.93624895
+            100.88503963,
+            12.93624889
           ],
           [
-            100.8850243,
-            12.93625604
+            100.88502428,
+            12.936256
           ],
           [
-            100.88501086,
-            12.93626223
+            100.88501084,
+            12.9362622
           ],
           [
-            100.88499868,
-            12.93626781
+            100.88499867,
+            12.93626779
           ],
           [
             100.88498713,
-            12.93627307
+            12.93627306
           ],
           [
             100.88497557,
@@ -7438,11 +7438,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0171",
-        "movement_id": "n_0171_m_004",
+        "junction_node_id": "n_0114",
+        "movement_id": "n_0114_m_004",
         "movement_kind": "through",
-        "from_edge_id": "e_0033",
-        "to_edge_id": "e_0034",
+        "from_edge_id": "e_0029",
+        "to_edge_id": "e_0030",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -7499,11 +7499,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0171",
-        "movement_id": "n_0171_m_005",
+        "junction_node_id": "n_0114",
+        "movement_id": "n_0114_m_005",
         "movement_kind": "turn",
-        "from_edge_id": "e_0025",
-        "to_edge_id": "e_0034",
+        "from_edge_id": "e_0022",
+        "to_edge_id": "e_0030",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -7560,11 +7560,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0173",
-        "movement_id": "n_0173_m_000",
+        "junction_node_id": "n_0116",
+        "movement_id": "n_0116_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0170",
-        "to_edge_id": "e_0171",
+        "from_edge_id": "e_0117",
+        "to_edge_id": "e_0118",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -7621,11 +7621,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0173",
-        "movement_id": "n_0173_m_001",
+        "junction_node_id": "n_0116",
+        "movement_id": "n_0116_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0170",
-        "to_edge_id": "e_0214",
+        "from_edge_id": "e_0117",
+        "to_edge_id": "e_0150",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -7682,11 +7682,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0173",
-        "movement_id": "n_0173_m_002",
+        "junction_node_id": "n_0116",
+        "movement_id": "n_0116_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0171",
-        "to_edge_id": "e_0214",
+        "from_edge_id": "e_0118",
+        "to_edge_id": "e_0150",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -7743,11 +7743,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0176",
-        "movement_id": "n_0176_m_000",
+        "junction_node_id": "n_0119",
+        "movement_id": "n_0119_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0171",
-        "to_edge_id": "e_0172",
+        "from_edge_id": "e_0118",
+        "to_edge_id": "e_0119",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -7770,7 +7770,7 @@
           ],
           [
             100.88505372,
-            12.93430369
+            12.93430368
           ],
           [
             100.8850562,
@@ -7782,7 +7782,7 @@
           ],
           [
             100.88505115,
-            12.93432279
+            12.93432278
           ],
           [
             100.88504453,
@@ -7794,21 +7794,21 @@
           ],
           [
             100.88502539,
-            12.93433783
+            12.93433782
           ],
           [
             100.88501378,
-            12.93434474
+            12.93434473
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0176",
-        "movement_id": "n_0176_m_001",
+        "junction_node_id": "n_0119",
+        "movement_id": "n_0119_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0171",
-        "to_edge_id": "e_0014",
+        "from_edge_id": "e_0118",
+        "to_edge_id": "e_0012",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -7839,37 +7839,37 @@
           ],
           [
             100.88506786,
-            12.93432988
+            12.93432987
           ],
           [
             100.88505958,
-            12.93432663
+            12.93432662
           ],
           [
             100.88505065,
-            12.93432661
+            12.9343266
           ],
           [
-            100.88504045,
-            12.9343297
+            100.88504046,
+            12.93432969
           ],
           [
             100.88502837,
-            12.93433578
+            12.93433577
           ],
           [
             100.88501378,
-            12.93434474
+            12.93434473
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0176",
-        "movement_id": "n_0176_m_002",
+        "junction_node_id": "n_0119",
+        "movement_id": "n_0119_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0172",
-        "to_edge_id": "e_0014",
+        "from_edge_id": "e_0119",
+        "to_edge_id": "e_0012",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -7891,46 +7891,46 @@
             12.93482163
           ],
           [
-            100.88543005,
-            12.93483532
+            100.88543003,
+            12.93483528
           ],
           [
-            100.88543891,
-            12.93484541
+            100.88543889,
+            12.93484534
           ],
           [
-            100.88544717,
-            12.93485204
+            100.88544715,
+            12.93485194
           ],
           [
-            100.88545544,
-            12.93485532
+            100.88545543,
+            12.9348552
           ],
           [
-            100.88546438,
-            12.93485537
+            100.88546436,
+            12.93485522
           ],
           [
-            100.88547461,
-            12.93485232
+            100.88547456,
+            12.93485214
           ],
           [
-            100.88548675,
-            12.93484629
+            100.88548665,
+            12.93484606
           ],
           [
-            100.88550145,
-            12.9348374
+            100.88550126,
+            12.93483712
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0187",
-        "movement_id": "n_0187_m_000",
+        "junction_node_id": "n_0129",
+        "movement_id": "n_0129_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0172",
-        "to_edge_id": "e_0063",
+        "from_edge_id": "e_0119",
+        "to_edge_id": "e_0047",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -7987,11 +7987,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0187",
-        "movement_id": "n_0187_m_001",
+        "junction_node_id": "n_0129",
+        "movement_id": "n_0129_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0172",
-        "to_edge_id": "e_0173",
+        "from_edge_id": "e_0119",
+        "to_edge_id": "e_0120",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -8009,36 +8009,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88550145,
-            12.9348374
+            100.88550126,
+            12.93483712
           ],
           [
-            100.88548971,
-            12.93484427
+            100.88548955,
+            12.93484406
           ],
           [
-            100.88547924,
-            12.93484976
+            100.8854791,
+            12.93484962
           ],
           [
-            100.88547048,
-            12.93485451
+            100.88547036,
+            12.9348544
           ],
           [
-            100.88546384,
-            12.93485912
+            100.88546375,
+            12.93485904
           ],
           [
-            100.88545977,
-            12.93486423
+            100.88545971,
+            12.93486417
           ],
           [
-            100.8854587,
-            12.93487044
+            100.88545866,
+            12.9348704
           ],
           [
-            100.88546106,
-            12.93487839
+            100.88546104,
+            12.93487837
           ],
           [
             100.88546729,
@@ -8048,11 +8048,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0187",
-        "movement_id": "n_0187_m_002",
+        "junction_node_id": "n_0129",
+        "movement_id": "n_0129_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0063",
-        "to_edge_id": "e_0173",
+        "from_edge_id": "e_0047",
+        "to_edge_id": "e_0120",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -8109,11 +8109,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0189",
-        "movement_id": "n_0189_m_000",
+        "junction_node_id": "n_0131",
+        "movement_id": "n_0131_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0031",
-        "to_edge_id": "e_0028",
+        "from_edge_id": "e_0028",
+        "to_edge_id": "e_0025",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -8144,37 +8144,37 @@
           ],
           [
             100.88548588,
-            12.93604232
+            12.93604231
           ],
           [
             100.8854743,
             12.93604751
           ],
           [
-            100.88546275,
-            12.93605275
+            100.88546274,
+            12.93605274
           ],
           [
-            100.88545057,
-            12.93605833
+            100.88545056,
+            12.93605831
           ],
           [
-            100.88543713,
-            12.93606453
+            100.88543712,
+            12.93606451
           ],
           [
-            100.88542179,
-            12.93607165
+            100.88542177,
+            12.93607161
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0189",
-        "movement_id": "n_0189_m_001",
+        "junction_node_id": "n_0131",
+        "movement_id": "n_0131_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0031",
-        "to_edge_id": "e_0032",
+        "from_edge_id": "e_0028",
+        "to_edge_id": "e_0029",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -8197,45 +8197,45 @@
           ],
           [
             100.88549478,
-            12.93608097
+            12.93608096
           ],
           [
-            100.88548651,
+            100.8854865,
             12.93607001
           ],
           [
-            100.88547874,
-            12.93606263
+            100.88547873,
+            12.93606261
           ],
           [
             100.88547074,
-            12.93605859
+            12.93605857
           ],
           [
-            100.88546178,
-            12.93605768
+            100.88546177,
+            12.93605766
           ],
           [
             100.88545112,
-            12.9360597
+            12.93605968
           ],
           [
-            100.88543803,
-            12.93606443
+            100.88543802,
+            12.9360644
           ],
           [
-            100.88542179,
-            12.93607165
+            100.88542177,
+            12.93607161
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0189",
-        "movement_id": "n_0189_m_002",
+        "junction_node_id": "n_0131",
+        "movement_id": "n_0131_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0028",
-        "to_edge_id": "e_0032",
+        "from_edge_id": "e_0025",
+        "to_edge_id": "e_0029",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 2,
@@ -8292,11 +8292,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0191",
-        "movement_id": "n_0191_m_000",
+        "junction_node_id": "n_0133",
+        "movement_id": "n_0133_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0173",
-        "to_edge_id": "e_0174",
+        "from_edge_id": "e_0120",
+        "to_edge_id": "e_0121",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -8353,10 +8353,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0191",
-        "movement_id": "n_0191_m_001",
+        "junction_node_id": "n_0133",
+        "movement_id": "n_0133_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0173",
+        "from_edge_id": "e_0120",
         "to_edge_id": "e_0010",
         "highway": "junction",
         "road_class": "junction",
@@ -8414,10 +8414,10 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0191",
-        "movement_id": "n_0191_m_002",
+        "junction_node_id": "n_0133",
+        "movement_id": "n_0133_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0174",
+        "from_edge_id": "e_0121",
         "to_edge_id": "e_0010",
         "highway": "junction",
         "road_class": "junction",
@@ -8448,7 +8448,7 @@
             12.93498903
           ],
           [
-            100.88554606,
+            100.88554605,
             12.93499591
           ],
           [
@@ -8456,8 +8456,8 @@
             12.93499944
           ],
           [
-            100.88556321,
-            12.93499977
+            100.8855632,
+            12.93499976
           ],
           [
             100.88557358,
@@ -8465,28 +8465,28 @@
           ],
           [
             100.88558604,
-            12.93499142
+            12.93499141
           ],
           [
-            100.88560125,
-            12.93498303
+            100.88560124,
+            12.93498302
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0194",
-        "movement_id": "n_0194_m_000",
+        "junction_node_id": "n_0134",
+        "movement_id": "n_0134_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0174",
-        "to_edge_id": "e_0139",
+        "from_edge_id": "e_0121",
+        "to_edge_id": "e_0097",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_044",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -8536,18 +8536,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0194",
-        "movement_id": "n_0194_m_001",
+        "junction_node_id": "n_0134",
+        "movement_id": "n_0134_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0174",
-        "to_edge_id": "e_0175",
+        "from_edge_id": "e_0121",
+        "to_edge_id": "e_0122",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_044",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_scaled_for_edge_length"
       }
@@ -8558,15 +8558,15 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88560125,
-            12.93498303
+            100.88560124,
+            12.93498302
           ],
           [
-            100.88558738,
+            100.88558737,
             12.93499147
           ],
           [
-            100.88557689,
+            100.88557688,
             12.93499912
           ],
           [
@@ -8574,7 +8574,7 @@
             12.93500648
           ],
           [
-            100.88556582,
+            100.88556581,
             12.93501405
           ],
           [
@@ -8597,18 +8597,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0194",
-        "movement_id": "n_0194_m_002",
+        "junction_node_id": "n_0134",
+        "movement_id": "n_0134_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0139",
-        "to_edge_id": "e_0175",
+        "from_edge_id": "e_0097",
+        "to_edge_id": "e_0122",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_044",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_scaled_for_edge_length"
       }
@@ -8623,53 +8623,53 @@
             12.93506027
           ],
           [
-            100.88559333,
-            12.93507345
+            100.8855938,
+            12.93507394
           ],
           [
-            100.88560136,
-            12.9350833
+            100.88560231,
+            12.93508388
           ],
           [
-            100.88560883,
-            12.93508995
+            100.88561026,
+            12.9350903
           ],
           [
-            100.88561637,
-            12.93509352
+            100.88561832,
+            12.93509342
           ],
           [
-            100.88562464,
-            12.93509412
+            100.88562713,
+            12.93509342
           ],
           [
-            100.88563428,
-            12.93509187
+            100.88563736,
+            12.93509053
           ],
           [
-            100.88564595,
-            12.9350869
+            100.88564968,
+            12.93508495
           ],
           [
-            100.88566029,
-            12.93507933
+            100.88566474,
+            12.93507687
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0199",
-        "movement_id": "n_0199_m_000",
+        "junction_node_id": "n_0137",
+        "movement_id": "n_0137_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0175",
-        "to_edge_id": "e_0140",
+        "from_edge_id": "e_0122",
+        "to_edge_id": "e_0098",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_045",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_scaled_for_edge_length",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -8719,18 +8719,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0199",
-        "movement_id": "n_0199_m_001",
+        "junction_node_id": "n_0137",
+        "movement_id": "n_0137_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0175",
-        "to_edge_id": "e_0176",
+        "from_edge_id": "e_0122",
+        "to_edge_id": "e_0123",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_045",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_scaled_for_edge_length",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -8741,36 +8741,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88566029,
-            12.93507933
+            100.88566474,
+            12.93507687
           ],
           [
-            100.88564667,
-            12.9350875
+            100.88565035,
+            12.93508537
           ],
           [
-            100.88563681,
-            12.93509501
+            100.88563962,
+            12.93509312
           ],
           [
-            100.88563051,
-            12.93510234
+            100.88563244,
+            12.93510064
           ],
           [
-            100.88562756,
-            12.93510997
+            100.88562866,
+            12.93510846
           ],
           [
-            100.88562773,
-            12.93511837
+            100.88562815,
+            12.93511708
           ],
           [
-            100.88563081,
-            12.93512802
+            100.88563077,
+            12.93512703
           ],
           [
-            100.8856366,
-            12.93513941
+            100.88563639,
+            12.93513884
           ],
           [
             100.88564487,
@@ -8780,18 +8780,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0199",
-        "movement_id": "n_0199_m_002",
+        "junction_node_id": "n_0137",
+        "movement_id": "n_0137_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0140",
-        "to_edge_id": "e_0176",
+        "from_edge_id": "e_0098",
+        "to_edge_id": "e_0123",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_045",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -8806,53 +8806,53 @@
             12.93534528
           ],
           [
-            100.88577563,
-            12.93535871
+            100.88577659,
+            12.93535972
           ],
           [
-            100.88578298,
-            12.93536926
+            100.88578497,
+            12.93537044
           ],
           [
-            100.88578978,
-            12.93537691
+            100.88579285,
+            12.93537763
           ],
           [
-            100.8857967,
-            12.93538168
+            100.88580093,
+            12.93538147
           ],
           [
-            100.88580442,
-            12.93538357
+            100.88580988,
+            12.93538214
           ],
           [
-            100.88581362,
-            12.93538258
+            100.88582041,
+            12.93537982
           ],
           [
-            100.885825,
-            12.93537872
+            100.88583321,
+            12.93537471
           ],
           [
-            100.88583922,
-            12.93537199
+            100.88584895,
+            12.93536698
           ]
         ]
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0203",
-        "movement_id": "n_0203_m_000",
+        "junction_node_id": "n_0139",
+        "movement_id": "n_0139_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0176",
-        "to_edge_id": "e_0061",
+        "from_edge_id": "e_0123",
+        "to_edge_id": "e_0046",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_046",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -8902,18 +8902,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0203",
-        "movement_id": "n_0203_m_001",
+        "junction_node_id": "n_0139",
+        "movement_id": "n_0139_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0176",
-        "to_edge_id": "e_0177",
+        "from_edge_id": "e_0123",
+        "to_edge_id": "e_0124",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_046",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -8924,36 +8924,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88583922,
-            12.93537199
+            100.88584895,
+            12.93536698
           ],
           [
-            100.88582631,
-            12.93537934
+            100.88583441,
+            12.93537497
           ],
           [
-            100.88581729,
-            12.93538627
+            100.88582354,
+            12.93538237
           ],
           [
-            100.88581185,
-            12.9353932
+            100.88581619,
+            12.93538968
           ],
           [
-            100.88580968,
-            12.93540052
+            100.88581223,
+            12.93539739
           ],
           [
-            100.88581046,
-            12.93540865
+            100.88581151,
+            12.93540597
           ],
           [
-            100.88581389,
-            12.935418
+            100.8858139,
+            12.93541594
           ],
           [
-            100.88581965,
-            12.93542896
+            100.88581925,
+            12.93542777
           ],
           [
             100.88582743,
@@ -8963,18 +8963,18 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0203",
-        "movement_id": "n_0203_m_002",
+        "junction_node_id": "n_0139",
+        "movement_id": "n_0139_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0061",
-        "to_edge_id": "e_0177",
+        "from_edge_id": "e_0046",
+        "to_edge_id": "e_0124",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
         "width_m": 12.0,
         "oneway": false,
         "regularized_junction_id": "j_046",
-        "junction_area_status": "warn",
+        "junction_area_status": "pass",
         "from_trim_source": "regularized_entry_pose",
         "to_trim_source": "regularized_entry_pose"
       }
@@ -9024,11 +9024,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0206",
-        "movement_id": "n_0206_m_000",
+        "junction_node_id": "n_0141",
+        "movement_id": "n_0141_m_000",
         "movement_kind": "turn",
-        "from_edge_id": "e_0185",
-        "to_edge_id": "e_0189",
+        "from_edge_id": "e_0130",
+        "to_edge_id": "e_0134",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -9085,11 +9085,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0206",
-        "movement_id": "n_0206_m_001",
+        "junction_node_id": "n_0141",
+        "movement_id": "n_0141_m_001",
         "movement_kind": "through",
-        "from_edge_id": "e_0185",
-        "to_edge_id": "e_0186",
+        "from_edge_id": "e_0130",
+        "to_edge_id": "e_0131",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -9146,11 +9146,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0206",
-        "movement_id": "n_0206_m_002",
+        "junction_node_id": "n_0141",
+        "movement_id": "n_0141_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0189",
-        "to_edge_id": "e_0186",
+        "from_edge_id": "e_0134",
+        "to_edge_id": "e_0131",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 1,
@@ -9207,11 +9207,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0215",
-        "movement_id": "n_0215_m_000",
+        "junction_node_id": "n_0149",
+        "movement_id": "n_0149_m_000",
         "movement_kind": "through",
-        "from_edge_id": "e_0177",
-        "to_edge_id": "e_0178",
+        "from_edge_id": "e_0124",
+        "to_edge_id": "e_0125",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -9268,11 +9268,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0215",
-        "movement_id": "n_0215_m_001",
+        "junction_node_id": "n_0149",
+        "movement_id": "n_0149_m_001",
         "movement_kind": "turn",
-        "from_edge_id": "e_0177",
-        "to_edge_id": "e_0031",
+        "from_edge_id": "e_0124",
+        "to_edge_id": "e_0028",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,
@@ -9329,11 +9329,11 @@
       },
       "properties": {
         "vc_part": "junction_movement_debug",
-        "junction_node_id": "n_0215",
-        "movement_id": "n_0215_m_002",
+        "junction_node_id": "n_0149",
+        "movement_id": "n_0149_m_002",
         "movement_kind": "turn",
-        "from_edge_id": "e_0178",
-        "to_edge_id": "e_0031",
+        "from_edge_id": "e_0125",
+        "to_edge_id": "e_0028",
         "highway": "junction",
         "road_class": "junction",
         "lanes": 4,

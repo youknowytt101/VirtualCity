@@ -37,13 +37,13 @@
       "issues": [],
       "transaction_family": "compound_junction_merge（复合路口合并）",
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
       "member_junctions": [
         {
           "junction_id": "j_022",
-          "junction_node_id": "n_0117",
+          "junction_node_id": "n_0081",
           "degree": 3,
           "center_xz": [
             -19.074,
@@ -53,7 +53,7 @@
         },
         {
           "junction_id": "j_023",
-          "junction_node_id": "n_0118",
+          "junction_node_id": "n_0082",
           "degree": 3,
           "center_xz": [
             -14.734,
@@ -63,13 +63,13 @@
         }
       ],
       "bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
       "bridge_edges": [
         {
-          "edge_id": "e_0241",
-          "from_node": "n_0117",
-          "to_node": "n_0118",
+          "edge_id": "e_0169",
+          "from_node": "n_0081",
+          "to_node": "n_0082",
           "from_node_kind": "junction",
           "to_node_kind": "junction",
           "road_class": "secondary",
@@ -103,40 +103,38 @@
         }
       ],
       "external_approach_edge_ids": [
-        "e_0041",
-        "e_0149",
-        "e_0240",
-        "e_0242"
+        "e_0035",
+        "e_0103",
+        "e_0168",
+        "e_0170"
       ],
       "external_approaches": [
         {
-          "junction_node_id": "n_0118",
-          "edge_id": "e_0041",
-          "other_node_id": "n_0120",
+          "junction_node_id": "n_0082",
+          "edge_id": "e_0035",
+          "other_node_id": "n_0095",
           "road_class": "residential",
-          "edge_length_m": 7.683,
-          "desired_trim_m": 6.3,
-          "entry_trim_m": 6.3,
-          "status": "warn",
-          "issues": [
-            "short_edge_absorption_candidate"
-          ]
-        },
-        {
-          "junction_node_id": "n_0117",
-          "edge_id": "e_0149",
-          "other_node_id": "n_0111",
-          "road_class": "service",
-          "edge_length_m": 13.606,
+          "edge_length_m": 117.244,
           "desired_trim_m": 6.3,
           "entry_trim_m": 6.3,
           "status": "pass",
           "issues": []
         },
         {
-          "junction_node_id": "n_0117",
-          "edge_id": "e_0240",
-          "other_node_id": "n_0110",
+          "junction_node_id": "n_0081",
+          "edge_id": "e_0103",
+          "other_node_id": "n_0075",
+          "road_class": "service",
+          "edge_length_m": 15.302,
+          "desired_trim_m": 6.3,
+          "entry_trim_m": 6.3,
+          "status": "pass",
+          "issues": []
+        },
+        {
+          "junction_node_id": "n_0081",
+          "edge_id": "e_0168",
+          "other_node_id": "n_0076",
           "road_class": "secondary",
           "edge_length_m": 14.061,
           "desired_trim_m": 6.3,
@@ -145,9 +143,9 @@
           "issues": []
         },
         {
-          "junction_node_id": "n_0118",
-          "edge_id": "e_0242",
-          "other_node_id": "n_0123",
+          "junction_node_id": "n_0082",
+          "edge_id": "e_0170",
+          "other_node_id": "n_0085",
           "road_class": "secondary",
           "edge_length_m": 30.739,
           "desired_trim_m": 6.3,
@@ -201,13 +199,13 @@
       "issues": [],
       "transaction_family": "compound_junction_merge（复合路口合并）",
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
       "member_junctions": [
         {
           "junction_id": "j_039",
-          "junction_node_id": "n_0173",
+          "junction_node_id": "n_0116",
           "degree": 3,
           "center_xz": [
             144.267,
@@ -217,7 +215,7 @@
         },
         {
           "junction_id": "j_040",
-          "junction_node_id": "n_0176",
+          "junction_node_id": "n_0119",
           "degree": 3,
           "center_xz": [
             147.793,
@@ -227,13 +225,13 @@
         }
       ],
       "bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
       "bridge_edges": [
         {
-          "edge_id": "e_0171",
-          "from_node": "n_0173",
-          "to_node": "n_0176",
+          "edge_id": "e_0118",
+          "from_node": "n_0116",
+          "to_node": "n_0119",
           "from_node_kind": "junction",
           "to_node_kind": "junction",
           "road_class": "secondary",
@@ -267,27 +265,27 @@
         }
       ],
       "external_approach_edge_ids": [
-        "e_0014",
-        "e_0170",
-        "e_0172",
-        "e_0214"
+        "e_0012",
+        "e_0117",
+        "e_0119",
+        "e_0150"
       ],
       "external_approaches": [
         {
-          "junction_node_id": "n_0176",
-          "edge_id": "e_0014",
-          "other_node_id": "n_0116",
+          "junction_node_id": "n_0119",
+          "edge_id": "e_0012",
+          "other_node_id": "n_0049",
           "road_class": "residential",
-          "edge_length_m": 207.518,
+          "edge_length_m": 316.037,
           "desired_trim_m": 6.3,
           "entry_trim_m": 6.3,
           "status": "pass",
           "issues": []
         },
         {
-          "junction_node_id": "n_0173",
-          "edge_id": "e_0170",
-          "other_node_id": "n_0165",
+          "junction_node_id": "n_0116",
+          "edge_id": "e_0117",
+          "other_node_id": "n_0111",
           "road_class": "secondary",
           "edge_length_m": 29.924,
           "desired_trim_m": 6.3,
@@ -296,9 +294,9 @@
           "issues": []
         },
         {
-          "junction_node_id": "n_0176",
-          "edge_id": "e_0172",
-          "other_node_id": "n_0187",
+          "junction_node_id": "n_0119",
+          "edge_id": "e_0119",
+          "other_node_id": "n_0129",
           "road_class": "secondary",
           "edge_length_m": 74.902,
           "desired_trim_m": 6.3,
@@ -307,9 +305,9 @@
           "issues": []
         },
         {
-          "junction_node_id": "n_0173",
-          "edge_id": "e_0214",
-          "other_node_id": "n_0071",
+          "junction_node_id": "n_0116",
+          "edge_id": "e_0150",
+          "other_node_id": "n_0047",
           "road_class": "service",
           "edge_length_m": 326.492,
           "desired_trim_m": 6.3,
@@ -363,13 +361,13 @@
       "issues": [],
       "transaction_family": "compound_junction_merge（复合路口合并）",
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
       "member_junctions": [
         {
           "junction_id": "j_041",
-          "junction_node_id": "n_0187",
+          "junction_node_id": "n_0129",
           "degree": 3,
           "center_xz": [
             190.171,
@@ -379,7 +377,7 @@
         },
         {
           "junction_id": "j_043",
-          "junction_node_id": "n_0191",
+          "junction_node_id": "n_0133",
           "degree": 3,
           "center_xz": [
             193.599,
@@ -389,13 +387,13 @@
         }
       ],
       "bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
       "bridge_edges": [
         {
-          "edge_id": "e_0173",
-          "from_node": "n_0187",
-          "to_node": "n_0191",
+          "edge_id": "e_0120",
+          "from_node": "n_0129",
+          "to_node": "n_0133",
           "from_node_kind": "junction",
           "to_node_kind": "junction",
           "road_class": "secondary",
@@ -430,15 +428,15 @@
       ],
       "external_approach_edge_ids": [
         "e_0010",
-        "e_0063",
-        "e_0172",
-        "e_0174"
+        "e_0047",
+        "e_0119",
+        "e_0121"
       ],
       "external_approaches": [
         {
-          "junction_node_id": "n_0191",
+          "junction_node_id": "n_0133",
           "edge_id": "e_0010",
-          "other_node_id": "n_0167",
+          "other_node_id": "n_0113",
           "road_class": "residential",
           "edge_length_m": 72.927,
           "desired_trim_m": 6.3,
@@ -447,22 +445,20 @@
           "issues": []
         },
         {
-          "junction_node_id": "n_0187",
-          "edge_id": "e_0063",
-          "other_node_id": "n_0192",
+          "junction_node_id": "n_0129",
+          "edge_id": "e_0047",
+          "other_node_id": "n_0135",
           "road_class": "service",
-          "edge_length_m": 7.136,
+          "edge_length_m": 16.953,
           "desired_trim_m": 6.3,
           "entry_trim_m": 6.3,
-          "status": "warn",
-          "issues": [
-            "short_edge_absorption_candidate"
-          ]
+          "status": "pass",
+          "issues": []
         },
         {
-          "junction_node_id": "n_0187",
-          "edge_id": "e_0172",
-          "other_node_id": "n_0176",
+          "junction_node_id": "n_0129",
+          "edge_id": "e_0119",
+          "other_node_id": "n_0119",
           "road_class": "secondary",
           "edge_length_m": 74.902,
           "desired_trim_m": 6.3,
@@ -471,9 +467,9 @@
           "issues": []
         },
         {
-          "junction_node_id": "n_0191",
-          "edge_id": "e_0174",
-          "other_node_id": "n_0194",
+          "junction_node_id": "n_0133",
+          "edge_id": "e_0121",
+          "other_node_id": "n_0134",
           "road_class": "secondary",
           "edge_length_m": 13.205,
           "desired_trim_m": 6.3,

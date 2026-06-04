@@ -13,19 +13,19 @@
     "engineering_reference_entry_poses": 149,
     "regularized_entry_pose_trims": 149,
     "regularized_entry_pose_status_counts": {
-      "pass": 115,
-      "warn": 34
+      "pass": 135,
+      "warn": 14
     },
     "regularized_entry_pose_issue_counts": {}
   },
   "counts": {
-    "input_edges": 243,
-    "optimized_approaches": 243,
+    "input_edges": 171,
+    "optimized_approaches": 171,
     "dropped_short_edges": 0,
     "heuristic_junction_trim_keys": 0,
     "regularized_junction_nodes": 49,
-    "regularized_endpoint_exact": 129,
-    "regularized_endpoint_scaled_for_edge_length": 20,
+    "regularized_endpoint_exact": 130,
+    "regularized_endpoint_scaled_for_edge_length": 19,
     "junction_nodes": 49,
     "junction_connectors": 149,
     "t_junctions": 47,
@@ -33,12 +33,12 @@
     "junction_movement_debug": 153,
     "junction_through_movements": 51,
     "junction_turn_movements": 102,
-    "corner_fillet_nodes": 21,
-    "corner_fillets": 21,
+    "corner_fillet_nodes": 20,
+    "corner_fillets": 20,
     "corner_circular_arcs": 19,
-    "corner_bezier_tangent_fallback": 2,
+    "corner_bezier_tangent_fallback": 1,
     "corner_straight_infinite_radius": 0,
-    "output_features": 413,
+    "output_features": 340,
     "t_branch_trim_adjustments": 0,
     "t_branch_trim_locked_skips": 47,
     "t_branch_trim_max_delta_m": 0.0,
@@ -62,23 +62,23 @@
     "t_turn": 94
   },
   "junction_connector_arc_geometry_counts": {
-    "bezier_tangent_fallback": 51,
-    "circular_arc": 56,
+    "bezier_tangent_fallback": 31,
+    "circular_arc": 76,
     "straight_infinite_radius": 42
   },
   "junction_connector_arc_fit_status_counts": {
-    "exact_tangent_arc": 56,
-    "incompatible_tangent_endpoints_bezier_fallback": 51,
+    "exact_tangent_arc": 76,
+    "incompatible_tangent_endpoints_bezier_fallback": 31,
     "near_straight_infinite_radius": 42
   },
   "corner_arc_geometry_counts": {
-    "bezier_tangent_fallback": 2,
+    "bezier_tangent_fallback": 1,
     "circular_arc": 19
   },
   "corner_fillet_metrics": {
-    "min_turn_deg": 20.983,
-    "max_turn_deg": 93.36,
-    "avg_turn_deg": 71.099,
+    "min_turn_deg": 39.555,
+    "max_turn_deg": 93.359,
+    "avg_turn_deg": 73.609,
     "max_cut_m": 12.0,
     "width_factor": 0.85,
     "edge_length_factor": 0.38,

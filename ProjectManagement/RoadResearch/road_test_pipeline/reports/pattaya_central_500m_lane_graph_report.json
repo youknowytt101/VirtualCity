@@ -3,45 +3,45 @@
   "stage": "lane_graph_topology_v1",
   "status": "warn",
   "counts": {
-    "edges": 243,
-    "lanes": 486,
+    "edges": 171,
+    "lanes": 342,
     "junctions": 49,
     "connections": 306,
-    "lane_links": 612,
+    "lane_links": 468,
     "junction_lane_links": 306,
-    "connector_continuity_links": 306,
+    "connector_continuity_links": 162,
     "issue_counts": {
-      "connector_continuity_inferred": 612,
-      "direction_forced_bidirectional_two_lane_policy": 729,
+      "connector_continuity_inferred": 324,
+      "direction_forced_bidirectional_two_lane_policy": 513,
       "inferred_without_turn_lanes": 612,
-      "lane_count_forced_bidirectional_two_lane_policy": 729,
-      "lanes_inferred": 729,
+      "lane_count_forced_bidirectional_two_lane_policy": 513,
+      "lanes_inferred": 513,
       "low_confidence_from_lane": 612,
       "low_confidence_to_lane": 612,
-      "missing_turn_lanes": 729,
-      "offset_centerline_preview_only": 486,
-      "source_lane_count_overridden_by_bidirectional_two_lane_policy": 702,
-      "source_oneway_overridden_by_bidirectional_two_lane_policy": 402,
-      "source_width_overridden_by_bidirectional_two_lane_policy": 729,
-      "width_forced_bidirectional_two_lane_policy": 729,
-      "width_inferred": 729
+      "missing_turn_lanes": 513,
+      "offset_centerline_preview_only": 342,
+      "source_lane_count_overridden_by_bidirectional_two_lane_policy": 504,
+      "source_oneway_overridden_by_bidirectional_two_lane_policy": 273,
+      "source_width_overridden_by_bidirectional_two_lane_policy": 513,
+      "width_forced_bidirectional_two_lane_policy": 513,
+      "width_inferred": 513
     }
   },
   "lane_direction_counts": {
-    "backward": 243,
-    "forward": 243
+    "backward": 171,
+    "forward": 171
   },
   "lane_source_counts": {
-    "stage_policy_override": 486
+    "stage_policy_override": 342
   },
   "width_source_counts": {
-    "stage_policy_override": 486
+    "stage_policy_override": 342
   },
   "turn_lanes_source_counts": {
-    "missing": 486
+    "missing": 342
   },
   "traffic_direction_policy_counts": {
-    "temporary_bidirectional_two_lane_policy": 486
+    "temporary_bidirectional_two_lane_policy": 342
   },
   "turn_counts": {
     "left": 102,
@@ -52,15 +52,15 @@
     "junction_semantics_plus_lane_attribute_model": 306
   },
   "lane_link_source_counts": {
-    "connector_node_rank_match": 306,
+    "connector_node_rank_match": 162,
     "inferred_lane_rank_plus_road_movement": 306
   },
   "lane_link_kind_counts": {
-    "connector_continuity": 306,
+    "connector_continuity": 162,
     "junction_movement": 306
   },
   "fallback_counts": {
-    "offset_centerline_preview": 486,
+    "offset_centerline_preview": 342,
     "shared_bidirectional_physical_lane": 0,
     "inferred_without_turn_lanes": 306
   },
@@ -74,7 +74,7 @@
     "empty_connection_curves": 0,
     "fan_fallback_ratio": 0.0,
     "avg_lane_links_per_junction": 6.245,
-    "inferred_turn_link_ratio": 0.5,
+    "inferred_turn_link_ratio": 0.654,
     "missing_turn_lanes_lane_ratio": 1.0,
     "inferred_bidirectional_prior_lane_ratio": 0.0,
     "source_oneway_lane_ratio": 0.0,

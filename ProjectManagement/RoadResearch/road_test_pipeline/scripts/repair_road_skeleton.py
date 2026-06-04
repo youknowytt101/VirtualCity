@@ -392,6 +392,7 @@ def main() -> int:
     repair_candidates = processed / f"{args.area_id}_repair_candidates.json"
     repair_decisions = processed / f"{args.area_id}_repair_decisions.json"
     repair_casebook = processed / f"{args.area_id}_repair_casebook.json"
+    raw_topology_diagnostics = processed / f"{args.area_id}_raw_topology_diagnostics.json"
     road_graph = processed / f"{args.area_id}_road_graph.json"
     junction_semantics = processed / f"{args.area_id}_junction_semantics.json"
     junction_areas = processed / f"{args.area_id}_junction_areas.json"
@@ -577,6 +578,7 @@ def main() -> int:
             "repair_candidates": str(repair_candidates),
             "repair_decisions": str(repair_decisions),
             "repair_casebook": str(repair_casebook),
+            "raw_topology_diagnostics": str(raw_topology_diagnostics),
             "road_graph": str(road_graph),
             "junction_semantics": str(junction_semantics),
             "junction_areas": str(junction_areas),

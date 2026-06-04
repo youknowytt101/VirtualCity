@@ -3,14 +3,14 @@
   "stage": "lane_graph_svg_visualization",
   "status": "pass",
   "counts": {
-    "lanes": 486,
-    "lane_links_total": 612,
+    "lanes": 342,
+    "lane_links_total": 468,
     "junction_connections_rendered": 306,
     "movement_corridors_rendered": 306,
     "anchor_markers_rendered": 612,
     "anchor_source_counts": {
-      "engineering_entry_pose_lateral_offset": 536,
-      "junction_zone_expansion_planned_pose_lateral_offset": 76
+      "engineering_entry_pose_lateral_offset": 592,
+      "junction_zone_expansion_planned_pose_lateral_offset": 20
     },
     "visual_candidate_family_counts": {
       "bezier_g1_preview": 204,
@@ -18,15 +18,15 @@
     },
     "visual_candidate_issue_counts": {
       "entry_anchor_entry_trim_capacity_limited": 18,
-      "entry_anchor_short_edge_absorption_candidate": 14,
+      "entry_anchor_short_edge_absorption_candidate": 2,
       "exit_anchor_entry_trim_capacity_limited": 18,
-      "exit_anchor_short_edge_absorption_candidate": 14,
+      "exit_anchor_short_edge_absorption_candidate": 2,
       "inferred_without_turn_lanes": 306,
       "low_confidence_from_lane": 306,
       "low_confidence_lane_link": 306,
       "low_confidence_to_lane": 306,
       "outgoing_turn_lanes_missing": 306,
-      "radius_proxy_below_lane_min": 18
+      "radius_proxy_below_lane_min": 17
     },
     "compound_corridors_rendered": 24,
     "compound_anchor_markers_rendered": 48,
@@ -39,8 +39,6 @@
     },
     "compound_visual_candidate_issue_counts": {
       "compound_junction_merge_trial": 24,
-      "entry_anchor_short_edge_absorption_candidate": 4,
-      "exit_anchor_short_edge_absorption_candidate": 4,
       "inferred_without_turn_lanes": 24,
       "low_confidence_from_lane": 24,
       "low_confidence_to_lane": 24,
@@ -55,6 +53,14 @@
       "residential": 14,
       "secondary": 3,
       "service": 27
+    },
+    "raw_topology_issue_markers_rendered": 30,
+    "raw_topology_issue_classification_counts": {
+      "dangling_endpoint": 29,
+      "internal_vertex_near_other_edge": 1
+    },
+    "raw_topology_issue_severity_counts": {
+      "review": 30
     }
   },
   "style": {
@@ -64,16 +70,18 @@
     "anchor_marker_stroke_width_px": 0.12,
     "lane_casing": "enabled（已启用）",
     "visual_mode": "review_drawing（审图线稿）",
-    "raw_roads_overlay": "thin_black_solid_with_all_vertex_markers_hidden_by_default（细黑实线 + 全部原始顶点/断点标记，默认隐藏）"
+    "raw_roads_overlay": "thin_black_solid_with_all_vertex_markers_hidden_by_default（细黑实线 + 全部原始顶点/断点标记，默认隐藏）",
+    "raw_topology_issue_overlay": "enabled_when_diagnostics_exist（诊断存在时启用）"
   },
   "link_source": "movement_corridor_anchors",
   "compound_link_source": "compound_junction_merge_transactions",
   "note": "SVG visualization（可视化） only. lane_graph.json, movement_corridor_candidates.json and compound_junction_merge_transactions.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
   "inputs": {
     "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "movement_corridors": "data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
-    "compound_junction_merge_transactions": "data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
-    "raw_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson"
+    "movement_corridors": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_movement_corridor_candidates.json",
+    "compound_junction_merge_transactions": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_compound_junction_merge_transactions.json",
+    "raw_roads": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
+    "raw_topology_diagnostics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_raw_topology_diagnostics.json"
   },
   "outputs": {
     "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\visualizations\\pattaya_central_500m_lane_graph_topology.svg",

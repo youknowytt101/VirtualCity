@@ -1,12 +1,12 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "topology_repair",
-  "status": "pass",
+  "status": "warn",
   "checks": [
     {
       "id": "output_edges",
       "status": "pass",
-      "value": 243,
+      "value": 171,
       "threshold": 40,
       "message": "Repair should output enough simple edges for road_graph construction."
     },
@@ -33,8 +33,8 @@
     },
     {
       "id": "dangling_endpoint_ratio",
-      "status": "pass",
-      "value": 0.133,
+      "status": "warn",
+      "value": 0.193,
       "threshold": 0.15,
       "message": "Dangling endpoints remain high; bbox boundary and dead-end classification should be added next."
     },
@@ -56,15 +56,17 @@
   "metrics": {
     "repair_counts": {
       "input_features": 44,
-      "output_edges": 243,
+      "output_edges": 171,
       "duplicate_points_removed": 0,
       "endpoint_snaps": 2,
       "endpoint_to_edge_snaps": 0,
       "intersection_split_insertions": 0,
-      "short_edges_before_cleanup": 23,
+      "raw_shape_vertices_removed": 84,
+      "raw_shape_simplification_passes": 1,
+      "short_edges_before_cleanup": 6,
       "short_edge_threshold_m": 3,
       "short_edge_collapse_passes": 1,
-      "short_edge_points_removed": 15,
+      "short_edge_points_removed": 3,
       "short_edges_remaining_under_threshold_pre_output": 1,
       "post_promotion_short_edge_points_removed": 0,
       "post_promotion_short_edges_remaining_under_threshold_pre_output": 1,
@@ -92,28 +94,28 @@
       "dangling_endpoint_ratio": 0.94
     },
     "endpoint_stats_after_output_edges": {
-      "endpoint_clusters": 233,
+      "endpoint_clusters": 161,
       "dangling_endpoint_clusters": 31,
-      "dangling_endpoint_ratio": 0.133
+      "dangling_endpoint_ratio": 0.193
     },
     "geometry": {
       "empty_geometry": 0,
       "duplicate_point_features": 0,
       "too_short_features": 0,
-      "total_length_m": 8325.835,
-      "min_length_m": 3.007,
+      "total_length_m": 8325.886,
+      "min_length_m": 3.35,
       "max_length_m": 326.492
     },
     "topology": {
-      "endpoint_clusters": 233,
+      "endpoint_clusters": 161,
       "endpoint_cluster_size_distribution": {
         "1": 31,
-        "2": 153,
+        "2": 81,
         "3": 47,
         "4": 2
       },
       "dangling_endpoint_clusters": 31,
-      "dangling_endpoint_ratio": 0.133,
+      "dangling_endpoint_ratio": 0.193,
       "low_confidence_endpoint_clusters": 2,
       "possible_unsplit_crossings": 0,
       "possible_unsplit_crossing_samples": []

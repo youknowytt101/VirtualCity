@@ -34,6 +34,11 @@ REVIEW_ENDPOINT_EDGE_GAP_M = 12.0
 REVIEW_MIN_CONFIDENCE = 0.45
 REVIEW_TOP_CANDIDATES = 40
 HIGH_CONFIDENCE_PROMOTION_MIN = 0.75
+RAW_VERTEX_NEAR_EDGE_M = 2.5
+RAW_DIAGNOSTIC_CROSSING_LIMIT = 200
+RAW_SHAPE_SIMPLIFY_TOLERANCE_M = 0.15
+RAW_SHAPE_SIMPLIFY_MAX_TURN_DEG = 8.0
+RAW_SHAPE_SIMPLIFY_SAMPLE_LIMIT = 80
 
 
 @dataclass
@@ -453,6 +458,222 @@ def apply_short_edge_cleanup(
     }
 
 
+def vertex_turn_degrees(a: tuple[float, float], p: tuple[float, float], b: tuple[float, float]) -> float:
+    incoming = normalize((p[0] - a[0], p[1] - a[1]))
+    outgoing = normalize((b[0] - p[0], b[1] - p[1]))
+    cosine = max(-1.0, min(1.0, dot(incoming, outgoing)))
+    return math.degrees(math.acos(cosine))
+
+
+def can_simplify_raw_shape_vertex(
+    roads: list[RoadFeature],
+    road_index: int,
+    point_index: int,
+    degrees: dict[tuple[int, int], int],
+    bbox: tuple[float, float, float, float] | None,
+    *,
+    tolerance_m: float,
+    max_turn_deg: float,
+) -> tuple[bool, dict[str, Any]]:
+    road = roads[road_index]
+    if point_index <= 0 or point_index >= len(road.local) - 1:
+        return False, {"reason": "endpoint_protected"}
+
+    point = road.local[point_index]
+    if is_near_bbox_edge(point, bbox):
+        return False, {"reason": "bbox_boundary_protected"}
+    if degrees.get(point_key(point), 0) != 2:
+        return False, {"reason": "junction_or_shared_node_protected"}
+
+    nearest = nearest_other_road_segment(point, roads, road_index)
+    if nearest is not None and float(nearest["gap_m"]) <= RAW_VERTEX_NEAR_EDGE_M:
+        return False, {"reason": "near_other_road_protected", "nearest": nearest}
+
+    a = road.local[point_index - 1]
+    b = road.local[point_index + 1]
+    if distance(a, b) <= DEDUP_EPS_M:
+        return False, {"reason": "collapsed_chord"}
+
+    turn_deg = vertex_turn_degrees(a, point, b)
+    if turn_deg > max_turn_deg:
+        return False, {"reason": "turn_angle_protected", "turn_deg": round(turn_deg, 3)}
+
+    projected, t = closest_point_on_segment(point, a, b)
+    if t <= 1e-6 or t >= 1.0 - 1e-6:
+        return False, {"reason": "projection_outside_chord"}
+
+    chord_deviation_m = distance(point, projected)
+    if chord_deviation_m > tolerance_m:
+        return False, {"reason": "deviation_protected", "chord_deviation_m": round(chord_deviation_m, 3)}
+
+    return True, {
+        "turn_deg": round(turn_deg, 3),
+        "chord_deviation_m": round(chord_deviation_m, 3),
+        "replacement_chord_m": round(distance(a, b), 3),
+    }
+
+
+def restore_road_state(
+    roads: list[RoadFeature],
+    locals_snapshot: list[list[tuple[float, float]]],
+    ops_snapshot: list[set[str]],
+) -> None:
+    for road, local_points, repair_ops in zip(roads, locals_snapshot, ops_snapshot):
+        road.local = list(local_points)
+        road.repair_ops = set(repair_ops)
+
+
+def apply_raw_shape_vertex_simplification(
+    roads: list[RoadFeature],
+    bbox: tuple[float, float, float, float] | None,
+    *,
+    enabled: bool = True,
+    tolerance_m: float = RAW_SHAPE_SIMPLIFY_TOLERANCE_M,
+    max_turn_deg: float = RAW_SHAPE_SIMPLIFY_MAX_TURN_DEG,
+) -> dict[str, Any]:
+    before_metrics = repair_validation_metrics(roads)
+    if not enabled:
+        return {
+            "enabled": False,
+            "status": "skipped",
+            "tolerance_m": tolerance_m,
+            "max_turn_deg": max_turn_deg,
+            "vertices_removed": 0,
+            "passes": 0,
+            "roads_changed": 0,
+            "before": before_metrics,
+            "after": before_metrics,
+            "sample_removed_vertices": [],
+            "validators": [],
+        }
+
+    locals_snapshot = [list(road.local) for road in roads]
+    ops_snapshot = [set(road.repair_ops) for road in roads]
+    removed_records: list[dict[str, Any]] = []
+    removed_count = 0
+    roads_changed: set[str] = set()
+    passes = 0
+
+    while True:
+        degrees = segment_node_degrees(roads)
+        removed_this_pass = 0
+        for road_index, road in enumerate(roads):
+            point_index = 1
+            while point_index < len(road.local) - 1:
+                removable, metrics = can_simplify_raw_shape_vertex(
+                    roads,
+                    road_index,
+                    point_index,
+                    degrees,
+                    bbox,
+                    tolerance_m=tolerance_m,
+                    max_turn_deg=max_turn_deg,
+                )
+                if not removable:
+                    point_index += 1
+                    continue
+
+                point = road.local[point_index]
+                if len(removed_records) < RAW_SHAPE_SIMPLIFY_SAMPLE_LIMIT:
+                    removed_records.append({
+                        "source_feature_id": road.source_feature_id,
+                        "point_index_at_removal": point_index,
+                        **review_point(point),
+                        **metrics,
+                    })
+                del road.local[point_index]
+                road.repair_ops.add("raw_shape_vertex_simplification")
+                removed_count += 1
+                roads_changed.add(road.source_feature_id)
+                removed_this_pass += 1
+
+            if len(road.local) < 2:
+                restore_road_state(roads, locals_snapshot, ops_snapshot)
+                return {
+                    "enabled": enabled,
+                    "status": "rejected",
+                    "tolerance_m": tolerance_m,
+                    "max_turn_deg": max_turn_deg,
+                    "vertices_removed": 0,
+                    "passes": passes,
+                    "roads_changed": 0,
+                    "before": before_metrics,
+                    "after": before_metrics,
+                    "sample_removed_vertices": [],
+                    "validators": [{
+                        "id": "preserve_minimum_line_points",
+                        "status": "fail",
+                        "message": "A road collapsed below two points during raw shape simplification.",
+                    }],
+                }
+
+        if removed_this_pass == 0:
+            break
+        passes += 1
+
+    after_metrics = repair_validation_metrics(roads)
+    validators = [
+        validator_result(
+            "no_new_unsplit_crossing",
+            int(after_metrics["possible_unsplit_crossings"]) <= int(before_metrics["possible_unsplit_crossings"]),
+            before_metrics["possible_unsplit_crossings"],
+            after_metrics["possible_unsplit_crossings"],
+            "Raw shape simplification must not introduce new planar crossing candidates.",
+        ),
+        validator_result(
+            "endpoint_topology_stable",
+            int(after_metrics["endpoint_clusters"]) == int(before_metrics["endpoint_clusters"])
+            and int(after_metrics["dangling_endpoint_clusters"]) == int(before_metrics["dangling_endpoint_clusters"]),
+            {
+                "endpoint_clusters": before_metrics["endpoint_clusters"],
+                "dangling_endpoint_clusters": before_metrics["dangling_endpoint_clusters"],
+            },
+            {
+                "endpoint_clusters": after_metrics["endpoint_clusters"],
+                "dangling_endpoint_clusters": after_metrics["dangling_endpoint_clusters"],
+            },
+            "Removing ordinary shape vertices must not change endpoint topology.",
+        ),
+        validator_result(
+            "no_new_short_edge",
+            int(after_metrics["short_segments_under_threshold"]) <= int(before_metrics["short_segments_under_threshold"]),
+            before_metrics["short_segments_under_threshold"],
+            after_metrics["short_segments_under_threshold"],
+            "Simplification must not increase short segments under the topology repair threshold.",
+        ),
+    ]
+    if any(item["status"] != "pass" for item in validators):
+        restore_road_state(roads, locals_snapshot, ops_snapshot)
+        return {
+            "enabled": enabled,
+            "status": "rejected",
+            "tolerance_m": tolerance_m,
+            "max_turn_deg": max_turn_deg,
+            "vertices_removed": 0,
+            "passes": passes,
+            "roads_changed": 0,
+            "before": before_metrics,
+            "after": before_metrics,
+            "sample_removed_vertices": [],
+            "validators": validators,
+        }
+
+    status = "applied" if removed_count else "noop"
+    return {
+        "enabled": enabled,
+        "status": status,
+        "tolerance_m": tolerance_m,
+        "max_turn_deg": max_turn_deg,
+        "vertices_removed": removed_count,
+        "passes": passes,
+        "roads_changed": len(roads_changed),
+        "before": before_metrics,
+        "after": after_metrics,
+        "sample_removed_vertices": removed_records,
+        "validators": validators,
+    }
+
+
 def endpoint_stats(roads: list[RoadFeature]) -> dict[str, Any]:
     clusters: dict[tuple[int, int], int] = defaultdict(int)
     for road in roads:
@@ -814,6 +1035,10 @@ def default_repair_decisions_path(area_id: str) -> Path:
 
 def default_repair_casebook_path(area_id: str) -> Path:
     return pipeline_root_from_script(Path(__file__)) / "data" / "processed" / f"{area_id}_repair_casebook.json"
+
+
+def default_raw_topology_diagnostics_path(area_id: str) -> Path:
+    return pipeline_root_from_script(Path(__file__)) / "data" / "processed" / f"{area_id}_raw_topology_diagnostics.json"
 
 
 def safe_id_part(value: Any) -> str:
@@ -1396,6 +1621,251 @@ def possible_unsplit_crossing_samples(
     return count, samples
 
 
+def nearest_other_road_segment(
+    point: tuple[float, float],
+    roads: list[RoadFeature],
+    source_road_index: int,
+) -> dict[str, Any] | None:
+    source = roads[source_road_index]
+    if has_layer_separation(source.props):
+        return None
+    best: dict[str, Any] | None = None
+    for target_road_index, target in enumerate(roads):
+        if target_road_index == source_road_index or len(target.local) < 2:
+            continue
+        if has_layer_separation(target.props):
+            continue
+        for segment_index in range(len(target.local) - 1):
+            a = target.local[segment_index]
+            b = target.local[segment_index + 1]
+            if distance(a, b) < DEDUP_EPS_M:
+                continue
+            proj, t = closest_point_on_segment(point, a, b)
+            if t <= 0.02 or t >= 0.98:
+                continue
+            gap_m = distance(point, proj)
+            if best is None or gap_m < float(best["gap_m"]):
+                best = {
+                    "source_feature_id": target.source_feature_id,
+                    "road_index": target_road_index,
+                    "segment_index": segment_index,
+                    "gap_m": round(gap_m, 3),
+                    "projection": review_point(proj),
+                }
+    return best
+
+
+def raw_unsplit_crossing_records(
+    roads: list[RoadFeature],
+    *,
+    limit: int = RAW_DIAGNOSTIC_CROSSING_LIMIT,
+) -> tuple[int, list[dict[str, Any]]]:
+    count = 0
+    records: list[dict[str, Any]] = []
+    for road_a_index, road_a in enumerate(roads):
+        if len(road_a.local) < 2 or has_layer_separation(road_a.props):
+            continue
+        for road_b_index in range(road_a_index + 1, len(roads)):
+            road_b = roads[road_b_index]
+            if len(road_b.local) < 2 or has_layer_separation(road_b.props):
+                continue
+            for segment_a_index in range(len(road_a.local) - 1):
+                a0, a1 = road_a.local[segment_a_index], road_a.local[segment_a_index + 1]
+                for segment_b_index in range(len(road_b.local) - 1):
+                    b0, b1 = road_b.local[segment_b_index], road_b.local[segment_b_index + 1]
+                    point = segment_intersection(a0, a1, b0, b1)
+                    if point is None:
+                        continue
+                    count += 1
+                    if len(records) >= limit:
+                        continue
+                    records.append({
+                        "issue_id": f"raw_crossing_{count - 1:04d}",
+                        "issue_type": "unsplit_crossing",
+                        "severity": "review",
+                        "source": "roads_raw.geojson",
+                        "a": {
+                            "source_feature_id": road_a.source_feature_id,
+                            "segment_index": segment_a_index,
+                        },
+                        "b": {
+                            "source_feature_id": road_b.source_feature_id,
+                            "segment_index": segment_b_index,
+                        },
+                        **review_point(point),
+                        "suggested_action": "split_both_edges_if_planar（如果是平面道路则切分两条边）",
+                    })
+    return count, records
+
+
+def endpoint_candidate_issue_map(candidates: list[dict[str, Any]]) -> dict[tuple[str, str], list[dict[str, Any]]]:
+    mapped: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for candidate in candidates:
+        kind = str(candidate.get("kind") or "")
+        if kind == "endpoint_to_edge_review":
+            ref = dict(candidate.get("from") or {})
+            key = (str(ref.get("source_feature_id") or ""), str(ref.get("endpoint_role") or ""))
+            mapped[key].append({
+                "issue_type": "near_miss_endpoint",
+                "candidate_kind": kind,
+                "candidate_id": str(candidate.get("candidate_id") or ""),
+                "gap_m": candidate.get("gap_m"),
+                "confidence": candidate.get("confidence"),
+                "target": candidate.get("to_edge"),
+            })
+        elif kind == "endpoint_bridge":
+            for ref_key in ("from", "to"):
+                ref = dict(candidate.get(ref_key) or {})
+                key = (str(ref.get("source_feature_id") or ""), str(ref.get("endpoint_role") or ""))
+                mapped[key].append({
+                    "issue_type": "endpoint_bridge_candidate",
+                    "candidate_kind": kind,
+                    "candidate_id": str(candidate.get("candidate_id") or ""),
+                    "gap_m": candidate.get("gap_m"),
+                    "confidence": candidate.get("confidence"),
+                })
+    return mapped
+
+
+def severity_from_issues(classification: str, issues: list[dict[str, Any]]) -> str:
+    issue_types = {str(issue.get("issue_type") or "") for issue in issues}
+    if "unsplit_crossing" in issue_types or "internal_vertex_on_other_edge" in issue_types:
+        return "high"
+    if issue_types or classification == "dangling_endpoint":
+        return "review"
+    return "info"
+
+
+def build_raw_topology_diagnostics(
+    *,
+    area_id: str,
+    input_path: Path,
+    roads: list[RoadFeature],
+    bbox: tuple[float, float, float, float] | None,
+) -> dict[str, Any]:
+    degrees = segment_node_degrees(roads)
+    dangling_records = dangling_endpoint_records(roads, bbox)
+    endpoint_candidates = endpoint_bridge_candidates(dangling_records, roads) + endpoint_to_edge_review_candidates(dangling_records, roads)
+    issue_map = endpoint_candidate_issue_map(endpoint_candidates)
+    crossing_count, crossing_records = raw_unsplit_crossing_records(roads)
+
+    vertices: list[dict[str, Any]] = []
+    classification_counts: dict[str, int] = defaultdict(int)
+    issue_counts: dict[str, int] = defaultdict(int)
+    severity_counts: dict[str, int] = defaultdict(int)
+    raw_endpoint_count = 0
+    raw_internal_vertex_count = 0
+
+    for road_index, road in enumerate(roads):
+        for point_index, point in enumerate(road.local):
+            is_start = point_index == 0
+            is_end = point_index == len(road.local) - 1
+            is_endpoint = is_start or is_end
+            vertex_role = "start" if is_start else "end" if is_end else "internal"
+            if is_endpoint:
+                raw_endpoint_count += 1
+            else:
+                raw_internal_vertex_count += 1
+
+            near_bbox = is_near_bbox_edge(point, bbox)
+            key = point_key(point)
+            degree = degrees.get(key, 0)
+            issues: list[dict[str, Any]] = []
+
+            if is_endpoint:
+                if near_bbox:
+                    classification = "bbox_boundary_endpoint"
+                elif degree <= 1:
+                    classification = "dangling_endpoint"
+                else:
+                    classification = "connected_endpoint"
+                for issue in issue_map.get((road.source_feature_id, vertex_role), []):
+                    issues.append(issue)
+            else:
+                classification = "ordinary_shape_vertex"
+                nearest = nearest_other_road_segment(point, roads, road_index)
+                if nearest is not None and float(nearest["gap_m"]) <= NODE_EPS_M:
+                    classification = "internal_vertex_on_other_edge"
+                    issues.append({
+                        "issue_type": "internal_vertex_on_other_edge",
+                        "gap_m": nearest["gap_m"],
+                        "target": nearest,
+                        "suggested_action": "split_target_edge_or_promote_connection_after_visual_review（审图后切分目标边或提升连接）",
+                    })
+                elif nearest is not None and float(nearest["gap_m"]) <= RAW_VERTEX_NEAR_EDGE_M:
+                    classification = "internal_vertex_near_other_edge"
+                    issues.append({
+                        "issue_type": "internal_vertex_near_other_edge",
+                        "gap_m": nearest["gap_m"],
+                        "target": nearest,
+                        "suggested_action": "review_before_snap_or_split（先审查再吸附或切分）",
+                    })
+
+            for issue in issues:
+                issue_type = str(issue.get("issue_type") or "unknown")
+                issue_counts[issue_type] += 1
+            classification_counts[classification] += 1
+            severity = severity_from_issues(classification, issues)
+            severity_counts[severity] += 1
+            vertices.append({
+                "diagnostic_id": f"raw_vertex_{len(vertices):04d}",
+                "source": "roads_raw.geojson",
+                "source_feature_id": road.source_feature_id,
+                "road_index": road_index,
+                "point_index": point_index,
+                "vertex_role": vertex_role,
+                "classification": classification,
+                "severity": severity,
+                "degree_key_count": degree,
+                "near_bbox_edge": near_bbox,
+                "highway": str(road.props.get("highway") or ""),
+                "name": str(road.props.get("name") or ""),
+                **review_point(point),
+                "issues": issues,
+            })
+
+    if crossing_count:
+        issue_counts["unsplit_crossing"] += crossing_count
+        severity_counts["review"] += crossing_count
+
+    return {
+        "type": "raw_topology_diagnostics",
+        "metadata": {
+            "area_id": area_id,
+            "schema": "road_test_pipeline.raw_topology_diagnostics.v1",
+            "source": str(input_path),
+            "contract": "non_destructive_raw_vertex_classification（非破坏式原始顶点分类）",
+        },
+        "thresholds": {
+            "node_eps_m": NODE_EPS_M,
+            "snap_endpoint_m": SNAP_ENDPOINT_M,
+            "snap_edge_m": SNAP_EDGE_M,
+            "raw_vertex_near_edge_m": RAW_VERTEX_NEAR_EDGE_M,
+            "review_endpoint_edge_gap_m": REVIEW_ENDPOINT_EDGE_GAP_M,
+            "crossing_record_limit": RAW_DIAGNOSTIC_CROSSING_LIMIT,
+        },
+        "summary": {
+            "raw_roads": len(roads),
+            "raw_vertices": len(vertices),
+            "raw_endpoints": raw_endpoint_count,
+            "raw_internal_vertices": raw_internal_vertex_count,
+            "possible_unsplit_crossings": crossing_count,
+            "crossing_records_emitted": len(crossing_records),
+            "classification_counts": dict(sorted(classification_counts.items())),
+            "issue_counts": dict(sorted(issue_counts.items())),
+            "severity_counts": dict(sorted(severity_counts.items())),
+            "endpoint_review_candidates": len(endpoint_candidates),
+        },
+        "vertices": vertices,
+        "unsplit_crossings": crossing_records,
+        "note": (
+            "Diagnostics classify raw vertices（原始顶点） for review. Ordinary shape vertices（普通形状点） "
+            "are not repair operations. Review/high severity items can later be promoted into topology repair "
+            "candidates（拓扑修复候选） after visual QA（可视化质检）."
+        ),
+    }
+
+
 def repair_validation_metrics(roads: list[RoadFeature]) -> dict[str, Any]:
     crossings, samples = possible_unsplit_crossing_samples(roads)
     endpoint = endpoint_stats(roads)
@@ -1558,12 +2028,20 @@ def repair(
     candidates_path: Path | None = None,
     decisions_path: Path | None = None,
     casebook_path: Path | None = None,
+    raw_diagnostics_path: Path | None = None,
     manual_overrides_path: Path | None = None,
     apply_high_confidence: bool = False,
+    raw_shape_simplification_enabled: bool = True,
 ) -> dict[str, Any]:
     fc, roads, origin_lon, origin_lat = load_roads(input_path)
     input_road_count = len(roads)
     local_bbox = local_bbox_from_metadata(fc, origin_lon, origin_lat)
+    raw_topology_diagnostics = build_raw_topology_diagnostics(
+        area_id=area_id,
+        input_path=input_path,
+        roads=roads,
+        bbox=local_bbox,
+    )
     before = endpoint_stats(roads)
     manual_override_ops, manual_override_info = load_manual_override_ops(manual_overrides_path)
 
@@ -1575,6 +2053,11 @@ def repair(
     endpoint_snaps = apply_endpoint_snaps(roads)
     endpoint_to_edge_snaps = apply_endpoint_to_edge_snaps(roads)
     intersection_splits = apply_intersection_splits(roads)
+    raw_shape_simplification = apply_raw_shape_vertex_simplification(
+        roads,
+        local_bbox,
+        enabled=raw_shape_simplification_enabled,
+    )
     short_edges_before = count_short_segments(roads, SHORT_EDGE_M)
     short_edge_cleanup = apply_short_edge_cleanup(roads, local_bbox)
     repair_review_before_promotions = build_repair_review(roads, local_bbox)
@@ -1637,6 +2120,8 @@ def repair(
         "endpoint_snaps": endpoint_snaps,
         "endpoint_to_edge_snaps": endpoint_to_edge_snaps,
         "intersection_split_insertions": intersection_splits,
+        "raw_shape_vertices_removed": raw_shape_simplification["vertices_removed"],
+        "raw_shape_simplification_passes": raw_shape_simplification["passes"],
         "short_edges_before_cleanup": short_edges_before,
         **short_edge_cleanup,
         "post_promotion_short_edge_points_removed": post_promotion_short_edge_cleanup["short_edge_points_removed"],
@@ -1699,6 +2184,8 @@ def repair(
         write_json(decisions_path, decision_doc)
     if casebook_path is not None:
         write_json(casebook_path, casebook_doc)
+    if raw_diagnostics_path is not None:
+        write_json(raw_diagnostics_path, raw_topology_diagnostics)
 
     report = {
         "area_id": area_id,
@@ -1716,10 +2203,14 @@ def repair(
             "review_min_confidence": REVIEW_MIN_CONFIDENCE,
             "high_confidence_promotion_min": HIGH_CONFIDENCE_PROMOTION_MIN,
             "apply_high_confidence": apply_high_confidence,
+            "raw_shape_simplification_enabled": raw_shape_simplification_enabled,
+            "raw_shape_simplify_tolerance_m": RAW_SHAPE_SIMPLIFY_TOLERANCE_M,
+            "raw_shape_simplify_max_turn_deg": RAW_SHAPE_SIMPLIFY_MAX_TURN_DEG,
             "manual_overrides_path": str(manual_overrides_path) if manual_overrides_path else "",
             "repair_candidates_path": str(candidates_path) if candidates_path else "",
             "repair_decisions_path": str(decisions_path) if decisions_path else "",
             "repair_casebook_path": str(casebook_path) if casebook_path else "",
+            "raw_topology_diagnostics_path": str(raw_diagnostics_path) if raw_diagnostics_path else "",
         },
         "counts": base_counts,
         "repair_candidate_artifact": {
@@ -1737,9 +2228,14 @@ def repair(
             "case_count": casebook_doc["case_count"],
             "case_type_counts": casebook_doc["case_type_counts"],
         },
+        "raw_topology_diagnostics_artifact": {
+            "path": str(raw_diagnostics_path) if raw_diagnostics_path else "",
+            "summary": raw_topology_diagnostics["summary"],
+        },
         "endpoint_stats_before": before,
         "endpoint_stats_after_parent_roads": after,
         "endpoint_stats_after_output_edges": output_edge_stats,
+        "raw_shape_simplification": raw_shape_simplification,
         "repair_review_before_promotions": repair_review_before_promotions,
         "repair_review": repair_review,
         "manual_overrides": {
@@ -1762,6 +2258,7 @@ def repair(
             "High-confidence repair candidates are attempted transactionally only when --apply-high-confidence is passed.",
             "Candidate and decision ledgers are written for transactional repair and regression-case workflows.",
             "Casebook entries preserve known false positives and rejected high-confidence repairs as regression fixtures.",
+            "Raw shape vertex simplification removes only ordinary internal shape vertices within a small tolerance; endpoints, junction/shared nodes, bbox boundary points and near-other-road review points are protected.",
         ],
     }
     write_json(report_path, report)
@@ -1777,9 +2274,11 @@ def main() -> int:
     parser.add_argument("--candidates-output", default="", help="Repair candidate ledger JSON.")
     parser.add_argument("--decisions-output", default="", help="Repair decision ledger JSON.")
     parser.add_argument("--casebook-output", default="", help="Repair regression casebook JSON.")
+    parser.add_argument("--raw-diagnostics-output", default="", help="Raw topology diagnostics JSON.")
     parser.add_argument("--manual-overrides", default="", help="Manual topology overrides JSON. Defaults to config/<area_id>.manual_overrides.json when present.")
     parser.add_argument("--no-manual-overrides", action="store_true", help="Do not load config/<area_id>.manual_overrides.json.")
     parser.add_argument("--apply-high-confidence", action="store_true", help="Promote high-confidence review candidates into geometry repairs.")
+    parser.add_argument("--no-raw-shape-simplification", action="store_true", help="Disable conservative internal raw shape vertex simplification.")
     args = parser.parse_args()
 
     root = pipeline_root_from_script(Path(__file__))
@@ -1789,6 +2288,11 @@ def main() -> int:
     candidates_path = Path(args.candidates_output) if args.candidates_output else default_repair_candidates_path(args.area_id)
     decisions_path = Path(args.decisions_output) if args.decisions_output else default_repair_decisions_path(args.area_id)
     casebook_path = Path(args.casebook_output) if args.casebook_output else default_repair_casebook_path(args.area_id)
+    raw_diagnostics_path = (
+        Path(args.raw_diagnostics_output)
+        if args.raw_diagnostics_output
+        else default_raw_topology_diagnostics_path(args.area_id)
+    )
     if args.no_manual_overrides:
         manual_overrides_path = None
     elif args.manual_overrides:
@@ -1804,8 +2308,10 @@ def main() -> int:
         candidates_path=candidates_path,
         decisions_path=decisions_path,
         casebook_path=casebook_path,
+        raw_diagnostics_path=raw_diagnostics_path,
         manual_overrides_path=manual_overrides_path,
         apply_high_confidence=args.apply_high_confidence,
+        raw_shape_simplification_enabled=not args.no_raw_shape_simplification,
     )
     print(json.dumps({
         "area_id": args.area_id,
@@ -1814,6 +2320,7 @@ def main() -> int:
         "repair_candidates": str(candidates_path),
         "repair_decisions": str(decisions_path),
         "repair_casebook": str(casebook_path),
+        "raw_topology_diagnostics": str(raw_diagnostics_path),
         "counts": report["counts"],
         "endpoint_stats_after_output_edges": report["endpoint_stats_after_output_edges"],
     }, ensure_ascii=False, indent=2))

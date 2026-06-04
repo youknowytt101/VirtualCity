@@ -58,8 +58,6 @@
       },
       "case_issue_counts": {
         "compound_junction_merge_trial": 24,
-        "entry_anchor_short_edge_absorption_candidate": 4,
-        "exit_anchor_short_edge_absorption_candidate": 4,
         "inferred_without_turn_lanes": 24,
         "low_confidence_from_lane": 24,
         "low_confidence_to_lane": 24,

@@ -9,7 +9,7 @@
     "endpoint_snaps": 2,
     "endpoint_to_edge_snaps": 0,
     "intersection_split_insertions": 0,
-    "short_edge_points_removed": 15
+    "short_edge_points_removed": 3
   },
   "decision_count": 1,
   "decision_status_counts": {

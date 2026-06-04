@@ -20,8 +20,6 @@
     },
     "case_issue_counts": {
       "compound_junction_merge_trial": 24,
-      "entry_anchor_short_edge_absorption_candidate": 4,
-      "exit_anchor_short_edge_absorption_candidate": 4,
       "inferred_without_turn_lanes": 24,
       "low_confidence_from_lane": 24,
       "low_confidence_to_lane": 24,
@@ -50,11 +48,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0117",
-        "n_0118"
+        "n_0081",
+        "n_0082"
       ],
       "bridge_edge_ids": [
-        "e_0241"
+        "e_0169"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -79,11 +77,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0173",
-        "n_0176"
+        "n_0116",
+        "n_0119"
       ],
       "bridge_edge_ids": [
-        "e_0171"
+        "e_0118"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,
@@ -108,11 +106,11 @@
       "risk": "low",
       "issues": [],
       "member_junction_node_ids": [
-        "n_0187",
-        "n_0191"
+        "n_0129",
+        "n_0133"
       ],
       "bridge_edge_ids": [
-        "e_0173"
+        "e_0120"
       ],
       "generated_compound_cases": 8,
       "expected_affected_anchor_records": 8,

@@ -4,44 +4,44 @@
   "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
   "counts": {
-    "input_features": 243,
-    "nodes": 233,
-    "edges": 243,
+    "input_features": 171,
+    "nodes": 161,
+    "edges": 171,
     "skipped_empty_geometry": 0,
     "zero_length_edges": 0,
     "orphan_edges": 0
   },
   "node_kind_counts": {
     "boundary": 3,
-    "connector": 153,
+    "connector": 81,
     "dead_end": 28,
     "junction": 49
   },
   "node_degree_counts": {
     "1": 31,
-    "2": 153,
+    "2": 81,
     "3": 47,
     "4": 2
   },
   "edge_highway_counts": {
-    "secondary": 93,
-    "service": 82,
-    "residential": 68
+    "service": 63,
+    "secondary": 62,
+    "residential": 46
   },
   "lanes_source_counts": {
-    "default": 90,
-    "tag": 153
+    "default": 65,
+    "tag": 106
   },
   "width_source_counts": {
-    "default": 243
+    "default": 171
   },
   "metrics": {
-    "dead_end_ratio": 0.12,
-    "boundary_ratio": 0.013,
-    "junction_ratio": 0.21,
+    "dead_end_ratio": 0.174,
+    "boundary_ratio": 0.019,
+    "junction_ratio": 0.304,
     "width_fallback_ratio": 1.0,
-    "lanes_fallback_ratio": 0.37,
-    "total_length_m": 8325.826
+    "lanes_fallback_ratio": 0.38,
+    "total_length_m": 8325.879
   },
   "notes": [
     "Road graph is built from repaired simple edges and keeps source OSM tags for traceability.",

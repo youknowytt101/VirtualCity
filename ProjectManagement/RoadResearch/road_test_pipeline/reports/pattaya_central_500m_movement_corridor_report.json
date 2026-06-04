@@ -8,7 +8,7 @@
     "candidate_curves": 918,
     "ready_for_geometry_solver": 0,
     "reference_errors": 0,
-    "skipped_non_junction_lane_links": 306,
+    "skipped_non_junction_lane_links": 162,
     "status_counts": {
       "qa_candidate": 306
     },
@@ -29,27 +29,27 @@
       "temporary_bidirectional_two_lane_policy->temporary_bidirectional_two_lane_policy": 306
     },
     "approach_entry_poses_indexed": 149,
-    "short_edge_absorption_planned_poses_indexed": 19,
+    "short_edge_absorption_planned_poses_indexed": 5,
     "anchor_source_counts": {
-      "engineering_entry_pose_lateral_offset": 536,
-      "junction_zone_expansion_planned_pose_lateral_offset": 76
+      "engineering_entry_pose_lateral_offset": 592,
+      "junction_zone_expansion_planned_pose_lateral_offset": 20
     },
     "anchor_issue_counts": {
       "entry_anchor_entry_trim_capacity_limited": 18,
-      "entry_anchor_short_edge_absorption_candidate": 14,
+      "entry_anchor_short_edge_absorption_candidate": 2,
       "exit_anchor_entry_trim_capacity_limited": 18,
-      "exit_anchor_short_edge_absorption_candidate": 14
+      "exit_anchor_short_edge_absorption_candidate": 2
     },
     "fully_anchored_cases": 306,
-    "planned_virtual_anchors": 76,
-    "planned_virtual_anchor_cases": 72,
+    "planned_virtual_anchors": 20,
+    "planned_virtual_anchor_cases": 20,
     "fallback_anchors": 0,
     "missing_anchor_poses": 0,
     "issue_counts": {
       "entry_anchor_entry_trim_capacity_limited": 18,
-      "entry_anchor_short_edge_absorption_candidate": 14,
+      "entry_anchor_short_edge_absorption_candidate": 2,
       "exit_anchor_entry_trim_capacity_limited": 18,
-      "exit_anchor_short_edge_absorption_candidate": 14,
+      "exit_anchor_short_edge_absorption_candidate": 2,
       "inferred_without_turn_lanes": 306,
       "low_confidence_from_lane": 306,
       "low_confidence_lane_link": 306,
@@ -58,15 +58,15 @@
     },
     "candidate_issue_counts": {
       "entry_anchor_entry_trim_capacity_limited": 54,
-      "entry_anchor_short_edge_absorption_candidate": 42,
+      "entry_anchor_short_edge_absorption_candidate": 6,
       "exit_anchor_entry_trim_capacity_limited": 54,
-      "exit_anchor_short_edge_absorption_candidate": 42,
+      "exit_anchor_short_edge_absorption_candidate": 6,
       "inferred_without_turn_lanes": 918,
       "low_confidence_from_lane": 918,
       "low_confidence_lane_link": 918,
       "low_confidence_to_lane": 918,
       "outgoing_turn_lanes_missing": 918,
-      "radius_proxy_below_lane_min": 81
+      "radius_proxy_below_lane_min": 80
     },
     "publish_ready_cases": 0
   },
@@ -78,7 +78,7 @@
     "avg_anchor_confidence": 0.42,
     "fully_anchored_case_ratio": 1.0,
     "anchor_fallback_ratio": 0.0,
-    "planned_virtual_anchor_ratio": 0.124
+    "planned_virtual_anchor_ratio": 0.033
   },
   "next_action": "Next add collision（碰撞） and swept envelope（扫掠包络） scoring, then promote only transaction-ready（事务就绪） junction-zone expansion（路口影响区扩张） candidates through a replacement transaction（替换事务）.",
   "candidate_selection_contract": "best_candidate_family（最佳候选曲线族） is diagnostic preview（诊断预览） only; do not publish it until collision（碰撞）, swept envelope（扫掠包络） and curvature scoring（曲率评分） exist.",

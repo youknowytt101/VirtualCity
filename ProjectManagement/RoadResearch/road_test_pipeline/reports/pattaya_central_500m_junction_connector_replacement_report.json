@@ -19,12 +19,12 @@
     "candidate_rejections": 0
   },
   "applied_trial_connector_ids": [
-    "n_0076_c_02",
-    "n_0107_c_01",
-    "n_0154_c_01",
-    "n_0166_c_02",
-    "n_0167_c_02",
-    "n_0206_c_01"
+    "n_0072_c_01",
+    "n_0089_c_02",
+    "n_0105_c_01",
+    "n_0112_c_02",
+    "n_0113_c_02",
+    "n_0141_c_01"
   ],
   "rejected_candidates": [],
   "audit_checks": [
@@ -38,8 +38,8 @@
     {
       "check_id": "total_issue_count_no_regression",
       "status": "pass",
-      "before": 78,
-      "after": 78,
+      "before": 75,
+      "after": 75,
       "message": "Replacement must not increase total junction geometry audit issues."
     },
     {
@@ -66,8 +66,8 @@
     {
       "check_id": "radius_below_design_min_no_regression",
       "status": "pass",
-      "before": 78,
-      "after": 78,
+      "before": 75,
+      "after": 75,
       "message": "Replacement must not increase radius_below_design_min."
     },
     {
@@ -80,7 +80,7 @@
   ],
   "baseline_metrics": {
     "junctions_with_connectors": 49,
-    "junctions_with_issues": 42,
+    "junctions_with_issues": 40,
     "connectors": 149,
     "connector_kind_counts": {
       "adjacent_fallback": 8,
@@ -88,22 +88,22 @@
       "t_turn": 94
     },
     "arc_geometry_counts": {
-      "bezier_tangent_fallback": 51,
-      "circular_arc": 56,
+      "bezier_tangent_fallback": 31,
+      "circular_arc": 76,
       "straight_infinite_radius": 42
     },
     "arc_fit_status_counts": {
-      "exact_tangent_arc": 56,
-      "incompatible_tangent_endpoints_bezier_fallback": 51,
+      "exact_tangent_arc": 76,
+      "incompatible_tangent_endpoints_bezier_fallback": 31,
       "near_straight_infinite_radius": 42
     },
     "issue_counts": {
-      "radius_below_design_min": 78
+      "radius_below_design_min": 75
     }
   },
   "trial_metrics": {
     "junctions_with_connectors": 49,
-    "junctions_with_issues": 42,
+    "junctions_with_issues": 40,
     "connectors": 149,
     "connector_kind_counts": {
       "adjacent_fallback": 8,
@@ -111,19 +111,19 @@
       "t_turn": 94
     },
     "arc_geometry_counts": {
-      "bezier_tangent_fallback": 50,
-      "circular_arc": 56,
+      "bezier_tangent_fallback": 30,
+      "circular_arc": 76,
       "param_poly3_hermite": 1,
       "straight_infinite_radius": 42
     },
     "arc_fit_status_counts": {
-      "exact_tangent_arc": 51,
-      "incompatible_tangent_endpoints_bezier_fallback": 50,
+      "exact_tangent_arc": 71,
+      "incompatible_tangent_endpoints_bezier_fallback": 30,
       "near_straight_infinite_radius": 42,
       "solver_v2_transaction_replacement": 6
     },
     "issue_counts": {
-      "radius_below_design_min": 78
+      "radius_below_design_min": 75
     }
   },
   "note": "Accepted replacements are written only when audit metrics do not regress. Rejected/no-op transactions leave optimized centerlines unchanged."
