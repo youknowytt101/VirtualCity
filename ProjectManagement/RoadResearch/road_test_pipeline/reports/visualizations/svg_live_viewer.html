@@ -512,6 +512,34 @@
       font-size: 10.5px;
     }
 
+    .inspector-value.multiline {
+      white-space: pre-wrap;
+    }
+
+    .inspector-section {
+      grid-column: 1 / -1;
+      padding: 8px 12px 6px;
+      border-bottom: 1px solid rgba(213, 220, 229, 0.55);
+      color: var(--accent-strong);
+      background: rgba(233, 246, 244, 0.52);
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .score-ready {
+      color: var(--accent-strong);
+    }
+
+    .score-warn {
+      color: var(--warn);
+    }
+
+    .score-danger {
+      color: var(--danger);
+    }
+
     @media (max-width: 820px) {
       body {
         grid-template-rows: auto 1fr;
@@ -624,6 +652,7 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const svgPath = params.get("svg") || "pattaya_central_500m_lane_graph_topology.svg";
+    const scoringPath = params.get("scoring") || defaultScoringPath(svgPath);
     const intervalParam = Number(params.get("interval"));
 
     const viewport = document.getElementById("viewport");
@@ -661,6 +690,11 @@
       dragOrigin: { x: 0, y: 0, width: 1, height: 1 },
       pollTimer: 0,
       loadInFlight: false,
+      scoringLoadInFlight: false,
+      scoringSignature: "",
+      scoringByCase: new Map(),
+      scoringMeta: null,
+      scoringState: "idle",
       selectedElement: null,
       selectedRef: null
     };
@@ -689,6 +723,16 @@
       movement: "movement（通行动作）",
       family: "family（曲线族）",
       confidence: "confidence（置信度）",
+      bestScore: "best_score（最佳评分）",
+      bestFamily: "best_family（最佳曲线族）",
+      scoreStatus: "score_status（评分状态）",
+      collisionScore: "collision_score（碰撞评分）",
+      sweptEnvelopeScore: "swept_envelope_score（扫掠包络评分）",
+      curvatureScore: "curvature_score（曲率评分）",
+      minRadiusM: "min_radius_m（最小半径）",
+      clearanceM: "clearance_m（净距）",
+      closestLaneId: "closest_lane_id（最近非目标车道）",
+      scoringIssues: "scoring_issues（评分问题）",
       status: "status（状态）",
       direction: "direction（方向）",
       policy: "policy（策略）",
@@ -717,6 +761,12 @@
       "issues",
       "tooltip"
     ];
+
+    function defaultScoringPath(path) {
+      const fileName = String(path || "").split("/").pop() || "";
+      const match = fileName.match(/^(.+)_lane_graph_topology\.svg$/);
+      return match ? `${match[1]}_movement_corridor_scoring_viewer.json` : "";
+    }
 
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
@@ -841,17 +891,116 @@
       inspectorBody.append(labelNode, valueNode);
     }
 
+    function appendInspectorSection(text) {
+      const section = document.createElement("div");
+      section.className = "inspector-section";
+      section.textContent = text;
+      inspectorBody.append(section);
+    }
+
+    function appendMultilineRow(label, value) {
+      if (value === undefined || value === null || value === "") {
+        return;
+      }
+      const labelNode = document.createElement("div");
+      labelNode.className = "inspector-label";
+      labelNode.textContent = label;
+      const valueNode = document.createElement("div");
+      valueNode.className = "inspector-value code multiline";
+      valueNode.textContent = String(value);
+      inspectorBody.append(labelNode, valueNode);
+    }
+
+    function scoreTone(score) {
+      if (score >= 70) {
+        return "score-ready";
+      }
+      if (score >= 35) {
+        return "score-warn";
+      }
+      return "score-danger";
+    }
+
+    function caseIdFromData(data) {
+      const kind = data.vcKind || "";
+      return (
+        data.vcCorridorId ||
+        data.vcCompoundCaseId ||
+        (kind === "movement_corridor" || kind === "compound_corridor" ? data.vcId : "")
+      );
+    }
+
+    function scoringForData(data) {
+      const caseId = caseIdFromData(data);
+      if (!caseId) {
+        return null;
+      }
+      return state.scoringByCase.get(caseId) || null;
+    }
+
+    function formatScore(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number.toFixed(3) : "";
+    }
+
+    function formatIssues(values) {
+      if (!Array.isArray(values) || values.length === 0) {
+        return "";
+      }
+      return values.join("\n");
+    }
+
+    function candidateSummary(caseScore) {
+      const scores = Array.isArray(caseScore?.candidate_scores) ? caseScore.candidate_scores : [];
+      return scores.map((candidate) => (
+        `${candidate.candidate_family}: overall ${formatScore(candidate.overall_score)} · ` +
+        `collision ${formatScore(candidate.collision_score)} · ` +
+        `swept ${formatScore(candidate.swept_envelope_score)} · ` +
+        `curvature ${formatScore(candidate.curvature_score)} · ${candidate.status || ""}`
+      )).join("\n");
+    }
+
+    function appendScoringRows(caseScore) {
+      appendInspectorSection("Scoring（评分）");
+      if (!caseScore) {
+        appendInspectorRow("scoring（评分）", state.scoringState === "ready" ? "no case match（未匹配案例）" : "not loaded（未加载）");
+        return;
+      }
+      const best = caseScore.best_candidate || {};
+      const bestScore = formatScore(caseScore.best_overall_score);
+      appendInspectorRow(FIELD_LABELS.bestScore, bestScore);
+      const lastValue = inspectorBody.lastElementChild;
+      if (lastValue) {
+        lastValue.classList.add(scoreTone(Number(caseScore.best_overall_score)));
+      }
+      appendInspectorRow(FIELD_LABELS.bestFamily, caseScore.best_scored_family);
+      appendInspectorRow(FIELD_LABELS.scoreStatus, caseScore.best_status);
+      appendInspectorRow(FIELD_LABELS.collisionScore, formatScore(best.collision_score));
+      appendInspectorRow(FIELD_LABELS.sweptEnvelopeScore, formatScore(best.swept_envelope_score));
+      appendInspectorRow(FIELD_LABELS.curvatureScore, formatScore(best.curvature_score));
+      appendInspectorRow(FIELD_LABELS.minRadiusM, formatScore(best.min_radius_m));
+      appendInspectorRow(FIELD_LABELS.clearanceM, formatScore(best.min_non_target_lane_clearance_m));
+      appendInspectorRow(FIELD_LABELS.closestLaneId, best.closest_non_target_lane_id);
+      appendMultilineRow(FIELD_LABELS.scoringIssues, formatIssues(best.scoring_issues));
+      appendMultilineRow("candidate_scores（候选评分）", candidateSummary(caseScore));
+    }
+
     function showInspection(element) {
       const data = { ...element.dataset };
       const visibleElement = visibleElementFor(element);
       const kind = data.vcKind || "unknown";
       const typeLabel = KIND_LABELS[kind] || `${kind}（未知类型）`;
+      const caseScore = scoringForData(data);
       data.tooltip = titleText(visibleElement) || titleText(element);
       setSelectedElement(visibleElement);
       state.selectedRef = selectedRefFrom(element);
       inspectorKicker.textContent = typeLabel;
-      inspectorTitle.textContent = data.vcId || data.vcLaneId || data.vcCorridorId || "Selection（选中项）";
+      inspectorTitle.textContent = caseScore
+        ? `${caseIdFromData(data)} · score ${formatScore(caseScore.best_overall_score)}`
+        : data.vcId || data.vcLaneId || data.vcCorridorId || "Selection（选中项）";
       inspectorBody.replaceChildren();
+      appendScoringRows(caseScore);
+      appendInspectorSection("Source Attributes（源数据属性）");
       for (const key of INSPECT_FIELD_ORDER) {
         const datasetKey = `vc${key[0].toUpperCase()}${key.slice(1)}`;
         appendInspectorRow(FIELD_LABELS[key] || key, data[datasetKey] || data[key]);
@@ -1127,9 +1276,9 @@
         if (force || nextSignature !== state.lastSignature) {
           renderSvg(text);
           state.lastSignature = nextSignature;
-          setStatus("ready", `vector viewBox updated ${new Date().toLocaleTimeString()} · ${svgPath}`);
+          setStatus("ready", `vector viewBox updated ${new Date().toLocaleTimeString()} · ${svgPath}${scoringStatusText()}`);
         } else {
-          setStatus("ready", `watching vector SVG ${new Date().toLocaleTimeString()} · ${svgPath}`);
+          setStatus("ready", `watching vector SVG ${new Date().toLocaleTimeString()} · ${svgPath}${scoringStatusText()}`);
         }
       } catch (error) {
         emptyState.classList.add("visible");
@@ -1139,12 +1288,74 @@
       }
     }
 
+    function scoringStatusText() {
+      if (!scoringPath) {
+        return "";
+      }
+      if (state.scoringState === "ready") {
+        return ` · scores ${state.scoringByCase.size}`;
+      }
+      if (state.scoringState === "missing") {
+        return " · no scores";
+      }
+      if (state.scoringState === "error") {
+        return " · score load failed";
+      }
+      return " · scores loading";
+    }
+
+    function applyScoringDocument(data) {
+      const byCase = new Map();
+      for (const item of data.cases || []) {
+        if (item && item.case_id) {
+          byCase.set(String(item.case_id), item);
+        }
+      }
+      state.scoringByCase = byCase;
+      state.scoringMeta = data.metrics || null;
+      state.scoringState = "ready";
+      restoreInspection();
+    }
+
+    async function loadScoring(force = false) {
+      if (!scoringPath || state.scoringLoadInFlight) {
+        return;
+      }
+      state.scoringLoadInFlight = true;
+      try {
+        const response = await fetch(`${scoringPath}?t=${Date.now()}`, { cache: "no-store" });
+        if (response.status === 404) {
+          state.scoringByCase = new Map();
+          state.scoringState = "missing";
+          return;
+        }
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const text = await response.text();
+        const nextSignature = signature(text);
+        if (force || nextSignature !== state.scoringSignature) {
+          applyScoringDocument(JSON.parse(text));
+          state.scoringSignature = nextSignature;
+        } else {
+          state.scoringState = "ready";
+        }
+      } catch (error) {
+        state.scoringState = "error";
+      } finally {
+        state.scoringLoadInFlight = false;
+      }
+    }
+
     function schedulePolling() {
       window.clearInterval(state.pollTimer);
       const interval = clamp(Number(intervalInput.value) || 1500, 500, 60000);
       intervalInput.value = String(interval);
       if (autoRefresh.checked) {
-        state.pollTimer = window.setInterval(() => loadSvg(false), interval);
+        state.pollTimer = window.setInterval(() => {
+          loadSvg(false);
+          loadScoring(false);
+        }, interval);
       }
     }
 
@@ -1270,6 +1481,7 @@
     });
 
     loadSvg(true);
+    loadScoring(true);
     schedulePolling();
   </script>
 </body>

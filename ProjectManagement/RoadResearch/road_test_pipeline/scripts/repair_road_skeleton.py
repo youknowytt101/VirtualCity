@@ -417,6 +417,7 @@ def main() -> int:
     movement_corridor_scoring = processed / f"{args.area_id}_movement_corridor_scoring.json"
     movement_corridor_scoring_report = reports / f"{args.area_id}_movement_corridor_scoring_report.json"
     movement_corridor_scoring_qa = reports / "qa" / f"{args.area_id}_movement_corridor_scoring_qa_report.json"
+    movement_corridor_scoring_viewer = reports / "visualizations" / f"{args.area_id}_movement_corridor_scoring_viewer.json"
     movement_anchor_gap_audit = processed / f"{args.area_id}_movement_anchor_gap_audit.json"
     movement_anchor_gap_audit_report = reports / f"{args.area_id}_movement_anchor_gap_audit_report.json"
     compound_junction_merge_candidates = processed / f"{args.area_id}_compound_junction_merge_candidates.json"
@@ -602,6 +603,7 @@ def main() -> int:
             "movement_corridor_scoring": str(movement_corridor_scoring),
             "movement_corridor_scoring_report": str(movement_corridor_scoring_report),
             "movement_corridor_scoring_qa": str(movement_corridor_scoring_qa),
+            "movement_corridor_scoring_viewer": str(movement_corridor_scoring_viewer),
             "movement_anchor_gap_audit": str(movement_anchor_gap_audit),
             "movement_anchor_gap_audit_report": str(movement_anchor_gap_audit_report),
             "compound_junction_merge_candidates": str(compound_junction_merge_candidates),

@@ -415,6 +415,76 @@ def score_document(
     return scoring_doc, report
 
 
+def compact_candidate_score(candidate: dict[str, Any]) -> dict[str, Any]:
+    metrics = candidate.get("metrics") or {}
+    return {
+        "candidate_family": str(candidate.get("candidate_family") or ""),
+        "status": str(candidate.get("status") or ""),
+        "overall_score": float(candidate.get("overall_score") or 0.0),
+        "collision_score": float(candidate.get("collision_score") or 0.0),
+        "swept_envelope_score": float(candidate.get("swept_envelope_score") or 0.0),
+        "curvature_score": float(candidate.get("curvature_score") or 0.0),
+        "min_radius_m": metrics.get("min_radius_m", 0.0),
+        "radius_threshold_m": metrics.get("radius_threshold_m", 0.0),
+        "min_non_target_lane_clearance_m": metrics.get("min_non_target_lane_clearance_m", 0.0),
+        "closest_non_target_lane_id": str(metrics.get("closest_non_target_lane_id") or ""),
+        "curvature_reversal_count": metrics.get("curvature_reversal_count", 0),
+        "self_intersection": bool(metrics.get("self_intersection", False)),
+        "scoring_issues": [str(issue) for issue in candidate.get("scoring_issues") or []],
+        "issues": [str(issue) for issue in candidate.get("issues") or []],
+    }
+
+
+def build_viewer_document(scoring_doc: dict[str, Any], report: dict[str, Any]) -> dict[str, Any]:
+    cases: list[dict[str, Any]] = []
+    for case in scoring_doc.get("cases", []):
+        compact_scores = [compact_candidate_score(candidate) for candidate in case.get("candidate_scores", [])]
+        best_family = str(case.get("best_scored_family") or "")
+        best_candidate = next(
+            (candidate for candidate in compact_scores if candidate["candidate_family"] == best_family),
+            compact_scores[0] if compact_scores else {},
+        )
+        cases.append({
+            "source_kind": str(case.get("source_kind") or ""),
+            "case_id": str(case.get("case_id") or ""),
+            "movement_kind": str(case.get("movement_kind") or ""),
+            "from_lane_id": str(case.get("from_lane_id") or ""),
+            "to_lane_id": str(case.get("to_lane_id") or ""),
+            "source_status": str(case.get("source_status") or ""),
+            "source_confidence": float(case.get("source_confidence") or 0.0),
+            "source_best_candidate_family": str(case.get("source_best_candidate_family") or ""),
+            "best_scored_family": best_family,
+            "best_overall_score": float(case.get("best_overall_score") or 0.0),
+            "best_status": str(case.get("best_status") or ""),
+            "best_candidate": best_candidate,
+            "candidate_scores": compact_scores,
+            "issues": [str(issue) for issue in case.get("issues") or []],
+        })
+
+    low_score_cases = sorted(cases, key=lambda item: float(item.get("best_overall_score") or 0.0))[:40]
+    return {
+        "type": "movement_corridor_scoring_viewer",
+        "metadata": {
+            **scoring_doc.get("metadata", {}),
+            "schema": "road_test_pipeline.movement_corridor_scoring_viewer.v1",
+            "contract": "viewer_sidecar_for_svg_inspector（SVG 检查器旁路数据）",
+        },
+        "metrics": report.get("metrics", {}),
+        "cases": cases,
+        "low_score_cases": [
+            {
+                "case_id": str(case.get("case_id") or ""),
+                "source_kind": str(case.get("source_kind") or ""),
+                "movement_kind": str(case.get("movement_kind") or ""),
+                "best_overall_score": float(case.get("best_overall_score") or 0.0),
+                "best_scored_family": str(case.get("best_scored_family") or ""),
+                "best_status": str(case.get("best_status") or ""),
+            }
+            for case in low_score_cases
+        ],
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Score movement corridor candidates.")
     parser.add_argument("--area-id", default="pattaya_central_500m")
@@ -423,6 +493,7 @@ def main() -> int:
     parser.add_argument("--compound-transactions", default="")
     parser.add_argument("--output", default="")
     parser.add_argument("--report", default="")
+    parser.add_argument("--viewer-output", default="")
     args = parser.parse_args()
 
     root = pipeline_root_from_script(Path(__file__))
@@ -441,6 +512,11 @@ def main() -> int:
     )
     output_path = Path(args.output) if args.output else processed / f"{args.area_id}_movement_corridor_scoring.json"
     report_path = Path(args.report) if args.report else reports / f"{args.area_id}_movement_corridor_scoring_report.json"
+    viewer_output_path = (
+        Path(args.viewer_output)
+        if args.viewer_output
+        else reports / "visualizations" / f"{args.area_id}_movement_corridor_scoring_viewer.json"
+    )
 
     compound_transactions = read_json(compound_path) if compound_path.exists() else None
     scoring_doc, report = score_document(
@@ -457,9 +533,12 @@ def main() -> int:
     report["outputs"] = {
         "scoring": str(output_path),
         "report": str(report_path),
+        "viewer_scoring": str(viewer_output_path),
     }
+    viewer_doc = build_viewer_document(scoring_doc, report)
     write_json(output_path, scoring_doc)
     write_json(report_path, report)
+    write_json(viewer_output_path, viewer_doc)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 
