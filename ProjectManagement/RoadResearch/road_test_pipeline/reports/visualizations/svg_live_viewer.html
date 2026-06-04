@@ -767,6 +767,325 @@
       color: var(--danger);
     }
 
+    body {
+      grid-template-rows: 56px 1fr;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(220px, auto) auto minmax(220px, 1fr) auto;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.05);
+    }
+
+    .brand {
+      min-width: 0;
+      font-size: 14px;
+    }
+
+    .brand-mark {
+      border-radius: 5px;
+    }
+
+    .divider {
+      display: none;
+    }
+
+    .view-controls {
+      gap: 6px;
+    }
+
+    .view-controls button {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .view-controls button.primary {
+      box-shadow: inset 0 0 0 1px rgba(15, 118, 110, 0.12);
+    }
+
+    .run-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      justify-self: start;
+    }
+
+    .run-controls .toggle,
+    .run-controls .field {
+      height: 34px;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .status {
+      align-self: center;
+      min-width: 0;
+      max-width: 100%;
+      margin-left: 0;
+      justify-self: end;
+      padding: 0 10px;
+      height: 34px;
+      border: 1px solid rgba(213, 220, 229, 0.8);
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .status-text {
+      max-width: min(36vw, 560px);
+    }
+
+    .control-rail {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      bottom: 58px;
+      z-index: 2;
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: auto;
+      pointer-events: none;
+    }
+
+    .control-rail > * {
+      pointer-events: auto;
+    }
+
+    .map-info {
+      position: static;
+      width: auto;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      pointer-events: auto;
+    }
+
+    .map-info-head {
+      padding: 9px 10px 8px;
+    }
+
+    .map-info-meta {
+      padding: 8px 10px 0;
+    }
+
+    .map-info-meta span {
+      height: 22px;
+      border-radius: 5px;
+    }
+
+    .legend-grid {
+      grid-template-columns: 1fr;
+      gap: 5px;
+      padding: 8px 10px 10px;
+    }
+
+    .legend-item {
+      font-size: 11px;
+    }
+
+    .layer-panel {
+      border: 1px solid rgba(213, 220, 229, 0.86);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 12px 30px rgba(35, 48, 67, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px) saturate(1.12);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 10px 8px;
+      border-bottom: 1px solid rgba(213, 220, 229, 0.66);
+      background: rgba(247, 249, 252, 0.78);
+    }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: 750;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+
+    .panel-subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.2;
+    }
+
+    .layer-count {
+      flex: 0 0 auto;
+      height: 22px;
+      padding: 0 7px;
+      border: 1px solid rgba(15, 118, 110, 0.26);
+      border-radius: 999px;
+      background: rgba(233, 246, 244, 0.9);
+      color: var(--accent-strong);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 20px;
+    }
+
+    .layer-presets {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      padding: 10px;
+      border-bottom: 1px solid rgba(213, 220, 229, 0.55);
+    }
+
+    .layer-presets button {
+      width: auto;
+      height: 30px;
+      border-radius: 6px;
+      padding: 0 6px;
+      font-size: 11px;
+      font-weight: 750;
+      background: #fff;
+    }
+
+    .layer-presets button.active,
+    .layer-presets button[aria-pressed="true"] {
+      border-color: rgba(15, 118, 110, 0.56);
+      background: #e9f6f4;
+      color: var(--accent-strong);
+      box-shadow: inset 0 0 0 1px rgba(15, 118, 110, 0.12);
+    }
+
+    .layer-presets button:focus-visible,
+    .layer-toggle:focus-within {
+      outline: 2px solid rgba(15, 118, 110, 0.36);
+      outline-offset: 2px;
+    }
+
+    .layer-toggle-list {
+      display: grid;
+      gap: 6px;
+      padding: 10px;
+    }
+
+    .layer-toggle {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      height: auto;
+      min-height: 36px;
+      padding: 7px 8px;
+      border-radius: 6px;
+      background: rgba(248, 250, 252, 0.82);
+    }
+
+    .layer-toggle input {
+      order: 3;
+    }
+
+    .layer-toggle span:not(.layer-swatch) {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 12px;
+      font-weight: 650;
+      color: #334155;
+    }
+
+    .layer-swatch {
+      width: 24px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.18);
+      background: #94a3b8;
+      flex: 0 0 auto;
+    }
+
+    .swatch-raw {
+      background: #111827;
+    }
+
+    .swatch-repaired {
+      background: repeating-linear-gradient(90deg, #2563eb 0 5px, transparent 5px 8px);
+      border-color: #2563eb;
+    }
+
+    .swatch-canonical {
+      background: #e11d48;
+    }
+
+    .swatch-surface {
+      background: #b7bcc4;
+    }
+
+    .swatch-corner {
+      background: #f59e0b;
+    }
+
+    .map-inspector {
+      width: min(420px, calc(100% - 24px));
+      bottom: 58px;
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .inspector-head {
+      padding: 10px 12px;
+    }
+
+    .inspector-body {
+      grid-template-columns: 124px minmax(0, 1fr);
+      font-size: 11px;
+    }
+
+    .viewport-hud {
+      position: absolute;
+      left: 364px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      pointer-events: none;
+    }
+
+    .hud-item,
+    .scale-readout {
+      position: static;
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+      height: 32px;
+      padding: 0 9px;
+      border: 1px solid rgba(213, 220, 229, 0.86);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--muted);
+      box-shadow: 0 4px 14px rgba(35, 48, 67, 0.08);
+      font: 12px/1.2 "Cascadia Mono", Consolas, monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .hud-item.selection {
+      flex: 1 1 auto;
+      justify-content: flex-end;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: #334155;
+    }
+
     @media (max-width: 820px) {
       body {
         grid-template-rows: auto 1fr;
@@ -790,9 +1109,16 @@
         max-width: 100%;
       }
 
-      .map-info {
+      .control-rail {
         left: 8px;
+        right: 8px;
         top: 8px;
+        bottom: auto;
+        width: auto;
+        max-height: 44%;
+      }
+
+      .map-info {
         width: calc(100% - 16px);
       }
 
@@ -804,9 +1130,15 @@
         left: 8px;
         right: 8px;
         top: auto;
-        bottom: 8px;
+        bottom: 48px;
         width: auto;
-        max-height: 45%;
+        max-height: 44%;
+      }
+
+      .viewport-hud {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
       }
     }
   </style>
@@ -817,42 +1149,23 @@
       <span class="brand-mark" aria-hidden="true"></span>
       <span>LaneForge（道路升级系统）</span>
     </div>
-    <div class="divider" aria-hidden="true"></div>
-    <div class="button-group" aria-label="视图控制">
+    <div class="button-group view-controls" aria-label="视图控制">
       <button id="zoomOutBtn" title="缩小" aria-label="缩小">-</button>
       <button id="zoomInBtn" title="放大" aria-label="放大">+</button>
-      <button id="fitBtn" class="primary" title="适配窗口" aria-label="适配窗口">[]</button>
+      <button id="fitBtn" class="primary" title="适配窗口" aria-label="适配窗口">⌖</button>
       <button id="actualBtn" title="原始比例" aria-label="原始比例">1:1</button>
-      <button id="reloadBtn" title="重新加载" aria-label="重新加载">R</button>
+      <button id="reloadBtn" title="重新加载" aria-label="重新加载">↻</button>
     </div>
-    <label class="toggle" title="Auto refresh（自动刷新）">
-      <input id="autoRefresh" type="checkbox" checked>
-      <span>Auto（自动）</span>
-    </label>
-    <label class="toggle" title="Raw roads（显示原始道路数据线）">
-      <input id="rawRoadsToggle" type="checkbox">
-      <span>Raw（原始）</span>
-    </label>
-    <label class="toggle" title="Repaired roads（显示拓扑修复道路）">
-      <input id="repairedRoadsToggle" type="checkbox">
-      <span>Repaired（修复）</span>
-    </label>
-    <label class="toggle" title="Canonical roads（显示标准道路）">
-      <input id="canonicalRoadsToggle" type="checkbox" checked>
-      <span>Canonical（标准）</span>
-    </label>
-    <label class="toggle" title="Centerline buffer preview（显示车道线向外扩展预览）">
-      <input id="laneSurfacesToggle" type="checkbox">
-      <span>Surfaces（车道面）</span>
-    </label>
-    <label class="toggle" title="Corner candidates（显示转角优化候选）">
-      <input id="cornerCandidatesToggle" type="checkbox" checked>
-      <span>Corners（转角）</span>
-    </label>
-    <label class="field" title="Refresh interval（刷新间隔）">
-      <span>ms（毫秒）</span>
-      <input id="intervalInput" type="number" min="500" step="500" value="1500">
-    </label>
+    <div class="run-controls" aria-label="刷新控制">
+      <label class="toggle" title="Auto refresh（自动刷新）">
+        <input id="autoRefresh" type="checkbox" checked>
+        <span>Auto（自动）</span>
+      </label>
+      <label class="field" title="Refresh interval（刷新间隔）">
+        <span>ms（毫秒）</span>
+        <input id="intervalInput" type="number" min="500" step="500" value="1500">
+      </label>
+    </div>
     <div class="status" aria-live="polite">
       <span id="statusDot" class="status-dot"></span>
       <span id="statusText" class="status-text">loading（加载中）</span>
@@ -860,33 +1173,77 @@
   </header>
   <main id="viewport" class="viewport">
     <div id="mapLayer" class="map-layer"></div>
-    <section class="map-info" aria-label="SVG 图例">
-      <div class="map-info-head">
-        <div class="map-info-title-wrap">
-          <span class="map-info-token" aria-hidden="true"></span>
-          <div id="mapInfoTitle" class="map-info-title">Road lane graph（车道拓扑图）</div>
+    <aside class="control-rail" aria-label="地图控制">
+      <section class="map-info" aria-label="SVG 图例">
+        <div class="map-info-head">
+          <div class="map-info-title-wrap">
+            <span class="map-info-token" aria-hidden="true"></span>
+            <div id="mapInfoTitle" class="map-info-title">Road lane graph（车道拓扑图）</div>
+          </div>
+          <span class="map-info-badge">Vector（矢量）</span>
         </div>
-        <span class="map-info-badge">Vector（矢量）</span>
-      </div>
-      <div id="mapInfoMeta" class="map-info-meta">
-        <span>SVG visual layer（SVG 可视图层）</span>
-        <span>JSON source truth（JSON 数据真值）</span>
-        <span>movement_corridor_anchors（通行走廊锚点）</span>
-      </div>
-      <div class="legend-grid">
-        <div class="legend-item" style="color:#0f766e"><span class="legend-line"></span><span>forward lane（正向车道）</span></div>
-        <div class="legend-item" style="color:#6d28d9"><span class="legend-line"></span><span>backward lane（反向车道）</span></div>
-        <div class="legend-item" style="color:#f97316"><span class="legend-line"></span><span>turn corridor（转向走廊）</span></div>
-        <div class="legend-item" style="color:#0ea5e9"><span class="legend-line"></span><span>through corridor（直行走廊）</span></div>
-        <div class="legend-item" style="color:#334155"><span class="legend-dot"></span><span>entry / exit anchors（入口 / 出口锚点）</span></div>
-        <div class="legend-item" style="color:#000000"><span class="legend-line"></span><span>raw roads（原始道路）</span></div>
-        <div class="legend-item" style="color:#000000"><span class="legend-dot" style="background:#000000;border-color:#ffffff;box-shadow:0 0 0 1px #000000"></span><span>raw vertices（原始全部断点）</span></div>
-        <div class="legend-item" style="color:#ef4444"><span class="legend-dot" style="background:#ef4444;border-color:#ffffff;box-shadow:0 0 0 1px #ef4444"></span><span>topology issues（拓扑问题）</span></div>
-        <div class="legend-item" style="color:#2563eb"><span class="legend-line dashed"></span><span>repaired roads（修复道路）</span></div>
-        <div class="legend-item" style="color:#e11d48"><span class="legend-line"></span><span>canonical roads（标准道路）</span></div>
-        <div class="legend-item" style="color:#8f96a1"><span class="legend-line" style="background:#b7bcc4;height:8px;border:1px solid #8f96a1"></span><span>centerline buffer（车道线扩展）</span></div>
-      </div>
-    </section>
+        <div id="mapInfoMeta" class="map-info-meta">
+          <span>SVG visual layer（SVG 可视图层）</span>
+          <span>JSON source truth（JSON 数据真值）</span>
+          <span>movement_corridor_anchors（通行走廊锚点）</span>
+        </div>
+        <div class="legend-grid">
+          <div class="legend-item" style="color:#0f766e"><span class="legend-line"></span><span>forward lane（正向车道）</span></div>
+          <div class="legend-item" style="color:#6d28d9"><span class="legend-line"></span><span>backward lane（反向车道）</span></div>
+          <div class="legend-item" style="color:#f97316"><span class="legend-line"></span><span>turn corridor（转向走廊）</span></div>
+          <div class="legend-item" style="color:#0ea5e9"><span class="legend-line"></span><span>through corridor（直行走廊）</span></div>
+          <div class="legend-item" style="color:#334155"><span class="legend-dot"></span><span>entry / exit anchors（入口 / 出口锚点）</span></div>
+          <div class="legend-item" style="color:#000000"><span class="legend-line"></span><span>raw roads（原始道路）</span></div>
+          <div class="legend-item" style="color:#000000"><span class="legend-dot" style="background:#000000;border-color:#ffffff;box-shadow:0 0 0 1px #000000"></span><span>raw vertices（原始全部断点）</span></div>
+          <div class="legend-item" style="color:#ef4444"><span class="legend-dot" style="background:#ef4444;border-color:#ffffff;box-shadow:0 0 0 1px #ef4444"></span><span>topology issues（拓扑问题）</span></div>
+          <div class="legend-item" style="color:#2563eb"><span class="legend-line dashed"></span><span>repaired roads（修复道路）</span></div>
+          <div class="legend-item" style="color:#e11d48"><span class="legend-line"></span><span>canonical roads（标准道路）</span></div>
+          <div class="legend-item" style="color:#8f96a1"><span class="legend-line" style="background:#b7bcc4;height:8px;border:1px solid #8f96a1"></span><span>centerline buffer（车道线扩展）</span></div>
+        </div>
+      </section>
+      <section class="layer-panel" aria-label="图层控制">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Layers（图层）</div>
+            <div class="panel-subtitle">LaneForge QA view</div>
+          </div>
+          <span id="layerCount" class="layer-count">0/5</span>
+        </div>
+        <div class="layer-presets" aria-label="图层预设">
+          <button type="button" data-layer-preset="core">Core</button>
+          <button type="button" data-layer-preset="truth">Truth</button>
+          <button type="button" data-layer-preset="surface">Surface</button>
+          <button type="button" data-layer-preset="all">All</button>
+        </div>
+        <div class="layer-toggle-list">
+          <label class="toggle layer-toggle" title="Raw roads（显示原始道路数据线）">
+            <span class="layer-swatch swatch-raw" aria-hidden="true"></span>
+            <span>Raw（原始）</span>
+            <input id="rawRoadsToggle" type="checkbox">
+          </label>
+          <label class="toggle layer-toggle" title="Repaired roads（显示拓扑修复道路）">
+            <span class="layer-swatch swatch-repaired" aria-hidden="true"></span>
+            <span>Repaired（修复）</span>
+            <input id="repairedRoadsToggle" type="checkbox">
+          </label>
+          <label class="toggle layer-toggle" title="Canonical roads（显示标准道路）">
+            <span class="layer-swatch swatch-canonical" aria-hidden="true"></span>
+            <span>Canonical（标准）</span>
+            <input id="canonicalRoadsToggle" type="checkbox" checked>
+          </label>
+          <label class="toggle layer-toggle" title="Centerline buffer preview（显示车道线向外扩展预览）">
+            <span class="layer-swatch swatch-surface" aria-hidden="true"></span>
+            <span>Surfaces（车道面）</span>
+            <input id="laneSurfacesToggle" type="checkbox">
+          </label>
+          <label class="toggle layer-toggle" title="Corner candidates（显示转角优化候选）">
+            <span class="layer-swatch swatch-corner" aria-hidden="true"></span>
+            <span>Corners（转角）</span>
+            <input id="cornerCandidatesToggle" type="checkbox" checked>
+          </label>
+        </div>
+      </section>
+    </aside>
     <section id="mapInspector" class="map-inspector" aria-label="SVG inspection panel（SVG 检查面板）">
       <div class="inspector-head">
         <div class="inspector-title-wrap">
@@ -898,7 +1255,11 @@
       <div id="inspectorBody" class="inspector-body"></div>
     </section>
     <div id="emptyState" class="empty-state">SVG unavailable（SVG 不可用）</div>
-    <div id="scaleReadout" class="scale-readout">100%</div>
+    <div class="viewport-hud" aria-label="视图状态">
+      <div id="scaleReadout" class="scale-readout">100%</div>
+      <div id="coordReadout" class="hud-item">x -- · z --</div>
+      <div id="selectionReadout" class="hud-item selection">No selection（未选中）</div>
+    </div>
   </main>
 
   <script>
@@ -915,6 +1276,9 @@
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
     const scaleReadout = document.getElementById("scaleReadout");
+    const coordReadout = document.getElementById("coordReadout");
+    const selectionReadout = document.getElementById("selectionReadout");
+    const layerCount = document.getElementById("layerCount");
     const intervalInput = document.getElementById("intervalInput");
     const autoRefresh = document.getElementById("autoRefresh");
     const rawRoadsToggle = document.getElementById("rawRoadsToggle");
@@ -922,6 +1286,7 @@
     const canonicalRoadsToggle = document.getElementById("canonicalRoadsToggle");
     const laneSurfacesToggle = document.getElementById("laneSurfacesToggle");
     const cornerCandidatesToggle = document.getElementById("cornerCandidatesToggle");
+    const controlRail = document.querySelector(".control-rail");
     const mapInspector = document.getElementById("mapInspector");
     const inspectorKicker = document.getElementById("inspectorKicker");
     const inspectorTitle = document.getElementById("inspectorTitle");
@@ -1182,6 +1547,37 @@
       "sourceObservationLanesSource"
     );
 
+    const LAYER_PRESETS = {
+      core: {
+        raw: false,
+        repaired: false,
+        canonical: true,
+        surfaces: false,
+        corners: true
+      },
+      truth: {
+        raw: true,
+        repaired: true,
+        canonical: true,
+        surfaces: false,
+        corners: false
+      },
+      surface: {
+        raw: false,
+        repaired: false,
+        canonical: true,
+        surfaces: true,
+        corners: false
+      },
+      all: {
+        raw: true,
+        repaired: true,
+        canonical: true,
+        surfaces: true,
+        corners: true
+      }
+    };
+
     function defaultScoringPath(path) {
       const fileName = String(path || "").split("/").pop() || "";
       const match = fileName.match(/^(.+)_lane_graph_topology\.svg$/);
@@ -1378,6 +1774,58 @@
     function setStatus(kind, text) {
       statusDot.className = `status-dot ${kind}`;
       statusText.textContent = text;
+    }
+
+    function layerToggleControls() {
+      return [
+        rawRoadsToggle,
+        repairedRoadsToggle,
+        canonicalRoadsToggle,
+        laneSurfacesToggle,
+        cornerCandidatesToggle
+      ];
+    }
+
+    function updateLayerCount() {
+      const toggles = layerToggleControls();
+      const available = toggles.filter((toggle) => !toggle.disabled).length;
+      const active = toggles.filter((toggle) => !toggle.disabled && toggle.checked).length;
+      layerCount.textContent = `${active}/${available || toggles.length}`;
+    }
+
+    function currentLayerPresetName() {
+      const current = {
+        raw: rawRoadsToggle.checked,
+        repaired: repairedRoadsToggle.checked,
+        canonical: canonicalRoadsToggle.checked,
+        surfaces: laneSurfacesToggle.checked,
+        corners: cornerCandidatesToggle.checked
+      };
+      for (const [name, preset] of Object.entries(LAYER_PRESETS)) {
+        if (Object.keys(preset).every((key) => preset[key] === current[key])) {
+          return name;
+        }
+      }
+      return "";
+    }
+
+    function updateLayerPresetState() {
+      const activePreset = currentLayerPresetName();
+      document.querySelectorAll("[data-layer-preset]").forEach((button) => {
+        const active = button.dataset.layerPreset === activePreset;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+    }
+
+    function applyLayerPreset(name) {
+      const preset = LAYER_PRESETS[name] || LAYER_PRESETS.core;
+      rawRoadsToggle.checked = preset.raw;
+      repairedRoadsToggle.checked = preset.repaired;
+      canonicalRoadsToggle.checked = preset.canonical;
+      laneSurfacesToggle.checked = preset.surfaces;
+      cornerCandidatesToggle.checked = preset.corners;
+      syncRoadOverlayVisibility();
     }
 
     function cssEscape(value) {
@@ -2216,6 +2664,7 @@
       inspectorTitle.textContent = caseScore
         ? `${caseIdFromData(data)} · score（评分） ${formatScore(caseScore.best_overall_score)}`
         : data.vcId || data.vcLaneId || data.vcCorridorId || "Selection（选中项）";
+      selectionReadout.textContent = inspectorTitle.textContent;
       inspectorBody.replaceChildren();
       appendLaneUpgradePanelV2(data);
       appendCornerOptimizationPanel(data);
@@ -2295,6 +2744,7 @@
       state.selectedRef = null;
       mapInspector.classList.remove("visible");
       inspectorTitle.textContent = "No selection（未选中）";
+      selectionReadout.textContent = "No selection（未选中）";
       inspectorBody.replaceChildren();
     }
 
@@ -2393,6 +2843,15 @@
         py,
         rect
       };
+    }
+
+    function updateCoordReadout(event) {
+      if (!state.hasLoaded || !event) {
+        coordReadout.textContent = "svg x -- · y --";
+        return;
+      }
+      const point = svgPointFromClient(event.clientX, event.clientY);
+      coordReadout.textContent = `svg x ${rounded(point.x)} · y ${rounded(point.y)}`;
     }
 
     function zoomAt(clientX, clientY, factor) {
@@ -2557,6 +3016,8 @@
       setRoadOverlayVisible("canonical_roads", canonicalRoadsToggle, canonicalRoadsToggle.checked);
       setRoadOverlayVisible("centerline_buffer_preview", laneSurfacesToggle, laneSurfacesToggle.checked);
       setRoadOverlayVisible("corner_optimization", cornerCandidatesToggle, cornerCandidatesToggle.checked);
+      updateLayerCount();
+      updateLayerPresetState();
     }
 
     function prepareSvg(svg) {
@@ -2733,6 +3194,7 @@
     });
 
     viewport.addEventListener("pointermove", (event) => {
+      updateCoordReadout(event);
       if (!state.dragging) {
         return;
       }
@@ -2798,9 +3260,15 @@
     });
     viewport.addEventListener("pointercancel", endDrag);
     viewport.addEventListener("lostpointercapture", endDrag);
+    viewport.addEventListener("pointerleave", () => updateCoordReadout(null));
     window.addEventListener("pointerup", endDrag);
     window.addEventListener("blur", () => endDrag());
     viewport.addEventListener("dblclick", (event) => zoomAt(event.clientX, event.clientY, 1.7));
+    if (controlRail) {
+      ["pointerdown", "pointerup", "mousedown", "mouseup", "click", "dblclick", "wheel"].forEach((type) => {
+        controlRail.addEventListener(type, (event) => event.stopPropagation(), { passive: type === "wheel" });
+      });
+    }
     mapInspector.addEventListener("pointerdown", (event) => event.stopPropagation());
     mapInspector.addEventListener("wheel", (event) => event.stopPropagation(), { passive: true });
     inspectorClose.addEventListener("click", clearInspection);
@@ -2820,6 +3288,24 @@
     canonicalRoadsToggle.addEventListener("change", syncRoadOverlayVisibility);
     laneSurfacesToggle.addEventListener("change", syncRoadOverlayVisibility);
     cornerCandidatesToggle.addEventListener("change", syncRoadOverlayVisibility);
+    document.querySelectorAll("[data-layer-preset]").forEach((button) => {
+      button.addEventListener("click", () => applyLayerPreset(button.dataset.layerPreset));
+    });
+    window.addEventListener("keydown", (event) => {
+      if (event.defaultPrevented || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      if (event.key === "Escape") {
+        clearInspection();
+      } else if (event.key === "+" || event.key === "=") {
+        zoomCenter(1.25);
+      } else if (event.key === "-") {
+        zoomCenter(1 / 1.25);
+      } else if (event.key.toLowerCase() === "f") {
+        state.fitPending = true;
+        fitToViewport();
+      }
+    });
     window.addEventListener("resize", () => {
       if (!state.hasLoaded) {
         return;
