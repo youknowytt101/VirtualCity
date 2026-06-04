@@ -650,9 +650,16 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     ))
 
     lane_debug_counts = lane_debug_report.get("counts", {})
+    physical_lane_centerlines = lane_graph.get("physical_lane_centerlines") or []
+    expected_debug_centerlines = len(physical_lane_centerlines) if physical_lane_centerlines else len(lane_graph.get("lanes", []))
+    actual_debug_centerlines = lane_debug_counts.get("debug_centerlines", lane_debug_counts.get("lane_centerlines"))
+    lane_debug_metrics = lane_debug_report.get("metrics", {})
+    expected_debug_centerline_source = "physical_lane_centerlines" if physical_lane_centerlines else "lanes"
     checks.append(make_check(
         "lane_debug_geometry_matches_lane_graph",
         lane_debug_counts.get("lanes") == len(lane_graph.get("lanes", []))
+        and lane_debug_counts.get("physical_lane_centerlines", 0) == len(physical_lane_centerlines)
+        and actual_debug_centerlines == expected_debug_centerlines
         and lane_debug_counts.get("lane_links") == len(lane_links)
         and lane_debug_counts.get("lane_link_curves") == len(lane_links)
         and lane_debug_counts.get("lane_link_ribbons") == len(lane_links)
@@ -660,17 +667,29 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         and lane_debug_counts.get("lane_continuity_curves", 0) == len(continuity_geometry_links)
         and lane_debug_counts.get("lane_continuity_ribbons", 0) == len(continuity_geometry_links)
         and lane_debug_counts.get("skipped_micro_seam_continuity_curve", 0) == len(micro_seam_continuity_links),
-        "Lane debug geometry should expose every lane, every laneLink and every non-micro continuity curve/ribbon.",
+        "Lane debug geometry should expose the final physical centerline contract, every laneLink and every non-micro continuity curve/ribbon.",
         {
             "debug_counts": lane_debug_counts,
             "lane_graph_lanes": len(lane_graph.get("lanes", [])),
+            "lane_graph_physical_lane_centerlines": len(physical_lane_centerlines),
+            "expected_debug_centerlines": expected_debug_centerlines,
+            "actual_debug_centerlines": actual_debug_centerlines,
+            "debug_centerline_source": lane_debug_metrics.get("lane_geometry_debug_centerline_source"),
             "lane_graph_lane_links": len(lane_links),
             "lane_graph_continuity_links": len(continuity_links),
             "lane_graph_micro_seam_continuity_links": len(micro_seam_continuity_links),
             "lane_graph_rendered_continuity_links": len(continuity_geometry_links),
         },
     ))
-    lane_debug_metrics = lane_debug_report.get("metrics", {})
+    checks.append(make_check(
+        "lane_debug_centerline_source_matches_contract",
+        str(lane_debug_metrics.get("lane_geometry_debug_centerline_source") or "") == expected_debug_centerline_source,
+        "Lane debug geometry should declare the same centerline source used by final lane surfaces and packages.",
+        {
+            "expected": expected_debug_centerline_source,
+            "actual": lane_debug_metrics.get("lane_geometry_debug_centerline_source"),
+        },
+    ))
     checks.append(make_check(
         "lane_debug_curves_nonempty",
         int(lane_debug_metrics.get("empty_lane_link_curves", 0)) == 0
@@ -695,6 +714,7 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     ))
 
     lane_surface_counts = lane_surface_report.get("counts", {})
+    expected_lane_surfaces = len(physical_lane_centerlines) if physical_lane_centerlines else len(lane_graph.get("lanes", []))
     junctions_with_lane_links = sum(
         1
         for junction in lane_graph.get("junctions", [])
@@ -705,15 +725,17 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     )
     checks.append(make_check(
         "lane_surface_v1_matches_lane_graph",
-        lane_surface_counts.get("lane_surfaces") == len(lane_graph.get("lanes", []))
+        lane_surface_counts.get("lane_surfaces") == expected_lane_surfaces
         and lane_surface_counts.get("lane_turn_surfaces") == len(lane_links)
         and lane_surface_counts.get("lane_continuity_surfaces", 0) == len(continuity_geometry_links)
         and lane_surface_counts.get("skipped_micro_seam_continuity_surface", 0) == len(micro_seam_continuity_links)
         and lane_surface_counts.get("junction_envelope_surfaces", 0) == junctions_with_lane_links,
-        "Lane surface v1 should generate approach, turn, non-micro continuity and junction envelope surfaces from the lane graph.",
+        "Lane surface v1 should generate physical lane centerline, turn, non-micro continuity and junction envelope surfaces from the lane graph.",
         {
             "surface_counts": lane_surface_counts,
             "lane_graph_lanes": len(lane_graph.get("lanes", [])),
+            "lane_graph_physical_lane_centerlines": len(physical_lane_centerlines),
+            "expected_lane_surfaces": expected_lane_surfaces,
             "lane_graph_lane_links": len(lane_links),
             "lane_graph_continuity_links": len(continuity_links),
             "lane_graph_micro_seam_continuity_links": len(micro_seam_continuity_links),

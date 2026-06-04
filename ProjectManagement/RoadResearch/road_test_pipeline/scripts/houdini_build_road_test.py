@@ -131,17 +131,26 @@ def load_standard_lane_package_stats(standard_lanes_path: Path, standard_junctio
     standard_junctions = read_json(standard_junctions_path)
     standard_surfaces = read_json(standard_surface_path)
     lanes = standard_lanes.get("lanes", [])
-    road_ids = {str(lane.get("road_id") or "") for lane in lanes if lane.get("road_id")}
+    physical_lane_centerlines = standard_lanes.get("physical_lane_centerlines") or []
+    centerline_records = physical_lane_centerlines or lanes
+    road_ids = {
+        str(road_id)
+        for record in centerline_records
+        for road_id in (record.get("road_ids") or [record.get("road_id", "")])
+        if str(road_id)
+    }
     directions: dict[str, int] = {}
-    for lane in lanes:
-        direction = str(lane.get("direction") or "unknown")
+    for record in centerline_records:
+        direction = str(record.get("direction") or "unknown")
         directions[direction] = directions.get(direction, 0) + 1
     return {
-        "feature_count": len(lanes),
-        "highway_counts": {"standard_lane": len(lanes)},
-        "features_with_lanes": len(lanes),
+        "feature_count": len(centerline_records),
+        "highway_counts": {"standard_lane": len(centerline_records)},
+        "features_with_lanes": len(centerline_records),
         "features_with_oneway": 0,
-        "standard_lane_count": len(lanes),
+        "standard_lane_count": len(centerline_records),
+        "standard_lane_segment_count": len(lanes),
+        "physical_lane_centerline_count": len(physical_lane_centerlines),
         "standard_road_count": len(road_ids),
         "standard_junction_count": len(standard_junctions.get("junctions", [])),
         "standard_surface_count": len(standard_surfaces.get("features", [])),
@@ -329,12 +338,15 @@ lane_group = geo.createPrimGroup("standard_lane_centerline")
 with open(STANDARD_LANES_PATH, encoding="utf-8") as f:
     standard_lanes = json.load(f)
 
-for index, lane in enumerate(standard_lanes.get("lanes", [])):
+centerline_records = standard_lanes.get("physical_lane_centerlines") or standard_lanes.get("lanes", [])
+
+for index, lane in enumerate(centerline_records):
     coords = lane.get("centerline_xz") or []
     if len(coords) < 2:
         continue
-    lane_id = str(lane.get("lane_id") or "")
-    road_id = str(lane.get("road_id") or "")
+    lane_id = str(lane.get("centerline_id") or lane.get("lane_id") or "")
+    road_ids = lane.get("road_ids") or [lane.get("road_id", "")]
+    road_id = ",".join(str(value) for value in road_ids if str(value))
     width = float(lane.get("width_m") or 3.2)
 
     poly = geo.createPolygon(is_closed=False)
@@ -958,16 +970,41 @@ def lane_trim_distances(lane_graph, lane_links, continuity_links):
     return trim_by_lane
 
 
-def trimmed_lane_points(lane, trim_by_lane):
-    lane_id = str(lane.get("lane_id") or "")
-    points = as_points(lane.get("centerline_xz") or [])
-    lane_trim = trim_by_lane.get(lane_id, {})
+def centerline_source_lane_ids(record):
+    source_lane_ids = [
+        str(lane_id)
+        for lane_id in (record.get("source_lane_ids") or [])
+        if str(lane_id)
+    ]
+    if source_lane_ids:
+        return source_lane_ids
+    lane_id = str(record.get("lane_id") or "")
+    return [lane_id] if lane_id else []
+
+
+def centerline_trim(record, trim_by_lane):
+    source_lane_ids = centerline_source_lane_ids(record)
+    if not source_lane_ids:
+        return {}
+    start_trim = trim_by_lane.get(source_lane_ids[0], {})
+    end_trim = trim_by_lane.get(source_lane_ids[-1], {})
+    return {
+        "start": float(start_trim.get("start") or 0.0),
+        "end": float(end_trim.get("end") or 0.0),
+        "locked_start": float(start_trim.get("locked_start") or 0.0),
+        "locked_end": float(end_trim.get("locked_end") or 0.0),
+    }
+
+
+def trimmed_centerline_points(record, trim_by_lane):
+    points = as_points(record.get("centerline_xz") or [])
+    trim = centerline_trim(record, trim_by_lane)
     return trim_polyline(
         points,
-        float(lane_trim.get("start") or 0.0),
-        float(lane_trim.get("end") or 0.0),
-        float(lane_trim.get("locked_start") or 0.0),
-        float(lane_trim.get("locked_end") or 0.0),
+        float(trim.get("start") or 0.0),
+        float(trim.get("end") or 0.0),
+        float(trim.get("locked_start") or 0.0),
+        float(trim.get("locked_end") or 0.0),
     )
 
 
@@ -1045,6 +1082,7 @@ else:
     lane_graph = {
         "metadata": standard_lanes.get("metadata") or {},
         "lanes": standard_lanes.get("lanes", []),
+        "physical_lane_centerlines": standard_lanes.get("physical_lane_centerlines", []),
         "continuity_links": standard_lanes.get("continuity_links", []),
         "junctions": standard_junctions.get("junctions", []),
     }
@@ -1053,11 +1091,12 @@ lane_links = lane_link_records(lane_graph)
 continuity_links = [dict(link) for link in lane_graph.get("continuity_links", [])]
 trim_by_lane = lane_trim_distances(lane_graph, lane_links, continuity_links)
 
-for lane in lane_graph.get("lanes", []):
-    points = trimmed_lane_points(lane, trim_by_lane)
-    lane_id = str(lane.get("lane_id") or "")
-    add_line(points, "lane_debug_centerline", lane_id, LANE_LINE_Y, LANE_RIBBON_WIDTH_M, lane_line_group)
-    add_ribbon(points, LANE_RIBBON_WIDTH_M, "lane_debug_ribbon", lane_id, RIBBON_Y, lane_ribbon_group)
+centerline_records = lane_graph.get("physical_lane_centerlines") or lane_graph.get("lanes", [])
+for record in centerline_records:
+    points = trimmed_centerline_points(record, trim_by_lane)
+    debug_id = str(record.get("centerline_id") or record.get("lane_id") or "")
+    add_line(points, "lane_debug_centerline", debug_id, LANE_LINE_Y, LANE_RIBBON_WIDTH_M, lane_line_group)
+    add_ribbon(points, LANE_RIBBON_WIDTH_M, "lane_debug_ribbon", debug_id, RIBBON_Y, lane_ribbon_group)
 
 for junction in lane_graph.get("junctions", []):
     for connection in junction.get("connections", []):
@@ -1072,6 +1111,8 @@ for junction in lane_graph.get("junctions", []):
             add_ribbon(points, LANE_LINK_RIBBON_WIDTH_M, "lane_link_debug_ribbon", lane_link_id, RIBBON_Y + 0.02, link_ribbon_group, turn, from_lane, to_lane, confidence)
 
 for link in lane_graph.get("continuity_links", []):
+    if link.get("micro_seam_absorbed"):
+        continue
     points = as_points(link.get("connecting_curve_xz") or [])
     continuity_link_id = str(link.get("continuity_link_id") or "")
     from_lane = str(link.get("from_lane") or "")

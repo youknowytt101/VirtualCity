@@ -22,3 +22,8 @@ def test_houdini_cooks_are_manifest_driven():
         assert "OUT_lane_surfaces_v1" in text
         assert 'root / "data" / "processed" / f"{area_id}_lane_graph.json"' not in text
         assert 'root / "data" / "preview" / f"{area_id}_lane_surfaces_v1.geojson"' not in text
+        if path == HOUDINI_BUILD:
+            assert "physical_lane_centerlines" in text
+            assert "micro_seam_absorbed" in text
+        else:
+            assert "builder.python_lane_debug_code" in text

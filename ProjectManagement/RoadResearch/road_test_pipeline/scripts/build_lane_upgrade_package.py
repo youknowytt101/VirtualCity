@@ -210,6 +210,7 @@ def build_package(
 
     lane_graph = read_json(lane_graph_path)
     lanes = lane_graph.get("lanes", [])
+    physical_lane_centerlines = lane_graph.get("physical_lane_centerlines", [])
     junctions = lane_graph.get("junctions", [])
     continuity_links = lane_graph.get("continuity_links", [])
     lane_graph_metadata = lane_graph.get("metadata") or {}
@@ -232,8 +233,10 @@ def build_package(
             "source": rel(lane_graph_path, root),
             "lane_geometry_rounding_style": rounding_style,
             "derived_lane_centerline_smoothing": derived_smoothing,
+            "physical_lane_centerlines": lane_graph_metadata.get("physical_lane_centerlines") or {},
         },
         "lanes": lanes,
+        "physical_lane_centerlines": physical_lane_centerlines,
         "continuity_links": continuity_links,
     }
     standard_junctions = {
@@ -317,6 +320,10 @@ def build_package(
         },
         "counts": {
             "lanes": len(lanes),
+            "physical_lane_centerlines": len(physical_lane_centerlines),
+            "physical_lane_group_centerlines": sum(
+                1 for centerline in physical_lane_centerlines if int(centerline.get("member_count") or 0) > 1
+            ),
             "junctions": len(junctions),
             "lane_links": len(lane_links),
             "continuity_links": len(continuity_links),

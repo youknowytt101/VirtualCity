@@ -270,6 +270,210 @@ class TestLaneUpgradeSystem(unittest.TestCase):
         self.assertEqual(report["counts"]["canonical_roads_road_graph_edge_mapped"], 1)
         self.assertEqual(report["counts"]["continuity_links_rendered"], 1)
 
+    def test_svg_exports_centerline_buffer_preview_layer(self):
+        svg, report = export_lane_graph_svg.build_svg(
+            lane_graph={
+                "lanes": [
+                    {
+                        "lane_id": "e0_f_1",
+                        "road_id": "e0",
+                        "direction": "forward",
+                        "width_m": 3.2,
+                        "centerline_xz": [[0.0, 0.0], [10.0, 0.0]],
+                    }
+                ],
+                "lane_links": [],
+                "continuity_links": [],
+            },
+            movement_corridors=None,
+            compound_transactions=None,
+            raw_roads=None,
+            repaired_roads=None,
+            canonical_roads=None,
+            road_graph=None,
+            raw_topology_diagnostics=None,
+            area_id="unit",
+            width_px=600,
+            max_height_px=900,
+            max_lane_links=10,
+            max_raw_roads=10,
+            max_raw_topology_issues=10,
+        )
+
+        self.assertIn('id="centerline-buffer-preview"', svg)
+        self.assertIn('data-vc-layer="centerline_buffer_preview"', svg)
+        self.assertIn('data-vc-buffer-source="lane_centerline"', svg)
+        self.assertIn('fill="#b7bcc4"', svg)
+        self.assertEqual(report["counts"]["centerline_buffer_preview_polygons"], 1)
+
+    def test_svg_centerline_buffer_uses_physical_lane_centerlines(self):
+        svg, report = export_lane_graph_svg.build_svg(
+            lane_graph={
+                "lanes": [
+                    {
+                        "lane_id": "e0_f_1",
+                        "road_id": "e0",
+                        "direction": "forward",
+                        "width_m": 3.2,
+                        "physical_lane_group_id": "plg_unit",
+                        "centerline_xz": [[0.0, 0.0], [10.0, 0.0]],
+                    },
+                    {
+                        "lane_id": "e1_f_1",
+                        "road_id": "e1",
+                        "direction": "forward",
+                        "width_m": 3.2,
+                        "physical_lane_group_id": "plg_unit",
+                        "centerline_xz": [[10.0, 0.0], [20.0, 0.0]],
+                    },
+                ],
+                "physical_lane_centerlines": [
+                    {
+                        "centerline_id": "plg_unit",
+                        "source": "physical_lane_group_centerline_v1",
+                        "source_lane_ids": ["e0_f_1", "e1_f_1"],
+                        "road_ids": ["e0", "e1"],
+                        "direction": "forward",
+                        "width_m": 3.2,
+                        "physical_lane_group_id": "plg_unit",
+                        "centerline_xz": [[0.0, 0.0], [10.0, 0.0], [20.0, 0.0]],
+                    }
+                ],
+                "lane_links": [],
+                "continuity_links": [
+                    {
+                        "continuity_link_id": "n0_through_cl_00_00",
+                        "from_lane": "e0_f_1",
+                        "to_lane": "e1_f_1",
+                        "source": "degree2_connector_through_continuity_v1",
+                        "micro_seam_absorbed": True,
+                        "same_physical_lane_continuity": True,
+                        "physical_lane_group_id": "plg_unit",
+                        "connecting_curve_xz": [[10.0, 0.0], [10.0, 0.0]],
+                    }
+                ],
+            },
+            movement_corridors=None,
+            compound_transactions=None,
+            raw_roads=None,
+            repaired_roads=None,
+            canonical_roads=None,
+            road_graph=None,
+            raw_topology_diagnostics=None,
+            area_id="unit",
+            width_px=600,
+            max_height_px=900,
+            max_lane_links=10,
+            max_raw_roads=10,
+            max_raw_topology_issues=10,
+        )
+
+        self.assertIn('data-vc-buffer-source="physical_lane_group_centerline_v1"', svg)
+        self.assertIn('data-vc-physical-lane-group-id="plg_unit"', svg)
+        self.assertIn('data-vc-physical-lane-group-lanes="e0_f_1, e1_f_1"', svg)
+        self.assertIn('data-vc-kind="physical_lane_centerline"', svg)
+        self.assertEqual(report["counts"]["centerline_buffer_preview_polygons"], 1)
+        self.assertEqual(
+            report["counts"]["centerline_buffer_preview_source_counts"],
+            {"physical_lane_group_centerline_v1": 1},
+        )
+
+    def test_svg_keeps_review_movement_corridors_visible_for_qa(self):
+        movement_corridors = {
+            "cases": [
+                {
+                    "corridor_id": "mc_review",
+                    "from_lane_id": "ln_a",
+                    "to_lane_id": "ln_b",
+                    "movement_kind": "through",
+                    "confidence": 0.42,
+                    "candidates": [
+                        {
+                            "family": "topology_straight_baseline",
+                            "centerline_xz": [[10.0, 0.0], [10.0, 2.0]],
+                            "issues": ["inferred_without_turn_lanes"],
+                        }
+                    ],
+                },
+                {
+                    "corridor_id": "mc_stale",
+                    "from_lane_id": "ln_old_a",
+                    "to_lane_id": "ln_old_b",
+                    "movement_kind": "through",
+                    "confidence": 0.8,
+                    "candidates": [
+                        {
+                            "family": "topology_straight_baseline",
+                            "centerline_xz": [[5.0, 5.0], [7.0, 5.0]],
+                            "issues": [],
+                        }
+                    ],
+                },
+            ],
+        }
+        scoring = {
+            "cases": [
+                {
+                    "case_id": "mc_review",
+                    "best_status": "needs_review",
+                    "best_scored_family": "topology_straight_baseline",
+                },
+                {
+                    "case_id": "mc_stale",
+                    "best_status": "scored_qa_candidate",
+                    "best_scored_family": "topology_straight_baseline",
+                },
+            ],
+        }
+
+        svg, report = export_lane_graph_svg.build_svg(
+            lane_graph={
+                "lanes": [
+                    {
+                        "lane_id": "ln_a",
+                        "road_id": "e_a",
+                        "direction": "forward",
+                        "width_m": 3.2,
+                        "centerline_xz": [[0.0, 0.0], [10.0, 0.0]],
+                    },
+                    {
+                        "lane_id": "ln_b",
+                        "road_id": "e_b",
+                        "direction": "forward",
+                        "width_m": 3.2,
+                        "centerline_xz": [[10.0, 2.0], [20.0, 2.0]],
+                    },
+                ],
+                "lane_links": [],
+                "continuity_links": [],
+            },
+            movement_corridors=movement_corridors,
+            compound_transactions=None,
+            raw_roads=None,
+            repaired_roads=None,
+            canonical_roads=None,
+            road_graph=None,
+            raw_topology_diagnostics=None,
+            area_id="unit",
+            width_px=600,
+            max_height_px=900,
+            max_lane_links=10,
+            max_raw_roads=10,
+            max_raw_topology_issues=10,
+            movement_corridor_scoring=scoring,
+        )
+
+        self.assertIn('data-vc-id="mc_review"', svg)
+        self.assertIn('data-vc-id="mc_stale"', svg)
+        self.assertEqual(report["counts"]["movement_corridors_rendered"], 2)
+        self.assertEqual(report["counts"]["movement_corridors_skipped"], 0)
+        self.assertEqual(report["counts"]["movement_corridor_skip_reason_counts"], {})
+        self.assertEqual(report["counts"]["centerline_buffer_preview_polygons"], 4)
+        self.assertEqual(
+            report["counts"]["centerline_buffer_preview_source_counts"],
+            {"lane_centerline": 2, "movement_corridor_centerline": 2},
+        )
+
     def test_execution_chooses_next_package_version(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

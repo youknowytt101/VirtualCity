@@ -33,7 +33,7 @@ area_id: pattaya_central_500m
 最新标准包：
 
 ```text
-data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0026/
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0028/
 data/lane_upgrade_packages/pattaya_central_500m/latest.json
 ```
 
@@ -45,6 +45,8 @@ qa_gate_status: manual_review_required
 qa_warning_summary: publishable_warn=0, manual_review_required=3, blocker=0
 path_policy: portable_lane_package_paths_v1
 lanes: 200
+physical_lane_centerlines: 186
+physical_lane_group_centerlines: 12
 junctions: 49
 lane_links: 306
 continuity_links: 20
@@ -171,8 +173,13 @@ road_semantics_rule_inputs_v1
 - `derived_lane_centerline_smoothing_v1` 已完成，派生车道中心线平滑不改
   `raw` / `repaired` / `canonical` / `road_graph` 真值。
 - Houdini cook 已改为 manifest-driven，只读最新 LaneForge package。
-- `lane_package_v0026` 已采用 `portable_lane_package_paths_v1`，package JSON
+- `lane_package_v0028` 已采用 `portable_lane_package_paths_v1`，package JSON
   和 latest pointer 不再写入盘符绝对路径。
+- `physical_lane_centerlines_v1` 已成为最终干净连续车道中心线契约；
+  `lanes` 保留 source road-edge lane segment 用于溯源和拓扑证据。
+- `lane_geometry_debug` 和 Houdini `OUT_lane_connections_debug` 已跟随
+  `physical_lane_centerlines`；调试层不再把 200 条 source lanes 误显示为
+  最终车道中心线。
 - `degree2_connector_through_continuity_v1` 已补上近直线 degree-2 connector
   的显式车道连续关系，例如 `e_0082_f_1 -> e_0078_f_1`。
 - `derived_lane_centerline_smoothing_v1` 已覆盖短连接段硬折角，例如
@@ -209,7 +216,7 @@ NEXT_AI_HANDOFF_CURRENT.md
 LANEFORGE_LANE_UPGRADE_SYSTEM.md
 scripts/README.md
 data/lane_upgrade_packages/pattaya_central_500m/latest.json
-data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0026/manifest.json
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0028/manifest.json
 reports/pattaya_central_500m_pipeline_audit_report.json
 reports/pattaya_central_500m_corner_optimization_report.json
 reports/pattaya_central_500m_lane_upgrade_propagation_report.json

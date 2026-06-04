@@ -376,6 +376,24 @@ def surface_widths(record: dict[str, Any]) -> tuple[float, float, float]:
     return width, width_start, width_end
 
 
+def centerline_trim_record(
+    centerline: dict[str, Any],
+    trim_by_lane: dict[str, dict[str, float]],
+) -> dict[str, float]:
+    source_lane_ids = [str(lane_id) for lane_id in centerline.get("source_lane_ids") or [] if str(lane_id)]
+    if not source_lane_ids:
+        lane_id = str(centerline.get("lane_id") or centerline.get("centerline_id") or "")
+        source_lane_ids = [lane_id] if lane_id else []
+    first = trim_by_lane.get(source_lane_ids[0], {}) if source_lane_ids else {}
+    last = trim_by_lane.get(source_lane_ids[-1], {}) if source_lane_ids else {}
+    return {
+        "start": float(first.get("start") or 0.0),
+        "end": float(last.get("end") or 0.0),
+        "locked_start": float(first.get("locked_start") or 0.0),
+        "locked_end": float(last.get("locked_end") or 0.0),
+    }
+
+
 def junction_envelope_feature(junction: dict[str, Any]) -> dict[str, Any] | None:
     links = junction_lane_link_records(junction)
     if not links:
@@ -453,13 +471,16 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
     counts: Counter = Counter()
     area_by_part: Counter = Counter()
 
-    for lane in lane_graph.get("lanes", []):
-        lane_id = str(lane.get("lane_id") or "")
+    centerline_records = lane_graph.get("physical_lane_centerlines") or lane_graph.get("lanes", [])
+    for lane in centerline_records:
+        lane_id = str(lane.get("centerline_id") or lane.get("lane_id") or "")
+        source_lane_ids = [str(value) for value in lane.get("source_lane_ids") or [] if str(value)]
+        road_ids = [str(value) for value in lane.get("road_ids") or [] if str(value)]
         points = as_points(lane.get("centerline_xz") or [])
         if len(points) < 2:
             counts["skipped_short_lane"] += 1
             continue
-        lane_trim = trim_by_lane.get(lane_id, {})
+        lane_trim = centerline_trim_record(lane, trim_by_lane)
         trim_start = float(lane_trim.get("start") or 0.0)
         trim_end = float(lane_trim.get("end") or 0.0)
         trimmed = trim_polyline(
@@ -487,7 +508,10 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
             "properties": {
                 "vc_part": "lane_surface_v1",
                 "lane_id": lane_id,
-                "road_id": lane.get("road_id", ""),
+                "centerline_id": lane_id,
+                "source_lane_ids": source_lane_ids,
+                "physical_lane_group_id": lane.get("physical_lane_group_id", ""),
+                "road_id": ",".join(road_ids) or lane.get("road_id", ""),
                 "direction": lane.get("direction", ""),
                 "width_m": width,
                 "width_start_m": width_start,
@@ -606,6 +630,8 @@ def build_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], di
         area_by_part["lane_continuity_surface_v1"] += area
 
     metrics = {
+        "lane_surface_centerline_source": "physical_lane_centerlines" if lane_graph.get("physical_lane_centerlines") else "lanes",
+        "physical_lane_centerlines": len(lane_graph.get("physical_lane_centerlines") or []),
         "trim_start_lane_count": sum(1 for item in trim_by_lane.values() if item.get("start", 0.0) > 0.0),
         "trim_end_lane_count": sum(1 for item in trim_by_lane.values() if item.get("end", 0.0) > 0.0),
         "junction_trim_m": trim_m,

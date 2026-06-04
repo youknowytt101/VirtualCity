@@ -142,6 +142,52 @@ class TestLaneSurfaceV1(unittest.TestCase):
         self.assertEqual(stats["metrics"]["derived_lane_centerline_smoothed_lanes"], 1)
         self.assertEqual(stats["metrics"]["derived_lane_centerline_inserted_sample_points"], 4)
 
+    def test_lane_surfaces_use_physical_lane_centerlines_when_present(self):
+        lane_graph = {
+            "metadata": {"junction_trim_m": 8.0},
+            "lanes": [
+                {
+                    "lane_id": "e0_f_1",
+                    "road_id": "e0",
+                    "direction": "forward",
+                    "centerline_xz": [[0.0, 0.0], [10.0, 0.0]],
+                },
+                {
+                    "lane_id": "e1_f_1",
+                    "road_id": "e1",
+                    "direction": "forward",
+                    "centerline_xz": [[10.0, 0.0], [20.0, 0.0]],
+                },
+            ],
+            "physical_lane_centerlines": [
+                {
+                    "centerline_id": "plg_unit",
+                    "source": "physical_lane_group_centerline_v1",
+                    "source_lane_ids": ["e0_f_1", "e1_f_1"],
+                    "road_ids": ["e0", "e1"],
+                    "direction": "forward",
+                    "member_count": 2,
+                    "centerline_xz": [[0.0, 0.0], [10.0, 0.0], [20.0, 0.0]],
+                    "width_m": 3.2,
+                    "physical_lane_group_id": "plg_unit",
+                },
+            ],
+            "junctions": [],
+            "continuity_links": [],
+        }
+
+        features, stats = surface_builder.build_features(lane_graph)
+        lane_surfaces = [
+            feature
+            for feature in features
+            if feature["properties"]["vc_part"] == "lane_surface_v1"
+        ]
+
+        self.assertEqual(len(lane_surfaces), 1)
+        self.assertEqual(lane_surfaces[0]["properties"]["lane_id"], "plg_unit")
+        self.assertEqual(lane_surfaces[0]["properties"]["source_lane_ids"], ["e0_f_1", "e1_f_1"])
+        self.assertEqual(stats["metrics"]["lane_surface_centerline_source"], "physical_lane_centerlines")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

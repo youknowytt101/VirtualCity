@@ -1,11 +1,14 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "lane_graph_v1",
-  "input": "data/processed/pattaya_central_500m_road_graph.json",
-  "junction_semantics": "data/processed/pattaya_central_500m_junction_semantics.json",
-  "output": "data/processed/pattaya_central_500m_lane_graph.json",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+  "junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
   "counts": {
     "lanes": 200,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
+    "standalone_physical_lane_centerlines": 174,
     "junctions": 49,
     "approach_lane_records": 149,
     "connections": 306,
@@ -17,6 +20,9 @@
     "optimized_junction_connector_lane_links": 0,
     "optimized_corner_fillet_links": 6,
     "direct_connector_continuity_links": 14,
+    "same_physical_lane_continuity_links": 14,
+    "physical_lane_groups_created": 12,
+    "physical_lane_grouped_lanes": 26,
     "active_lane_upgrades": 4,
     "active_lane_upgrades_applied": 0,
     "active_lane_upgrades_deferred": 4,
@@ -274,18 +280,54 @@
       ]
     }
   },
+  "physical_lane_centerlines": {
+    "policy": "physical_lane_centerlines_v1",
+    "group_policy": "degree2_connector_physical_lane_group_v1",
+    "centerlines": 186,
+    "grouped_centerlines": 12,
+    "standalone_centerlines": 174,
+    "source_lane_segments_grouped": 26
+  },
   "direct_connector_continuity": {
     "policy": "degree2_connector_through_continuity_v1",
     "micro_seam_policy": "degree2_connector_micro_seam_endpoint_snap_v1",
+    "physical_lane_group_policy": "degree2_connector_physical_lane_group_v1",
     "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
     "rounding_curve_family": "straight_infinite_radius",
     "max_turn_deg": 18.0,
     "max_endpoint_gap_m": 2.0,
     "micro_seam_snap_threshold_m": 0.1,
+    "physical_lane_grouping": {
+      "policy": "degree2_connector_physical_lane_group_v1",
+      "max_turn_deg": 5.0,
+      "max_endpoint_gap_m": 0.1,
+      "candidate_links": 14,
+      "links_grouped": 14,
+      "groups_created": 12,
+      "lanes_grouped": 26,
+      "group_ids": [
+        "plg_690e8dfb9028",
+        "plg_7acbe54f0555",
+        "plg_8e8e49c08a2b",
+        "plg_97df9ec02a57",
+        "plg_9823dabcd1b8",
+        "plg_a00107c1cfbb",
+        "plg_acb9c8e18143",
+        "plg_b231181c59e0",
+        "plg_b4c48f3b4a82",
+        "plg_b5cce8ee354a",
+        "plg_cfcfc6215d40",
+        "plg_f8ad26a6693f"
+      ],
+      "skipped": {}
+    },
     "connector_nodes_considered": 7,
     "connector_nodes_linked": 7,
     "links_created": 14,
     "micro_seams_absorbed": 12,
+    "same_physical_lane_links": 14,
+    "physical_lane_groups_created": 12,
+    "physical_lane_grouped_lanes": 26,
     "max_created_endpoint_gap_m": 0.0,
     "max_observed_turn_deg": 2.254,
     "skipped": {
@@ -294,7 +336,7 @@
   },
   "lane_upgrade_system": {
     "system": "LaneForge",
-    "overrides_source": "data/processed/pattaya_central_500m_lane_upgrade_overrides.json",
+    "overrides_source": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_upgrade_overrides.json",
     "geometry_application_policy": "defer_lane_upgrade_overrides_keep_all_roads_bidirectional_two_lane_v1",
     "applied_road_ids": [],
     "deferred_road_ids": [
@@ -394,6 +436,12 @@
       "tangent_circular_arc": 6
     },
     "lane_level_radius_regularized_continuity_links": 1,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
+    "standalone_physical_lane_centerlines": 174,
+    "same_physical_lane_continuity_links": 14,
+    "physical_lane_groups_created": 12,
+    "physical_lane_grouped_lanes": 26,
     "min_optimized_corner_continuity_radius_m": 0.645
   },
   "notes": [
@@ -401,10 +449,12 @@
     "Temporary policy: every source road is generated as bidirectional two-lane geometry, including source one-way roads.",
     "LaneForge lane upgrades can override the generated physical lane count per road through versioned transactions.",
     "Derived lane centerline smoothing only adds low-offset samples to lane_graph/lane_surface outputs; raw/repaired/canonical/road_graph truth layers are unchanged.",
+    "physical_lane_centerlines is the clean continuous lane centerline contract; lanes remain source road-edge lane segments.",
     "Final lane centerline smoothing and continuity links declare unified_lane_geometry_rounding_style_v1 for consistent downstream road styling.",
     "Lane widths use a fixed default width for this replay state.",
     "Junction laneLinks are generated only for allowed semantic movements and stay independent from road-level optimized junction connectors.",
     "Degree-2 road bends are bridged by optimized_corner_fillet continuity links; near-straight degree-2 connectors get direct through continuity links.",
+    "Near-straight degree-2 direct connector links with endpoint gaps inside the micro-seam threshold are annotated as derived physical lane groups without merging road truth layers.",
     "Because the current OSM sample lacks reliable turn restrictions, movement and laneLink confidence is inherited from geometry inference.",
     "No road surface, junction fan polygon or envelope mesh is generated in this layer."
   ]

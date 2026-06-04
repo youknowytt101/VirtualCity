@@ -135,6 +135,14 @@ class TestLaneModelBuilder(unittest.TestCase):
         self.assertEqual(forward["rounding_style_id"], "unified_lane_geometry_rounding_style_v1")
         self.assertEqual(forward["rounding_curve_family"], "straight_infinite_radius")
         self.assertLess(forward["turn_angle_deg"], 18.0)
+        self.assertTrue(forward["same_physical_lane_continuity"])
+        self.assertEqual(
+            forward["physical_lane_group_policy"],
+            "degree2_connector_physical_lane_group_v1",
+        )
+        self.assertEqual(stats["same_physical_lane_links"], 2)
+        self.assertEqual(stats["physical_lane_groups_created"], 2)
+        self.assertEqual(stats["physical_lane_grouped_lanes"], 4)
 
     def test_direct_connector_micro_seam_snaps_lane_endpoints(self):
         graph = {
@@ -172,6 +180,57 @@ class TestLaneModelBuilder(unittest.TestCase):
             lanes_by_id[forward["from_lane"]]["centerline_endpoint_snap_policy"],
             "degree2_connector_micro_seam_endpoint_snap_v1",
         )
+        self.assertTrue(forward["same_physical_lane_continuity"])
+        self.assertEqual(
+            forward["physical_lane_group_policy"],
+            "degree2_connector_physical_lane_group_v1",
+        )
+        self.assertEqual(
+            lanes_by_id[forward["from_lane"]]["physical_lane_group_id"],
+            lanes_by_id[forward["to_lane"]]["physical_lane_group_id"],
+        )
+        self.assertEqual(
+            lanes_by_id[forward["from_lane"]]["physical_lane_group_policy"],
+            "degree2_connector_physical_lane_group_v1",
+        )
+        self.assertEqual(lanes_by_id[forward["from_lane"]]["physical_lane_group_member_count"], 2)
+        self.assertEqual(
+            lanes_by_id[forward["from_lane"]]["physical_lane_group_links"][0]["linked_lane_id"],
+            forward["to_lane"],
+        )
+
+    def test_physical_lane_centerlines_join_micro_seam_segments(self):
+        graph = {
+            "nodes": [
+                {"node_id": "n0", "kind": "dead_end", "degree": 1, "incident_edges": ["e0"]},
+                {"node_id": "c", "kind": "connector", "degree": 2, "incident_edges": ["e0", "e1"]},
+                {"node_id": "n1", "kind": "dead_end", "degree": 1, "incident_edges": ["e1"]},
+            ],
+            "edges": [
+                {"edge_id": "e0", "from_node": "n0", "to_node": "c", "geometry_xz": [[0.0, 0.0], [10.0, 0.0]]},
+                {"edge_id": "e1", "from_node": "c", "to_node": "n1", "geometry_xz": [[10.063, 0.0], [20.063, 0.0]]},
+            ],
+        }
+        lanes = lane_model_builder.build_lanes(graph["edges"])
+        links, _stats = lane_model_builder.build_direct_connector_continuity_links(
+            graph=graph,
+            lanes=lanes,
+            corner_fillets=[],
+        )
+
+        centerlines, stats = lane_model_builder.build_physical_lane_centerlines(lanes, links)
+
+        forward = next(
+            centerline
+            for centerline in centerlines
+            if centerline["source_lane_ids"] == ["e0_f_1", "e1_f_1"]
+        )
+        self.assertEqual(forward["source"], "physical_lane_group_centerline_v1")
+        self.assertEqual(forward["member_count"], 2)
+        self.assertEqual(len(forward["centerline_xz"]), 3)
+        self.assertEqual(forward["centerline_xz"][1], [10.032, 1.6])
+        self.assertEqual(stats["grouped_centerlines"], 2)
+        self.assertEqual(stats["source_lane_segments_grouped"], 4)
 
     def test_direct_connector_continuity_skips_real_corners(self):
         graph = {

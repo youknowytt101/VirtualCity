@@ -8,14 +8,14 @@
     "candidate_scores": 918,
     "reference_errors": 0,
     "scored_candidate_ratio": 1.0,
-    "qa_ready_cases": 0,
-    "qa_ready_case_ratio": 0.0,
-    "collision_risk_candidate_ratio": 1.0,
-    "swept_margin_candidate_ratio": 0.0,
+    "qa_ready_cases": 298,
+    "qa_ready_case_ratio": 0.974,
+    "collision_risk_candidate_ratio": 0.028,
+    "swept_margin_candidate_ratio": 0.021,
     "curvature_risk_candidate_ratio": 0.593,
-    "avg_overall_score": 19.752,
-    "min_overall_score": 4.27,
-    "max_overall_score": 43.507,
+    "avg_overall_score": 87.731,
+    "min_overall_score": 10.5,
+    "max_overall_score": 100.0,
     "candidate_family_counts": {
       "bezier_g1_preview": 306,
       "param_poly3_hermite_proxy": 306,
@@ -27,12 +27,14 @@
       "topology_straight_baseline": 105
     },
     "candidate_status_counts": {
-      "needs_review": 918
+      "needs_review": 25,
+      "scored_qa_candidate": 893
     },
     "scoring_issue_counts": {
-      "collision_risk_non_target_lane_centerline": 918,
+      "collision_risk_non_target_lane_centerline": 26,
       "curvature_radius_below_scoring_min": 544,
-      "curvature_reversal": 172
+      "curvature_reversal": 172,
+      "swept_envelope_margin_low": 19
     },
     "publish_ready_candidates": 0,
     "destructive_writeback_ready": false

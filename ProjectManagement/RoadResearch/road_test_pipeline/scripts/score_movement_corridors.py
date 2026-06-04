@@ -37,6 +37,13 @@ def pipeline_root_from_script(script_path: Path) -> Path:
     return script_path.resolve().parents[1]
 
 
+def rel(path: Path, root: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(root.resolve())).replace("\\", "/")
+    except ValueError:
+        return str(path)
+
+
 def rounded(value: float) -> float:
     return round(float(value), 3)
 
@@ -157,9 +164,16 @@ def lane_index(lane_graph: dict[str, Any]) -> dict[str, dict[str, Any]]:
         lane_id = str(lane.get("lane_id") or "")
         if not lane_id:
             continue
+        edge_id = str(lane.get("edge_id") or lane.get("road_id") or "")
+        direction = str(lane.get("direction") or "")
+        direction_token = {"forward": "f", "backward": "b"}.get(direction, "")
+        aliases = {lane_id}
+        if edge_id and direction_token:
+            aliases.add(f"ln_{edge_id}_{direction_token}_00")
         indexed[lane_id] = {
             "lane_id": lane_id,
-            "edge_id": str(lane.get("edge_id") or ""),
+            "aliases": sorted(aliases),
+            "edge_id": edge_id,
             "road_class": str(lane.get("road_class") or "residential"),
             "width_m": float(lane.get("width_m") or 3.2),
             "centerline_xz": points_xz(lane.get("centerline_xz") or []),
@@ -167,23 +181,32 @@ def lane_index(lane_graph: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return indexed
 
 
+def resolve_lane_id(lane_id: str, lanes_by_id: dict[str, dict[str, Any]]) -> str:
+    if lane_id in lanes_by_id:
+        return lane_id
+    for lane in lanes_by_id.values():
+        if lane_id in set(lane.get("aliases") or []):
+            return str(lane["lane_id"])
+    return lane_id
+
+
 def design_min_radius(case: dict[str, Any], lanes_by_id: dict[str, dict[str, Any]], corridor_width_m: float) -> float:
     if str(case.get("movement_kind") or "") == "through":
         return 0.0
     classes = []
     for lane_id in (str(case.get("from_lane_id") or ""), str(case.get("to_lane_id") or "")):
-        lane = lanes_by_id.get(lane_id)
+        lane = lanes_by_id.get(resolve_lane_id(lane_id, lanes_by_id))
         if lane:
             classes.append(str(lane.get("road_class") or "residential"))
     class_min = max((oc.JUNCTION_TURN_MIN_RADIUS_BY_CLASS.get(value, 6.0) for value in classes), default=6.0)
     return max(class_min, corridor_width_m * 1.5)
 
 
-def excluded_lane_sets(case: dict[str, Any]) -> tuple[set[str], set[str]]:
+def excluded_lane_sets(case: dict[str, Any], lanes_by_id: dict[str, dict[str, Any]]) -> tuple[set[str], set[str]]:
     lane_ids = {
-        str(case.get("from_lane_id") or ""),
-        str(case.get("to_lane_id") or ""),
-        str(case.get("internal_bridge_lane_id") or ""),
+        resolve_lane_id(str(case.get("from_lane_id") or ""), lanes_by_id),
+        resolve_lane_id(str(case.get("to_lane_id") or ""), lanes_by_id),
+        resolve_lane_id(str(case.get("internal_bridge_lane_id") or ""), lanes_by_id),
     }
     edge_ids = {
         str(case.get("from_edge_id") or ""),
@@ -201,7 +224,7 @@ def clearance_to_non_target_lanes(
     case: dict[str, Any],
     lanes_by_id: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    excluded_lanes, excluded_edges = excluded_lane_sets(case)
+    excluded_lanes, excluded_edges = excluded_lane_sets(case, lanes_by_id)
     min_clearance = 999999.0
     closest_lane_id = ""
     lane_checks = 0
@@ -218,7 +241,7 @@ def clearance_to_non_target_lanes(
                 min_clearance = clearance
                 closest_lane_id = lane["lane_id"]
     if min_clearance > 999998.0:
-        min_clearance = 0.0
+        min_clearance = 999999.0
     return {
         "min_non_target_lane_clearance_m": rounded(min_clearance),
         "closest_non_target_lane_id": closest_lane_id,
@@ -515,13 +538,13 @@ def main() -> int:
         compound_transactions=None,
     )
     report["inputs"] = {
-        "lane_graph": str(lane_graph_path),
-        "movement_corridors": str(movement_corridors_path),
+        "lane_graph": rel(lane_graph_path, root),
+        "movement_corridors": rel(movement_corridors_path, root),
     }
     report["outputs"] = {
-        "scoring": str(output_path),
-        "report": str(report_path),
-        "viewer_scoring": str(viewer_output_path),
+        "scoring": rel(output_path, root),
+        "report": rel(report_path, root),
+        "viewer_scoring": rel(viewer_output_path, root),
     }
     viewer_doc = build_viewer_document(scoring_doc, report)
     write_json(output_path, scoring_doc)

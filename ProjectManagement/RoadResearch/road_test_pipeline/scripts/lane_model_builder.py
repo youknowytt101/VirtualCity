@@ -10,6 +10,7 @@ generate junction surfaces; that stays in the later geometry layer.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 from collections import Counter
@@ -59,9 +60,12 @@ LANE_LEVEL_CONTINUITY_MIN_RADIUS_EPSILON_M = 0.15
 LANE_LEVEL_CONTINUITY_MAX_EXTRA_TRIM_M = 8.0
 DIRECT_CONNECTOR_CONTINUITY_POLICY = "degree2_connector_through_continuity_v1"
 DIRECT_CONNECTOR_MICRO_SEAM_POLICY = "degree2_connector_micro_seam_endpoint_snap_v1"
+DIRECT_CONNECTOR_PHYSICAL_LANE_GROUP_POLICY = "degree2_connector_physical_lane_group_v1"
 DIRECT_CONNECTOR_MAX_TURN_DEG = 18.0
 DIRECT_CONNECTOR_MAX_ENDPOINT_GAP_M = 2.0
 DIRECT_CONNECTOR_MICRO_SEAM_SNAP_M = 0.10
+DIRECT_CONNECTOR_PHYSICAL_LANE_MAX_TURN_DEG = 5.0
+DIRECT_CONNECTOR_PHYSICAL_LANE_MAX_ENDPOINT_GAP_M = DIRECT_CONNECTOR_MICRO_SEAM_SNAP_M
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -1932,6 +1936,309 @@ def snap_direct_connector_micro_seam(
     return seam_point
 
 
+def direct_connector_physical_lane_group_candidate(link: dict[str, Any]) -> bool:
+    if str(link.get("source") or "") != DIRECT_CONNECTOR_CONTINUITY_POLICY:
+        return False
+    turn_deg = float(link.get("turn_angle_deg") or 0.0)
+    endpoint_gap_m = float(link.get("endpoint_gap_m") or 0.0)
+    original_endpoint_gap_m = float(link.get("original_endpoint_gap_m") or endpoint_gap_m)
+    return (
+        turn_deg <= DIRECT_CONNECTOR_PHYSICAL_LANE_MAX_TURN_DEG
+        and endpoint_gap_m <= 0.001
+        and original_endpoint_gap_m <= DIRECT_CONNECTOR_PHYSICAL_LANE_MAX_ENDPOINT_GAP_M
+    )
+
+
+def physical_lane_group_id(lane_ids: list[str]) -> str:
+    key = "|".join(sorted(lane_ids))
+    digest = hashlib.sha1(key.encode("utf-8")).hexdigest()[:12]
+    return f"plg_{digest}"
+
+
+def append_physical_lane_group_link(
+    lane: dict[str, Any],
+    *,
+    group_id: str,
+    side: str,
+    node_id: str,
+    linked_lane_id: str,
+    link: dict[str, Any],
+) -> None:
+    records = lane.setdefault("physical_lane_group_links", [])
+    records.append({
+        "policy": DIRECT_CONNECTOR_PHYSICAL_LANE_GROUP_POLICY,
+        "physical_lane_group_id": group_id,
+        "side": side,
+        "node_id": node_id,
+        "linked_lane_id": linked_lane_id,
+        "continuity_link_id": str(link.get("continuity_link_id") or ""),
+        "turn_angle_deg": link.get("turn_angle_deg", 0.0),
+        "endpoint_gap_m": link.get("endpoint_gap_m", 0.0),
+        "original_endpoint_gap_m": link.get("original_endpoint_gap_m", 0.0),
+        "micro_seam_absorbed": bool(link.get("micro_seam_absorbed")),
+    })
+
+
+def annotate_direct_connector_physical_lane_groups(
+    lanes: list[dict[str, Any]],
+    links: list[dict[str, Any]],
+) -> dict[str, Any]:
+    lanes_by_id = {str(lane.get("lane_id") or ""): lane for lane in lanes if lane.get("lane_id")}
+    parent: dict[str, str] = {}
+
+    def find(lane_id: str) -> str:
+        parent.setdefault(lane_id, lane_id)
+        while parent[lane_id] != lane_id:
+            parent[lane_id] = parent[parent[lane_id]]
+            lane_id = parent[lane_id]
+        return lane_id
+
+    def union(a: str, b: str) -> None:
+        root_a = find(a)
+        root_b = find(b)
+        if root_a == root_b:
+            return
+        if root_b < root_a:
+            root_a, root_b = root_b, root_a
+        parent[root_b] = root_a
+
+    candidate_links: list[dict[str, Any]] = []
+    skipped = Counter()
+    for link in links:
+        if not direct_connector_physical_lane_group_candidate(link):
+            skipped["not_same_physical_lane_candidate"] += 1
+            continue
+        from_lane_id = str(link.get("from_lane") or "")
+        to_lane_id = str(link.get("to_lane") or "")
+        if from_lane_id not in lanes_by_id or to_lane_id not in lanes_by_id:
+            skipped["missing_lane_reference"] += 1
+            continue
+        union(from_lane_id, to_lane_id)
+        candidate_links.append(link)
+
+    components: dict[str, list[str]] = {}
+    for lane_id in parent:
+        components.setdefault(find(lane_id), []).append(lane_id)
+    group_by_lane: dict[str, tuple[str, list[str]]] = {}
+    for members in components.values():
+        if len(members) < 2:
+            continue
+        sorted_members = sorted(members)
+        group_id = physical_lane_group_id(sorted_members)
+        for lane_id in sorted_members:
+            group_by_lane[lane_id] = (group_id, sorted_members)
+
+    for lane_id, (group_id, members) in group_by_lane.items():
+        lane = lanes_by_id[lane_id]
+        lane["physical_lane_group_id"] = group_id
+        lane["physical_lane_group_policy"] = DIRECT_CONNECTOR_PHYSICAL_LANE_GROUP_POLICY
+        lane["physical_lane_group_member_count"] = len(members)
+        lane["physical_lane_group_members"] = members
+
+    grouped_links = 0
+    for link in candidate_links:
+        from_lane_id = str(link.get("from_lane") or "")
+        to_lane_id = str(link.get("to_lane") or "")
+        group = group_by_lane.get(from_lane_id)
+        if not group or group != group_by_lane.get(to_lane_id):
+            continue
+        group_id, members = group
+        link["same_physical_lane_continuity"] = True
+        link["physical_lane_group_id"] = group_id
+        link["physical_lane_group_policy"] = DIRECT_CONNECTOR_PHYSICAL_LANE_GROUP_POLICY
+        link["physical_lane_group_member_count"] = len(members)
+        append_physical_lane_group_link(
+            lanes_by_id[from_lane_id],
+            group_id=group_id,
+            side="end",
+            node_id=str(link.get("corner_node_id") or ""),
+            linked_lane_id=to_lane_id,
+            link=link,
+        )
+        append_physical_lane_group_link(
+            lanes_by_id[to_lane_id],
+            group_id=group_id,
+            side="start",
+            node_id=str(link.get("corner_node_id") or ""),
+            linked_lane_id=from_lane_id,
+            link=link,
+        )
+        grouped_links += 1
+
+    group_ids = sorted({group_id for group_id, _members in group_by_lane.values()})
+    return {
+        "policy": DIRECT_CONNECTOR_PHYSICAL_LANE_GROUP_POLICY,
+        "max_turn_deg": DIRECT_CONNECTOR_PHYSICAL_LANE_MAX_TURN_DEG,
+        "max_endpoint_gap_m": DIRECT_CONNECTOR_PHYSICAL_LANE_MAX_ENDPOINT_GAP_M,
+        "candidate_links": len(candidate_links),
+        "links_grouped": grouped_links,
+        "groups_created": len(group_ids),
+        "lanes_grouped": len(group_by_lane),
+        "group_ids": group_ids,
+        "skipped": dict(sorted(skipped.items())),
+    }
+
+
+def physical_lane_group_sequences(
+    lanes: list[dict[str, Any]],
+    continuity_links: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    lanes_by_id = {str(lane.get("lane_id") or ""): lane for lane in lanes if lane.get("lane_id")}
+    group_members: dict[str, set[str]] = {}
+    for lane in lanes:
+        group_id = str(lane.get("physical_lane_group_id") or "")
+        if group_id:
+            group_members.setdefault(group_id, set()).add(str(lane.get("lane_id") or ""))
+
+    next_by_group: dict[str, dict[str, str]] = {}
+    prev_by_group: dict[str, dict[str, str]] = {}
+    link_ids_by_pair: dict[tuple[str, str], str] = {}
+    for link in continuity_links:
+        if not bool(link.get("same_physical_lane_continuity")):
+            continue
+        group_id = str(link.get("physical_lane_group_id") or "")
+        from_lane_id = str(link.get("from_lane") or "")
+        to_lane_id = str(link.get("to_lane") or "")
+        if not group_id or from_lane_id not in lanes_by_id or to_lane_id not in lanes_by_id:
+            continue
+        group_members.setdefault(group_id, set()).update([from_lane_id, to_lane_id])
+        next_by_group.setdefault(group_id, {})[from_lane_id] = to_lane_id
+        prev_by_group.setdefault(group_id, {})[to_lane_id] = from_lane_id
+        link_ids_by_pair[(from_lane_id, to_lane_id)] = str(link.get("continuity_link_id") or "")
+
+    sequences: list[dict[str, Any]] = []
+    for group_id, member_set in sorted(group_members.items()):
+        members = sorted(lane_id for lane_id in member_set if lane_id in lanes_by_id)
+        if len(members) < 2:
+            continue
+        next_by_lane = next_by_group.get(group_id, {})
+        prev_by_lane = prev_by_group.get(group_id, {})
+        starts = sorted(lane_id for lane_id in members if lane_id not in prev_by_lane)
+        starts = starts or members[:1]
+        visited: set[str] = set()
+        for start_lane_id in starts:
+            lane_ids: list[str] = []
+            continuity_link_ids: list[str] = []
+            lane_id = start_lane_id
+            while lane_id and lane_id in member_set and lane_id not in visited:
+                visited.add(lane_id)
+                lane_ids.append(lane_id)
+                next_lane_id = next_by_lane.get(lane_id, "")
+                if next_lane_id:
+                    continuity_link_id = link_ids_by_pair.get((lane_id, next_lane_id), "")
+                    if continuity_link_id:
+                        continuity_link_ids.append(continuity_link_id)
+                lane_id = next_lane_id
+            if len(lane_ids) >= 2:
+                sequences.append({
+                    "group_id": group_id,
+                    "lane_ids": lane_ids,
+                    "continuity_link_ids": continuity_link_ids,
+                    "sequence_status": "ordered_from_continuity_links",
+                })
+        for lane_id in members:
+            if lane_id not in visited:
+                sequences.append({
+                    "group_id": group_id,
+                    "lane_ids": [lane_id],
+                    "continuity_link_ids": [],
+                    "sequence_status": "unlinked_group_member",
+                })
+    return sequences
+
+
+def joined_lane_centerline_points(lane_ids: list[str], lanes_by_id: dict[str, dict[str, Any]]) -> list[list[float]]:
+    points: list[tuple[float, float]] = []
+    for lane_id in lane_ids:
+        lane_points = [
+            (float(point[0]), float(point[1]))
+            for point in (lanes_by_id.get(lane_id) or {}).get("centerline_xz") or []
+            if len(point) >= 2
+        ]
+        if not lane_points:
+            continue
+        if points and distance(points[-1], lane_points[0]) <= 0.01:
+            points.extend(lane_points[1:])
+        else:
+            points.extend(lane_points)
+    return [[round(x, 3), round(z, 3)] for x, z in points]
+
+
+def build_physical_lane_centerlines(
+    lanes: list[dict[str, Any]],
+    continuity_links: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    lanes_by_id = {str(lane.get("lane_id") or ""): lane for lane in lanes if lane.get("lane_id")}
+    centerlines: list[dict[str, Any]] = []
+    grouped_lane_ids: set[str] = set()
+
+    for sequence in physical_lane_group_sequences(lanes, continuity_links):
+        lane_ids = [str(lane_id) for lane_id in sequence.get("lane_ids") or []]
+        if len(lane_ids) < 2:
+            continue
+        points = joined_lane_centerline_points(lane_ids, lanes_by_id)
+        if len(points) < 2:
+            continue
+        source_lanes = [lanes_by_id[lane_id] for lane_id in lane_ids]
+        widths = [float(lane.get("width_m") or DEFAULT_LANE_WIDTH_M) for lane in source_lanes]
+        directions = sorted({str(lane.get("direction") or "") for lane in source_lanes if str(lane.get("direction") or "")})
+        centerlines.append({
+            "centerline_id": str(sequence.get("group_id") or ""),
+            "source": "physical_lane_group_centerline_v1",
+            "source_policy": DIRECT_CONNECTOR_PHYSICAL_LANE_GROUP_POLICY,
+            "physical_lane_group_id": str(sequence.get("group_id") or ""),
+            "physical_lane_group_policy": DIRECT_CONNECTOR_PHYSICAL_LANE_GROUP_POLICY,
+            "source_lane_ids": lane_ids,
+            "continuity_link_ids": list(sequence.get("continuity_link_ids") or []),
+            "road_ids": [str(lane.get("road_id") or "") for lane in source_lanes],
+            "direction": directions[0] if len(directions) == 1 else "mixed",
+            "member_count": len(lane_ids),
+            "centerline_xz": points,
+            "width_m": round(sum(widths) / max(1, len(widths)), 3),
+            "width_source": "source_lane_widths",
+            "sequence_status": str(sequence.get("sequence_status") or ""),
+        })
+        grouped_lane_ids.update(lane_ids)
+
+    for lane in lanes:
+        lane_id = str(lane.get("lane_id") or "")
+        if not lane_id or lane_id in grouped_lane_ids:
+            continue
+        points = [
+            [round(float(point[0]), 3), round(float(point[1]), 3)]
+            for point in lane.get("centerline_xz") or []
+            if len(point) >= 2
+        ]
+        if len(points) < 2:
+            continue
+        centerlines.append({
+            "centerline_id": lane_id,
+            "source": "lane_centerline",
+            "source_policy": "single_lane_segment_passthrough",
+            "physical_lane_group_id": "",
+            "physical_lane_group_policy": "",
+            "source_lane_ids": [lane_id],
+            "continuity_link_ids": [],
+            "road_ids": [str(lane.get("road_id") or "")],
+            "direction": str(lane.get("direction") or ""),
+            "member_count": 1,
+            "centerline_xz": points,
+            "width_m": round(float(lane.get("width_m") or DEFAULT_LANE_WIDTH_M), 3),
+            "width_source": str(lane.get("width_source") or "source_lane_width"),
+            "sequence_status": "single_lane_segment",
+        })
+
+    stats = {
+        "policy": "physical_lane_centerlines_v1",
+        "group_policy": DIRECT_CONNECTOR_PHYSICAL_LANE_GROUP_POLICY,
+        "centerlines": len(centerlines),
+        "grouped_centerlines": sum(1 for centerline in centerlines if centerline["member_count"] > 1),
+        "standalone_centerlines": sum(1 for centerline in centerlines if centerline["member_count"] == 1),
+        "source_lane_segments_grouped": len(grouped_lane_ids),
+    }
+    return centerlines, stats
+
+
 def add_direct_connector_links_for_direction(
     links: list[dict[str, Any]],
     *,
@@ -2082,18 +2389,24 @@ def build_direct_connector_continuity_links(
         for link in added:
             max_endpoint_gap = max(max_endpoint_gap, float(link.get("endpoint_gap_m") or 0.0))
 
+    physical_lane_group_stats = annotate_direct_connector_physical_lane_groups(lanes, links)
     stats = {
         "policy": DIRECT_CONNECTOR_CONTINUITY_POLICY,
         "micro_seam_policy": DIRECT_CONNECTOR_MICRO_SEAM_POLICY,
+        "physical_lane_group_policy": DIRECT_CONNECTOR_PHYSICAL_LANE_GROUP_POLICY,
         "rounding_style_id": UNIFIED_LANE_GEOMETRY_ROUNDING_STYLE_ID,
         "rounding_curve_family": UNIFIED_ROUNDING_STRAIGHT_CURVE_FAMILY,
         "max_turn_deg": DIRECT_CONNECTOR_MAX_TURN_DEG,
         "max_endpoint_gap_m": DIRECT_CONNECTOR_MAX_ENDPOINT_GAP_M,
         "micro_seam_snap_threshold_m": DIRECT_CONNECTOR_MICRO_SEAM_SNAP_M,
+        "physical_lane_grouping": physical_lane_group_stats,
         "connector_nodes_considered": nodes_considered,
         "connector_nodes_linked": len(nodes_linked),
         "links_created": len(links),
         "micro_seams_absorbed": sum(1 for link in links if bool(link.get("micro_seam_absorbed"))),
+        "same_physical_lane_links": physical_lane_group_stats["links_grouped"],
+        "physical_lane_groups_created": physical_lane_group_stats["groups_created"],
+        "physical_lane_grouped_lanes": physical_lane_group_stats["lanes_grouped"],
         "max_created_endpoint_gap_m": round(max_endpoint_gap, 3),
         "max_observed_turn_deg": round(max_turn, 3),
         "skipped": dict(sorted(skipped.items())),
@@ -2261,6 +2574,10 @@ def build_lane_graph(
         corner_fillets=optimized_refs["corner_fillets"],
     )
     continuity_links = corner_continuity_links + direct_connector_links
+    physical_lane_centerlines, physical_lane_centerline_stats = build_physical_lane_centerlines(
+        lanes,
+        continuity_links,
+    )
     junctions, fallback_counts, skipped_counts = build_junctions_from_semantics(
         graph,
         lanes,
@@ -2352,6 +2669,7 @@ def build_lane_graph(
             "lane_upgrade_deferred_road_ids": lane_upgrade_stats["deferred_road_ids"],
             "junction_lane_strategy": "semantic_lane_endpoint_bezier",
             "corner_continuity_strategy": "optimized_corner_fillet_and_direct_degree2_connector_through",
+            "physical_lane_centerlines": physical_lane_centerline_stats,
             "lane_geometry_rounding_style": lane_geometry_rounding_style_config(),
             "direct_connector_continuity": direct_connector_continuity_stats,
             "temporary_lane_policy": TEMPORARY_LANE_POLICY_ID,
@@ -2366,6 +2684,7 @@ def build_lane_graph(
             "design_note": "Semantic-driven junction laneLinks stay separate from degree-2 corner continuity links.",
         },
         "lanes": lanes,
+        "physical_lane_centerlines": physical_lane_centerlines,
         "continuity_links": continuity_links,
         "junctions": junctions,
     }
@@ -2381,6 +2700,9 @@ def build_lane_graph(
         "output": str(output_path),
         "counts": {
             "lanes": len(lanes),
+            "physical_lane_centerlines": len(physical_lane_centerlines),
+            "physical_lane_group_centerlines": physical_lane_centerline_stats["grouped_centerlines"],
+            "standalone_physical_lane_centerlines": physical_lane_centerline_stats["standalone_centerlines"],
             "junctions": total_junctions,
             "approach_lane_records": sum(len(junction["approach_lanes"]) for junction in junctions),
             "connections": connection_count,
@@ -2392,6 +2714,9 @@ def build_lane_graph(
             "optimized_junction_connector_lane_links": 0,
             "optimized_corner_fillet_links": len(corner_continuity_links),
             "direct_connector_continuity_links": len(direct_connector_links),
+            "same_physical_lane_continuity_links": direct_connector_continuity_stats["same_physical_lane_links"],
+            "physical_lane_groups_created": direct_connector_continuity_stats["physical_lane_groups_created"],
+            "physical_lane_grouped_lanes": direct_connector_continuity_stats["physical_lane_grouped_lanes"],
             "active_lane_upgrades": len(lane_upgrade_refs["active_upgrades_by_road"]),
             "active_lane_upgrades_applied": len(lane_upgrade_stats["applied_road_ids"]),
             "active_lane_upgrades_deferred": len(lane_upgrade_stats["deferred_road_ids"]),
@@ -2404,6 +2729,7 @@ def build_lane_graph(
             "fan_fallback_junctions": fan_fallback,
         },
         "derived_lane_centerline_smoothing": derived_smoothing_stats,
+        "physical_lane_centerlines": physical_lane_centerline_stats,
         "direct_connector_continuity": direct_connector_continuity_stats,
         "lane_upgrade_system": {
             "system": LANE_UPGRADE_SYSTEM_ID,
@@ -2462,6 +2788,12 @@ def build_lane_graph(
             "continuity_rounding_style_counts": dict(sorted(continuity_rounding_style_counts.items())),
             "continuity_rounding_curve_family_counts": dict(sorted(continuity_rounding_curve_family_counts.items())),
             "lane_level_radius_regularized_continuity_links": lane_level_radius_regularized_links,
+            "physical_lane_centerlines": len(physical_lane_centerlines),
+            "physical_lane_group_centerlines": physical_lane_centerline_stats["grouped_centerlines"],
+            "standalone_physical_lane_centerlines": physical_lane_centerline_stats["standalone_centerlines"],
+            "same_physical_lane_continuity_links": direct_connector_continuity_stats["same_physical_lane_links"],
+            "physical_lane_groups_created": direct_connector_continuity_stats["physical_lane_groups_created"],
+            "physical_lane_grouped_lanes": direct_connector_continuity_stats["physical_lane_grouped_lanes"],
             "min_optimized_corner_continuity_radius_m": round(min(optimized_corner_continuity_radii), 3) if optimized_corner_continuity_radii else 0.0,
         },
         "notes": [
@@ -2469,10 +2801,12 @@ def build_lane_graph(
             "Temporary policy: every source road is generated as bidirectional two-lane geometry, including source one-way roads.",
             "LaneForge lane upgrades can override the generated physical lane count per road through versioned transactions.",
             "Derived lane centerline smoothing only adds low-offset samples to lane_graph/lane_surface outputs; raw/repaired/canonical/road_graph truth layers are unchanged.",
+            "physical_lane_centerlines is the clean continuous lane centerline contract; lanes remain source road-edge lane segments.",
             "Final lane centerline smoothing and continuity links declare unified_lane_geometry_rounding_style_v1 for consistent downstream road styling.",
             "Lane widths use a fixed default width for this replay state.",
             "Junction laneLinks are generated only for allowed semantic movements and stay independent from road-level optimized junction connectors.",
             "Degree-2 road bends are bridged by optimized_corner_fillet continuity links; near-straight degree-2 connectors get direct through continuity links.",
+            "Near-straight degree-2 direct connector links with endpoint gaps inside the micro-seam threshold are annotated as derived physical lane groups without merging road truth layers.",
             "Because the current OSM sample lacks reliable turn restrictions, movement and laneLink confidence is inherited from geometry inference.",
             "No road surface, junction fan polygon or envelope mesh is generated in this layer.",
         ],

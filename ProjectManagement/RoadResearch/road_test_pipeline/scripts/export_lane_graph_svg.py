@@ -39,8 +39,19 @@ def pipeline_root_from_script(script_path: Path) -> Path:
     return script_path.resolve().parents[1]
 
 
+def rel(path: Path, root: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(root.resolve())).replace("\\", "/")
+    except ValueError:
+        return str(path)
+
+
 def points_from_lanes(lane_graph: dict[str, Any]) -> list[tuple[float, float]]:
     points: list[tuple[float, float]] = []
+    for centerline in lane_graph.get("physical_lane_centerlines") or []:
+        for point in centerline.get("centerline_xz") or []:
+            if len(point) >= 2:
+                points.append((float(point[0]), float(point[1])))
     for lane in lane_graph.get("lanes", []):
         for point in lane.get("centerline_xz") or []:
             if len(point) >= 2:
@@ -308,6 +319,55 @@ def polyline(points: list[list[float]], transform: Any) -> str:
     )
 
 
+def polygon_points(points: list[tuple[float, float]], transform: Any) -> str:
+    return " ".join(
+        f"{transform(float(point[0]), float(point[1]))[0]},{transform(float(point[0]), float(point[1]))[1]}"
+        for point in points
+        if len(point) >= 2
+    )
+
+
+def normalize(vector: tuple[float, float]) -> tuple[float, float]:
+    length = math.sqrt(vector[0] * vector[0] + vector[1] * vector[1])
+    if length <= 1e-9:
+        return 0.0, 0.0
+    return vector[0] / length, vector[1] / length
+
+
+def rotate90(vector: tuple[float, float]) -> tuple[float, float]:
+    return -vector[1], vector[0]
+
+
+def as_xz_points(points: list[list[float]]) -> list[tuple[float, float]]:
+    return [(float(point[0]), float(point[1])) for point in points if len(point) >= 2]
+
+
+def ribbon_polygon(points: list[tuple[float, float]], width_m: float) -> list[tuple[float, float]]:
+    if len(points) < 2:
+        return []
+    left: list[tuple[float, float]] = []
+    right: list[tuple[float, float]] = []
+    half_width = max(0.1, width_m) * 0.5
+    for index, point in enumerate(points):
+        if index == 0:
+            tangent = normalize((points[1][0] - point[0], points[1][1] - point[1]))
+        elif index == len(points) - 1:
+            tangent = normalize((point[0] - points[index - 1][0], point[1] - points[index - 1][1]))
+        else:
+            previous_tangent = normalize((point[0] - points[index - 1][0], point[1] - points[index - 1][1]))
+            next_tangent = normalize((points[index + 1][0] - point[0], points[index + 1][1] - point[1]))
+            tangent = normalize((previous_tangent[0] + next_tangent[0], previous_tangent[1] + next_tangent[1]))
+            if tangent == (0.0, 0.0):
+                tangent = next_tangent
+        normal = rotate90(tangent)
+        left.append((point[0] + normal[0] * half_width, point[1] + normal[1] * half_width))
+        right.append((point[0] - normal[0] * half_width, point[1] - normal[1] * half_width))
+    polygon = left + list(reversed(right))
+    if polygon and polygon[0] != polygon[-1]:
+        polygon.append(polygon[0])
+    return polygon
+
+
 def svg_title(value: str) -> str:
     return f"<title>{html.escape(value)}</title>"
 
@@ -333,10 +393,33 @@ def endpoint(lane: dict[str, Any], side: str) -> tuple[float, float] | None:
     return float(point[0]), float(point[1])
 
 
-def candidate_for_visual(case: dict[str, Any]) -> dict[str, Any] | None:
+def movement_corridor_scoring_index(scoring: dict[str, Any] | None) -> dict[str, dict[str, Any]] | None:
+    if not scoring:
+        return None
+    index: dict[str, dict[str, Any]] = {}
+    for case in scoring.get("cases", []):
+        case_id = str(case.get("case_id") or case.get("corridor_id") or case.get("compound_case_id") or "")
+        if case_id:
+            index[case_id] = case
+    return index
+
+
+def movement_case_id(case: dict[str, Any]) -> str:
+    return str(case.get("corridor_id") or case.get("compound_case_id") or case.get("case_id") or "")
+
+
+def candidate_for_visual(
+    case: dict[str, Any],
+    scoring_case: dict[str, Any] | None = None,
+) -> dict[str, Any] | None:
     candidates = [candidate for candidate in case.get("candidates", []) if isinstance(candidate, dict)]
     if not candidates:
         return None
+    if scoring_case:
+        best_family = str(scoring_case.get("best_scored_family") or "")
+        for candidate in candidates:
+            if str(candidate.get("family") or "") == best_family:
+                return candidate
     movement_kind = str(case.get("movement_kind") or "")
     if movement_kind == "through":
         preferred = ("topology_straight_baseline", "compound_topology_straight_baseline")
@@ -352,6 +435,7 @@ def candidate_for_visual(case: dict[str, Any]) -> dict[str, Any] | None:
 def movement_case_lines(
     *,
     movement_corridors: dict[str, Any],
+    movement_scoring_by_case: dict[str, dict[str, Any]] | None,
     transform: Any,
     max_cases: int,
 ) -> tuple[list[str], list[str], dict[str, Any]]:
@@ -361,11 +445,17 @@ def movement_case_lines(
     source_counts: dict[str, int] = {}
     family_counts: dict[str, int] = {}
     issue_counts: dict[str, int] = {}
+    skip_counts: dict[str, int] = {}
+    scoring_status_counts: dict[str, int] = {}
 
     for case in movement_corridors.get("cases", []):
         if rendered >= max_cases:
             break
-        candidate = candidate_for_visual(case)
+        scoring_case = movement_scoring_by_case.get(movement_case_id(case)) if movement_scoring_by_case else None
+        if scoring_case:
+            status = str(scoring_case.get("best_status") or "unknown")
+            scoring_status_counts[status] = scoring_status_counts.get(status, 0) + 1
+        candidate = candidate_for_visual(case, scoring_case)
         if candidate is None:
             continue
         points = candidate.get("centerline_xz") or []
@@ -444,6 +534,9 @@ def movement_case_lines(
         "anchor_source_counts": dict(sorted(source_counts.items())),
         "visual_candidate_family_counts": dict(sorted(family_counts.items())),
         "visual_candidate_issue_counts": dict(sorted(issue_counts.items())),
+        "movement_corridors_skipped": sum(skip_counts.values()),
+        "movement_corridor_skip_reason_counts": dict(sorted(skip_counts.items())),
+        "movement_corridor_scoring_status_counts": dict(sorted(scoring_status_counts.items())),
     }
     return corridor_lines, anchor_marks, metrics
 
@@ -542,6 +635,10 @@ def continuity_link_lines(
             "micro_seam_absorbed": link.get("micro_seam_absorbed", ""),
             "micro_seam_policy": link.get("micro_seam_policy", ""),
             "original_endpoint_gap_m": link.get("original_endpoint_gap_m", ""),
+            "same_physical_lane_continuity": link.get("same_physical_lane_continuity", ""),
+            "physical_lane_group_id": link.get("physical_lane_group_id", ""),
+            "physical_lane_group_policy": link.get("physical_lane_group_policy", ""),
+            "physical_lane_group_member_count": link.get("physical_lane_group_member_count", ""),
         })
         dash = f' stroke-dasharray="{dasharray}"' if dasharray else ""
         lines.append(
@@ -897,6 +994,161 @@ def corner_candidate_marks(
     }
 
 
+def centerline_buffer_preview_polygons(
+    *,
+    lanes: list[dict[str, Any]],
+    physical_lane_centerlines: list[dict[str, Any]],
+    continuity_links: list[dict[str, Any]],
+    movement_corridors: dict[str, Any] | None,
+    movement_scoring_by_case: dict[str, dict[str, Any]] | None,
+    lane_links: list[dict[str, Any]],
+    lanes_by_id: dict[str, dict[str, Any]],
+    transform: Any,
+    max_links: int,
+) -> tuple[list[str], dict[str, Any]]:
+    polygons: list[str] = []
+    source_counts: dict[str, int] = {}
+    skip_counts: dict[str, int] = {}
+
+    def append_polygon(
+        *,
+        source: str,
+        record_id: str,
+        points: list[tuple[float, float]],
+        width_m: float,
+        lane_id: str = "",
+        from_lane_id: str = "",
+        to_lane_id: str = "",
+        movement: str = "",
+        physical_lane_group_id: str = "",
+        physical_lane_group_lanes: str = "",
+    ) -> None:
+        polygon = ribbon_polygon(points, width_m)
+        if len(polygon) < 4:
+            return
+        source_counts[source] = source_counts.get(source, 0) + 1
+        attrs = svg_attrs({
+            "kind": "centerline_buffer_preview",
+            "layer": "centerline_buffer_preview",
+            "source": source,
+            "id": record_id,
+            "buffer_source": source,
+            "lane_id": lane_id,
+            "from_lane_id": from_lane_id,
+            "to_lane_id": to_lane_id,
+            "movement": movement,
+            "width_m": round(width_m, 3),
+            "physical_lane_group_id": physical_lane_group_id,
+            "physical_lane_group_lanes": physical_lane_group_lanes,
+        })
+        tooltip = (
+            f"centerline_buffer_preview={record_id}; source={source}; width_m={width_m:.3f}; "
+            "policy=centerline_buffer_preview_v1"
+        )
+        polygons.append(
+            f'<polygon {attrs} points="{polygon_points(polygon, transform)}" '
+            'fill="#b7bcc4" fill-opacity="1" stroke="#8f96a1" stroke-width="0.45" '
+            f'stroke-opacity="0.62" pointer-events="none">{svg_title(tooltip)}</polygon>'
+        )
+
+    grouped_lane_ids: set[str] = set()
+    for centerline in physical_lane_centerlines:
+        centerline_id = str(centerline.get("centerline_id") or "")
+        lane_ids = [str(lane_id) for lane_id in centerline.get("source_lane_ids") or []]
+        points = as_xz_points(centerline.get("centerline_xz") or [])
+        append_polygon(
+            source=str(centerline.get("source") or "physical_lane_centerline"),
+            record_id=centerline_id,
+            points=points,
+            width_m=float(centerline.get("width_m") or 3.2),
+            lane_id=", ".join(lane_ids),
+            physical_lane_group_id=str(centerline.get("physical_lane_group_id") or ""),
+            physical_lane_group_lanes=", ".join(lane_ids),
+        )
+        grouped_lane_ids.update(lane_ids)
+
+    for lane in lanes:
+        lane_id = str(lane.get("lane_id") or "")
+        if lane_id in grouped_lane_ids:
+            continue
+        points = as_xz_points(lane.get("centerline_xz") or [])
+        width_m = float(lane.get("width_m") or 3.2)
+        append_polygon(
+            source="lane_centerline",
+            record_id=lane_id,
+            points=points,
+            width_m=width_m,
+            lane_id=lane_id,
+        )
+
+    for link in continuity_links:
+        if bool(link.get("micro_seam_absorbed")):
+            continue
+        link_id = str(link.get("continuity_link_id") or "")
+        points = as_xz_points(link.get("connecting_curve_xz") or [])
+        append_polygon(
+            source="continuity_curve",
+            record_id=link_id,
+            points=points,
+            width_m=float(link.get("width_m") or 3.2),
+            from_lane_id=str(link.get("from_lane") or ""),
+            to_lane_id=str(link.get("to_lane") or ""),
+            movement=str(link.get("turn") or ""),
+        )
+
+    rendered_links = 0
+    if movement_corridors:
+        for case in movement_corridors.get("cases", []):
+            if rendered_links >= max_links:
+                break
+            scoring_case = movement_scoring_by_case.get(movement_case_id(case)) if movement_scoring_by_case else None
+            candidate = candidate_for_visual(case, scoring_case)
+            if candidate is None:
+                continue
+            points = as_xz_points(candidate.get("centerline_xz") or [])
+            append_polygon(
+                source="movement_corridor_centerline",
+                record_id=str(case.get("corridor_id") or ""),
+                points=points,
+                width_m=float(case.get("width_m") or 3.2),
+                from_lane_id=str(case.get("from_lane_id") or ""),
+                to_lane_id=str(case.get("to_lane_id") or ""),
+                movement=str(case.get("movement_kind") or ""),
+            )
+            rendered_links += 1
+    else:
+        for link in lane_links:
+            if rendered_links >= max_links:
+                break
+            if str(link.get("link_kind") or "") != "junction_movement":
+                continue
+            from_lane = lanes_by_id.get(str(link.get("from_lane_id") or ""))
+            to_lane = lanes_by_id.get(str(link.get("to_lane_id") or ""))
+            if not from_lane or not to_lane:
+                continue
+            start = endpoint(from_lane, "end")
+            end = endpoint(to_lane, "start")
+            if not start or not end:
+                continue
+            append_polygon(
+                source="lane_link_endpoint_preview",
+                record_id=str(link.get("link_id") or ""),
+                points=[start, end],
+                width_m=3.2,
+                from_lane_id=str(link.get("from_lane_id") or ""),
+                to_lane_id=str(link.get("to_lane_id") or ""),
+                movement=str(link.get("turn") or ""),
+            )
+            rendered_links += 1
+
+    return polygons, {
+        "centerline_buffer_preview_polygons": len(polygons),
+        "centerline_buffer_preview_source_counts": dict(sorted(source_counts.items())),
+        "centerline_buffer_preview_skipped_movement_corridors": sum(skip_counts.values()),
+        "centerline_buffer_preview_skip_reason_counts": dict(sorted(skip_counts.items())),
+    }
+
+
 def build_svg(
     *,
     lane_graph: dict[str, Any],
@@ -914,11 +1166,13 @@ def build_svg(
     max_raw_roads: int,
     max_raw_topology_issues: int,
     corner_candidates: dict[str, Any] | None = None,
+    movement_corridor_scoring: dict[str, Any] | None = None,
 ) -> tuple[str, dict[str, Any]]:
     lanes = lane_graph.get("lanes", [])
     links = lane_graph.get("lane_links", [])
     continuity_links = lane_graph.get("continuity_links", [])
     lanes_by_id = lane_by_id(lane_graph)
+    movement_scoring_by_case = movement_corridor_scoring_index(movement_corridor_scoring)
     road_graph_edge_by_canonical = road_graph_edge_ids_by_canonical(road_graph)
     all_points = (
         points_from_lanes(lane_graph)
@@ -938,12 +1192,19 @@ def build_svg(
 
     lane_casing_lines: list[str] = []
     lane_lines: list[str] = []
-    for lane in lanes:
+    physical_lane_centerlines = lane_graph.get("physical_lane_centerlines") or []
+    visible_centerlines = physical_lane_centerlines or lanes
+    visible_centerline_source = "lane_graph.physical_lane_centerlines" if physical_lane_centerlines else "lane_graph.lanes"
+    for lane in visible_centerlines:
         points = lane.get("centerline_xz") or []
         if len(points) < 2:
             continue
         direction = str(lane.get("direction") or "")
-        road_id = str(lane.get("road_id") or lane.get("edge_id") or "")
+        source_lane_ids = [str(value) for value in lane.get("source_lane_ids") or [] if str(value)]
+        road_ids = [str(value) for value in lane.get("road_ids") or [] if str(value)]
+        lane_id = str(lane.get("centerline_id") or lane.get("lane_id") or "")
+        road_id = ", ".join(road_ids) or str(lane.get("road_id") or lane.get("edge_id") or "")
+        kind = "physical_lane_centerline" if physical_lane_centerlines else "lane"
         color = "#0f766e" if direction == "forward" else "#6d28d9"
         confidence = float(lane.get("overall_confidence") or 0.0)
         opacity = 0.48 + min(0.40, confidence * 0.42)
@@ -955,18 +1216,25 @@ def build_svg(
             f"{key}:{value}"
             for key, value in sorted((smoothing.get("profile_counts") or {}).items())
         )
+        physical_group_links = ", ".join(
+            f"{record.get('linked_lane_id', '')}@{record.get('node_id', '')}"
+            for record in lane.get("physical_lane_group_links") or []
+        )
         tooltip = (
-            f"lane={lane.get('lane_id', '')}; road={road_id}; "
+            f"lane={lane_id}; road={road_id}; "
             f"direction={direction}; confidence={confidence:.3f}; "
             f"policy={lane.get('traffic_direction_policy', '')}; "
             f"upgrade={lane.get('lane_upgrade_id', '')}; target={lane.get('lane_upgrade_target_physical_lane_count', '')}; "
+            f"physical_group={lane.get('physical_lane_group_id', '')}; "
             f"smoothing={lane.get('centerline_derivation_policy', '')}; style={smoothing.get('rounding_style_id', '')}"
         )
         attrs = svg_attrs({
-            "kind": "lane",
-            "source": "lane_graph.json",
-            "id": lane.get("lane_id", ""),
-            "lane_id": lane.get("lane_id", ""),
+            "kind": kind,
+            "source": visible_centerline_source,
+            "id": lane_id,
+            "lane_id": lane_id,
+            "centerline_id": lane.get("centerline_id", ""),
+            "source_lane_ids": ", ".join(source_lane_ids),
             "road_id": road_id,
             "edge_id": road_id,
             "direction": direction,
@@ -978,6 +1246,11 @@ def build_svg(
             "lane_upgrade_distribution_policy": lane.get("lane_upgrade_distribution_policy", ""),
             "lane_source": lane.get("source", ""),
             "physical_lane_shared": lane.get("physical_lane_shared", ""),
+            "physical_lane_group_id": lane.get("physical_lane_group_id", ""),
+            "physical_lane_group_policy": lane.get("physical_lane_group_policy", ""),
+            "physical_lane_group_member_count": lane.get("physical_lane_group_member_count", ""),
+            "physical_lane_group_links": physical_group_links,
+            "physical_lane_group_lanes": ", ".join(source_lane_ids),
             "road_width_m": lane.get("road_width_m", ""),
             "centerline_derivation_policy": lane.get("centerline_derivation_policy", ""),
             "centerline_derived_from": lane.get("centerline_derived_from", ""),
@@ -1008,6 +1281,7 @@ def build_svg(
     if movement_corridors:
         link_lines, anchor_marks, movement_metrics = movement_case_lines(
             movement_corridors=movement_corridors,
+            movement_scoring_by_case=movement_scoring_by_case,
             transform=transform,
             max_cases=max_lane_links,
         )
@@ -1027,6 +1301,9 @@ def build_svg(
             "anchor_source_counts": {},
             "visual_candidate_family_counts": {},
             "visual_candidate_issue_counts": {},
+            "movement_corridors_skipped": 0,
+            "movement_corridor_skip_reason_counts": {},
+            "movement_corridor_scoring_status_counts": {},
         }
         link_source = "lane_graph_endpoint_preview"
 
@@ -1074,6 +1351,18 @@ def build_svg(
             "corner_candidate_risk_counts": {},
             "corner_candidate_status_counts": {},
         }
+
+    centerline_buffer_polygons, centerline_buffer_metrics = centerline_buffer_preview_polygons(
+        lanes=lanes,
+        physical_lane_centerlines=physical_lane_centerlines,
+        continuity_links=continuity_links,
+        movement_corridors=movement_corridors,
+        movement_scoring_by_case=movement_scoring_by_case,
+        lane_links=links,
+        lanes_by_id=lanes_by_id,
+        transform=transform,
+        max_links=max_lane_links,
+    )
 
     title = html.escape(f"{area_id} lane graph (车道拓扑图) visualization")
     if repaired_roads:
@@ -1161,6 +1450,9 @@ def build_svg(
         '<g id="movement-anchors">',
         *anchor_marks,
         '</g>',
+        '<g id="centerline-buffer-preview" data-vc-layer="centerline_buffer_preview" style="display:none">',
+        *centerline_buffer_polygons,
+        '</g>',
         '<g id="legend" font-family="Arial, sans-serif" font-size="12" fill="#334155">',
         '<rect x="24" y="64" width="360" height="258" fill="#ffffff" stroke="#cbd5e1" />',
         '<line x1="40" y1="86" x2="84" y2="86" stroke="#0f766e" stroke-width="2" /><text x="94" y="90">forward lane（正向车道）</text>',
@@ -1169,6 +1461,7 @@ def build_svg(
         '<line x1="40" y1="146" x2="84" y2="146" stroke="#f97316" stroke-width="2" /><text x="94" y="150">turn corridor preview（转向走廊预览）</text>',
         '<line x1="40" y1="166" x2="84" y2="166" stroke="#0ea5e9" stroke-width="2" /><text x="94" y="170">through corridor preview（直行走廊预览）</text>',
         '<circle cx="47" cy="185" r="3" fill="#22c55e" stroke="#111827" stroke-width="0.5" /><text x="94" y="189">entry / exit anchors（入口 / 出口锚点）</text>',
+        '<rect x="40" y="202" width="44" height="10" fill="#b7bcc4" fill-opacity="1" stroke="#8f96a1" stroke-width="0.5" /><text x="94" y="212">centerline buffer preview（车道线扩展预览）</text>',
         '<line x1="40" y1="226" x2="84" y2="226" stroke="#000000" stroke-width="1" /><text x="94" y="230">raw road data（原始道路数据）</text>',
         '<circle cx="47" cy="246" r="3" fill="#000000" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="250">raw vertices（原始全部断点）</text>',
         '<circle cx="47" cy="262" r="3" fill="#ef4444" stroke="#ffffff" stroke-width="0.7" /><text x="94" y="266">topology issue（拓扑问题）</text>',
@@ -1183,6 +1476,8 @@ def build_svg(
         "status": "pass",
         "counts": {
             "lanes": len(lanes),
+            "physical_lane_centerlines": len(physical_lane_centerlines),
+            "visible_lane_centerlines": len(visible_centerlines),
             "lane_links_total": len(links),
             "continuity_links_total": len(continuity_links),
             "junction_connections_rendered": rendered_links,
@@ -1193,6 +1488,7 @@ def build_svg(
             **corner_metrics,
             **repaired_metrics,
             **canonical_metrics,
+            **centerline_buffer_metrics,
         },
         "style": {
             "svg_width_px": svg_w,
@@ -1208,6 +1504,8 @@ def build_svg(
             "raw_topology_issue_overlay": "enabled_when_diagnostics_exist（诊断存在时启用）" if raw_topology_diagnostics else "missing（缺失）",
             "repaired_roads_overlay": "blue_dashed_hidden_by_default" if repaired_roads else "missing",
             "canonical_roads_overlay": "rose_solid_hidden_by_default" if canonical_roads else "missing",
+            "centerline_buffer_preview_overlay": "uniform_gray_hidden_by_default",
+            "movement_corridor_preview_gate": "qa_visible_not_publish_gate",
         },
         "link_source": link_source,
         "note": (
@@ -1224,6 +1522,7 @@ def main() -> int:
     parser.add_argument("--area-id", default="pattaya_central_500m")
     parser.add_argument("--lane-graph", default="")
     parser.add_argument("--movement-corridors", default="", help="Optional movement_corridor_candidates.json. Defaults to processed/<area_id> file if present.")
+    parser.add_argument("--movement-corridor-scoring", default="", help="Optional movement_corridor_scoring.json used to gate corridor preview rendering.")
     parser.add_argument("--compound-transactions", default="", help="Deprecated no-op; compound corridor overlay is no longer rendered.")
     parser.add_argument("--raw-roads", default="", help="Optional roads_raw.geojson overlay. Defaults to processed/<area_id> file if present.")
     parser.add_argument("--repaired-roads", default="", help="Optional roads_repaired.geojson overlay. Defaults to processed/<area_id> file if present.")
@@ -1232,6 +1531,7 @@ def main() -> int:
     parser.add_argument("--raw-topology-diagnostics", default="", help="Optional raw_topology_diagnostics.json issue overlay.")
     parser.add_argument("--corner-candidates", default="", help="Optional corner_optimization_candidates.json overlay.")
     parser.add_argument("--no-movement-corridors", action="store_true", help="Do not auto-load movement corridor overlay.")
+    parser.add_argument("--no-movement-corridor-scoring", action="store_true", help="Do not auto-load movement corridor scoring gate.")
     parser.add_argument("--no-compound-transactions", action="store_true", help="Deprecated no-op; compound corridor overlay is no longer rendered.")
     parser.add_argument("--no-raw-roads", action="store_true", help="Do not auto-load raw road source overlay.")
     parser.add_argument("--no-repaired-roads", action="store_true", help="Do not auto-load repaired road overlay.")
@@ -1259,6 +1559,18 @@ def main() -> int:
         else processed / f"{args.area_id}_movement_corridor_candidates.json"
     )
     movement_corridors = read_json(movement_corridors_path) if movement_corridors_path and movement_corridors_path.exists() else None
+    movement_corridor_scoring_path = (
+        None
+        if args.no_movement_corridor_scoring
+        else Path(args.movement_corridor_scoring)
+        if args.movement_corridor_scoring
+        else processed / f"{args.area_id}_movement_corridor_scoring.json"
+    )
+    movement_corridor_scoring = (
+        read_json(movement_corridor_scoring_path)
+        if movement_corridor_scoring_path and movement_corridor_scoring_path.exists()
+        else None
+    )
     compound_transactions_path = None
     compound_transactions = None
     raw_roads_path = (
@@ -1330,18 +1642,20 @@ def main() -> int:
         max_raw_roads=args.max_raw_roads,
         max_raw_topology_issues=args.max_raw_topology_issues,
         corner_candidates=corner_candidates,
+        movement_corridor_scoring=movement_corridor_scoring,
     )
     report["inputs"] = {
-        "lane_graph": str(lane_graph_path),
-        "movement_corridors": str(movement_corridors_path) if movement_corridors_path and movement_corridors is not None else "",
-        "raw_roads": str(raw_roads_path) if raw_roads_path and raw_roads is not None else "",
-        "repaired_roads": str(repaired_roads_path) if repaired_roads_path and repaired_roads is not None else "",
-        "canonical_roads": str(canonical_roads_path) if canonical_roads_path and canonical_roads is not None else "",
-        "road_graph": str(road_graph_path) if road_graph is not None else "",
-        "raw_topology_diagnostics": str(raw_topology_diagnostics_path) if raw_topology_diagnostics_path and raw_topology_diagnostics is not None else "",
-        "corner_candidates": str(corner_candidates_path) if corner_candidates_path and corner_candidates is not None else "",
+        "lane_graph": rel(lane_graph_path, root),
+        "movement_corridors": rel(movement_corridors_path, root) if movement_corridors_path and movement_corridors is not None else "",
+        "movement_corridor_scoring": rel(movement_corridor_scoring_path, root) if movement_corridor_scoring_path and movement_corridor_scoring is not None else "",
+        "raw_roads": rel(raw_roads_path, root) if raw_roads_path and raw_roads is not None else "",
+        "repaired_roads": rel(repaired_roads_path, root) if repaired_roads_path and repaired_roads is not None else "",
+        "canonical_roads": rel(canonical_roads_path, root) if canonical_roads_path and canonical_roads is not None else "",
+        "road_graph": rel(road_graph_path, root) if road_graph is not None else "",
+        "raw_topology_diagnostics": rel(raw_topology_diagnostics_path, root) if raw_topology_diagnostics_path and raw_topology_diagnostics is not None else "",
+        "corner_candidates": rel(corner_candidates_path, root) if corner_candidates_path and corner_candidates is not None else "",
     }
-    report["outputs"] = {"svg": str(output_path), "report": str(report_path)}
+    report["outputs"] = {"svg": rel(output_path, root), "report": rel(report_path, root)}
     write_text(output_path, svg)
     write_json(report_path, report)
     print(json.dumps(report, ensure_ascii=False, indent=2))

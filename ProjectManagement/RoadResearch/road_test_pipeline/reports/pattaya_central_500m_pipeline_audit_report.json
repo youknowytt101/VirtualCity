@@ -146,26 +146,42 @@
       "value": {
         "debug_counts": {
           "lanes": 200,
+          "physical_lane_centerlines": 186,
+          "debug_centerlines": 186,
           "lane_links": 306,
           "continuity_links": 20,
-          "lane_ribbons": 200,
-          "lane_centerlines": 200,
+          "debug_centerline_source_physical_lane_centerlines": 186,
+          "lane_ribbons": 186,
+          "lane_centerlines": 186,
           "lane_link_ribbons": 306,
           "lane_link_curves": 306,
           "lane_continuity_ribbons": 8,
           "lane_continuity_curves": 8,
           "skipped_micro_seam_continuity_curve": 12,
-          "obj_vertices": 12031,
-          "obj_lines": 514,
-          "obj_faces": 514
+          "obj_vertices": 11989,
+          "obj_lines": 500,
+          "obj_faces": 500
         },
         "lane_graph_lanes": 200,
+        "lane_graph_physical_lane_centerlines": 186,
+        "expected_debug_centerlines": 186,
+        "actual_debug_centerlines": 186,
+        "debug_centerline_source": "physical_lane_centerlines",
         "lane_graph_lane_links": 306,
         "lane_graph_continuity_links": 20,
         "lane_graph_micro_seam_continuity_links": 12,
         "lane_graph_rendered_continuity_links": 8
       },
-      "message": "Lane debug geometry should expose every lane, every laneLink and every non-micro continuity curve/ribbon."
+      "message": "Lane debug geometry should expose the final physical centerline contract, every laneLink and every non-micro continuity curve/ribbon."
+    },
+    {
+      "id": "lane_debug_centerline_source_matches_contract",
+      "status": "pass",
+      "value": {
+        "expected": "physical_lane_centerlines",
+        "actual": "physical_lane_centerlines"
+      },
+      "message": "Lane debug geometry should declare the same centerline source used by final lane surfaces and packages."
     },
     {
       "id": "lane_debug_curves_nonempty",
@@ -180,9 +196,9 @@
       "id": "lane_debug_obj_has_lines_and_faces",
       "status": "pass",
       "value": {
-        "vertices": 12031,
-        "line_elements": 514,
-        "faces": 514
+        "vertices": 11989,
+        "line_elements": 500,
+        "faces": 500
       },
       "message": "Lane debug OBJ should contain both centerline curves and narrow debug ribbon faces."
     },
@@ -194,22 +210,24 @@
           "lanes": 200,
           "lane_links": 306,
           "continuity_links": 20,
-          "lane_surfaces": 200,
+          "lane_surfaces": 186,
           "junction_envelope_surfaces": 49,
           "lane_turn_surfaces": 306,
           "lane_continuity_surfaces": 8,
           "skipped_micro_seam_continuity_surface": 12,
-          "obj_vertices": 8556,
-          "obj_faces": 563
+          "obj_vertices": 8528,
+          "obj_faces": 549
         },
         "lane_graph_lanes": 200,
+        "lane_graph_physical_lane_centerlines": 186,
+        "expected_lane_surfaces": 186,
         "lane_graph_lane_links": 306,
         "lane_graph_continuity_links": 20,
         "lane_graph_micro_seam_continuity_links": 12,
         "lane_graph_surface_continuity_links": 8,
         "junctions_with_lane_links": 49
       },
-      "message": "Lane surface v1 should generate approach, turn, non-micro continuity and junction envelope surfaces from the lane graph."
+      "message": "Lane surface v1 should generate physical lane centerline, turn, non-micro continuity and junction envelope surfaces from the lane graph."
     },
     {
       "id": "junction_envelope_surfaces_have_area",
@@ -226,8 +244,8 @@
       "id": "lane_surface_v1_obj_has_faces",
       "status": "pass",
       "value": {
-        "vertices": 8556,
-        "faces": 563
+        "vertices": 8528,
+        "faces": 549
       },
       "message": "Lane surface v1 OBJ should contain surface faces."
     },
@@ -333,10 +351,10 @@
     "optimized_points": 2202,
     "preview_points": 2202,
     "preview_obj_vertices": 2202,
-    "lane_debug_obj_vertices": 12031,
-    "lane_debug_obj_faces": 514,
-    "lane_surface_v1_obj_vertices": 8556,
-    "lane_surface_v1_obj_faces": 563,
+    "lane_debug_obj_vertices": 11989,
+    "lane_debug_obj_faces": 500,
+    "lane_surface_v1_obj_vertices": 8528,
+    "lane_surface_v1_obj_faces": 549,
     "junction_envelope_surfaces": 49,
     "qa_statuses": {
       "topology_repair": "warn",
@@ -351,26 +369,26 @@
     }
   },
   "inputs": {
-    "raw_roads": "data/processed/pattaya_central_500m_roads_raw.geojson",
-    "repaired_roads": "data/processed/pattaya_central_500m_roads_repaired.geojson",
-    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
-    "junction_semantics": "data/processed/pattaya_central_500m_junction_semantics.json",
-    "optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
-    "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
-    "preview_geojson": "data/preview/pattaya_central_500m_roads_preview_surfaces.geojson",
-    "preview_obj": "data/preview/pattaya_central_500m_roads_preview.obj",
-    "preview_svg": "data/preview/pattaya_central_500m_roads_preview.svg",
-    "lane_geometry_debug_geojson": "data/preview/pattaya_central_500m_lane_geometry_debug.geojson",
-    "lane_geometry_debug_obj": "data/preview/pattaya_central_500m_lane_geometry_debug.obj",
-    "lane_geometry_debug_svg": "data/preview/pattaya_central_500m_lane_geometry_debug.svg",
-    "lane_geometry_debug_report": "reports/pattaya_central_500m_lane_geometry_debug_report.json",
-    "lane_surface_v1_geojson": "data/preview/pattaya_central_500m_lane_surfaces_v1.geojson",
-    "lane_surface_v1_obj": "data/preview/pattaya_central_500m_lane_surfaces_v1.obj",
-    "lane_surface_v1_svg": "data/preview/pattaya_central_500m_lane_surfaces_v1.svg",
-    "lane_surface_v1_report": "reports/pattaya_central_500m_lane_surface_v1_report.json",
-    "topology_qa": "reports/qa/pattaya_central_500m_topology_repair_qa_report.json",
-    "road_graph_qa": "reports/qa/pattaya_central_500m_road_graph_qa_report.json",
-    "lane_graph_qa": "reports/qa/pattaya_central_500m_lane_graph_qa_report.json"
+    "raw_roads": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
+    "repaired_roads": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
+    "optimized_centerlines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "preview_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview_surfaces.geojson",
+    "preview_obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.obj",
+    "preview_svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_roads_preview.svg",
+    "lane_geometry_debug_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.geojson",
+    "lane_geometry_debug_obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.obj",
+    "lane_geometry_debug_svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.svg",
+    "lane_geometry_debug_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_geometry_debug_report.json",
+    "lane_surface_v1_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.geojson",
+    "lane_surface_v1_obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.obj",
+    "lane_surface_v1_svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.svg",
+    "lane_surface_v1_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_surface_v1_report.json",
+    "topology_qa": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_topology_repair_qa_report.json",
+    "road_graph_qa": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_road_graph_qa_report.json",
+    "lane_graph_qa": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_lane_graph_qa_report.json"
   },
   "next_action": "Use this audit as the automated gate before curb, island, marking and swept-envelope geometry."
 }

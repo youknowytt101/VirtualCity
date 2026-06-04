@@ -841,6 +841,10 @@
       <input id="canonicalRoadsToggle" type="checkbox" checked>
       <span>Canonical（标准）</span>
     </label>
+    <label class="toggle" title="Centerline buffer preview（显示车道线向外扩展预览）">
+      <input id="laneSurfacesToggle" type="checkbox">
+      <span>Surfaces（车道面）</span>
+    </label>
     <label class="toggle" title="Corner candidates（显示转角优化候选）">
       <input id="cornerCandidatesToggle" type="checkbox" checked>
       <span>Corners（转角）</span>
@@ -880,6 +884,7 @@
         <div class="legend-item" style="color:#ef4444"><span class="legend-dot" style="background:#ef4444;border-color:#ffffff;box-shadow:0 0 0 1px #ef4444"></span><span>topology issues（拓扑问题）</span></div>
         <div class="legend-item" style="color:#2563eb"><span class="legend-line dashed"></span><span>repaired roads（修复道路）</span></div>
         <div class="legend-item" style="color:#e11d48"><span class="legend-line"></span><span>canonical roads（标准道路）</span></div>
+        <div class="legend-item" style="color:#8f96a1"><span class="legend-line" style="background:#b7bcc4;height:8px;border:1px solid #8f96a1"></span><span>centerline buffer（车道线扩展）</span></div>
       </div>
     </section>
     <section id="mapInspector" class="map-inspector" aria-label="SVG inspection panel（SVG 检查面板）">
@@ -915,6 +920,7 @@
     const rawRoadsToggle = document.getElementById("rawRoadsToggle");
     const repairedRoadsToggle = document.getElementById("repairedRoadsToggle");
     const canonicalRoadsToggle = document.getElementById("canonicalRoadsToggle");
+    const laneSurfacesToggle = document.getElementById("laneSurfacesToggle");
     const cornerCandidatesToggle = document.getElementById("cornerCandidatesToggle");
     const mapInspector = document.getElementById("mapInspector");
     const inspectorKicker = document.getElementById("inspectorKicker");
@@ -961,11 +967,13 @@
 
     const KIND_LABELS = {
       lane: "Lane（车道）",
+      physical_lane_centerline: "Physical lane centerline（连续物理车道线）",
       movement_corridor: "Movement corridor（通行走廊）",
       movement_anchor: "Movement anchor（通行锚点）",
       raw_road: "Raw road（原始道路）",
       repaired_road: "Repaired road（修复道路）",
       canonical_road: "Canonical road（标准道路）",
+      centerline_buffer_preview: "Centerline buffer preview（车道线扩展预览）",
       corner_candidate: "Corner candidate（转角候选）",
       raw_road_endpoint: "Raw endpoint（原始断点）",
       raw_road_vertex: "Raw vertex（原始顶点 / 断点）",
@@ -979,6 +987,8 @@
       id: "ID（编号）",
       continuityLinkId: "continuity_link_id（连续连接编号）",
       laneId: "lane_id（车道编号）",
+      centerlineId: "centerline_id（连续中心线编号）",
+      sourceLaneIds: "source_lane_ids（来源车道段）",
       edgeId: "edge_id（道路边编号）",
       roadGraphEdgeId: "road_graph_edge_id（路网边编号）",
       sourceFeatureId: "source_feature_id（源要素编号）",
@@ -1058,6 +1068,8 @@
       "id",
       "continuityLinkId",
       "laneId",
+      "centerlineId",
+      "sourceLaneIds",
       "edgeId",
       "roadGraphEdgeId",
       "sourceFeatureId",
@@ -1129,6 +1141,12 @@
       laneUpgradeDistributionPolicy: "upgrade_distribution（车道分配策略）",
       laneSource: "lane_source（车道来源）",
       physicalLaneShared: "physical_lane_shared（物理车道共享）",
+      physicalLaneGroupId: "physical_lane_group_id（连续物理车道组）",
+      physicalLaneGroupPolicy: "physical_lane_group_policy（连续物理车道策略）",
+      physicalLaneGroupMemberCount: "physical_lane_group_member_count（组内车道段数）",
+      physicalLaneGroupLinks: "physical_lane_group_links（连续物理车道连接）",
+      physicalLaneGroupLanes: "physical_lane_group_lanes（连续物理车道段）",
+      samePhysicalLaneContinuity: "same_physical_lane_continuity（同一物理车道连续）",
       roadWidthM: "road_width_m（道路宽度/米）",
       centerlineDerivationPolicy: "centerline_derivation_policy（中心线派生策略）",
       centerlineDerivedFrom: "centerline_derived_from（中心线来源）",
@@ -1136,7 +1154,8 @@
       centerlineSmoothingProfiles: "centerline_smoothing_profiles（平滑类型统计）",
       centerlineSmoothingMaxDerivationOffsetM: "centerline_smoothing_max_derivation_offset_m（最大派生偏移/米）",
       sourceObservationLanes: "source_lanes（源观测车道数）",
-      sourceObservationLanesSource: "source_lanes_source（源车道数来源）"
+      sourceObservationLanesSource: "source_lanes_source（源车道数来源）",
+      bufferSource: "buffer_source（扩展来源）"
     });
     INSPECT_FIELD_ORDER.splice(
       4,
@@ -1147,6 +1166,12 @@
       "laneUpgradeDistributionPolicy",
       "laneSource",
       "physicalLaneShared",
+      "physicalLaneGroupId",
+      "physicalLaneGroupPolicy",
+      "physicalLaneGroupMemberCount",
+      "physicalLaneGroupLinks",
+      "physicalLaneGroupLanes",
+      "samePhysicalLaneContinuity",
       "roadWidthM",
       "centerlineDerivationPolicy",
       "centerlineDerivedFrom",
@@ -2530,6 +2555,7 @@
       setRoadOverlayVisible("raw_roads", rawRoadsToggle, rawRoadsToggle.checked);
       setRoadOverlayVisible("repaired_roads", repairedRoadsToggle, repairedRoadsToggle.checked);
       setRoadOverlayVisible("canonical_roads", canonicalRoadsToggle, canonicalRoadsToggle.checked);
+      setRoadOverlayVisible("centerline_buffer_preview", laneSurfacesToggle, laneSurfacesToggle.checked);
       setRoadOverlayVisible("corner_optimization", cornerCandidatesToggle, cornerCandidatesToggle.checked);
     }
 
@@ -2792,6 +2818,7 @@
     rawRoadsToggle.addEventListener("change", syncRoadOverlayVisibility);
     repairedRoadsToggle.addEventListener("change", syncRoadOverlayVisibility);
     canonicalRoadsToggle.addEventListener("change", syncRoadOverlayVisibility);
+    laneSurfacesToggle.addEventListener("change", syncRoadOverlayVisibility);
     cornerCandidatesToggle.addEventListener("change", syncRoadOverlayVisibility);
     window.addEventListener("resize", () => {
       if (!state.hasLoaded) {

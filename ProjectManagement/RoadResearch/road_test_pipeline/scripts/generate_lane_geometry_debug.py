@@ -202,6 +202,41 @@ def is_micro_seam_continuity(link: dict[str, Any]) -> bool:
     return bool(link.get("micro_seam_absorbed"))
 
 
+def debug_centerline_records(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], str]:
+    physical_lane_centerlines = lane_graph.get("physical_lane_centerlines") or []
+    if physical_lane_centerlines:
+        return list(physical_lane_centerlines), "physical_lane_centerlines"
+    return list(lane_graph.get("lanes", [])), "lanes"
+
+
+def centerline_id(record: dict[str, Any]) -> str:
+    return str(record.get("centerline_id") or record.get("lane_id") or "")
+
+
+def centerline_source_lane_ids(record: dict[str, Any]) -> list[str]:
+    source_lane_ids = [
+        str(lane_id)
+        for lane_id in (record.get("source_lane_ids") or [])
+        if str(lane_id)
+    ]
+    if source_lane_ids:
+        return source_lane_ids
+    lane_id = str(record.get("lane_id") or "")
+    return [lane_id] if lane_id else []
+
+
+def centerline_road_ids(record: dict[str, Any]) -> list[str]:
+    road_ids = [
+        str(road_id)
+        for road_id in (record.get("road_ids") or [])
+        if str(road_id)
+    ]
+    if road_ids:
+        return road_ids
+    road_id = str(record.get("road_id") or "")
+    return [road_id] if road_id else []
+
+
 def lane_trim_distances(
     lane_graph: dict[str, Any],
     lane_links: list[dict[str, Any]],
@@ -248,16 +283,29 @@ def lane_trim_distances(
     return trim_by_lane
 
 
-def trimmed_lane_points(lane: dict[str, Any], trim_by_lane: dict[str, dict[str, float]]) -> list[tuple[float, float]]:
-    lane_id = str(lane.get("lane_id") or "")
-    raw_points = as_points(lane.get("centerline_xz") or [])
-    lane_trim = trim_by_lane.get(lane_id, {})
+def centerline_trim(record: dict[str, Any], trim_by_lane: dict[str, dict[str, float]]) -> dict[str, float]:
+    source_lane_ids = centerline_source_lane_ids(record)
+    if not source_lane_ids:
+        return {}
+    start_trim = trim_by_lane.get(source_lane_ids[0], {})
+    end_trim = trim_by_lane.get(source_lane_ids[-1], {})
+    return {
+        "start": float(start_trim.get("start") or 0.0),
+        "end": float(end_trim.get("end") or 0.0),
+        "locked_start": float(start_trim.get("locked_start") or 0.0),
+        "locked_end": float(end_trim.get("locked_end") or 0.0),
+    }
+
+
+def trimmed_centerline_points(record: dict[str, Any], trim_by_lane: dict[str, dict[str, float]]) -> list[tuple[float, float]]:
+    raw_points = as_points(record.get("centerline_xz") or [])
+    trim = centerline_trim(record, trim_by_lane)
     return trim_polyline(
         raw_points,
-        float(lane_trim.get("start") or 0.0),
-        float(lane_trim.get("end") or 0.0),
-        float(lane_trim.get("locked_start") or 0.0),
-        float(lane_trim.get("locked_end") or 0.0),
+        float(trim.get("start") or 0.0),
+        float(trim.get("end") or 0.0),
+        float(trim.get("locked_start") or 0.0),
+        float(trim.get("locked_end") or 0.0),
     )
 
 
@@ -267,30 +315,40 @@ def geojson_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], 
     lane_links = lane_link_records(lane_graph)
     continuity_links = continuity_link_records(lane_graph)
     trim_by_lane = lane_trim_distances(lane_graph, lane_links, continuity_links)
+    centerline_records, centerline_source = debug_centerline_records(lane_graph)
+    counts[f"debug_centerline_source_{centerline_source}"] = len(centerline_records)
 
-    for lane in lane_graph.get("lanes", []):
-        lane_id = str(lane.get("lane_id") or "")
-        points = trimmed_lane_points(lane, trim_by_lane)
+    for record in centerline_records:
+        debug_id = centerline_id(record)
+        source_lane_ids = centerline_source_lane_ids(record)
+        road_ids = centerline_road_ids(record)
+        points = trimmed_centerline_points(record, trim_by_lane)
         if len(points) < 2:
-            counts["skipped_short_lane"] += 1
+            counts["skipped_short_centerline"] += 1
             continue
         features.append({
             "type": "Feature",
             "geometry": {"type": "LineString", "coordinates": round_line(points)},
             "properties": {
                 "vc_part": "lane_debug_centerline",
-                "lane_id": lane_id,
-                "road_id": lane["road_id"],
-                "direction": lane["direction"],
-                "source": lane.get("source", "unknown"),
-                "width_m": float(lane.get("width_m") or 0.0),
-                "width_start_m": float(lane.get("width_start_m") or lane.get("width_m") or 0.0),
-                "width_end_m": float(lane.get("width_end_m") or lane.get("width_m") or 0.0),
-                "road_width_m": float(lane.get("road_width_m") or 0.0),
-                "road_width_start_m": float(lane.get("road_width_start_m") or 0.0),
-                "road_width_end_m": float(lane.get("road_width_end_m") or 0.0),
-                "width_source": lane.get("width_source", "unknown"),
-                "width_confidence": float(lane.get("width_confidence") or 0.0),
+                "lane_id": debug_id,
+                "centerline_id": debug_id,
+                "source_lane_ids": source_lane_ids,
+                "road_id": ",".join(road_ids),
+                "road_ids": road_ids,
+                "direction": record.get("direction", ""),
+                "source": record.get("source", "unknown"),
+                "centerline_source": centerline_source,
+                "physical_lane_group_id": record.get("physical_lane_group_id", ""),
+                "member_count": int(record.get("member_count") or len(source_lane_ids) or 1),
+                "width_m": float(record.get("width_m") or 0.0),
+                "width_start_m": float(record.get("width_start_m") or record.get("width_m") or 0.0),
+                "width_end_m": float(record.get("width_end_m") or record.get("width_m") or 0.0),
+                "road_width_m": float(record.get("road_width_m") or 0.0),
+                "road_width_start_m": float(record.get("road_width_start_m") or 0.0),
+                "road_width_end_m": float(record.get("road_width_end_m") or 0.0),
+                "width_source": record.get("width_source", "unknown"),
+                "width_confidence": float(record.get("width_confidence") or 0.0),
                 "debug_width_m": LANE_RIBBON_WIDTH_M,
                 "length_m": round(polyline_length(points), 3),
             },
@@ -302,14 +360,21 @@ def geojson_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], 
                 "geometry": {"type": "Polygon", "coordinates": round_polygon(ribbon)},
                 "properties": {
                     "vc_part": "lane_debug_ribbon",
-                    "lane_id": lane_id,
-                    "road_id": lane["road_id"],
-                    "direction": lane["direction"],
-                    "actual_width_m": float(lane.get("width_m") or 0.0),
-                    "actual_width_start_m": float(lane.get("width_start_m") or lane.get("width_m") or 0.0),
-                    "actual_width_end_m": float(lane.get("width_end_m") or lane.get("width_m") or 0.0),
-                    "width_source": lane.get("width_source", "unknown"),
-                    "width_confidence": float(lane.get("width_confidence") or 0.0),
+                    "lane_id": debug_id,
+                    "centerline_id": debug_id,
+                    "source_lane_ids": source_lane_ids,
+                    "road_id": ",".join(road_ids),
+                    "road_ids": road_ids,
+                    "direction": record.get("direction", ""),
+                    "source": record.get("source", "unknown"),
+                    "centerline_source": centerline_source,
+                    "physical_lane_group_id": record.get("physical_lane_group_id", ""),
+                    "member_count": int(record.get("member_count") or len(source_lane_ids) or 1),
+                    "actual_width_m": float(record.get("width_m") or 0.0),
+                    "actual_width_start_m": float(record.get("width_start_m") or record.get("width_m") or 0.0),
+                    "actual_width_end_m": float(record.get("width_end_m") or record.get("width_m") or 0.0),
+                    "width_source": record.get("width_source", "unknown"),
+                    "width_confidence": float(record.get("width_confidence") or 0.0),
                     "debug_width_m": LANE_RIBBON_WIDTH_M,
                 },
             })
@@ -404,6 +469,7 @@ def geojson_features(lane_graph: dict[str, Any]) -> tuple[list[dict[str, Any]], 
 
 def write_geojson(path: Path, area_id: str, lane_graph: dict[str, Any]) -> dict[str, int]:
     features, counts = geojson_features(lane_graph)
+    _records, centerline_source = debug_centerline_records(lane_graph)
     write_json(path, {
         "type": "FeatureCollection",
         "metadata": {
@@ -411,6 +477,7 @@ def write_geojson(path: Path, area_id: str, lane_graph: dict[str, Any]) -> dict[
             "schema": "road_test_pipeline.lane_geometry_debug.v1",
             "coord_domain": "local_xz_m",
             "source": "lane_graph.json",
+            "debug_centerline_source": centerline_source,
             "lane_ribbon_width_m": LANE_RIBBON_WIDTH_M,
             "lane_link_ribbon_width_m": LANE_LINK_RIBBON_WIDTH_M,
             "debug_note": "Inspection geometry only; not final road surface.",
@@ -451,9 +518,10 @@ def write_obj(path: Path, lane_graph: dict[str, Any]) -> dict[str, int]:
     lane_links = lane_link_records(lane_graph)
     continuity_links = continuity_link_records(lane_graph)
     trim_by_lane = lane_trim_distances(lane_graph, lane_links, continuity_links)
+    centerline_records, _centerline_source = debug_centerline_records(lane_graph)
 
-    for lane in lane_graph.get("lanes", []):
-        points = trimmed_lane_points(lane, trim_by_lane)
+    for record in centerline_records:
+        points = trimmed_centerline_points(record, trim_by_lane)
         if len(points) < 2:
             continue
         line = add_obj_line(vertices, points, LANE_LINE_Y)
@@ -530,7 +598,8 @@ def write_svg(path: Path, area_id: str, lane_graph: dict[str, Any]) -> None:
     lane_links = lane_link_records(lane_graph)
     continuity_links = continuity_link_records(lane_graph)
     trim_by_lane = lane_trim_distances(lane_graph, lane_links, continuity_links)
-    lane_lines = [trimmed_lane_points(lane, trim_by_lane) for lane in lane_graph.get("lanes", [])]
+    centerline_records, centerline_source = debug_centerline_records(lane_graph)
+    lane_lines = [trimmed_centerline_points(record, trim_by_lane) for record in centerline_records]
     link_items = [(link, as_points(link.get("connecting_curve_xz") or [])) for link in lane_links]
     continuity_items = [
         (link, as_points(link.get("connecting_curve_xz") or []))
@@ -563,7 +632,7 @@ def write_svg(path: Path, area_id: str, lane_graph: dict[str, Any]) -> None:
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{canvas_w}" height="{canvas_h}" viewBox="0 0 {canvas_w} {canvas_h}">',
         '<rect width="100%" height="100%" fill="#f8fafc"/>',
         f'<text x="40" y="34" font-family="Arial, Microsoft YaHei" font-size="22" font-weight="700" fill="#111827">{area_id} lane geometry debug</text>',
-        '<text x="40" y="58" font-family="Arial, Microsoft YaHei" font-size="13" fill="#475569">Lane centerlines and laneLink turn curves; debug geometry only</text>',
+        f'<text x="40" y="58" font-family="Arial, Microsoft YaHei" font-size="13" fill="#475569">Lane centerlines ({centerline_source}) and laneLink turn curves; debug geometry only</text>',
     ]
     for points in lane_lines:
         if len(points) < 2:
@@ -588,7 +657,7 @@ def write_svg(path: Path, area_id: str, lane_graph: dict[str, Any]) -> None:
             f'<polyline points="{polyline(points)}" fill="none" stroke="#0F766E" '
             'stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" opacity="0.82"/>'
         )
-    lines.append(f'<text x="40" y="{canvas_h - 50}" font-family="Arial, Microsoft YaHei" font-size="13" fill="#334155">lanes: {len(lane_lines)} | laneLinks: {len(link_items)} | continuity: {len(continuity_items)} | colors: left blue, right amber, through green, continuity teal</text>')
+    lines.append(f'<text x="40" y="{canvas_h - 50}" font-family="Arial, Microsoft YaHei" font-size="13" fill="#334155">debug centerlines: {len(lane_lines)} | laneLinks: {len(link_items)} | continuity: {len(continuity_items)} | colors: left blue, right amber, through green, continuity teal</text>')
     lines.append("</svg>")
     path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -610,6 +679,7 @@ def generate(area_id: str, root: Path) -> dict[str, Any]:
 
     lane_links = lane_link_records(lane_graph)
     continuity_links = continuity_link_records(lane_graph)
+    centerline_records, centerline_source = debug_centerline_records(lane_graph)
     link_lengths = [
         polyline_length(as_points(link.get("connecting_curve_xz") or []))
         for link in lane_links
@@ -620,8 +690,8 @@ def generate(area_id: str, root: Path) -> dict[str, Any]:
         for link in continuity_links
         if len(link.get("connecting_curve_xz") or []) >= 2
     ]
-    lane_widths = [float(lane.get("width_m", 0.0)) for lane in lane_graph.get("lanes", [])]
-    lane_width_confidences = [float(lane.get("width_confidence", 0.0)) for lane in lane_graph.get("lanes", [])]
+    lane_widths = [float(record.get("width_m", 0.0)) for record in centerline_records]
+    lane_width_confidences = [float(record.get("width_confidence", 0.0)) for record in centerline_records]
     turn_counts = Counter(str(link.get("turn") or link.get("connection_turn") or "unknown") for link in lane_links)
     report = {
         "area_id": area_id,
@@ -634,6 +704,8 @@ def generate(area_id: str, root: Path) -> dict[str, Any]:
         },
         "counts": {
             "lanes": len(lane_graph.get("lanes", [])),
+            "physical_lane_centerlines": len(lane_graph.get("physical_lane_centerlines") or []),
+            "debug_centerlines": feature_counts.get("lane_centerlines", 0),
             "lane_links": len(lane_links),
             "continuity_links": len(continuity_links),
             **feature_counts,
@@ -641,6 +713,7 @@ def generate(area_id: str, root: Path) -> dict[str, Any]:
         },
         "turn_counts": dict(sorted(turn_counts.items())),
         "metrics": {
+            "lane_geometry_debug_centerline_source": centerline_source,
             "empty_lane_link_curves": feature_counts.get("skipped_empty_lane_link_curve", 0),
             "empty_continuity_curves": feature_counts.get("skipped_empty_continuity_curve", 0),
             "avg_lane_link_curve_length_m": round(sum(link_lengths) / max(1, len(link_lengths)), 3),
@@ -656,7 +729,7 @@ def generate(area_id: str, root: Path) -> dict[str, Any]:
         },
         "notes": [
             "Debug ribbons are intentionally narrow and are not final lane surfaces.",
-            "This layer verifies lane direction and laneLink turn paths before junction surface generation.",
+            "Debug lane centerlines follow physical_lane_centerlines when present, matching the package centerline contract.",
             "Continuity links preserve optimized road-level corner fillets when inspecting lane-level geometry.",
         ],
     }

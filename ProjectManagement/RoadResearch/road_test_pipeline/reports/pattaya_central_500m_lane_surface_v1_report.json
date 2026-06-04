@@ -1,25 +1,27 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "lane_surface_v1",
-  "input": "data/processed/pattaya_central_500m_lane_graph.json",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
   "outputs": {
-    "geojson": "data/preview/pattaya_central_500m_lane_surfaces_v1.geojson",
-    "obj": "data/preview/pattaya_central_500m_lane_surfaces_v1.obj",
-    "svg": "data/preview/pattaya_central_500m_lane_surfaces_v1.svg"
+    "geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.geojson",
+    "obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.obj",
+    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.svg"
   },
   "counts": {
     "lanes": 200,
     "lane_links": 306,
     "continuity_links": 20,
-    "lane_surfaces": 200,
+    "lane_surfaces": 186,
     "junction_envelope_surfaces": 49,
     "lane_turn_surfaces": 306,
     "lane_continuity_surfaces": 8,
     "skipped_micro_seam_continuity_surface": 12,
-    "obj_vertices": 8556,
-    "obj_faces": 563
+    "obj_vertices": 8528,
+    "obj_faces": 549
   },
   "metrics": {
+    "lane_surface_centerline_source": "physical_lane_centerlines",
+    "physical_lane_centerlines": 186,
     "trim_start_lane_count": 128,
     "trim_end_lane_count": 128,
     "junction_trim_m": 8.0,
@@ -58,12 +60,12 @@
     "max_junction_envelope_area_m2": 605.163,
     "junction_envelope_padding_m": 0.25,
     "area_by_part_m2": {
-      "lane_surface_v1": 41778.767,
+      "lane_surface_v1": 41778.589,
       "junction_envelope_surface_v1": 15228.042,
       "lane_turn_surface_v1": 19883.635,
       "lane_continuity_surface_v1": 88.895
     },
-    "total_area_m2": 76979.338
+    "total_area_m2": 76979.16
   },
   "notes": [
     "Approach lane surfaces use optimized trimmed centerlines when available; raw fallback still trims near junctions using laneLink membership.",

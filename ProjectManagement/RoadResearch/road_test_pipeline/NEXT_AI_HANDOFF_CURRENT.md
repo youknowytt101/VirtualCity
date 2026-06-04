@@ -59,7 +59,7 @@ data/lane_upgrade_packages/pattaya_central_500m/latest.json
 Latest package:
 
 ```text
-data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0026/
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0028/
 ```
 
 Latest manifest facts:
@@ -70,6 +70,8 @@ qa_gate_status: manual_review_required
 qa_warning_summary: publishable_warn=0, manual_review_required=3, blocker=0
 path_policy: portable_lane_package_paths_v1
 lanes: 200
+physical_lane_centerlines: 186
+physical_lane_group_centerlines: 12
 junctions: 49
 lane_links: 306
 continuity_links: 20
@@ -108,7 +110,7 @@ max_continuity_end_gap_m: 0.0
 Houdini handoff:
 
 ```text
-data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0026/houdini_manifest.json
+data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0028/houdini_manifest.json
 ```
 
 Houdini should read package outputs only:
@@ -119,6 +121,21 @@ standard_junctions.json
 standard_lane_surfaces.geojson
 standard_lane_surfaces.obj
 ```
+
+`standard_lanes.json` now exposes both layers:
+
+```text
+lanes: source road-edge lane segments for traceability
+physical_lane_centerlines: clean continuous lane centerlines for final consumption
+```
+
+Houdini import prefers `physical_lane_centerlines` and falls back to `lanes`
+only for old packages.
+
+Lane geometry debug now follows the same contract. Package
+`lane_debug_geometry.geojson` and Houdini `OUT_lane_connections_debug` render
+186 `physical_lane_centerlines`, while `lanes=200` remains traceability/source
+segment data.
 
 `latest.json`, `manifest.json`, and `houdini_manifest.json` now use package-
 relative paths. Houdini cook entrypoints resolve the latest package manifest and
@@ -272,7 +289,7 @@ review_candidates: 5
 context_review_candidates: 2
 ```
 
-The current `lane_package_v0026` copies the latest propagation plan/report into
+The current `lane_package_v0028` copies the latest propagation plan/report into
 the package. Historical `D:\VirtualCity` latest pointers are rebased to the
 current pipeline root during package publish, and newly written propagation
 latest/report paths are root-relative.
@@ -323,8 +340,11 @@ Latest SVG report:
 
 ```text
 lanes: 200
+physical_lane_centerlines: 186
+visible_lane_centerlines: 186
 movement_corridors_rendered: 306
-continuity_links_rendered: 20
+continuity_links_rendered: 8
+continuity_micro_seams_skipped: 12
 compound_corridor_overlay: removed
 corner_candidates_rendered: 19
 corner_candidate_status_counts:
@@ -395,13 +415,13 @@ python scripts\apply_corner_optimization.py --area-id pattaya_central_500m --can
 For code changes in this pipeline, run the focused test set:
 
 ```powershell
-pytest E:\VirtualCity\tests\test_corner_optimization.py E:\VirtualCity\tests\test_lane_upgrade_system.py E:\VirtualCity\tests\test_lane_model_builder.py E:\VirtualCity\tests\test_lane_surface_v1.py E:\VirtualCity\tests\test_canonical_roads.py
+pytest E:\VirtualCity\tests\test_corner_optimization.py E:\VirtualCity\tests\test_lane_upgrade_system.py E:\VirtualCity\tests\test_lane_model_builder.py E:\VirtualCity\tests\test_lane_surface_v1.py E:\VirtualCity\tests\test_lane_geometry_debug.py E:\VirtualCity\tests\test_laneforge_houdini_contract.py E:\VirtualCity\tests\test_canonical_roads.py
 ```
 
 Last known full result:
 
 ```text
-148 passed
+155 passed
 pytest E:\VirtualCity\tests
 ```
 
