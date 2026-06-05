@@ -1,0 +1,41 @@
+{
+  "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+  "stage": "corner_optimization_candidates_v1",
+  "schema": "road_upgrade_system.corner_optimization_report.v1",
+  "status": "pass",
+  "inputs": {
+    "road_graph": "data/processed/z47n_e704000_n1431000_w1000_h1000_s1000_road_graph.json",
+    "optimized_centerlines": "data/processed/z47n_e704000_n1431000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+    "corner_overrides": ""
+  },
+  "outputs": {
+    "candidates": "data/processed/z47n_e704000_n1431000_w1000_h1000_s1000_corner_optimization_candidates.json",
+    "report": "reports/z47n_e704000_n1431000_w1000_h1000_s1000_corner_optimization_report.json"
+  },
+  "counts": {
+    "candidates": 79,
+    "degree2_connector_corner": 12,
+    "internal_centerline_bend": 67,
+    "low_risk": 36,
+    "medium_risk": 43,
+    "high_risk": 0,
+    "accepted_active": 0,
+    "accepted_active_candidates": 0,
+    "accepted_active_overrides": 0,
+    "active_degree2_corner_overrides": 0,
+    "active_internal_bend_overrides": 0,
+    "candidate_id_reassignments": 0
+  },
+  "type_counts": {
+    "degree2_connector_corner": 12,
+    "internal_centerline_bend": 67
+  },
+  "risk_counts": {
+    "low": 36,
+    "medium": 43
+  },
+  "status_counts": {
+    "candidate_review": 79
+  },
+  "note": "Corner optimization candidates are proposal records; accepted_active counts active geometry transactions, including internal bends that no longer appear as candidates after smoothing."
+}

@@ -186,27 +186,37 @@ def load_edges(path: Path) -> tuple[list[dict[str, Any]], float, float, dict[str
             to_local(float(coord[0]), float(coord[1]), origin_lon, origin_lat)
             for coord in coords
         ]
-        a = points[0]
-        b = points[-1]
-        if distance(a, b) < 0.05:
-            continue
         highway = str(props.get("highway") or "unclassified")
         lanes = parse_lanes(props.get("lanes"), highway)
         width = parse_width(props.get("width_m"), highway, lanes)
-        edges.append({
-            "edge_id": len(edges),
-            "source_feature_id": str(props.get("source_feature_id") or index),
-            "highway": highway,
-            "lanes": lanes,
-            "width_m": width,
-            "half_width": width * 0.5,
-            "a": a,
-            "b": b,
-            "points": points,
-            "length_m": polyline_length(points),
-            "point_count": len(points),
-            "props": props,
-        })
+        source_feature_id = str(props.get("source_feature_id") or index)
+        point_parts: list[tuple[list[tuple[float, float]], str]] = [(points, "")]
+        if node_key(points[0]) == node_key(points[-1]) and len(points) > 2:
+            split_index = max(range(1, len(points) - 1), key=lambda i: distance(points[0], points[i]))
+            part_a = points[: split_index + 1]
+            part_b = points[split_index:]
+            if len(part_a) >= 2 and len(part_b) >= 2:
+                point_parts = [(part_a, "closed_loop_a"), (part_b, "closed_loop_b")]
+
+        for part_points, loop_role in point_parts:
+            a = part_points[0]
+            b = part_points[-1]
+            edge_source_id = f"{source_feature_id}_{loop_role}" if loop_role else source_feature_id
+            edges.append({
+                "edge_id": len(edges),
+                "source_feature_id": edge_source_id,
+                "highway": highway,
+                "lanes": lanes,
+                "width_m": width,
+                "half_width": width * 0.5,
+                "a": a,
+                "b": b,
+                "points": part_points,
+                "length_m": polyline_length(part_points),
+                "point_count": len(part_points),
+                "closed_loop_split_role": loop_role,
+                "props": props,
+            })
     return edges, origin_lon, origin_lat, fc.get("metadata") or {}
 
 

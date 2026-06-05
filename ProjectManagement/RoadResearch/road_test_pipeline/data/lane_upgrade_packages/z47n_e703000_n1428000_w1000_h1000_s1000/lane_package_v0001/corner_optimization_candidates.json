@@ -1,0 +1,4278 @@
+{
+  "type": "corner_optimization_candidates",
+  "metadata": {
+    "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+    "schema": "road_upgrade_system.corner_optimization_candidates.v1",
+    "policy": "proposal_only_no_geometry_mutation",
+    "source_road_graph": "data/processed/z47n_e703000_n1428000_w1000_h1000_s1000_road_graph.json",
+    "source_optimized_centerlines": "data/processed/z47n_e703000_n1428000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+    "source_corner_overrides": ""
+  },
+  "candidates": [
+    {
+      "candidate_id": "corner_0000",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0012",
+      "node_kind": "connector",
+      "from_edge_id": "e_0289",
+      "to_edge_id": "e_0290",
+      "from_canonical_road_id": "cr_0286",
+      "to_canonical_road_id": "cr_0286",
+      "road_class": "service",
+      "turn_angle_deg": 96.638,
+      "interior_angle_deg": 83.362,
+      "suggested_cut_m": 3.221,
+      "suggested_radius_m": 4.418,
+      "nearest_junction_distance_m": 71.722,
+      "center_xz": [
+        -628.422,
+        -255.196
+      ],
+      "context_polyline_xz": [
+        [
+          -644.616,
+          -247.337
+        ],
+        [
+          -628.422,
+          -255.196
+        ],
+        [
+          -622.488,
+          -238.202
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0001",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0017",
+      "node_kind": "connector",
+      "from_edge_id": "e_0524",
+      "to_edge_id": "e_0537",
+      "from_canonical_road_id": "cr_0520",
+      "to_canonical_road_id": "cr_0533",
+      "road_class": "secondary",
+      "turn_angle_deg": 119.31,
+      "interior_angle_deg": 60.69,
+      "suggested_cut_m": 8.731,
+      "suggested_radius_m": 16.363,
+      "nearest_junction_distance_m": 22.976,
+      "center_xz": [
+        -618.711,
+        593.397
+      ],
+      "context_polyline_xz": [
+        [
+          -600.751,
+          592.191
+        ],
+        [
+          -618.711,
+          593.397
+        ],
+        [
+          -612.429,
+          603.015
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0002",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0021",
+      "node_kind": "connector",
+      "from_edge_id": "e_0475",
+      "to_edge_id": "e_0546",
+      "from_canonical_road_id": "cr_0471",
+      "to_canonical_road_id": "cr_0541",
+      "road_class": "service",
+      "turn_angle_deg": 22.72,
+      "interior_angle_deg": 157.28,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 26.207,
+      "center_xz": [
+        -609.195,
+        -599.709
+      ],
+      "context_polyline_xz": [
+        [
+          -617.685,
+          -589.625
+        ],
+        [
+          -609.195,
+          -599.709
+        ],
+        [
+          -608.121,
+          -616.657
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0003",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0032",
+      "node_kind": "connector",
+      "from_edge_id": "e_0176",
+      "to_edge_id": "e_0320",
+      "from_canonical_road_id": "cr_0175",
+      "to_canonical_road_id": "cr_0316",
+      "road_class": "path",
+      "turn_angle_deg": 38.541,
+      "interior_angle_deg": 141.459,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 23.703,
+      "center_xz": [
+        -581.331,
+        -133.044
+      ],
+      "context_polyline_xz": [
+        [
+          -593.746,
+          -137.856
+        ],
+        [
+          -581.331,
+          -133.044
+        ],
+        [
+          -564.15,
+          -138.413
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0004",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0051",
+      "node_kind": "connector",
+      "from_edge_id": "e_0062",
+      "to_edge_id": "e_0063",
+      "from_canonical_road_id": "cr_0062",
+      "to_canonical_road_id": "cr_0062",
+      "road_class": "residential",
+      "turn_angle_deg": 180.0,
+      "interior_angle_deg": 0.0,
+      "suggested_cut_m": 5.625,
+      "suggested_radius_m": 8.64,
+      "nearest_junction_distance_m": 16.535,
+      "center_xz": [
+        -520.994,
+        -190.628
+      ],
+      "context_polyline_xz": [
+        [
+          -513.192,
+          -193.362
+        ],
+        [
+          -520.994,
+          -190.628
+        ],
+        [
+          -513.192,
+          -193.362
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0005",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0073",
+      "node_kind": "connector",
+      "from_edge_id": "e_0222",
+      "to_edge_id": "e_0223",
+      "from_canonical_road_id": "cr_0221",
+      "to_canonical_road_id": "cr_0221",
+      "road_class": "service",
+      "turn_angle_deg": 25.553,
+      "interior_angle_deg": 154.447,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 20.908,
+      "center_xz": [
+        -452.483,
+        -565.867
+      ],
+      "context_polyline_xz": [
+        [
+          -454.62,
+          -551.424
+        ],
+        [
+          -452.483,
+          -565.867
+        ],
+        [
+          -466.979,
+          -567.643
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0006",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0076",
+      "node_kind": "connector",
+      "from_edge_id": "e_0034",
+      "to_edge_id": "e_0522",
+      "from_canonical_road_id": "cr_0034",
+      "to_canonical_road_id": "cr_0518",
+      "road_class": "secondary_link",
+      "turn_angle_deg": 29.002,
+      "interior_angle_deg": 150.998,
+      "suggested_cut_m": 5.85,
+      "suggested_radius_m": 7.2,
+      "nearest_junction_distance_m": 51.682,
+      "center_xz": [
+        -443.943,
+        637.123
+      ],
+      "context_polyline_xz": [
+        [
+          -426.328,
+          633.546
+        ],
+        [
+          -443.943,
+          637.123
+        ],
+        [
+          -461.011,
+          631.406
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0007",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0196",
+      "node_kind": "connector",
+      "from_edge_id": "e_0540",
+      "to_edge_id": "e_0541",
+      "from_canonical_road_id": "cr_0536",
+      "to_canonical_road_id": "cr_0536",
+      "road_class": "footway",
+      "turn_angle_deg": 31.992,
+      "interior_angle_deg": 148.008,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 14.805,
+      "center_xz": [
+        -149.323,
+        -97.288
+      ],
+      "context_polyline_xz": [
+        [
+          -140.84,
+          -91.445
+        ],
+        [
+          -149.323,
+          -97.288
+        ],
+        [
+          -143.245,
+          -105.687
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0008",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0243",
+      "node_kind": "connector",
+      "from_edge_id": "e_0333",
+      "to_edge_id": "e_0468",
+      "from_canonical_road_id": "cr_0329",
+      "to_canonical_road_id": "cr_0464",
+      "road_class": "residential",
+      "turn_angle_deg": 37.671,
+      "interior_angle_deg": 142.329,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 53.769,
+      "center_xz": [
+        -8.181,
+        434.554
+      ],
+      "context_polyline_xz": [
+        [
+          8.986,
+          438.898
+        ],
+        [
+          -8.181,
+          434.554
+        ],
+        [
+          -8.017,
+          416.875
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0009",
+      "candidate_type": "degree2_connector_corner",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_auto_fillet_after_review",
+      "node_id": "n_0369",
+      "node_kind": "connector",
+      "from_edge_id": "e_0225",
+      "to_edge_id": "e_0226",
+      "from_canonical_road_id": "cr_0223",
+      "to_canonical_road_id": "cr_0223",
+      "road_class": "service",
+      "turn_angle_deg": 89.941,
+      "interior_angle_deg": 90.059,
+      "suggested_cut_m": 2.998,
+      "suggested_radius_m": 4.112,
+      "nearest_junction_distance_m": 31.036,
+      "center_xz": [
+        385.981,
+        391.563
+      ],
+      "context_polyline_xz": [
+        [
+          383.955,
+          409.449
+        ],
+        [
+          385.981,
+          391.563
+        ],
+        [
+          368.098,
+          389.518
+        ]
+      ],
+      "rationale": "Degree-2 connector node creates a visible road-corner bend."
+    },
+    {
+      "candidate_id": "corner_0010",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0014",
+      "canonical_road_id": "cr_0014",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 71.412,
+      "interior_angle_deg": 108.588,
+      "suggested_cut_m": 3.571,
+      "suggested_radius_m": 4.897,
+      "nearest_junction_distance_m": 58.898,
+      "center_xz": [
+        533.654,
+        403.607
+      ],
+      "context_polyline_xz": [
+        [
+          566.757,
+          516.628
+        ],
+        [
+          533.654,
+          403.607
+        ],
+        [
+          478.06,
+          401.41
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0011",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "high",
+      "recommended_action": "proposal_only_review_near_junction",
+      "source_edge_id": "e_0024",
+      "canonical_road_id": "cr_0024",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 179.999,
+      "interior_angle_deg": 0.001,
+      "suggested_cut_m": 5.099,
+      "suggested_radius_m": 8.64,
+      "nearest_junction_distance_m": 3.319,
+      "center_xz": [
+        -285.748,
+        -216.063
+      ],
+      "context_polyline_xz": [
+        [
+          -312.065,
+          -236.111
+        ],
+        [
+          -285.748,
+          -216.063
+        ],
+        [
+          -296.422,
+          -224.194
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0012",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0024",
+      "canonical_road_id": "cr_0024",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 180.0,
+      "interior_angle_deg": 0.0,
+      "suggested_cut_m": 4.879,
+      "suggested_radius_m": 8.64,
+      "nearest_junction_distance_m": 16.737,
+      "center_xz": [
+        -296.422,
+        -224.194
+      ],
+      "context_polyline_xz": [
+        [
+          -285.748,
+          -216.063
+        ],
+        [
+          -296.422,
+          -224.194
+        ],
+        [
+          -286.207,
+          -216.413
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0013",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0027",
+      "canonical_road_id": "cr_0027",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 34.317,
+      "interior_angle_deg": 145.683,
+      "suggested_cut_m": 1.945,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 8.629,
+      "center_xz": [
+        -231.07,
+        -171.104
+      ],
+      "context_polyline_xz": [
+        [
+          -242.437,
+          -181.804
+        ],
+        [
+          -231.07,
+          -171.104
+        ],
+        [
+          -229.97,
+          -166.106
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0014",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0035",
+      "canonical_road_id": "cr_0035",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 79.551,
+      "interior_angle_deg": 100.449,
+      "suggested_cut_m": 3.978,
+      "suggested_radius_m": 5.455,
+      "nearest_junction_distance_m": 22.772,
+      "center_xz": [
+        130.346,
+        282.458
+      ],
+      "context_polyline_xz": [
+        [
+          134.076,
+          263.295
+        ],
+        [
+          130.346,
+          282.458
+        ],
+        [
+          15.918,
+          281.326
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0015",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0040",
+      "canonical_road_id": "cr_0040",
+      "road_class": "residential",
+      "point_index": 3,
+      "turn_angle_deg": 45.076,
+      "interior_angle_deg": 134.924,
+      "suggested_cut_m": 1.993,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 50.272,
+      "center_xz": [
+        -67.262,
+        433.586
+      ],
+      "context_polyline_xz": [
+        [
+          -65.862,
+          428.532
+        ],
+        [
+          -67.262,
+          433.586
+        ],
+        [
+          -80.336,
+          440.966
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0016",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0040",
+      "canonical_road_id": "cr_0040",
+      "road_class": "residential",
+      "point_index": 7,
+      "turn_angle_deg": 76.577,
+      "interior_angle_deg": 103.423,
+      "suggested_cut_m": 2.193,
+      "suggested_radius_m": 5.251,
+      "nearest_junction_distance_m": 83.73,
+      "center_xz": [
+        -99.682,
+        458.945
+      ],
+      "context_polyline_xz": [
+        [
+          -96.492,
+          454.136
+        ],
+        [
+          -99.682,
+          458.945
+        ],
+        [
+          -85.306,
+          474.351
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0017",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0110",
+      "canonical_road_id": "cr_0109",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 29.02,
+      "interior_angle_deg": 150.98,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 61.6,
+      "center_xz": [
+        20.703,
+        -442.135
+      ],
+      "context_polyline_xz": [
+        [
+          -11.95,
+          -490.493
+        ],
+        [
+          20.703,
+          -442.135
+        ],
+        [
+          23.61,
+          -408.951
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0018",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0119",
+      "canonical_road_id": "cr_0118",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 46.363,
+      "interior_angle_deg": 133.637,
+      "suggested_cut_m": 1.865,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 8.179,
+      "center_xz": [
+        -95.19,
+        -320.474
+      ],
+      "context_polyline_xz": [
+        [
+          -97.248,
+          -324.93
+        ],
+        [
+          -95.19,
+          -320.474
+        ],
+        [
+          -38.964,
+          -301.271
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0019",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0150",
+      "canonical_road_id": "cr_0149",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 81.362,
+      "interior_angle_deg": 98.638,
+      "suggested_cut_m": 4.068,
+      "suggested_radius_m": 5.579,
+      "nearest_junction_distance_m": 37.014,
+      "center_xz": [
+        520.07,
+        -357.988
+      ],
+      "context_polyline_xz": [
+        [
+          670.901,
+          -358.289
+        ],
+        [
+          520.07,
+          -357.988
+        ],
+        [
+          512.869,
+          -404.756
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0020",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0161",
+      "canonical_road_id": "cr_0160",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 89.874,
+      "interior_angle_deg": 90.126,
+      "suggested_cut_m": 4.494,
+      "suggested_radius_m": 6.163,
+      "nearest_junction_distance_m": 19.903,
+      "center_xz": [
+        -223.377,
+        491.517
+      ],
+      "context_polyline_xz": [
+        [
+          -193.702,
+          539.365
+        ],
+        [
+          -223.377,
+          491.517
+        ],
+        [
+          -237.515,
+          500.242
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0021",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0169",
+      "canonical_road_id": "cr_0168",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 32.708,
+      "interior_angle_deg": 147.292,
+      "suggested_cut_m": 2.099,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 32.997,
+      "center_xz": [
+        -593.82,
+        175.936
+      ],
+      "context_polyline_xz": [
+        [
+          -553.926,
+          162.034
+        ],
+        [
+          -593.82,
+          175.936
+        ],
+        [
+          -599.191,
+          174.647
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0022",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0169",
+      "canonical_road_id": "cr_0168",
+      "road_class": "residential",
+      "point_index": 4,
+      "turn_angle_deg": 36.036,
+      "interior_angle_deg": 143.964,
+      "suggested_cut_m": 1.202,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 41.787,
+      "center_xz": [
+        -604.214,
+        170.704
+      ],
+      "context_polyline_xz": [
+        [
+          -602.043,
+          173.006
+        ],
+        [
+          -604.214,
+          170.704
+        ],
+        [
+          -608.121,
+          140.157
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0023",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0169",
+      "canonical_road_id": "cr_0168",
+      "road_class": "residential",
+      "point_index": 5,
+      "turn_angle_deg": 75.283,
+      "interior_angle_deg": 104.717,
+      "suggested_cut_m": 3.764,
+      "suggested_radius_m": 5.162,
+      "nearest_junction_distance_m": 60.931,
+      "center_xz": [
+        -608.121,
+        140.157
+      ],
+      "context_polyline_xz": [
+        [
+          -604.214,
+          170.704
+        ],
+        [
+          -608.121,
+          140.157
+        ],
+        [
+          -486.913,
+          91.176
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0024",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0171",
+      "canonical_road_id": "cr_0170",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 62.423,
+      "interior_angle_deg": 117.577,
+      "suggested_cut_m": 2.081,
+      "suggested_radius_m": 2.854,
+      "nearest_junction_distance_m": 15.283,
+      "center_xz": [
+        -471.124,
+        -194.036
+      ],
+      "context_polyline_xz": [
+        [
+          -479.688,
+          -201.875
+        ],
+        [
+          -471.124,
+          -194.036
+        ],
+        [
+          -440.309,
+          -205.224
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0025",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0171",
+      "canonical_road_id": "cr_0170",
+      "road_class": "service",
+      "point_index": 2,
+      "turn_angle_deg": 65.591,
+      "interior_angle_deg": 114.409,
+      "suggested_cut_m": 2.186,
+      "suggested_radius_m": 2.998,
+      "nearest_junction_distance_m": 14.94,
+      "center_xz": [
+        -440.309,
+        -205.224
+      ],
+      "context_polyline_xz": [
+        [
+          -471.124,
+          -194.036
+        ],
+        [
+          -440.309,
+          -205.224
+        ],
+        [
+          -439.425,
+          -216.559
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0026",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0176",
+      "canonical_road_id": "cr_0175",
+      "road_class": "path",
+      "point_index": 1,
+      "turn_angle_deg": 58.379,
+      "interior_angle_deg": 121.621,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.669,
+      "nearest_junction_distance_m": 8.581,
+      "center_xz": [
+        -598.16,
+        -139.567
+      ],
+      "context_polyline_xz": [
+        [
+          -583.708,
+          -133.966
+        ],
+        [
+          -598.16,
+          -139.567
+        ],
+        [
+          -602.606,
+          -136.193
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0027",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0179",
+      "canonical_road_id": "cr_0178",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 88.287,
+      "interior_angle_deg": 91.713,
+      "suggested_cut_m": 4.414,
+      "suggested_radius_m": 6.054,
+      "nearest_junction_distance_m": 96.457,
+      "center_xz": [
+        600.959,
+        -25.142
+      ],
+      "context_polyline_xz": [
+        [
+          583.751,
+          -115.845
+        ],
+        [
+          600.959,
+          -25.142
+        ],
+        [
+          567.345,
+          -17.717
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0028",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0179",
+      "canonical_road_id": "cr_0178",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 88.261,
+      "interior_angle_deg": 91.739,
+      "suggested_cut_m": 4.413,
+      "suggested_radius_m": 6.052,
+      "nearest_junction_distance_m": 95.718,
+      "center_xz": [
+        567.345,
+        -17.717
+      ],
+      "context_polyline_xz": [
+        [
+          600.959,
+          -25.142
+        ],
+        [
+          567.345,
+          -17.717
+        ],
+        [
+          610.128,
+          208.341
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0029",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0181",
+      "canonical_road_id": "cr_0180",
+      "road_class": "service",
+      "point_index": 3,
+      "turn_angle_deg": 55.682,
+      "interior_angle_deg": 124.318,
+      "suggested_cut_m": 1.845,
+      "suggested_radius_m": 2.545,
+      "nearest_junction_distance_m": 135.6,
+      "center_xz": [
+        -512.887,
+        -681.54
+      ],
+      "context_polyline_xz": [
+        [
+          -516.88,
+          -684.301
+        ],
+        [
+          -512.887,
+          -681.54
+        ],
+        [
+          -513.028,
+          -657.896
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0030",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0181",
+      "canonical_road_id": "cr_0180",
+      "road_class": "service",
+      "point_index": 13,
+      "turn_angle_deg": 30.758,
+      "interior_angle_deg": 149.242,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 39.448,
+      "center_xz": [
+        -612.906,
+        -548.001
+      ],
+      "context_polyline_xz": [
+        [
+          -607.394,
+          -544.316
+        ],
+        [
+          -612.906,
+          -548.001
+        ],
+        [
+          -628.585,
+          -580.903
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0031",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0203",
+      "canonical_road_id": "cr_0202",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 51.753,
+      "interior_angle_deg": 128.247,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 33.329,
+      "center_xz": [
+        283.369,
+        -191.32
+      ],
+      "context_polyline_xz": [
+        [
+          295.13,
+          -192.767
+        ],
+        [
+          283.369,
+          -191.32
+        ],
+        [
+          278.063,
+          -182.57
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0032",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0203",
+      "canonical_road_id": "cr_0202",
+      "road_class": "residential",
+      "point_index": 4,
+      "turn_angle_deg": 30.286,
+      "interior_angle_deg": 149.714,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 49.51,
+      "center_xz": [
+        272.898,
+        -168.911
+      ],
+      "context_polyline_xz": [
+        [
+          278.063,
+          -182.57
+        ],
+        [
+          272.898,
+          -168.911
+        ],
+        [
+          264.966,
+          -162.488
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0033",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0203",
+      "canonical_road_id": "cr_0202",
+      "road_class": "residential",
+      "point_index": 6,
+      "turn_angle_deg": 80.57,
+      "interior_angle_deg": 99.43,
+      "suggested_cut_m": 4.029,
+      "suggested_radius_m": 5.525,
+      "nearest_junction_distance_m": 34.185,
+      "center_xz": [
+        187.039,
+        -141.549
+      ],
+      "context_polyline_xz": [
+        [
+          264.966,
+          -162.488
+        ],
+        [
+          187.039,
+          -141.549
+        ],
+        [
+          174.242,
+          -169.668
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0034",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0210",
+      "canonical_road_id": "cr_0209",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 77.171,
+      "interior_angle_deg": 102.829,
+      "suggested_cut_m": 3.859,
+      "suggested_radius_m": 5.292,
+      "nearest_junction_distance_m": 39.029,
+      "center_xz": [
+        606.623,
+        -272.695
+      ],
+      "context_polyline_xz": [
+        [
+          576.635,
+          -292.205
+        ],
+        [
+          606.623,
+          -272.695
+        ],
+        [
+          591.211,
+          -230.848
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0035",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0211",
+      "canonical_road_id": "cr_0210",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 70.169,
+      "interior_angle_deg": 109.831,
+      "suggested_cut_m": 3.508,
+      "suggested_radius_m": 4.812,
+      "nearest_junction_distance_m": 51.381,
+      "center_xz": [
+        -41.492,
+        -432.128
+      ],
+      "context_polyline_xz": [
+        [
+          -74.809,
+          -397.392
+        ],
+        [
+          -41.492,
+          -432.128
+        ],
+        [
+          -20.54,
+          -422.81
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0036",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0211",
+      "canonical_road_id": "cr_0210",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 52.886,
+      "interior_angle_deg": 127.114,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.626,
+      "nearest_junction_distance_m": 53.795,
+      "center_xz": [
+        -20.54,
+        -422.81
+      ],
+      "context_polyline_xz": [
+        [
+          -41.492,
+          -432.128
+        ],
+        [
+          -20.54,
+          -422.81
+        ],
+        [
+          -9.05,
+          -373.589
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0037",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0212",
+      "canonical_road_id": "cr_0211",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 53.232,
+      "interior_angle_deg": 126.768,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.65,
+      "nearest_junction_distance_m": 15.527,
+      "center_xz": [
+        -11.805,
+        -355.294
+      ],
+      "context_polyline_xz": [
+        [
+          -9.043,
+          -367.256
+        ],
+        [
+          -11.805,
+          -355.294
+        ],
+        [
+          -40.906,
+          -342.482
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0038",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0212",
+      "canonical_road_id": "cr_0211",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 50.331,
+      "interior_angle_deg": 129.669,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 42.932,
+      "center_xz": [
+        -40.906,
+        -342.482
+      ],
+      "context_polyline_xz": [
+        [
+          -11.805,
+          -355.294
+        ],
+        [
+          -40.906,
+          -342.482
+        ],
+        [
+          -60.697,
+          -352.378
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0039",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0212",
+      "canonical_road_id": "cr_0211",
+      "road_class": "residential",
+      "point_index": 3,
+      "turn_angle_deg": 42.453,
+      "interior_angle_deg": 137.547,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 45.136,
+      "center_xz": [
+        -60.697,
+        -352.378
+      ],
+      "context_polyline_xz": [
+        [
+          -40.906,
+          -342.482
+        ],
+        [
+          -60.697,
+          -352.378
+        ],
+        [
+          -75.895,
+          -392.012
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0040",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0218",
+      "canonical_road_id": "cr_0217",
+      "road_class": "residential",
+      "point_index": 7,
+      "turn_angle_deg": 34.128,
+      "interior_angle_deg": 145.872,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 26.326,
+      "center_xz": [
+        -650.101,
+        -107.307
+      ],
+      "context_polyline_xz": [
+        [
+          -660.875,
+          -141.36
+        ],
+        [
+          -650.101,
+          -107.307
+        ],
+        [
+          -637.59,
+          -97.422
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0041",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0218",
+      "canonical_road_id": "cr_0217",
+      "road_class": "residential",
+      "point_index": 8,
+      "turn_angle_deg": 35.415,
+      "interior_angle_deg": 144.585,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 11.657,
+      "center_xz": [
+        -637.59,
+        -97.422
+      ],
+      "context_polyline_xz": [
+        [
+          -650.101,
+          -107.307
+        ],
+        [
+          -637.59,
+          -97.422
+        ],
+        [
+          -629.436,
+          -97.009
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0042",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0219",
+      "canonical_road_id": "cr_0218",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 33.237,
+      "interior_angle_deg": 146.763,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 13.592,
+      "center_xz": [
+        -616.052,
+        -106.149
+      ],
+      "context_polyline_xz": [
+        [
+          -623.404,
+          -99.226
+        ],
+        [
+          -616.052,
+          -106.149
+        ],
+        [
+          -608.488,
+          -137.691
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0043",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0225",
+      "canonical_road_id": "cr_0223_closed_loop_a",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 89.75,
+      "interior_angle_deg": 90.25,
+      "suggested_cut_m": 2.992,
+      "suggested_radius_m": 4.103,
+      "nearest_junction_distance_m": 20.257,
+      "center_xz": [
+        383.344,
+        414.84
+      ],
+      "context_polyline_xz": [
+        [
+          366.188,
+          412.972
+        ],
+        [
+          383.344,
+          414.84
+        ],
+        [
+          385.599,
+          394.939
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0044",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0226",
+      "canonical_road_id": "cr_0223_closed_loop_b",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 90.143,
+      "interior_angle_deg": 89.857,
+      "suggested_cut_m": 3.005,
+      "suggested_radius_m": 4.121,
+      "nearest_junction_distance_m": 23.534,
+      "center_xz": [
+        365.821,
+        389.258
+      ],
+      "context_polyline_xz": [
+        [
+          382.605,
+          391.177
+        ],
+        [
+          365.821,
+          389.258
+        ],
+        [
+          363.539,
+          409.665
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0045",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0266",
+      "canonical_road_id": "cr_0263",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 85.705,
+      "interior_angle_deg": 94.295,
+      "suggested_cut_m": 4.285,
+      "suggested_radius_m": 5.877,
+      "nearest_junction_distance_m": 41.622,
+      "center_xz": [
+        34.667,
+        -170.748
+      ],
+      "context_polyline_xz": [
+        [
+          -10.256,
+          -304.575
+        ],
+        [
+          34.667,
+          -170.748
+        ],
+        [
+          -0.687,
+          -155.85
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0046",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0269",
+      "canonical_road_id": "cr_0266",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 84.471,
+      "interior_angle_deg": 95.529,
+      "suggested_cut_m": 1.718,
+      "suggested_radius_m": 5.792,
+      "nearest_junction_distance_m": 7.8,
+      "center_xz": [
+        -31.39,
+        -152.859
+      ],
+      "context_polyline_xz": [
+        [
+          -28.698,
+          -149.227
+        ],
+        [
+          -31.39,
+          -152.859
+        ],
+        [
+          -61.86,
+          -134.541
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0047",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0272",
+      "canonical_road_id": "cr_0269",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 90.938,
+      "interior_angle_deg": 89.062,
+      "suggested_cut_m": 4.547,
+      "suggested_radius_m": 6.236,
+      "nearest_junction_distance_m": 126.472,
+      "center_xz": [
+        709.344,
+        -597.816
+      ],
+      "context_polyline_xz": [
+        [
+          576.513,
+          -603.115
+        ],
+        [
+          709.344,
+          -597.816
+        ],
+        [
+          710.461,
+          -645.383
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0048",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0272",
+      "canonical_road_id": "cr_0269",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 87.35,
+      "interior_angle_deg": 92.65,
+      "suggested_cut_m": 4.367,
+      "suggested_radius_m": 5.99,
+      "nearest_junction_distance_m": 115.001,
+      "center_xz": [
+        710.461,
+        -645.383
+      ],
+      "context_polyline_xz": [
+        [
+          709.344,
+          -597.816
+        ],
+        [
+          710.461,
+          -645.383
+        ],
+        [
+          600.786,
+          -653.045
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0049",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0276",
+      "canonical_road_id": "cr_0273",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 127.438,
+      "interior_angle_deg": 52.562,
+      "suggested_cut_m": 3.75,
+      "suggested_radius_m": 5.76,
+      "nearest_junction_distance_m": 20.55,
+      "center_xz": [
+        337.165,
+        -21.112
+      ],
+      "context_polyline_xz": [
+        [
+          342.308,
+          -4.333
+        ],
+        [
+          337.165,
+          -21.112
+        ],
+        [
+          364.034,
+          -11.121
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0050",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0281",
+      "canonical_road_id": "cr_0278",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 89.744,
+      "interior_angle_deg": 90.256,
+      "suggested_cut_m": 2.991,
+      "suggested_radius_m": 4.103,
+      "nearest_junction_distance_m": 34.577,
+      "center_xz": [
+        446.992,
+        523.343
+      ],
+      "context_polyline_xz": [
+        [
+          329.906,
+          515.453
+        ],
+        [
+          446.992,
+          523.343
+        ],
+        [
+          445.214,
+          551.612
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0051",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0282",
+      "canonical_road_id": "cr_0279",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 89.02,
+      "interior_angle_deg": 90.98,
+      "suggested_cut_m": 2.967,
+      "suggested_radius_m": 4.069,
+      "nearest_junction_distance_m": 34.549,
+      "center_xz": [
+        464.114,
+        67.276
+      ],
+      "context_polyline_xz": [
+        [
+          435.292,
+          59.72
+        ],
+        [
+          464.114,
+          67.276
+        ],
+        [
+          455.043,
+          104.457
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0052",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0287",
+      "canonical_road_id": "cr_0284",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 90.886,
+      "interior_angle_deg": 89.114,
+      "suggested_cut_m": 4.544,
+      "suggested_radius_m": 6.232,
+      "nearest_junction_distance_m": 23.056,
+      "center_xz": [
+        474.227,
+        356.23
+      ],
+      "context_polyline_xz": [
+        [
+          474.479,
+          376.032
+        ],
+        [
+          474.227,
+          356.23
+        ],
+        [
+          518.844,
+          356.352
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0053",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0288",
+      "canonical_road_id": "cr_0285",
+      "road_class": "residential",
+      "point_index": 3,
+      "turn_angle_deg": 35.424,
+      "interior_angle_deg": 144.576,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 63.181,
+      "center_xz": [
+        131.333,
+        -220.263
+      ],
+      "context_polyline_xz": [
+        [
+          121.513,
+          -202.307
+        ],
+        [
+          131.333,
+          -220.263
+        ],
+        [
+          128.968,
+          -240.245
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0054",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0288",
+      "canonical_road_id": "cr_0285",
+      "road_class": "residential",
+      "point_index": 5,
+      "turn_angle_deg": 43.924,
+      "interior_angle_deg": 136.076,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 91.201,
+      "center_xz": [
+        119.484,
+        -264.969
+      ],
+      "context_polyline_xz": [
+        [
+          128.968,
+          -240.245
+        ],
+        [
+          119.484,
+          -264.969
+        ],
+        [
+          103.556,
+          -272.428
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0055",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0288",
+      "canonical_road_id": "cr_0285",
+      "road_class": "residential",
+      "point_index": 6,
+      "turn_angle_deg": 39.159,
+      "interior_angle_deg": 140.841,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 85.53,
+      "center_xz": [
+        103.556,
+        -272.428
+      ],
+      "context_polyline_xz": [
+        [
+          119.484,
+          -264.969
+        ],
+        [
+          103.556,
+          -272.428
+        ],
+        [
+          92.717,
+          -269.712
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0056",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0289",
+      "canonical_road_id": "cr_0286_closed_loop_a",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 85.901,
+      "interior_angle_deg": 94.099,
+      "suggested_cut_m": 2.863,
+      "suggested_radius_m": 3.927,
+      "nearest_junction_distance_m": 84.424,
+      "center_xz": [
+        -644.708,
+        -247.292
+      ],
+      "context_polyline_xz": [
+        [
+          -614.922,
+          -172.788
+        ],
+        [
+          -644.708,
+          -247.292
+        ],
+        [
+          -631.706,
+          -253.603
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0057",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0290",
+      "canonical_road_id": "cr_0286_closed_loop_b",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 46.166,
+      "interior_angle_deg": 133.834,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 19.726,
+      "center_xz": [
+        -604.366,
+        -186.311
+      ],
+      "context_polyline_xz": [
+        [
+          -627.218,
+          -251.749
+        ],
+        [
+          -604.366,
+          -186.311
+        ],
+        [
+          -611.314,
+          -172.626
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0058",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0298",
+      "canonical_road_id": "cr_0294",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 78.711,
+      "interior_angle_deg": 101.289,
+      "suggested_cut_m": 2.624,
+      "suggested_radius_m": 3.598,
+      "nearest_junction_distance_m": 10.82,
+      "center_xz": [
+        581.266,
+        -553.333
+      ],
+      "context_polyline_xz": [
+        [
+          579.708,
+          -545.95
+        ],
+        [
+          581.266,
+          -553.333
+        ],
+        [
+          611.734,
+          -552.999
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0059",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0300",
+      "canonical_road_id": "cr_0296",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 72.325,
+      "interior_angle_deg": 107.675,
+      "suggested_cut_m": 2.411,
+      "suggested_radius_m": 3.306,
+      "nearest_junction_distance_m": 23.85,
+      "center_xz": [
+        -9.103,
+        239.911
+      ],
+      "context_polyline_xz": [
+        [
+          -6.948,
+          257.199
+        ],
+        [
+          -9.103,
+          239.911
+        ],
+        [
+          -18.891,
+          238.086
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0060",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0300",
+      "canonical_road_id": "cr_0296",
+      "road_class": "service",
+      "point_index": 2,
+      "turn_angle_deg": 63.966,
+      "interior_angle_deg": 116.034,
+      "suggested_cut_m": 2.132,
+      "suggested_radius_m": 2.924,
+      "nearest_junction_distance_m": 28.498,
+      "center_xz": [
+        -18.891,
+        238.086
+      ],
+      "context_polyline_xz": [
+        [
+          -9.103,
+          239.911
+        ],
+        [
+          -18.891,
+          238.086
+        ],
+        [
+          -30.728,
+          195.305
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0061",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0302",
+      "canonical_road_id": "cr_0298",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 83.327,
+      "interior_angle_deg": 96.673,
+      "suggested_cut_m": 2.778,
+      "suggested_radius_m": 3.809,
+      "nearest_junction_distance_m": 60.217,
+      "center_xz": [
+        -332.141,
+        535.689
+      ],
+      "context_polyline_xz": [
+        [
+          -393.317,
+          562.99
+        ],
+        [
+          -332.141,
+          535.689
+        ],
+        [
+          -339.15,
+          513.291
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0062",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0305",
+      "canonical_road_id": "cr_0301",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 81.356,
+      "interior_angle_deg": 98.644,
+      "suggested_cut_m": 2.712,
+      "suggested_radius_m": 3.719,
+      "nearest_junction_distance_m": 67.006,
+      "center_xz": [
+        46.429,
+        222.044
+      ],
+      "context_polyline_xz": [
+        [
+          14.053,
+          278.057
+        ],
+        [
+          46.429,
+          222.044
+        ],
+        [
+          78.752,
+          234.702
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0063",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0306",
+      "canonical_road_id": "cr_0302",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 88.27,
+      "interior_angle_deg": 91.73,
+      "suggested_cut_m": 2.942,
+      "suggested_radius_m": 4.035,
+      "nearest_junction_distance_m": 14.33,
+      "center_xz": [
+        85.577,
+        119.897
+      ],
+      "context_polyline_xz": [
+        [
+          85.8,
+          108.569
+        ],
+        [
+          85.577,
+          119.897
+        ],
+        [
+          65.363,
+          120.109
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0064",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0310",
+      "canonical_road_id": "cr_0306",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 98.117,
+      "interior_angle_deg": 81.883,
+      "suggested_cut_m": 3.271,
+      "suggested_radius_m": 4.485,
+      "nearest_junction_distance_m": 18.436,
+      "center_xz": [
+        104.185,
+        107.574
+      ],
+      "context_polyline_xz": [
+        [
+          88.841,
+          105.896
+        ],
+        [
+          104.185,
+          107.574
+        ],
+        [
+          102.95,
+          69.87
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0065",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0322",
+      "canonical_road_id": "cr_0318",
+      "road_class": "service",
+      "point_index": 2,
+      "turn_angle_deg": 41.527,
+      "interior_angle_deg": 138.473,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 15.518,
+      "center_xz": [
+        -594.807,
+        383.926
+      ],
+      "context_polyline_xz": [
+        [
+          -600.341,
+          384.661
+        ],
+        [
+          -594.807,
+          383.926
+        ],
+        [
+          -589.436,
+          387.544
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0066",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0322",
+      "canonical_road_id": "cr_0318",
+      "road_class": "service",
+      "point_index": 3,
+      "turn_angle_deg": 35.028,
+      "interior_angle_deg": 144.972,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 19.684,
+      "center_xz": [
+        -589.436,
+        387.544
+      ],
+      "context_polyline_xz": [
+        [
+          -594.807,
+          383.926
+        ],
+        [
+          -589.436,
+          387.544
+        ],
+        [
+          -569.678,
+          438.996
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0067",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0322",
+      "canonical_road_id": "cr_0318",
+      "road_class": "service",
+      "point_index": 5,
+      "turn_angle_deg": 36.093,
+      "interior_angle_deg": 143.907,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 66.851,
+      "center_xz": [
+        -570.296,
+        444.963
+      ],
+      "context_polyline_xz": [
+        [
+          -569.678,
+          438.996
+        ],
+        [
+          -570.296,
+          444.963
+        ],
+        [
+          -608.218,
+          487.064
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0068",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0335",
+      "canonical_road_id": "cr_0331",
+      "road_class": "residential",
+      "point_index": 5,
+      "turn_angle_deg": 29.176,
+      "interior_angle_deg": 150.824,
+      "suggested_cut_m": 1.235,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 33.831,
+      "center_xz": [
+        488.658,
+        207.361
+      ],
+      "context_polyline_xz": [
+        [
+          487.095,
+          204.512
+        ],
+        [
+          488.658,
+          207.361
+        ],
+        [
+          488.422,
+          237.941
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0069",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0343",
+      "canonical_road_id": "cr_0339",
+      "road_class": "residential",
+      "point_index": 4,
+      "turn_angle_deg": 30.026,
+      "interior_angle_deg": 149.974,
+      "suggested_cut_m": 0.798,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 5.969,
+      "center_xz": [
+        199.441,
+        333.498
+      ],
+      "context_polyline_xz": [
+        [
+          194.624,
+          332.73
+        ],
+        [
+          199.441,
+          333.498
+        ],
+        [
+          201.072,
+          334.823
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0070",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0345",
+      "canonical_road_id": "cr_0341",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 28.323,
+      "interior_angle_deg": 151.677,
+      "suggested_cut_m": 1.353,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 30.464,
+      "center_xz": [
+        207.524,
+        306.993
+      ],
+      "context_polyline_xz": [
+        [
+          204.512,
+          333.418
+        ],
+        [
+          207.524,
+          306.993
+        ],
+        [
+          206.201,
+          303.687
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0071",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0345",
+      "canonical_road_id": "cr_0341",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 57.289,
+      "interior_angle_deg": 122.711,
+      "suggested_cut_m": 1.353,
+      "suggested_radius_m": 3.928,
+      "nearest_junction_distance_m": 33.642,
+      "center_xz": [
+        206.201,
+        303.687
+      ],
+      "context_polyline_xz": [
+        [
+          207.524,
+          306.993
+        ],
+        [
+          206.201,
+          303.687
+        ],
+        [
+          202.041,
+          302.886
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0072",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0348",
+      "canonical_road_id": "cr_0344",
+      "road_class": "residential",
+      "point_index": 6,
+      "turn_angle_deg": 30.888,
+      "interior_angle_deg": 149.112,
+      "suggested_cut_m": 2.058,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 102.528,
+      "center_xz": [
+        672.214,
+        245.043
+      ],
+      "context_polyline_xz": [
+        [
+          668.763,
+          240.869
+        ],
+        [
+          672.214,
+          245.043
+        ],
+        [
+          674.416,
+          259.459
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0073",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0349",
+      "canonical_road_id": "cr_0345",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 30.943,
+      "interior_angle_deg": 149.057,
+      "suggested_cut_m": 1.272,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 27.815,
+      "center_xz": [
+        371.702,
+        163.913
+      ],
+      "context_polyline_xz": [
+        [
+          393.617,
+          170.469
+        ],
+        [
+          371.702,
+          163.913
+        ],
+        [
+          369.445,
+          161.442
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0074",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0349",
+      "canonical_road_id": "cr_0345",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 56.2,
+      "interior_angle_deg": 123.8,
+      "suggested_cut_m": 1.272,
+      "suggested_radius_m": 3.854,
+      "nearest_junction_distance_m": 30.734,
+      "center_xz": [
+        369.445,
+        161.442
+      ],
+      "context_polyline_xz": [
+        [
+          371.702,
+          163.913
+        ],
+        [
+          369.445,
+          161.442
+        ],
+        [
+          379.526,
+          120.389
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0075",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0353",
+      "canonical_road_id": "cr_0349",
+      "road_class": "residential",
+      "point_index": 4,
+      "turn_angle_deg": 36.289,
+      "interior_angle_deg": 143.711,
+      "suggested_cut_m": 2.15,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 52.663,
+      "center_xz": [
+        -215.424,
+        204.968
+      ],
+      "context_polyline_xz": [
+        [
+          -199.68,
+          201.038
+        ],
+        [
+          -215.424,
+          204.968
+        ],
+        [
+          -219.037,
+          209.321
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0076",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0353",
+      "canonical_road_id": "cr_0349",
+      "road_class": "residential",
+      "point_index": 5,
+      "turn_angle_deg": 36.504,
+      "interior_angle_deg": 143.496,
+      "suggested_cut_m": 2.15,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 58.245,
+      "center_xz": [
+        -219.037,
+        209.321
+      ],
+      "context_polyline_xz": [
+        [
+          -215.424,
+          204.968
+        ],
+        [
+          -219.037,
+          209.321
+        ],
+        [
+          -222.55,
+          272.307
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0077",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0377",
+      "canonical_road_id": "cr_0373",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 32.639,
+      "interior_angle_deg": 147.361,
+      "suggested_cut_m": 2.637,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 24.186,
+      "center_xz": [
+        220.436,
+        162.31
+      ],
+      "context_polyline_xz": [
+        [
+          195.969,
+          137.848
+        ],
+        [
+          220.436,
+          162.31
+        ],
+        [
+          221.923,
+          169.09
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0078",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0377",
+      "canonical_road_id": "cr_0373",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 55.426,
+      "interior_angle_deg": 124.574,
+      "suggested_cut_m": 2.637,
+      "suggested_radius_m": 3.801,
+      "nearest_junction_distance_m": 19.563,
+      "center_xz": [
+        221.923,
+        169.09
+      ],
+      "context_polyline_xz": [
+        [
+          220.436,
+          162.31
+        ],
+        [
+          221.923,
+          169.09
+        ],
+        [
+          211.174,
+          180.592
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0079",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0379",
+      "canonical_road_id": "cr_0375",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 29.193,
+      "interior_angle_deg": 150.807,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 14.136,
+      "center_xz": [
+        138.657,
+        246.535
+      ],
+      "context_polyline_xz": [
+        [
+          158.416,
+          227.093
+        ],
+        [
+          138.657,
+          246.535
+        ],
+        [
+          135.607,
+          256.986
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0080",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0387",
+      "canonical_road_id": "cr_0383",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 88.31,
+      "interior_angle_deg": 91.69,
+      "suggested_cut_m": 4.416,
+      "suggested_radius_m": 6.056,
+      "nearest_junction_distance_m": 62.374,
+      "center_xz": [
+        16.395,
+        -61.977
+      ],
+      "context_polyline_xz": [
+        [
+          100.868,
+          -100.41
+        ],
+        [
+          16.395,
+          -61.977
+        ],
+        [
+          29.415,
+          -30.964
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0081",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0387",
+      "canonical_road_id": "cr_0383",
+      "road_class": "residential",
+      "point_index": 3,
+      "turn_angle_deg": 41.768,
+      "interior_angle_deg": 138.232,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 42.737,
+      "center_xz": [
+        30.913,
+        -21.357
+      ],
+      "context_polyline_xz": [
+        [
+          29.415,
+          -30.964
+        ],
+        [
+          30.913,
+          -21.357
+        ],
+        [
+          9.479,
+          11.763
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0082",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0388",
+      "canonical_road_id": "cr_0384",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 108.555,
+      "interior_angle_deg": 71.445,
+      "suggested_cut_m": 5.428,
+      "suggested_radius_m": 7.444,
+      "nearest_junction_distance_m": 38.708,
+      "center_xz": [
+        -27.18,
+        -609.56
+      ],
+      "context_polyline_xz": [
+        [
+          99.455,
+          -703.581
+        ],
+        [
+          -27.18,
+          -609.56
+        ],
+        [
+          -41.243,
+          -652.747
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0083",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0393",
+      "canonical_road_id": "cr_0389",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 83.609,
+      "interior_angle_deg": 96.391,
+      "suggested_cut_m": 2.787,
+      "suggested_radius_m": 3.822,
+      "nearest_junction_distance_m": 31.024,
+      "center_xz": [
+        385.525,
+        22.036
+      ],
+      "context_polyline_xz": [
+        [
+          375.891,
+          -4.28
+        ],
+        [
+          385.525,
+          22.036
+        ],
+        [
+          409.971,
+          16.069
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0084",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0393",
+      "canonical_road_id": "cr_0389",
+      "road_class": "service",
+      "point_index": 2,
+      "turn_angle_deg": 53.763,
+      "interior_angle_deg": 126.237,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.458,
+      "nearest_junction_distance_m": 8.809,
+      "center_xz": [
+        409.971,
+        16.069
+      ],
+      "context_polyline_xz": [
+        [
+          385.525,
+          22.036
+        ],
+        [
+          409.971,
+          16.069
+        ],
+        [
+          412.563,
+          9.817
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0085",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0394",
+      "canonical_road_id": "cr_0390",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 29.859,
+      "interior_angle_deg": 150.141,
+      "suggested_cut_m": 0.408,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 5.892,
+      "center_xz": [
+        465.199,
+        -363.399
+      ],
+      "context_polyline_xz": [
+        [
+          464.18,
+          -363.734
+        ],
+        [
+          465.199,
+          -363.399
+        ],
+        [
+          480.543,
+          -366.563
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0086",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0395",
+      "canonical_road_id": "cr_0391",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 31.49,
+      "interior_angle_deg": 148.51,
+      "suggested_cut_m": 0.419,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 5.921,
+      "center_xz": [
+        463.81,
+        -369.399
+      ],
+      "context_polyline_xz": [
+        [
+          480.973,
+          -373.422
+        ],
+        [
+          463.81,
+          -369.399
+        ],
+        [
+          463.027,
+          -368.624
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0087",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0456",
+      "canonical_road_id": "cr_0452",
+      "road_class": "secondary_link",
+      "point_index": 2,
+      "turn_angle_deg": 28.929,
+      "interior_angle_deg": 151.071,
+      "suggested_cut_m": 1.494,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 9.839,
+      "center_xz": [
+        -561.052,
+        606.277
+      ],
+      "context_polyline_xz": [
+        [
+          -557.623,
+          602.269
+        ],
+        [
+          -561.052,
+          606.277
+        ],
+        [
+          -561.844,
+          610.128
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0088",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0456",
+      "canonical_road_id": "cr_0452",
+      "road_class": "secondary_link",
+      "point_index": 3,
+      "turn_angle_deg": 40.237,
+      "interior_angle_deg": 139.763,
+      "suggested_cut_m": 1.492,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 8.146,
+      "center_xz": [
+        -561.844,
+        610.128
+      ],
+      "context_polyline_xz": [
+        [
+          -561.052,
+          606.277
+        ],
+        [
+          -561.844,
+          610.128
+        ],
+        [
+          -559.963,
+          613.575
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0089",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0463",
+      "canonical_road_id": "cr_0459",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 30.951,
+      "interior_angle_deg": 149.049,
+      "suggested_cut_m": 1.218,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 37.374,
+      "center_xz": [
+        -214.577,
+        467.16
+      ],
+      "context_polyline_xz": [
+        [
+          -244.6,
+          483.368
+        ],
+        [
+          -214.577,
+          467.16
+        ],
+        [
+          -211.376,
+          467.305
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0090",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0463",
+      "canonical_road_id": "cr_0459",
+      "road_class": "residential",
+      "point_index": 3,
+      "turn_angle_deg": 28.005,
+      "interior_angle_deg": 151.995,
+      "suggested_cut_m": 1.583,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 42.667,
+      "center_xz": [
+        -207.741,
+        469.342
+      ],
+      "context_polyline_xz": [
+        [
+          -211.376,
+          467.305
+        ],
+        [
+          -207.741,
+          469.342
+        ],
+        [
+          -176.579,
+          517.833
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0091",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0467",
+      "canonical_road_id": "cr_0463",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 56.516,
+      "interior_angle_deg": 123.484,
+      "suggested_cut_m": 1.277,
+      "suggested_radius_m": 3.875,
+      "nearest_junction_distance_m": 86.007,
+      "center_xz": [
+        -81.573,
+        210.912
+      ],
+      "context_polyline_xz": [
+        [
+          -80.564,
+          214.118
+        ],
+        [
+          -81.573,
+          210.912
+        ],
+        [
+          -79.099,
+          207.862
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0092",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0467",
+      "canonical_road_id": "cr_0463",
+      "road_class": "residential",
+      "point_index": 3,
+      "turn_angle_deg": 32.924,
+      "interior_angle_deg": 147.076,
+      "suggested_cut_m": 1.492,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 85.172,
+      "center_xz": [
+        -79.099,
+        207.862
+      ],
+      "context_polyline_xz": [
+        [
+          -81.573,
+          210.912
+        ],
+        [
+          -79.099,
+          207.862
+        ],
+        [
+          -54.512,
+          199.858
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0093",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0469",
+      "canonical_road_id": "cr_0465",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 45.262,
+      "interior_angle_deg": 134.738,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 31.88,
+      "center_xz": [
+        13.541,
+        353.858
+      ],
+      "context_polyline_xz": [
+        [
+          32.686,
+          379.217
+        ],
+        [
+          13.541,
+          353.858
+        ],
+        [
+          19.162,
+          314.908
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0094",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0471",
+      "canonical_road_id": "cr_0467",
+      "road_class": "residential",
+      "point_index": 6,
+      "turn_angle_deg": 29.037,
+      "interior_angle_deg": 150.963,
+      "suggested_cut_m": 2.805,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 66.659,
+      "center_xz": [
+        80.087,
+        304.766
+      ],
+      "context_polyline_xz": [
+        [
+          73.837,
+          308.696
+        ],
+        [
+          80.087,
+          304.766
+        ],
+        [
+          96.004,
+          303.898
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0095",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0472",
+      "canonical_road_id": "cr_0468",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 30.276,
+      "interior_angle_deg": 149.724,
+      "suggested_cut_m": 2.925,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 29.913,
+      "center_xz": [
+        138.592,
+        364.289
+      ],
+      "context_polyline_xz": [
+        [
+          139.612,
+          338.966
+        ],
+        [
+          138.592,
+          364.289
+        ],
+        [
+          133.199,
+          372.727
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0096",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0472",
+      "canonical_road_id": "cr_0468",
+      "road_class": "residential",
+      "point_index": 3,
+      "turn_angle_deg": 33.543,
+      "interior_angle_deg": 146.457,
+      "suggested_cut_m": 2.311,
+      "suggested_radius_m": 3.6,
+      "nearest_junction_distance_m": 22.304,
+      "center_xz": [
+        123.597,
+        379.562
+      ],
+      "context_polyline_xz": [
+        [
+          133.199,
+          372.727
+        ],
+        [
+          123.597,
+          379.562
+        ],
+        [
+          121.416,
+          385.24
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0097",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0473",
+      "canonical_road_id": "cr_0469",
+      "road_class": "service",
+      "point_index": 3,
+      "turn_angle_deg": 42.787,
+      "interior_angle_deg": 137.213,
+      "suggested_cut_m": 1.504,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 53.082,
+      "center_xz": [
+        297.637,
+        330.381
+      ],
+      "context_polyline_xz": [
+        [
+          299.959,
+          333.587
+        ],
+        [
+          297.637,
+          330.381
+        ],
+        [
+          272.898,
+          325.438
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0098",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0479",
+      "canonical_road_id": "cr_0475",
+      "road_class": "service",
+      "point_index": 4,
+      "turn_angle_deg": 68.423,
+      "interior_angle_deg": 111.577,
+      "suggested_cut_m": 1.388,
+      "suggested_radius_m": 3.128,
+      "nearest_junction_distance_m": 31.729,
+      "center_xz": [
+        -313.164,
+        -417.79
+      ],
+      "context_polyline_xz": [
+        [
+          -316.734,
+          -417.021
+        ],
+        [
+          -313.164,
+          -417.79
+        ],
+        [
+          -272.345,
+          -356.63
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0099",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0480",
+      "canonical_road_id": "cr_0476",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 84.355,
+      "interior_angle_deg": 95.645,
+      "suggested_cut_m": 4.218,
+      "suggested_radius_m": 5.784,
+      "nearest_junction_distance_m": 58.694,
+      "center_xz": [
+        63.41,
+        -591.638
+      ],
+      "context_polyline_xz": [
+        [
+          -28.971,
+          -527.188
+        ],
+        [
+          63.41,
+          -591.638
+        ],
+        [
+          53.438,
+          -609.438
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0100",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0480",
+      "canonical_road_id": "cr_0476",
+      "road_class": "residential",
+      "point_index": 2,
+      "turn_angle_deg": 84.814,
+      "interior_angle_deg": 95.186,
+      "suggested_cut_m": 4.241,
+      "suggested_radius_m": 5.816,
+      "nearest_junction_distance_m": 53.22,
+      "center_xz": [
+        53.438,
+        -609.438
+      ],
+      "context_polyline_xz": [
+        [
+          63.41,
+          -591.638
+        ],
+        [
+          53.438,
+          -609.438
+        ],
+        [
+          94.639,
+          -637.694
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0101",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0496",
+      "canonical_road_id": "cr_0492",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 34.47,
+      "interior_angle_deg": 145.53,
+      "suggested_cut_m": 1.155,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 30.222,
+      "center_xz": [
+        171.252,
+        -133.3
+      ],
+      "context_polyline_xz": [
+        [
+          155.707,
+          -155.264
+        ],
+        [
+          171.252,
+          -133.3
+        ],
+        [
+          171.295,
+          -130.261
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0102",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0496",
+      "canonical_road_id": "cr_0492",
+      "road_class": "service",
+      "point_index": 2,
+      "turn_angle_deg": 51.338,
+      "interior_angle_deg": 128.662,
+      "suggested_cut_m": 1.155,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 32.773,
+      "center_xz": [
+        171.295,
+        -130.261
+      ],
+      "context_polyline_xz": [
+        [
+          171.252,
+          -133.3
+        ],
+        [
+          171.295,
+          -130.261
+        ],
+        [
+          154.227,
+          -116.201
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0103",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0505",
+      "canonical_road_id": "cr_0501",
+      "road_class": "footway",
+      "point_index": 1,
+      "turn_angle_deg": 38.505,
+      "interior_angle_deg": 141.495,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 23.59,
+      "center_xz": [
+        -148.802,
+        -118.639
+      ],
+      "context_polyline_xz": [
+        [
+          -172.748,
+          -114.874
+        ],
+        [
+          -148.802,
+          -118.639
+        ],
+        [
+          -122.531,
+          -103.734
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0104",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0506",
+      "canonical_road_id": "cr_0502",
+      "road_class": "footway",
+      "point_index": 1,
+      "turn_angle_deg": 79.298,
+      "interior_angle_deg": 100.702,
+      "suggested_cut_m": 2.115,
+      "suggested_radius_m": 3.625,
+      "nearest_junction_distance_m": 9.243,
+      "center_xz": [
+        -114.971,
+        -93.77
+      ],
+      "context_polyline_xz": [
+        [
+          -117.598,
+          -98.676
+        ],
+        [
+          -114.971,
+          -93.77
+        ],
+        [
+          -122.056,
+          -88.06
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0105",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0506",
+      "canonical_road_id": "cr_0502",
+      "road_class": "footway",
+      "point_index": 2,
+      "turn_angle_deg": 29.93,
+      "interior_angle_deg": 150.07,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 14.124,
+      "center_xz": [
+        -122.056,
+        -88.06
+      ],
+      "context_polyline_xz": [
+        [
+          -114.971,
+          -93.77
+        ],
+        [
+          -122.056,
+          -88.06
+        ],
+        [
+          -148.596,
+          -83.885
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0106",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0506",
+      "canonical_road_id": "cr_0502",
+      "road_class": "footway",
+      "point_index": 3,
+      "turn_angle_deg": 91.007,
+      "interior_angle_deg": 88.993,
+      "suggested_cut_m": 3.034,
+      "suggested_radius_m": 4.16,
+      "nearest_junction_distance_m": 11.619,
+      "center_xz": [
+        -148.596,
+        -83.885
+      ],
+      "context_polyline_xz": [
+        [
+          -122.056,
+          -88.06
+        ],
+        [
+          -148.596,
+          -83.885
+        ],
+        [
+          -147.107,
+          -75.396
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0107",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0507",
+      "canonical_road_id": "cr_0503",
+      "road_class": "footway",
+      "point_index": 1,
+      "turn_angle_deg": 89.781,
+      "interior_angle_deg": 90.219,
+      "suggested_cut_m": 2.518,
+      "suggested_radius_m": 4.104,
+      "nearest_junction_distance_m": 9.626,
+      "center_xz": [
+        -144.82,
+        -62.979
+      ],
+      "context_polyline_xz": [
+        [
+          -146.037,
+          -69.493
+        ],
+        [
+          -144.82,
+          -62.979
+        ],
+        [
+          -128.696,
+          -65.929
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0108",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0507",
+      "canonical_road_id": "cr_0503",
+      "road_class": "footway",
+      "point_index": 2,
+      "turn_angle_deg": 90.108,
+      "interior_angle_deg": 89.892,
+      "suggested_cut_m": 3.004,
+      "suggested_radius_m": 4.119,
+      "nearest_junction_distance_m": 19.041,
+      "center_xz": [
+        -128.696,
+        -65.929
+      ],
+      "context_polyline_xz": [
+        [
+          -144.82,
+          -62.979
+        ],
+        [
+          -128.696,
+          -65.929
+        ],
+        [
+          -116.935,
+          -0.952
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0109",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0507",
+      "canonical_road_id": "cr_0503",
+      "road_class": "footway",
+      "point_index": 3,
+      "turn_angle_deg": 90.268,
+      "interior_angle_deg": 89.732,
+      "suggested_cut_m": 3.009,
+      "suggested_radius_m": 4.127,
+      "nearest_junction_distance_m": 56.118,
+      "center_xz": [
+        -116.935,
+        -0.952
+      ],
+      "context_polyline_xz": [
+        [
+          -128.696,
+          -65.929
+        ],
+        [
+          -116.935,
+          -0.952
+        ],
+        [
+          -136.205,
+          2.443
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0110",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0507",
+      "canonical_road_id": "cr_0503",
+      "road_class": "footway",
+      "point_index": 4,
+      "turn_angle_deg": 90.022,
+      "interior_angle_deg": 89.978,
+      "suggested_cut_m": 3.001,
+      "suggested_radius_m": 4.115,
+      "nearest_junction_distance_m": 45.276,
+      "center_xz": [
+        -136.205,
+        2.443
+      ],
+      "context_polyline_xz": [
+        [
+          -116.935,
+          -0.952
+        ],
+        [
+          -136.205,
+          2.443
+        ],
+        [
+          -143.42,
+          -38.6
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0111",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0507",
+      "canonical_road_id": "cr_0503",
+      "road_class": "footway",
+      "point_index": 5,
+      "turn_angle_deg": 90.851,
+      "interior_angle_deg": 89.149,
+      "suggested_cut_m": 3.028,
+      "suggested_radius_m": 4.153,
+      "nearest_junction_distance_m": 18.326,
+      "center_xz": [
+        -143.42,
+        -38.6
+      ],
+      "context_polyline_xz": [
+        [
+          -136.205,
+          2.443
+        ],
+        [
+          -143.42,
+          -38.6
+        ],
+        [
+          -158.474,
+          -35.723
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0112",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0508",
+      "canonical_road_id": "cr_0504",
+      "road_class": "footway",
+      "point_index": 1,
+      "turn_angle_deg": 90.543,
+      "interior_angle_deg": 89.457,
+      "suggested_cut_m": 3.018,
+      "suggested_radius_m": 4.139,
+      "nearest_junction_distance_m": 42.711,
+      "center_xz": [
+        -153.848,
+        6.874
+      ],
+      "context_polyline_xz": [
+        [
+          -160.889,
+          -32.207
+        ],
+        [
+          -153.848,
+          6.874
+        ],
+        [
+          -173.443,
+          10.214
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0113",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0508",
+      "canonical_road_id": "cr_0504",
+      "road_class": "footway",
+      "point_index": 2,
+      "turn_angle_deg": 89.844,
+      "interior_angle_deg": 90.156,
+      "suggested_cut_m": 2.995,
+      "suggested_radius_m": 4.107,
+      "nearest_junction_distance_m": 46.939,
+      "center_xz": [
+        -173.443,
+        10.214
+      ],
+      "context_polyline_xz": [
+        [
+          -153.848,
+          6.874
+        ],
+        [
+          -173.443,
+          10.214
+        ],
+        [
+          -183.879,
+          -50.027
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0114",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_sharp_internal_bend",
+      "source_edge_id": "e_0511",
+      "canonical_road_id": "cr_0507",
+      "road_class": "residential",
+      "point_index": 1,
+      "turn_angle_deg": 93.198,
+      "interior_angle_deg": 86.802,
+      "suggested_cut_m": 4.66,
+      "suggested_radius_m": 6.391,
+      "nearest_junction_distance_m": 25.141,
+      "center_xz": [
+        174.225,
+        -598.896
+      ],
+      "context_polyline_xz": [
+        [
+          144.402,
+          -585.146
+        ],
+        [
+          174.225,
+          -598.896
+        ],
+        [
+          163.991,
+          -618.183
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0115",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0540",
+      "canonical_road_id": "cr_0536_closed_loop_a",
+      "road_class": "footway",
+      "point_index": 1,
+      "turn_angle_deg": 39.944,
+      "interior_angle_deg": 140.056,
+      "suggested_cut_m": 0.785,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 5.066,
+      "center_xz": [
+        -135.608,
+        -94.728
+      ],
+      "context_polyline_xz": [
+        [
+          -135.245,
+          -96.762
+        ],
+        [
+          -135.608,
+          -94.728
+        ],
+        [
+          -139.493,
+          -91.477
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0116",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0540",
+      "canonical_road_id": "cr_0536_closed_loop_a",
+      "road_class": "footway",
+      "point_index": 2,
+      "turn_angle_deg": 38.559,
+      "interior_angle_deg": 141.441,
+      "suggested_cut_m": 1.778,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 9.521,
+      "center_xz": [
+        -139.493,
+        -91.477
+      ],
+      "context_polyline_xz": [
+        [
+          -135.608,
+          -94.728
+        ],
+        [
+          -139.493,
+          -91.477
+        ],
+        [
+          -144.169,
+          -91.366
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0117",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0540",
+      "canonical_road_id": "cr_0536_closed_loop_a",
+      "road_class": "footway",
+      "point_index": 3,
+      "turn_angle_deg": 38.266,
+      "interior_angle_deg": 141.734,
+      "suggested_cut_m": 1.778,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 12.611,
+      "center_xz": [
+        -144.169,
+        -91.366
+      ],
+      "context_polyline_xz": [
+        [
+          -139.493,
+          -91.477
+        ],
+        [
+          -144.169,
+          -91.366
+        ],
+        [
+          -148.216,
+          -94.405
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0118",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0541",
+      "canonical_road_id": "cr_0536_closed_loop_b",
+      "road_class": "footway",
+      "point_index": 1,
+      "turn_angle_deg": 44.069,
+      "interior_angle_deg": 135.931,
+      "suggested_cut_m": 0.957,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 13.875,
+      "center_xz": [
+        -148.357,
+        -102.264
+      ],
+      "context_polyline_xz": [
+        [
+          -148.837,
+          -99.792
+        ],
+        [
+          -148.357,
+          -102.264
+        ],
+        [
+          -143.42,
+          -105.715
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0119",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "low",
+      "recommended_action": "candidate_for_smoothing_after_review",
+      "source_edge_id": "e_0541",
+      "canonical_road_id": "cr_0536_closed_loop_b",
+      "road_class": "footway",
+      "point_index": 2,
+      "turn_angle_deg": 44.057,
+      "interior_angle_deg": 135.943,
+      "suggested_cut_m": 1.925,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 10.57,
+      "center_xz": [
+        -143.42,
+        -105.715
+      ],
+      "context_polyline_xz": [
+        [
+          -148.357,
+          -102.264
+        ],
+        [
+          -143.42,
+          -105.715
+        ],
+        [
+          -138.418,
+          -104.914
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    },
+    {
+      "candidate_id": "corner_0120",
+      "candidate_type": "internal_centerline_bend",
+      "status": "candidate_review",
+      "risk_level": "medium",
+      "recommended_action": "proposal_only_review_short_context",
+      "source_edge_id": "e_0541",
+      "canonical_road_id": "cr_0536_closed_loop_b",
+      "road_class": "footway",
+      "point_index": 3,
+      "turn_angle_deg": 45.449,
+      "interior_angle_deg": 134.551,
+      "suggested_cut_m": 1.285,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 6.381,
+      "center_xz": [
+        -138.418,
+        -104.914
+      ],
+      "context_polyline_xz": [
+        [
+          -143.42,
+          -105.715
+        ],
+        [
+          -138.418,
+          -104.914
+        ],
+        [
+          -136.458,
+          -102.159
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
+    }
+  ]
+}

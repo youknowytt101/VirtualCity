@@ -1,0 +1,10 @@
+{
+  "area_id": "z47n_e703000_n1429000_w1000_h1000_s1000",
+  "stage": "topology_repair_casebook_v1",
+  "schema": "road_test_pipeline.repair_casebook.v1",
+  "source": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1429000_w1000_h1000_s1000_roads_raw.geojson",
+  "case_count": 0,
+  "case_type_counts": {},
+  "cases": [],
+  "note": "Casebook entries are regression fixtures for known false positives, rejected high-confidence repairs and manual review decisions."
+}

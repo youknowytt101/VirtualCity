@@ -1585,6 +1585,9 @@
       <span class="brand-mark" aria-hidden="true"></span>
       <span>LaneForge（道路升级系统）</span>
     </div>
+    <div class="button-group view-controls" aria-label="主流程导航">
+      <button id="homeBtn" class="primary" title="返回 VirtualCity BBOX 主操作台" aria-label="返回主操作台">主页</button>
+    </div>
     <div class="button-group view-controls" aria-label="视图控制">
       <button id="zoomOutBtn" title="缩小" aria-label="缩小">-</button>
       <button id="zoomInBtn" title="放大" aria-label="放大">+</button>
@@ -1702,8 +1705,10 @@
     const params = new URLSearchParams(window.location.search);
     const svgPath = params.get("svg") || "pattaya_central_500m_lane_graph_topology.svg";
     const scoringPath = params.get("scoring") || defaultScoringPath(svgPath);
+    const homeUrl = params.get("home") || "http://127.0.0.1:8765/";
     const intervalParam = Number(params.get("interval"));
 
+    const homeBtn = document.getElementById("homeBtn");
     const viewport = document.getElementById("viewport");
     const mapLayer = document.getElementById("mapLayer");
     const mapInfoTitle = document.getElementById("mapInfoTitle");
@@ -1732,6 +1737,10 @@
     if (Number.isFinite(intervalParam) && intervalParam >= 500) {
       intervalInput.value = String(intervalParam);
     }
+
+    homeBtn.addEventListener("click", () => {
+      window.location.href = homeUrl;
+    });
 
     const state = {
       svg: null,

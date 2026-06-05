@@ -211,6 +211,54 @@
       "fingerprint": "efeab863502e8b55f24c0d8a8c3b8838cccb05e92d5f1460dd2d5a3027ecb18d",
       "manifest": "RawData/_cleaned/z47n_e703000_n1429000_w1000_h1000_s1000/_manifest.json",
       "updated": "2026-06-02T03:59:16"
+    },
+    "refine_3e9ce7572fdff7ef": {
+      "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+      "bbox": [
+        100.8710111,
+        12.9106233,
+        100.8802921,
+        12.9197274
+      ],
+      "fingerprint": "3e9ce7572fdff7ef5a9a3c38f672500fd9a70ac049071cac6f4aa3532f667d17",
+      "manifest": "RawData/_cleaned/z47n_e703000_n1428000_w1000_h1000_s1000/_manifest.json",
+      "updated": "2026-06-06T03:58:25"
+    },
+    "refine_66ba8b3d1508467f": {
+      "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+      "bbox": [
+        100.8804274,
+        12.9376703,
+        100.8897098,
+        12.9467748
+      ],
+      "fingerprint": "66ba8b3d1508467f12dcf871d1c6b4fb8696c13569aa8ecfcd978aa50e348119",
+      "manifest": "RawData/_cleaned/z47n_e704000_n1431000_w1000_h1000_s1000/_manifest.json",
+      "updated": "2026-06-06T04:14:51"
+    },
+    "refine_47c747c4b39bcadf": {
+      "area_id": "z47n_e705000_n1431000_w1000_h1000_s1000",
+      "bbox": [
+        100.8896417,
+        12.9376034,
+        100.8989243,
+        12.9467081
+      ],
+      "fingerprint": "47c747c4b39bcadf074cb7d107458ad5201eb7226bae5d05f819ed21369b64a6",
+      "manifest": "RawData/_cleaned/z47n_e705000_n1431000_w1000_h1000_s1000/_manifest.json",
+      "updated": "2026-06-06T04:09:19"
+    },
+    "refine_86104c684c8e4166": {
+      "area_id": "z47n_e706000_n1433000_w1000_h1000_s1000",
+      "bbox": [
+        100.8989928,
+        12.9556116,
+        100.9082765,
+        12.9647167
+      ],
+      "fingerprint": "86104c684c8e41669534c1b035a80a4d774a87630ca58ef1134b9b978a0ced30",
+      "manifest": "RawData/_cleaned/z47n_e706000_n1433000_w1000_h1000_s1000/_manifest.json",
+      "updated": "2026-06-06T04:13:15"
     }
   }
 }

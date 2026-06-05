@@ -1,0 +1,128 @@
+{
+  "area_id": "z47n_e703000_n1429000_w1000_h1000_s1000",
+  "stage": "road_graph",
+  "status": "warn",
+  "checks": [
+    {
+      "id": "nodes",
+      "status": "pass",
+      "value": 505,
+      "threshold": 40,
+      "message": "Road graph should contain enough nodes for junction and lane graph research."
+    },
+    {
+      "id": "edges",
+      "status": "pass",
+      "value": 630,
+      "threshold": 40,
+      "message": "Road graph should contain enough edges for a useful test sample."
+    },
+    {
+      "id": "junction_nodes",
+      "status": "pass",
+      "value": 338,
+      "threshold": 1,
+      "message": "Road graph should expose at least one junction node for junction solver iteration."
+    },
+    {
+      "id": "skipped_empty_geometry",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Road graph builder should not skip repaired features due to empty geometry."
+    },
+    {
+      "id": "zero_length_edges",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Road graph should not contain zero-length edges."
+    },
+    {
+      "id": "orphan_edges",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Road graph edges should connect two distinct graph nodes."
+    },
+    {
+      "id": "dead_end_ratio",
+      "status": "warn",
+      "value": 0.255,
+      "threshold": 0.12,
+      "message": "Internal dead ends remain high after boundary classification; review endpoint clusters visually."
+    },
+    {
+      "id": "width_fallback_ratio",
+      "status": "warn",
+      "value": 0.997,
+      "threshold": 0.8,
+      "message": "Many edges use road-class width defaults; better data or local width inference is needed."
+    },
+    {
+      "id": "lanes_fallback_ratio",
+      "status": "pass",
+      "value": 0.506,
+      "threshold": 0.6,
+      "message": "Many edges use lane-count defaults; lane graph will need inference."
+    }
+  ],
+  "metrics": {
+    "counts": {
+      "input_features": 619,
+      "nodes": 505,
+      "edges": 630,
+      "skipped_empty_geometry": 0,
+      "zero_length_edges": 0,
+      "closed_loop_edges_split": 11,
+      "orphan_edges": 0
+    },
+    "node_kind_counts": {
+      "boundary": 3,
+      "connector": 35,
+      "dead_end": 129,
+      "junction": 338
+    },
+    "node_degree_counts": {
+      "1": 132,
+      "2": 35,
+      "3": 301,
+      "4": 30,
+      "5": 7
+    },
+    "edge_highway_counts": {
+      "residential": 252,
+      "service": 155,
+      "secondary": 136,
+      "footway": 31,
+      "tertiary": 30,
+      "pedestrian": 14,
+      "secondary_link": 9,
+      "path": 1,
+      "tertiary_link": 1,
+      "track": 1
+    },
+    "lanes_source_counts": {
+      "default": 319,
+      "tag": 311
+    },
+    "width_source_counts": {
+      "default": 628,
+      "tag": 2
+    },
+    "graph_metrics": {
+      "dead_end_ratio": 0.255,
+      "boundary_ratio": 0.006,
+      "junction_ratio": 0.669,
+      "width_fallback_ratio": 0.997,
+      "lanes_fallback_ratio": 0.506,
+      "total_length_m": 43651.13
+    }
+  },
+  "inputs": {
+    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1429000_w1000_h1000_s1000_road_graph.json",
+    "road_graph_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1429000_w1000_h1000_s1000_road_graph_report.json",
+    "rules": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+  },
+  "next_action": "Use road_graph.json as the contract for junction_solver and lane_graph_builder v1."
+}

@@ -1,0 +1,45 @@
+{
+  "area_id": "z47n_e706000_n1433000_w1000_h1000_s1000",
+  "stage": "junction_semantics_v1",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e706000_n1433000_w1000_h1000_s1000_road_graph.json",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e706000_n1433000_w1000_h1000_s1000_junction_semantics.json",
+  "counts": {
+    "junctions": 262,
+    "approaches": 800,
+    "through_pairs": 271,
+    "movements": 1660,
+    "blocked_movements": 0,
+    "source_oneway_ignored_approaches": 105,
+    "source_oneway_blocked_movements_if_trusted": 159
+  },
+  "junction_type_counts": {
+    "T": 250,
+    "cross": 9,
+    "Y": 0,
+    "offset": 1,
+    "complex": 2
+  },
+  "classification_iteration_counts": {
+    "0": 262
+  },
+  "approach_role_counts": {
+    "approach": 8,
+    "major_through": 520,
+    "minor_branch": 250,
+    "minor_through": 18,
+    "through_candidate": 4
+  },
+  "allowed_movement_kind_counts": {
+    "left": 549,
+    "right": 549,
+    "through": 542,
+    "through_candidate": 20
+  },
+  "notes": [
+    "This model classifies road-level junctions and movement intent; it does not generate geometry.",
+    "Public junction classes are restricted to T, cross, Y, offset and complex.",
+    "Adaptive classification iteratively relaxes through-pair angle thresholds for low-quality OSM geometry.",
+    "Movement permissions currently use temporary_all_roads_bidirectional_two_lane_v1（临时全道路双向两车道策略）; OSM oneway（OSM 单行） is retained as source observation（源数据观察值） only.",
+    "T and cross junctions are high-confidence; Y, offset and complex junctions remain lower-confidence inference."
+  ]
+}

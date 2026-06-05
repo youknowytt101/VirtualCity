@@ -1,0 +1,85 @@
+{
+  "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+  "status": "completed",
+  "houdini_status": "skipped",
+  "package_version": "lane_package_v0002",
+  "outputs": {
+    "repaired_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_repaired.geojson",
+    "canonical_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_canonical.geojson",
+    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_road_graph.json",
+    "junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_junction_semantics.json",
+    "optimized_centerlines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+    "corner_optimization_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_corner_optimization_candidates.json",
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_lane_graph.json",
+    "semantic_evidence_summary": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e704000_n1431000_w1000_h1000_s1000_semantic_evidence_summary.json",
+    "preview_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e704000_n1431000_w1000_h1000_s1000_road_preview_report.json",
+    "lane_geometry_debug_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e704000_n1431000_w1000_h1000_s1000_lane_geometry_debug_report.json",
+    "lane_surface_v1_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e704000_n1431000_w1000_h1000_s1000_lane_surface_v1_report.json",
+    "pipeline_audit_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e704000_n1431000_w1000_h1000_s1000_pipeline_audit_report.json",
+    "lane_package_manifest": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\z47n_e704000_n1431000_w1000_h1000_s1000\\lane_package_v0002\\manifest.json",
+    "laneforge_current_status_json": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e704000_n1431000_w1000_h1000_s1000_laneforge_current_status.json",
+    "laneforge_current_status_md": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\CURRENT_LANEFORGE_STATUS.md",
+    "topology_qa_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\z47n_e704000_n1431000_w1000_h1000_s1000_topology_repair_qa_report.json",
+    "road_graph_qa_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\z47n_e704000_n1431000_w1000_h1000_s1000_road_graph_qa_report.json",
+    "lane_graph_qa_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\z47n_e704000_n1431000_w1000_h1000_s1000_lane_graph_qa_report.json",
+    "log": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\last_rebuild.log"
+  },
+  "artifact_identity": {
+    "road_graph": {
+      "path": "data/processed/z47n_e704000_n1431000_w1000_h1000_s1000_road_graph.json",
+      "exists": true,
+      "size_bytes": 716637,
+      "mtime_utc": 1780690492.7116468,
+      "sha256": "8c4fd19bfbfdd7fd76f5277a755c6ac35f28e65387ac562567ae063fb3fa7d27"
+    },
+    "junction_semantics": {
+      "path": "data/processed/z47n_e704000_n1431000_w1000_h1000_s1000_junction_semantics.json",
+      "exists": true,
+      "size_bytes": 1281070,
+      "mtime_utc": 1780690492.8448758,
+      "sha256": "5ebd0c225f2ee414cdb4012990b3bc99968002bd84a66be16c9539e2341b8ab7"
+    },
+    "optimized_centerlines": {
+      "path": "data/processed/z47n_e704000_n1431000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+      "exists": true,
+      "size_bytes": 1755156,
+      "mtime_utc": 1780690492.962635,
+      "sha256": "01b6eb546df7481f4c50a7a2896baf36bc2296a40cb97926608ef0d9ed68240e"
+    },
+    "lane_graph": {
+      "path": "data/processed/z47n_e704000_n1431000_w1000_h1000_s1000_lane_graph.json",
+      "exists": true,
+      "size_bytes": 7200445,
+      "mtime_utc": 1780690493.301807,
+      "sha256": "afffd245f759b3366bd24385f5acbd35edb0c8472c270e946ef0fb410f961dcd"
+    },
+    "lane_surface_v1_geojson": {
+      "path": "data/preview/z47n_e704000_n1431000_w1000_h1000_s1000_lane_surfaces_v1.geojson",
+      "exists": true,
+      "size_bytes": 4689279,
+      "mtime_utc": 1780690494.10356,
+      "sha256": "336f765fd7175d830aa766e46b4c2093dc3d899319d3cf3e1495b59ee0655b52"
+    },
+    "lane_geometry_debug_geojson": {
+      "path": "data/preview/z47n_e704000_n1431000_w1000_h1000_s1000_lane_geometry_debug.geojson",
+      "exists": true,
+      "size_bytes": 6913897,
+      "mtime_utc": 1780690493.7903717,
+      "sha256": "8ac97fe41f311cc0a7bc3156eacc82ad77e1f4d4194142e745644d89512cc076"
+    },
+    "pipeline_audit_report": {
+      "path": "reports/z47n_e704000_n1431000_w1000_h1000_s1000_pipeline_audit_report.json",
+      "exists": true,
+      "size_bytes": 42241,
+      "mtime_utc": 1780690494.3827581,
+      "sha256": "78c3cf14d8e716e4c8c98ee32f1777b272d198d3f47845b53f1b02732677d9d3"
+    },
+    "lane_package_manifest": {
+      "path": "data/lane_upgrade_packages/z47n_e704000_n1431000_w1000_h1000_s1000/lane_package_v0002/manifest.json",
+      "exists": true,
+      "size_bytes": 34647,
+      "mtime_utc": 1780690494.9531918,
+      "sha256": "930804017c8c98df925f8326ff74780a9c38dd453e1251b50f81b31890d44d91"
+    }
+  }
+}

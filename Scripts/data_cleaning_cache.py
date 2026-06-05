@@ -35,6 +35,12 @@ OUTPUT_NAMES = {
     "dem": "dem.csv",
 }
 
+REQUIRED_CLEAN_OUTPUT_NAMES = {
+    **OUTPUT_NAMES,
+    "roads_clean": "roads_clean.geojson",
+    "road_graph": "road_graph.json",
+}
+
 SOURCE_CONFIG_KEYS = {
     "buildings": "buildings_file",
     "roads": "osm_file",
@@ -109,6 +115,12 @@ def outputs_exist(base_dir: str | Path, *, min_bytes: int = 128) -> bool:
     base = Path(base_dir)
     return all((base / name).exists() and (base / name).stat().st_size > min_bytes
                for name in OUTPUT_NAMES.values())
+
+
+def clean_outputs_exist(base_dir: str | Path, *, min_bytes: int = 128) -> bool:
+    base = Path(base_dir)
+    return all((base / name).exists() and (base / name).stat().st_size > min_bytes
+               for name in REQUIRED_CLEAN_OUTPUT_NAMES.values())
 
 
 def ready_outputs_exist(base_dir: str | Path, *, expected_area_id: str | None = None,
@@ -284,12 +296,12 @@ def restore_refine_cache(state: dict[str, Any], cleaned_dir: str | Path) -> dict
         return None
 
     source_dir = manifest_path.parent
-    if not outputs_exist(source_dir):
+    if not clean_outputs_exist(source_dir):
         return None
 
     target_dir = Path(cleaned_dir)
     target_dir.mkdir(parents=True, exist_ok=True)
-    for name in OUTPUT_NAMES.values():
+    for name in REQUIRED_CLEAN_OUTPUT_NAMES.values():
         shutil.copy2(source_dir / name, target_dir / name)
 
     with open(manifest_path, encoding="utf-8") as f:

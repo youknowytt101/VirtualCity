@@ -1,0 +1,18 @@
+{
+  "area_id": "z47n_e703000_n1429000_w1000_h1000_s1000",
+  "stage": "topology_repair_decisions_v1",
+  "schema": "road_test_pipeline.repair_decisions.v1",
+  "source": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1429000_w1000_h1000_s1000_roads_raw.geojson",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1429000_w1000_h1000_s1000_roads_repaired.geojson",
+  "base_repair_summary": {
+    "duplicate_points_removed": 0,
+    "endpoint_snaps": 13,
+    "endpoint_to_edge_snaps": 0,
+    "intersection_split_insertions": 0,
+    "short_edge_points_removed": 18
+  },
+  "decision_count": 0,
+  "decision_status_counts": {},
+  "decisions": [],
+  "note": "Decisions are the audit trail for candidate handling, manual overrides and high-confidence promotion attempts."
+}

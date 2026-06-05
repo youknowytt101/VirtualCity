@@ -1,0 +1,57 @@
+{
+  "area_id": "z47n_e703000_n1429000_w1000_h1000_s1000",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1429000_w1000_h1000_s1000_roads_repaired.geojson",
+  "origin": {
+    "lon": 100.87571905,
+    "lat": 12.924213250000001
+  },
+  "feature_count": 1265,
+  "geometry": {
+    "empty_geometry": 0,
+    "duplicate_point_features": 0,
+    "too_short_features": 0,
+    "total_length_m": 43653.222,
+    "min_length_m": 2.078,
+    "max_length_m": 445.155
+  },
+  "tags": {
+    "lanes_count": 1265,
+    "lanes_coverage_pct": 100.0,
+    "turn_lanes_count": 0,
+    "turn_lanes_coverage_pct": 0.0,
+    "width_count": 1265,
+    "width_coverage_pct": 100.0,
+    "oneway_count": 1265,
+    "oneway_coverage_pct": 100.0,
+    "maxspeed_count": 1265,
+    "maxspeed_coverage_pct": 100.0,
+    "bridge_tunnel_layer_count": 1265
+  },
+  "topology": {
+    "endpoint_clusters": 1139,
+    "endpoint_cluster_size_distribution": {
+      "1": 132,
+      "2": 668,
+      "3": 301,
+      "4": 31,
+      "5": 7
+    },
+    "dangling_endpoint_clusters": 132,
+    "dangling_endpoint_ratio": 0.116,
+    "low_confidence_endpoint_clusters": 8,
+    "possible_unsplit_crossings": 0,
+    "possible_unsplit_crossing_samples": []
+  },
+  "highway_class_counts": {
+    "residential": 463,
+    "service": 285,
+    "secondary": 243,
+    "tertiary": 113,
+    "footway": 57,
+    "secondary_link": 53,
+    "pedestrian": 44,
+    "track": 4,
+    "path": 2,
+    "tertiary_link": 1
+  }
+}

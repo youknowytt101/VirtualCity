@@ -206,6 +206,7 @@ def build_graph(input_path: Path, output_path: Path, report_path: Path, area_id:
     raw_edges: list[dict[str, Any]] = []
     skipped_empty_geometry = 0
     zero_length_edges = 0
+    closed_loop_edges_split = 0
 
     for index, feat in enumerate(fc.get("features", [])):
         props = feat.get("properties") or {}
@@ -213,55 +214,72 @@ def build_graph(input_path: Path, output_path: Path, report_path: Path, area_id:
         if len(points) < 2:
             skipped_empty_geometry += 1
             continue
-        length_m = polyline_length(points)
-        if length_m <= 0.05:
-            zero_length_edges += 1
-            continue
-
-        start_key = node_key(points[0])
-        end_key = node_key(points[-1])
-        node_points[start_key].append(points[0])
-        node_points[end_key].append(points[-1])
 
         highway = str(props.get("highway") or "unknown")
         lanes, lanes_source = parse_lanes(props.get("lanes"), highway)
         width_m, width_source = parse_width(props.get("width_m"), highway, lanes)
         oneway, oneway_direction = parse_oneway(props.get("oneway"))
+        base_source_feature_id = str(props.get("source_feature_id") or index)
 
-        raw_edges.append({
-            "index": index,
-            "start_key": start_key,
-            "end_key": end_key,
-            "points": points,
-            "length_m": length_m,
-            "source_feature_id": str(props.get("source_feature_id") or index),
-            "canonical_road_id": str(props.get("canonical_road_id") or ""),
-            "road_chain_id": str(props.get("road_chain_id") or ""),
-            "road_chain_source_ids": props.get("road_chain_source_ids") or [],
-            "road_chain_fragment_index": props.get("road_chain_fragment_index", ""),
-            "road_chain_fragment_count": props.get("road_chain_fragment_count", ""),
-            "road_chain_role": props.get("road_chain_role", ""),
-            "source_feature_ids": props.get("source_feature_ids") or [],
-            "repaired_source_feature_ids": props.get("repaired_source_feature_ids") or [],
-            "repair_parent_ids": props.get("repair_parent_ids") or [],
-            "repair_parent_id": props.get("repair_parent_id", ""),
-            "repair_edge_id": props.get("repair_edge_id", ""),
-            "repair_edge_ids": props.get("repair_edge_ids") or [],
-            "canonical_edge_count": props.get("canonical_edge_count", ""),
-            "canonical_ops": props.get("canonical_ops") or [],
-            "attribute_conflicts": props.get("attribute_conflicts") or {},
-            "highway": highway,
-            "road_class": str(props.get("road_class") or highway),
-            "name": props.get("name", ""),
-            "lanes": lanes,
-            "lanes_source": lanes_source,
-            "width_m": width_m,
-            "width_source": width_source,
-            "oneway": oneway,
-            "oneway_direction": oneway_direction,
-            "source_provider": props.get("source_provider", ""),
-            "provider_tags": props.get("provider_tags") or {},
-        })
+        point_parts: list[tuple[list[tuple[float, float]], str]] = [(points, "")]
+        if node_key(points[0]) == node_key(points[-1]) and len(points) > 2:
+            split_index = max(range(1, len(points) - 1), key=lambda i: distance(points[0], points[i]))
+            part_a = points[: split_index + 1]
+            part_b = points[split_index:]
+            if len(part_a) >= 2 and len(part_b) >= 2:
+                point_parts = [(part_a, "closed_loop_a"), (part_b, "closed_loop_b")]
+                closed_loop_edges_split += 1
+
+        for part_points, loop_role in point_parts:
+            length_m = polyline_length(part_points)
+            if length_m <= 0.05:
+                zero_length_edges += 1
+                continue
+
+            start_key = node_key(part_points[0])
+            end_key = node_key(part_points[-1])
+            node_points[start_key].append(part_points[0])
+            node_points[end_key].append(part_points[-1])
+            source_feature_id = (
+                f"{base_source_feature_id}_{loop_role}" if loop_role else base_source_feature_id
+            )
+
+            raw_edges.append({
+                "index": index,
+                "start_key": start_key,
+                "end_key": end_key,
+                "points": part_points,
+                "length_m": length_m,
+                "source_feature_id": source_feature_id,
+                "closed_loop_split_role": loop_role,
+                "closed_loop_source_feature_id": base_source_feature_id if loop_role else "",
+                "canonical_road_id": str(props.get("canonical_road_id") or ""),
+                "road_chain_id": str(props.get("road_chain_id") or ""),
+                "road_chain_source_ids": props.get("road_chain_source_ids") or [],
+                "road_chain_fragment_index": props.get("road_chain_fragment_index", ""),
+                "road_chain_fragment_count": props.get("road_chain_fragment_count", ""),
+                "road_chain_role": props.get("road_chain_role", ""),
+                "source_feature_ids": props.get("source_feature_ids") or [],
+                "repaired_source_feature_ids": props.get("repaired_source_feature_ids") or [],
+                "repair_parent_ids": props.get("repair_parent_ids") or [],
+                "repair_parent_id": props.get("repair_parent_id", ""),
+                "repair_edge_id": props.get("repair_edge_id", ""),
+                "repair_edge_ids": props.get("repair_edge_ids") or [],
+                "canonical_edge_count": props.get("canonical_edge_count", ""),
+                "canonical_ops": props.get("canonical_ops") or [],
+                "attribute_conflicts": props.get("attribute_conflicts") or {},
+                "highway": highway,
+                "road_class": str(props.get("road_class") or highway),
+                "name": props.get("name", ""),
+                "lanes": lanes,
+                "lanes_source": lanes_source,
+                "width_m": width_m,
+                "width_source": width_source,
+                "oneway": oneway,
+                "oneway_direction": oneway_direction,
+                "source_provider": props.get("source_provider", ""),
+                "provider_tags": props.get("provider_tags") or {},
+            })
 
     node_ids: dict[tuple[int, int], str] = {}
     nodes: list[dict[str, Any]] = []
@@ -287,6 +305,8 @@ def build_graph(input_path: Path, output_path: Path, report_path: Path, area_id:
             "from_node": from_node,
             "to_node": to_node,
             "source_feature_id": raw["source_feature_id"],
+            "closed_loop_split_role": raw["closed_loop_split_role"],
+            "closed_loop_source_feature_id": raw["closed_loop_source_feature_id"],
             "canonical_road_id": raw["canonical_road_id"],
             "road_chain_id": raw["road_chain_id"],
             "road_chain_source_ids": raw["road_chain_source_ids"],
@@ -377,6 +397,7 @@ def build_graph(input_path: Path, output_path: Path, report_path: Path, area_id:
             "edges": edge_count,
             "skipped_empty_geometry": skipped_empty_geometry,
             "zero_length_edges": zero_length_edges,
+            "closed_loop_edges_split": closed_loop_edges_split,
             "orphan_edges": orphan_edges,
         },
         "node_kind_counts": dict(sorted(node_kind_counts.items())),

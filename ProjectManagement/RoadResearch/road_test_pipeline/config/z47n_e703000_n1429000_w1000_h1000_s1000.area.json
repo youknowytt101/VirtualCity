@@ -1,0 +1,34 @@
+{
+  "area_id": "z47n_e703000_n1429000_w1000_h1000_s1000",
+  "label": "VirtualCity active area z47n_e703000_n1429000_w1000_h1000_s1000",
+  "center": {
+    "lon": 100.87571905,
+    "lat": 12.924213250000001
+  },
+  "bbox": [
+    100.8710784,
+    12.9196612,
+    100.8803597,
+    12.9287653
+  ],
+  "bbox_swen": [
+    12.9196612,
+    100.8710784,
+    12.9287653,
+    100.8803597
+  ],
+  "origin_lon": 100.87571905,
+  "origin_lat": 12.924213250000001,
+  "run_id": "20260602_040246_z47n_e703000_n1429000_w1000_h1000_s1000_fbbc9415",
+  "data_source": {
+    "provider": "VirtualCity.refine_data",
+    "roads_clean": "RawData/_houdini_ready/z47n_e703000_n1429000_w1000_h1000_s1000/roads_clean.geojson",
+    "road_graph": "RawData/_houdini_ready/z47n_e703000_n1429000_w1000_h1000_s1000/road_graph.json",
+    "roads_osm": "RawData/_houdini_ready/z47n_e703000_n1429000_w1000_h1000_s1000/roads.osm"
+  },
+  "output": {
+    "raw_dir": "data/raw",
+    "processed_dir": "data/processed",
+    "reports_dir": "reports"
+  }
+}

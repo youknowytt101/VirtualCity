@@ -1,0 +1,67 @@
+{
+  "area_id": "z47n_e705000_n1431000_w1000_h1000_s1000",
+  "stage": "canonical_roads_v1",
+  "status": "pass",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e705000_n1431000_w1000_h1000_s1000_roads_repaired.geojson",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e705000_n1431000_w1000_h1000_s1000_roads_canonical.geojson",
+  "parameters": {
+    "node_eps_m": 0.35,
+    "bbox_edge_margin_m": 5.0,
+    "merge_policy": "degree2_nodes_only_with_matching_attribute_signature",
+    "centerline_simplify_tolerance_m": 0.25,
+    "centerline_simplify_max_turn_deg": 7.0,
+    "centerline_smoothing_weight": 0.18,
+    "centerline_smoothing_max_turn_deg": 22.0,
+    "centerline_smoothing_max_offset_m": 0.35
+  },
+  "counts": {
+    "input_edges": 877,
+    "output_canonical_roads": 443,
+    "skipped_empty_geometry": 0,
+    "merged_input_edges": 434,
+    "connector_nodes_available_for_merge": 438,
+    "boundary_nodes_protected": 10,
+    "junction_or_terminal_nodes_protected": 385,
+    "road_chain_count": 412,
+    "fragmented_road_chains": 11,
+    "max_canonical_roads_per_road_chain": 8
+  },
+  "chain_edge_count_histogram": {
+    "1": 265,
+    "2": 80,
+    "3": 41,
+    "4": 25,
+    "5": 12,
+    "6": 7,
+    "7": 2,
+    "8": 3,
+    "9": 3,
+    "11": 3,
+    "14": 1,
+    "15": 1
+  },
+  "merge_stop_counts": {},
+  "geometry_refinement": {
+    "control_points_before": 1320,
+    "control_points_after": 1303,
+    "vertices_removed": 17,
+    "vertices_smoothed": 39,
+    "max_removed_deviation_m": 0.24,
+    "max_smoothing_offset_m": 0.34,
+    "avg_smoothing_offset_m": 0.217,
+    "max_abs_length_delta_m": 0.089,
+    "total_length_delta_m": -0.807
+  },
+  "metrics": {
+    "edge_reduction_ratio": 0.495,
+    "avg_input_edges_per_canonical_road": 1.98,
+    "total_length_m": 38854.6
+  },
+  "notes": [
+    "Canonical roads are machine-readable GeoJSON, not SVG visualization.",
+    "Each canonical road keeps source_feature_ids, repaired_source_feature_ids, and repair_parent_ids for traceability.",
+    "road_chain_id preserves continuous source-road identity when graph edges must stay split at junctions or crop boundaries.",
+    "The stage does not cross true junctions or attribute conflicts; it only removes unstable degree-2 fragmentation from downstream graph construction.",
+    "Centerline refinement preserves chain endpoints; simplification and smoothing only touch internal control points inside conservative deviation thresholds."
+  ]
+}

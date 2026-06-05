@@ -1,0 +1,121 @@
+{
+  "area_id": "z47n_e705000_n1431000_w1000_h1000_s1000",
+  "stage": "lane_graph_svg_visualization",
+  "status": "pass",
+  "counts": {
+    "lanes": 895,
+    "physical_lane_centerlines": 893,
+    "visible_lane_centerlines": 893,
+    "lane_links_total": 1504,
+    "continuity_links_total": 20,
+    "junction_connections_rendered": 900,
+    "continuity_links_rendered": 18,
+    "continuity_micro_seams_skipped": 2,
+    "continuity_link_source_counts": {
+      "degree2_connector_through_continuity_v1": 8,
+      "optimized_corner_fillet": 10
+    },
+    "movement_corridors_rendered": 0,
+    "anchor_markers_rendered": 0,
+    "anchor_source_counts": {},
+    "visual_candidate_family_counts": {},
+    "visual_candidate_issue_counts": {},
+    "movement_corridors_skipped": 0,
+    "movement_corridor_skip_reason_counts": {},
+    "movement_corridor_scoring_status_counts": {},
+    "raw_roads_rendered": 416,
+    "raw_road_endpoint_markers_rendered": 832,
+    "raw_road_internal_vertex_markers_rendered": 578,
+    "raw_road_vertex_markers_rendered": 1410,
+    "raw_road_class_counts": {
+      "footway": 1,
+      "residential": 221,
+      "secondary": 32,
+      "service": 134,
+      "tertiary": 26,
+      "unclassified": 2
+    },
+    "raw_topology_issue_markers_rendered": 151,
+    "raw_topology_issue_classification_counts": {
+      "dangling_endpoint": 151
+    },
+    "raw_topology_issue_severity_counts": {
+      "review": 151
+    },
+    "corner_candidates_rendered": 132,
+    "corner_candidate_type_counts": {
+      "degree2_connector_corner": 8,
+      "internal_centerline_bend": 124
+    },
+    "corner_candidate_risk_counts": {
+      "low": 54,
+      "medium": 78
+    },
+    "corner_candidate_status_counts": {
+      "candidate_review": 132
+    },
+    "repaired_roads_rendered": 877,
+    "repaired_roads_class_counts": {
+      "footway": 2,
+      "residential": 422,
+      "secondary": 52,
+      "service": 306,
+      "tertiary": 93,
+      "unclassified": 2
+    },
+    "repaired_roads_source_edge_count_sum": 0,
+    "repaired_roads_road_graph_edge_mapped": 0,
+    "canonical_roads_rendered": 412,
+    "canonical_roads_class_counts": {
+      "footway": 1,
+      "residential": 220,
+      "secondary": 31,
+      "service": 132,
+      "tertiary": 26,
+      "unclassified": 2
+    },
+    "canonical_roads_source_edge_count_sum": 877,
+    "canonical_roads_road_graph_edge_mapped": 443,
+    "centerline_buffer_preview_polygons": 1811,
+    "centerline_buffer_preview_source_counts": {
+      "continuity_curve": 18,
+      "lane_centerline": 891,
+      "lane_link_centerline": 900,
+      "physical_lane_group_centerline_v1": 2
+    },
+    "centerline_buffer_preview_skipped_movement_corridors": 0,
+    "centerline_buffer_preview_skip_reason_counts": {}
+  },
+  "style": {
+    "svg_width_px": 3200,
+    "svg_height_px": 2881,
+    "anchor_marker_radius_px": 0.55,
+    "anchor_marker_stroke_width_px": 0.12,
+    "lane_casing": "enabled（已启用）",
+    "visual_mode": "review_drawing（审图线稿）",
+    "raw_roads_overlay": "thin_black_solid_with_all_vertex_markers_hidden_by_default（细黑实线 + 全部原始顶点/断点标记，默认隐藏）",
+    "raw_topology_issue_overlay": "enabled_when_diagnostics_exist（诊断存在时启用）",
+    "repaired_roads_overlay": "blue_dashed_hidden_by_default",
+    "canonical_roads_overlay": "rose_solid_hidden_by_default",
+    "centerline_buffer_preview_overlay": "uniform_gray_hidden_by_default",
+    "movement_corridor_preview_gate": "fallback_when_no_lane_graph_junction_lane_links"
+  },
+  "link_source": "lane_graph_junction_lane_links",
+  "final_lane_link_precedence": "lane_graph_junction_lane_links_before_movement_corridor_candidates",
+  "note": "SVG visualization（可视化） only. lane_graph.json and movement_corridor_candidates.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
+  "inputs": {
+    "lane_graph": "data/processed/z47n_e705000_n1431000_w1000_h1000_s1000_lane_graph.json",
+    "movement_corridors": "",
+    "movement_corridor_scoring": "",
+    "raw_roads": "data/processed/z47n_e705000_n1431000_w1000_h1000_s1000_roads_raw.geojson",
+    "repaired_roads": "data/processed/z47n_e705000_n1431000_w1000_h1000_s1000_roads_repaired.geojson",
+    "canonical_roads": "data/processed/z47n_e705000_n1431000_w1000_h1000_s1000_roads_canonical.geojson",
+    "road_graph": "data/processed/z47n_e705000_n1431000_w1000_h1000_s1000_road_graph.json",
+    "raw_topology_diagnostics": "data/processed/z47n_e705000_n1431000_w1000_h1000_s1000_raw_topology_diagnostics.json",
+    "corner_candidates": "data/processed/z47n_e705000_n1431000_w1000_h1000_s1000_corner_optimization_candidates.json"
+  },
+  "outputs": {
+    "svg": "reports/visualizations/z47n_e705000_n1431000_w1000_h1000_s1000_lane_graph_topology.svg",
+    "report": "reports/z47n_e705000_n1431000_w1000_h1000_s1000_lane_graph_svg_report.json"
+  }
+}

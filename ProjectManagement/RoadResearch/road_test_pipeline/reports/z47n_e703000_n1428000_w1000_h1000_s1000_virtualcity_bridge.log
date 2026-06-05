@@ -1,0 +1,1280 @@
+[LaneForgeBridge] started 2026-06-06 03:58:25
+
+[2026-06-06 03:58:25] Rebuilding LaneForge package from VirtualCity roads
+C:\Users\yintong\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe E:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\rebuild_road_test.py --area-id z47n_e703000_n1428000_w1000_h1000_s1000 --skip-houdini
+[RoadTest] Running topology repair...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_repaired.geojson",
+  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_repair_report.json",
+  "repair_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_repair_candidates.json",
+  "repair_decisions": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_repair_decisions.json",
+  "repair_casebook": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_repair_casebook.json",
+  "raw_topology_diagnostics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_raw_topology_diagnostics.json",
+  "counts": {
+    "input_features": 520,
+    "output_edges": 1007,
+    "duplicate_points_removed": 0,
+    "endpoint_snaps": 12,
+    "endpoint_to_edge_snaps": 0,
+    "intersection_split_insertions": 0,
+    "raw_shape_vertices_removed": 79,
+    "raw_shape_simplification_passes": 1,
+    "short_edges_before_cleanup": 49,
+    "short_edge_threshold_m": 3,
+    "short_edge_collapse_passes": 1,
+    "short_edge_points_removed": 32,
+    "short_edges_remaining_under_threshold_pre_output": 2,
+    "post_promotion_short_edge_points_removed": 0,
+    "post_promotion_short_edges_remaining_under_threshold_pre_output": 2,
+    "short_edges_remaining_under_threshold": 0,
+    "internal_dangling_endpoints_for_review": 166,
+    "endpoint_bridge_candidates_for_review": 0,
+    "endpoint_to_edge_candidates_for_review": 0,
+    "high_confidence_repair_candidates": 0,
+    "manual_override_ops_loaded": 0,
+    "manual_override_ops_applied": 0,
+    "manual_override_ops_failed": 0,
+    "high_confidence_promotions_applied": 0,
+    "high_confidence_promotions_rejected": 0,
+    "high_confidence_promotions_failed": 0,
+    "high_confidence_promotions_skipped": 0
+  },
+  "endpoint_stats_after_output_edges": {
+    "endpoint_clusters": 931,
+    "dangling_endpoint_clusters": 167,
+    "dangling_endpoint_ratio": 0.179
+  }
+}
+[RoadTest] Analyzing repaired roads...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_repaired.geojson",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_repaired_analysis.json",
+  "feature_count": 1007,
+  "possible_unsplit_crossings": 0,
+  "dangling_endpoint_clusters": 167
+}
+[RoadTest] Running topology repair QA...
+topology_repair QA status: warn
+[pass] output_edges: 1007 / 40
+[pass] empty_geometry: 0 / 0
+[pass] duplicate_point_features: 0 / 0
+[pass] too_short_features: 0 / 2
+[warn] dangling_endpoint_ratio: 0.179 / 0.15
+[pass] possible_unsplit_crossings: 0 / 0
+[pass] repair_ops_when_dangling_high: 0 / 0
+[RoadTest] Building canonical roads...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_canonical.geojson",
+  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_canonical_roads_report.json",
+  "counts": {
+    "input_edges": 1007,
+    "output_canonical_roads": 542,
+    "skipped_empty_geometry": 0,
+    "merged_input_edges": 465,
+    "connector_nodes_available_for_merge": 472,
+    "boundary_nodes_protected": 17,
+    "junction_or_terminal_nodes_protected": 450,
+    "road_chain_count": 512,
+    "fragmented_road_chains": 13,
+    "max_canonical_roads_per_road_chain": 9
+  },
+  "metrics": {
+    "edge_reduction_ratio": 0.462,
+    "avg_input_edges_per_canonical_road": 1.858,
+    "total_length_m": 39173.544
+  }
+}
+[RoadTest] Analyzing canonical roads...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_canonical.geojson",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_canonical_analysis.json",
+  "feature_count": 542,
+  "possible_unsplit_crossings": 0,
+  "dangling_endpoint_clusters": 167
+}
+[RoadTest] Building road graph...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_road_graph.json",
+  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_road_graph_report.json",
+  "counts": {
+    "input_features": 542,
+    "nodes": 471,
+    "edges": 547,
+    "skipped_empty_geometry": 0,
+    "zero_length_edges": 0,
+    "closed_loop_edges_split": 5,
+    "orphan_edges": 0
+  },
+  "node_kind_counts": {
+    "boundary": 1,
+    "connector": 21,
+    "dead_end": 166,
+    "junction": 283
+  }
+}
+[RoadTest] Running road graph QA...
+road_graph QA status: warn
+[pass] nodes: 471 / 40
+[pass] edges: 547 / 40
+[pass] junction_nodes: 283 / 1
+[pass] skipped_empty_geometry: 0 / 0
+[pass] zero_length_edges: 0 / 0
+[pass] orphan_edges: 0 / 0
+[warn] dead_end_ratio: 0.352 / 0.12
+[warn] width_fallback_ratio: 1.0 / 0.8
+[warn] lanes_fallback_ratio: 0.638 / 0.6
+[RoadTest] Building junction semantic model...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_junction_semantics.json",
+  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_junction_semantics_report.json",
+  "counts": {
+    "junctions": 283,
+    "approaches": 885,
+    "through_pairs": 313,
+    "movements": 1918,
+    "blocked_movements": 0,
+    "source_oneway_ignored_approaches": 105,
+    "source_oneway_blocked_movements_if_trusted": 160
+  },
+  "junction_type_counts": {
+    "T": 249,
+    "cross": 29,
+    "Y": 0,
+    "offset": 3,
+    "complex": 2
+  }
+}
+[RoadTest] Optimizing junction centerlines...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_optimized_centerlines_report.json",
+  "counts": {
+    "input_edges": 547,
+    "optimized_approaches": 547,
+    "dropped_short_edges": 0,
+    "heuristic_junction_trim_keys": 885,
+    "regularized_junction_nodes": 0,
+    "regularized_endpoint_exact": 0,
+    "regularized_endpoint_scaled_for_edge_length": 0,
+    "junction_nodes": 283,
+    "junction_connectors": 885,
+    "t_junctions": 249,
+    "t_junction_connectors": 747,
+    "junction_movement_debug": 952,
+    "junction_through_movements": 313,
+    "junction_turn_movements": 639,
+    "corner_fillet_nodes": 9,
+    "corner_fillets": 9,
+    "corner_transaction_fillets": 0,
+    "corner_heuristic_fillets": 9,
+    "internal_bend_smoothing_applied": 0,
+    "internal_bend_smoothing_skipped": 0,
+    "corner_circular_arcs": 8,
+    "corner_bezier_tangent_fallback": 1,
+    "corner_straight_infinite_radius": 0,
+    "output_features": 1441,
+    "t_branch_trim_adjustments": 230,
+    "t_branch_trim_locked_skips": 0,
+    "t_branch_trim_max_delta_m": 10.267,
+    "t_branch_trim_avg_delta_m": 1.359,
+    "near_junction_bend_absorptions": 0,
+    "near_junction_bend_absorption_trim_raises": 0,
+    "near_junction_bend_absorption_max_trim_raise_m": 0.0,
+    "near_junction_bend_absorption_avg_trim_raise_m": 0.0,
+    "near_junction_bend_preservations": 0,
+    "near_junction_bend_preservation_records": [],
+    "near_junction_bend_absorption_skipped": {},
+    "junction_common_trim_nodes": 241,
+    "junction_common_trim_raised": 427,
+    "junction_common_trim_lowered": 80,
+    "junction_common_trim_max_raise_m": 5.063,
+    "junction_common_trim_avg_raise_m": 0.694,
+    "junction_common_trim_max_lower_m": 11.637,
+    "junction_common_trim_avg_lower_m": 1.811,
+    "junction_common_trim_skipped_regularized_nodes": 0,
+    "corner_override_records": 0,
+    "active_corner_overrides": 0,
+    "active_degree2_corner_overrides": 0,
+    "active_internal_bend_overrides": 0,
+    "corner_override_issue_counts": {}
+  }
+}
+[RoadTest] Planning corner optimization candidates...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "stage": "corner_optimization_candidates_v1",
+  "schema": "road_upgrade_system.corner_optimization_report.v1",
+  "status": "pass",
+  "inputs": {
+    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_road_graph.json",
+    "optimized_centerlines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+    "corner_overrides": ""
+  },
+  "outputs": {
+    "candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_corner_optimization_candidates.json",
+    "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_corner_optimization_report.json"
+  },
+  "counts": {
+    "candidates": 121,
+    "degree2_connector_corner": 10,
+    "internal_centerline_bend": 111,
+    "low_risk": 49,
+    "medium_risk": 71,
+    "high_risk": 1,
+    "accepted_active": 0,
+    "accepted_active_candidates": 0,
+    "accepted_active_overrides": 0,
+    "active_degree2_corner_overrides": 0,
+    "active_internal_bend_overrides": 0,
+    "candidate_id_reassignments": 0
+  },
+  "type_counts": {
+    "degree2_connector_corner": 10,
+    "internal_centerline_bend": 111
+  },
+  "risk_counts": {
+    "high": 1,
+    "low": 49,
+    "medium": 71
+  },
+  "status_counts": {
+    "candidate_review": 121
+  },
+  "note": "Corner optimization candidates are proposal records; accepted_active counts active geometry transactions, including internal bends that no longer appear as candidates after smoothing."
+}
+[RoadTest] Building lane graph and junction connections...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_graph.json",
+  "report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_graph_report.json",
+  "counts": {
+    "lanes": 1094,
+    "physical_lane_centerlines": 1080,
+    "physical_lane_group_centerlines": 14,
+    "standalone_physical_lane_centerlines": 1066,
+    "junctions": 283,
+    "approach_lane_records": 885,
+    "connections": 1918,
+    "lane_links": 1918,
+    "continuity_links": 40,
+    "optimized_approach_centerlines": 547,
+    "optimized_approach_centerlines_applied": 547,
+    "optimized_junction_connectors": 885,
+    "optimized_junction_connector_lane_links": 0,
+    "optimized_corner_fillet_links": 18,
+    "direct_connector_continuity_links": 22,
+    "same_physical_lane_continuity_links": 14,
+    "physical_lane_groups_created": 14,
+    "physical_lane_grouped_lanes": 28,
+    "active_lane_upgrades": 0,
+    "active_lane_upgrades_applied": 0,
+    "active_lane_upgrades_deferred": 0,
+    "active_lane_upgrades_missing_roads": 0,
+    "active_lane_upgrades_ignored": 0,
+    "lane_bundle_centerline_smoothed_edges": 124,
+    "lane_bundle_centerline_smoothed_bends": 246,
+    "derived_lane_centerline_smoothed_lanes": 1,
+    "derived_lane_centerline_smoothed_bends": 1,
+    "derived_lane_centerline_inserted_sample_points": 8,
+    "lane_level_radius_regularized_continuity_links": 2,
+    "fan_fallback_junctions": 0
+  },
+  "metrics": {
+    "junctions_with_connections_ratio": 1.0,
+    "fan_fallback_ratio": 0.0,
+    "avg_lane_links_per_junction": 6.777,
+    "lane_link_reference_errors": 0,
+    "blocked_lane_links": 0,
+    "empty_connection_curves": 0,
+    "avg_lane_link_confidence": 0.811,
+    "min_lane_link_confidence": 0.55,
+    "avg_curve_length_m": 6.782,
+    "max_curve_length_m": 24.482,
+    "avg_continuity_curve_length_m": 3.874,
+    "max_continuity_curve_length_m": 15.779,
+    "avg_lane_width_m": 3.2,
+    "min_lane_width_m": 3.2,
+    "max_lane_width_m": 3.2,
+    "avg_lane_width_confidence": 0.45,
+    "max_lane_width_start_end_delta_m": 0.0,
+    "lane_bundle_centerline_smoothed_edges": 124,
+    "lane_bundle_centerline_smoothed_bends": 246,
+    "lane_bundle_centerline_max_min_arc_radius_m": 6.4,
+    "derived_lane_centerline_smoothed_lanes": 1,
+    "derived_lane_centerline_smoothed_bends": 1,
+    "derived_lane_centerline_inserted_sample_points": 8,
+    "derived_lane_centerline_max_derivation_offset_m": 0.18,
+    "derived_lane_centerline_max_source_bend_offset_m": 0.756,
+    "derived_lane_centerline_smoothing_curve_family_counts": {
+      "tangent_circular_arc": 1
+    },
+    "derived_lane_centerline_smoothing_arc_fit_status_counts": {
+      "exact_tangent_arc": 1
+    },
+    "continuity_rounding_style_counts": {
+      "unified_lane_geometry_rounding_style_v1": 40
+    },
+    "continuity_rounding_curve_family_counts": {
+      "straight_infinite_radius": 22,
+      "tangent_circular_arc": 16,
+      "tangent_continuous_bezier_fallback": 2
+    },
+    "lane_level_radius_regularized_continuity_links": 2,
+    "physical_lane_centerlines": 1080,
+    "physical_lane_group_centerlines": 14,
+    "standalone_physical_lane_centerlines": 1066,
+    "same_physical_lane_continuity_links": 14,
+    "physical_lane_groups_created": 14,
+    "physical_lane_grouped_lanes": 28,
+    "min_optimized_corner_continuity_radius_m": 1.527
+  }
+}
+[RoadTest] Generating semantic evidence summary...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "status": "completed",
+  "schema": "lane_upgrade_system.semantic_evidence_summary.v1",
+  "report": "reports/z47n_e703000_n1428000_w1000_h1000_s1000_semantic_evidence_summary.json",
+  "processed": "data/processed/z47n_e703000_n1428000_w1000_h1000_s1000_semantic_evidence_summary.json",
+  "counts": {
+    "road_edges": 547,
+    "active_lane_upgrade_edges": 0,
+    "source_oneway_edges": 63,
+    "source_lanes_tag_edges": 198,
+    "width_fallback_edges": 547,
+    "missing_turn_lanes_edges": 547,
+    "source_lane_count_differs_from_geometry_edges": 150
+  },
+  "review_flag_counts": {
+    "missing_turn_lanes": 547,
+    "road_chain_fragment": 45,
+    "source_lane_count_differs_from_geometry": 150,
+    "source_oneway_overridden_by_temporary_bidirectional_policy": 63,
+    "width_fallback": 547
+  }
+}
+[RoadTest] Running lane graph QA...
+lane_graph QA status: pass
+[pass] lanes: 1094 / 40
+[pass] junctions: 283 / 1
+[pass] connections: 1918 / 1
+[pass] lane_links: 1918 / 1
+[pass] lane_link_reference_errors: 0 / 0
+[pass] blocked_lane_links: 0 / 0
+[pass] empty_connection_curves: 0 / 0
+[pass] fan_fallback_ratio: 0.0 / 0.95
+[pass] avg_lane_links_per_junction: 6.777 / 1.0
+[RoadTest] Generating standalone preview...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+  "input_mode": "optimized_centerlines",
+  "outputs": {
+    "centerline_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_preview_surfaces.geojson",
+    "legacy_surface_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_preview_surfaces.geojson",
+    "obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_preview.obj",
+    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_preview.svg"
+  },
+  "counts": {
+    "edges": 1441,
+    "endpoint_clusters": 1080,
+    "junction_nodes_degree_ge_3": 883,
+    "junction_clusters": 259,
+    "road_surface_polygons": 0,
+    "road_surface_trimmed_polygons": 0,
+    "road_surface_absorbed_by_junction": 0,
+    "road_centerline_features": 1441,
+    "junction_patch_polygons": 0,
+    "junction_clustered_nodes": 0,
+    "obj_vertices": 15599,
+    "obj_faces": 0,
+    "obj_centerlines": 1441,
+    "obj_junction_patches": 0
+  },
+  "junction_patch_area_m2": {
+    "min_m2": 0.0,
+    "median_m2": 0.0,
+    "max_m2": 0.0,
+    "outliers_gt_4x_median": 0
+  },
+  "road_surface_extrusion": {
+    "enabled": false,
+    "generated_surfaces": 0,
+    "trimmed_at_junction": 0,
+    "absorbed_by_junction": 0,
+    "note": "Disabled by centerline-only preview mode."
+  },
+  "highway_class_counts": {
+    "junction": 885,
+    "residential": 353,
+    "service": 65,
+    "secondary": 61,
+    "tertiary": 39,
+    "footway": 17,
+    "corner": 9,
+    "secondary_link": 7,
+    "path": 2,
+    "track": 2,
+    "tertiary_link": 1
+  },
+  "notes": [
+    "V5 standalone preview keeps optimized centerlines only.",
+    "Road surfaces, junction fan polygons and OBJ faces are intentionally disabled."
+  ]
+}
+[RoadTest] Generating lane-level debug geometry...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "outputs": {
+    "geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_geometry_debug.geojson",
+    "obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_geometry_debug.obj",
+    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_geometry_debug.svg"
+  },
+  "counts": {
+    "lanes": 1094,
+    "physical_lane_centerlines": 1080,
+    "debug_centerlines": 1080,
+    "lane_links": 1918,
+    "continuity_links": 40,
+    "debug_centerline_source_physical_lane_centerlines": 1080,
+    "lane_ribbons": 1080,
+    "lane_centerlines": 1080,
+    "lane_link_ribbons": 1918,
+    "lane_link_curves": 1918,
+    "lane_continuity_ribbons": 26,
+    "lane_continuity_curves": 26,
+    "skipped_micro_seam_continuity_curve": 14,
+    "obj_vertices": 74892,
+    "obj_lines": 3024,
+    "obj_faces": 3024
+  },
+  "metrics": {
+    "lane_geometry_debug_centerline_source": "physical_lane_centerlines",
+    "empty_lane_link_curves": 0,
+    "empty_continuity_curves": 0,
+    "avg_lane_link_curve_length_m": 6.782,
+    "max_lane_link_curve_length_m": 24.482,
+    "avg_continuity_curve_length_m": 3.874,
+    "max_continuity_curve_length_m": 15.779,
+    "avg_lane_width_m": 3.2,
+    "min_lane_width_m": 3.2,
+    "max_lane_width_m": 3.2,
+    "avg_width_confidence": 0.0,
+    "lane_ribbon_width_m": 0.7,
+    "lane_link_ribbon_width_m": 1.0
+  }
+}
+[RoadTest] Generating lane surface v1 geometry...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "outputs": {
+    "geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_surfaces_v1.geojson",
+    "obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_surfaces_v1.obj",
+    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_surfaces_v1.svg"
+  },
+  "counts": {
+    "lanes": 1094,
+    "lane_links": 1918,
+    "continuity_links": 40,
+    "lane_surfaces": 1080,
+    "junction_envelope_surfaces": 283,
+    "lane_turn_surfaces": 1918,
+    "lane_continuity_surfaces": 26,
+    "skipped_micro_seam_continuity_surface": 14,
+    "obj_vertices": 53646,
+    "obj_faces": 3307
+  },
+  "metrics": {
+    "lane_surface_centerline_source": "physical_lane_centerlines",
+    "physical_lane_centerlines": 1080,
+    "trim_start_lane_count": 0,
+    "trim_end_lane_count": 0,
+    "junction_trim_m": 8.0,
+    "approach_centerlines_trimmed": true,
+    "corner_continuity_trimmed_lane_count": 76,
+    "lane_geometry_rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+    "lane_geometry_rounding_curve_family": "tangent_circular_arc",
+    "derived_lane_centerline_smoothing_policy": "derived_lane_centerline_smoothing_v1",
+    "derived_lane_centerline_smoothed_lanes": 1,
+    "derived_lane_centerline_smoothed_bends": 1,
+    "derived_lane_centerline_inserted_sample_points": 8,
+    "derived_lane_centerline_max_derivation_offset_m": 0.18,
+    "derived_lane_centerline_smoothing_profile_counts": {
+      "hard_bend_lane_level_rounding": 1
+    },
+    "derived_lane_centerline_smoothing_curve_family_counts": {
+      "tangent_circular_arc": 1
+    },
+    "derived_lane_centerline_smoothing_arc_fit_status_counts": {
+      "exact_tangent_arc": 1
+    },
+    "continuity_rounding_style_counts": {
+      "unified_lane_geometry_rounding_style_v1": 40
+    },
+    "continuity_rounding_curve_family_counts": {
+      "straight_infinite_radius": 22,
+      "tangent_circular_arc": 16,
+      "tangent_continuous_bezier_fallback": 2
+    },
+    "lane_level_radius_regularized_continuity_links": 2,
+    "min_optimized_corner_continuity_radius_m": 1.527,
+    "avg_lane_surface_width_m": 3.2,
+    "avg_turn_surface_width_m": 3.2,
+    "avg_continuity_surface_width_m": 3.2,
+    "avg_junction_envelope_area_m2": 68.885,
+    "max_junction_envelope_area_m2": 239.625,
+    "junction_envelope_padding_m": 0.25,
+    "area_by_part_m2": {
+      "lane_surface_v1": 226195.511,
+      "junction_envelope_surface_v1": 19494.467,
+      "lane_turn_surface_v1": 41510.233,
+      "lane_continuity_surface_v1": 483.214
+    },
+    "total_area_m2": 287683.424
+  }
+}
+[RoadTest] Auditing road pipeline contracts...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "status": "warn",
+  "qa_gate_status": "manual_review_required",
+  "qa_warning_summary": {
+    "publishable_warn": 0,
+    "manual_review_required": 5,
+    "blocker": 0
+  },
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_pipeline_audit_report.json",
+  "metrics": {
+    "road_graph": {
+      "nodes": 471,
+      "edges": 547
+    },
+    "road_identity_fragmentation": {
+      "policy": "road_identity_fragmentation_tracking_v1",
+      "max_touch_gap_m": 0.01,
+      "road_identity_groups": 512,
+      "fragmented_road_identities": 16,
+      "touching_fragmented_road_identities": 16,
+      "max_fragments_per_identity": 9,
+      "samples": [
+        {
+          "road_identity_key": "rc_1197731777_seg_483",
+          "canonical_road_ids": [
+            "cr_0497",
+            "cr_0498",
+            "cr_0499"
+          ],
+          "edge_ids": [
+            "e_0501",
+            "e_0502",
+            "e_0503"
+          ],
+          "fragment_count": 3,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_1197731777_seg_484",
+          "canonical_road_ids": [
+            "cr_0500",
+            "cr_0501",
+            "cr_0502",
+            "cr_0503",
+            "cr_0504"
+          ],
+          "edge_ids": [
+            "e_0504",
+            "e_0505",
+            "e_0506",
+            "e_0507",
+            "e_0508"
+          ],
+          "fragment_count": 5,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_1279691631_seg_515",
+          "canonical_road_ids": [
+            "cr_0536",
+            "cr_0536"
+          ],
+          "edge_ids": [
+            "e_0540",
+            "e_0541"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_1322497277_seg_492",
+          "canonical_road_ids": [
+            "cr_0511",
+            "cr_0512",
+            "cr_0513"
+          ],
+          "edge_ids": [
+            "e_0515",
+            "e_0516",
+            "e_0517"
+          ],
+          "fragment_count": 3,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_143266125_seg_53",
+          "canonical_road_ids": [
+            "cr_0062",
+            "cr_0062",
+            "cr_0063",
+            "cr_0064",
+            "cr_0065",
+            "cr_0066"
+          ],
+          "edge_ids": [
+            "e_0062",
+            "e_0063",
+            "e_0064",
+            "e_0065",
+            "e_0066",
+            "e_0067"
+          ],
+          "fragment_count": 6,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_172893304_seg_210",
+          "canonical_road_ids": [
+            "cr_0221",
+            "cr_0221"
+          ],
+          "edge_ids": [
+            "e_0222",
+            "e_0223"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_179275926_seg_211",
+          "canonical_road_ids": [
+            "cr_0222",
+            "cr_0223",
+            "cr_0223"
+          ],
+          "edge_ids": [
+            "e_0224",
+            "e_0225",
+            "e_0226"
+          ],
+          "fragment_count": 3,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_311526148_seg_261",
+          "canonical_road_ids": [
+            "cr_0273",
+            "cr_0274"
+          ],
+          "edge_ids": [
+            "e_0276",
+            "e_0277"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_322604517_seg_273",
+          "canonical_road_ids": [
+            "cr_0286",
+            "cr_0286"
+          ],
+          "edge_ids": [
+            "e_0289",
+            "e_0290"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_342779085_seg_298",
+          "canonical_road_ids": [
+            "cr_0311",
+            "cr_0312",
+            "cr_0313"
+          ],
+          "edge_ids": [
+            "e_0315",
+            "e_0316",
+            "e_0317"
+          ],
+          "fragment_count": 3,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_36237245_seg_21",
+          "canonical_road_ids": [
+            "cr_0020",
+            "cr_0021",
+            "cr_0022"
+          ],
+          "edge_ids": [
+            "e_0020",
+            "e_0021",
+            "e_0022"
+          ],
+          "fragment_count": 3,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_36328924_seg_23",
+          "canonical_road_ids": [
+            "cr_0024",
+            "cr_0025",
+            "cr_0026",
+            "cr_0027",
+            "cr_0028",
+            "cr_0029",
+            "cr_0030",
+            "cr_0031",
+            "cr_0032"
+          ],
+          "edge_ids": [
+            "e_0024",
+            "e_0025",
+            "e_0026",
+            "e_0027",
+            "e_0028",
+            "e_0029",
+            "e_0030",
+            "e_0031",
+            "e_0032"
+          ],
+          "fragment_count": 9,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_709343627_seg_381",
+          "canonical_road_ids": [
+            "cr_0393",
+            "cr_0394"
+          ],
+          "edge_ids": [
+            "e_0397",
+            "e_0398"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_732696927_seg_430",
+          "canonical_road_ids": [
+            "cr_0443",
+            "cr_0444"
+          ],
+          "edge_ids": [
+            "e_0447",
+            "e_0448"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_936646921_seg_445",
+          "canonical_road_ids": [
+            "cr_0457",
+            "cr_0458"
+          ],
+          "edge_ids": [
+            "e_0461",
+            "e_0462"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_936722664_seg_470",
+          "canonical_road_ids": [
+            "cr_0483",
+            "cr_0484"
+          ],
+          "edge_ids": [
+            "e_0487",
+            "e_0488"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        }
+      ]
+    },
+    "junctions": 283,
+    "allowed_movements": 1918,
+    "blocked_movements": 0,
+    "lanes": 1094,
+    "lane_connections": 1918,
+    "lane_links": 1918,
+    "continuity_links": 40,
+    "micro_seam_continuity_links": 14,
+    "surface_continuity_links": 26,
+    "lane_curve_gap_metrics": {
+      "max_lane_link_start_gap_m": 0.0,
+      "max_lane_link_end_gap_m": 0.0,
+      "max_continuity_start_gap_m": 0.0,
+      "max_continuity_end_gap_m": 0.0
+    },
+    "lane_link_curve_source_counts": {
+      "junction_lane_endpoint_bezier": 1918
+    },
+    "optimized_features": 1441,
+    "optimized_corner_fillets": 9,
+    "optimized_junction_connectors": 885,
+    "compound_alternating_bend_guard_skips": 0,
+    "unresolved_upgraded_internal_bends": 0,
+    "optimized_points": 15599,
+    "preview_points": 15599,
+    "preview_obj_vertices": 15599,
+    "lane_debug_obj_vertices": 74892,
+    "lane_debug_obj_faces": 3024,
+    "lane_surface_v1_obj_vertices": 53646,
+    "lane_surface_v1_obj_faces": 3307,
+    "junction_envelope_surfaces": 283,
+    "qa_statuses": {
+      "topology_repair": "warn",
+      "road_graph": "warn",
+      "lane_graph": "pass"
+    },
+    "qa_gate_status": "manual_review_required",
+    "qa_warning_summary": {
+      "publishable_warn": 0,
+      "manual_review_required": 5,
+      "blocker": 0
+    }
+  },
+  "failed_or_warn_checks": [
+    {
+      "id": "road_identity_fragmentation_tracked",
+      "status": "warn",
+      "value": {
+        "policy": "road_identity_fragmentation_tracking_v1",
+        "max_touch_gap_m": 0.01,
+        "road_identity_groups": 512,
+        "fragmented_road_identities": 16,
+        "touching_fragmented_road_identities": 16,
+        "max_fragments_per_identity": 9,
+        "samples": [
+          {
+            "road_identity_key": "rc_1197731777_seg_483",
+            "canonical_road_ids": [
+              "cr_0497",
+              "cr_0498",
+              "cr_0499"
+            ],
+            "edge_ids": [
+              "e_0501",
+              "e_0502",
+              "e_0503"
+            ],
+            "fragment_count": 3,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_1197731777_seg_484",
+            "canonical_road_ids": [
+              "cr_0500",
+              "cr_0501",
+              "cr_0502",
+              "cr_0503",
+              "cr_0504"
+            ],
+            "edge_ids": [
+              "e_0504",
+              "e_0505",
+              "e_0506",
+              "e_0507",
+              "e_0508"
+            ],
+            "fragment_count": 5,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_1279691631_seg_515",
+            "canonical_road_ids": [
+              "cr_0536",
+              "cr_0536"
+            ],
+            "edge_ids": [
+              "e_0540",
+              "e_0541"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_1322497277_seg_492",
+            "canonical_road_ids": [
+              "cr_0511",
+              "cr_0512",
+              "cr_0513"
+            ],
+            "edge_ids": [
+              "e_0515",
+              "e_0516",
+              "e_0517"
+            ],
+            "fragment_count": 3,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_143266125_seg_53",
+            "canonical_road_ids": [
+              "cr_0062",
+              "cr_0062",
+              "cr_0063",
+              "cr_0064",
+              "cr_0065",
+              "cr_0066"
+            ],
+            "edge_ids": [
+              "e_0062",
+              "e_0063",
+              "e_0064",
+              "e_0065",
+              "e_0066",
+              "e_0067"
+            ],
+            "fragment_count": 6,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_172893304_seg_210",
+            "canonical_road_ids": [
+              "cr_0221",
+              "cr_0221"
+            ],
+            "edge_ids": [
+              "e_0222",
+              "e_0223"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_179275926_seg_211",
+            "canonical_road_ids": [
+              "cr_0222",
+              "cr_0223",
+              "cr_0223"
+            ],
+            "edge_ids": [
+              "e_0224",
+              "e_0225",
+              "e_0226"
+            ],
+            "fragment_count": 3,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_311526148_seg_261",
+            "canonical_road_ids": [
+              "cr_0273",
+              "cr_0274"
+            ],
+            "edge_ids": [
+              "e_0276",
+              "e_0277"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_322604517_seg_273",
+            "canonical_road_ids": [
+              "cr_0286",
+              "cr_0286"
+            ],
+            "edge_ids": [
+              "e_0289",
+              "e_0290"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_342779085_seg_298",
+            "canonical_road_ids": [
+              "cr_0311",
+              "cr_0312",
+              "cr_0313"
+            ],
+            "edge_ids": [
+              "e_0315",
+              "e_0316",
+              "e_0317"
+            ],
+            "fragment_count": 3,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_36237245_seg_21",
+            "canonical_road_ids": [
+              "cr_0020",
+              "cr_0021",
+              "cr_0022"
+            ],
+            "edge_ids": [
+              "e_0020",
+              "e_0021",
+              "e_0022"
+            ],
+            "fragment_count": 3,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_36328924_seg_23",
+            "canonical_road_ids": [
+              "cr_0024",
+              "cr_0025",
+              "cr_0026",
+              "cr_0027",
+              "cr_0028",
+              "cr_0029",
+              "cr_0030",
+              "cr_0031",
+              "cr_0032"
+            ],
+            "edge_ids": [
+              "e_0024",
+              "e_0025",
+              "e_0026",
+              "e_0027",
+              "e_0028",
+              "e_0029",
+              "e_0030",
+              "e_0031",
+              "e_0032"
+            ],
+            "fragment_count": 9,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_709343627_seg_381",
+            "canonical_road_ids": [
+              "cr_0393",
+              "cr_0394"
+            ],
+            "edge_ids": [
+              "e_0397",
+              "e_0398"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_732696927_seg_430",
+            "canonical_road_ids": [
+              "cr_0443",
+              "cr_0444"
+            ],
+            "edge_ids": [
+              "e_0447",
+              "e_0448"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_936646921_seg_445",
+            "canonical_road_ids": [
+              "cr_0457",
+              "cr_0458"
+            ],
+            "edge_ids": [
+              "e_0461",
+              "e_0462"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_936722664_seg_470",
+            "canonical_road_ids": [
+              "cr_0483",
+              "cr_0484"
+            ],
+            "edge_ids": [
+              "e_0487",
+              "e_0488"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          }
+        ]
+      },
+      "message": "Continuous source-road identity should stay visible when topology requires multiple road graph edges."
+    }
+  ]
+}
+[RoadTest] Publishing LaneForge standard lane package...
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "package_version": "lane_package_v0001",
+  "package_dir": "data/lane_upgrade_packages/z47n_e703000_n1428000_w1000_h1000_s1000/lane_package_v0001",
+  "manifest": "data/lane_upgrade_packages/z47n_e703000_n1428000_w1000_h1000_s1000/lane_package_v0001/manifest.json",
+  "path_policy": "portable_lane_package_paths_v1",
+  "counts": {
+    "lanes": 1094,
+    "physical_lane_centerlines": 1080,
+    "physical_lane_group_centerlines": 14,
+    "junctions": 283,
+    "lane_links": 1918,
+    "continuity_links": 40,
+    "junction_envelope_surfaces": 283,
+    "active_lane_upgrades": 0,
+    "active_corner_optimizations": 0,
+    "corner_optimization_candidates": 121,
+    "corner_optimization_accepted_active": 0,
+    "corner_optimization_accepted_active_candidates": 0,
+    "corner_optimization_accepted_active_overrides": 0,
+    "lane_upgrade_propagation_candidates": 0,
+    "lane_upgrade_propagation_high_confidence": 0
+  },
+  "qa_status": "warn",
+  "qa_gate_status": "manual_review_required",
+  "qa_warning_summary": {
+    "publishable_warn": 0,
+    "manual_review_required": 5,
+    "blocker": 0
+  }
+}
+[RoadTest] Generating current LaneForge status...
+{
+  "status": "generated",
+  "json_output": "reports/z47n_e703000_n1428000_w1000_h1000_s1000_laneforge_current_status.json",
+  "md_output": "CURRENT_LANEFORGE_STATUS.md",
+  "latest_package_version": "lane_package_v0001",
+  "qa_gate_status": "manual_review_required"
+}
+[RoadTest] Rebuild complete
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "status": "completed",
+  "houdini_status": "skipped",
+  "package_version": "lane_package_v0001",
+  "outputs": {
+    "repaired_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_repaired.geojson",
+    "canonical_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_canonical.geojson",
+    "road_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_road_graph.json",
+    "junction_semantics": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_junction_semantics.json",
+    "optimized_centerlines": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+    "corner_optimization_candidates": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_corner_optimization_candidates.json",
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_graph.json",
+    "semantic_evidence_summary": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_semantic_evidence_summary.json",
+    "preview_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_road_preview_report.json",
+    "lane_geometry_debug_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_geometry_debug_report.json",
+    "lane_surface_v1_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_surface_v1_report.json",
+    "pipeline_audit_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_pipeline_audit_report.json",
+    "lane_package_manifest": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\z47n_e703000_n1428000_w1000_h1000_s1000\\lane_package_v0001\\manifest.json",
+    "laneforge_current_status_json": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e703000_n1428000_w1000_h1000_s1000_laneforge_current_status.json",
+    "laneforge_current_status_md": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\CURRENT_LANEFORGE_STATUS.md",
+    "topology_qa_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\z47n_e703000_n1428000_w1000_h1000_s1000_topology_repair_qa_report.json",
+    "road_graph_qa_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\z47n_e703000_n1428000_w1000_h1000_s1000_road_graph_qa_report.json",
+    "lane_graph_qa_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\z47n_e703000_n1428000_w1000_h1000_s1000_lane_graph_qa_report.json",
+    "log": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\last_rebuild.log"
+  },
+  "artifact_identity": {
+    "road_graph": {
+      "path": "data/processed/z47n_e703000_n1428000_w1000_h1000_s1000_road_graph.json",
+      "exists": true,
+      "size_bytes": 1169833,
+      "mtime_utc": 1780689506.9587147,
+      "sha256": "fc87ee3ded1612e3591b818fa916394cd7d26013939b8b1c3fc02cdbf96690fc"
+    },
+    "junction_semantics": {
+      "path": "data/processed/z47n_e703000_n1428000_w1000_h1000_s1000_junction_semantics.json",
+      "exists": true,
+      "size_bytes": 1916160,
+      "mtime_utc": 1780689507.1039658,
+      "sha256": "7243b1c06add2dfc95c4b0edbf94ab62eecb5fd85bceaff532f3e9ecec65a0c8"
+    },
+    "optimized_centerlines": {
+      "path": "data/processed/z47n_e703000_n1428000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+      "exists": true,
+      "size_bytes": 2766022,
+      "mtime_utc": 1780689507.2505562,
+      "sha256": "daea9ceb036f6decfe12de41c980a35ab80cfbe9ee88f302428632ee8bce6192"
+    },
+    "lane_graph": {
+      "path": "data/processed/z47n_e703000_n1428000_w1000_h1000_s1000_lane_graph.json",
+      "exists": true,
+      "size_bytes": 11063420,
+      "mtime_utc": 1780689507.662358,
+      "sha256": "bfe9641bf1b63a208ae53266204260d9e09c7b8f4d872dfad2dd9527b93e75da"
+    },
+    "lane_surface_v1_geojson": {
+      "path": "data/preview/z47n_e703000_n1428000_w1000_h1000_s1000_lane_surfaces_v1.geojson",
+      "exists": true,
+      "size_bytes": 7175703,
+      "mtime_utc": 1780689508.7050612,
+      "sha256": "0ba7de126d51510ebde10c028c0e82852f27deac04517bf8f358e27bd8334b8c"
+    },
+    "lane_geometry_debug_geojson": {
+      "path": "data/preview/z47n_e703000_n1428000_w1000_h1000_s1000_lane_geometry_debug.geojson",
+      "exists": true,
+      "size_bytes": 10622740,
+      "mtime_utc": 1780689508.2887094,
+      "sha256": "f2aa18354ff5999b5c9de76218ac6155302f85d88ef4685de9a3271ed390d122"
+    },
+    "pipeline_audit_report": {
+      "path": "reports/z47n_e703000_n1428000_w1000_h1000_s1000_pipeline_audit_report.json",
+      "exists": true,
+      "size_bytes": 43609,
+      "mtime_utc": 1780689509.1000643,
+      "sha256": "c5f9f88463760602f0edb3972b39fbbea8fec10e95ee33a56a5a74b176a803ef"
+    },
+    "lane_package_manifest": {
+      "path": "data/lane_upgrade_packages/z47n_e703000_n1428000_w1000_h1000_s1000/lane_package_v0001/manifest.json",
+      "exists": true,
+      "size_bytes": 36348,
+      "mtime_utc": 1780689509.909801,
+      "sha256": "239c0e040900d29a6ae0bfb411dc192c03b6b6f7feef25530d172118252d212b"
+    }
+  }
+}
+[exit] 0

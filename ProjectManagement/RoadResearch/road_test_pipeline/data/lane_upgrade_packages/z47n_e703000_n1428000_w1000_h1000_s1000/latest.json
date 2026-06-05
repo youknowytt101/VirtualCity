@@ -1,0 +1,30 @@
+{
+  "area_id": "z47n_e703000_n1428000_w1000_h1000_s1000",
+  "system": "LaneForge",
+  "latest_package_version": "lane_package_v0001",
+  "path_policy": "portable_lane_package_paths_v1",
+  "latest_package_dir": "lane_package_v0001",
+  "manifest": "manifest.json",
+  "qa_gate_status": "manual_review_required",
+  "qa_warning_summary": {
+    "publishable_warn": 0,
+    "manual_review_required": 5,
+    "blocker": 0
+  },
+  "source_artifacts": {
+    "lane_graph": {
+      "path": "data/processed/z47n_e703000_n1428000_w1000_h1000_s1000_lane_graph.json",
+      "exists": true,
+      "size_bytes": 11063420,
+      "mtime_utc": 1780689507.662358,
+      "sha256": "bfe9641bf1b63a208ae53266204260d9e09c7b8f4d872dfad2dd9527b93e75da"
+    },
+    "pipeline_audit_report": {
+      "path": "reports/z47n_e703000_n1428000_w1000_h1000_s1000_pipeline_audit_report.json",
+      "exists": true,
+      "size_bytes": 43609,
+      "mtime_utc": 1780689509.1000643,
+      "sha256": "c5f9f88463760602f0edb3972b39fbbea8fec10e95ee33a56a5a74b176a803ef"
+    }
+  }
+}

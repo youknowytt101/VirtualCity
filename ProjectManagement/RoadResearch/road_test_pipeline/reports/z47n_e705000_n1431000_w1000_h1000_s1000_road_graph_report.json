@@ -1,0 +1,56 @@
+{
+  "area_id": "z47n_e705000_n1431000_w1000_h1000_s1000",
+  "stage": "road_graph_v1",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e705000_n1431000_w1000_h1000_s1000_roads_canonical.geojson",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e705000_n1431000_w1000_h1000_s1000_road_graph.json",
+  "counts": {
+    "input_features": 443,
+    "nodes": 398,
+    "edges": 447,
+    "skipped_empty_geometry": 0,
+    "zero_length_edges": 0,
+    "closed_loop_edges_split": 4,
+    "orphan_edges": 0
+  },
+  "node_kind_counts": {
+    "boundary": 2,
+    "connector": 13,
+    "dead_end": 150,
+    "junction": 233
+  },
+  "node_degree_counts": {
+    "1": 152,
+    "2": 13,
+    "3": 218,
+    "4": 13,
+    "5": 2
+  },
+  "edge_highway_counts": {
+    "residential": 241,
+    "service": 137,
+    "tertiary": 35,
+    "secondary": 31,
+    "unclassified": 2,
+    "footway": 1
+  },
+  "lanes_source_counts": {
+    "default": 179,
+    "tag": 268
+  },
+  "width_source_counts": {
+    "default": 447
+  },
+  "metrics": {
+    "dead_end_ratio": 0.377,
+    "boundary_ratio": 0.005,
+    "junction_ratio": 0.585,
+    "width_fallback_ratio": 1.0,
+    "lanes_fallback_ratio": 0.4,
+    "total_length_m": 38854.605
+  },
+  "notes": [
+    "Road graph is built from repaired simple edges and keeps source OSM tags for traceability.",
+    "Node kinds are boundary-aware so bbox exits are not treated as internal dead ends.",
+    "Width and lanes fall back to road class defaults when OSM tags are missing."
+  ]
+}

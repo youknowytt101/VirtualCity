@@ -1,0 +1,63 @@
+{
+  "status": "ok",
+  "area_id": "z47n_e706000_n1433000_w1000_h1000_s1000",
+  "run_id": "20260606_041311_z47n_e706000_n1433000_w1000_h1000_s1000_5d5acb43",
+  "package_dir": "ProjectManagement/RoadResearch/road_test_pipeline/data/lane_upgrade_packages/z47n_e706000_n1433000_w1000_h1000_s1000/lane_package_v0001",
+  "manifest": "ProjectManagement/RoadResearch/road_test_pipeline/data/lane_upgrade_packages/z47n_e706000_n1433000_w1000_h1000_s1000/lane_package_v0001/manifest.json",
+  "houdini_manifest": "ProjectManagement/RoadResearch/road_test_pipeline/data/lane_upgrade_packages/z47n_e706000_n1433000_w1000_h1000_s1000/lane_package_v0001/houdini_manifest.json",
+  "qa_gate_status": "manual_review_required",
+  "source_identity": {
+    "schema": "virtualcity.laneforge.source_identity.v1",
+    "source_system": "VirtualCity",
+    "area_id": "z47n_e706000_n1433000_w1000_h1000_s1000",
+    "run_id": "20260606_041311_z47n_e706000_n1433000_w1000_h1000_s1000_5d5acb43",
+    "bbox": [
+      100.8989928,
+      12.9556116,
+      100.9082765,
+      12.9647167
+    ],
+    "bbox_swen": [
+      12.9556116,
+      100.8989928,
+      12.9647167,
+      100.9082765
+    ],
+    "origin_lon": 100.90363465,
+    "origin_lat": 12.96016415,
+    "source_artifacts": {
+      "active_area": {
+        "path": "Config/active_area.json",
+        "exists": true,
+        "size_bytes": 1182,
+        "sha256": "b4de6c571df69da900d97cd04ea8f1b23afff163b467592e358f201394665c2c"
+      },
+      "roads_clean": {
+        "path": "RawData/_houdini_ready/z47n_e706000_n1433000_w1000_h1000_s1000/roads_clean.geojson",
+        "exists": true,
+        "size_bytes": 411388,
+        "sha256": "db7da8a4c68100b562eb163fdbc52c18170cca85033e69234a0be077760052a0"
+      },
+      "road_graph": {
+        "path": "RawData/_houdini_ready/z47n_e706000_n1433000_w1000_h1000_s1000/road_graph.json",
+        "exists": true,
+        "size_bytes": 494448,
+        "sha256": "dd8d2601c13fcde9c6e6c06fc471a3e8742c382ad65005cffcf130d803ff5dc0"
+      },
+      "roads_osm": {
+        "path": "RawData/_houdini_ready/z47n_e706000_n1433000_w1000_h1000_s1000/roads.osm",
+        "exists": true,
+        "size_bytes": 289973,
+        "sha256": "1c6070aab83645aa2b563f38922d590252a270cc80c1c7b34966e13b6c97443d"
+      },
+      "laneforge_raw": {
+        "path": "ProjectManagement/RoadResearch/road_test_pipeline/data/processed/z47n_e706000_n1433000_w1000_h1000_s1000_roads_raw.geojson",
+        "exists": true,
+        "size_bytes": 662436,
+        "sha256": "06eeabf3e52629c14f714c1c097614c786a2f28c5356f169b361ef75c1a33bdb"
+      }
+    },
+    "handoff_rule": "VirtualCity active area and Houdini-ready roads are the source of truth; LaneForge must not select or download a second road dataset in this integration mode."
+  },
+  "log": "ProjectManagement/RoadResearch/road_test_pipeline/reports/z47n_e706000_n1433000_w1000_h1000_s1000_virtualcity_bridge.log"
+}

@@ -1,0 +1,54 @@
+{
+  "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+  "input_mode": "optimized_centerlines",
+  "outputs": {
+    "centerline_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_preview_surfaces.geojson",
+    "legacy_surface_geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_preview_surfaces.geojson",
+    "obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_preview.obj",
+    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_preview.svg"
+  },
+  "counts": {
+    "edges": 913,
+    "endpoint_clusters": 660,
+    "junction_nodes_degree_ge_3": 560,
+    "junction_clusters": 143,
+    "road_surface_polygons": 0,
+    "road_surface_trimmed_polygons": 0,
+    "road_surface_absorbed_by_junction": 0,
+    "road_centerline_features": 913,
+    "junction_patch_polygons": 0,
+    "junction_clustered_nodes": 0,
+    "obj_vertices": 9851,
+    "obj_faces": 0,
+    "obj_centerlines": 913,
+    "obj_junction_patches": 0
+  },
+  "junction_patch_area_m2": {
+    "min_m2": 0.0,
+    "median_m2": 0.0,
+    "max_m2": 0.0,
+    "outliers_gt_4x_median": 0
+  },
+  "road_surface_extrusion": {
+    "enabled": false,
+    "generated_surfaces": 0,
+    "trimmed_at_junction": 0,
+    "absorbed_by_junction": 0,
+    "note": "Disabled by centerline-only preview mode."
+  },
+  "highway_class_counts": {
+    "junction": 566,
+    "service": 116,
+    "residential": 87,
+    "secondary": 72,
+    "footway": 53,
+    "corner": 9,
+    "pedestrian": 6,
+    "tertiary": 4
+  },
+  "notes": [
+    "V5 standalone preview keeps optimized centerlines only.",
+    "Road surfaces, junction fan polygons and OBJ faces are intentionally disabled."
+  ]
+}

@@ -1,0 +1,1596 @@
+{
+  "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+  "stage": "topology_repair_v2",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_raw.geojson",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_repaired.geojson",
+  "parameters": {
+    "snap_endpoint_m": 4.0,
+    "snap_edge_m": 5.0,
+    "node_eps_m": 0.25,
+    "short_edge_m": 3.0,
+    "bbox_edge_margin_m": 5.0,
+    "review_bridge_gap_m": 18.0,
+    "review_endpoint_edge_gap_m": 12.0,
+    "review_min_confidence": 0.45,
+    "high_confidence_promotion_min": 0.75,
+    "apply_high_confidence": false,
+    "raw_shape_simplification_enabled": true,
+    "raw_shape_simplify_tolerance_m": 0.15,
+    "raw_shape_simplify_max_turn_deg": 8.0,
+    "manual_overrides_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\z47n_e704000_n1431000_w1000_h1000_s1000.manual_overrides.json",
+    "repair_candidates_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_repair_candidates.json",
+    "repair_decisions_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_repair_decisions.json",
+    "repair_casebook_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_repair_casebook.json",
+    "raw_topology_diagnostics_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_raw_topology_diagnostics.json"
+  },
+  "counts": {
+    "input_features": 313,
+    "output_edges": 634,
+    "duplicate_points_removed": 0,
+    "endpoint_snaps": 40,
+    "endpoint_to_edge_snaps": 0,
+    "intersection_split_insertions": 0,
+    "raw_shape_vertices_removed": 98,
+    "raw_shape_simplification_passes": 1,
+    "short_edges_before_cleanup": 26,
+    "short_edge_threshold_m": 3,
+    "short_edge_collapse_passes": 1,
+    "short_edge_points_removed": 15,
+    "short_edges_remaining_under_threshold_pre_output": 7,
+    "post_promotion_short_edge_points_removed": 0,
+    "post_promotion_short_edges_remaining_under_threshold_pre_output": 7,
+    "short_edges_remaining_under_threshold": 0,
+    "internal_dangling_endpoints_for_review": 72,
+    "endpoint_bridge_candidates_for_review": 0,
+    "endpoint_to_edge_candidates_for_review": 0,
+    "high_confidence_repair_candidates": 0,
+    "manual_override_ops_loaded": 0,
+    "manual_override_ops_applied": 0,
+    "manual_override_ops_failed": 0,
+    "high_confidence_promotions_applied": 0,
+    "high_confidence_promotions_rejected": 0,
+    "high_confidence_promotions_failed": 0,
+    "high_confidence_promotions_skipped": 0
+  },
+  "repair_candidate_artifact": {
+    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_repair_candidates.json",
+    "candidate_count": 0,
+    "counts": {
+      "endpoint_bridge": 0,
+      "endpoint_to_edge": 0,
+      "auto_promotable": 0
+    }
+  },
+  "repair_decision_artifact": {
+    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_repair_decisions.json",
+    "decision_count": 0,
+    "decision_status_counts": {}
+  },
+  "repair_casebook_artifact": {
+    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_repair_casebook.json",
+    "case_count": 0,
+    "case_type_counts": {}
+  },
+  "raw_topology_diagnostics_artifact": {
+    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_raw_topology_diagnostics.json",
+    "summary": {
+      "raw_roads": 313,
+      "raw_vertices": 1067,
+      "raw_endpoints": 626,
+      "raw_internal_vertices": 441,
+      "possible_unsplit_crossings": 0,
+      "crossing_records_emitted": 0,
+      "classification_counts": {
+        "bbox_boundary_endpoint": 14,
+        "connected_endpoint": 542,
+        "dangling_endpoint": 70,
+        "ordinary_shape_vertex": 441
+      },
+      "issue_counts": {},
+      "severity_counts": {
+        "info": 997,
+        "review": 70
+      },
+      "endpoint_review_candidates": 0
+    }
+  },
+  "endpoint_stats_before": {
+    "endpoint_clusters": 261,
+    "dangling_endpoint_clusters": 88,
+    "dangling_endpoint_ratio": 0.337
+  },
+  "endpoint_stats_after_parent_roads": {
+    "endpoint_clusters": 254,
+    "dangling_endpoint_clusters": 86,
+    "dangling_endpoint_ratio": 0.339
+  },
+  "endpoint_stats_after_output_edges": {
+    "endpoint_clusters": 563,
+    "dangling_endpoint_clusters": 70,
+    "dangling_endpoint_ratio": 0.124
+  },
+  "raw_shape_simplification": {
+    "enabled": true,
+    "status": "applied",
+    "tolerance_m": 0.15,
+    "max_turn_deg": 8.0,
+    "vertices_removed": 98,
+    "passes": 1,
+    "roads_changed": 46,
+    "before": {
+      "short_segments_under_threshold": 37,
+      "possible_unsplit_crossings": 0,
+      "possible_unsplit_crossing_samples": [],
+      "endpoint_clusters": 254,
+      "dangling_endpoint_clusters": 86,
+      "dangling_endpoint_ratio": 0.339
+    },
+    "after": {
+      "short_segments_under_threshold": 26,
+      "possible_unsplit_crossings": 0,
+      "possible_unsplit_crossing_samples": [],
+      "endpoint_clusters": 254,
+      "dangling_endpoint_clusters": 86,
+      "dangling_endpoint_ratio": 0.339
+    },
+    "sample_removed_vertices": [
+      {
+        "source_feature_id": "27463705_seg_6",
+        "point_index_at_removal": 1,
+        "x": -10.338,
+        "z": 41.41,
+        "turn_deg": 0.0,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 29.012
+      },
+      {
+        "source_feature_id": "27463705_seg_6",
+        "point_index_at_removal": 2,
+        "x": 14.145,
+        "z": 32.881,
+        "turn_deg": 0.0,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 50.492
+      },
+      {
+        "source_feature_id": "27463705_seg_6",
+        "point_index_at_removal": 3,
+        "x": 73.203,
+        "z": 12.304,
+        "turn_deg": 0.0,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 45.979
+      },
+      {
+        "source_feature_id": "27463705_seg_6",
+        "point_index_at_removal": 3,
+        "x": 84.959,
+        "z": 8.206,
+        "turn_deg": 0.0,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 53.929
+      },
+      {
+        "source_feature_id": "27463705_seg_6",
+        "point_index_at_removal": 3,
+        "x": 92.467,
+        "z": 5.59,
+        "turn_deg": 0.0,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 84.021
+      },
+      {
+        "source_feature_id": "27463705_seg_6",
+        "point_index_at_removal": 4,
+        "x": 121.889,
+        "z": -4.664,
+        "turn_deg": 0.0,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 45.979
+      },
+      {
+        "source_feature_id": "27463705_seg_6",
+        "point_index_at_removal": 6,
+        "x": 295.467,
+        "z": -65.495,
+        "turn_deg": 0.085,
+        "chord_deviation_m": 0.004,
+        "replacement_chord_m": 88.127
+      },
+      {
+        "source_feature_id": "27464541_seg_9",
+        "point_index_at_removal": 1,
+        "x": 479.936,
+        "z": 473.594,
+        "turn_deg": 0.002,
+        "chord_deviation_m": 0.001,
+        "replacement_chord_m": 94.779
+      },
+      {
+        "source_feature_id": "27464541_seg_12",
+        "point_index_at_removal": 1,
+        "x": 551.216,
+        "z": 471.179,
+        "turn_deg": 0.186,
+        "chord_deviation_m": 0.051,
+        "replacement_chord_m": 131.688
+      },
+      {
+        "source_feature_id": "27464541_seg_12",
+        "point_index_at_removal": 1,
+        "x": 664.579,
+        "z": 467.004,
+        "turn_deg": 0.005,
+        "chord_deviation_m": 0.001,
+        "replacement_chord_m": 141.817
+      },
+      {
+        "source_feature_id": "27464541_seg_12",
+        "point_index_at_removal": 1,
+        "x": 674.701,
+        "z": 466.637,
+        "turn_deg": 0.024,
+        "chord_deviation_m": 0.016,
+        "replacement_chord_m": 193.592
+      },
+      {
+        "source_feature_id": "27486187_seg_16",
+        "point_index_at_removal": 1,
+        "x": 190.1,
+        "z": -4.937,
+        "turn_deg": 0.009,
+        "chord_deviation_m": 0.002,
+        "replacement_chord_m": 53.352
+      },
+      {
+        "source_feature_id": "27486189_seg_22",
+        "point_index_at_removal": 1,
+        "x": 370.088,
+        "z": 139.968,
+        "turn_deg": 0.197,
+        "chord_deviation_m": 0.016,
+        "replacement_chord_m": 26.795
+      },
+      {
+        "source_feature_id": "27486194_seg_34",
+        "point_index_at_removal": 1,
+        "x": 384.811,
+        "z": 603.972,
+        "turn_deg": 0.349,
+        "chord_deviation_m": 0.096,
+        "replacement_chord_m": 89.451
+      },
+      {
+        "source_feature_id": "31975797_seg_46",
+        "point_index_at_removal": 1,
+        "x": 421.448,
+        "z": -127.122,
+        "turn_deg": 0.037,
+        "chord_deviation_m": 0.002,
+        "replacement_chord_m": 24.607
+      },
+      {
+        "source_feature_id": "31975797_seg_46",
+        "point_index_at_removal": 1,
+        "x": 400.086,
+        "z": -127.356,
+        "turn_deg": 1.379,
+        "chord_deviation_m": 0.131,
+        "replacement_chord_m": 31.619
+      },
+      {
+        "source_feature_id": "31975797_seg_46",
+        "point_index_at_removal": 5,
+        "x": 372.269,
+        "z": -121.923,
+        "turn_deg": 3.121,
+        "chord_deviation_m": 0.131,
+        "replacement_chord_m": 9.605
+      },
+      {
+        "source_feature_id": "31975949_seg_47",
+        "point_index_at_removal": 1,
+        "x": 671.729,
+        "z": -173.821,
+        "turn_deg": 0.034,
+        "chord_deviation_m": 0.004,
+        "replacement_chord_m": 75.433
+      },
+      {
+        "source_feature_id": "31976283_seg_63",
+        "point_index_at_removal": 4,
+        "x": 590.945,
+        "z": -271.415,
+        "turn_deg": 0.333,
+        "chord_deviation_m": 0.024,
+        "replacement_chord_m": 19.71
+      },
+      {
+        "source_feature_id": "31976283_seg_63",
+        "point_index_at_removal": 5,
+        "x": 588.266,
+        "z": -259.203,
+        "turn_deg": 1.845,
+        "chord_deviation_m": 0.142,
+        "replacement_chord_m": 19.299
+      },
+      {
+        "source_feature_id": "35129296_seg_66",
+        "point_index_at_removal": 1,
+        "x": 9.189,
+        "z": -670.831,
+        "turn_deg": 0.108,
+        "chord_deviation_m": 0.025,
+        "replacement_chord_m": 58.515
+      },
+      {
+        "source_feature_id": "35129296_seg_67",
+        "point_index_at_removal": 1,
+        "x": -57.425,
+        "z": -640.062,
+        "turn_deg": 0.021,
+        "chord_deviation_m": 0.003,
+        "replacement_chord_m": 62.14
+      },
+      {
+        "source_feature_id": "35429331_seg_81",
+        "point_index_at_removal": 2,
+        "x": 550.727,
+        "z": -257.311,
+        "turn_deg": 3.393,
+        "chord_deviation_m": 0.13,
+        "replacement_chord_m": 9.072
+      },
+      {
+        "source_feature_id": "35429331_seg_82",
+        "point_index_at_removal": 1,
+        "x": 635.08,
+        "z": -483.223,
+        "turn_deg": 0.991,
+        "chord_deviation_m": 0.084,
+        "replacement_chord_m": 41.224
+      },
+      {
+        "source_feature_id": "35429331_seg_85",
+        "point_index_at_removal": 4,
+        "x": 590.175,
+        "z": -663.506,
+        "turn_deg": 0.098,
+        "chord_deviation_m": 0.024,
+        "replacement_chord_m": 58.66
+      },
+      {
+        "source_feature_id": "144690745_seg_99",
+        "point_index_at_removal": 1,
+        "x": 202.381,
+        "z": -357.076,
+        "turn_deg": 0.065,
+        "chord_deviation_m": 0.004,
+        "replacement_chord_m": 18.62
+      },
+      {
+        "source_feature_id": "144690745_seg_101",
+        "point_index_at_removal": 1,
+        "x": -91.86,
+        "z": -247.871,
+        "turn_deg": 0.197,
+        "chord_deviation_m": 0.011,
+        "replacement_chord_m": 221.243
+      },
+      {
+        "source_feature_id": "144690746_seg_104",
+        "point_index_at_removal": 9,
+        "x": 78.299,
+        "z": -325.55,
+        "turn_deg": 2.712,
+        "chord_deviation_m": 0.083,
+        "replacement_chord_m": 7.131
+      },
+      {
+        "source_feature_id": "149356489_seg_107",
+        "point_index_at_removal": 1,
+        "x": 661.812,
+        "z": 926.5,
+        "turn_deg": 0.425,
+        "chord_deviation_m": 0.034,
+        "replacement_chord_m": 20.399
+      },
+      {
+        "source_feature_id": "149356489_seg_107",
+        "point_index_at_removal": 1,
+        "x": 662.832,
+        "z": 919.498,
+        "turn_deg": 0.499,
+        "chord_deviation_m": 0.114,
+        "replacement_chord_m": 57.384
+      },
+      {
+        "source_feature_id": "149356489_seg_107",
+        "point_index_at_removal": 9,
+        "x": 726.984,
+        "z": 508.17,
+        "turn_deg": 0.176,
+        "chord_deviation_m": 0.051,
+        "replacement_chord_m": 69.958
+      },
+      {
+        "source_feature_id": "149356489_seg_108",
+        "point_index_at_removal": 2,
+        "x": 722.774,
+        "z": 320.173,
+        "turn_deg": 0.912,
+        "chord_deviation_m": 0.08,
+        "replacement_chord_m": 31.682
+      },
+      {
+        "source_feature_id": "149356489_seg_109",
+        "point_index_at_removal": 3,
+        "x": 700.273,
+        "z": 105.27,
+        "turn_deg": 0.165,
+        "chord_deviation_m": 0.017,
+        "replacement_chord_m": 150.987
+      },
+      {
+        "source_feature_id": "193633860_seg_113",
+        "point_index_at_removal": 1,
+        "x": 136.505,
+        "z": -612.911,
+        "turn_deg": 0.022,
+        "chord_deviation_m": 0.005,
+        "replacement_chord_m": 64.308
+      },
+      {
+        "source_feature_id": "259502652_seg_119",
+        "point_index_at_removal": 1,
+        "x": 228.582,
+        "z": -314.151,
+        "turn_deg": 0.001,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 251.601
+      },
+      {
+        "source_feature_id": "266333531_seg_121",
+        "point_index_at_removal": 3,
+        "x": 451.002,
+        "z": -80.69,
+        "turn_deg": 0.249,
+        "chord_deviation_m": 0.052,
+        "replacement_chord_m": 49.536
+      },
+      {
+        "source_feature_id": "350135618_seg_134",
+        "point_index_at_removal": 1,
+        "x": -201.491,
+        "z": -528.898,
+        "turn_deg": 0.155,
+        "chord_deviation_m": 0.007,
+        "replacement_chord_m": 18.082
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 2,
+        "x": -273.292,
+        "z": -677.443,
+        "turn_deg": 1.226,
+        "chord_deviation_m": 0.016,
+        "replacement_chord_m": 52.237
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 2,
+        "x": -273.617,
+        "z": -678.111,
+        "turn_deg": 1.011,
+        "chord_deviation_m": 0.047,
+        "replacement_chord_m": 55.065
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 3,
+        "x": -281.711,
+        "z": -694.52,
+        "turn_deg": 0.879,
+        "chord_deviation_m": 0.08,
+        "replacement_chord_m": 23.361
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 5,
+        "x": -343.084,
+        "z": -804.916,
+        "turn_deg": 0.001,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 28.78
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 5,
+        "x": -348.227,
+        "z": -813.087,
+        "turn_deg": 0.003,
+        "chord_deviation_m": 0.001,
+        "replacement_chord_m": 84.061
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 6,
+        "x": -422.804,
+        "z": -924.351,
+        "turn_deg": 0.011,
+        "chord_deviation_m": 0.001,
+        "replacement_chord_m": 81.882
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 8,
+        "x": -467.243,
+        "z": -986.668,
+        "turn_deg": 0.522,
+        "chord_deviation_m": 0.097,
+        "replacement_chord_m": 49.889
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 8,
+        "x": -476.258,
+        "z": -999.058,
+        "turn_deg": 0.401,
+        "chord_deviation_m": 0.125,
+        "replacement_chord_m": 77.794
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 9,
+        "x": -495.841,
+        "z": -1025.586,
+        "turn_deg": 0.375,
+        "chord_deviation_m": 0.03,
+        "replacement_chord_m": 59.089
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 10,
+        "x": -549.393,
+        "z": -1092.021,
+        "turn_deg": 0.002,
+        "chord_deviation_m": 0.001,
+        "replacement_chord_m": 109.088
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 13,
+        "x": -711.795,
+        "z": -1275.944,
+        "turn_deg": 0.049,
+        "chord_deviation_m": 0.002,
+        "replacement_chord_m": 19.372
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 13,
+        "x": -713.921,
+        "z": -1277.959,
+        "turn_deg": 0.001,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 39.311
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 13,
+        "x": -728.405,
+        "z": -1291.663,
+        "turn_deg": 0.301,
+        "chord_deviation_m": 0.107,
+        "replacement_chord_m": 81.835
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 13,
+        "x": -759.141,
+        "z": -1321.051,
+        "turn_deg": 0.011,
+        "chord_deviation_m": 0.008,
+        "replacement_chord_m": 166.126
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 13,
+        "x": -820.222,
+        "z": -1379.138,
+        "turn_deg": 0.05,
+        "chord_deviation_m": 0.003,
+        "replacement_chord_m": 169.133
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 13,
+        "x": -822.402,
+        "z": -1381.208,
+        "turn_deg": 0.031,
+        "chord_deviation_m": 0.006,
+        "replacement_chord_m": 179.949
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 13,
+        "x": -830.236,
+        "z": -1388.667,
+        "turn_deg": 0.028,
+        "chord_deviation_m": 0.003,
+        "replacement_chord_m": 186.026
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 13,
+        "x": -834.64,
+        "z": -1392.853,
+        "turn_deg": 0.018,
+        "chord_deviation_m": 0.008,
+        "replacement_chord_m": 214.302
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 16,
+        "x": -955.913,
+        "z": -1500.699,
+        "turn_deg": 0.248,
+        "chord_deviation_m": 0.009,
+        "replacement_chord_m": 61.71
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 16,
+        "x": -957.486,
+        "z": -1502.057,
+        "turn_deg": 0.043,
+        "chord_deviation_m": 0.005,
+        "replacement_chord_m": 69.746
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 17,
+        "x": -1000.47,
+        "z": -1539.839,
+        "turn_deg": 1.565,
+        "chord_deviation_m": 0.123,
+        "replacement_chord_m": 54.141
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 18,
+        "x": -1031.987,
+        "z": -1566.233,
+        "turn_deg": 0.264,
+        "chord_deviation_m": 0.008,
+        "replacement_chord_m": 38.078
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 18,
+        "x": -1033.463,
+        "z": -1567.458,
+        "turn_deg": 0.012,
+        "chord_deviation_m": 0.003,
+        "replacement_chord_m": 64.827
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 18,
+        "x": -1053.968,
+        "z": -1584.635,
+        "turn_deg": 0.007,
+        "chord_deviation_m": 0.002,
+        "replacement_chord_m": 85.896
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "point_index_at_removal": 18,
+        "x": -1070.122,
+        "z": -1598.16,
+        "turn_deg": 1.452,
+        "chord_deviation_m": 0.055,
+        "replacement_chord_m": 88.113
+      },
+      {
+        "source_feature_id": "415109738_seg_146",
+        "point_index_at_removal": 7,
+        "x": 663.7,
+        "z": 451.798,
+        "turn_deg": 0.078,
+        "chord_deviation_m": 0.012,
+        "replacement_chord_m": 115.791
+      },
+      {
+        "source_feature_id": "415109738_seg_146",
+        "point_index_at_removal": 7,
+        "x": 673.313,
+        "z": 451.531,
+        "turn_deg": 0.089,
+        "chord_deviation_m": 0.044,
+        "replacement_chord_m": 153.453
+      },
+      {
+        "source_feature_id": "722363651_seg_163",
+        "point_index_at_removal": 4,
+        "x": -40.663,
+        "z": 630.689,
+        "turn_deg": 0.093,
+        "chord_deviation_m": 0.003,
+        "replacement_chord_m": 14.873
+      },
+      {
+        "source_feature_id": "722363651_seg_163",
+        "point_index_at_removal": 4,
+        "x": -40.359,
+        "z": 628.118,
+        "turn_deg": 0.004,
+        "chord_deviation_m": 0.001,
+        "replacement_chord_m": 43.138
+      },
+      {
+        "source_feature_id": "722363651_seg_165",
+        "point_index_at_removal": 1,
+        "x": -27.807,
+        "z": 499.532,
+        "turn_deg": 0.014,
+        "chord_deviation_m": 0.001,
+        "replacement_chord_m": 24.889
+      },
+      {
+        "source_feature_id": "722363651_seg_165",
+        "point_index_at_removal": 1,
+        "x": -27.579,
+        "z": 495.624,
+        "turn_deg": 0.004,
+        "chord_deviation_m": 0.001,
+        "replacement_chord_m": 90.357
+      },
+      {
+        "source_feature_id": "722363651_seg_166",
+        "point_index_at_removal": 1,
+        "x": -23.217,
+        "z": 405.433,
+        "turn_deg": 0.036,
+        "chord_deviation_m": 0.002,
+        "replacement_chord_m": 28.705
+      },
+      {
+        "source_feature_id": "722363651_seg_166",
+        "point_index_at_removal": 1,
+        "x": -23.131,
+        "z": 401.57,
+        "turn_deg": 0.007,
+        "chord_deviation_m": 0.002,
+        "replacement_chord_m": 69.558
+      },
+      {
+        "source_feature_id": "722363651_seg_167",
+        "point_index_at_removal": 1,
+        "x": -22.924,
+        "z": 302.173,
+        "turn_deg": 0.004,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 61.319
+      },
+      {
+        "source_feature_id": "722363651_seg_167",
+        "point_index_at_removal": 1,
+        "x": -22.957,
+        "z": 299.412,
+        "turn_deg": 0.005,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 65.928
+      },
+      {
+        "source_feature_id": "722363651_seg_173",
+        "point_index_at_removal": 1,
+        "x": -57.36,
+        "z": -79.51,
+        "turn_deg": 0.121,
+        "chord_deviation_m": 0.006,
+        "replacement_chord_m": 23.148
+      },
+      {
+        "source_feature_id": "722363651_seg_175",
+        "point_index_at_removal": 1,
+        "x": -90.526,
+        "z": -211.235,
+        "turn_deg": 0.15,
+        "chord_deviation_m": 0.008,
+        "replacement_chord_m": 15.922
+      },
+      {
+        "source_feature_id": "722363651_seg_178",
+        "point_index_at_removal": 1,
+        "x": -126.426,
+        "z": -321.219,
+        "turn_deg": 0.102,
+        "chord_deviation_m": 0.006,
+        "replacement_chord_m": 84.488
+      },
+      {
+        "source_feature_id": "724142653_seg_189",
+        "point_index_at_removal": 9,
+        "x": 237.359,
+        "z": -314.318,
+        "turn_deg": 0.009,
+        "chord_deviation_m": 0.0,
+        "replacement_chord_m": 22.307
+      },
+      {
+        "source_feature_id": "724361577_seg_191",
+        "point_index_at_removal": 1,
+        "x": 269.288,
+        "z": -301.85,
+        "turn_deg": 0.009,
+        "chord_deviation_m": 0.003,
+        "replacement_chord_m": 86.186
+      },
+      {
+        "source_feature_id": "945051119_seg_215",
+        "point_index_at_removal": 1,
+        "x": 370.49,
+        "z": 161.809,
+        "turn_deg": 0.091,
+        "chord_deviation_m": 0.007,
+        "replacement_chord_m": 26.931
+      },
+      {
+        "source_feature_id": "945051119_seg_215",
+        "point_index_at_removal": 1,
+        "x": 372.084,
+        "z": 166.863,
+        "turn_deg": 0.058,
+        "chord_deviation_m": 0.005,
+        "replacement_chord_m": 32.705
+      },
+      {
+        "source_feature_id": "945051119_seg_215",
+        "point_index_at_removal": 1,
+        "x": 373.809,
+        "z": 172.373,
+        "turn_deg": 0.002,
+        "chord_deviation_m": 0.001,
+        "replacement_chord_m": 112.012
+      }
+    ],
+    "validators": [
+      {
+        "id": "no_new_unsplit_crossing",
+        "status": "pass",
+        "before": 0,
+        "after": 0,
+        "message": "Raw shape simplification must not introduce new planar crossing candidates."
+      },
+      {
+        "id": "endpoint_topology_stable",
+        "status": "pass",
+        "before": {
+          "endpoint_clusters": 254,
+          "dangling_endpoint_clusters": 86
+        },
+        "after": {
+          "endpoint_clusters": 254,
+          "dangling_endpoint_clusters": 86
+        },
+        "message": "Removing ordinary shape vertices must not change endpoint topology."
+      },
+      {
+        "id": "no_new_short_edge",
+        "status": "pass",
+        "before": 37,
+        "after": 26,
+        "message": "Simplification must not increase short segments under the topology repair threshold."
+      }
+    ]
+  },
+  "repair_review_before_promotions": {
+    "dangling_endpoints": 72,
+    "internal_dangling_endpoints": 72,
+    "bbox_boundary_dangling_endpoints": 0,
+    "endpoint_bridge_candidates": 0,
+    "endpoint_to_edge_review_candidates": 0,
+    "high_confidence_candidates": 0,
+    "high_confidence_candidate_items": [],
+    "candidate_items": [],
+    "top_endpoint_bridge_candidates": [],
+    "top_endpoint_to_edge_candidates": [],
+    "sample_internal_dangling_endpoints": [
+      {
+        "source_feature_id": "27443601_seg_1",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": -58.163,
+        "z": -750.302
+      },
+      {
+        "source_feature_id": "27464544_seg_13",
+        "endpoint_role": "end",
+        "highway": "footway",
+        "road_class": "footway",
+        "x": 541.202,
+        "z": 440.443
+      },
+      {
+        "source_feature_id": "27464547_seg_14",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 532.783,
+        "z": 464.867
+      },
+      {
+        "source_feature_id": "27486189_seg_23",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 407.648,
+        "z": 205.435
+      },
+      {
+        "source_feature_id": "27486780_seg_36",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 370.316,
+        "z": 313.026
+      },
+      {
+        "source_feature_id": "27670514_seg_40",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 228.343,
+        "z": -0.573
+      },
+      {
+        "source_feature_id": "31975949_seg_47",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 794.639,
+        "z": -216.946
+      },
+      {
+        "source_feature_id": "31975950_seg_48",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 546.561,
+        "z": -206.805
+      },
+      {
+        "source_feature_id": "31975951_seg_49",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 699.362,
+        "z": -320.006
+      },
+      {
+        "source_feature_id": "31976276_seg_50",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 383.563,
+        "z": -701.978
+      },
+      {
+        "source_feature_id": "31976277_seg_56",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 293.547,
+        "z": -670.074
+      },
+      {
+        "source_feature_id": "31976278_seg_59",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 309.951,
+        "z": -529.555
+      },
+      {
+        "source_feature_id": "31976282_seg_62",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 487.119,
+        "z": -274.51
+      },
+      {
+        "source_feature_id": "31976283_seg_63",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 617.504,
+        "z": -330.414
+      },
+      {
+        "source_feature_id": "35129296_seg_65",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 106.008,
+        "z": -715.281
+      },
+      {
+        "source_feature_id": "35129331_seg_74",
+        "endpoint_role": "end",
+        "highway": "footway",
+        "road_class": "footway",
+        "x": 356.733,
+        "z": -233.132
+      },
+      {
+        "source_feature_id": "35429331_seg_85",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 588.504,
+        "z": -774.615
+      },
+      {
+        "source_feature_id": "35536296_seg_88",
+        "endpoint_role": "end",
+        "highway": "footway",
+        "road_class": "footway",
+        "x": -214.5,
+        "z": -626.459
+      },
+      {
+        "source_feature_id": "143857500_seg_93",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 38.797,
+        "z": 535.432
+      },
+      {
+        "source_feature_id": "144685430_seg_94",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 495.516,
+        "z": -615.505
+      },
+      {
+        "source_feature_id": "144685430_seg_95",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 529.224,
+        "z": -619.546
+      },
+      {
+        "source_feature_id": "144685431_seg_96",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 504.228,
+        "z": -657.417
+      },
+      {
+        "source_feature_id": "144686985_seg_97",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 295.522,
+        "z": -481.342
+      },
+      {
+        "source_feature_id": "144691114_seg_106",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 567.75,
+        "z": -479.35
+      },
+      {
+        "source_feature_id": "149356489_seg_107",
+        "endpoint_role": "start",
+        "highway": "tertiary",
+        "road_class": "tertiary",
+        "x": 659.795,
+        "z": 939.669
+      },
+      {
+        "source_feature_id": "282872965_seg_124",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 233.225,
+        "z": -648.69
+      },
+      {
+        "source_feature_id": "307777150_seg_127",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 185.174,
+        "z": -341.357
+      },
+      {
+        "source_feature_id": "315430417_seg_130",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 676.35,
+        "z": -639.873
+      },
+      {
+        "source_feature_id": "317141440_seg_131",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": -133.38,
+        "z": -642.522
+      },
+      {
+        "source_feature_id": "317141440_seg_132",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": -109.61,
+        "z": -591.015
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "endpoint_role": "end",
+        "highway": "secondary",
+        "road_class": "secondary",
+        "x": -1126.354,
+        "z": -1644.825
+      },
+      {
+        "source_feature_id": "380807537_seg_140",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 514.404,
+        "z": 511.12
+      },
+      {
+        "source_feature_id": "381194402_seg_141",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 134.519,
+        "z": 34.214
+      },
+      {
+        "source_feature_id": "381194403_seg_143",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 54.886,
+        "z": 60.597
+      },
+      {
+        "source_feature_id": "382791542_seg_145",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 548.373,
+        "z": 325.116
+      },
+      {
+        "source_feature_id": "415109738_seg_146",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 710.601,
+        "z": 431.237
+      },
+      {
+        "source_feature_id": "415109738_seg_146",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 710.959,
+        "z": 450.473
+      },
+      {
+        "source_feature_id": "451837197_seg_152",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 538.251,
+        "z": -166.073
+      },
+      {
+        "source_feature_id": "451840408_seg_153",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 546.909,
+        "z": -588.721
+      },
+      {
+        "source_feature_id": "452208684_seg_154",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 86.978,
+        "z": 138.621
+      }
+    ],
+    "note": "Review candidates are not applied automatically; promote only high-confidence cases after visual QA or manual overrides."
+  },
+  "repair_review": {
+    "dangling_endpoints": 72,
+    "internal_dangling_endpoints": 72,
+    "bbox_boundary_dangling_endpoints": 0,
+    "endpoint_bridge_candidates": 0,
+    "endpoint_to_edge_review_candidates": 0,
+    "high_confidence_candidates": 0,
+    "high_confidence_candidate_items": [],
+    "candidate_items": [],
+    "top_endpoint_bridge_candidates": [],
+    "top_endpoint_to_edge_candidates": [],
+    "sample_internal_dangling_endpoints": [
+      {
+        "source_feature_id": "27443601_seg_1",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": -58.163,
+        "z": -750.302
+      },
+      {
+        "source_feature_id": "27464544_seg_13",
+        "endpoint_role": "end",
+        "highway": "footway",
+        "road_class": "footway",
+        "x": 541.202,
+        "z": 440.443
+      },
+      {
+        "source_feature_id": "27464547_seg_14",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 532.783,
+        "z": 464.867
+      },
+      {
+        "source_feature_id": "27486189_seg_23",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 407.648,
+        "z": 205.435
+      },
+      {
+        "source_feature_id": "27486780_seg_36",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 370.316,
+        "z": 313.026
+      },
+      {
+        "source_feature_id": "27670514_seg_40",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 228.343,
+        "z": -0.573
+      },
+      {
+        "source_feature_id": "31975949_seg_47",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 794.639,
+        "z": -216.946
+      },
+      {
+        "source_feature_id": "31975950_seg_48",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 546.561,
+        "z": -206.805
+      },
+      {
+        "source_feature_id": "31975951_seg_49",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 699.362,
+        "z": -320.006
+      },
+      {
+        "source_feature_id": "31976276_seg_50",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 383.563,
+        "z": -701.978
+      },
+      {
+        "source_feature_id": "31976277_seg_56",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 293.547,
+        "z": -670.074
+      },
+      {
+        "source_feature_id": "31976278_seg_59",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 309.951,
+        "z": -529.555
+      },
+      {
+        "source_feature_id": "31976282_seg_62",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 487.119,
+        "z": -274.51
+      },
+      {
+        "source_feature_id": "31976283_seg_63",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 617.504,
+        "z": -330.414
+      },
+      {
+        "source_feature_id": "35129296_seg_65",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 106.008,
+        "z": -715.281
+      },
+      {
+        "source_feature_id": "35129331_seg_74",
+        "endpoint_role": "end",
+        "highway": "footway",
+        "road_class": "footway",
+        "x": 356.733,
+        "z": -233.132
+      },
+      {
+        "source_feature_id": "35429331_seg_85",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 588.504,
+        "z": -774.615
+      },
+      {
+        "source_feature_id": "35536296_seg_88",
+        "endpoint_role": "end",
+        "highway": "footway",
+        "road_class": "footway",
+        "x": -214.5,
+        "z": -626.459
+      },
+      {
+        "source_feature_id": "143857500_seg_93",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 38.797,
+        "z": 535.432
+      },
+      {
+        "source_feature_id": "144685430_seg_94",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 495.516,
+        "z": -615.505
+      },
+      {
+        "source_feature_id": "144685430_seg_95",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 529.224,
+        "z": -619.546
+      },
+      {
+        "source_feature_id": "144685431_seg_96",
+        "endpoint_role": "start",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 504.228,
+        "z": -657.417
+      },
+      {
+        "source_feature_id": "144686985_seg_97",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 295.522,
+        "z": -481.342
+      },
+      {
+        "source_feature_id": "144691114_seg_106",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 567.75,
+        "z": -479.35
+      },
+      {
+        "source_feature_id": "149356489_seg_107",
+        "endpoint_role": "start",
+        "highway": "tertiary",
+        "road_class": "tertiary",
+        "x": 659.795,
+        "z": 939.669
+      },
+      {
+        "source_feature_id": "282872965_seg_124",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 233.225,
+        "z": -648.69
+      },
+      {
+        "source_feature_id": "307777150_seg_127",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 185.174,
+        "z": -341.357
+      },
+      {
+        "source_feature_id": "315430417_seg_130",
+        "endpoint_role": "end",
+        "highway": "residential",
+        "road_class": "residential",
+        "x": 676.35,
+        "z": -639.873
+      },
+      {
+        "source_feature_id": "317141440_seg_131",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": -133.38,
+        "z": -642.522
+      },
+      {
+        "source_feature_id": "317141440_seg_132",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": -109.61,
+        "z": -591.015
+      },
+      {
+        "source_feature_id": "350135618_seg_138",
+        "endpoint_role": "end",
+        "highway": "secondary",
+        "road_class": "secondary",
+        "x": -1126.354,
+        "z": -1644.825
+      },
+      {
+        "source_feature_id": "380807537_seg_140",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 514.404,
+        "z": 511.12
+      },
+      {
+        "source_feature_id": "381194402_seg_141",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 134.519,
+        "z": 34.214
+      },
+      {
+        "source_feature_id": "381194403_seg_143",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 54.886,
+        "z": 60.597
+      },
+      {
+        "source_feature_id": "382791542_seg_145",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 548.373,
+        "z": 325.116
+      },
+      {
+        "source_feature_id": "415109738_seg_146",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 710.601,
+        "z": 431.237
+      },
+      {
+        "source_feature_id": "415109738_seg_146",
+        "endpoint_role": "end",
+        "highway": "service",
+        "road_class": "service",
+        "x": 710.959,
+        "z": 450.473
+      },
+      {
+        "source_feature_id": "451837197_seg_152",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 538.251,
+        "z": -166.073
+      },
+      {
+        "source_feature_id": "451840408_seg_153",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 546.909,
+        "z": -588.721
+      },
+      {
+        "source_feature_id": "452208684_seg_154",
+        "endpoint_role": "start",
+        "highway": "service",
+        "road_class": "service",
+        "x": 86.978,
+        "z": 138.621
+      }
+    ],
+    "note": "Review candidates are not applied automatically; promote only high-confidence cases after visual QA or manual overrides."
+  },
+  "manual_overrides": {
+    "enabled": true,
+    "path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\config\\z47n_e704000_n1431000_w1000_h1000_s1000.manual_overrides.json",
+    "exists": false,
+    "result_counts": {
+      "applied": 0,
+      "failed": 0,
+      "rejected": 0,
+      "skipped": 0,
+      "noop": 0,
+      "recorded": 0
+    },
+    "results": []
+  },
+  "high_confidence_promotion": {
+    "enabled": false,
+    "candidate_count_before": 0,
+    "result_counts": {
+      "applied": 0,
+      "failed": 0,
+      "rejected": 0,
+      "skipped": 0,
+      "noop": 0,
+      "recorded": 0
+    },
+    "results": []
+  },
+  "notes": [
+    "V2 solves road continuity, planar junction insertion and conservative short-edge cleanup.",
+    "Bridge, tunnel and layer-separated crossings are not planarized.",
+    "Short-edge cleanup preserves road endpoints, junction anchors and bbox boundary points.",
+    "Output is split into simple two-point edges for later road_graph building.",
+    "Dangling endpoints and longer gap candidates are reported before promotion; manual overrides are reproducible in config.",
+    "High-confidence repair candidates are attempted transactionally only when --apply-high-confidence is passed.",
+    "Candidate and decision ledgers are written for transactional repair and regression-case workflows.",
+    "Casebook entries preserve known false positives and rejected high-confidence repairs as regression fixtures.",
+    "Raw shape vertex simplification removes only ordinary internal shape vertices within a small tolerance; endpoints, junction/shared nodes, bbox boundary points and near-other-road review points are protected."
+  ]
+}

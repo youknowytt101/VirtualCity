@@ -1,0 +1,100 @@
+{
+  "type": "laneforge_current_status",
+  "schema": "lane_upgrade_system.current_status.v1",
+  "area_id": "z47n_e705000_n1431000_w1000_h1000_s1000",
+  "latest_package_version": "lane_package_v0002",
+  "package_dir": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/lane_package_v0002",
+  "manifest": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/lane_package_v0002/manifest.json",
+  "houdini_manifest": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/lane_package_v0002/houdini_manifest.json",
+  "path_policy": "portable_lane_package_paths_v1",
+  "qa_status": "warn",
+  "qa_gate_status": "manual_review_required",
+  "qa_warning_summary": {
+    "publishable_warn": 0,
+    "manual_review_required": 4,
+    "blocker": 0
+  },
+  "counts": {
+    "lanes": 895,
+    "physical_lane_centerlines": 893,
+    "physical_lane_group_centerlines": 2,
+    "junctions": 233,
+    "lane_links": 1504,
+    "continuity_links": 20,
+    "junction_envelope_surfaces": 233,
+    "active_lane_upgrades": 1,
+    "active_corner_optimizations": 0,
+    "corner_optimization_candidates": 132,
+    "corner_optimization_accepted_active": 0,
+    "corner_optimization_accepted_active_candidates": 0,
+    "corner_optimization_accepted_active_overrides": 0,
+    "lane_upgrade_propagation_candidates": 0,
+    "lane_upgrade_propagation_high_confidence": 0
+  },
+  "semantic_review": {
+    "schema": "lane_upgrade_system.semantic_review_summary.v1",
+    "status": "manual_review_required",
+    "active_lane_policy": "",
+    "width_fallback_ratio": 1.0,
+    "lanes_fallback_ratio": 0.4,
+    "missing_turn_lanes_ratio": null,
+    "lane_count_policy_override_ratio": null,
+    "direction_policy_override_ratio": null,
+    "source_oneway_ignored_approaches": 43,
+    "source_oneway_blocked_movements_if_trusted": 64,
+    "turn_lanes_source_counts": {},
+    "qa_review_entries": [
+      {
+        "stage": "road_graph",
+        "check_id": "dead_end_ratio",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": 0.377,
+        "threshold": 0.12,
+        "message": "Internal dead ends remain high after boundary classification; review endpoint clusters visually.",
+        "reason": "Road graph contains a high dead-end ratio; review endpoint classification before unattended production."
+      },
+      {
+        "stage": "road_graph",
+        "check_id": "width_fallback_ratio",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": 1.0,
+        "threshold": 0.8,
+        "message": "Many edges use road-class width defaults; better data or local width inference is needed.",
+        "reason": "All or most road widths are inferred from defaults; output is publishable for research but needs semantic review."
+      }
+    ],
+    "production_note": "Lane geometry is publishable for research when qa_gate allows it, but traffic semantics remain review-gated until width, lanes, oneway and turn-lanes sources are promoted from temporary policy/fallback inputs."
+  },
+  "publish_decision": {
+    "research_publish_allowed": true,
+    "autonomous_production_allowed": false,
+    "manual_review_required": true,
+    "blocker": false
+  },
+  "artifact_identity": {
+    "latest": {
+      "path": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/latest.json",
+      "exists": true,
+      "size_bytes": 1061,
+      "mtime_utc": 1780690265.105955,
+      "sha256": "2b3c48a185e0f5c3504131f99d706f8ef470ee3a06d3990c04743e84a344563d"
+    },
+    "manifest": {
+      "path": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/lane_package_v0002/manifest.json",
+      "exists": true,
+      "size_bytes": 31940,
+      "mtime_utc": 1780690265.10505,
+      "sha256": "50249c6d725c070e1898b669a3ce437eda868b3dd4df049d7ace4fa4ff56b09c"
+    },
+    "houdini_manifest": {
+      "path": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/lane_package_v0002/houdini_manifest.json",
+      "exists": true,
+      "size_bytes": 2862,
+      "mtime_utc": 1780690265.0986047,
+      "sha256": "a257da3b560403634fe09003cc97705bf2914098ef56bc9b06e493087979b861"
+    }
+  },
+  "handoff_rule": "Houdini and downstream systems consume the latest standard lane package, not data/processed internals."
+}

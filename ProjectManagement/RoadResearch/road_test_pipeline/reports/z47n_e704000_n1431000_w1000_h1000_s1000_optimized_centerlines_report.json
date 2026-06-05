@@ -1,0 +1,124 @@
+{
+  "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+  "stage": "optimized_centerlines_v1",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_road_graph.json",
+  "output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_roads_optimized_centerlines.geojson",
+  "movement_debug_output": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_junction_movements_debug.geojson",
+  "lane_geometry_rounding_style": {
+    "style_id": "unified_lane_geometry_rounding_style_v1",
+    "primary_curve_family": "tangent_circular_arc",
+    "fallback_curve_families": [
+      "straight_infinite_radius",
+      "tangent_continuous_bezier_fallback"
+    ],
+    "sample_strategy": "arc_angle_limited_min_profile_samples",
+    "sample_angle_deg": 5.0,
+    "semantic_boundary": "geometry_style_only_no_traffic_semantics_inference"
+  },
+  "regularization_inputs": {
+    "junction_areas_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_junction_areas.json",
+    "junction_areas_loaded": false,
+    "junction_area_count": 0,
+    "engineering_reference_path": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_engineering_reference_lines.json",
+    "engineering_reference_loaded": false,
+    "engineering_reference_entry_poses": 0,
+    "regularized_entry_pose_trims": 0,
+    "regularized_entry_pose_status_counts": {},
+    "regularized_entry_pose_issue_counts": {}
+  },
+  "counts": {
+    "input_edges": 338,
+    "optimized_approaches": 338,
+    "dropped_short_edges": 0,
+    "heuristic_junction_trim_keys": 564,
+    "regularized_junction_nodes": 0,
+    "regularized_endpoint_exact": 0,
+    "regularized_endpoint_scaled_for_edge_length": 0,
+    "junction_nodes": 176,
+    "junction_connectors": 564,
+    "t_junctions": 143,
+    "t_junction_connectors": 429,
+    "junction_movement_debug": 629,
+    "junction_through_movements": 208,
+    "junction_turn_movements": 421,
+    "corner_fillet_nodes": 9,
+    "corner_fillets": 9,
+    "corner_transaction_fillets": 0,
+    "corner_heuristic_fillets": 9,
+    "internal_bend_smoothing_applied": 0,
+    "internal_bend_smoothing_skipped": 0,
+    "corner_circular_arcs": 9,
+    "corner_bezier_tangent_fallback": 0,
+    "corner_straight_infinite_radius": 0,
+    "output_features": 911,
+    "t_branch_trim_adjustments": 111,
+    "t_branch_trim_locked_skips": 0,
+    "t_branch_trim_max_delta_m": 5.236,
+    "t_branch_trim_avg_delta_m": 1.956,
+    "near_junction_bend_absorptions": 0,
+    "near_junction_bend_absorption_trim_raises": 0,
+    "near_junction_bend_absorption_max_trim_raise_m": 0.0,
+    "near_junction_bend_absorption_avg_trim_raise_m": 0.0,
+    "near_junction_bend_preservations": 0,
+    "near_junction_bend_preservation_records": [],
+    "near_junction_bend_absorption_skipped": {},
+    "junction_common_trim_nodes": 126,
+    "junction_common_trim_raised": 198,
+    "junction_common_trim_lowered": 100,
+    "junction_common_trim_max_raise_m": 6.0,
+    "junction_common_trim_avg_raise_m": 1.17,
+    "junction_common_trim_max_lower_m": 6.717,
+    "junction_common_trim_avg_lower_m": 2.803,
+    "junction_common_trim_skipped_regularized_nodes": 0,
+    "corner_override_records": 0,
+    "active_corner_overrides": 0,
+    "active_degree2_corner_overrides": 0,
+    "active_internal_bend_overrides": 0,
+    "corner_override_issue_counts": {}
+  },
+  "junction_degree_counts": {
+    "3": 143,
+    "4": 30,
+    "5": 3
+  },
+  "junction_connector_style_counts": {
+    "adjacent_fallback": 135,
+    "t_through": 143,
+    "t_turn": 286
+  },
+  "junction_connector_arc_geometry_counts": {
+    "bezier_tangent_fallback": 20,
+    "circular_arc": 447,
+    "straight_infinite_radius": 97
+  },
+  "junction_connector_arc_fit_status_counts": {
+    "degenerate_tangent_or_chord": 2,
+    "exact_tangent_arc": 447,
+    "incompatible_tangent_endpoints_bezier_fallback": 20,
+    "near_straight_infinite_radius": 95
+  },
+  "corner_arc_geometry_counts": {
+    "circular_arc": 9
+  },
+  "internal_bend_smoothing_by_edge": {},
+  "near_junction_bend_absorption_by_edge": {},
+  "corner_fillet_metrics": {
+    "min_turn_deg": 25.053,
+    "max_turn_deg": 92.172,
+    "avg_turn_deg": 67.801,
+    "max_cut_m": 12.0,
+    "width_factor": 0.85,
+    "edge_length_factor": 0.38,
+    "samples": 9
+  },
+  "notes": [
+    "This stage optimizes centerlines before road width extrusion, matching the sketch-driven junction approach.",
+    "Approach lines use regularized junction entry poses when engineering_reference_lines.json is available.",
+    "Visible junction connectors stay in the centerline skeleton.",
+    "Visible junction connectors and degree-2 corner fillets are sampled from tangent circular arcs where geometry allows it.",
+    "If regularized entry poses are not compatible with a single circle, a tangent-continuous Bezier fallback is emitted and remains visible to QA.",
+    "Near-straight through connectors are represented as straight infinite-radius arcs.",
+    "Road-level through/turn movement curves are exported to a separate debug layer so they do not visually cross the road skeleton.",
+    "Surface builders should consume this optimized centerline output before using any fan fallback."
+  ]
+}

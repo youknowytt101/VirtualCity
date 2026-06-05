@@ -1,0 +1,54 @@
+{
+  "area_id": "z47n_e705000_n1431000_w1000_h1000_s1000",
+  "stage": "lane_geometry_debug_v1",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e705000_n1431000_w1000_h1000_s1000_lane_graph.json",
+  "outputs": {
+    "geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e705000_n1431000_w1000_h1000_s1000_lane_geometry_debug.geojson",
+    "obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e705000_n1431000_w1000_h1000_s1000_lane_geometry_debug.obj",
+    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\z47n_e705000_n1431000_w1000_h1000_s1000_lane_geometry_debug.svg"
+  },
+  "counts": {
+    "lanes": 895,
+    "physical_lane_centerlines": 893,
+    "debug_centerlines": 893,
+    "lane_links": 1504,
+    "continuity_links": 20,
+    "debug_centerline_source_physical_lane_centerlines": 893,
+    "lane_ribbons": 893,
+    "lane_centerlines": 893,
+    "lane_link_ribbons": 1504,
+    "lane_link_curves": 1504,
+    "lane_continuity_ribbons": 18,
+    "lane_continuity_curves": 18,
+    "skipped_micro_seam_continuity_curve": 2,
+    "obj_vertices": 61089,
+    "obj_lines": 2415,
+    "obj_faces": 2415
+  },
+  "turn_counts": {
+    "left": 498,
+    "right": 498,
+    "through": 486,
+    "through_candidate": 22
+  },
+  "metrics": {
+    "lane_geometry_debug_centerline_source": "physical_lane_centerlines",
+    "empty_lane_link_curves": 0,
+    "empty_continuity_curves": 0,
+    "avg_lane_link_curve_length_m": 6.728,
+    "max_lane_link_curve_length_m": 18.435,
+    "avg_continuity_curve_length_m": 3.789,
+    "max_continuity_curve_length_m": 10.699,
+    "avg_lane_width_m": 3.2,
+    "min_lane_width_m": 3.2,
+    "max_lane_width_m": 3.2,
+    "avg_width_confidence": 0.0,
+    "lane_ribbon_width_m": 0.7,
+    "lane_link_ribbon_width_m": 1.0
+  },
+  "notes": [
+    "Debug ribbons are intentionally narrow and are not final lane surfaces.",
+    "Debug lane centerlines follow physical_lane_centerlines when present, matching the package centerline contract.",
+    "Continuity links preserve optimized road-level corner fillets when inspecting lane-level geometry."
+  ]
+}

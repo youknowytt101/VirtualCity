@@ -1,0 +1,72 @@
+{
+  "type": "houdini_lane_package_manifest",
+  "metadata": {
+    "area_id": "z47n_e705000_n1431000_w1000_h1000_s1000",
+    "schema": "lane_upgrade_system.houdini_manifest.v1",
+    "system": "LaneForge",
+    "package_version": "lane_package_v0002",
+    "path_policy": "portable_lane_package_paths_v1",
+    "qa_gate_status": "manual_review_required",
+    "lane_geometry_rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+    "compatibility_version": "laneforge_houdini_handoff.v1",
+    "compatibility_contract": {
+      "contract_id": "laneforge_houdini_handoff.v1",
+      "input_hash_source": "manifest.package_artifacts（数据包资产记录）",
+      "houdini_reads_package_outputs_only": true,
+      "stable_output_nodes": [
+        "OUT_roads_centerlines",
+        "OUT_lane_connections_debug",
+        "OUT_lane_surfaces_v1"
+      ],
+      "stable_primitive_groups": [
+        "lane_surface_v1",
+        "lane_turn_surface_v1",
+        "lane_continuity_surface_v1",
+        "junction_envelope_surface_v1"
+      ]
+    }
+  },
+  "inputs": {
+    "standard_lanes": "standard_lanes.json",
+    "standard_junctions": "standard_junctions.json",
+    "standard_lane_surfaces": "standard_lane_surfaces.geojson",
+    "standard_lane_surfaces_obj": "standard_lane_surfaces.obj"
+  },
+  "expected_houdini_outputs": [
+    "OUT_roads_centerlines",
+    "OUT_lane_connections_debug",
+    "OUT_lane_surfaces_v1"
+  ],
+  "primitive_groups": [
+    "lane_surface_v1",
+    "lane_turn_surface_v1",
+    "lane_continuity_surface_v1",
+    "junction_envelope_surface_v1"
+  ],
+  "input_asset_hashes": {
+    "standard_lanes": {
+      "path": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/lane_package_v0002/standard_lanes.json",
+      "exists": true,
+      "size_bytes": 2683800,
+      "sha256": "630e2b0be0e0c2035de1a912df0ed4f8d098436e63b9f6a9dfe41550c29e72e0"
+    },
+    "standard_junctions": {
+      "path": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/lane_package_v0002/standard_junctions.json",
+      "exists": true,
+      "size_bytes": 6170235,
+      "sha256": "1fe372d101af06390e3e71a7d16206c7c28fb28eb09fbcba0fbc5c7c6b021764"
+    },
+    "standard_lane_surfaces": {
+      "path": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/lane_package_v0002/standard_lane_surfaces.geojson",
+      "exists": true,
+      "size_bytes": 5814304,
+      "sha256": "219b8ebb0ddb2b75e92c472d8e8920f70e5da892d6e37740abbd214463d1bdfd"
+    },
+    "standard_lane_surfaces_obj": {
+      "path": "data/lane_upgrade_packages/z47n_e705000_n1431000_w1000_h1000_s1000/lane_package_v0002/standard_lane_surfaces.obj",
+      "exists": true,
+      "size_bytes": 1512831,
+      "sha256": "28832660de24390efe1b8622ab37c8e13479c3e8a6b99f922ade2081e0ec1f65"
+    }
+  }
+}

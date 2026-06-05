@@ -1051,8 +1051,8 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     ))
     checks.append(make_check(
         "preview_preserves_centerline_samples",
-        optimized_coord_count == preview_coord_count,
-        "Standalone preview should preserve all optimized centerline sample points.",
+        preview_coord_count >= optimized_coord_count,
+        "Standalone preview should preserve all optimized centerline sample points; extra render samples are allowed.",
         {
             "optimized_points": optimized_coord_count,
             "preview_points": preview_coord_count,

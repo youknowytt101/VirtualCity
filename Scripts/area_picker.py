@@ -16,7 +16,7 @@ VirtualCity — 交互式区域选择器
 
 import sys, json, subprocess, threading, webbrowser, time, os, re, socket, mimetypes, urllib.error, urllib.request, urllib.parse
 from pathlib import Path
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 import vc_grid
 
@@ -27,6 +27,7 @@ NO_BROWSER = os.environ.get("VC_AREA_PICKER_NO_BROWSER") == "1"
 SHUTDOWN_WITH_PAGE = os.environ.get("VC_AREA_PICKER_SHUTDOWN_WITH_PAGE") == "1"
 PAGE_SESSION_GRACE_SECONDS = 30.0
 PAGE_CLOSE_GRACE_SECONDS = 4.0
+LANE_UPGRADE_SESSION_HOLD_SECONDS = int(os.environ.get("VC_LANE_UPGRADE_SESSION_HOLD_SECONDS", str(4 * 60 * 60)))
 
 # Global pipeline state
 _state = {'running': False, 'done': False, 'ok': False, 'returncode': None, 'name': '', 'start': 0.0,
@@ -41,7 +42,7 @@ _server_ref = [None]  # mutable ref so _run thread can call shutdown()
 _MAX_LOG_LINES = 80
 _page_lock = threading.Lock()
 _page_state = {'seen': False, 'last_seen': 0.0, 'close_requested': False, 'closed_at': 0.0,
-               'monitor_started': False}
+               'monitor_started': False, 'hold_until': 0.0}
 
 
 def _safe_print(msg):
@@ -54,6 +55,9 @@ SCRIPTS = Path(__file__).resolve().parent
 ROOT    = SCRIPTS.parent
 STATIC_ROOT = SCRIPTS / 'web_assets'
 PORT    = 8765
+LANEFORGE_ROOT = ROOT / 'ProjectManagement' / 'RoadResearch' / 'road_test_pipeline'
+LANEFORGE_HOST = os.environ.get('VC_LANEFORGE_VIEWER_HOST', '127.0.0.1')
+LANEFORGE_PORT = int(os.environ.get('VC_LANEFORGE_VIEWER_PORT', '8766'))
 
 _STEP_RE = re.compile(r'^\[(\d+)/(\d+)\]')
 _RUN_RE = re.compile(r'^\[RUN\] run_id=(\S+)$')
@@ -118,6 +122,36 @@ def _service_payload() -> dict:
         'shutdown_with_page': SHUTDOWN_WITH_PAGE,
         'houdini_available': _probe_houdini(),
         'export_available': False if running or export_running else _export_available(),
+        'lane_upgrade': _lane_upgrade_status(),
+    }
+
+
+def _resolve_project_path(value: str | Path) -> Path:
+    path = Path(value)
+    if path.is_absolute():
+        return path
+    return ROOT / path
+
+
+def _load_active_area() -> dict:
+    return json.loads((ROOT / 'Config' / 'active_area.json').read_text(encoding='utf-8'))
+
+
+def _lane_upgrade_status() -> dict:
+    try:
+        cfg = _load_active_area()
+    except Exception as exc:
+        return {'available': False, 'message': f'active_area.json 不可读: {exc}'}
+    area_id = str(cfg.get('area_id') or '')
+    latest = LANEFORGE_ROOT / 'data' / 'lane_upgrade_packages' / area_id / 'latest.json'
+    manifest = cfg.get('lane_package_manifest') or ''
+    manifest_path = _resolve_project_path(manifest) if manifest else None
+    return {
+        'available': bool(area_id and latest.exists() and (manifest_path is None or manifest_path.exists())),
+        'area_id': area_id,
+        'latest': str(latest),
+        'manifest': str(manifest_path) if manifest_path else '',
+        'viewer_url': _laneforge_viewer_url(area_id) if area_id else '',
     }
 
 
@@ -133,6 +167,15 @@ def _mark_page_closed(now: float | None = None) -> None:
         _page_state.update({'seen': True, 'close_requested': True, 'closed_at': now})
 
 
+def _hold_page_shutdown(seconds: int = LANE_UPGRADE_SESSION_HOLD_SECONDS, now: float | None = None) -> None:
+    """Keep the area picker alive while the user is working in a companion page."""
+    now = time.time() if now is None else now
+    with _page_lock:
+        _page_state['hold_until'] = max(float(_page_state.get('hold_until') or 0.0), now + max(0, seconds))
+        _page_state['close_requested'] = False
+        _page_state['closed_at'] = 0.0
+
+
 def _page_shutdown_due(now: float | None = None, *, enabled: bool | None = None) -> bool:
     enabled = SHUTDOWN_WITH_PAGE if enabled is None else enabled
     if not enabled:
@@ -142,6 +185,9 @@ def _page_shutdown_due(now: float | None = None, *, enabled: bool | None = None)
             return False
     now = time.time() if now is None else now
     with _page_lock:
+        hold_until = float(_page_state.get('hold_until') or 0.0)
+        if hold_until > now:
+            return False
         if not _page_state.get('seen'):
             return False
         last_seen = float(_page_state.get('last_seen') or 0.0)
@@ -195,6 +241,79 @@ def _probe_houdini(timeout: float = 0.35) -> bool:
             return True
     except OSError:
         return False
+
+
+def _laneforge_api_url() -> str:
+    return f'http://{LANEFORGE_HOST}:{LANEFORGE_PORT}/api/status'
+
+
+def _laneforge_viewer_url(area_id: str) -> str:
+    query = urllib.parse.urlencode({
+        'svg': f'{area_id}_lane_graph_topology.svg',
+        'home': f'http://127.0.0.1:{PORT}/',
+    })
+    return f'http://{LANEFORGE_HOST}:{LANEFORGE_PORT}/svg_live_viewer.html?{query}'
+
+
+def _laneforge_ready(timeout: float = 1.5) -> bool:
+    try:
+        with urllib.request.urlopen(_laneforge_api_url(), timeout=timeout) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+        return isinstance(data, dict) and data.get('status') == 'ok' and data.get('system') == 'LaneForge'
+    except Exception:
+        return False
+
+
+def _ensure_laneforge_viewer() -> None:
+    if _laneforge_ready(timeout=0.8):
+        return
+    script = LANEFORGE_ROOT / 'start_laneforge_viewer.ps1'
+    if not script.exists():
+        raise FileNotFoundError(f'LaneForge 启动脚本不存在: {script}')
+    cmd = [
+        'powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass',
+        '-File', str(script),
+        '-Port', str(LANEFORGE_PORT),
+        '-BindAddress', LANEFORGE_HOST,
+    ]
+    proc = subprocess.run(
+        cmd,
+        cwd=str(LANEFORGE_ROOT),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        timeout=25,
+    )
+    if not _laneforge_ready(timeout=1.5):
+        tail = (proc.stdout or '').strip()[-900:]
+        raise RuntimeError(f'LaneForge viewer 未能启动: {tail or "no output"}')
+
+
+def _ensure_laneforge_svg(area_id: str) -> Path:
+    target = LANEFORGE_ROOT / 'reports' / 'visualizations' / f'{area_id}_lane_graph_topology.svg'
+    if target.exists():
+        return target
+    lane_graph = LANEFORGE_ROOT / 'data' / 'processed' / f'{area_id}_lane_graph.json'
+    if not lane_graph.exists():
+        raise FileNotFoundError(f'当前区域还没有 LaneForge lane_graph: {lane_graph}')
+    cmd = [
+        sys.executable,
+        str(LANEFORGE_ROOT / 'scripts' / 'export_lane_graph_svg.py'),
+        '--area-id',
+        area_id,
+    ]
+    proc = subprocess.run(
+        cmd,
+        cwd=str(LANEFORGE_ROOT),
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        timeout=90,
+    )
+    if proc.returncode != 0 or not target.exists():
+        tail = (proc.stdout or '').strip()[-900:]
+        raise RuntimeError(f'LaneForge SVG 生成失败: {tail or "no output"}')
+    return target
 
 
 def _export_available() -> bool:
@@ -320,7 +439,7 @@ body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; display:flex; flex-
   background:#1a1a2e; border:1px solid #2a2a4a; border-radius:4px;
   padding:5px 9px; white-space:nowrap;
 }
-#run-btn, #export-btn, #download-btn {
+#run-btn, #export-btn, #download-btn, #lane-upgrade-btn {
   padding:8px 22px; background:#4fc3f7; color:#000;
   border:none; border-radius:5px; font-size:14px;
   font-weight:bold; cursor:pointer; white-space:nowrap;
@@ -328,10 +447,12 @@ body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; display:flex; flex-
 }
 #export-btn { background:#a5d6a7; }
 #download-btn { background:#ffcc80; }
-#run-btn:disabled, #export-btn:disabled, #download-btn:disabled { background:#3a3a5a; color:#666; cursor:not-allowed; }
+#lane-upgrade-btn { background:#80cbc4; }
+#run-btn:disabled, #export-btn:disabled, #download-btn:disabled, #lane-upgrade-btn:disabled { background:#3a3a5a; color:#666; cursor:not-allowed; }
 #run-btn:hover:not(:disabled) { background:#81d4fa; }
 #export-btn:hover:not(:disabled) { background:#c8e6c9; }
 #download-btn:hover:not(:disabled) { background:#ffe0b2; }
+#lane-upgrade-btn:hover:not(:disabled) { background:#b2dfdb; }
 #clear-btn {
   padding:8px 12px; background:#1e1e38; color:#ddd;
   border:1px solid #3a3a5a; border-radius:5px; font-size:13px;
@@ -427,6 +548,7 @@ body { margin:0; font-family: 'Segoe UI', Arial, sans-serif; display:flex; flex-
   <div id="tile-display">尚未框选网格</div>
   <button id="clear-btn" onclick="clearSelection()">清除框选</button>
   <button id="run-btn" disabled onclick="runPipeline()">Houdini 生成</button>
+  <button id="lane-upgrade-btn" disabled onclick="handleLaneUpgrade()">车道预览</button>
   <button id="export-btn" disabled onclick="exportFbx()">导出 FBX</button>
   <button id="download-btn" disabled onclick="downloadData()">下载数据</button>
 </div>
@@ -527,6 +649,23 @@ function updateExportButton(available, running) {
   btn.disabled = !available || !!running;
 }
 
+function updateLaneUpgradeButton(info, running) {
+  _laneUpgradeInfo = info || null;
+  var btn = document.getElementById('lane-upgrade-btn');
+  var available = !!(info && info.available);
+  var preparesSelection = !!selection && (!available || info.area_id !== selection.selection_id);
+  btn.disabled = (!available && !preparesSelection) || !!running;
+  if (preparesSelection) {
+    btn.title = '准备并打开当前框选区域 LaneForge 车道预览: ' + selection.selection_id;
+  } else if (available && info.area_id) {
+    btn.title = '打开当前区域 LaneForge 车道预览: ' + info.area_id;
+  } else if (info && info.message) {
+    btn.title = info.message;
+  } else {
+    btn.title = '先框选区域；点击后会自动准备当前区域车道预览数据。';
+  }
+}
+
 function updateSelectionButtons(running) {
   var disabled = !selection || !!running;
   document.getElementById('run-btn').disabled = disabled;
@@ -539,10 +678,12 @@ function refreshServiceState() {
   .then(function(d) {
     setHoudiniBadge(!!d.houdini_available);
     updateExportButton(!!d.export_available, !!d.running);
+    updateLaneUpgradeButton(d.lane_upgrade, !!d.running);
     updateSelectionButtons(!!d.running);
   })
   .catch(function() {
     setHoudiniBadge(false);
+    updateLaneUpgradeButton(null, false);
   });
 }
 
@@ -881,6 +1022,7 @@ function switchTab(panelId) {
 var _pollTimer = null;
 var _lastLogLen = 0;
 var _lastExportLogLen = 0;
+var _laneUpgradeInfo = null;
 
 function pollStatus() {
   fetch('/status')
@@ -932,11 +1074,16 @@ function pollStatus() {
       document.getElementById('progress-text').textContent = '100%';
       if (d.ok) {
         document.getElementById('progress-bar').style.background = 'linear-gradient(90deg, #2e7d32, #a5d6a7)';
-        var doneLabel = d.operation === 'download' ? '[OK] 数据下载完成' : '[OK] 生成完成';
-        var doneLog = d.operation === 'download' ? '[OK] 数据下载完成！区域: ' : '[OK] 生成完成！区域: ';
+        var doneLabel = d.operation === 'download' ? '[OK] 数据下载完成' : (d.operation === 'lane_upgrade_prepare' ? '[OK] 车道预览准备完成' : '[OK] 生成完成');
+        var doneLog = d.operation === 'download' ? '[OK] 数据下载完成！区域: ' : (d.operation === 'lane_upgrade_prepare' ? '[OK] 车道预览数据准备完成！区域: ' : '[OK] 生成完成！区域: ');
         document.getElementById('step-label').textContent = doneLabel;
         log(doneLog + d.name, 'ok');
         if (d.run_id) log('run_id: ' + d.run_id, 'dim');
+        if (d.operation === 'lane_upgrade_prepare') {
+          log('[LaneForge] 正在进入当前区域车道预览页面...', 'dim');
+          openLaneUpgrade();
+          return;
+        }
         if (d.auto_shutdown_on_success) {
           log('3 秒后自动关闭页面，5 秒后停止本地服务...', 'dim');
           setTimeout(function() {
@@ -1015,6 +1162,45 @@ function downloadData() {
   submitSelectedArea('/download-data', '提交数据下载');
 }
 
+function openLaneUpgrade() {
+  var btn = document.getElementById('lane-upgrade-btn');
+  btn.disabled = true;
+  var tileIds = selection ? selection.tiles.map(function(tile) { return tile.tile_id; }) : [];
+  log('[' + new Date().toLocaleTimeString() + '] 打开当前区域车道预览入口...', 'ok');
+  fetch('/lane-upgrade', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tile_ids: tileIds })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.ok && d.url) {
+      log('[LaneForge] 打开区域: ' + d.area_id, 'dim');
+      window.location.href = d.url;
+    } else {
+      log('[错误] ' + (d.message || '无法打开车道预览入口'), 'err');
+    }
+    refreshServiceState();
+  })
+  .catch(function(e) {
+    log('[网络错误] ' + e, 'err');
+    refreshServiceState();
+  });
+}
+
+function prepareLaneUpgrade() {
+  if (!selection) return;
+  submitSelectedArea('/lane-upgrade-prepare', '提交车道预览准备');
+}
+
+function handleLaneUpgrade() {
+  if (selection && (!_laneUpgradeInfo || !_laneUpgradeInfo.available || _laneUpgradeInfo.area_id !== selection.selection_id)) {
+    prepareLaneUpgrade();
+    return;
+  }
+  openLaneUpgrade();
+}
+
 function ensurePolling() {
   if (!_pollTimer) _pollTimer = setInterval(pollStatus, 1000);
 }
@@ -1054,6 +1240,11 @@ class _Handler(BaseHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path == '/health':
             self._json(_service_payload())
+            return
+        if parsed.path in ('/svg_live_viewer.html', '/reports/visualizations/svg_live_viewer.html'):
+            self.send_response(302)
+            self.send_header('Location', '/')
+            self.end_headers()
             return
         if parsed.path == '/status':
             with _state_lock:
@@ -1147,11 +1338,15 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == '/export':
             self._post_export()
             return
-        if parsed.path not in ('/run', '/download-data'):
+        if parsed.path == '/lane-upgrade':
+            self._post_lane_upgrade()
+            return
+        if parsed.path not in ('/run', '/download-data', '/lane-upgrade-prepare'):
             self.send_response(404)
             self.end_headers()
             return
         data_only = parsed.path == '/download-data'
+        lane_upgrade_prepare = parsed.path == '/lane-upgrade-prepare'
 
         length = int(self.headers.get('Content-Length', 0))
         try:
@@ -1171,7 +1366,7 @@ class _Handler(BaseHTTPRequestHandler):
         except ValueError as exc:
             self._json({'ok': False, 'message': f'网格框选无效: {exc}'})
             return
-        if not data_only and not _probe_houdini():
+        if not data_only and not lane_upgrade_prepare and not _probe_houdini():
             self._json({'ok': False, 'message': 'Houdini 未连接。请先打开 Houdini，并确认 RPYC 端口 18811 可用。'})
             return
         west, south, east, north = selection['bbox']
@@ -1182,9 +1377,10 @@ class _Handler(BaseHTTPRequestHandler):
             if _state.get('running'):
                 self._json({'ok': False, 'message': '已有管线正在运行，请等待当前流程结束'})
                 return
+            operation = 'lane_upgrade_prepare' if lane_upgrade_prepare else ('download' if data_only else 'generate')
             _state.update({'running': True, 'done': False, 'ok': False,
                            'returncode': None, 'name': name, 'start': time.time(),
-                           'operation': 'download' if data_only else 'generate',
+                           'operation': operation,
                            'run_id': '',
                            'step': 0, 'total_steps': 6, 'step_label': '启动中...', 'pct': 0,
                            'log_lines': [],
@@ -1200,6 +1396,8 @@ class _Handler(BaseHTTPRequestHandler):
         ]
         if data_only:
             cmd.insert(5, '--data-only')
+        if lane_upgrade_prepare:
+            cmd.insert(5, '--lane-upgrade-only')
         _safe_print(f"\n[area_picker] 启动管线: {' '.join(cmd)}")
 
         def _run():
@@ -1235,6 +1433,9 @@ class _Handler(BaseHTTPRequestHandler):
                 if data_only:
                     houdini_done, houdini_status, houdini_message = False, 'skipped', 'data download only'
                     ok = returncode == 0
+                elif lane_upgrade_prepare:
+                    houdini_done, houdini_status, houdini_message = False, 'skipped', 'lane upgrade prepare only'
+                    ok = returncode == 0
                 else:
                     with _state_lock:
                         run_id = _state.get('run_id', '')
@@ -1250,7 +1451,7 @@ class _Handler(BaseHTTPRequestHandler):
                     _safe_print('[area_picker] pipeline thread exception')
 
             with _state_lock:
-                if ok and not houdini_done and not data_only:
+                if ok and not houdini_done and not data_only and not lane_upgrade_prepare:
                     _state['log_lines'].append(f'[WARN] Houdini 状态文件未确认，但 set_area.py 已成功退出: {houdini_message}')
                 _state.update({'running': False, 'done': True,
                                'ok': ok,
@@ -1264,6 +1465,8 @@ class _Handler(BaseHTTPRequestHandler):
             _safe_print(f'[area_picker] 管线结束: {status}')
             if data_only:
                 _safe_print('[area_picker] 数据下载完成，Houdini 重算已跳过')
+            elif lane_upgrade_prepare:
+                _safe_print('[area_picker] 车道预览数据准备完成，Houdini 重算已跳过')
             elif houdini_done:
                 _safe_print('[area_picker] Houdini 构建完成已确认')
             else:
@@ -1277,7 +1480,12 @@ class _Handler(BaseHTTPRequestHandler):
                     _safe_print('[area_picker] 状态服务保持运行，按 Ctrl+C 退出')
 
         threading.Thread(target=_run, daemon=True).start()
-        message = f'数据下载已启动: {name}' if data_only else f'Houdini 生成已启动: {name}'
+        if data_only:
+            message = f'数据下载已启动: {name}'
+        elif lane_upgrade_prepare:
+            message = f'车道预览数据准备已启动: {name}'
+        else:
+            message = f'Houdini 生成已启动: {name}'
         self._json({'ok': True, 'message': message})
 
     def _post_export(self):
@@ -1345,6 +1553,72 @@ class _Handler(BaseHTTPRequestHandler):
 
         threading.Thread(target=_run_export, daemon=True).start()
         self._json({'ok': True, 'message': 'FBX 导出已启动'})
+
+    def _post_lane_upgrade(self):
+        with _state_lock:
+            if _state.get('running'):
+                self._json({'ok': False, 'message': '生成管线正在运行，完成后再打开车道预览。'})
+                return
+        length = int(self.headers.get('Content-Length', 0))
+        try:
+            body = json.loads(self.rfile.read(length) or b'{}')
+        except json.JSONDecodeError:
+            self._json({'ok': False, 'message': '请求 JSON 无法解析'})
+            return
+
+        try:
+            cfg = _load_active_area()
+        except Exception as exc:
+            self._json({'ok': False, 'message': f'active_area.json 不可读: {exc}'})
+            return
+
+        area_id = str(cfg.get('area_id') or '')
+        if not area_id:
+            self._json({'ok': False, 'message': '当前还没有 active area。请先框选 BBOX，然后点击“车道预览”准备当前区域数据。'})
+            return
+
+        tile_ids = body.get('tile_ids') or []
+        if tile_ids:
+            try:
+                selection = vc_grid.selection_from_tile_ids(tile_ids)
+            except ValueError as exc:
+                self._json({'ok': False, 'message': f'网格框选无效: {exc}'})
+                return
+            if selection.get('selection_id') != area_id:
+                self._json({
+                    'ok': False,
+                    'message': (
+                        '当前框选区域还没有成为 active_area。请先点击“下载数据”或“Houdini 生成”，'
+                        f'或直接点击“车道预览”让系统准备当前框选区域。当前 active_area={area_id}，框选={selection.get("selection_id")}'
+                    ),
+                })
+                return
+
+        latest = LANEFORGE_ROOT / 'data' / 'lane_upgrade_packages' / area_id / 'latest.json'
+        if not latest.exists():
+            self._json({
+                'ok': False,
+                'message': '当前区域还没有 LaneForge 车道预览包。请点击“车道预览”重新准备；系统会自动执行数据清洗和 LaneForge bridge，不需要先跑完整 Houdini 主流程。',
+            })
+            return
+
+        manifest_value = cfg.get('lane_package_manifest') or ''
+        if manifest_value:
+            manifest_path = _resolve_project_path(manifest_value)
+            if not manifest_path.exists():
+                self._json({'ok': False, 'message': f'active_area 指向的 LaneForge manifest 不存在: {manifest_value}'})
+                return
+
+        try:
+            _ensure_laneforge_svg(area_id)
+            _ensure_laneforge_viewer()
+        except Exception as exc:
+            self._json({'ok': False, 'message': str(exc)})
+            return
+
+        url = _laneforge_viewer_url(area_id)
+        _hold_page_shutdown()
+        self._json({'ok': True, 'area_id': area_id, 'url': url})
 
     def _static(self, request_path: str):
         rel = urllib.parse.unquote(request_path[len('/static/'):]).replace('\\', '/').lstrip('/')
@@ -1423,7 +1697,7 @@ def main():
     print(f"  按 Ctrl+C 退出\n")
 
     try:
-        server = HTTPServer(('localhost', PORT), _Handler)
+        server = ThreadingHTTPServer(('localhost', PORT), _Handler)
     except OSError as exc:
         print(f"[FAIL] 无法启动 area_picker 服务: {exc}")
         print(f"       端口 {PORT} 可能仍被其他进程占用。")

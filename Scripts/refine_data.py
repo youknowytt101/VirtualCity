@@ -132,6 +132,11 @@ def _levels_ready(manifest: dict, target_level: int) -> bool:
     )
 
 
+def _road_clean_outputs_ready(cl_dir: Path) -> bool:
+    required = ("roads.osm", "roads_clean.geojson", "road_graph.json")
+    return all((cl_dir / name).exists() and (cl_dir / name).stat().st_size > 128 for name in required)
+
+
 def _prepare_raw_sources(area_cfg: dict, manifest: dict, dl_dir: Path) -> dict[str, Path]:
     """Keep immutable raw inputs in _downloads and clean only working copies."""
     specs = {
@@ -632,7 +637,7 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
         dcc.reset_levels(manifest)
     elif not _levels_ready(manifest, target_level):
         print("  [cache] fingerprint matches; missing target levels will run")
-    elif not dcc.outputs_exist(cl_dir):
+    elif not dcc.clean_outputs_exist(cl_dir):
         print("  [cache] fingerprint matches, but cleaned outputs are missing")
         dcc.reset_levels(manifest)
     else:
@@ -666,6 +671,11 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
     osm_src = raw_sources["roads"]
     osm_cleaned = cl_dir / "roads.osm"
     road_level = manifest["levels"]["roads"]["current"]
+
+    if road_level >= 1 and not _road_clean_outputs_ready(cl_dir):
+        print("  [cache] 道路清洗附属文件缺失，重跑道路 L1")
+        manifest["levels"]["roads"]["current"] = 0
+        road_level = 0
 
     if road_level < 1 or force:
         _copy_file(osm_src, osm_cleaned)

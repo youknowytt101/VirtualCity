@@ -1,0 +1,177 @@
+{
+  "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+  "stage": "lane_graph",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "lanes",
+      "status": "pass",
+      "value": 676,
+      "threshold": 40,
+      "message": "Lane graph should expose enough directed lane records for junction connection research."
+    },
+    {
+      "id": "junctions",
+      "status": "pass",
+      "value": 176,
+      "threshold": 1,
+      "message": "Lane graph should include junction models derived from road_graph junction nodes."
+    },
+    {
+      "id": "connections",
+      "status": "pass",
+      "value": 1278,
+      "threshold": 1,
+      "message": "Semantic junctions should infer at least one road-level movement."
+    },
+    {
+      "id": "lane_links",
+      "status": "pass",
+      "value": 1278,
+      "threshold": 1,
+      "message": "Allowed movements should produce laneLinks for downstream movement corridor research."
+    },
+    {
+      "id": "lane_link_reference_errors",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Every laneLink from_lane and to_lane should reference an existing lane."
+    },
+    {
+      "id": "blocked_lane_links",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Blocked or disallowed semantic movements must not produce laneLinks."
+    },
+    {
+      "id": "empty_connection_curves",
+      "status": "pass",
+      "value": 0,
+      "threshold": 0,
+      "message": "Topology-only lane graph should not claim missing final connection curves as published geometry."
+    },
+    {
+      "id": "fan_fallback_ratio",
+      "status": "pass",
+      "value": 0.0,
+      "threshold": 0.95,
+      "message": "Layer 3 should avoid junction fan fallback; lane-boundary envelopes belong to the later geometry layer."
+    },
+    {
+      "id": "avg_lane_links_per_junction",
+      "status": "pass",
+      "value": 7.261,
+      "threshold": 1.0,
+      "message": "LaneLink density is low; review oneway, lane count and movement inference."
+    }
+  ],
+  "metrics": {
+    "counts": {
+      "lanes": 676,
+      "physical_lane_centerlines": 666,
+      "physical_lane_group_centerlines": 10,
+      "standalone_physical_lane_centerlines": 656,
+      "junctions": 176,
+      "approach_lane_records": 564,
+      "connections": 1278,
+      "lane_links": 1278,
+      "continuity_links": 36,
+      "optimized_approach_centerlines": 338,
+      "optimized_approach_centerlines_applied": 338,
+      "optimized_junction_connectors": 564,
+      "optimized_junction_connector_lane_links": 0,
+      "optimized_corner_fillet_links": 18,
+      "direct_connector_continuity_links": 18,
+      "same_physical_lane_continuity_links": 10,
+      "physical_lane_groups_created": 10,
+      "physical_lane_grouped_lanes": 20,
+      "active_lane_upgrades": 0,
+      "active_lane_upgrades_applied": 0,
+      "active_lane_upgrades_deferred": 0,
+      "active_lane_upgrades_missing_roads": 0,
+      "active_lane_upgrades_ignored": 0,
+      "lane_bundle_centerline_smoothed_edges": 73,
+      "lane_bundle_centerline_smoothed_bends": 151,
+      "derived_lane_centerline_smoothed_lanes": 2,
+      "derived_lane_centerline_smoothed_bends": 2,
+      "derived_lane_centerline_inserted_sample_points": 2,
+      "lane_level_radius_regularized_continuity_links": 6,
+      "fan_fallback_junctions": 0
+    },
+    "turn_counts": {
+      "left": 422,
+      "right": 422,
+      "through": 418,
+      "through_candidate": 16
+    },
+    "lane_source_counts": {
+      "temporary_bidirectional_two_lane_policy": 676
+    },
+    "traffic_direction_policy_counts": {},
+    "connection_source_counts": {
+      "geometry_inferred_from_osm_plus_temporary_bidirectional_two_lane_policy": 1278
+    },
+    "lane_link_source_counts": {
+      "junction_semantics": 1278
+    },
+    "fallback_counts": {
+      "not_generated_layer3_lane_graph_only": 176
+    },
+    "lane_graph_metrics": {
+      "junctions_with_connections_ratio": 1.0,
+      "fan_fallback_ratio": 0.0,
+      "avg_lane_links_per_junction": 7.261,
+      "lane_link_reference_errors": 0,
+      "blocked_lane_links": 0,
+      "empty_connection_curves": 0,
+      "avg_lane_link_confidence": 0.807,
+      "min_lane_link_confidence": 0.55,
+      "avg_curve_length_m": 6.826,
+      "max_curve_length_m": 18.191,
+      "avg_continuity_curve_length_m": 3.568,
+      "max_continuity_curve_length_m": 18.345,
+      "avg_lane_width_m": 3.2,
+      "min_lane_width_m": 3.2,
+      "max_lane_width_m": 3.2,
+      "avg_lane_width_confidence": 0.45,
+      "max_lane_width_start_end_delta_m": 0.0,
+      "lane_bundle_centerline_smoothed_edges": 73,
+      "lane_bundle_centerline_smoothed_bends": 151,
+      "lane_bundle_centerline_max_min_arc_radius_m": 6.4,
+      "derived_lane_centerline_smoothed_lanes": 2,
+      "derived_lane_centerline_smoothed_bends": 2,
+      "derived_lane_centerline_inserted_sample_points": 2,
+      "derived_lane_centerline_max_derivation_offset_m": 0.0,
+      "derived_lane_centerline_max_source_bend_offset_m": 2.515,
+      "derived_lane_centerline_smoothing_curve_family_counts": {
+        "straight_infinite_radius": 2
+      },
+      "derived_lane_centerline_smoothing_arc_fit_status_counts": {
+        "low_radius_arc_regularization_unavailable": 2
+      },
+      "continuity_rounding_style_counts": {
+        "unified_lane_geometry_rounding_style_v1": 36
+      },
+      "continuity_rounding_curve_family_counts": {
+        "straight_infinite_radius": 18,
+        "tangent_circular_arc": 18
+      },
+      "lane_level_radius_regularized_continuity_links": 6,
+      "physical_lane_centerlines": 666,
+      "physical_lane_group_centerlines": 10,
+      "standalone_physical_lane_centerlines": 656,
+      "same_physical_lane_continuity_links": 10,
+      "physical_lane_groups_created": 10,
+      "physical_lane_grouped_lanes": 20,
+      "min_optimized_corner_continuity_radius_m": 1.704
+    }
+  },
+  "inputs": {
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\z47n_e704000_n1431000_w1000_h1000_s1000_lane_graph.json",
+    "lane_graph_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\z47n_e704000_n1431000_w1000_h1000_s1000_lane_graph_report.json",
+    "rules": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+  },
+  "next_action": "Use lane_graph as the topology contract for movement corridor solver; do not treat offset previews as final lane geometry."
+}

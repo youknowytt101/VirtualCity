@@ -1,0 +1,170 @@
+
+====================================================
+  VirtualCity 区域选择器
+  当前区域中心: (12.9152, 100.8757)
+  浏览器地址:   http://localhost:8765
+====================================================
+  操作步骤:
+    1. 放大到目标区域
+    2. 点击左侧矩形工具，框选 1 个或多个 1km x 1km 网格
+    3. 点击 [开始生成] 按钮
+====================================================
+
+  按 Ctrl+C 退出
+
+
+[area_picker] 启动管线: uv run python -u set_area.py --lane-upgrade-only 100.8804274 12.9376703 100.8897098 12.9467748 z47n_e704000_n1431000_w1000_h1000_s1000
+==================================================
+[VirtualCity] 设置区域: z47n_e704000_n1431000_w1000_h1000_s1000
+  bbox: [100.8804274, 12.9376703, 100.8897098, 12.9467748]
+  中心: (100.8851, 12.9422)
+  尺寸: 1.0 km × 1.0 km
+  模式: 车道升级准备（执行 refine_data + LaneForge bridge，跳过 Houdini 重算）
+==================================================
+[1/5] [OK] active_area.json 已更新: z47n_e704000_n1431000_w1000_h1000_s1000
+[RUN] run_id=20260606_040130_z47n_e704000_n1431000_w1000_h1000_s1000_3ee3ee92
+  [tile cache] OSM 过滤: 167 roads, 97 KB
+  [tile cache] 建筑过滤: 537 栋
+  [clip-cache] 命中 bbox_ef2e0d60fa42f10b，已恢复 OSM/DEM/建筑原始裁切
+[2/5] 获取 OSM 数据...
+  [clip-cache] OSM 已恢复，跳过 Overpass
+[3/5] 获取 DEM 数据...
+  [clip-cache] DEM 已恢复，跳过 FABDEM/GEE
+  [OK] DEM 完成 (source=fabdem)
+[4/5] 获取建筑数据...
+  [clip-cache] 建筑已恢复，跳过 Overture
+  [OK] 建筑完成
+[5/6] 数据精炼（清洗 + 补全 + QA）...
+==================================================
+[VirtualCity 数据精炼] z47n_e704000_n1431000_w1000_h1000_s1000
+==================================================
+[InputQA] 原始数据检查...
+  [OK] 原始数据完整
+  [raw-cache] buildings: using _downloads/z47n_e704000_n1431000_w1000_h1000_s1000/buildings.geojson
+  [raw-cache] roads: using _downloads/z47n_e704000_n1431000_w1000_h1000_s1000/roads.osm
+  [raw-cache] dem: using _downloads/z47n_e704000_n1431000_w1000_h1000_s1000/dem.csv
+  [cache] hit: refine_66ba8b3d1508467f
+[建筑精炼]
+  [L1] 跳过 (已在 L3)
+[道路精炼]
+  [L1] 跳过 (已在 L2)
+[DEM 精炼]
+  [L1] 跳过 (已在 L2)
+[导出 Houdini Ready staging]
+  [OK] staging → RawData/_houdini_ready/.staging/z47n_e704000_n1431000_w1000_h1000_s1000_z0cbsl11
+[QA 精炼校验]
+  -- InputQA --
+    [OK] buildings_exists: 178 KB
+    [OK] roads_exists: 97 KB
+    [OK] dem_exists: 30 KB
+  -- ProcessQA --
+    [WARN] bld_retention: 保留率 100%，清洗几乎无效
+    [OK] dem_correction: applied=False
+  -- OutputQA --
+    [OK] output_buildings.geojson: 178 KB
+    [OK] output_roads.osm: 86 KB
+    [OK] output_dem.csv: 30 KB
+    [OK] bld_sample: 10/10 建筑有效
+    [OK] bld_height_present: 537 建筑均有 height
+    [OK] bld_height_source: 真值 537 / 待推算 0（{'overture': 433, 'osm': 104}）
+    [OK] road_attr_coverage: highway 140：lanes 36 · oneway 25 · width 0
+    [OK] road_connectivity: 分量 4 · 最大连通占比 96% · 悬挂端点 208
+  结果: 12 passed, 1 warnings, 0 failed
+  [OK] QA 通过
+  报告: z47n_e704000_n1431000_w1000_h1000_s1000_qa_20260606_040131.json
+  [OK] 已发布 → _houdini_ready/z47n_e704000_n1431000_w1000_h1000_s1000/
+[5b/6] LaneForge 道路升级包（同源道路 bridge）...
+{
+  "status": "failed",
+  "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+  "run_id": "20260606_040130_z47n_e704000_n1431000_w1000_h1000_s1000_3ee3ee92",
+  "error": "Missing current Houdini-ready road inputs: E:\\VirtualCity\\RawData\\_houdini_ready\\z47n_e704000_n1431000_w1000_h1000_s1000\\roads_clean.geojson, E:\\VirtualCity\\RawData\\_houdini_ready\\z47n_e704000_n1431000_w1000_h1000_s1000\\road_graph.json",
+  "fallback": "legacy road_strips remains available in VirtualCity recook"
+}
+==================================================
+[OK] 车道升级数据准备完成: z47n_e704000_n1431000_w1000_h1000_s1000
+==================================================
+[INFO] 已生成当前 BBOX 的 Houdini-ready 数据与 LaneForge 车道 package。
+       可进入 LaneForge 页面进行预览/编辑；之后再回到主操作台点击 [Houdini 生成]。
+[area_picker] 管线结束: OK
+[area_picker] 车道预览数据准备完成，Houdini 重算已跳过
+[area_picker] 状态服务保持运行，按 Ctrl+C 退出
+
+[area_picker] 启动管线: uv run python -u set_area.py --lane-upgrade-only 100.8804274 12.9376703 100.8897098 12.9467748 z47n_e704000_n1431000_w1000_h1000_s1000
+==================================================
+[VirtualCity] 设置区域: z47n_e704000_n1431000_w1000_h1000_s1000
+  bbox: [100.8804274, 12.9376703, 100.8897098, 12.9467748]
+  中心: (100.8851, 12.9422)
+  尺寸: 1.0 km × 1.0 km
+  模式: 车道升级准备（执行 refine_data + LaneForge bridge，跳过 Houdini 重算）
+==================================================
+[1/5] [OK] active_area.json 已更新: z47n_e704000_n1431000_w1000_h1000_s1000
+[RUN] run_id=20260606_040324_z47n_e704000_n1431000_w1000_h1000_s1000_1ff74151
+  [tile cache] OSM 过滤: 167 roads, 97 KB
+  [tile cache] 建筑过滤: 537 栋
+  [clip-cache] 命中 bbox_ef2e0d60fa42f10b，已恢复 OSM/DEM/建筑原始裁切
+[2/5] 获取 OSM 数据...
+  [clip-cache] OSM 已恢复，跳过 Overpass
+[3/5] 获取 DEM 数据...
+  [clip-cache] DEM 已恢复，跳过 FABDEM/GEE
+  [OK] DEM 完成 (source=fabdem)
+[4/5] 获取建筑数据...
+  [clip-cache] 建筑已恢复，跳过 Overture
+  [OK] 建筑完成
+[5/6] 数据精炼（清洗 + 补全 + QA）...
+==================================================
+[VirtualCity 数据精炼] z47n_e704000_n1431000_w1000_h1000_s1000
+==================================================
+[InputQA] 原始数据检查...
+  [OK] 原始数据完整
+  [raw-cache] buildings: using _downloads/z47n_e704000_n1431000_w1000_h1000_s1000/buildings.geojson
+  [raw-cache] roads: using _downloads/z47n_e704000_n1431000_w1000_h1000_s1000/roads.osm
+  [raw-cache] dem: using _downloads/z47n_e704000_n1431000_w1000_h1000_s1000/dem.csv
+  [cache] hit: refine_66ba8b3d1508467f
+[建筑精炼]
+  [L1] 跳过 (已在 L3)
+[道路精炼]
+  [L1] 跳过 (已在 L2)
+[DEM 精炼]
+  [L1] 跳过 (已在 L2)
+[导出 Houdini Ready staging]
+  [OK] staging → RawData/_houdini_ready/.staging/z47n_e704000_n1431000_w1000_h1000_s1000_djhh9k28
+[QA 精炼校验]
+  -- InputQA --
+    [OK] buildings_exists: 178 KB
+    [OK] roads_exists: 97 KB
+    [OK] dem_exists: 30 KB
+  -- ProcessQA --
+    [WARN] bld_retention: 保留率 100%，清洗几乎无效
+    [OK] dem_correction: applied=False
+  -- OutputQA --
+    [OK] output_buildings.geojson: 178 KB
+    [OK] output_roads.osm: 86 KB
+    [OK] output_dem.csv: 30 KB
+    [OK] bld_sample: 10/10 建筑有效
+    [OK] bld_height_present: 537 建筑均有 height
+    [OK] bld_height_source: 真值 537 / 待推算 0（{'overture': 433, 'osm': 104}）
+    [OK] road_attr_coverage: highway 140：lanes 36 · oneway 25 · width 0
+    [OK] road_connectivity: 分量 4 · 最大连通占比 96% · 悬挂端点 208
+  结果: 12 passed, 1 warnings, 0 failed
+  [OK] QA 通过
+  报告: z47n_e704000_n1431000_w1000_h1000_s1000_qa_20260606_040324.json
+  [OK] 已发布 → _houdini_ready/z47n_e704000_n1431000_w1000_h1000_s1000/
+[5b/6] LaneForge 道路升级包（同源道路 bridge）...
+{
+  "status": "failed",
+  "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+  "run_id": "20260606_040324_z47n_e704000_n1431000_w1000_h1000_s1000_1ff74151",
+  "error": "Missing current Houdini-ready road inputs: E:\\VirtualCity\\RawData\\_houdini_ready\\z47n_e704000_n1431000_w1000_h1000_s1000\\roads_clean.geojson, E:\\VirtualCity\\RawData\\_houdini_ready\\z47n_e704000_n1431000_w1000_h1000_s1000\\road_graph.json",
+  "fallback": "legacy road_strips remains available in VirtualCity recook"
+}
+==================================================
+[OK] 车道升级数据准备完成: z47n_e704000_n1431000_w1000_h1000_s1000
+==================================================
+[INFO] 已生成当前 BBOX 的 Houdini-ready 数据与 LaneForge 车道 package。
+       可进入 LaneForge 页面进行预览/编辑；之后再回到主操作台点击 [Houdini 生成]。
+[area_picker] 管线结束: OK
+[area_picker] 车道预览数据准备完成，Houdini 重算已跳过
+[area_picker] 状态服务保持运行，按 Ctrl+C 退出
+[area_picker] 收到来自新实例的停机指令，正在释放资源准备退出...
+[area_picker] 已退出
