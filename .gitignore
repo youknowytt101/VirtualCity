@@ -2,6 +2,8 @@
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+*.lnk
+Scripts/logs/
 
 # ===== Houdini =====
 # 缓存和模拟数据（体积大，不提交）

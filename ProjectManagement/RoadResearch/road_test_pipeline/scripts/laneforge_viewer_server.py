@@ -3623,7 +3623,7 @@ class LaneForgeViewerHandler(SimpleHTTPRequestHandler):
         path = unquote(parsed.path)
         query = parse_qs(parsed.query)
         if path == "/api/status":
-            area_id = "pattaya_central_500m"
+            area_id = str(query.get("area_id", ["pattaya_central_500m"])[0] or "pattaya_central_500m")
             json_response(self, HTTPStatus.OK, {
                 "status": "ok",
                 "schema": API_SCHEMA,

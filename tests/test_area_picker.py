@@ -67,8 +67,24 @@ class TestRootLauncher(unittest.TestCase):
         launcher = ROOT / "启动VirtualCity操作台.cmd"
         self.assertTrue(launcher.exists())
         source = launcher.read_text(encoding="utf-8")
-        self.assertIn("VC_AREA_PICKER_SHUTDOWN_WITH_PAGE=1", source)
-        self.assertIn('uv --cache-dir "%~dp0Scripts\\.uv-cache" run python -u area_picker.py', source)
+        self.assertIn("launch_virtualcity_console.ps1", source)
+
+        launch_script = ROOT / "Scripts" / "launch_virtualcity_console.ps1"
+        self.assertTrue(launch_script.exists())
+        launch_source = launch_script.read_text(encoding="utf-8")
+        self.assertIn("VC_AREA_PICKER_SHUTDOWN_WITH_PAGE=1", launch_source)
+        self.assertIn("VC_AREA_PICKER_NO_BROWSER=1", launch_source)
+        self.assertIn("http://127.0.0.1:$Port/", launch_source)
+        self.assertIn("Test-AreaPickerReady", launch_source)
+        self.assertIn("Open-ConsoleUrl", launch_source)
+        self.assertIn("url.dll,FileProtocolHandler", launch_source)
+
+    def test_root_reset_shortcut_uses_reset_script(self):
+        shortcut = ROOT / "重置VirtualCity网页服务.cmd"
+        self.assertTrue(shortcut.exists())
+        source = shortcut.read_text(encoding="utf-8")
+        self.assertIn("reset_virtualcity_servers.ps1", source)
+        self.assertNotIn("-StopUnknownPortOwners", source)
 
 
 class TestHoudiniStatus(unittest.TestCase):
@@ -186,7 +202,7 @@ class TestSetAreaDataOnly(unittest.TestCase):
 
     def test_data_only_does_not_emit_houdini_completion_warning(self):
         source = (ROOT / "Scripts" / "area_picker.py").read_text(encoding="utf-8")
-        self.assertIn("if ok and not houdini_done and not data_only:", source)
+        self.assertIn("if ok and not houdini_done and not data_only and not lane_upgrade_prepare:", source)
 
 
 class TestServerStartup(unittest.TestCase):
@@ -200,7 +216,7 @@ class TestServerStartup(unittest.TestCase):
         with patch.object(area_picker, "_probe_existing_server", return_value=existing), \
                 patch.object(area_picker, "_open_browser") as open_browser:
             self.assertEqual(area_picker.main(), 0)
-            open_browser.assert_called_once_with(f"http://localhost:{area_picker.PORT}")
+            open_browser.assert_called_once_with(f"http://{area_picker.PICKER_HOST}:{area_picker.PORT}")
 
     def test_legacy_server_is_rejected(self):
         existing = {
@@ -210,9 +226,19 @@ class TestServerStartup(unittest.TestCase):
             "run_id": "",
         }
         with patch.object(area_picker, "_probe_existing_server", return_value=existing), \
+                patch.object(area_picker.urllib.request, "urlopen", side_effect=OSError("mocked shutdown request")), \
                 patch.object(area_picker, "_open_browser") as open_browser:
             self.assertEqual(area_picker.main(), 2)
             open_browser.assert_not_called()
+
+
+class TestLaneForgeViewerStartup(unittest.TestCase):
+    def test_laneforge_viewer_starts_direct_python_server(self):
+        source = (ROOT / "Scripts" / "area_picker.py").read_text(encoding="utf-8")
+        self.assertIn("laneforge_viewer_server.py", source)
+        self.assertIn("subprocess.Popen", source)
+        self.assertIn("_laneforge_ready(timeout=0.8, area_id=area_id)", source)
+        self.assertNotIn("start_laneforge_viewer.ps1'\n", source)
 
 
 class TestPageShutdown(unittest.TestCase):

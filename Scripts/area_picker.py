@@ -54,6 +54,7 @@ def _safe_print(msg):
 SCRIPTS = Path(__file__).resolve().parent
 ROOT    = SCRIPTS.parent
 STATIC_ROOT = SCRIPTS / 'web_assets'
+PICKER_HOST = '127.0.0.1'
 PORT    = 8765
 LANEFORGE_ROOT = ROOT / 'ProjectManagement' / 'RoadResearch' / 'road_test_pipeline'
 LANEFORGE_HOST = os.environ.get('VC_LANEFORGE_VIEWER_HOST', '127.0.0.1')
@@ -243,8 +244,11 @@ def _probe_houdini(timeout: float = 0.35) -> bool:
         return False
 
 
-def _laneforge_api_url() -> str:
-    return f'http://{LANEFORGE_HOST}:{LANEFORGE_PORT}/api/status'
+def _laneforge_api_url(area_id: str = '') -> str:
+    query = ''
+    if area_id:
+        query = '?' + urllib.parse.urlencode({'area_id': area_id})
+    return f'http://{LANEFORGE_HOST}:{LANEFORGE_PORT}/api/status{query}'
 
 
 def _laneforge_viewer_url(area_id: str) -> str:
@@ -255,38 +259,73 @@ def _laneforge_viewer_url(area_id: str) -> str:
     return f'http://{LANEFORGE_HOST}:{LANEFORGE_PORT}/svg_live_viewer.html?{query}'
 
 
-def _laneforge_ready(timeout: float = 1.5) -> bool:
+def _laneforge_ready(timeout: float = 1.5, area_id: str = '') -> bool:
     try:
-        with urllib.request.urlopen(_laneforge_api_url(), timeout=timeout) as resp:
+        with urllib.request.urlopen(_laneforge_api_url(area_id), timeout=timeout) as resp:
             data = json.loads(resp.read().decode('utf-8'))
-        return isinstance(data, dict) and data.get('status') == 'ok' and data.get('system') == 'LaneForge'
+        if not isinstance(data, dict) or data.get('status') != 'ok' or data.get('system') != 'LaneForge':
+            return False
+        if area_id:
+            latest = data.get('latest_package') or {}
+            latest_data = latest.get('data') if isinstance(latest, dict) else {}
+            if isinstance(latest_data, dict) and latest_data.get('area_id') != area_id:
+                return False
+        return True
     except Exception:
         return False
 
 
-def _ensure_laneforge_viewer() -> None:
-    if _laneforge_ready(timeout=0.8):
-        return
-    script = LANEFORGE_ROOT / 'start_laneforge_viewer.ps1'
-    if not script.exists():
-        raise FileNotFoundError(f'LaneForge 启动脚本不存在: {script}')
+def _tail_file(path: Path, max_chars: int = 900) -> str:
+    try:
+        if not path.exists():
+            return ''
+        return path.read_text(encoding='utf-8', errors='replace')[-max_chars:]
+    except Exception:
+        return ''
+
+
+def _start_laneforge_viewer_process() -> int:
+    server_script = LANEFORGE_ROOT / 'scripts' / 'laneforge_viewer_server.py'
+    if not server_script.exists():
+        raise FileNotFoundError(f'LaneForge viewer server 不存在: {server_script}')
+    visualizations = LANEFORGE_ROOT / 'reports' / 'visualizations'
+    visualizations.mkdir(parents=True, exist_ok=True)
+    stdout_log = visualizations / 'laneforge_viewer_server.out.log'
+    stderr_log = visualizations / 'laneforge_viewer_server.err.log'
     cmd = [
-        'powershell.exe', '-NoProfile', '-ExecutionPolicy', 'Bypass',
-        '-File', str(script),
-        '-Port', str(LANEFORGE_PORT),
-        '-BindAddress', LANEFORGE_HOST,
+        sys.executable,
+        str(server_script),
+        '--host',
+        LANEFORGE_HOST,
+        '--port',
+        str(LANEFORGE_PORT),
     ]
-    proc = subprocess.run(
-        cmd,
-        cwd=str(LANEFORGE_ROOT),
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        timeout=25,
-    )
-    if not _laneforge_ready(timeout=1.5):
-        tail = (proc.stdout or '').strip()[-900:]
-        raise RuntimeError(f'LaneForge viewer 未能启动: {tail or "no output"}')
+    creationflags = getattr(subprocess, 'CREATE_NO_WINDOW', 0)
+    with stdout_log.open('ab') as out, stderr_log.open('ab') as err:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=str(LANEFORGE_ROOT),
+            stdin=subprocess.DEVNULL,
+            stdout=out,
+            stderr=err,
+            creationflags=creationflags,
+        )
+    return int(proc.pid)
+
+
+def _ensure_laneforge_viewer(area_id: str = '') -> None:
+    if _laneforge_ready(timeout=0.8, area_id=area_id):
+        return
+    pid = _start_laneforge_viewer_process()
+    deadline = time.time() + 18.0
+    while time.time() < deadline:
+        if _laneforge_ready(timeout=0.8, area_id=area_id):
+            return
+        time.sleep(0.35)
+    stderr_tail = _tail_file(LANEFORGE_ROOT / 'reports' / 'visualizations' / 'laneforge_viewer_server.err.log')
+    stdout_tail = _tail_file(LANEFORGE_ROOT / 'reports' / 'visualizations' / 'laneforge_viewer_server.out.log')
+    detail = (stderr_tail or stdout_tail or 'no output').strip()
+    raise RuntimeError(f'LaneForge viewer 未能启动或未对齐当前区域: pid={pid} {detail[-900:]}')
 
 
 def _ensure_laneforge_svg(area_id: str) -> Path:
@@ -361,7 +400,7 @@ def _houdini_model_available(cfg: dict | None = None, timeout: float = 1.5) -> b
 
 
 def _probe_existing_server() -> dict | None:
-    url = f'http://localhost:{PORT}'
+    url = f'http://{PICKER_HOST}:{PORT}'
     try:
         with urllib.request.urlopen(url + '/health', timeout=1.5) as resp:
             data = json.loads(resp.read().decode('utf-8'))
@@ -1611,7 +1650,7 @@ class _Handler(BaseHTTPRequestHandler):
 
         try:
             _ensure_laneforge_svg(area_id)
-            _ensure_laneforge_viewer()
+            _ensure_laneforge_viewer(area_id)
         except Exception as exc:
             self._json({'ok': False, 'message': str(exc)})
             return
@@ -1653,7 +1692,7 @@ class _Handler(BaseHTTPRequestHandler):
 
 def main():
     lat, lon = _get_initial_center()
-    url = f'http://localhost:{PORT}'
+    url = f'http://{PICKER_HOST}:{PORT}'
     existing = _probe_existing_server()
     if existing:
         version = existing.get('server_version', '')
@@ -1697,7 +1736,7 @@ def main():
     print(f"  按 Ctrl+C 退出\n")
 
     try:
-        server = ThreadingHTTPServer(('localhost', PORT), _Handler)
+        server = ThreadingHTTPServer((PICKER_HOST, PORT), _Handler)
     except OSError as exc:
         print(f"[FAIL] 无法启动 area_picker 服务: {exc}")
         print(f"       端口 {PORT} 可能仍被其他进程占用。")
