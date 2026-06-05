@@ -5,27 +5,27 @@
   "junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
   "counts": {
-    "lanes": 200,
-    "physical_lane_centerlines": 186,
-    "physical_lane_group_centerlines": 12,
-    "standalone_physical_lane_centerlines": 174,
+    "lanes": 230,
+    "physical_lane_centerlines": 212,
+    "physical_lane_group_centerlines": 14,
+    "standalone_physical_lane_centerlines": 198,
     "junctions": 49,
     "approach_lane_records": 149,
     "connections": 306,
-    "lane_links": 306,
-    "continuity_links": 20,
+    "lane_links": 320,
+    "continuity_links": 24,
     "optimized_approach_centerlines": 100,
     "optimized_approach_centerlines_applied": 100,
     "optimized_junction_connectors": 149,
     "optimized_junction_connector_lane_links": 0,
     "optimized_corner_fillet_links": 6,
-    "direct_connector_continuity_links": 14,
-    "same_physical_lane_continuity_links": 14,
-    "physical_lane_groups_created": 12,
-    "physical_lane_grouped_lanes": 26,
-    "active_lane_upgrades": 5,
-    "active_lane_upgrades_applied": 0,
-    "active_lane_upgrades_deferred": 5,
+    "direct_connector_continuity_links": 18,
+    "same_physical_lane_continuity_links": 18,
+    "physical_lane_groups_created": 14,
+    "physical_lane_grouped_lanes": 32,
+    "active_lane_upgrades": 15,
+    "active_lane_upgrades_applied": 15,
+    "active_lane_upgrades_deferred": 0,
     "active_lane_upgrades_missing_roads": 0,
     "active_lane_upgrades_ignored": 0,
     "lane_bundle_centerline_smoothed_edges": 20,
@@ -63,18 +63,20 @@
       "e_0095"
     ],
     "smoothed_bend_count": 39,
-    "inserted_sample_points": 331,
-    "max_abs_lane_offset_m": 1.6,
-    "max_min_arc_radius_m": 6.4,
+    "inserted_sample_points": 314,
+    "max_abs_lane_offset_m": 4.8,
+    "max_min_arc_radius_m": 9.6,
     "profile_counts": {
       "hard_bend_lane_level_rounding": 18,
       "micro_bend": 21
     },
     "curve_family_counts": {
-      "tangent_circular_arc": 39
+      "straight_infinite_radius": 1,
+      "tangent_circular_arc": 38
     },
     "arc_fit_status_counts": {
-      "exact_tangent_arc": 39
+      "exact_tangent_arc": 38,
+      "low_radius_arc_regularization_unavailable": 1
     },
     "low_radius_sampled_arc_cleanup": {
       "edges_cleaned": 0,
@@ -160,19 +162,19 @@
       "canonical",
       "road_graph"
     ],
-    "lanes_evaluated": 200,
+    "lanes_evaluated": 230,
     "smoothed_lane_count": 1,
     "smoothed_bend_count": 0,
     "inserted_sample_points": 0,
-    "source_point_count": 1218,
-    "derived_point_count": 1216,
+    "source_point_count": 1396,
+    "derived_point_count": 1394,
     "max_source_bend_offset_m": 0.0,
     "max_smoothed_angle_deg": 0.0,
     "profile_counts": {},
     "curve_family_counts": {},
     "arc_fit_status_counts": {},
     "derivation_limit_adjustments": 0,
-    "lane_bundle_managed_lanes": 40,
+    "lane_bundle_managed_lanes": 54,
     "micro_segment_cleanup": {
       "policy": "lane_centerline_micro_segment_cleanup_v1",
       "lanes_cleaned": 1,
@@ -191,7 +193,7 @@
     "skipped_bends": {
       "above_angle_threshold": 21,
       "below_source_offset_threshold": 37,
-      "too_few_points": 142
+      "too_few_points": 158
     },
     "skipped_road_ids_by_reason": {
       "above_angle_threshold": [
@@ -286,10 +288,10 @@
   "physical_lane_centerlines": {
     "policy": "physical_lane_centerlines_v1",
     "group_policy": "degree2_connector_physical_lane_group_v1",
-    "centerlines": 186,
-    "grouped_centerlines": 12,
-    "standalone_centerlines": 174,
-    "source_lane_segments_grouped": 26
+    "centerlines": 212,
+    "grouped_centerlines": 14,
+    "standalone_centerlines": 198,
+    "source_lane_segments_grouped": 32
   },
   "direct_connector_continuity": {
     "policy": "degree2_connector_through_continuity_v1",
@@ -304,11 +306,13 @@
       "policy": "degree2_connector_physical_lane_group_v1",
       "max_turn_deg": 5.0,
       "max_endpoint_gap_m": 0.1,
-      "candidate_links": 14,
-      "links_grouped": 14,
-      "groups_created": 12,
-      "lanes_grouped": 26,
+      "candidate_links": 18,
+      "links_grouped": 18,
+      "groups_created": 14,
+      "lanes_grouped": 32,
       "group_ids": [
+        "plg_5aa4d3d0d8cb",
+        "plg_5cdd2b989672",
         "plg_690e8dfb9028",
         "plg_7acbe54f0555",
         "plg_8e8e49c08a2b",
@@ -326,11 +330,11 @@
     },
     "connector_nodes_considered": 7,
     "connector_nodes_linked": 7,
-    "links_created": 14,
-    "micro_seams_absorbed": 12,
-    "same_physical_lane_links": 14,
-    "physical_lane_groups_created": 12,
-    "physical_lane_grouped_lanes": 26,
+    "links_created": 18,
+    "micro_seams_absorbed": 16,
+    "same_physical_lane_links": 18,
+    "physical_lane_groups_created": 14,
+    "physical_lane_grouped_lanes": 32,
     "max_created_endpoint_gap_m": 0.0,
     "max_observed_turn_deg": 2.254,
     "skipped": {
@@ -340,15 +344,25 @@
   "lane_upgrade_system": {
     "system": "LaneForge",
     "overrides_source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_upgrade_overrides.json",
-    "geometry_application_policy": "defer_lane_upgrade_overrides_keep_all_roads_bidirectional_two_lane_v1",
-    "applied_road_ids": [],
-    "deferred_road_ids": [
+    "geometry_application_policy": "apply_all_lane_upgrade_overrides_to_geometry_v1",
+    "applied_road_ids": [
+      "e_0000",
+      "e_0001",
+      "e_0002",
+      "e_0003",
+      "e_0004",
       "e_0005",
+      "e_0006",
+      "e_0007",
       "e_0013",
       "e_0014",
       "e_0015",
-      "e_0017"
+      "e_0017",
+      "e_0023",
+      "e_0044",
+      "e_0083"
     ],
+    "deferred_road_ids": [],
     "missing_road_ids": [],
     "ignored": [],
     "distribution_policy": "balanced_bidirectional_left_traffic_v1",
@@ -364,40 +378,41 @@
     "through": 102
   },
   "lane_source_counts": {
-    "temporary_bidirectional_two_lane_policy": 200
+    "lane_upgrade_system_manual_override": 60,
+    "temporary_bidirectional_two_lane_policy": 170
   },
   "lane_centerline_source_counts": {
-    "optimized_approach_centerline": 160,
-    "optimized_approach_centerline+lane_bundle_centerline_smoothing_v1": 40
+    "optimized_approach_centerline": 176,
+    "optimized_approach_centerline+lane_bundle_centerline_smoothing_v1": 54
   },
   "lane_centerline_derivation_counts": {
     "derived_lane_centerline_smoothing_v1": 1,
-    "none": 199
+    "none": 229
   },
   "width_source_counts": {
-    "fixed_default": 200
+    "fixed_default": 230
   },
   "connection_source_counts": {
     "geometry_inferred_from_osm_plus_temporary_bidirectional_two_lane_policy": 306
   },
   "lane_link_source_counts": {
-    "junction_semantics": 306
+    "junction_semantics": 320
   },
   "lane_link_curve_source_counts": {
-    "junction_lane_endpoint_bezier": 306
+    "junction_lane_endpoint_bezier": 320
   },
   "lane_link_connector_kind_counts": {
-    "none": 306
+    "none": 320
   },
   "continuity_link_source_counts": {
-    "degree2_connector_through_continuity_v1": 14,
+    "degree2_connector_through_continuity_v1": 18,
     "optimized_corner_fillet": 6
   },
   "continuity_rounding_style_counts": {
-    "unified_lane_geometry_rounding_style_v1": 20
+    "unified_lane_geometry_rounding_style_v1": 24
   },
   "continuity_rounding_curve_family_counts": {
-    "straight_infinite_radius": 14,
+    "straight_infinite_radius": 18,
     "tangent_circular_arc": 6
   },
   "fallback_counts": {
@@ -407,15 +422,15 @@
   "metrics": {
     "junctions_with_connections_ratio": 1.0,
     "fan_fallback_ratio": 0.0,
-    "avg_lane_links_per_junction": 6.245,
+    "avg_lane_links_per_junction": 6.531,
     "lane_link_reference_errors": 0,
     "blocked_lane_links": 0,
     "empty_connection_curves": 0,
     "avg_lane_link_confidence": 0.82,
     "min_lane_link_confidence": 0.82,
-    "avg_curve_length_m": 10.35,
-    "max_curve_length_m": 14.954,
-    "avg_continuity_curve_length_m": 1.392,
+    "avg_curve_length_m": 10.693,
+    "max_curve_length_m": 17.562,
+    "avg_continuity_curve_length_m": 1.16,
     "max_continuity_curve_length_m": 7.301,
     "avg_lane_width_m": 3.2,
     "min_lane_width_m": 3.2,
@@ -424,7 +439,7 @@
     "max_lane_width_start_end_delta_m": 0.0,
     "lane_bundle_centerline_smoothed_edges": 20,
     "lane_bundle_centerline_smoothed_bends": 39,
-    "lane_bundle_centerline_max_min_arc_radius_m": 6.4,
+    "lane_bundle_centerline_max_min_arc_radius_m": 9.6,
     "derived_lane_centerline_smoothed_lanes": 1,
     "derived_lane_centerline_smoothed_bends": 0,
     "derived_lane_centerline_inserted_sample_points": 0,
@@ -433,19 +448,19 @@
     "derived_lane_centerline_smoothing_curve_family_counts": {},
     "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
     "continuity_rounding_style_counts": {
-      "unified_lane_geometry_rounding_style_v1": 20
+      "unified_lane_geometry_rounding_style_v1": 24
     },
     "continuity_rounding_curve_family_counts": {
-      "straight_infinite_radius": 14,
+      "straight_infinite_radius": 18,
       "tangent_circular_arc": 6
     },
     "lane_level_radius_regularized_continuity_links": 1,
-    "physical_lane_centerlines": 186,
-    "physical_lane_group_centerlines": 12,
-    "standalone_physical_lane_centerlines": 174,
-    "same_physical_lane_continuity_links": 14,
-    "physical_lane_groups_created": 12,
-    "physical_lane_grouped_lanes": 26,
+    "physical_lane_centerlines": 212,
+    "physical_lane_group_centerlines": 14,
+    "standalone_physical_lane_centerlines": 198,
+    "same_physical_lane_continuity_links": 18,
+    "physical_lane_groups_created": 14,
+    "physical_lane_grouped_lanes": 32,
     "min_optimized_corner_continuity_radius_m": 0.728
   },
   "notes": [

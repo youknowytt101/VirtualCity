@@ -2259,6 +2259,30 @@
       return match ? `e_${match[1]}` : "";
     }
 
+    function csvList(value) {
+      return String(value || "")
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    function laneForgeRoadIdsFromData(data) {
+      const ids = csvList(data.vcRoadGraphEdgeIds);
+      if (ids.length) {
+        return ids;
+      }
+      const single = laneForgeRoadIdFromData(data);
+      return single ? [single] : [];
+    }
+
+    function laneForgeCanonicalRoadIdsFromData(data) {
+      const ids = csvList(data.vcCanonicalRoadIds);
+      if (ids.length) {
+        return ids;
+      }
+      return data.vcCanonicalRoadId ? [data.vcCanonicalRoadId] : [];
+    }
+
     function laneForgeRoadIdFromData(data) {
       const kind = data.vcKind || "";
       if (data.vcRoadGraphEdgeId) {
@@ -2271,6 +2295,26 @@
         return data.vcEdgeId || data.vcRoadId || "";
       }
       return "";
+    }
+
+    function laneForgeSelectionScopeFromData(data) {
+      if (data.vcSelectionScope) {
+        return data.vcSelectionScope;
+      }
+      if ((data.vcKind || "") === "canonical_road" && data.vcRoadChainId) {
+        return "road_chain";
+      }
+      return "road_edge";
+    }
+
+    function laneForgeTargetLabelFromData(data) {
+      const scope = laneForgeSelectionScopeFromData(data);
+      const chainId = data.vcRoadChainId || "";
+      const roadIds = laneForgeRoadIdsFromData(data);
+      if (scope === "road_chain" && chainId) {
+        return `${chainId} (${roadIds.length || 1} road graph edges)`;
+      }
+      return laneForgeRoadIdFromData(data);
     }
 
     function laneForgeTransactionText(data, targetLaneCount) {
@@ -2416,28 +2460,44 @@
 
     function laneForgePayload(data, targetLaneCount, restoreDefault = false) {
       const areaId = areaIdFromSvgPath(svgPath);
-      const roadId = laneForgeRoadIdFromData(data);
-      const canonicalRoadId = data.vcCanonicalRoadId || "";
+      const roadIds = laneForgeRoadIdsFromData(data);
+      const canonicalRoadIds = laneForgeCanonicalRoadIdsFromData(data);
+      const roadId = roadIds[0] || "";
+      const canonicalRoadId = canonicalRoadIds[0] || "";
+      const roadChainId = data.vcRoadChainId || "";
+      const selectionScope = laneForgeSelectionScopeFromData(data);
       return {
         area_id: areaId,
         road_id: roadId,
         canonical_road_id: canonicalRoadId,
+        road_ids: roadIds,
+        canonical_road_ids: canonicalRoadIds,
+        road_chain_id: roadChainId,
+        selection_scope: selectionScope,
         target_physical_lane_count: restoreDefault ? 0 : targetLaneCount,
         action: restoreDefault ? "restore_road_lane_count_default" : "set_road_physical_lane_count",
         reason: restoreDefault
-          ? `viewer request: restore ${roadId || canonicalRoadId} to default lane model`
-          : `viewer request: set ${roadId || canonicalRoadId} to ${targetLaneCount} physical lanes`
+          ? `viewer request: restore ${roadChainId || roadId || canonicalRoadId} to default lane model`
+          : `viewer request: set ${roadChainId || roadId || canonicalRoadId} to ${targetLaneCount} physical lanes`
       };
     }
 
     function laneForgeCliCommand(payload) {
-      const canonicalCliArg = payload.canonical_road_id ? ` --canonical-road-id ${payload.canonical_road_id}` : "";
       const operationCliArg = payload.action === "restore_road_lane_count_default"
         ? "--restore-default"
         : `--target-lane-count ${payload.target_physical_lane_count}`;
+      const roadIds = Array.isArray(payload.road_ids) && payload.road_ids.length ? payload.road_ids : [payload.road_id].filter(Boolean);
+      const canonicalRoadIds = Array.isArray(payload.canonical_road_ids) && payload.canonical_road_ids.length ? payload.canonical_road_ids : [payload.canonical_road_id].filter(Boolean);
+      if (roadIds.length > 1) {
+        return roadIds.map((roadId, index) => {
+          const canonicalArg = canonicalRoadIds[index] ? ` --canonical-road-id ${canonicalRoadIds[index]}` : "";
+          return `python scripts\\execute_lane_upgrade.py --area-id ${payload.area_id} --road-id ${roadId}${canonicalArg} ${operationCliArg} --apply-all-active-geometry --reason "${payload.reason}"`;
+        }).join("\n");
+      }
+      const canonicalCliArg = canonicalRoadIds[0] ? ` --canonical-road-id ${canonicalRoadIds[0]}` : "";
       return (
         `python scripts\\execute_lane_upgrade.py --area-id ${payload.area_id} ` +
-        `--road-id ${payload.road_id}${canonicalCliArg} ${operationCliArg} ` +
+        `--road-id ${roadIds[0] || ""}${canonicalCliArg} ${operationCliArg} ` +
         `--apply-all-active-geometry --reason "${payload.reason}"`
       );
     }
@@ -2463,6 +2523,9 @@
           action: payload.action,
           road_id: payload.road_id,
           canonical_road_id: payload.canonical_road_id,
+          road_ids: payload.road_ids || [],
+          canonical_road_ids: payload.canonical_road_ids || [],
+          road_chain_id: payload.road_chain_id || "",
           target_physical_lane_count: payload.target_physical_lane_count,
           distribution_policy: restoreDefault ? "source_or_default_lane_model_v1" : "balanced_bidirectional_left_traffic_v1",
           source: "web_lane_count_menu",
@@ -2534,6 +2597,9 @@
 
     function appendLaneUpgradePanelV2(data) {
       const roadId = laneForgeRoadIdFromData(data);
+      const roadIds = laneForgeRoadIdsFromData(data);
+      const selectionScope = laneForgeSelectionScopeFromData(data);
+      const targetLabel = laneForgeTargetLabelFromData(data);
       const kind = data.vcKind || "";
       if (!roadId && kind !== "canonical_road") {
         return;
@@ -2550,7 +2616,7 @@
       const note = document.createElement("div");
       note.className = "lane-upgrade-note";
       note.textContent = roadId
-        ? `Road（道路） ${roadId}：选择目标车道数后点确定；后台会重建车道、相邻路口 laneLinks 和 surface。`
+        ? `Road（道路） ${targetLabel || roadId}：选择目标车道数后点确定；后台会重建车道、相邻路口 laneLinks 和 surface。`
         : "请优先选择 lane（车道）或 canonical road（标准道路）；当前对象缺少 road_graph road_id。";
       panel.append(note);
 
@@ -2566,7 +2632,9 @@
       const currentText = activeTarget > 0 ? `${activeTarget} 车道（active / 激活）` : sourceLaneText;
       const selectedLaneText = data.vcLaneId
         ? `${data.vcLaneId}${data.vcDirection ? ` / ${data.vcDirection}` : ""}`
-        : "road selection（道路选择）";
+        : selectionScope === "road_chain" && roadIds.length > 1
+          ? `road chain selection (${roadIds.length} edges)`
+          : "road selection（道路选择）";
 
       const status = document.createElement("div");
       status.className = "lane-upgrade-status";

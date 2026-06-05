@@ -2,37 +2,37 @@
   "type": "laneforge_current_status",
   "schema": "lane_upgrade_system.current_status.v1",
   "area_id": "pattaya_central_500m",
-  "latest_package_version": "lane_package_v0049",
-  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049",
-  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049/manifest.json",
-  "houdini_manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049/houdini_manifest.json",
+  "latest_package_version": "lane_package_v0078",
+  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078",
+  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/manifest.json",
+  "houdini_manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/houdini_manifest.json",
   "path_policy": "portable_lane_package_paths_v1",
   "qa_status": "warn",
   "qa_gate_status": "manual_review_required",
   "qa_warning_summary": {
     "publishable_warn": 0,
-    "manual_review_required": 4,
+    "manual_review_required": 6,
     "blocker": 0
   },
   "counts": {
-    "lanes": 200,
-    "physical_lane_centerlines": 186,
-    "physical_lane_group_centerlines": 12,
+    "lanes": 230,
+    "physical_lane_centerlines": 212,
+    "physical_lane_group_centerlines": 14,
     "junctions": 49,
-    "lane_links": 306,
-    "continuity_links": 20,
+    "lane_links": 320,
+    "continuity_links": 24,
     "junction_envelope_surfaces": 49,
-    "active_lane_upgrades": 5,
+    "active_lane_upgrades": 15,
     "active_corner_optimizations": 5,
     "corner_optimization_candidates": 19,
     "corner_optimization_accepted_active": 5,
     "corner_optimization_accepted_active_candidates": 4,
     "corner_optimization_accepted_active_overrides": 5,
-    "lane_upgrade_propagation_candidates": 14,
-    "lane_upgrade_propagation_high_confidence": 4
+    "lane_upgrade_propagation_candidates": 27,
+    "lane_upgrade_propagation_high_confidence": 12
   },
   "semantic_review": {
-    "schema": "lane_upgrade_system.semantic_review_summary.v1.fallback_from_reports",
+    "schema": "lane_upgrade_system.semantic_review_summary.v1",
     "status": "manual_review_required",
     "active_lane_policy": "temporary_all_roads_bidirectional_two_lane_v1",
     "width_fallback_ratio": 1.0,
@@ -42,7 +42,32 @@
     "direction_policy_override_ratio": 1.0,
     "source_oneway_ignored_approaches": 96,
     "source_oneway_blocked_movements_if_trusted": 142,
-    "source": "current reports fallback; future packages embed semantic_review in manifest"
+    "turn_lanes_source_counts": {
+      "missing": 100
+    },
+    "qa_review_entries": [
+      {
+        "stage": "road_graph",
+        "check_id": "dead_end_ratio",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": 0.311,
+        "threshold": 0.12,
+        "message": "Internal dead ends remain high after boundary classification; review endpoint clusters visually.",
+        "reason": "Road graph contains a high dead-end ratio; review endpoint classification before unattended production."
+      },
+      {
+        "stage": "road_graph",
+        "check_id": "width_fallback_ratio",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": 1.0,
+        "threshold": 0.8,
+        "message": "Many edges use road-class width defaults; better data or local width inference is needed.",
+        "reason": "All or most road widths are inferred from defaults; output is publishable for research but needs semantic review."
+      }
+    ],
+    "production_note": "Lane geometry is publishable for research when qa_gate allows it, but traffic semantics remain review-gated until width, lanes, oneway and turn-lanes sources are promoted from temporary policy/fallback inputs."
   },
   "publish_decision": {
     "research_publish_allowed": true,
@@ -54,23 +79,23 @@
     "latest": {
       "path": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
       "exists": true,
-      "size_bytes": 409,
-      "mtime_utc": 1780649336.9596364,
-      "sha256": "828872338cdb3bb435d28cb0524794d904da622abf58303237818d667b85bbd3"
+      "size_bytes": 1004,
+      "mtime_utc": 1780656704.9240415,
+      "sha256": "ac93233f4ec3bcbcad8a3d700fcd9ba02e52dc84b5345d1c483c471665dd4758"
     },
     "manifest": {
-      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049/manifest.json",
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/manifest.json",
       "exists": true,
-      "size_bytes": 12807,
-      "mtime_utc": 1780649336.9586387,
-      "sha256": "778e7df4772dc55fba00be52ad5ae4c6344cdc0ed6f2a4c8028cf4bc2f7fb727"
+      "size_bytes": 51566,
+      "mtime_utc": 1780656704.9240415,
+      "sha256": "09a4b4784df1734cdcd178761c062aa134b69ef2100721fa30acfa1faab65876"
     },
     "houdini_manifest": {
-      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049/houdini_manifest.json",
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/houdini_manifest.json",
       "exists": true,
       "size_bytes": 964,
-      "mtime_utc": 1780649336.9596364,
-      "sha256": "f9463936aaff3ab7a470c168f1bb05a021bcba58f7053fd1270a52c39c025730"
+      "mtime_utc": 1780656704.864596,
+      "sha256": "10f10db1d96e63e5c1125df558e19ed6a408523c7833b29536faf2bb2f80ac52"
     }
   },
   "handoff_rule": "Houdini and downstream systems consume the latest standard lane package, not data/processed internals."

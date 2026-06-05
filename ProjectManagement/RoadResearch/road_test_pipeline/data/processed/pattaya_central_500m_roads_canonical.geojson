@@ -102,7 +102,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443571",
+        "road_chain_source_ids": [
+          "27443571"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 8,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -189,7 +196,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443571",
+        "road_chain_source_ids": [
+          "27443571"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 8,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -285,7 +299,14 @@
         "canonical_vertices_removed": 1,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.152,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443571",
+        "road_chain_source_ids": [
+          "27443571"
+        ],
+        "road_chain_fragment_index": 2,
+        "road_chain_fragment_count": 8,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -372,7 +393,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443571",
+        "road_chain_source_ids": [
+          "27443571"
+        ],
+        "road_chain_fragment_index": 3,
+        "road_chain_fragment_count": 8,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -465,7 +493,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443571",
+        "road_chain_source_ids": [
+          "27443571"
+        ],
+        "road_chain_fragment_index": 4,
+        "road_chain_fragment_count": 8,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -552,7 +587,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443571",
+        "road_chain_source_ids": [
+          "27443571"
+        ],
+        "road_chain_fragment_index": 5,
+        "road_chain_fragment_count": 8,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -639,7 +681,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443571",
+        "road_chain_source_ids": [
+          "27443571"
+        ],
+        "road_chain_fragment_index": 6,
+        "road_chain_fragment_count": 8,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -726,7 +775,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443571",
+        "road_chain_source_ids": [
+          "27443571"
+        ],
+        "road_chain_fragment_index": 7,
+        "road_chain_fragment_count": 8,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -819,7 +875,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443575",
+        "road_chain_source_ids": [
+          "27443575"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -912,7 +975,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443575",
+        "road_chain_source_ids": [
+          "27443575"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -1001,7 +1071,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443579",
+        "road_chain_source_ids": [
+          "27443579"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -1099,7 +1176,14 @@
         "canonical_vertices_removed": 1,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.176,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443579",
+        "road_chain_source_ids": [
+          "27443579"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -1192,7 +1276,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443587",
+        "road_chain_source_ids": [
+          "27443587"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -1273,7 +1364,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443601",
+        "road_chain_source_ids": [
+          "27443601"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 3,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -1360,7 +1458,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443601",
+        "road_chain_source_ids": [
+          "27443601"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 3,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -1447,7 +1552,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_27443601",
+        "road_chain_source_ids": [
+          "27443601"
+        ],
+        "road_chain_fragment_index": 2,
+        "road_chain_fragment_count": 3,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -1531,7 +1643,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 1,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.332
+        "canonical_max_smoothing_offset_m": 0.332,
+        "road_chain_id": "rc_27444194",
+        "road_chain_source_ids": [
+          "27444194"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -1644,7 +1763,15 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_multi_27444620_355438653",
+        "road_chain_source_ids": [
+          "27444620",
+          "355438653"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -1735,7 +1862,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35129296",
+        "road_chain_source_ids": [
+          "35129296"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 6,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -1826,7 +1960,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35129296",
+        "road_chain_source_ids": [
+          "35129296"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 6,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -1917,7 +2058,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35129296",
+        "road_chain_source_ids": [
+          "35129296"
+        ],
+        "road_chain_fragment_index": 2,
+        "road_chain_fragment_count": 6,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -2008,7 +2156,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35129296",
+        "road_chain_source_ids": [
+          "35129296"
+        ],
+        "road_chain_fragment_index": 3,
+        "road_chain_fragment_count": 6,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -2105,7 +2260,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35129296",
+        "road_chain_source_ids": [
+          "35129296"
+        ],
+        "road_chain_fragment_index": 4,
+        "road_chain_fragment_count": 6,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -2196,7 +2358,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35129296",
+        "road_chain_source_ids": [
+          "35129296"
+        ],
+        "road_chain_fragment_index": 5,
+        "road_chain_fragment_count": 6,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -2294,7 +2463,14 @@
         "canonical_vertices_removed": 1,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.223,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35129317",
+        "road_chain_source_ids": [
+          "35129317"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -2380,7 +2556,14 @@
         "canonical_vertices_removed": 1,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.154,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35129317",
+        "road_chain_source_ids": [
+          "35129317"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -2463,7 +2646,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35129321",
+        "road_chain_source_ids": [
+          "35129321"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -2548,7 +2738,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35400897",
+        "road_chain_source_ids": [
+          "35400897"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -2627,7 +2824,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35400897",
+        "road_chain_source_ids": [
+          "35400897"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -2710,7 +2914,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_35536298",
+        "road_chain_source_ids": [
+          "35536298"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -2793,7 +3004,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_151000018",
+        "road_chain_source_ids": [
+          "151000018"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -2878,7 +3096,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_169556497",
+        "road_chain_source_ids": [
+          "169556497"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -2961,7 +3186,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_174587497",
+        "road_chain_source_ids": [
+          "174587497"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3038,7 +3270,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_174587497",
+        "road_chain_source_ids": [
+          "174587497"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3147,7 +3386,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_273672874",
+        "road_chain_source_ids": [
+          "273672874"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -3220,7 +3466,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_317141440",
+        "road_chain_source_ids": [
+          "317141440"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3293,7 +3546,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_317141440",
+        "road_chain_source_ids": [
+          "317141440"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3366,7 +3626,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_317141441",
+        "road_chain_source_ids": [
+          "317141441"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3439,7 +3706,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_317141441",
+        "road_chain_source_ids": [
+          "317141441"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3512,7 +3786,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_317141442",
+        "road_chain_source_ids": [
+          "317141442"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 3,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3585,7 +3866,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_317141442",
+        "road_chain_source_ids": [
+          "317141442"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 3,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3658,7 +3946,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_317141442",
+        "road_chain_source_ids": [
+          "317141442"
+        ],
+        "road_chain_fragment_index": 2,
+        "road_chain_fragment_count": 3,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3735,7 +4030,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_347104620",
+        "road_chain_source_ids": [
+          "347104620"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -3840,7 +4142,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -3951,7 +4260,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -4056,7 +4372,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 2,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -4161,7 +4484,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 3,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -4266,7 +4596,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 4,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -4371,7 +4708,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 5,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -4476,7 +4820,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 6,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -4581,7 +4932,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 7,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -4695,7 +5053,14 @@
         "canonical_vertices_removed": 1,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.189,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 8,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -4800,7 +5165,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 9,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -4905,7 +5277,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 10,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -5073,7 +5452,14 @@
         "canonical_vertices_removed": 1,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.167,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_350135618",
+        "road_chain_source_ids": [
+          "350135618"
+        ],
+        "road_chain_fragment_index": 11,
+        "road_chain_fragment_count": 12,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -5154,7 +5540,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_695055372",
+        "road_chain_source_ids": [
+          "695055372"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -5235,7 +5628,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_695055372",
+        "road_chain_source_ids": [
+          "695055372"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -5316,7 +5716,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_695055373",
+        "road_chain_source_ids": [
+          "695055373"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -5415,7 +5822,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 3,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.128
+        "canonical_max_smoothing_offset_m": 0.128,
+        "road_chain_id": "rc_724095739",
+        "road_chain_source_ids": [
+          "724095739"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -5501,7 +5915,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_724095740",
+        "road_chain_source_ids": [
+          "724095740"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -5581,7 +6002,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_724095740",
+        "road_chain_source_ids": [
+          "724095740"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 2,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -5672,7 +6100,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_724100785",
+        "road_chain_source_ids": [
+          "724100785"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -5755,7 +6190,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_727879443",
+        "road_chain_source_ids": [
+          "727879443"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -5859,7 +6301,15 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_multi_1219573624_945012935",
+        "road_chain_source_ids": [
+          "1219573624",
+          "945012935"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -5954,7 +6404,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6049,7 +6506,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6144,7 +6608,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 2,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6239,7 +6710,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 3,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6334,7 +6812,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 4,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6429,7 +6914,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 5,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6524,7 +7016,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 6,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6619,7 +7118,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 7,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6714,7 +7220,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 8,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6809,7 +7322,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 9,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6904,7 +7424,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 10,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -6999,7 +7526,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 11,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -7094,7 +7628,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 12,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -7201,7 +7742,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_945012935",
+        "road_chain_source_ids": [
+          "945012935"
+        ],
+        "road_chain_fragment_index": 13,
+        "road_chain_fragment_count": 14,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -7284,7 +7832,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1088913687",
+        "road_chain_source_ids": [
+          "1088913687"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -7367,7 +7922,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1197567955",
+        "road_chain_source_ids": [
+          "1197567955"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 3,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -7444,7 +8006,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1197567955",
+        "road_chain_source_ids": [
+          "1197567955"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 3,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -7533,7 +8102,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1197567955",
+        "road_chain_source_ids": [
+          "1197567955"
+        ],
+        "road_chain_fragment_index": 2,
+        "road_chain_fragment_count": 3,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -7626,7 +8202,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1208214302",
+        "road_chain_source_ids": [
+          "1208214302"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -7715,7 +8298,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1209258524",
+        "road_chain_source_ids": [
+          "1209258524"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -7798,7 +8388,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1209258529",
+        "road_chain_source_ids": [
+          "1209258529"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -7873,7 +8470,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1209258533",
+        "road_chain_source_ids": [
+          "1209258533"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -7946,7 +8550,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1209258534",
+        "road_chain_source_ids": [
+          "1209258534"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -8021,7 +8632,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1209268124",
+        "road_chain_source_ids": [
+          "1209268124"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -8096,7 +8714,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1209276004",
+        "road_chain_source_ids": [
+          "1209276004"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -8174,7 +8799,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1210036649",
+        "road_chain_source_ids": [
+          "1210036649"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -8251,7 +8883,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1210036650",
+        "road_chain_source_ids": [
+          "1210036650"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -8334,7 +8973,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1210710015",
+        "road_chain_source_ids": [
+          "1210710015"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -8413,7 +9059,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1211501574",
+        "road_chain_source_ids": [
+          "1211501574"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 1,
+        "road_chain_role": "complete"
       }
     },
     {
@@ -8562,7 +9215,14 @@
         "canonical_vertices_removed": 2,
         "canonical_vertices_smoothed": 1,
         "canonical_max_removed_deviation_m": 0.221,
-        "canonical_max_smoothing_offset_m": 0.108
+        "canonical_max_smoothing_offset_m": 0.108,
+        "road_chain_id": "rc_1219573624",
+        "road_chain_source_ids": [
+          "1219573624"
+        ],
+        "road_chain_fragment_index": 0,
+        "road_chain_fragment_count": 7,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -8657,7 +9317,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1219573624",
+        "road_chain_source_ids": [
+          "1219573624"
+        ],
+        "road_chain_fragment_index": 1,
+        "road_chain_fragment_count": 7,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -8758,7 +9425,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1219573624",
+        "road_chain_source_ids": [
+          "1219573624"
+        ],
+        "road_chain_fragment_index": 2,
+        "road_chain_fragment_count": 7,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -8853,7 +9527,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1219573624",
+        "road_chain_source_ids": [
+          "1219573624"
+        ],
+        "road_chain_fragment_index": 3,
+        "road_chain_fragment_count": 7,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -8948,7 +9629,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1219573624",
+        "road_chain_source_ids": [
+          "1219573624"
+        ],
+        "road_chain_fragment_index": 4,
+        "road_chain_fragment_count": 7,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -9043,7 +9731,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1219573624",
+        "road_chain_source_ids": [
+          "1219573624"
+        ],
+        "road_chain_fragment_index": 5,
+        "road_chain_fragment_count": 7,
+        "road_chain_role": "fragment"
       }
     },
     {
@@ -9138,7 +9833,14 @@
         "canonical_vertices_removed": 0,
         "canonical_vertices_smoothed": 0,
         "canonical_max_removed_deviation_m": 0.0,
-        "canonical_max_smoothing_offset_m": 0.0
+        "canonical_max_smoothing_offset_m": 0.0,
+        "road_chain_id": "rc_1219573624",
+        "road_chain_source_ids": [
+          "1219573624"
+        ],
+        "road_chain_fragment_index": 6,
+        "road_chain_fragment_count": 7,
+        "road_chain_role": "fragment"
       }
     }
   ]

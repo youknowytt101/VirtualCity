@@ -21,7 +21,10 @@
     "merged_input_edges": 71,
     "connector_nodes_available_for_merge": 73,
     "boundary_nodes_protected": 14,
-    "junction_or_terminal_nodes_protected": 80
+    "junction_or_terminal_nodes_protected": 80,
+    "road_chain_count": 43,
+    "fragmented_road_chains": 17,
+    "max_canonical_roads_per_road_chain": 14
   },
   "chain_edge_count_histogram": {
     "1": 68,
@@ -52,6 +55,7 @@
   "notes": [
     "Canonical roads are machine-readable GeoJSON, not SVG visualization.",
     "Each canonical road keeps source_feature_ids, repaired_source_feature_ids, and repair_parent_ids for traceability.",
+    "road_chain_id preserves continuous source-road identity when graph edges must stay split at junctions or crop boundaries.",
     "The stage does not cross true junctions or attribute conflicts; it only removes unstable degree-2 fragmentation from downstream graph construction.",
     "Centerline refinement preserves chain endpoints; simplification and smoothing only touch internal control points inside conservative deviation thresholds."
   ]

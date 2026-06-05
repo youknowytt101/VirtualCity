@@ -412,6 +412,79 @@ def unique_sorted(values: list[str]) -> list[str]:
     return sorted({value for value in values if value})
 
 
+def safe_id_token(value: str) -> str:
+    output = []
+    for char in str(value):
+        if char.isalnum() or char in {"_", "-"}:
+            output.append(char)
+        else:
+            output.append("_")
+    token = "".join(output).strip("_")
+    return token or "unknown"
+
+
+def min_numeric_id(values: Any) -> int:
+    numeric: list[int] = []
+    for value in source_list(values):
+        try:
+            numeric.append(int(value))
+        except ValueError:
+            continue
+    return min(numeric) if numeric else 1_000_000_000
+
+
+def road_chain_key(props: dict[str, Any]) -> tuple[str, ...]:
+    source_ids = source_list(props.get("source_feature_ids"))
+    if source_ids:
+        return tuple(unique_sorted(source_ids))
+    repair_parent_ids = source_list(props.get("repair_parent_ids"))
+    if repair_parent_ids:
+        return tuple(unique_sorted(repair_parent_ids))
+    return (str(props.get("canonical_road_id") or props.get("source_feature_id") or "unknown"),)
+
+
+def road_chain_id_from_key(key: tuple[str, ...]) -> str:
+    if len(key) == 1:
+        return f"rc_{safe_id_token(key[0])}"
+    joined = "_".join(safe_id_token(value) for value in key[:4])
+    suffix = f"_{len(key)}sources" if len(key) > 4 else ""
+    return f"rc_multi_{joined}{suffix}"
+
+
+def annotate_road_chains(features: list[dict[str, Any]]) -> dict[str, Any]:
+    groups: dict[tuple[str, ...], list[dict[str, Any]]] = defaultdict(list)
+    for feature in features:
+        props = feature.get("properties") or {}
+        groups[road_chain_key(props)].append(feature)
+
+    fragmented_counts: list[int] = []
+    for key, group in groups.items():
+        chain_id = road_chain_id_from_key(key)
+        ordered = sorted(
+            group,
+            key=lambda feature: (
+                min_numeric_id((feature.get("properties") or {}).get("repair_edge_ids")),
+                str((feature.get("properties") or {}).get("canonical_road_id") or ""),
+            ),
+        )
+        fragment_count = len(ordered)
+        if fragment_count > 1:
+            fragmented_counts.append(fragment_count)
+        for index, feature in enumerate(ordered):
+            props = feature.setdefault("properties", {})
+            props["road_chain_id"] = chain_id
+            props["road_chain_source_ids"] = list(key)
+            props["road_chain_fragment_index"] = index
+            props["road_chain_fragment_count"] = fragment_count
+            props["road_chain_role"] = "fragment" if fragment_count > 1 else "complete"
+
+    return {
+        "road_chain_count": len(groups),
+        "fragmented_road_chains": len(fragmented_counts),
+        "max_canonical_roads_per_road_chain": max(fragmented_counts) if fragmented_counts else 1,
+    }
+
+
 def merged_props(
     canonical_id: str,
     chain_ids: list[int],
@@ -567,6 +640,7 @@ def build_canonical_roads(
         })
         chain_edge_counts[len(chain_ids)] += 1
 
+    road_chain_metrics = annotate_road_chains(features)
     connector_nodes = sum(1 for key, ids in incident.items() if len(ids) == 2 and not is_near_bbox_edge(node_points[key], bbox))
     boundary_nodes = sum(1 for key in incident if is_near_bbox_edge(node_points[key], bbox))
     junction_or_terminal_nodes = sum(1 for ids in incident.values() if len(ids) != 2)
@@ -616,6 +690,7 @@ def build_canonical_roads(
             "connector_nodes_available_for_merge": connector_nodes,
             "boundary_nodes_protected": boundary_nodes,
             "junction_or_terminal_nodes_protected": junction_or_terminal_nodes,
+            **road_chain_metrics,
         },
         "chain_edge_count_histogram": {str(key): value for key, value in sorted(chain_edge_counts.items())},
         "merge_stop_counts": dict(sorted(merge_stop_counts.items())),
@@ -641,6 +716,7 @@ def build_canonical_roads(
         "notes": [
             "Canonical roads are machine-readable GeoJSON, not SVG visualization.",
             "Each canonical road keeps source_feature_ids, repaired_source_feature_ids, and repair_parent_ids for traceability.",
+            "road_chain_id preserves continuous source-road identity when graph edges must stay split at junctions or crop boundaries.",
             "The stage does not cross true junctions or attribute conflicts; it only removes unstable degree-2 fragmentation from downstream graph construction.",
             "Centerline refinement preserves chain endpoints; simplification and smoothing only touch internal control points inside conservative deviation thresholds.",
         ],

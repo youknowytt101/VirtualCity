@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import threading
@@ -49,6 +50,14 @@ def read_json(path: Path) -> dict[str, Any]:
 def write_json(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def string_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()]
+    if value is None:
+        return []
+    return [item.strip() for item in str(value).split(",") if item.strip()]
 
 
 def rel(path: Path) -> str:
@@ -100,23 +109,131 @@ def active_lane_upgrade(area_id: str, road_id: str) -> dict[str, Any] | None:
     return None
 
 
+def road_chain_id_from_reason(reason: str) -> str:
+    match = re.search(r"\brc_[A-Za-z0-9_-]+\b", reason or "")
+    return match.group(0) if match else ""
+
+
+def targets_for_road_chain(
+    *,
+    road_graph: dict[str, Any],
+    edges: list[dict[str, Any]],
+    road_chain_id: str,
+    graph_path: Path,
+) -> list[dict[str, Any]]:
+    chain_edges = [
+        edge for edge in edges
+        if str(edge.get("road_chain_id") or "") == road_chain_id
+    ]
+    if not chain_edges:
+        raise ValueError(f"road_chain_id {road_chain_id} was not found in {graph_path}")
+    chain_edges.sort(key=lambda edge: (
+        int(edge.get("road_chain_fragment_index") or 0),
+        str(edge.get("edge_id") or ""),
+    ))
+    return [
+        {
+            "road_id": str(edge.get("edge_id") or ""),
+            "canonical_road_id": str(edge.get("canonical_road_id") or ""),
+            "road_chain_id": road_chain_id,
+            "edge": edge,
+            "road_graph": road_graph,
+        }
+        for edge in chain_edges
+    ]
+
+
+def resolve_lane_upgrade_targets(request: dict[str, Any]) -> list[dict[str, Any]]:
+    area_id = request["area_id"]
+    graph_path = ROOT / "data" / "processed" / f"{area_id}_road_graph.json"
+    road_graph = read_json(graph_path)
+    edges = list(road_graph.get("edges", []))
+    targets: list[dict[str, Any]] = []
+
+    road_chain_id = str(request.get("road_chain_id") or "") or road_chain_id_from_reason(str(request.get("reason") or ""))
+    if road_chain_id:
+        return targets_for_road_chain(
+            road_graph=road_graph,
+            edges=edges,
+            road_chain_id=road_chain_id,
+            graph_path=graph_path,
+        )
+
+    if str(request.get("selection_scope") or "") == "road_chain":
+        resolved = create_lane_upgrade_transaction.resolve_road_reference(
+            root=ROOT,
+            area_id=area_id,
+            road_id=request.get("road_id", ""),
+            canonical_road_id=request.get("canonical_road_id", ""),
+        )
+        inferred_chain_id = str((resolved.get("edge") or {}).get("road_chain_id") or "")
+        if inferred_chain_id:
+            return targets_for_road_chain(
+                road_graph=road_graph,
+                edges=edges,
+                road_chain_id=inferred_chain_id,
+                graph_path=graph_path,
+            )
+
+    road_ids = list(request.get("road_ids") or [])
+    canonical_ids = list(request.get("canonical_road_ids") or [])
+    if road_ids or canonical_ids:
+        count = max(len(road_ids), len(canonical_ids))
+        for index in range(count):
+            resolved = create_lane_upgrade_transaction.resolve_road_reference(
+                root=ROOT,
+                area_id=area_id,
+                road_id=road_ids[index] if index < len(road_ids) else "",
+                canonical_road_id=canonical_ids[index] if index < len(canonical_ids) else "",
+            )
+            targets.append({
+                "road_id": resolved["road_id"],
+                "canonical_road_id": resolved["canonical_road_id"],
+                "road_chain_id": str((resolved.get("edge") or {}).get("road_chain_id") or ""),
+                "edge": resolved["edge"],
+                "road_graph": resolved["road_graph"],
+            })
+        return targets
+
+    resolved = create_lane_upgrade_transaction.resolve_road_reference(
+        root=ROOT,
+        area_id=area_id,
+        road_id=request["road_id"],
+        canonical_road_id=request["canonical_road_id"],
+    )
+    return [{
+        "road_id": resolved["road_id"],
+        "canonical_road_id": resolved["canonical_road_id"],
+        "road_chain_id": str((resolved.get("edge") or {}).get("road_chain_id") or ""),
+        "edge": resolved["edge"],
+        "road_graph": resolved["road_graph"],
+    }]
+
+
 def parse_lane_upgrade_request(body: dict[str, Any]) -> dict[str, Any]:
     area_id = str(body.get("area_id") or "pattaya_central_500m").strip()
     road_id = str(body.get("road_id") or "").strip()
     canonical_road_id = str(body.get("canonical_road_id") or "").strip()
+    road_ids = string_list(body.get("road_ids"))
+    canonical_road_ids = string_list(body.get("canonical_road_ids"))
+    road_chain_id = str(body.get("road_chain_id") or "").strip()
     restore_default = bool(body.get("restore_default")) or str(body.get("action") or "") == "restore_road_lane_count_default"
     target = body.get("target_physical_lane_count", body.get("target_lane_count"))
     target_lane_count = 0 if restore_default else int(target or 0)
     if not area_id:
         raise ValueError("area_id is required")
-    if not road_id and not canonical_road_id:
-        raise ValueError("road_id or canonical_road_id is required")
+    if not road_id and not canonical_road_id and not road_ids and not canonical_road_ids and not road_chain_id:
+        raise ValueError("road_id, canonical_road_id or road_chain_id is required")
     if not restore_default and target_lane_count not in {1, 2, 3, 4}:
         raise ValueError("target_physical_lane_count must be one of 1, 2, 3 or 4")
     return {
         "area_id": area_id,
         "road_id": road_id,
         "canonical_road_id": canonical_road_id,
+        "road_ids": road_ids,
+        "canonical_road_ids": canonical_road_ids,
+        "road_chain_id": road_chain_id,
+        "selection_scope": str(body.get("selection_scope") or "").strip(),
         "restore_default": restore_default,
         "target_lane_count": target_lane_count,
         "reason": str(body.get("reason") or ("web restore default lane model" if restore_default else "web menu lane upgrade")),
@@ -125,28 +242,38 @@ def parse_lane_upgrade_request(body: dict[str, Any]) -> dict[str, Any]:
 
 def preview_lane_upgrade(body: dict[str, Any]) -> dict[str, Any]:
     request = parse_lane_upgrade_request(body)
-    resolved = create_lane_upgrade_transaction.resolve_road_reference(
-        root=ROOT,
-        area_id=request["area_id"],
-        road_id=request["road_id"],
-        canonical_road_id=request["canonical_road_id"],
-    )
-    road_id = resolved["road_id"]
-    canonical_road_id = resolved["canonical_road_id"]
-    affected_scope = create_lane_upgrade_transaction.affected_scope_for_edge(
-        resolved["edge"],
-        resolved["road_graph"],
-        road_id=road_id,
-        canonical_road_id=canonical_road_id,
-    )
+    targets = resolve_lane_upgrade_targets(request)
+    primary = targets[0]
+    road_id = primary["road_id"]
+    canonical_road_id = primary["canonical_road_id"]
+    road_ids = [target["road_id"] for target in targets]
+    canonical_road_ids = [target["canonical_road_id"] for target in targets]
+    affected_scopes = [
+        create_lane_upgrade_transaction.affected_scope_for_edge(
+            target["edge"],
+            target["road_graph"],
+            road_id=target["road_id"],
+            canonical_road_id=target["canonical_road_id"],
+        )
+        for target in targets
+    ]
+    affected_scope = affected_scopes[0] if len(affected_scopes) == 1 else {
+        "scope_policy": "road_chain_ordered_edges_v1",
+        "road_chain_id": request["road_chain_id"] or primary.get("road_chain_id", ""),
+        "target_count": len(targets),
+        "targets": affected_scopes,
+    }
     active = active_lane_upgrade(request["area_id"], road_id)
     operation = "--restore-default" if request["restore_default"] else f"--target-lane-count {request['target_lane_count']}"
     geometry_flag = " --apply-all-active-geometry"
-    command = (
-        f"python scripts\\execute_lane_upgrade.py --area-id {request['area_id']} "
-        f"--road-id {road_id} --canonical-road-id {canonical_road_id} {operation}{geometry_flag} "
-        f"--reason \"{request['reason']}\""
-    )
+    commands = [
+        (
+            f"python scripts\\execute_lane_upgrade.py --area-id {request['area_id']} "
+            f"--road-id {target['road_id']} --canonical-road-id {target['canonical_road_id']} {operation}{geometry_flag} "
+            f"--reason \"{request['reason']}\""
+        )
+        for target in targets
+    ]
     return {
         "type": "lane_upgrade_preview",
         "metadata": {
@@ -158,6 +285,10 @@ def preview_lane_upgrade(body: dict[str, Any]) -> dict[str, Any]:
             "action": "restore_road_lane_count_default" if request["restore_default"] else "set_road_physical_lane_count",
             "road_id": road_id,
             "canonical_road_id": canonical_road_id,
+            "road_ids": road_ids,
+            "canonical_road_ids": canonical_road_ids,
+            "road_chain_id": request["road_chain_id"] or primary.get("road_chain_id", ""),
+            "selection_scope": request.get("selection_scope", ""),
             "target_physical_lane_count": request["target_lane_count"],
             "apply_selected_geometry": False,
             "apply_all_active_geometry": True,
@@ -165,7 +296,8 @@ def preview_lane_upgrade(body: dict[str, Any]) -> dict[str, Any]:
         "current_active_override": active or {},
         "affected_scope": affected_scope,
         "geometry_application_policy": "apply_all_lane_upgrade_overrides_to_geometry_v1",
-        "execution_cli_command": command,
+        "execution_cli_command": commands[0] if len(commands) == 1 else "\n".join(commands),
+        "execution_cli_commands": commands,
         "latest_package": latest_package(request["area_id"]),
         "notes": [
             "All active LaneForge lane-count overrides are applied to geometry during the rebuild.",
@@ -185,7 +317,7 @@ def save_job(job: dict[str, Any]) -> None:
     write_json(job_path(job["job_id"]), job)
 
 
-def run_lane_upgrade_job(job_id: str, command: list[str]) -> None:
+def run_lane_upgrade_job(job_id: str, commands: list[list[str]]) -> None:
     global running_job_id
     job = jobs[job_id]
     job.update({
@@ -193,19 +325,33 @@ def run_lane_upgrade_job(job_id: str, command: list[str]) -> None:
         "started_at_local": time.strftime("%Y-%m-%dT%H:%M:%S"),
     })
     save_job(job)
-    proc = subprocess.run(
-        command,
-        cwd=str(ROOT),
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
+    exit_code = 0
+    stdout_parts: list[str] = []
+    for index, command in enumerate(commands):
+        job.update({
+            "current_step": index + 1,
+            "total_steps": len(commands),
+            "current_command": [str(item) for item in command],
+        })
+        save_job(job)
+        proc = subprocess.run(
+            command,
+            cwd=str(ROOT),
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+        )
+        stdout_parts.append(f"\n[viewer step {index + 1}/{len(commands)}]\n" + (proc.stdout or ""))
+        if proc.returncode != 0:
+            exit_code = proc.returncode
+            break
+    stdout = "".join(stdout_parts)
     job.update({
-        "exit_code": proc.returncode,
-        "stdout_tail": (proc.stdout or "")[-8000:],
+        "exit_code": exit_code,
+        "stdout_tail": stdout[-8000:],
         "completed_at_local": time.strftime("%Y-%m-%dT%H:%M:%S"),
     })
-    if proc.returncode == 0:
+    if exit_code == 0:
         area_id = str((job.get("request") or {}).get("area_id") or "pattaya_central_500m")
         job.update({
             "status": "completed",
@@ -229,27 +375,34 @@ def start_lane_upgrade_job(body: dict[str, Any]) -> dict[str, Any]:
             raise RuntimeError(f"LaneForge job already running: {running_job_id}")
         job_id = f"lane_upgrade_{time.strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
         running_job_id = job_id
-    command = [
-        sys.executable,
-        str(ROOT / "scripts" / "execute_lane_upgrade.py"),
-        "--area-id",
-        str((preview["metadata"] or {}).get("area_id") or "pattaya_central_500m"),
-        "--road-id",
-        str(request["road_id"]),
-        "--canonical-road-id",
-        str(request["canonical_road_id"]),
-        "--reason",
-        str(body.get("reason") or "web menu lane upgrade"),
-        "--reviewer",
-        "web_user",
-        "--source",
-        "web_lane_count_menu",
-    ]
-    if str(request["action"]) == "restore_road_lane_count_default":
-        command.append("--restore-default")
-    else:
-        command.extend(["--target-lane-count", str(request["target_physical_lane_count"])])
-    command.append("--apply-all-active-geometry")
+    area_id = str((preview["metadata"] or {}).get("area_id") or "pattaya_central_500m")
+    road_ids = string_list(request.get("road_ids")) or [str(request["road_id"])]
+    canonical_road_ids = string_list(request.get("canonical_road_ids")) or [str(request["canonical_road_id"])]
+    commands: list[list[str]] = []
+    for index, road_id in enumerate(road_ids):
+        command = [
+            sys.executable,
+            str(ROOT / "scripts" / "execute_lane_upgrade.py"),
+            "--area-id",
+            area_id,
+            "--road-id",
+            road_id,
+            "--reason",
+            str(body.get("reason") or "web menu lane upgrade"),
+            "--reviewer",
+            "web_user",
+            "--source",
+            "web_lane_count_menu",
+        ]
+        canonical_road_id = canonical_road_ids[index] if index < len(canonical_road_ids) else ""
+        if canonical_road_id:
+            command.extend(["--canonical-road-id", canonical_road_id])
+        if str(request["action"]) == "restore_road_lane_count_default":
+            command.append("--restore-default")
+        else:
+            command.extend(["--target-lane-count", str(request["target_physical_lane_count"])])
+        command.append("--apply-all-active-geometry")
+        commands.append(command)
     job = {
         "type": "lane_upgrade_viewer_job",
         "schema": JOB_SCHEMA,
@@ -258,10 +411,10 @@ def start_lane_upgrade_job(body: dict[str, Any]) -> dict[str, Any]:
         "created_at_local": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "request": request,
         "preview": preview,
-        "command": [str(item) for item in command],
+        "command": [[str(item) for item in command] for command in commands],
     }
     save_job(job)
-    thread = threading.Thread(target=run_lane_upgrade_job, args=(job_id, command), daemon=True)
+    thread = threading.Thread(target=run_lane_upgrade_job, args=(job_id, commands), daemon=True)
     thread.start()
     return job
 

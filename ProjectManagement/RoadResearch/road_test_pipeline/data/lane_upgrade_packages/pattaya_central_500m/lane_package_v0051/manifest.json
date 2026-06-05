@@ -1,0 +1,776 @@
+{
+  "type": "standard_lane_package_manifest",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "lane_upgrade_system.standard_lane_package.v1",
+    "system": "LaneForge",
+    "package_version": "lane_package_v0051",
+    "path_policy": "portable_lane_package_paths_v1",
+    "source_pipeline_root": "",
+    "source_pipeline_root_policy": "not_embedded_for_portable_package",
+    "qa_status": "warn",
+    "qa_gate_status": "manual_review_required",
+    "qa_warning_severity_policy_id": "qa_warning_severity_tiers_v1",
+    "lane_geometry_rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+    "lane_geometry_rounding_style": {
+      "style_id": "unified_lane_geometry_rounding_style_v1",
+      "primary_curve_family": "tangent_circular_arc",
+      "straight_curve_family": "straight_infinite_radius",
+      "sample_strategy": "arc_angle_limited_min_profile_samples",
+      "sample_angle_deg": 5.0,
+      "lane_level_straight_sweep_deg": 0.1,
+      "lane_level_continuity_min_radius_m": 3.2,
+      "lane_level_continuity_regularization": "enabled_for_offset_corner_fillets_below_min_radius",
+      "min_samples": {
+        "optimized_corner_fillet": 9,
+        "micro_bend": 5,
+        "hard_bend_lane_level_rounding": 9
+      },
+      "endpoint_lock": "preserve_lane_endpoints_and_trim_local_bend_windows",
+      "semantic_boundary": "geometry_style_only_no_traffic_semantics_inference",
+      "truth_layers_unchanged": [
+        "raw",
+        "repaired",
+        "canonical",
+        "road_graph"
+      ]
+    }
+  },
+  "human_model": "raw map data -> LaneForge lane upgrade system -> standard lane package -> Houdini construction pipeline",
+  "source_artifacts": {
+    "lane_graph": {
+      "path": "data/processed/pattaya_central_500m_lane_graph.json",
+      "exists": true,
+      "size_bytes": 1932846,
+      "mtime_utc": 1780653998.3168752,
+      "sha256": "bedfd5f2640ac86b292a99880c3c67c7f1f3ce465863131ac900c4cedd6a37f7"
+    },
+    "standard_lane_surfaces_source": {
+      "path": "data/preview/pattaya_central_500m_lane_surfaces_v1.geojson",
+      "exists": true,
+      "size_bytes": 1209712,
+      "mtime_utc": 1780654001.0106895,
+      "sha256": "5a7536458a1fdbe7f5324007be6d9bc3d9f3c88caabcb10eb84b3c7a6c1b8bbc"
+    },
+    "standard_lane_surfaces_obj_source": {
+      "path": "data/preview/pattaya_central_500m_lane_surfaces_v1.obj",
+      "exists": true,
+      "size_bytes": 299048,
+      "mtime_utc": 1780654001.0326884,
+      "sha256": "3537fcb7a22947456257f2a503370beb2d6a7ddc68ee99fa3165cda13cadf098"
+    },
+    "lane_debug_geometry_source": {
+      "path": "data/preview/pattaya_central_500m_lane_geometry_debug.geojson",
+      "exists": true,
+      "size_bytes": 1795867,
+      "mtime_utc": 1780654000.7690532,
+      "sha256": "2594912f006c30911ab0672b240aad770afb8f07f7bfb9d407c7c0106239e99a"
+    },
+    "pipeline_audit_report": {
+      "path": "reports/pattaya_central_500m_pipeline_audit_report.json",
+      "exists": true,
+      "size_bytes": 43404,
+      "mtime_utc": 1780654002.251819,
+      "sha256": "81dc0f63d440c1f11c5e9cc4f9caacda5a53462047773113bda53f2ca13b2a91"
+    },
+    "lane_graph_report": {
+      "path": "reports/pattaya_central_500m_lane_graph_report.json",
+      "exists": true,
+      "size_bytes": 16064,
+      "mtime_utc": 1780653998.317877,
+      "sha256": "6ca95e9cf78a97ad3ff7d035e5e4e95f7cedaeed838c0f4d6769de06e63ad106"
+    },
+    "lane_surface_report": {
+      "path": "reports/pattaya_central_500m_lane_surface_v1_report.json",
+      "exists": true,
+      "size_bytes": 3322,
+      "mtime_utc": 1780654001.0406885,
+      "sha256": "76d29ff5d129211e2cd37f1a99b856c5b10916fdfeadec3b9036289be6a7963c"
+    },
+    "road_graph_report": {
+      "path": "reports/pattaya_central_500m_road_graph_report.json",
+      "exists": true,
+      "size_bytes": 1457,
+      "mtime_utc": 1780653995.4775903,
+      "sha256": "f83dc2549ef6a1033e3ffb0c2432028207edc3108b862ef5038364c5e09eb5f9"
+    },
+    "lane_attribute_model_report": {
+      "path": "reports/pattaya_central_500m_lane_attribute_model_report.json",
+      "exists": true,
+      "size_bytes": 1712,
+      "mtime_utc": 1780626698.7774985,
+      "sha256": "5c62e196ab5b1add4746680ac458a7bf2851c40a7982a9e26773ab87049f6860"
+    },
+    "junction_semantics_report": {
+      "path": "reports/pattaya_central_500m_junction_semantics_report.json",
+      "exists": true,
+      "size_bytes": 1652,
+      "mtime_utc": 1780653996.7351847,
+      "sha256": "06dc8479ad43db422a0d6cc2f48eb5739d7b736093ee409b1824449692e13ebd"
+    }
+  },
+  "contents": {
+    "standard_lanes": "standard_lanes.json",
+    "standard_junctions": "standard_junctions.json",
+    "standard_lane_surfaces": "standard_lane_surfaces.geojson",
+    "standard_lane_surfaces_obj": "standard_lane_surfaces.obj",
+    "lane_debug_geometry": "lane_debug_geometry.geojson",
+    "qa_report": "qa_report.json",
+    "lane_graph_report": "lane_graph_report.json",
+    "lane_surface_report": "lane_surface_report.json",
+    "active_lane_upgrades": "active_lane_upgrades.json",
+    "active_corner_optimizations": "active_corner_optimizations.json",
+    "corner_optimization_candidates": "corner_optimization_candidates.json",
+    "corner_optimization_report": "corner_optimization_report.json",
+    "lane_upgrade_propagation_plan": "lane_upgrade_propagation_plan.json",
+    "lane_upgrade_propagation_report": "lane_upgrade_propagation_report.json",
+    "houdini_manifest": "houdini_manifest.json"
+  },
+  "counts": {
+    "lanes": 208,
+    "physical_lane_centerlines": 194,
+    "physical_lane_group_centerlines": 12,
+    "junctions": 49,
+    "lane_links": 308,
+    "continuity_links": 20,
+    "junction_envelope_surfaces": 49,
+    "active_lane_upgrades": 6,
+    "active_corner_optimizations": 5,
+    "corner_optimization_candidates": 19,
+    "corner_optimization_accepted_active": 5,
+    "corner_optimization_accepted_active_candidates": 4,
+    "corner_optimization_accepted_active_overrides": 5,
+    "lane_upgrade_propagation_candidates": 19,
+    "lane_upgrade_propagation_high_confidence": 7
+  },
+  "semantic_review": {
+    "schema": "lane_upgrade_system.semantic_review_summary.v1",
+    "status": "manual_review_required",
+    "active_lane_policy": "temporary_all_roads_bidirectional_two_lane_v1",
+    "width_fallback_ratio": 1.0,
+    "lanes_fallback_ratio": 0.36,
+    "missing_turn_lanes_ratio": 1.0,
+    "lane_count_policy_override_ratio": 1.0,
+    "direction_policy_override_ratio": 1.0,
+    "source_oneway_ignored_approaches": 96,
+    "source_oneway_blocked_movements_if_trusted": 142,
+    "turn_lanes_source_counts": {
+      "missing": 100
+    },
+    "qa_review_entries": [
+      {
+        "stage": "road_graph",
+        "check_id": "dead_end_ratio",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": 0.311,
+        "threshold": 0.12,
+        "message": "Internal dead ends remain high after boundary classification; review endpoint clusters visually.",
+        "reason": "Road graph contains a high dead-end ratio; review endpoint classification before unattended production."
+      },
+      {
+        "stage": "road_graph",
+        "check_id": "width_fallback_ratio",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": 1.0,
+        "threshold": 0.8,
+        "message": "Many edges use road-class width defaults; better data or local width inference is needed.",
+        "reason": "All or most road widths are inferred from defaults; output is publishable for research but needs semantic review."
+      }
+    ],
+    "production_note": "Lane geometry is publishable for research when qa_gate allows it, but traffic semantics remain review-gated until width, lanes, oneway and turn-lanes sources are promoted from temporary policy/fallback inputs."
+  },
+  "metrics": {
+    "lane_graph": {
+      "junctions_with_connections_ratio": 1.0,
+      "fan_fallback_ratio": 0.0,
+      "avg_lane_links_per_junction": 6.286,
+      "lane_link_reference_errors": 0,
+      "blocked_lane_links": 0,
+      "empty_connection_curves": 0,
+      "avg_lane_link_confidence": 0.82,
+      "min_lane_link_confidence": 0.82,
+      "avg_curve_length_m": 10.496,
+      "max_curve_length_m": 15.564,
+      "avg_continuity_curve_length_m": 1.392,
+      "max_continuity_curve_length_m": 7.301,
+      "avg_lane_width_m": 3.2,
+      "min_lane_width_m": 3.2,
+      "max_lane_width_m": 3.2,
+      "avg_lane_width_confidence": 0.45,
+      "max_lane_width_start_end_delta_m": 0.0,
+      "lane_bundle_centerline_smoothed_edges": 20,
+      "lane_bundle_centerline_smoothed_bends": 39,
+      "lane_bundle_centerline_max_min_arc_radius_m": 9.6,
+      "derived_lane_centerline_smoothed_lanes": 1,
+      "derived_lane_centerline_smoothed_bends": 0,
+      "derived_lane_centerline_inserted_sample_points": 0,
+      "derived_lane_centerline_max_derivation_offset_m": 0.0,
+      "derived_lane_centerline_max_source_bend_offset_m": 0.0,
+      "derived_lane_centerline_smoothing_curve_family_counts": {},
+      "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
+      "continuity_rounding_style_counts": {
+        "unified_lane_geometry_rounding_style_v1": 20
+      },
+      "continuity_rounding_curve_family_counts": {
+        "straight_infinite_radius": 14,
+        "tangent_circular_arc": 6
+      },
+      "lane_level_radius_regularized_continuity_links": 1,
+      "physical_lane_centerlines": 194,
+      "physical_lane_group_centerlines": 12,
+      "standalone_physical_lane_centerlines": 182,
+      "same_physical_lane_continuity_links": 14,
+      "physical_lane_groups_created": 12,
+      "physical_lane_grouped_lanes": 26,
+      "min_optimized_corner_continuity_radius_m": 0.728
+    },
+    "lane_surface": {
+      "lane_surface_centerline_source": "physical_lane_centerlines",
+      "physical_lane_centerlines": 194,
+      "trim_start_lane_count": 0,
+      "trim_end_lane_count": 0,
+      "junction_trim_m": 8.0,
+      "approach_centerlines_trimmed": true,
+      "corner_continuity_trimmed_lane_count": 36,
+      "lane_geometry_rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+      "lane_geometry_rounding_curve_family": "tangent_circular_arc",
+      "derived_lane_centerline_smoothing_policy": "derived_lane_centerline_smoothing_v1",
+      "derived_lane_centerline_smoothed_lanes": 1,
+      "derived_lane_centerline_smoothed_bends": 0,
+      "derived_lane_centerline_inserted_sample_points": 0,
+      "derived_lane_centerline_max_derivation_offset_m": 0.0,
+      "derived_lane_centerline_smoothing_profile_counts": {},
+      "derived_lane_centerline_smoothing_curve_family_counts": {},
+      "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
+      "continuity_rounding_style_counts": {
+        "unified_lane_geometry_rounding_style_v1": 20
+      },
+      "continuity_rounding_curve_family_counts": {
+        "straight_infinite_radius": 14,
+        "tangent_circular_arc": 6
+      },
+      "lane_level_radius_regularized_continuity_links": 1,
+      "min_optimized_corner_continuity_radius_m": 0.728,
+      "avg_lane_surface_width_m": 3.2,
+      "avg_turn_surface_width_m": 3.2,
+      "avg_continuity_surface_width_m": 3.2,
+      "avg_junction_envelope_area_m2": 116.157,
+      "max_junction_envelope_area_m2": 167.552,
+      "junction_envelope_padding_m": 0.25,
+      "area_by_part_m2": {
+        "lane_surface_v1": 50267.836,
+        "junction_envelope_surface_v1": 5691.705,
+        "lane_turn_surface_v1": 10314.636,
+        "lane_continuity_surface_v1": 88.996
+      },
+      "total_area_m2": 66363.174
+    },
+    "pipeline_audit": {
+      "road_graph": {
+        "nodes": 90,
+        "edges": 100
+      },
+      "junctions": 49,
+      "allowed_movements": 306,
+      "blocked_movements": 0,
+      "lanes": 208,
+      "lane_connections": 306,
+      "lane_links": 308,
+      "continuity_links": 20,
+      "micro_seam_continuity_links": 12,
+      "surface_continuity_links": 8,
+      "lane_curve_gap_metrics": {
+        "max_lane_link_start_gap_m": 0.0,
+        "max_lane_link_end_gap_m": 0.0,
+        "max_continuity_start_gap_m": 0.0,
+        "max_continuity_end_gap_m": 0.0
+      },
+      "lane_link_curve_source_counts": {
+        "junction_lane_endpoint_bezier": 308
+      },
+      "optimized_features": 252,
+      "optimized_corner_fillets": 3,
+      "optimized_junction_connectors": 149,
+      "compound_alternating_bend_guard_skips": 1,
+      "optimized_points": 2205,
+      "preview_points": 2205,
+      "preview_obj_vertices": 2205,
+      "lane_debug_obj_vertices": 12640,
+      "lane_debug_obj_faces": 510,
+      "lane_surface_v1_obj_vertices": 8952,
+      "lane_surface_v1_obj_faces": 559,
+      "junction_envelope_surfaces": 49,
+      "qa_statuses": {
+        "topology_repair": "warn",
+        "road_graph": "warn",
+        "lane_graph": "pass"
+      },
+      "qa_gate_status": "manual_review_required",
+      "qa_warning_summary": {
+        "publishable_warn": 0,
+        "manual_review_required": 5,
+        "blocker": 0
+      }
+    }
+  },
+  "qa_gate": {
+    "policy_id": "qa_warning_severity_tiers_v1",
+    "status": "manual_review_required",
+    "summary": {
+      "publishable_warn": 0,
+      "manual_review_required": 5,
+      "blocker": 0
+    },
+    "entries": [
+      {
+        "stage": "topology_repair",
+        "check_id": "dangling_endpoint_ratio",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": 0.193,
+        "threshold": 0.15,
+        "message": "Dangling endpoints remain high; bbox boundary and dead-end classification should be added next.",
+        "reason": "Topology still has enough dangling endpoints that autonomous production should stop for review."
+      },
+      {
+        "stage": "road_graph",
+        "check_id": "dead_end_ratio",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": 0.311,
+        "threshold": 0.12,
+        "message": "Internal dead ends remain high after boundary classification; review endpoint clusters visually.",
+        "reason": "Road graph contains a high dead-end ratio; review endpoint classification before unattended production."
+      },
+      {
+        "stage": "road_graph",
+        "check_id": "width_fallback_ratio",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": 1.0,
+        "threshold": 0.8,
+        "message": "Many edges use road-class width defaults; better data or local width inference is needed.",
+        "reason": "All or most road widths are inferred from defaults; output is publishable for research but needs semantic review."
+      },
+      {
+        "stage": "pipeline_audit",
+        "check_id": "movement_corridors_match_final_lane_link_endpoints",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": {
+          "policy": "movement_corridor_final_lane_link_endpoint_contract_v1",
+          "max_allowed_gap_m": 0.5,
+          "corridor_cases": 306,
+          "comparable_cases": 292,
+          "missing_final_lane_link": 14,
+          "missing_candidate_geometry": 0,
+          "stale_cases": 84,
+          "max_start_gap_m": 5.549,
+          "max_end_gap_m": 5.549,
+          "max_endpoint_gap_m": 5.549,
+          "stale_case_samples": [
+            {
+              "corridor_id": "mc_00019",
+              "lane_link_id": "j_003_c_001_ll_00",
+              "from_lane_id": "ln_e_0051_b_00",
+              "to_lane_id": "ln_e_0050_b_00",
+              "normalized_from_lane_id": "e_0051_b_1",
+              "normalized_to_lane_id": "e_0050_b_1",
+              "movement_kind": "through",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.0,
+              "end_gap_m": 1.722,
+              "max_gap_m": 1.722
+            },
+            {
+              "corridor_id": "mc_00021",
+              "lane_link_id": "j_003_c_003_ll_00",
+              "from_lane_id": "ln_e_0089_b_00",
+              "to_lane_id": "ln_e_0050_b_00",
+              "normalized_from_lane_id": "e_0089_b_1",
+              "normalized_to_lane_id": "e_0050_b_1",
+              "movement_kind": "right",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.0,
+              "end_gap_m": 1.722,
+              "max_gap_m": 1.722
+            },
+            {
+              "corridor_id": "mc_00022",
+              "lane_link_id": "j_003_c_004_ll_00",
+              "from_lane_id": "ln_e_0050_f_00",
+              "to_lane_id": "ln_e_0051_f_00",
+              "normalized_from_lane_id": "e_0050_f_1",
+              "normalized_to_lane_id": "e_0051_f_1",
+              "movement_kind": "through",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 1.722,
+              "end_gap_m": 0.0,
+              "max_gap_m": 1.722
+            },
+            {
+              "corridor_id": "mc_00023",
+              "lane_link_id": "j_003_c_005_ll_00",
+              "from_lane_id": "ln_e_0050_f_00",
+              "to_lane_id": "ln_e_0089_f_00",
+              "normalized_from_lane_id": "e_0050_f_1",
+              "normalized_to_lane_id": "e_0089_f_1",
+              "movement_kind": "left",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 1.722,
+              "end_gap_m": 0.0,
+              "max_gap_m": 1.722
+            },
+            {
+              "corridor_id": "mc_00024",
+              "lane_link_id": "j_004_c_000_ll_00",
+              "from_lane_id": "ln_e_0050_b_00",
+              "to_lane_id": "ln_e_0090_f_00",
+              "normalized_from_lane_id": "e_0050_b_1",
+              "normalized_to_lane_id": "e_0090_f_1",
+              "movement_kind": "right",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 1.723,
+              "end_gap_m": 0.001,
+              "max_gap_m": 1.723
+            },
+            {
+              "corridor_id": "mc_00025",
+              "lane_link_id": "j_004_c_001_ll_00",
+              "from_lane_id": "ln_e_0050_b_00",
+              "to_lane_id": "ln_e_0049_b_00",
+              "normalized_from_lane_id": "e_0050_b_1",
+              "normalized_to_lane_id": "e_0049_b_1",
+              "movement_kind": "through",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 1.723,
+              "end_gap_m": 0.001,
+              "max_gap_m": 1.723
+            },
+            {
+              "corridor_id": "mc_00026",
+              "lane_link_id": "j_004_c_002_ll_00",
+              "from_lane_id": "ln_e_0090_b_00",
+              "to_lane_id": "ln_e_0050_f_00",
+              "normalized_from_lane_id": "e_0090_b_1",
+              "normalized_to_lane_id": "e_0050_f_1",
+              "movement_kind": "left",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.001,
+              "end_gap_m": 1.723,
+              "max_gap_m": 1.723
+            },
+            {
+              "corridor_id": "mc_00028",
+              "lane_link_id": "j_004_c_004_ll_00",
+              "from_lane_id": "ln_e_0049_f_00",
+              "to_lane_id": "ln_e_0050_f_00",
+              "normalized_from_lane_id": "e_0049_f_1",
+              "normalized_to_lane_id": "e_0050_f_1",
+              "movement_kind": "through",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.001,
+              "end_gap_m": 1.723,
+              "max_gap_m": 1.723
+            },
+            {
+              "corridor_id": "mc_00037",
+              "lane_link_id": "j_006_c_001_ll_00",
+              "from_lane_id": "ln_e_0048_b_00",
+              "to_lane_id": "ln_e_0047_b_00",
+              "normalized_from_lane_id": "e_0048_b_1",
+              "normalized_to_lane_id": "e_0047_b_1",
+              "movement_kind": "through",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.0,
+              "end_gap_m": 2.601,
+              "max_gap_m": 2.601
+            },
+            {
+              "corridor_id": "mc_00039",
+              "lane_link_id": "j_006_c_003_ll_00",
+              "from_lane_id": "ln_e_0091_b_00",
+              "to_lane_id": "ln_e_0047_b_00",
+              "normalized_from_lane_id": "e_0091_b_1",
+              "normalized_to_lane_id": "e_0047_b_1",
+              "movement_kind": "right",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.001,
+              "end_gap_m": 2.601,
+              "max_gap_m": 2.601
+            },
+            {
+              "corridor_id": "mc_00040",
+              "lane_link_id": "j_006_c_004_ll_00",
+              "from_lane_id": "ln_e_0047_f_00",
+              "to_lane_id": "ln_e_0048_f_00",
+              "normalized_from_lane_id": "e_0047_f_1",
+              "normalized_to_lane_id": "e_0048_f_1",
+              "movement_kind": "through",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 2.606,
+              "end_gap_m": 0.0,
+              "max_gap_m": 2.606
+            },
+            {
+              "corridor_id": "mc_00041",
+              "lane_link_id": "j_006_c_005_ll_00",
+              "from_lane_id": "ln_e_0047_f_00",
+              "to_lane_id": "ln_e_0091_f_00",
+              "normalized_from_lane_id": "e_0047_f_1",
+              "normalized_to_lane_id": "e_0091_f_1",
+              "movement_kind": "left",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 2.606,
+              "end_gap_m": 0.001,
+              "max_gap_m": 2.606
+            },
+            {
+              "corridor_id": "mc_00048",
+              "lane_link_id": "j_008_c_000_ll_00",
+              "from_lane_id": "ln_e_0047_b_00",
+              "to_lane_id": "ln_e_0008_f_00",
+              "normalized_from_lane_id": "e_0047_b_1",
+              "normalized_to_lane_id": "e_0008_f_1",
+              "movement_kind": "right",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 2.606,
+              "end_gap_m": 0.0,
+              "max_gap_m": 2.606
+            },
+            {
+              "corridor_id": "mc_00049",
+              "lane_link_id": "j_008_c_001_ll_00",
+              "from_lane_id": "ln_e_0047_b_00",
+              "to_lane_id": "ln_e_0046_b_00",
+              "normalized_from_lane_id": "e_0047_b_1",
+              "normalized_to_lane_id": "e_0046_b_1",
+              "movement_kind": "through",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 2.606,
+              "end_gap_m": 0.001,
+              "max_gap_m": 2.606
+            },
+            {
+              "corridor_id": "mc_00050",
+              "lane_link_id": "j_008_c_002_ll_00",
+              "from_lane_id": "ln_e_0008_b_00",
+              "to_lane_id": "ln_e_0047_f_00",
+              "normalized_from_lane_id": "e_0008_b_1",
+              "normalized_to_lane_id": "e_0047_f_1",
+              "movement_kind": "left",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.0,
+              "end_gap_m": 2.602,
+              "max_gap_m": 2.602
+            },
+            {
+              "corridor_id": "mc_00052",
+              "lane_link_id": "j_008_c_004_ll_00",
+              "from_lane_id": "ln_e_0046_f_00",
+              "to_lane_id": "ln_e_0047_f_00",
+              "normalized_from_lane_id": "e_0046_f_1",
+              "normalized_to_lane_id": "e_0047_f_1",
+              "movement_kind": "through",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.001,
+              "end_gap_m": 2.602,
+              "max_gap_m": 2.602
+            },
+            {
+              "corridor_id": "mc_00072",
+              "lane_link_id": "j_012_c_000_ll_00",
+              "from_lane_id": "ln_e_0045_b_00",
+              "to_lane_id": "ln_e_0000_f_00",
+              "normalized_from_lane_id": "e_0045_b_1",
+              "normalized_to_lane_id": "e_0000_f_1",
+              "movement_kind": "right",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.0,
+              "end_gap_m": 2.279,
+              "max_gap_m": 2.279
+            },
+            {
+              "corridor_id": "mc_00074",
+              "lane_link_id": "j_012_c_002_ll_00",
+              "from_lane_id": "ln_e_0000_b_00",
+              "to_lane_id": "ln_e_0045_f_00",
+              "normalized_from_lane_id": "e_0000_b_1",
+              "normalized_to_lane_id": "e_0045_f_1",
+              "movement_kind": "left",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 2.276,
+              "end_gap_m": 0.0,
+              "max_gap_m": 2.276
+            },
+            {
+              "corridor_id": "mc_00075",
+              "lane_link_id": "j_012_c_003_ll_00",
+              "from_lane_id": "ln_e_0000_b_00",
+              "to_lane_id": "ln_e_0044_b_00",
+              "normalized_from_lane_id": "e_0000_b_1",
+              "normalized_to_lane_id": "e_0044_b_1",
+              "movement_kind": "right",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 2.276,
+              "end_gap_m": 0.0,
+              "max_gap_m": 2.276
+            },
+            {
+              "corridor_id": "mc_00077",
+              "lane_link_id": "j_012_c_005_ll_00",
+              "from_lane_id": "ln_e_0044_f_00",
+              "to_lane_id": "ln_e_0000_f_00",
+              "normalized_from_lane_id": "e_0044_f_1",
+              "normalized_to_lane_id": "e_0000_f_1",
+              "movement_kind": "left",
+              "candidate_family": "topology_straight_baseline",
+              "start_gap_m": 0.0,
+              "end_gap_m": 2.279,
+              "max_gap_m": 2.279
+            }
+          ]
+        },
+        "threshold": null,
+        "message": "Movement corridor candidates should not drift from final laneLink endpoints; stale candidates are QA-only and must not drive final display or geometry.",
+        "reason": "Pipeline audit contract warning requires review."
+      },
+      {
+        "stage": "pipeline_audit",
+        "check_id": "compound_alternating_bends_are_tracked",
+        "source_status": "warn",
+        "tier": "manual_review_required",
+        "value": {
+          "issues": [
+            {
+              "edge_id": "e_0017",
+              "candidate_id": "corner_0003",
+              "point_index": 1,
+              "guard_policy": "compound_alternating_bend_guard_v1",
+              "significant_turn_count": 4,
+              "sign_change_count": 2,
+              "turns": [
+                {
+                  "point_index": 1,
+                  "turn_deg": -41.331,
+                  "sign": -1,
+                  "prev_segment_m": 74.142,
+                  "next_segment_m": 20.299
+                },
+                {
+                  "point_index": 2,
+                  "turn_deg": 40.926,
+                  "sign": 1,
+                  "prev_segment_m": 20.299,
+                  "next_segment_m": 65.634
+                },
+                {
+                  "point_index": 3,
+                  "turn_deg": 54.493,
+                  "sign": 1,
+                  "prev_segment_m": 65.634,
+                  "next_segment_m": 22.126
+                },
+                {
+                  "point_index": 4,
+                  "turn_deg": -53.933,
+                  "sign": -1,
+                  "prev_segment_m": 22.126,
+                  "next_segment_m": 62.361
+                }
+              ]
+            }
+          ],
+          "issue_count": 1,
+          "guard_status": "skipped_compound_alternating_bend_guard"
+        },
+        "threshold": null,
+        "message": "Compound alternating source/reference bends should be tracked for whole-edge review instead of accepting point-level internal bend smoothing.",
+        "reason": "Pipeline audit contract warning requires review."
+      }
+    ],
+    "publish_decision": {
+      "research_publish_allowed": true,
+      "autonomous_production_allowed": false,
+      "manual_review_required": true,
+      "blocker": false
+    }
+  },
+  "publish_policy": {
+    "source_map_data_immutable": true,
+    "manual_lane_upgrades_are_transactions": true,
+    "derived_lane_centerline_smoothing_is_downstream_geometry": true,
+    "unified_lane_geometry_rounding_style_is_downstream_geometry": true,
+    "houdini_consumes_package_outputs_only": true,
+    "qa_warning_severity_tiers": true,
+    "blocker_warnings_refuse_package_publish": true,
+    "manual_review_required_warnings_are_marked": true
+  },
+  "package_artifacts": {
+    "standard_lanes": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0051/standard_lanes.json",
+      "exists": true,
+      "size_bytes": 658510,
+      "mtime_utc": 1780654005.1186776,
+      "sha256": "1da054521d5c3d929cb60fc0a57647605bd4303493350653431e9484710346c0"
+    },
+    "standard_junctions": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0051/standard_junctions.json",
+      "exists": true,
+      "size_bytes": 1270278,
+      "mtime_utc": 1780654005.1476767,
+      "sha256": "e0f878a129d5bf0771864318dabeab221204f6018d18c72b629c87e071070759"
+    },
+    "standard_lane_surfaces": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0051/standard_lane_surfaces.geojson",
+      "exists": true,
+      "size_bytes": 1209712,
+      "mtime_utc": 1780654005.2072477,
+      "sha256": "5a7536458a1fdbe7f5324007be6d9bc3d9f3c88caabcb10eb84b3c7a6c1b8bbc"
+    },
+    "standard_lane_surfaces_obj": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0051/standard_lane_surfaces.obj",
+      "exists": true,
+      "size_bytes": 299048,
+      "mtime_utc": 1780654005.3113613,
+      "sha256": "3537fcb7a22947456257f2a503370beb2d6a7ddc68ee99fa3165cda13cadf098"
+    },
+    "lane_debug_geometry": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0051/lane_debug_geometry.geojson",
+      "exists": true,
+      "size_bytes": 1795867,
+      "mtime_utc": 1780654005.2942495,
+      "sha256": "2594912f006c30911ab0672b240aad770afb8f07f7bfb9d407c7c0106239e99a"
+    },
+    "qa_report": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0051/qa_report.json",
+      "exists": true,
+      "size_bytes": 41895,
+      "mtime_utc": 1780654005.3062499,
+      "sha256": "e3c1c324ae868a0d6014090179dd79ab83f9e4feba2c40ea56890905c943eba2"
+    },
+    "lane_graph_report": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0051/lane_graph_report.json",
+      "exists": true,
+      "size_bytes": 15776,
+      "mtime_utc": 1780654005.3083653,
+      "sha256": "1a6ac5f440049103a34611484795d46bd428ca76991460f6ed6b002462b4f8f5"
+    },
+    "lane_surface_report": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0051/lane_surface_report.json",
+      "exists": true,
+      "size_bytes": 3034,
+      "mtime_utc": 1780654005.3103607,
+      "sha256": "af3c811fe6f32ceaf3a9d7c6627b7917a8ef9a3174cb5f49659b367856c0587a"
+    },
+    "houdini_manifest": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0051/houdini_manifest.json",
+      "exists": true,
+      "size_bytes": 964,
+      "mtime_utc": 1780654005.3373618,
+      "sha256": "4c99adb0a575f026473ea83e8455a58ad7bf22bb4dc83703274ff14bee87eb02"
+    }
+  }
+}

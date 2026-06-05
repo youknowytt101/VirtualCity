@@ -139,6 +139,12 @@ def to_local(lon: float, lat: float, origin_lon: float, origin_lat: float) -> tu
     return (lon - origin_lon) * m_per_deg_lon, (lat - origin_lat) * m_per_deg_lat
 
 
+def distance(a: tuple[float, float], b: tuple[float, float]) -> float:
+    dx = a[0] - b[0]
+    dz = a[1] - b[1]
+    return math.sqrt(dx * dx + dz * dz)
+
+
 def raw_road_feature_lines(feature: dict[str, Any]) -> list[list[list[float]]]:
     geom = feature.get("geometry") or {}
     geom_type = str(geom.get("type") or "")
@@ -234,6 +240,9 @@ def road_layer_local_lines(
                 "road_graph_edge_id": road_graph_edge_id,
                 "source_feature_id": str(props.get("source_feature_id") or source_id),
                 "canonical_road_id": canonical_road_id,
+                "road_chain_id": str(props.get("road_chain_id") or ""),
+                "road_chain_fragment_index": str(props["road_chain_fragment_index"]) if props.get("road_chain_fragment_index") is not None else "",
+                "road_chain_fragment_count": str(props["road_chain_fragment_count"]) if props.get("road_chain_fragment_count") is not None else "",
                 "part_index": part_index,
                 "highway": str(props.get("highway") or ""),
                 "road_class": str(props.get("road_class") or props.get("highway") or ""),
@@ -831,6 +840,8 @@ def road_overlay_lines(
         tooltip = (
             f"{kind}={road_line.get('road_id', '')}; highway={highway}; name={name}; "
             f"canonical={road_line.get('canonical_road_id', '')}; source={road_line.get('source_feature_id', '')}; "
+            f"chain={road_line.get('road_chain_id', '')}; "
+            f"fragment={road_line.get('road_chain_fragment_index', '')}/{road_line.get('road_chain_fragment_count', '')}; "
             f"road_graph_edge={road_graph_edge_id}; edges={road_line.get('canonical_edge_count', '')}"
         )
         attrs = svg_attrs({
@@ -841,6 +852,9 @@ def road_overlay_lines(
             "road_graph_edge_id": road_graph_edge_id,
             "source_feature_id": road_line.get("source_feature_id", ""),
             "canonical_road_id": road_line.get("canonical_road_id", ""),
+            "road_chain_id": road_line.get("road_chain_id", ""),
+            "road_chain_fragment_index": road_line.get("road_chain_fragment_index", ""),
+            "road_chain_fragment_count": road_line.get("road_chain_fragment_count", ""),
             "part_index": road_line.get("part_index", ""),
             "highway": highway,
             "road_class": road_line.get("road_class", ""),
@@ -860,6 +874,142 @@ def road_overlay_lines(
         lines.append(
             f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
             f'stroke="{stroke}" stroke-width="{stroke_width}" stroke-opacity="{stroke_opacity:.2f}"{dash} '
+            f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
+        )
+        rendered += 1
+    return lines, {
+        f"{layer}_rendered": rendered,
+        f"{layer}_class_counts": dict(sorted(class_counts.items())),
+        f"{layer}_source_edge_count_sum": total_source_edges,
+        f"{layer}_road_graph_edge_mapped": mapped_road_graph_edges,
+    }
+
+
+def numeric_text(value: Any, default: int = 0) -> int:
+    try:
+        return int(str(value))
+    except (TypeError, ValueError):
+        return default
+
+
+def unique_joined(values: list[str]) -> str:
+    return ", ".join(dict.fromkeys(value for value in values if value))
+
+
+def stitch_chain_points(lines: list[dict[str, Any]], *, max_gap_m: float = 0.5) -> list[list[float]]:
+    points: list[list[float]] = []
+    for line in lines:
+        line_points = [list(point) for point in line.get("points") or []]
+        if len(line_points) < 2:
+            continue
+        if not points:
+            points.extend(line_points)
+            continue
+
+        last = points[-1]
+        start = line_points[0]
+        end = line_points[-1]
+        start_gap = distance((float(last[0]), float(last[1])), (float(start[0]), float(start[1])))
+        end_gap = distance((float(last[0]), float(last[1])), (float(end[0]), float(end[1])))
+        if end_gap < start_gap:
+            line_points = list(reversed(line_points))
+            start_gap = end_gap
+        if start_gap <= max_gap_m:
+            points.extend(line_points[1:])
+        else:
+            points.extend(line_points)
+    return points
+
+
+def road_chain_overlay_lines(
+    *,
+    roads: dict[str, Any],
+    transform: Any,
+    layer: str,
+    source_label: str,
+    fallback_prefix: str,
+    stroke: str,
+    stroke_width: float,
+    stroke_opacity: float,
+    max_chains: int,
+    road_graph_edge_by_canonical: dict[str, str] | None = None,
+) -> tuple[list[str], dict[str, Any]]:
+    grouped: dict[str, list[dict[str, Any]]] = {}
+    for road_line in road_layer_local_lines(roads, fallback_prefix, road_graph_edge_by_canonical):
+        chain_id = str(road_line.get("road_chain_id") or road_line.get("canonical_road_id") or road_line.get("road_id") or "")
+        if not chain_id:
+            continue
+        grouped.setdefault(chain_id, []).append(road_line)
+
+    lines: list[str] = []
+    class_counts: dict[str, int] = {}
+    total_source_edges = 0
+    mapped_road_graph_edges = 0
+    rendered = 0
+    for chain_id, chain_lines in sorted(grouped.items()):
+        if rendered >= max_chains:
+            break
+        ordered = sorted(
+            chain_lines,
+            key=lambda item: (
+                numeric_text(item.get("road_chain_fragment_index"), 1_000_000),
+                numeric_text((str(item.get("repair_edge_ids") or "").split(",")[0]).strip(), 1_000_000),
+                str(item.get("canonical_road_id") or ""),
+            ),
+        )
+        points = stitch_chain_points(ordered)
+        if len(points) < 2:
+            continue
+        first = ordered[0]
+        highway = str(first.get("highway") or "unknown")
+        class_counts[highway] = class_counts.get(highway, 0) + 1
+        canonical_ids = [str(item.get("canonical_road_id") or "") for item in ordered]
+        road_graph_edge_ids = [str(item.get("road_graph_edge_id") or "") for item in ordered]
+        source_ids = [str(item.get("source_feature_ids") or "") for item in ordered]
+        repaired_ids = [str(item.get("repaired_source_feature_ids") or "") for item in ordered]
+        repair_edge_ids = [str(item.get("repair_edge_ids") or "") for item in ordered]
+        chain_source_edges = sum(numeric_text(item.get("canonical_edge_count"), 0) for item in ordered)
+        chain_mapped_edges = sum(1 for value in road_graph_edge_ids if value)
+        total_source_edges += chain_source_edges
+        mapped_road_graph_edges += chain_mapped_edges
+        fragment_count = len(ordered)
+        name = str(first.get("name") or "")
+        chain_length = sum(float(item.get("canonical_length_m") or 0.0) for item in ordered)
+        tooltip = (
+            f"canonical_road_chain={chain_id}; highway={highway}; name={name}; "
+            f"fragments={fragment_count}; canonical_roads={unique_joined(canonical_ids)}; "
+            f"road_graph_edges={unique_joined(road_graph_edge_ids)}"
+        )
+        attrs = svg_attrs({
+            "kind": "canonical_road",
+            "layer": layer,
+            "source": source_label,
+            "id": chain_id,
+            "road_chain_id": chain_id,
+            "road_chain_fragment_count": fragment_count,
+            "road_graph_edge_ids": unique_joined(road_graph_edge_ids),
+            "road_graph_edge_id": road_graph_edge_ids[0] if road_graph_edge_ids else "",
+            "canonical_road_ids": unique_joined(canonical_ids),
+            "canonical_road_id": canonical_ids[0] if canonical_ids else "",
+            "source_feature_id": str(first.get("source_feature_id") or ""),
+            "highway": highway,
+            "road_class": first.get("road_class", ""),
+            "road_name": name,
+            "lanes": first.get("lanes", ""),
+            "width_m": first.get("width_m", ""),
+            "oneway": first.get("oneway", ""),
+            "canonical_edge_count": chain_source_edges,
+            "canonical_length_m": f"{chain_length:.3f}",
+            "canonical_ops": unique_joined([str(item.get("canonical_ops") or "") for item in ordered]),
+            "repair_ops": unique_joined([str(item.get("repair_ops") or "") for item in ordered]),
+            "repair_edge_ids": unique_joined(repair_edge_ids),
+            "source_feature_ids": unique_joined(source_ids),
+            "repaired_source_feature_ids": unique_joined(repaired_ids),
+            "selection_scope": "road_chain",
+        })
+        lines.append(
+            f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
+            f'stroke="{stroke}" stroke-width="{stroke_width}" stroke-opacity="{stroke_opacity:.2f}" '
             f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
         )
         rendered += 1
@@ -1476,17 +1626,16 @@ def build_svg(
         }
 
     if canonical_roads:
-        canonical_lines, canonical_metrics = road_overlay_lines(
+        canonical_lines, canonical_metrics = road_chain_overlay_lines(
             roads=canonical_roads,
             transform=transform,
             layer="canonical_roads",
-            kind="canonical_road",
             source_label="roads_canonical.geojson",
             fallback_prefix="canonical",
             stroke="#e11d48",
             stroke_width=1.35,
             stroke_opacity=0.88,
-            max_roads=max_raw_roads,
+            max_chains=max_raw_roads,
             road_graph_edge_by_canonical=road_graph_edge_by_canonical,
         )
     else:

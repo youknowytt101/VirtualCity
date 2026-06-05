@@ -3,14 +3,14 @@
   "stage": "lane_graph_svg_visualization",
   "status": "pass",
   "counts": {
-    "lanes": 200,
-    "physical_lane_centerlines": 186,
-    "visible_lane_centerlines": 186,
-    "lane_links_total": 306,
-    "continuity_links_total": 20,
-    "junction_connections_rendered": 306,
+    "lanes": 230,
+    "physical_lane_centerlines": 212,
+    "visible_lane_centerlines": 212,
+    "lane_links_total": 320,
+    "continuity_links_total": 24,
+    "junction_connections_rendered": 320,
     "continuity_links_rendered": 8,
-    "continuity_micro_seams_skipped": 12,
+    "continuity_micro_seams_skipped": 16,
     "continuity_link_source_counts": {
       "degree2_connector_through_continuity_v1": 2,
       "optimized_corner_fillet": 6
@@ -61,20 +61,20 @@
     },
     "repaired_roads_source_edge_count_sum": 0,
     "repaired_roads_road_graph_edge_mapped": 0,
-    "canonical_roads_rendered": 100,
+    "canonical_roads_rendered": 43,
     "canonical_roads_class_counts": {
-      "residential": 32,
-      "secondary": 34,
-      "service": 34
+      "residential": 14,
+      "secondary": 4,
+      "service": 25
     },
     "canonical_roads_source_edge_count_sum": 171,
     "canonical_roads_road_graph_edge_mapped": 100,
-    "centerline_buffer_preview_polygons": 500,
+    "centerline_buffer_preview_polygons": 540,
     "centerline_buffer_preview_source_counts": {
       "continuity_curve": 8,
-      "lane_centerline": 174,
-      "lane_link_centerline": 306,
-      "physical_lane_group_centerline_v1": 12
+      "lane_centerline": 198,
+      "lane_link_centerline": 320,
+      "physical_lane_group_centerline_v1": 14
     },
     "centerline_buffer_preview_skipped_movement_corridors": 0,
     "centerline_buffer_preview_skip_reason_counts": {}

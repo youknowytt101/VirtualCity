@@ -1,0 +1,332 @@
+{
+  "type": "lane_upgrade_overrides",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "lane_upgrade_system.active_overrides.v1",
+    "system": "LaneForge",
+    "updated_by_transaction": "lane_upgrade_transaction_v0034",
+    "updated_at_utc": "2026-06-05T10:51:22+00:00",
+    "note": "Active LaneForge lane-count overrides consumed by lane_model_builder.py."
+  },
+  "active_upgrades": [
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0023",
+      "transaction_id": "lane_upgrade_transaction_v0023",
+      "version": "v0023",
+      "road_id": "e_0000",
+      "canonical_road_id": "cr_0000",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443571 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0000",
+        "canonical_road_id": "cr_0000",
+        "endpoint_node_ids": [
+          "n_0018",
+          "n_0019"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0018"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0024",
+      "transaction_id": "lane_upgrade_transaction_v0024",
+      "version": "v0024",
+      "road_id": "e_0001",
+      "canonical_road_id": "cr_0001",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443571 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0001",
+        "canonical_road_id": "cr_0001",
+        "endpoint_node_ids": [
+          "n_0019",
+          "n_0020"
+        ],
+        "adjacent_junction_node_ids": [],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0025",
+      "transaction_id": "lane_upgrade_transaction_v0025",
+      "version": "v0025",
+      "road_id": "e_0002",
+      "canonical_road_id": "cr_0002",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443571 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0002",
+        "canonical_road_id": "cr_0002",
+        "endpoint_node_ids": [
+          "n_0020",
+          "n_0028"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0028"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0026",
+      "transaction_id": "lane_upgrade_transaction_v0026",
+      "version": "v0026",
+      "road_id": "e_0003",
+      "canonical_road_id": "cr_0003",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443571 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0003",
+        "canonical_road_id": "cr_0003",
+        "endpoint_node_ids": [
+          "n_0028",
+          "n_0030"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0028",
+          "n_0030"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0027",
+      "transaction_id": "lane_upgrade_transaction_v0027",
+      "version": "v0027",
+      "road_id": "e_0004",
+      "canonical_road_id": "cr_0004",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443571 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0004",
+        "canonical_road_id": "cr_0004",
+        "endpoint_node_ids": [
+          "n_0030",
+          "n_0050"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0030",
+          "n_0050"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0028",
+      "transaction_id": "lane_upgrade_transaction_v0028",
+      "version": "v0028",
+      "road_id": "e_0005",
+      "canonical_road_id": "cr_0005",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443571 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0005",
+        "canonical_road_id": "cr_0005",
+        "endpoint_node_ids": [
+          "n_0050",
+          "n_0055"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0050",
+          "n_0055"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0029",
+      "transaction_id": "lane_upgrade_transaction_v0029",
+      "version": "v0029",
+      "road_id": "e_0006",
+      "canonical_road_id": "cr_0006",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443571 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0006",
+        "canonical_road_id": "cr_0006",
+        "endpoint_node_ids": [
+          "n_0055",
+          "n_0060"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0055",
+          "n_0060"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0030",
+      "transaction_id": "lane_upgrade_transaction_v0030",
+      "version": "v0030",
+      "road_id": "e_0007",
+      "canonical_road_id": "cr_0007",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443571 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0007",
+        "canonical_road_id": "cr_0007",
+        "endpoint_node_ids": [
+          "n_0060",
+          "n_0070"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0060",
+          "n_0070"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0034",
+      "transaction_id": "lane_upgrade_transaction_v0034",
+      "version": "v0034",
+      "road_id": "e_0013",
+      "canonical_road_id": "cr_0013",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443601 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0013",
+        "canonical_road_id": "cr_0013",
+        "endpoint_node_ids": [
+          "n_0050",
+          "n_0056"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0050",
+          "n_0056"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0008",
+      "transaction_id": "lane_upgrade_transaction_v0008",
+      "version": "v0008",
+      "road_id": "e_0017",
+      "canonical_road_id": "cr_0017",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set e_0017 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0017",
+        "canonical_road_id": "cr_0017",
+        "endpoint_node_ids": [
+          "n_0017",
+          "n_0003"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0017",
+          "n_0003"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0010",
+      "transaction_id": "lane_upgrade_transaction_v0010",
+      "version": "v0010",
+      "road_id": "e_0023",
+      "canonical_road_id": "cr_0023",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set e_0023 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0023",
+        "canonical_road_id": "cr_0023",
+        "endpoint_node_ids": [
+          "n_0042",
+          "n_0021"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0042",
+          "n_0021"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0011",
+      "transaction_id": "lane_upgrade_transaction_v0011",
+      "version": "v0011",
+      "road_id": "e_0044",
+      "canonical_road_id": "cr_0044",
+      "target_physical_lane_count": 4,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set e_0044 to 4 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0044",
+        "canonical_road_id": "cr_0044",
+        "endpoint_node_ids": [
+          "n_0021",
+          "n_0018"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0021",
+          "n_0018"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    }
+  ]
+}

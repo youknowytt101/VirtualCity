@@ -2,7 +2,7 @@
   "area_id": "pattaya_central_500m",
   "status": "completed",
   "houdini_status": "skipped",
-  "package_version": "lane_package_v0049",
+  "package_version": "lane_package_v0078",
   "outputs": {
     "repaired_geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
     "canonical_geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
@@ -15,10 +15,70 @@
     "lane_geometry_debug_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_geometry_debug_report.json",
     "lane_surface_v1_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_surface_v1_report.json",
     "pipeline_audit_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_pipeline_audit_report.json",
-    "lane_package_manifest": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\pattaya_central_500m\\lane_package_v0049\\manifest.json",
+    "lane_package_manifest": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\pattaya_central_500m\\lane_package_v0078\\manifest.json",
+    "laneforge_current_status_json": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_laneforge_current_status.json",
+    "laneforge_current_status_md": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\CURRENT_LANEFORGE_STATUS.md",
     "topology_qa_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_topology_repair_qa_report.json",
     "road_graph_qa_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_road_graph_qa_report.json",
     "lane_graph_qa_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_lane_graph_qa_report.json",
     "log": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\last_rebuild.log"
+  },
+  "artifact_identity": {
+    "road_graph": {
+      "path": "data/processed/pattaya_central_500m_road_graph.json",
+      "exists": true,
+      "size_bytes": 228947,
+      "mtime_utc": 1780656703.3660865,
+      "sha256": "c1fb641f12f014344dfc0e56865724351527f007a1db42464ed9c9e8fa14f257"
+    },
+    "junction_semantics": {
+      "path": "data/processed/pattaya_central_500m_junction_semantics.json",
+      "exists": true,
+      "size_bytes": 332445,
+      "mtime_utc": 1780656703.5165226,
+      "sha256": "25bbd7501e0febf15c99c19d5753c387b90307db17b73cf724d0fa1a9751679d"
+    },
+    "optimized_centerlines": {
+      "path": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+      "exists": true,
+      "size_bytes": 451211,
+      "mtime_utc": 1780656703.6088917,
+      "sha256": "a65305cd76e3bf393a60901714b7a1e00c363838d220b5327230faa36878f211"
+    },
+    "lane_graph": {
+      "path": "data/processed/pattaya_central_500m_lane_graph.json",
+      "exists": true,
+      "size_bytes": 2028027,
+      "mtime_utc": 1780656703.8581357,
+      "sha256": "9e60a9d216c79935e4e6655885d08bd93f03d770faf0ac1f9c1c1f3da2be905e"
+    },
+    "lane_surface_v1_geojson": {
+      "path": "data/preview/pattaya_central_500m_lane_surfaces_v1.geojson",
+      "exists": true,
+      "size_bytes": 1263959,
+      "mtime_utc": 1780656704.3069203,
+      "sha256": "ef0c47a3d430ad95bbb8e750882e8fea1d3fef2dbbd10c2c5324fc4471ec3ea9"
+    },
+    "lane_geometry_debug_geojson": {
+      "path": "data/preview/pattaya_central_500m_lane_geometry_debug.geojson",
+      "exists": true,
+      "size_bytes": 1884959,
+      "mtime_utc": 1780656704.1479032,
+      "sha256": "26e5a59a2d67f68b39480200129b4af968c9a1a88fe6110e4a2d6e796fedcbe1"
+    },
+    "pipeline_audit_report": {
+      "path": "reports/pattaya_central_500m_pipeline_audit_report.json",
+      "exists": true,
+      "size_bytes": 71352,
+      "mtime_utc": 1780656704.5149372,
+      "sha256": "fa7b5cd8bda11e50981666d5c7dbb86718442c09e71b3be9e38a352ced96681d"
+    },
+    "lane_package_manifest": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/manifest.json",
+      "exists": true,
+      "size_bytes": 51566,
+      "mtime_utc": 1780656704.9240415,
+      "sha256": "09a4b4784df1734cdcd178761c062aa134b69ef2100721fa30acfa1faab65876"
+    }
   }
 }

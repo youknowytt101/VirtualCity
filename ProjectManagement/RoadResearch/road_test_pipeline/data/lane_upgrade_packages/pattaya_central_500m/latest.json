@@ -1,14 +1,30 @@
 {
   "area_id": "pattaya_central_500m",
   "system": "LaneForge",
-  "latest_package_version": "lane_package_v0049",
+  "latest_package_version": "lane_package_v0078",
   "path_policy": "portable_lane_package_paths_v1",
-  "latest_package_dir": "lane_package_v0049",
+  "latest_package_dir": "lane_package_v0078",
   "manifest": "manifest.json",
   "qa_gate_status": "manual_review_required",
   "qa_warning_summary": {
     "publishable_warn": 0,
-    "manual_review_required": 4,
+    "manual_review_required": 6,
     "blocker": 0
+  },
+  "source_artifacts": {
+    "lane_graph": {
+      "path": "data/processed/pattaya_central_500m_lane_graph.json",
+      "exists": true,
+      "size_bytes": 2028027,
+      "mtime_utc": 1780656703.8581357,
+      "sha256": "9e60a9d216c79935e4e6655885d08bd93f03d770faf0ac1f9c1c1f3da2be905e"
+    },
+    "pipeline_audit_report": {
+      "path": "reports/pattaya_central_500m_pipeline_audit_report.json",
+      "exists": true,
+      "size_bytes": 71352,
+      "mtime_utc": 1780656704.5149372,
+      "sha256": "fa7b5cd8bda11e50981666d5c7dbb86718442c09e71b3be9e38a352ced96681d"
+    }
   }
 }

@@ -1,7 +1,7 @@
-[RoadTest] rebuild started 2026-06-05 16:48:45
+[RoadTest] rebuild started 2026-06-05 18:51:42
 
-[2026-06-05 16:48:45] Running topology repair
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\topology_repair.py --area-id pattaya_central_500m
+[2026-06-05 18:51:42] Running topology repair
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\topology_repair.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
@@ -47,8 +47,8 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:46] Analyzing repaired roads
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_repaired.geojson --output D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_repaired_analysis.json
+[2026-06-05 18:51:42] Analyzing repaired roads
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_repaired.geojson --output D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_repaired_analysis.json
 {
   "area_id": "pattaya_central_500m",
   "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
@@ -59,8 +59,8 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:47] Running topology repair QA
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage topology_repair --area-id pattaya_central_500m
+[2026-06-05 18:51:43] Running topology repair QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage topology_repair --area-id pattaya_central_500m
 topology_repair QA status: warn
 [pass] output_edges: 171 / 40
 [pass] empty_geometry: 0 / 0
@@ -71,8 +71,8 @@ topology_repair QA status: warn
 [pass] repair_ops_when_dangling_high: 0 / 0
 [exit] 0
 
-[2026-06-05 16:48:47] Building canonical roads
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_canonical_roads.py --area-id pattaya_central_500m
+[2026-06-05 18:51:43] Building canonical roads
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_canonical_roads.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
@@ -84,7 +84,10 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
     "merged_input_edges": 71,
     "connector_nodes_available_for_merge": 73,
     "boundary_nodes_protected": 14,
-    "junction_or_terminal_nodes_protected": 80
+    "junction_or_terminal_nodes_protected": 80,
+    "road_chain_count": 43,
+    "fragmented_road_chains": 17,
+    "max_canonical_roads_per_road_chain": 14
   },
   "metrics": {
     "edge_reduction_ratio": 0.415,
@@ -94,8 +97,8 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:48] Analyzing canonical roads
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_canonical.geojson --output D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_canonical_analysis.json
+[2026-06-05 18:51:43] Analyzing canonical roads
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_canonical.geojson --output D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_canonical_analysis.json
 {
   "area_id": "pattaya_central_500m",
   "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
@@ -106,8 +109,8 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:48] Building road graph
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_canonical.geojson
+[2026-06-05 18:51:43] Building road graph
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_canonical.geojson
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
@@ -129,8 +132,8 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:49] Running road graph QA
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage road_graph --area-id pattaya_central_500m
+[2026-06-05 18:51:43] Running road graph QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage road_graph --area-id pattaya_central_500m
 road_graph QA status: warn
 [pass] nodes: 90 / 40
 [pass] edges: 100 / 40
@@ -143,8 +146,8 @@ road_graph QA status: warn
 [pass] lanes_fallback_ratio: 0.36 / 0.6
 [exit] 0
 
-[2026-06-05 16:48:50] Building junction semantic model
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_junction_semantics.py --area-id pattaya_central_500m
+[2026-06-05 18:51:43] Building junction semantic model
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_junction_semantics.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
@@ -168,8 +171,8 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:51] Optimizing junction centerlines
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\optimize_junction_centerlines.py --area-id pattaya_central_500m
+[2026-06-05 18:51:43] Optimizing junction centerlines
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\optimize_junction_centerlines.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
@@ -272,8 +275,8 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:51] Planning corner optimization candidates
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\plan_corner_optimization.py --area-id pattaya_central_500m
+[2026-06-05 18:51:43] Planning corner optimization candidates
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\plan_corner_optimization.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "stage": "corner_optimization_candidates_v1",
@@ -318,34 +321,34 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:52] Building lane graph and junction connections
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\lane_model_builder.py --area-id pattaya_central_500m
+[2026-06-05 18:51:43] Building lane graph and junction connections
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\lane_model_builder.py --area-id pattaya_central_500m --apply-all-lane-upgrades
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
   "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
   "counts": {
-    "lanes": 200,
-    "physical_lane_centerlines": 186,
-    "physical_lane_group_centerlines": 12,
-    "standalone_physical_lane_centerlines": 174,
+    "lanes": 230,
+    "physical_lane_centerlines": 212,
+    "physical_lane_group_centerlines": 14,
+    "standalone_physical_lane_centerlines": 198,
     "junctions": 49,
     "approach_lane_records": 149,
     "connections": 306,
-    "lane_links": 306,
-    "continuity_links": 20,
+    "lane_links": 320,
+    "continuity_links": 24,
     "optimized_approach_centerlines": 100,
     "optimized_approach_centerlines_applied": 100,
     "optimized_junction_connectors": 149,
     "optimized_junction_connector_lane_links": 0,
     "optimized_corner_fillet_links": 6,
-    "direct_connector_continuity_links": 14,
-    "same_physical_lane_continuity_links": 14,
-    "physical_lane_groups_created": 12,
-    "physical_lane_grouped_lanes": 26,
-    "active_lane_upgrades": 5,
-    "active_lane_upgrades_applied": 0,
-    "active_lane_upgrades_deferred": 5,
+    "direct_connector_continuity_links": 18,
+    "same_physical_lane_continuity_links": 18,
+    "physical_lane_groups_created": 14,
+    "physical_lane_grouped_lanes": 32,
+    "active_lane_upgrades": 15,
+    "active_lane_upgrades_applied": 15,
+    "active_lane_upgrades_deferred": 0,
     "active_lane_upgrades_missing_roads": 0,
     "active_lane_upgrades_ignored": 0,
     "lane_bundle_centerline_smoothed_edges": 20,
@@ -359,15 +362,15 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
   "metrics": {
     "junctions_with_connections_ratio": 1.0,
     "fan_fallback_ratio": 0.0,
-    "avg_lane_links_per_junction": 6.245,
+    "avg_lane_links_per_junction": 6.531,
     "lane_link_reference_errors": 0,
     "blocked_lane_links": 0,
     "empty_connection_curves": 0,
     "avg_lane_link_confidence": 0.82,
     "min_lane_link_confidence": 0.82,
-    "avg_curve_length_m": 10.35,
-    "max_curve_length_m": 14.954,
-    "avg_continuity_curve_length_m": 1.392,
+    "avg_curve_length_m": 10.693,
+    "max_curve_length_m": 17.562,
+    "avg_continuity_curve_length_m": 1.16,
     "max_continuity_curve_length_m": 7.301,
     "avg_lane_width_m": 3.2,
     "min_lane_width_m": 3.2,
@@ -376,7 +379,7 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
     "max_lane_width_start_end_delta_m": 0.0,
     "lane_bundle_centerline_smoothed_edges": 20,
     "lane_bundle_centerline_smoothed_bends": 39,
-    "lane_bundle_centerline_max_min_arc_radius_m": 6.4,
+    "lane_bundle_centerline_max_min_arc_radius_m": 9.6,
     "derived_lane_centerline_smoothed_lanes": 1,
     "derived_lane_centerline_smoothed_bends": 0,
     "derived_lane_centerline_inserted_sample_points": 0,
@@ -385,40 +388,40 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
     "derived_lane_centerline_smoothing_curve_family_counts": {},
     "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
     "continuity_rounding_style_counts": {
-      "unified_lane_geometry_rounding_style_v1": 20
+      "unified_lane_geometry_rounding_style_v1": 24
     },
     "continuity_rounding_curve_family_counts": {
-      "straight_infinite_radius": 14,
+      "straight_infinite_radius": 18,
       "tangent_circular_arc": 6
     },
     "lane_level_radius_regularized_continuity_links": 1,
-    "physical_lane_centerlines": 186,
-    "physical_lane_group_centerlines": 12,
-    "standalone_physical_lane_centerlines": 174,
-    "same_physical_lane_continuity_links": 14,
-    "physical_lane_groups_created": 12,
-    "physical_lane_grouped_lanes": 26,
+    "physical_lane_centerlines": 212,
+    "physical_lane_group_centerlines": 14,
+    "standalone_physical_lane_centerlines": 198,
+    "same_physical_lane_continuity_links": 18,
+    "physical_lane_groups_created": 14,
+    "physical_lane_grouped_lanes": 32,
     "min_optimized_corner_continuity_radius_m": 0.728
   }
 }
 [exit] 0
 
-[2026-06-05 16:48:52] Running lane graph QA
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage lane_graph --area-id pattaya_central_500m
+[2026-06-05 18:51:43] Running lane graph QA
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage lane_graph --area-id pattaya_central_500m
 lane_graph QA status: pass
-[pass] lanes: 200 / 40
+[pass] lanes: 230 / 40
 [pass] junctions: 49 / 1
 [pass] connections: 306 / 1
-[pass] lane_links: 306 / 1
+[pass] lane_links: 320 / 1
 [pass] lane_link_reference_errors: 0 / 0
 [pass] blocked_lane_links: 0 / 0
 [pass] empty_connection_curves: 0 / 0
 [pass] fan_fallback_ratio: 0.0 / 0.95
-[pass] avg_lane_links_per_junction: 6.245 / 1.0
+[pass] avg_lane_links_per_junction: 6.531 / 1.0
 [exit] 0
 
-[2026-06-05 16:48:53] Generating standalone preview
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_road_preview.py --area-id pattaya_central_500m
+[2026-06-05 18:51:43] Generating standalone preview
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_road_preview.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
@@ -472,8 +475,8 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:53] Generating lane-level debug geometry
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_geometry_debug.py --area-id pattaya_central_500m
+[2026-06-05 18:51:44] Generating lane-level debug geometry
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_geometry_debug.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "outputs": {
@@ -482,30 +485,30 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
     "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.svg"
   },
   "counts": {
-    "lanes": 200,
-    "physical_lane_centerlines": 186,
-    "debug_centerlines": 186,
-    "lane_links": 306,
-    "continuity_links": 20,
-    "debug_centerline_source_physical_lane_centerlines": 186,
-    "lane_ribbons": 186,
-    "lane_centerlines": 186,
-    "lane_link_ribbons": 306,
-    "lane_link_curves": 306,
+    "lanes": 230,
+    "physical_lane_centerlines": 212,
+    "debug_centerlines": 212,
+    "lane_links": 320,
+    "continuity_links": 24,
+    "debug_centerline_source_physical_lane_centerlines": 212,
+    "lane_ribbons": 212,
+    "lane_centerlines": 212,
+    "lane_link_ribbons": 320,
+    "lane_link_curves": 320,
     "lane_continuity_ribbons": 8,
     "lane_continuity_curves": 8,
-    "skipped_micro_seam_continuity_curve": 12,
-    "obj_vertices": 12226,
-    "obj_lines": 500,
-    "obj_faces": 500
+    "skipped_micro_seam_continuity_curve": 16,
+    "obj_vertices": 13126,
+    "obj_lines": 540,
+    "obj_faces": 540
   },
   "metrics": {
     "lane_geometry_debug_centerline_source": "physical_lane_centerlines",
     "empty_lane_link_curves": 0,
     "empty_continuity_curves": 0,
-    "avg_lane_link_curve_length_m": 10.35,
-    "max_lane_link_curve_length_m": 14.954,
-    "avg_continuity_curve_length_m": 1.392,
+    "avg_lane_link_curve_length_m": 10.693,
+    "max_lane_link_curve_length_m": 17.562,
+    "avg_continuity_curve_length_m": 1.16,
     "max_continuity_curve_length_m": 7.301,
     "avg_lane_width_m": 3.2,
     "min_lane_width_m": 3.2,
@@ -517,8 +520,8 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:55] Generating lane surface v1 geometry
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_surface_v1.py --area-id pattaya_central_500m
+[2026-06-05 18:51:44] Generating lane surface v1 geometry
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_surface_v1.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "outputs": {
@@ -527,25 +530,25 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
     "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.svg"
   },
   "counts": {
-    "lanes": 200,
-    "lane_links": 306,
-    "continuity_links": 20,
-    "lane_surfaces": 186,
+    "lanes": 230,
+    "lane_links": 320,
+    "continuity_links": 24,
+    "lane_surfaces": 212,
     "junction_envelope_surfaces": 49,
-    "lane_turn_surfaces": 306,
+    "lane_turn_surfaces": 320,
     "lane_continuity_surfaces": 8,
-    "skipped_micro_seam_continuity_surface": 12,
-    "obj_vertices": 8684,
-    "obj_faces": 549
+    "skipped_micro_seam_continuity_surface": 16,
+    "obj_vertices": 9282,
+    "obj_faces": 589
   },
   "metrics": {
     "lane_surface_centerline_source": "physical_lane_centerlines",
-    "physical_lane_centerlines": 186,
+    "physical_lane_centerlines": 212,
     "trim_start_lane_count": 0,
     "trim_end_lane_count": 0,
     "junction_trim_m": 8.0,
     "approach_centerlines_trimmed": true,
-    "corner_continuity_trimmed_lane_count": 36,
+    "corner_continuity_trimmed_lane_count": 42,
     "lane_geometry_rounding_style_id": "unified_lane_geometry_rounding_style_v1",
     "lane_geometry_rounding_curve_family": "tangent_circular_arc",
     "derived_lane_centerline_smoothing_policy": "derived_lane_centerline_smoothing_v1",
@@ -557,10 +560,10 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
     "derived_lane_centerline_smoothing_curve_family_counts": {},
     "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
     "continuity_rounding_style_counts": {
-      "unified_lane_geometry_rounding_style_v1": 20
+      "unified_lane_geometry_rounding_style_v1": 24
     },
     "continuity_rounding_curve_family_counts": {
-      "straight_infinite_radius": 14,
+      "straight_infinite_radius": 18,
       "tangent_circular_arc": 6
     },
     "lane_level_radius_regularized_continuity_links": 1,
@@ -568,29 +571,29 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
     "avg_lane_surface_width_m": 3.2,
     "avg_turn_surface_width_m": 3.2,
     "avg_continuity_surface_width_m": 3.2,
-    "avg_junction_envelope_area_m2": 113.636,
-    "max_junction_envelope_area_m2": 154.603,
+    "avg_junction_envelope_area_m2": 122.71,
+    "max_junction_envelope_area_m2": 181.909,
     "junction_envelope_padding_m": 0.25,
     "area_by_part_m2": {
-      "lane_surface_v1": 47313.192,
-      "junction_envelope_surface_v1": 5568.153,
-      "lane_turn_surface_v1": 10105.67,
+      "lane_surface_v1": 53331.483,
+      "junction_envelope_surface_v1": 6012.811,
+      "lane_turn_surface_v1": 10919.038,
       "lane_continuity_surface_v1": 88.996
     },
-    "total_area_m2": 63076.011
+    "total_area_m2": 70352.328
   }
 }
 [exit] 0
 
-[2026-06-05 16:48:55] Auditing road pipeline contracts
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\audit_road_pipeline.py --area-id pattaya_central_500m
+[2026-06-05 18:51:44] Auditing road pipeline contracts
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\audit_road_pipeline.py --area-id pattaya_central_500m
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
   "qa_gate_status": "manual_review_required",
   "qa_warning_summary": {
     "publishable_warn": 0,
-    "manual_review_required": 4,
+    "manual_review_required": 6,
     "blocker": 0
   },
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_pipeline_audit_report.json",
@@ -599,14 +602,342 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
       "nodes": 90,
       "edges": 100
     },
+    "road_identity_fragmentation": {
+      "policy": "road_identity_fragmentation_tracking_v1",
+      "max_touch_gap_m": 0.01,
+      "road_identity_groups": 43,
+      "fragmented_road_identities": 17,
+      "touching_fragmented_road_identities": 17,
+      "max_fragments_per_identity": 14,
+      "samples": [
+        {
+          "road_identity_key": "rc_1197567955",
+          "canonical_road_ids": [
+            "cr_0079",
+            "cr_0080",
+            "cr_0081"
+          ],
+          "edge_ids": [
+            "e_0079",
+            "e_0080",
+            "e_0081"
+          ],
+          "fragment_count": 3,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_1219573624",
+          "canonical_road_ids": [
+            "cr_0093",
+            "cr_0094",
+            "cr_0095",
+            "cr_0096",
+            "cr_0097",
+            "cr_0098",
+            "cr_0099"
+          ],
+          "edge_ids": [
+            "e_0093",
+            "e_0094",
+            "e_0095",
+            "e_0096",
+            "e_0097",
+            "e_0098",
+            "e_0099"
+          ],
+          "fragment_count": 7,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_174587497",
+          "canonical_road_ids": [
+            "cr_0032",
+            "cr_0033"
+          ],
+          "edge_ids": [
+            "e_0032",
+            "e_0033"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_27443571",
+          "canonical_road_ids": [
+            "cr_0000",
+            "cr_0001",
+            "cr_0002",
+            "cr_0003",
+            "cr_0004",
+            "cr_0005",
+            "cr_0006",
+            "cr_0007"
+          ],
+          "edge_ids": [
+            "e_0000",
+            "e_0001",
+            "e_0002",
+            "e_0003",
+            "e_0004",
+            "e_0005",
+            "e_0006",
+            "e_0007"
+          ],
+          "fragment_count": 8,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_27443575",
+          "canonical_road_ids": [
+            "cr_0008",
+            "cr_0009"
+          ],
+          "edge_ids": [
+            "e_0008",
+            "e_0009"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_27443579",
+          "canonical_road_ids": [
+            "cr_0010",
+            "cr_0011"
+          ],
+          "edge_ids": [
+            "e_0010",
+            "e_0011"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_27443601",
+          "canonical_road_ids": [
+            "cr_0013",
+            "cr_0014",
+            "cr_0015"
+          ],
+          "edge_ids": [
+            "e_0013",
+            "e_0014",
+            "e_0015"
+          ],
+          "fragment_count": 3,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_317141440",
+          "canonical_road_ids": [
+            "cr_0035",
+            "cr_0036"
+          ],
+          "edge_ids": [
+            "e_0035",
+            "e_0036"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_317141441",
+          "canonical_road_ids": [
+            "cr_0037",
+            "cr_0038"
+          ],
+          "edge_ids": [
+            "e_0037",
+            "e_0038"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_317141442",
+          "canonical_road_ids": [
+            "cr_0039",
+            "cr_0040",
+            "cr_0041"
+          ],
+          "edge_ids": [
+            "e_0039",
+            "e_0040",
+            "e_0041"
+          ],
+          "fragment_count": 3,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_350135618",
+          "canonical_road_ids": [
+            "cr_0043",
+            "cr_0044",
+            "cr_0045",
+            "cr_0046",
+            "cr_0047",
+            "cr_0048",
+            "cr_0049",
+            "cr_0050",
+            "cr_0051",
+            "cr_0052",
+            "cr_0053",
+            "cr_0054"
+          ],
+          "edge_ids": [
+            "e_0043",
+            "e_0044",
+            "e_0045",
+            "e_0046",
+            "e_0047",
+            "e_0048",
+            "e_0049",
+            "e_0050",
+            "e_0051",
+            "e_0052",
+            "e_0053",
+            "e_0054"
+          ],
+          "fragment_count": 12,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_35129296",
+          "canonical_road_ids": [
+            "cr_0018",
+            "cr_0019",
+            "cr_0020",
+            "cr_0021",
+            "cr_0022",
+            "cr_0023"
+          ],
+          "edge_ids": [
+            "e_0018",
+            "e_0019",
+            "e_0020",
+            "e_0021",
+            "e_0022",
+            "e_0023"
+          ],
+          "fragment_count": 6,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_35129317",
+          "canonical_road_ids": [
+            "cr_0024",
+            "cr_0025"
+          ],
+          "edge_ids": [
+            "e_0024",
+            "e_0025"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_35400897",
+          "canonical_road_ids": [
+            "cr_0027",
+            "cr_0028"
+          ],
+          "edge_ids": [
+            "e_0027",
+            "e_0028"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_695055372",
+          "canonical_road_ids": [
+            "cr_0055",
+            "cr_0056"
+          ],
+          "edge_ids": [
+            "e_0055",
+            "e_0056"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_724095740",
+          "canonical_road_ids": [
+            "cr_0059",
+            "cr_0060"
+          ],
+          "edge_ids": [
+            "e_0059",
+            "e_0060"
+          ],
+          "fragment_count": 2,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        },
+        {
+          "road_identity_key": "rc_945012935",
+          "canonical_road_ids": [
+            "cr_0064",
+            "cr_0065",
+            "cr_0066",
+            "cr_0067",
+            "cr_0068",
+            "cr_0069",
+            "cr_0070",
+            "cr_0071",
+            "cr_0072",
+            "cr_0073",
+            "cr_0074",
+            "cr_0075",
+            "cr_0076",
+            "cr_0077"
+          ],
+          "edge_ids": [
+            "e_0064",
+            "e_0065",
+            "e_0066",
+            "e_0067",
+            "e_0068",
+            "e_0069",
+            "e_0070",
+            "e_0071",
+            "e_0072",
+            "e_0073",
+            "e_0074",
+            "e_0075",
+            "e_0076",
+            "e_0077"
+          ],
+          "fragment_count": 14,
+          "max_adjacent_endpoint_gap_m": 0.0,
+          "touching_fragments": true
+        }
+      ]
+    },
     "junctions": 49,
     "allowed_movements": 306,
     "blocked_movements": 0,
-    "lanes": 200,
+    "lanes": 230,
     "lane_connections": 306,
-    "lane_links": 306,
-    "continuity_links": 20,
-    "micro_seam_continuity_links": 12,
+    "lane_links": 320,
+    "continuity_links": 24,
+    "micro_seam_continuity_links": 16,
     "surface_continuity_links": 8,
     "lane_curve_gap_metrics": {
       "max_lane_link_start_gap_m": 0.0,
@@ -615,7 +946,7 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
       "max_continuity_end_gap_m": 0.0
     },
     "lane_link_curve_source_counts": {
-      "junction_lane_endpoint_bezier": 306
+      "junction_lane_endpoint_bezier": 320
     },
     "optimized_features": 252,
     "optimized_corner_fillets": 3,
@@ -624,10 +955,10 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
     "optimized_points": 2205,
     "preview_points": 2205,
     "preview_obj_vertices": 2205,
-    "lane_debug_obj_vertices": 12226,
-    "lane_debug_obj_faces": 500,
-    "lane_surface_v1_obj_vertices": 8684,
-    "lane_surface_v1_obj_faces": 549,
+    "lane_debug_obj_vertices": 13126,
+    "lane_debug_obj_faces": 540,
+    "lane_surface_v1_obj_vertices": 9282,
+    "lane_surface_v1_obj_faces": 589,
     "junction_envelope_surfaces": 49,
     "qa_statuses": {
       "topology_repair": "warn",
@@ -637,11 +968,623 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
     "qa_gate_status": "manual_review_required",
     "qa_warning_summary": {
       "publishable_warn": 0,
-      "manual_review_required": 4,
+      "manual_review_required": 6,
       "blocker": 0
     }
   },
   "failed_or_warn_checks": [
+    {
+      "id": "road_identity_fragmentation_tracked",
+      "status": "warn",
+      "value": {
+        "policy": "road_identity_fragmentation_tracking_v1",
+        "max_touch_gap_m": 0.01,
+        "road_identity_groups": 43,
+        "fragmented_road_identities": 17,
+        "touching_fragmented_road_identities": 17,
+        "max_fragments_per_identity": 14,
+        "samples": [
+          {
+            "road_identity_key": "rc_1197567955",
+            "canonical_road_ids": [
+              "cr_0079",
+              "cr_0080",
+              "cr_0081"
+            ],
+            "edge_ids": [
+              "e_0079",
+              "e_0080",
+              "e_0081"
+            ],
+            "fragment_count": 3,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_1219573624",
+            "canonical_road_ids": [
+              "cr_0093",
+              "cr_0094",
+              "cr_0095",
+              "cr_0096",
+              "cr_0097",
+              "cr_0098",
+              "cr_0099"
+            ],
+            "edge_ids": [
+              "e_0093",
+              "e_0094",
+              "e_0095",
+              "e_0096",
+              "e_0097",
+              "e_0098",
+              "e_0099"
+            ],
+            "fragment_count": 7,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_174587497",
+            "canonical_road_ids": [
+              "cr_0032",
+              "cr_0033"
+            ],
+            "edge_ids": [
+              "e_0032",
+              "e_0033"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_27443571",
+            "canonical_road_ids": [
+              "cr_0000",
+              "cr_0001",
+              "cr_0002",
+              "cr_0003",
+              "cr_0004",
+              "cr_0005",
+              "cr_0006",
+              "cr_0007"
+            ],
+            "edge_ids": [
+              "e_0000",
+              "e_0001",
+              "e_0002",
+              "e_0003",
+              "e_0004",
+              "e_0005",
+              "e_0006",
+              "e_0007"
+            ],
+            "fragment_count": 8,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_27443575",
+            "canonical_road_ids": [
+              "cr_0008",
+              "cr_0009"
+            ],
+            "edge_ids": [
+              "e_0008",
+              "e_0009"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_27443579",
+            "canonical_road_ids": [
+              "cr_0010",
+              "cr_0011"
+            ],
+            "edge_ids": [
+              "e_0010",
+              "e_0011"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_27443601",
+            "canonical_road_ids": [
+              "cr_0013",
+              "cr_0014",
+              "cr_0015"
+            ],
+            "edge_ids": [
+              "e_0013",
+              "e_0014",
+              "e_0015"
+            ],
+            "fragment_count": 3,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_317141440",
+            "canonical_road_ids": [
+              "cr_0035",
+              "cr_0036"
+            ],
+            "edge_ids": [
+              "e_0035",
+              "e_0036"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_317141441",
+            "canonical_road_ids": [
+              "cr_0037",
+              "cr_0038"
+            ],
+            "edge_ids": [
+              "e_0037",
+              "e_0038"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_317141442",
+            "canonical_road_ids": [
+              "cr_0039",
+              "cr_0040",
+              "cr_0041"
+            ],
+            "edge_ids": [
+              "e_0039",
+              "e_0040",
+              "e_0041"
+            ],
+            "fragment_count": 3,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_350135618",
+            "canonical_road_ids": [
+              "cr_0043",
+              "cr_0044",
+              "cr_0045",
+              "cr_0046",
+              "cr_0047",
+              "cr_0048",
+              "cr_0049",
+              "cr_0050",
+              "cr_0051",
+              "cr_0052",
+              "cr_0053",
+              "cr_0054"
+            ],
+            "edge_ids": [
+              "e_0043",
+              "e_0044",
+              "e_0045",
+              "e_0046",
+              "e_0047",
+              "e_0048",
+              "e_0049",
+              "e_0050",
+              "e_0051",
+              "e_0052",
+              "e_0053",
+              "e_0054"
+            ],
+            "fragment_count": 12,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_35129296",
+            "canonical_road_ids": [
+              "cr_0018",
+              "cr_0019",
+              "cr_0020",
+              "cr_0021",
+              "cr_0022",
+              "cr_0023"
+            ],
+            "edge_ids": [
+              "e_0018",
+              "e_0019",
+              "e_0020",
+              "e_0021",
+              "e_0022",
+              "e_0023"
+            ],
+            "fragment_count": 6,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_35129317",
+            "canonical_road_ids": [
+              "cr_0024",
+              "cr_0025"
+            ],
+            "edge_ids": [
+              "e_0024",
+              "e_0025"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_35400897",
+            "canonical_road_ids": [
+              "cr_0027",
+              "cr_0028"
+            ],
+            "edge_ids": [
+              "e_0027",
+              "e_0028"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_695055372",
+            "canonical_road_ids": [
+              "cr_0055",
+              "cr_0056"
+            ],
+            "edge_ids": [
+              "e_0055",
+              "e_0056"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_724095740",
+            "canonical_road_ids": [
+              "cr_0059",
+              "cr_0060"
+            ],
+            "edge_ids": [
+              "e_0059",
+              "e_0060"
+            ],
+            "fragment_count": 2,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          },
+          {
+            "road_identity_key": "rc_945012935",
+            "canonical_road_ids": [
+              "cr_0064",
+              "cr_0065",
+              "cr_0066",
+              "cr_0067",
+              "cr_0068",
+              "cr_0069",
+              "cr_0070",
+              "cr_0071",
+              "cr_0072",
+              "cr_0073",
+              "cr_0074",
+              "cr_0075",
+              "cr_0076",
+              "cr_0077"
+            ],
+            "edge_ids": [
+              "e_0064",
+              "e_0065",
+              "e_0066",
+              "e_0067",
+              "e_0068",
+              "e_0069",
+              "e_0070",
+              "e_0071",
+              "e_0072",
+              "e_0073",
+              "e_0074",
+              "e_0075",
+              "e_0076",
+              "e_0077"
+            ],
+            "fragment_count": 14,
+            "max_adjacent_endpoint_gap_m": 0.0,
+            "touching_fragments": true
+          }
+        ]
+      },
+      "message": "Continuous source-road identity should stay visible when topology requires multiple road graph edges."
+    },
+    {
+      "id": "movement_corridors_match_final_lane_link_endpoints",
+      "status": "warn",
+      "value": {
+        "policy": "movement_corridor_final_lane_link_endpoint_contract_v1",
+        "max_allowed_gap_m": 0.5,
+        "corridor_cases": 306,
+        "comparable_cases": 278,
+        "missing_final_lane_link": 28,
+        "missing_candidate_geometry": 0,
+        "stale_cases": 79,
+        "max_start_gap_m": 5.549,
+        "max_end_gap_m": 5.549,
+        "max_endpoint_gap_m": 5.549,
+        "stale_case_samples": [
+          {
+            "corridor_id": "mc_00019",
+            "lane_link_id": "j_003_c_001_ll_00",
+            "from_lane_id": "ln_e_0051_b_00",
+            "to_lane_id": "ln_e_0050_b_00",
+            "normalized_from_lane_id": "e_0051_b_1",
+            "normalized_to_lane_id": "e_0050_b_1",
+            "movement_kind": "through",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.0,
+            "end_gap_m": 1.722,
+            "max_gap_m": 1.722
+          },
+          {
+            "corridor_id": "mc_00021",
+            "lane_link_id": "j_003_c_003_ll_00",
+            "from_lane_id": "ln_e_0089_b_00",
+            "to_lane_id": "ln_e_0050_b_00",
+            "normalized_from_lane_id": "e_0089_b_1",
+            "normalized_to_lane_id": "e_0050_b_1",
+            "movement_kind": "right",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.0,
+            "end_gap_m": 1.722,
+            "max_gap_m": 1.722
+          },
+          {
+            "corridor_id": "mc_00022",
+            "lane_link_id": "j_003_c_004_ll_00",
+            "from_lane_id": "ln_e_0050_f_00",
+            "to_lane_id": "ln_e_0051_f_00",
+            "normalized_from_lane_id": "e_0050_f_1",
+            "normalized_to_lane_id": "e_0051_f_1",
+            "movement_kind": "through",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 1.722,
+            "end_gap_m": 0.0,
+            "max_gap_m": 1.722
+          },
+          {
+            "corridor_id": "mc_00023",
+            "lane_link_id": "j_003_c_005_ll_00",
+            "from_lane_id": "ln_e_0050_f_00",
+            "to_lane_id": "ln_e_0089_f_00",
+            "normalized_from_lane_id": "e_0050_f_1",
+            "normalized_to_lane_id": "e_0089_f_1",
+            "movement_kind": "left",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 1.722,
+            "end_gap_m": 0.0,
+            "max_gap_m": 1.722
+          },
+          {
+            "corridor_id": "mc_00024",
+            "lane_link_id": "j_004_c_000_ll_00",
+            "from_lane_id": "ln_e_0050_b_00",
+            "to_lane_id": "ln_e_0090_f_00",
+            "normalized_from_lane_id": "e_0050_b_1",
+            "normalized_to_lane_id": "e_0090_f_1",
+            "movement_kind": "right",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 1.723,
+            "end_gap_m": 0.001,
+            "max_gap_m": 1.723
+          },
+          {
+            "corridor_id": "mc_00025",
+            "lane_link_id": "j_004_c_001_ll_00",
+            "from_lane_id": "ln_e_0050_b_00",
+            "to_lane_id": "ln_e_0049_b_00",
+            "normalized_from_lane_id": "e_0050_b_1",
+            "normalized_to_lane_id": "e_0049_b_1",
+            "movement_kind": "through",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 1.723,
+            "end_gap_m": 0.001,
+            "max_gap_m": 1.723
+          },
+          {
+            "corridor_id": "mc_00026",
+            "lane_link_id": "j_004_c_002_ll_00",
+            "from_lane_id": "ln_e_0090_b_00",
+            "to_lane_id": "ln_e_0050_f_00",
+            "normalized_from_lane_id": "e_0090_b_1",
+            "normalized_to_lane_id": "e_0050_f_1",
+            "movement_kind": "left",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.001,
+            "end_gap_m": 1.723,
+            "max_gap_m": 1.723
+          },
+          {
+            "corridor_id": "mc_00028",
+            "lane_link_id": "j_004_c_004_ll_00",
+            "from_lane_id": "ln_e_0049_f_00",
+            "to_lane_id": "ln_e_0050_f_00",
+            "normalized_from_lane_id": "e_0049_f_1",
+            "normalized_to_lane_id": "e_0050_f_1",
+            "movement_kind": "through",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.001,
+            "end_gap_m": 1.723,
+            "max_gap_m": 1.723
+          },
+          {
+            "corridor_id": "mc_00037",
+            "lane_link_id": "j_006_c_001_ll_00",
+            "from_lane_id": "ln_e_0048_b_00",
+            "to_lane_id": "ln_e_0047_b_00",
+            "normalized_from_lane_id": "e_0048_b_1",
+            "normalized_to_lane_id": "e_0047_b_1",
+            "movement_kind": "through",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.0,
+            "end_gap_m": 2.601,
+            "max_gap_m": 2.601
+          },
+          {
+            "corridor_id": "mc_00039",
+            "lane_link_id": "j_006_c_003_ll_00",
+            "from_lane_id": "ln_e_0091_b_00",
+            "to_lane_id": "ln_e_0047_b_00",
+            "normalized_from_lane_id": "e_0091_b_1",
+            "normalized_to_lane_id": "e_0047_b_1",
+            "movement_kind": "right",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.001,
+            "end_gap_m": 2.601,
+            "max_gap_m": 2.601
+          },
+          {
+            "corridor_id": "mc_00040",
+            "lane_link_id": "j_006_c_004_ll_00",
+            "from_lane_id": "ln_e_0047_f_00",
+            "to_lane_id": "ln_e_0048_f_00",
+            "normalized_from_lane_id": "e_0047_f_1",
+            "normalized_to_lane_id": "e_0048_f_1",
+            "movement_kind": "through",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 2.606,
+            "end_gap_m": 0.0,
+            "max_gap_m": 2.606
+          },
+          {
+            "corridor_id": "mc_00041",
+            "lane_link_id": "j_006_c_005_ll_00",
+            "from_lane_id": "ln_e_0047_f_00",
+            "to_lane_id": "ln_e_0091_f_00",
+            "normalized_from_lane_id": "e_0047_f_1",
+            "normalized_to_lane_id": "e_0091_f_1",
+            "movement_kind": "left",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 2.606,
+            "end_gap_m": 0.001,
+            "max_gap_m": 2.606
+          },
+          {
+            "corridor_id": "mc_00048",
+            "lane_link_id": "j_008_c_000_ll_00",
+            "from_lane_id": "ln_e_0047_b_00",
+            "to_lane_id": "ln_e_0008_f_00",
+            "normalized_from_lane_id": "e_0047_b_1",
+            "normalized_to_lane_id": "e_0008_f_1",
+            "movement_kind": "right",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 2.606,
+            "end_gap_m": 0.0,
+            "max_gap_m": 2.606
+          },
+          {
+            "corridor_id": "mc_00049",
+            "lane_link_id": "j_008_c_001_ll_00",
+            "from_lane_id": "ln_e_0047_b_00",
+            "to_lane_id": "ln_e_0046_b_00",
+            "normalized_from_lane_id": "e_0047_b_1",
+            "normalized_to_lane_id": "e_0046_b_1",
+            "movement_kind": "through",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 2.606,
+            "end_gap_m": 0.001,
+            "max_gap_m": 2.606
+          },
+          {
+            "corridor_id": "mc_00050",
+            "lane_link_id": "j_008_c_002_ll_00",
+            "from_lane_id": "ln_e_0008_b_00",
+            "to_lane_id": "ln_e_0047_f_00",
+            "normalized_from_lane_id": "e_0008_b_1",
+            "normalized_to_lane_id": "e_0047_f_1",
+            "movement_kind": "left",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.0,
+            "end_gap_m": 2.602,
+            "max_gap_m": 2.602
+          },
+          {
+            "corridor_id": "mc_00052",
+            "lane_link_id": "j_008_c_004_ll_00",
+            "from_lane_id": "ln_e_0046_f_00",
+            "to_lane_id": "ln_e_0047_f_00",
+            "normalized_from_lane_id": "e_0046_f_1",
+            "normalized_to_lane_id": "e_0047_f_1",
+            "movement_kind": "through",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.001,
+            "end_gap_m": 2.602,
+            "max_gap_m": 2.602
+          },
+          {
+            "corridor_id": "mc_00074",
+            "lane_link_id": "j_012_c_002_ll_00",
+            "from_lane_id": "ln_e_0000_b_00",
+            "to_lane_id": "ln_e_0045_f_00",
+            "normalized_from_lane_id": "e_0000_b_1",
+            "normalized_to_lane_id": "e_0045_f_1",
+            "movement_kind": "left",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 2.276,
+            "end_gap_m": 0.0,
+            "max_gap_m": 2.276
+          },
+          {
+            "corridor_id": "mc_00077",
+            "lane_link_id": "j_012_c_005_ll_00",
+            "from_lane_id": "ln_e_0044_f_00",
+            "to_lane_id": "ln_e_0000_f_00",
+            "normalized_from_lane_id": "e_0044_f_1",
+            "normalized_to_lane_id": "e_0000_f_1",
+            "movement_kind": "left",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.0,
+            "end_gap_m": 2.279,
+            "max_gap_m": 2.279
+          },
+          {
+            "corridor_id": "mc_00085",
+            "lane_link_id": "j_014_c_001_ll_00",
+            "from_lane_id": "ln_e_0095_f_00",
+            "to_lane_id": "ln_e_0010_f_00",
+            "normalized_from_lane_id": "e_0095_f_1",
+            "normalized_to_lane_id": "e_0010_f_1",
+            "movement_kind": "left",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.001,
+            "end_gap_m": 1.19,
+            "max_gap_m": 1.19
+          },
+          {
+            "corridor_id": "mc_00087",
+            "lane_link_id": "j_014_c_003_ll_00",
+            "from_lane_id": "ln_e_0096_b_00",
+            "to_lane_id": "ln_e_0010_f_00",
+            "normalized_from_lane_id": "e_0096_b_1",
+            "normalized_to_lane_id": "e_0010_f_1",
+            "movement_kind": "right",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.001,
+            "end_gap_m": 1.19,
+            "max_gap_m": 1.19
+          }
+        ]
+      },
+      "message": "Movement corridor candidates should not drift from final laneLink endpoints; stale candidates are QA-only and must not drive final display or geometry."
+    },
     {
       "id": "compound_alternating_bends_are_tracked",
       "status": "warn",
@@ -695,37 +1638,48 @@ C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.ex
 }
 [exit] 0
 
-[2026-06-05 16:48:56] Publishing LaneForge standard lane package
-C:\Users\YT\AppData\Roaming\uv\python\cpython-3.14-windows-x86_64-none\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_upgrade_package.py --area-id pattaya_central_500m --version lane_package_v0049
+[2026-06-05 18:51:44] Publishing LaneForge standard lane package
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_upgrade_package.py --area-id pattaya_central_500m --version lane_package_v0078
 {
   "area_id": "pattaya_central_500m",
-  "package_version": "lane_package_v0049",
-  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049",
-  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049/manifest.json",
+  "package_version": "lane_package_v0078",
+  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078",
+  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/manifest.json",
   "path_policy": "portable_lane_package_paths_v1",
   "counts": {
-    "lanes": 200,
-    "physical_lane_centerlines": 186,
-    "physical_lane_group_centerlines": 12,
+    "lanes": 230,
+    "physical_lane_centerlines": 212,
+    "physical_lane_group_centerlines": 14,
     "junctions": 49,
-    "lane_links": 306,
-    "continuity_links": 20,
+    "lane_links": 320,
+    "continuity_links": 24,
     "junction_envelope_surfaces": 49,
-    "active_lane_upgrades": 5,
+    "active_lane_upgrades": 15,
     "active_corner_optimizations": 5,
     "corner_optimization_candidates": 19,
     "corner_optimization_accepted_active": 5,
     "corner_optimization_accepted_active_candidates": 4,
     "corner_optimization_accepted_active_overrides": 5,
-    "lane_upgrade_propagation_candidates": 14,
-    "lane_upgrade_propagation_high_confidence": 4
+    "lane_upgrade_propagation_candidates": 27,
+    "lane_upgrade_propagation_high_confidence": 12
   },
   "qa_status": "warn",
   "qa_gate_status": "manual_review_required",
   "qa_warning_summary": {
     "publishable_warn": 0,
-    "manual_review_required": 4,
+    "manual_review_required": 6,
     "blocker": 0
   }
+}
+[exit] 0
+
+[2026-06-05 18:51:44] Generating current LaneForge status
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_laneforge_status.py --area-id pattaya_central_500m
+{
+  "status": "generated",
+  "json_output": "reports/pattaya_central_500m_laneforge_current_status.json",
+  "md_output": "CURRENT_LANEFORGE_STATUS.md",
+  "latest_package_version": "lane_package_v0078",
+  "qa_gate_status": "manual_review_required"
 }
 [exit] 0

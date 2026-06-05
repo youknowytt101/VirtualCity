@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -209,6 +210,103 @@ def line_coordinate_count(fc: dict[str, Any]) -> int:
         if geom.get("type") == "LineString":
             total += len(geom.get("coordinates") or [])
     return total
+
+
+def source_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [str(item) for item in value if str(item)]
+    if value is None or value == "":
+        return []
+    return [str(value)]
+
+
+def min_numeric_id(values: Any) -> int:
+    numeric: list[int] = []
+    for value in source_list(values):
+        try:
+            numeric.append(int(value))
+        except ValueError:
+            continue
+    return min(numeric) if numeric else 1_000_000_000
+
+
+def road_identity_key(edge: dict[str, Any]) -> str:
+    chain_id = str(edge.get("road_chain_id") or "")
+    if chain_id:
+        return chain_id
+    source_ids = source_list(edge.get("source_feature_ids"))
+    if source_ids:
+        return "source:" + "|".join(sorted(source_ids))
+    return ""
+
+
+def edge_endpoints(edge: dict[str, Any]) -> tuple[tuple[float, float], tuple[float, float]] | None:
+    points = as_points(edge.get("geometry_xz") or [])
+    if len(points) < 2:
+        return None
+    return points[0], points[-1]
+
+
+def endpoint_gap(edge_a: dict[str, Any], edge_b: dict[str, Any]) -> float | None:
+    endpoints_a = edge_endpoints(edge_a)
+    endpoints_b = edge_endpoints(edge_b)
+    if endpoints_a is None or endpoints_b is None:
+        return None
+    return min(distance(a, b) for a in endpoints_a for b in endpoints_b)
+
+
+def road_identity_fragmentation(
+    road_graph: dict[str, Any],
+    *,
+    max_touch_gap_m: float = 0.01,
+    sample_limit: int = 20,
+) -> dict[str, Any]:
+    groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for edge in road_graph.get("edges", []):
+        key = road_identity_key(edge)
+        if key:
+            groups[key].append(edge)
+
+    fragmented = []
+    touching_fragmented = 0
+    max_fragments = 1
+    for key, edges in sorted(groups.items()):
+        if len(edges) <= 1:
+            continue
+        ordered = sorted(
+            edges,
+            key=lambda edge: (
+                min_numeric_id(edge.get("repair_edge_ids")),
+                str(edge.get("canonical_road_id") or edge.get("edge_id") or ""),
+            ),
+        )
+        gaps = [
+            gap
+            for gap in (endpoint_gap(ordered[index], ordered[index + 1]) for index in range(len(ordered) - 1))
+            if gap is not None
+        ]
+        max_gap = max(gaps) if gaps else 0.0
+        if max_gap <= max_touch_gap_m:
+            touching_fragmented += 1
+        max_fragments = max(max_fragments, len(ordered))
+        fragmented.append({
+            "road_identity_key": key,
+            "canonical_road_ids": [str(edge.get("canonical_road_id") or "") for edge in ordered],
+            "edge_ids": [str(edge.get("edge_id") or "") for edge in ordered],
+            "fragment_count": len(ordered),
+            "max_adjacent_endpoint_gap_m": round(max_gap, 3),
+            "touching_fragments": max_gap <= max_touch_gap_m,
+        })
+
+    return {
+        "policy": "road_identity_fragmentation_tracking_v1",
+        "max_touch_gap_m": max_touch_gap_m,
+        "road_identity_groups": len(groups),
+        "fragmented_road_identities": len(fragmented),
+        "touching_fragmented_road_identities": touching_fragmented,
+        "max_fragments_per_identity": max_fragments,
+        "samples": fragmented[:sample_limit],
+    }
 
 
 def as_points(points: list[Any]) -> list[tuple[float, float]]:
@@ -713,6 +811,14 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "Road graph should expose non-empty nodes and edges.",
         road_counts,
     ))
+    identity_fragmentation = road_identity_fragmentation(road_graph)
+    checks.append(make_check(
+        "road_identity_fragmentation_tracked",
+        int(identity_fragmentation.get("touching_fragmented_road_identities") or 0) == 0,
+        "Continuous source-road identity should stay visible when topology requires multiple road graph edges.",
+        identity_fragmentation,
+        warn=True,
+    ))
 
     semantic_types = {junction.get("type") for junction in semantics.get("junctions", [])}
     checks.append(make_check(
@@ -1124,6 +1230,7 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
 
     metrics = {
         "road_graph": road_counts,
+        "road_identity_fragmentation": identity_fragmentation,
         "junctions": len(semantics.get("junctions", [])),
         "allowed_movements": len(allowed),
         "blocked_movements": len(blocked),
