@@ -8,6 +8,7 @@ lowest-risk family only:
 - low risk
 - accepted by explicit candidate id, or by an explicit all-matching flag
 
+Reviewed internal bends can also be accepted by explicit candidate id only.
 The command writes active corner overrides, rebuilds the structured pipeline,
 publishes the next package and refreshes the SVG QA view.
 """
@@ -28,6 +29,7 @@ APPLICATION_SCHEMA = "lane_upgrade_system.corner_optimization_application.v1"
 OVERRIDE_SCHEMA = "lane_upgrade_system.corner_optimization_overrides.v1"
 DEFAULT_POLICY = "low_risk_degree2_connector_only_v1"
 INTERNAL_BEND_POLICY = "low_risk_internal_centerline_bend_smoothing_v1"
+REVIEWED_INTERNAL_BEND_POLICY = "reviewed_internal_centerline_bend_smoothing_v1"
 POLICY_CONFIGS: dict[str, dict[str, Any]] = {
     DEFAULT_POLICY: {
         "candidate_types": {"degree2_connector_corner"},
@@ -42,6 +44,19 @@ POLICY_CONFIGS: dict[str, dict[str, Any]] = {
         "allowed_actions": {"candidate_for_smoothing_after_review", "active_geometry_transaction"},
         "min_turn_angle_deg": 28.0,
         "max_nearest_junction_distance_m": None,
+    },
+    REVIEWED_INTERNAL_BEND_POLICY: {
+        "candidate_types": {"internal_centerline_bend"},
+        "risk_levels": {"low", "medium"},
+        "allowed_actions": {
+            "candidate_for_smoothing_after_review",
+            "proposal_only_review_short_context",
+            "proposal_only_review_sharp_internal_bend",
+            "active_geometry_transaction",
+        },
+        "min_turn_angle_deg": 28.0,
+        "max_nearest_junction_distance_m": None,
+        "requires_explicit_candidate_id": True,
     },
 }
 
@@ -179,6 +194,8 @@ def selected_candidates(
 ) -> list[dict[str, Any]]:
     if not candidate_ids and not all_matching_policy:
         raise ValueError("--candidate-id is required unless --all-matching-policy is explicitly set")
+    if all_matching_policy and bool(config.get("requires_explicit_candidate_id")):
+        raise ValueError("Selected corner optimization policy requires explicit --candidate-id review")
     selected: list[dict[str, Any]] = []
     for candidate in candidate_doc.get("candidates", []):
         candidate_id = str(candidate.get("candidate_id") or "")

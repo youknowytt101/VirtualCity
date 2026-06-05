@@ -1,0 +1,77 @@
+{
+  "type": "laneforge_current_status",
+  "schema": "lane_upgrade_system.current_status.v1",
+  "area_id": "pattaya_central_500m",
+  "latest_package_version": "lane_package_v0049",
+  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049",
+  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049/manifest.json",
+  "houdini_manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049/houdini_manifest.json",
+  "path_policy": "portable_lane_package_paths_v1",
+  "qa_status": "warn",
+  "qa_gate_status": "manual_review_required",
+  "qa_warning_summary": {
+    "publishable_warn": 0,
+    "manual_review_required": 4,
+    "blocker": 0
+  },
+  "counts": {
+    "lanes": 200,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
+    "junctions": 49,
+    "lane_links": 306,
+    "continuity_links": 20,
+    "junction_envelope_surfaces": 49,
+    "active_lane_upgrades": 5,
+    "active_corner_optimizations": 5,
+    "corner_optimization_candidates": 19,
+    "corner_optimization_accepted_active": 5,
+    "corner_optimization_accepted_active_candidates": 4,
+    "corner_optimization_accepted_active_overrides": 5,
+    "lane_upgrade_propagation_candidates": 14,
+    "lane_upgrade_propagation_high_confidence": 4
+  },
+  "semantic_review": {
+    "schema": "lane_upgrade_system.semantic_review_summary.v1.fallback_from_reports",
+    "status": "manual_review_required",
+    "active_lane_policy": "temporary_all_roads_bidirectional_two_lane_v1",
+    "width_fallback_ratio": 1.0,
+    "lanes_fallback_ratio": 0.36,
+    "missing_turn_lanes_ratio": 1.0,
+    "lane_count_policy_override_ratio": 1.0,
+    "direction_policy_override_ratio": 1.0,
+    "source_oneway_ignored_approaches": 96,
+    "source_oneway_blocked_movements_if_trusted": 142,
+    "source": "current reports fallback; future packages embed semantic_review in manifest"
+  },
+  "publish_decision": {
+    "research_publish_allowed": true,
+    "autonomous_production_allowed": false,
+    "manual_review_required": true,
+    "blocker": false
+  },
+  "artifact_identity": {
+    "latest": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
+      "exists": true,
+      "size_bytes": 409,
+      "mtime_utc": 1780649336.9596364,
+      "sha256": "828872338cdb3bb435d28cb0524794d904da622abf58303237818d667b85bbd3"
+    },
+    "manifest": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049/manifest.json",
+      "exists": true,
+      "size_bytes": 12807,
+      "mtime_utc": 1780649336.9586387,
+      "sha256": "778e7df4772dc55fba00be52ad5ae4c6344cdc0ed6f2a4c8028cf4bc2f7fb727"
+    },
+    "houdini_manifest": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0049/houdini_manifest.json",
+      "exists": true,
+      "size_bytes": 964,
+      "mtime_utc": 1780649336.9596364,
+      "sha256": "f9463936aaff3ab7a470c168f1bb05a021bcba58f7053fd1270a52c39c025730"
+    }
+  },
+  "handoff_rule": "Houdini and downstream systems consume the latest standard lane package, not data/processed internals."
+}

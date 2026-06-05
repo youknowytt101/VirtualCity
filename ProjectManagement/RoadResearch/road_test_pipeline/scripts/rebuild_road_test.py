@@ -17,6 +17,12 @@ import sys
 import time
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from artifact_manifest import artifact_records
+
 
 def pipeline_root_from_script(script_path: Path) -> Path:
     return script_path.resolve().parents[1]
@@ -75,6 +81,17 @@ def main() -> int:
     parser.add_argument("--area-id", default="pattaya_central_500m")
     parser.add_argument("--skip-houdini", action="store_true", help="Do not attempt RPYC Houdini cook.")
     parser.add_argument("--require-houdini", action="store_true", help="Return non-zero if RPYC cook fails.")
+    parser.add_argument(
+        "--apply-lane-upgrade-road-id",
+        action="append",
+        default=[],
+        help="Apply an active lane-count upgrade to geometry for this explicit road id. Can be repeated.",
+    )
+    parser.add_argument(
+        "--apply-all-lane-upgrades",
+        action="store_true",
+        help="Apply all active lane-count upgrades to geometry. Use only for controlled review.",
+    )
     args = parser.parse_args()
 
     root = pipeline_root_from_script(Path(__file__))
@@ -131,13 +148,28 @@ def main() -> int:
         ("Building junction semantic model", [python_cmd(), str(root / "scripts" / "build_junction_semantics.py"), "--area-id", args.area_id]),
         ("Optimizing junction centerlines", [python_cmd(), str(root / "scripts" / "optimize_junction_centerlines.py"), "--area-id", args.area_id]),
         ("Planning corner optimization candidates", [python_cmd(), str(root / "scripts" / "plan_corner_optimization.py"), "--area-id", args.area_id]),
-        ("Building lane graph and junction connections", [python_cmd(), str(root / "scripts" / "lane_model_builder.py"), "--area-id", args.area_id]),
+        (
+            "Building lane graph and junction connections",
+            [
+                python_cmd(),
+                str(root / "scripts" / "lane_model_builder.py"),
+                "--area-id",
+                args.area_id,
+                *[
+                    item
+                    for road_id in args.apply_lane_upgrade_road_id
+                    for item in ("--apply-lane-upgrade-road-id", road_id)
+                ],
+                *(["--apply-all-lane-upgrades"] if args.apply_all_lane_upgrades else []),
+            ],
+        ),
         ("Running lane graph QA", [python_cmd(), str(root / "scripts" / "run_auto_qa.py"), "--stage", "lane_graph", "--area-id", args.area_id]),
         ("Generating standalone preview", [python_cmd(), str(root / "scripts" / "generate_road_preview.py"), "--area-id", args.area_id]),
         ("Generating lane-level debug geometry", [python_cmd(), str(root / "scripts" / "generate_lane_geometry_debug.py"), "--area-id", args.area_id]),
         ("Generating lane surface v1 geometry", [python_cmd(), str(root / "scripts" / "generate_lane_surface_v1.py"), "--area-id", args.area_id]),
         ("Auditing road pipeline contracts", [python_cmd(), str(root / "scripts" / "audit_road_pipeline.py"), "--area-id", args.area_id]),
         ("Publishing LaneForge standard lane package", [python_cmd(), str(root / "scripts" / "build_lane_upgrade_package.py"), "--area-id", args.area_id, "--version", package_version]),
+        ("Generating current LaneForge status", [python_cmd(), str(root / "scripts" / "generate_laneforge_status.py"), "--area-id", args.area_id]),
     ])
 
     for name, cmd in steps:
@@ -177,11 +209,26 @@ def main() -> int:
             "lane_surface_v1_report": str(reports / f"{args.area_id}_lane_surface_v1_report.json"),
             "pipeline_audit_report": str(reports / f"{args.area_id}_pipeline_audit_report.json"),
             "lane_package_manifest": str(root / "data" / "lane_upgrade_packages" / args.area_id / package_version / "manifest.json"),
+            "laneforge_current_status_json": str(reports / f"{args.area_id}_laneforge_current_status.json"),
+            "laneforge_current_status_md": str(root / "CURRENT_LANEFORGE_STATUS.md"),
             "topology_qa_report": str(reports / "qa" / f"{args.area_id}_topology_repair_qa_report.json"),
             "road_graph_qa_report": str(reports / "qa" / f"{args.area_id}_road_graph_qa_report.json"),
             "lane_graph_qa_report": str(reports / "qa" / f"{args.area_id}_lane_graph_qa_report.json"),
             "log": str(log_path),
         },
+        "artifact_identity": artifact_records(
+            {
+                "road_graph": road_graph,
+                "junction_semantics": junction_semantics,
+                "optimized_centerlines": optimized_centerlines,
+                "lane_graph": lane_graph,
+                "lane_surface_v1_geojson": root / "data" / "preview" / f"{args.area_id}_lane_surfaces_v1.geojson",
+                "lane_geometry_debug_geojson": root / "data" / "preview" / f"{args.area_id}_lane_geometry_debug.geojson",
+                "pipeline_audit_report": reports / f"{args.area_id}_pipeline_audit_report.json",
+                "lane_package_manifest": root / "data" / "lane_upgrade_packages" / args.area_id / package_version / "manifest.json",
+            },
+            root=root,
+        ),
     }
     summary_path = reports / f"{args.area_id}_rebuild_report.json"
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")

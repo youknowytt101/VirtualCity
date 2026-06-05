@@ -191,6 +191,11 @@
       background: var(--accent);
     }
 
+    .status-dot.busy {
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.13);
+    }
+
     .status-dot.error {
       background: var(--danger);
     }
@@ -582,8 +587,8 @@
     .lane-upgrade-panel {
       grid-column: 1 / -1;
       display: grid;
-      gap: 8px;
-      padding: 10px 12px;
+      gap: 10px;
+      padding: 12px;
       border-bottom: 1px solid rgba(213, 220, 229, 0.55);
       background: rgba(248, 250, 252, 0.72);
     }
@@ -603,22 +608,40 @@
 
     .lane-upgrade-status {
       display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 4px 8px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .lane-upgrade-status-item {
+      min-width: 0;
+      padding: 7px 8px;
+      border: 1px solid rgba(203, 213, 225, 0.74);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.82);
       color: #334155;
       font-size: 10.5px;
       line-height: 1.35;
     }
 
     .lane-upgrade-status strong {
+      display: block;
+      margin-bottom: 2px;
       color: var(--accent-strong);
       font-weight: 750;
+    }
+
+    .lane-upgrade-status span {
+      display: block;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .lane-upgrade-actions {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 5px;
+      gap: 6px;
     }
 
     .lane-upgrade-actions button,
@@ -638,10 +661,89 @@
       color: var(--accent-strong);
     }
 
+    .lane-upgrade-command-row {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 1fr;
+      gap: 6px;
+    }
+
+    .lane-upgrade-command-row .lane-upgrade-copy {
+      width: 100%;
+      justify-self: stretch;
+    }
+
+    .lane-upgrade-command-row .lane-upgrade-secondary {
+      justify-self: stretch;
+    }
+
     .lane-upgrade-secondary {
       justify-self: start;
       background: #ffffff;
       color: #475569;
+    }
+
+    .lane-upgrade-apply {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .lane-upgrade-job-status {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #475569;
+      font-size: 10.5px;
+      line-height: 1.35;
+      min-height: 15px;
+    }
+
+    .lane-upgrade-progress-box {
+      display: grid;
+      gap: 6px;
+      padding: 8px 9px;
+      border: 1px solid rgba(203, 213, 225, 0.72);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .lane-upgrade-progress-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .lane-upgrade-progress {
+      width: 100%;
+      height: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(15, 118, 110, 0.18);
+      border-radius: 999px;
+      background: #e6eef2;
+    }
+
+    .lane-upgrade-progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #0f766e, #14b8a6);
+      transition: width 240ms ease;
+    }
+
+    .lane-upgrade-progress.failed .lane-upgrade-progress-fill {
+      background: var(--danger);
+    }
+
+    .lane-upgrade-progress-label {
+      flex: 0 0 auto;
+      color: #64748b;
+      font-size: 10px;
+      line-height: 1.2;
+      white-space: nowrap;
     }
 
     .lane-upgrade-output {
@@ -1325,7 +1427,8 @@
       fixedSizingFrame: 0,
       fixedSizingScale: 0,
       suppressMouseSelectionUntil: 0,
-      suppressMouseSelectionPoint: null
+      suppressMouseSelectionPoint: null,
+      laneForgeJobInFlight: false
     };
 
     const SVG_NS = "http://www.w3.org/2000/svg";
@@ -2311,35 +2414,59 @@
       inspectorBody.append(panel);
     }
 
-    function laneForgeRequestTextV2(data, targetLaneCount, restoreDefault = false) {
+    function laneForgePayload(data, targetLaneCount, restoreDefault = false) {
       const areaId = areaIdFromSvgPath(svgPath);
       const roadId = laneForgeRoadIdFromData(data);
       const canonicalRoadId = data.vcCanonicalRoadId || "";
+      return {
+        area_id: areaId,
+        road_id: roadId,
+        canonical_road_id: canonicalRoadId,
+        target_physical_lane_count: restoreDefault ? 0 : targetLaneCount,
+        action: restoreDefault ? "restore_road_lane_count_default" : "set_road_physical_lane_count",
+        reason: restoreDefault
+          ? `viewer request: restore ${roadId || canonicalRoadId} to default lane model`
+          : `viewer request: set ${roadId || canonicalRoadId} to ${targetLaneCount} physical lanes`
+      };
+    }
+
+    function laneForgeCliCommand(payload) {
+      const canonicalCliArg = payload.canonical_road_id ? ` --canonical-road-id ${payload.canonical_road_id}` : "";
+      const operationCliArg = payload.action === "restore_road_lane_count_default"
+        ? "--restore-default"
+        : `--target-lane-count ${payload.target_physical_lane_count}`;
+      return (
+        `python scripts\\execute_lane_upgrade.py --area-id ${payload.area_id} ` +
+        `--road-id ${payload.road_id}${canonicalCliArg} ${operationCliArg} ` +
+        `--apply-all-active-geometry --reason "${payload.reason}"`
+      );
+    }
+
+    function laneForgeRequestTextV2(data, targetLaneCount, restoreDefault = false) {
+      const payload = laneForgePayload(data, targetLaneCount, restoreDefault);
       const now = new Date().toISOString();
-      const canonicalCliArg = canonicalRoadId ? ` --canonical-road-id ${canonicalRoadId}` : "";
-      const operationCliArg = restoreDefault ? "--restore-default" : `--target-lane-count ${targetLaneCount}`;
       const reason = restoreDefault ? "web restore default lane model" : "web menu lane upgrade";
-      const createCliCommand = `python scripts\\create_lane_upgrade_transaction.py --area-id ${areaId} --road-id ${roadId}${canonicalCliArg} ${operationCliArg} --reason "${reason}"`;
-      const executeCliCommand = `python scripts\\execute_lane_upgrade.py --area-id ${areaId} --road-id ${roadId}${canonicalCliArg} ${operationCliArg} --reason "${reason}"`;
+      const canonicalCliArg = payload.canonical_road_id ? ` --canonical-road-id ${payload.canonical_road_id}` : "";
+      const operationCliArg = restoreDefault ? "--restore-default" : `--target-lane-count ${targetLaneCount}`;
+      const createCliCommand = `python scripts\\create_lane_upgrade_transaction.py --area-id ${payload.area_id} --road-id ${payload.road_id}${canonicalCliArg} ${operationCliArg} --reason "${reason}"`;
+      const executeCliCommand = laneForgeCliCommand(payload);
       const request = {
         type: "lane_upgrade_transaction_request",
         metadata: {
-          area_id: areaId,
+          area_id: payload.area_id,
           schema: "lane_upgrade_system.transaction_request.v1",
           system: "LaneForge",
           created_at_utc: now,
           source_surface: "svg_live_viewer"
         },
         request: {
-          action: restoreDefault ? "restore_road_lane_count_default" : "set_road_physical_lane_count",
-          road_id: roadId,
-          canonical_road_id: canonicalRoadId,
-          target_physical_lane_count: restoreDefault ? 0 : targetLaneCount,
+          action: payload.action,
+          road_id: payload.road_id,
+          canonical_road_id: payload.canonical_road_id,
+          target_physical_lane_count: payload.target_physical_lane_count,
           distribution_policy: restoreDefault ? "source_or_default_lane_model_v1" : "balanced_bidirectional_left_traffic_v1",
           source: "web_lane_count_menu",
-          reason: restoreDefault
-            ? `viewer request: restore ${roadId || canonicalRoadId} to default lane model`
-            : `viewer request: set ${roadId || canonicalRoadId} to ${targetLaneCount} physical lanes`,
+          reason: payload.reason,
           reviewer: "web_user"
         },
         next_cli_command: executeCliCommand,
@@ -2347,6 +2474,62 @@
         execute_cli_command: executeCliCommand
       };
       return JSON.stringify(request, null, 2);
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+
+    async function fetchJson(url, options = {}) {
+      const response = await fetch(url, {
+        cache: "no-store",
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        }
+      });
+      let payload = {};
+      try {
+        payload = await response.json();
+      } catch {
+        payload = {};
+      }
+      if (!response.ok) {
+        throw new Error(payload.error || `HTTP ${response.status}`);
+      }
+      return payload;
+    }
+
+    async function postJson(url, payload) {
+      return fetchJson(url, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+    }
+
+    async function getJson(url) {
+      return fetchJson(url);
+    }
+
+    function laneForgeAffectedText(job) {
+      const scope = job?.preview?.affected_scope || {};
+      const nodes = Array.isArray(scope.adjacent_junction_node_ids) ? scope.adjacent_junction_node_ids : [];
+      if (!nodes.length) {
+        return "相邻路口 0 个";
+      }
+      return `相邻路口 ${nodes.length} 个：${nodes.join(", ")}`;
+    }
+
+    async function waitForLaneForgeJob(jobId, onUpdate) {
+      for (;;) {
+        const job = await getJson(`/api/jobs/${encodeURIComponent(jobId)}`);
+        onUpdate(job);
+        if (job.status === "completed" || job.status === "failed") {
+          return job;
+        }
+        await sleep(1200);
+      }
     }
 
     function appendLaneUpgradePanelV2(data) {
@@ -2367,7 +2550,7 @@
       const note = document.createElement("div");
       note.className = "lane-upgrade-note";
       note.textContent = roadId
-        ? `Road（道路） ${roadId}：选择目标车道数，或恢复默认。网页只生成事务命令，不直接改道路真值。`
+        ? `Road（道路） ${roadId}：选择目标车道数后点确定；后台会重建车道、相邻路口 laneLinks 和 surface。`
         : "请优先选择 lane（车道）或 canonical road（标准道路）；当前对象缺少 road_graph road_id。";
       panel.append(note);
 
@@ -2388,11 +2571,15 @@
       const status = document.createElement("div");
       status.className = "lane-upgrade-status";
       for (const [label, value] of [["当前", currentText], ["选中", selectedLaneText], ["事务", laneUpgradeId || "无 active override（无激活覆盖）"]]) {
+        const item = document.createElement("div");
+        item.className = "lane-upgrade-status-item";
+        item.title = value;
         const key = document.createElement("strong");
         key.textContent = label;
         const val = document.createElement("span");
         val.textContent = value;
-        status.append(key, val);
+        item.append(key, val);
+        status.append(item);
       }
       panel.append(status);
 
@@ -2404,12 +2591,20 @@
       output.hidden = true;
       output.setAttribute("aria-label", "LaneForge transaction request JSON");
       let selectedRequest = "";
+      let selectedPayload = null;
+      const actionButtons = [];
 
       const copyCommandButton = document.createElement("button");
       copyCommandButton.type = "button";
       copyCommandButton.className = "lane-upgrade-copy";
-      copyCommandButton.textContent = "先选择操作";
+      copyCommandButton.textContent = "复制命令";
       copyCommandButton.disabled = true;
+
+      const applyButton = document.createElement("button");
+      applyButton.type = "button";
+      applyButton.className = "lane-upgrade-copy lane-upgrade-apply";
+      applyButton.textContent = "确定应用";
+      applyButton.disabled = true;
 
       const detailsButton = document.createElement("button");
       detailsButton.type = "button";
@@ -2417,23 +2612,93 @@
       detailsButton.textContent = "显示详情";
       detailsButton.disabled = true;
 
-      function setRequest(label, requestText) {
+      const jobStatus = document.createElement("div");
+      jobStatus.className = "lane-upgrade-job-status";
+      jobStatus.textContent = "选择 1/2/3/4 车道或恢复默认。";
+
+      const progressTrack = document.createElement("div");
+      progressTrack.className = "lane-upgrade-progress";
+      progressTrack.setAttribute("role", "progressbar");
+      progressTrack.setAttribute("aria-valuemin", "0");
+      progressTrack.setAttribute("aria-valuemax", "100");
+      progressTrack.setAttribute("aria-valuenow", "0");
+
+      const progressFill = document.createElement("div");
+      progressFill.className = "lane-upgrade-progress-fill";
+      progressTrack.append(progressFill);
+
+      const progressLabel = document.createElement("div");
+      progressLabel.className = "lane-upgrade-progress-label";
+      progressLabel.textContent = "等待操作 · 0%";
+
+      const progressMeta = document.createElement("div");
+      progressMeta.className = "lane-upgrade-progress-meta";
+      progressMeta.append(jobStatus, progressLabel);
+
+      const progressBox = document.createElement("div");
+      progressBox.className = "lane-upgrade-progress-box";
+      progressBox.append(progressMeta, progressTrack);
+
+      let progressValue = 0;
+      let progressTimer = 0;
+
+      function setProgress(value, label, tone = "") {
+        progressValue = clamp(Number(value) || 0, 0, 100);
+        const roundedValue = Math.round(progressValue);
+        progressFill.style.width = `${roundedValue}%`;
+        progressTrack.setAttribute("aria-valuenow", String(roundedValue));
+        progressTrack.classList.toggle("failed", tone === "failed");
+        progressLabel.textContent = `${label} · ${roundedValue}%`;
+      }
+
+      function stopRunningProgress() {
+        if (progressTimer) {
+          window.clearInterval(progressTimer);
+          progressTimer = 0;
+        }
+      }
+
+      function startRunningProgress(label) {
+        if (progressTimer) {
+          return;
+        }
+        setProgress(Math.max(progressValue, 32), label);
+        progressTimer = window.setInterval(() => {
+          const next = progressValue + Math.max(0.6, (85 - progressValue) * 0.08);
+          setProgress(Math.min(85, next), label);
+          if (progressValue >= 85) {
+            stopRunningProgress();
+          }
+        }, 1000);
+      }
+
+      function setPanelBusy(busy) {
+        for (const button of actionButtons) {
+          button.disabled = busy;
+        }
+        copyCommandButton.disabled = busy || !selectedRequest;
+        applyButton.disabled = busy || !selectedPayload;
+        detailsButton.disabled = busy || !selectedRequest;
+      }
+
+      function setRequest(label, payload, requestText) {
+        selectedPayload = payload;
         selectedRequest = requestText;
         output.value = selectedRequest;
-        copyCommandButton.disabled = false;
-        detailsButton.disabled = false;
-        copyCommandButton.textContent = label;
+        setPanelBusy(false);
+        jobStatus.textContent = `已选择：${label}。点“确定应用”会重建道路和相邻路口。`;
       }
 
       for (const count of [1, 2, 3, 4]) {
         const button = document.createElement("button");
         button.type = "button";
         button.textContent = `${count}车道`;
-        button.title = `生成 ${count} 车道事务`;
+        button.title = `设置为 ${count} 车道并准备应用`;
         button.addEventListener("click", (event) => {
           event.stopPropagation();
-          setRequest(`复制 ${count}车道命令`, laneForgeRequestTextV2(data, count, false));
+          setRequest(`${count}车道`, laneForgePayload(data, count, false), laneForgeRequestTextV2(data, count, false));
         });
+        actionButtons.push(button);
         actions.append(button);
       }
 
@@ -2443,9 +2708,14 @@
       restoreButton.title = "移除 active override，回到源数据/默认规则";
       restoreButton.addEventListener("click", (event) => {
         event.stopPropagation();
-        setRequest("复制恢复命令", laneForgeRequestTextV2(data, 0, true));
+        setRequest("恢复默认", laneForgePayload(data, 0, true), laneForgeRequestTextV2(data, 0, true));
       });
+      actionButtons.push(restoreButton);
       actions.append(restoreButton);
+
+      const commandRow = document.createElement("div");
+      commandRow.className = "lane-upgrade-command-row";
+      commandRow.append(applyButton, copyCommandButton, detailsButton);
 
       copyCommandButton.addEventListener("click", async (event) => {
         event.stopPropagation();
@@ -2469,13 +2739,67 @@
         }, 1200);
       });
 
+      applyButton.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        if (!selectedPayload || state.laneForgeJobInFlight) {
+          return;
+        }
+        state.laneForgeJobInFlight = true;
+        setPanelBusy(true);
+        applyButton.textContent = "执行中";
+        jobStatus.textContent = "正在提交 LaneForge 后台任务...";
+        stopRunningProgress();
+        setProgress(8, "提交任务");
+        setStatus("busy", "LaneForge job queued（车道任务已提交）");
+        try {
+          const job = await postJson("/api/lane-upgrades/apply", selectedPayload);
+          jobStatus.textContent = `任务 ${job.job_id} 已提交，${laneForgeAffectedText(job)}，正在重建。`;
+          setProgress(18, "任务已提交");
+          setStatus("busy", `LaneForge rebuilding（正在重建） · ${job.job_id}`);
+          const completed = await waitForLaneForgeJob(job.job_id, (nextJob) => {
+            jobStatus.textContent = `任务 ${nextJob.status} · ${laneForgeAffectedText(nextJob)}`;
+            if (nextJob.status === "queued") {
+              setProgress(Math.max(progressValue, 18), "排队中");
+            } else if (nextJob.status === "running") {
+              startRunningProgress("重建管线中");
+            } else if (nextJob.status === "completed") {
+              stopRunningProgress();
+              setProgress(92, "后台完成，刷新 SVG");
+            } else if (nextJob.status === "failed") {
+              stopRunningProgress();
+              setProgress(100, "执行失败", "failed");
+            }
+          });
+          if (completed.status !== "completed") {
+            throw new Error((completed.stdout_tail || "LaneForge job failed").slice(-220));
+          }
+          jobStatus.textContent = `完成：已重建道路和${laneForgeAffectedText(completed)}，正在刷新 SVG。`;
+          setProgress(96, "刷新 SVG");
+          await loadSvg(true);
+          await loadScoring(true);
+          setProgress(100, "完成");
+          setStatus("ready", `LaneForge completed（车道与路口已刷新） · ${new Date().toLocaleTimeString()}`);
+          jobStatus.textContent = `完成：道路车道、相邻路口和 SVG 已刷新。`;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          stopRunningProgress();
+          setProgress(100, "执行失败", "failed");
+          jobStatus.textContent = `执行失败：${message}`;
+          setStatus("error", `LaneForge failed（执行失败） · ${message}`);
+        } finally {
+          state.laneForgeJobInFlight = false;
+          applyButton.textContent = "确定应用";
+          setPanelBusy(false);
+        }
+      });
+
       detailsButton.addEventListener("click", (event) => {
         event.stopPropagation();
         output.hidden = !output.hidden;
         detailsButton.textContent = output.hidden ? "显示详情" : "隐藏详情";
       });
 
-      panel.append(actions, copyCommandButton, detailsButton, output);
+      panel.append(actions, commandRow, progressBox, output);
       inspectorBody.append(panel);
     }
 

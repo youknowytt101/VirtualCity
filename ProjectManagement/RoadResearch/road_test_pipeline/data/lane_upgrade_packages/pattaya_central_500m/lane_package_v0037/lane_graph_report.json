@@ -1,0 +1,457 @@
+{
+  "area_id": "pattaya_central_500m",
+  "stage": "lane_graph_v1",
+  "input": "data/processed/pattaya_central_500m_road_graph.json",
+  "junction_semantics": "data/processed/pattaya_central_500m_junction_semantics.json",
+  "output": "data/processed/pattaya_central_500m_lane_graph.json",
+  "counts": {
+    "lanes": 200,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
+    "standalone_physical_lane_centerlines": 174,
+    "junctions": 49,
+    "approach_lane_records": 149,
+    "connections": 306,
+    "lane_links": 306,
+    "continuity_links": 20,
+    "optimized_approach_centerlines": 100,
+    "optimized_approach_centerlines_applied": 100,
+    "optimized_junction_connectors": 149,
+    "optimized_junction_connector_lane_links": 0,
+    "optimized_corner_fillet_links": 6,
+    "direct_connector_continuity_links": 14,
+    "same_physical_lane_continuity_links": 14,
+    "physical_lane_groups_created": 12,
+    "physical_lane_grouped_lanes": 26,
+    "active_lane_upgrades": 5,
+    "active_lane_upgrades_applied": 0,
+    "active_lane_upgrades_deferred": 5,
+    "active_lane_upgrades_missing_roads": 0,
+    "active_lane_upgrades_ignored": 0,
+    "lane_bundle_centerline_smoothed_edges": 21,
+    "lane_bundle_centerline_smoothed_bends": 40,
+    "derived_lane_centerline_smoothed_lanes": 0,
+    "derived_lane_centerline_smoothed_bends": 0,
+    "derived_lane_centerline_inserted_sample_points": 0,
+    "lane_level_radius_regularized_continuity_links": 1,
+    "fan_fallback_junctions": 0
+  },
+  "lane_bundle_centerline_smoothing": {
+    "policy": "lane_bundle_centerline_smoothing_v1",
+    "edges_evaluated": 100,
+    "smoothed_edge_count": 21,
+    "smoothed_edge_ids": [
+      "e_0002",
+      "e_0004",
+      "e_0011",
+      "e_0012",
+      "e_0014",
+      "e_0015",
+      "e_0017",
+      "e_0022",
+      "e_0031",
+      "e_0034",
+      "e_0044",
+      "e_0054",
+      "e_0062",
+      "e_0077",
+      "e_0079",
+      "e_0081",
+      "e_0082",
+      "e_0083",
+      "e_0084",
+      "e_0093",
+      "e_0095"
+    ],
+    "smoothed_bend_count": 40,
+    "inserted_sample_points": 332,
+    "max_abs_lane_offset_m": 1.6,
+    "max_min_arc_radius_m": 6.4,
+    "profile_counts": {
+      "hard_bend_lane_level_rounding": 19,
+      "micro_bend": 21
+    },
+    "curve_family_counts": {
+      "straight_infinite_radius": 1,
+      "tangent_circular_arc": 39
+    },
+    "arc_fit_status_counts": {
+      "exact_tangent_arc": 39,
+      "low_radius_arc_regularization_unavailable": 1
+    },
+    "low_radius_sampled_arc_cleanup": {
+      "edges_cleaned": 0,
+      "removed_points": 0
+    },
+    "skipped_bends": {
+      "above_angle_threshold": 19,
+      "too_few_points": 71
+    }
+  },
+  "derived_lane_centerline_smoothing": {
+    "policy": "derived_lane_centerline_smoothing_v1",
+    "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+    "rounding_style": {
+      "style_id": "unified_lane_geometry_rounding_style_v1",
+      "primary_curve_family": "tangent_circular_arc",
+      "straight_curve_family": "straight_infinite_radius",
+      "sample_strategy": "arc_angle_limited_min_profile_samples",
+      "sample_angle_deg": 5.0,
+      "lane_level_straight_sweep_deg": 0.1,
+      "lane_level_continuity_min_radius_m": 3.2,
+      "lane_level_continuity_regularization": "enabled_for_offset_corner_fillets_below_min_radius",
+      "min_samples": {
+        "optimized_corner_fillet": 9,
+        "micro_bend": 5,
+        "hard_bend_lane_level_rounding": 9
+      },
+      "endpoint_lock": "preserve_lane_endpoints_and_trim_local_bend_windows",
+      "semantic_boundary": "geometry_style_only_no_traffic_semantics_inference",
+      "truth_layers_unchanged": [
+        "raw",
+        "repaired",
+        "canonical",
+        "road_graph"
+      ]
+    },
+    "curve_family": "tangent_circular_arc",
+    "sample_strategy": "arc_angle_limited_min_profile_samples",
+    "sample_angle_deg": 5.0,
+    "profiles": [
+      "micro_bend",
+      "hard_bend_lane_level_rounding"
+    ],
+    "lane_bundle_centerline_smoothing_policy": "lane_bundle_centerline_smoothing_v1",
+    "lane_bundle_min_base_radius_policy": "max_abs_lane_offset_plus_lane_min_radius",
+    "min_angle_deg": 0.5,
+    "max_angle_deg": 3.0,
+    "min_source_offset_m": 0.05,
+    "max_source_offset_m": 0.75,
+    "min_adjacent_segment_m": 8.0,
+    "cut_ratio": 0.45,
+    "max_cut_m": 24.0,
+    "sample_count": 5,
+    "max_derivation_offset_m": 0.0,
+    "hard_bend_min_angle_deg": 12.0,
+    "hard_bend_max_angle_deg": 120.0,
+    "hard_bend_min_adjacent_segment_m": 1.5,
+    "hard_bend_source_offset_policy": "diagnostic_only_local_derivation_limited",
+    "hard_bend_cut_ratio": 0.32,
+    "hard_bend_max_cut_m": 9.0,
+    "hard_bend_sample_count": 9,
+    "hard_bend_max_derivation_offset_m": 2.6,
+    "hard_bend_min_arc_radius_m": 4.800000000000001,
+    "hard_bend_low_radius_max_cut_ratio": 0.9,
+    "hard_bend_low_radius_fallback": "straight_chord_when_min_radius_arc_is_infeasible",
+    "short_connector_hard_bend_smoothing": "enabled_when_local_derivation_offset_stays_within_limit",
+    "adjacent_bend_chain_smoothing": "enabled_with_non_overlapping_cut_windows",
+    "low_radius_sampled_arc_cleanup": {
+      "policy": "lane_centerline_low_radius_sampled_arc_cleanup_v1",
+      "lanes_cleaned": 0,
+      "runs_collapsed": 0,
+      "removed_points": 0,
+      "max_run_span_m": 0.0,
+      "min_radius_m": 4.800000000000001,
+      "min_observed_radius_m": 0.0,
+      "max_sample_segment_m": 1.0,
+      "max_run_span_threshold_m": 4.0
+    },
+    "truth_layers_unchanged": [
+      "raw",
+      "repaired",
+      "canonical",
+      "road_graph"
+    ],
+    "lanes_evaluated": 200,
+    "smoothed_lane_count": 0,
+    "smoothed_bend_count": 0,
+    "inserted_sample_points": 0,
+    "source_point_count": 1182,
+    "derived_point_count": 1182,
+    "max_source_bend_offset_m": 0.0,
+    "max_smoothed_angle_deg": 0.0,
+    "profile_counts": {},
+    "curve_family_counts": {},
+    "arc_fit_status_counts": {},
+    "derivation_limit_adjustments": 0,
+    "lane_bundle_managed_lanes": 42,
+    "micro_segment_cleanup": {
+      "policy": "lane_centerline_micro_segment_cleanup_v1",
+      "lanes_cleaned": 0,
+      "runs_collapsed": 0,
+      "removed_points": 0,
+      "max_run_span_m": 0.0,
+      "min_segment_m": 0.5,
+      "max_run_span_threshold_m": 1.25
+    },
+    "smoothed_lane_ids": [],
+    "smoothed_road_ids": [],
+    "skipped_bends": {
+      "above_angle_threshold": 20,
+      "too_few_points": 142
+    },
+    "skipped_road_ids_by_reason": {
+      "above_angle_threshold": [
+        "e_0016",
+        "e_0024",
+        "e_0032",
+        "e_0051",
+        "e_0058",
+        "e_0061",
+        "e_0063",
+        "e_0091"
+      ],
+      "too_few_points": [
+        "e_0000",
+        "e_0001",
+        "e_0003",
+        "e_0005",
+        "e_0006",
+        "e_0007",
+        "e_0008",
+        "e_0009",
+        "e_0010",
+        "e_0013",
+        "e_0018",
+        "e_0019",
+        "e_0020",
+        "e_0021",
+        "e_0023",
+        "e_0025",
+        "e_0026",
+        "e_0027",
+        "e_0028",
+        "e_0029",
+        "e_0030",
+        "e_0033",
+        "e_0035",
+        "e_0036",
+        "e_0037",
+        "e_0038",
+        "e_0039",
+        "e_0040",
+        "e_0041",
+        "e_0042",
+        "e_0043",
+        "e_0045",
+        "e_0046",
+        "e_0047",
+        "e_0048",
+        "e_0049",
+        "e_0050",
+        "e_0052",
+        "e_0053",
+        "e_0055",
+        "e_0056",
+        "e_0057",
+        "e_0059",
+        "e_0060",
+        "e_0064",
+        "e_0065",
+        "e_0066",
+        "e_0067",
+        "e_0068",
+        "e_0069",
+        "e_0070",
+        "e_0071",
+        "e_0072",
+        "e_0073",
+        "e_0074",
+        "e_0075",
+        "e_0076",
+        "e_0078",
+        "e_0080",
+        "e_0085",
+        "e_0086",
+        "e_0087",
+        "e_0088",
+        "e_0089",
+        "e_0090",
+        "e_0092",
+        "e_0094",
+        "e_0096",
+        "e_0097",
+        "e_0098",
+        "e_0099"
+      ]
+    }
+  },
+  "physical_lane_centerlines": {
+    "policy": "physical_lane_centerlines_v1",
+    "group_policy": "degree2_connector_physical_lane_group_v1",
+    "centerlines": 186,
+    "grouped_centerlines": 12,
+    "standalone_centerlines": 174,
+    "source_lane_segments_grouped": 26
+  },
+  "direct_connector_continuity": {
+    "policy": "degree2_connector_through_continuity_v1",
+    "micro_seam_policy": "degree2_connector_micro_seam_endpoint_snap_v1",
+    "physical_lane_group_policy": "degree2_connector_physical_lane_group_v1",
+    "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+    "rounding_curve_family": "straight_infinite_radius",
+    "max_turn_deg": 18.0,
+    "max_endpoint_gap_m": 2.0,
+    "micro_seam_snap_threshold_m": 0.1,
+    "physical_lane_grouping": {
+      "policy": "degree2_connector_physical_lane_group_v1",
+      "max_turn_deg": 5.0,
+      "max_endpoint_gap_m": 0.1,
+      "candidate_links": 14,
+      "links_grouped": 14,
+      "groups_created": 12,
+      "lanes_grouped": 26,
+      "group_ids": [
+        "plg_690e8dfb9028",
+        "plg_7acbe54f0555",
+        "plg_8e8e49c08a2b",
+        "plg_97df9ec02a57",
+        "plg_9823dabcd1b8",
+        "plg_a00107c1cfbb",
+        "plg_acb9c8e18143",
+        "plg_b231181c59e0",
+        "plg_b4c48f3b4a82",
+        "plg_b5cce8ee354a",
+        "plg_cfcfc6215d40",
+        "plg_f8ad26a6693f"
+      ],
+      "skipped": {}
+    },
+    "connector_nodes_considered": 7,
+    "connector_nodes_linked": 7,
+    "links_created": 14,
+    "micro_seams_absorbed": 12,
+    "same_physical_lane_links": 14,
+    "physical_lane_groups_created": 12,
+    "physical_lane_grouped_lanes": 26,
+    "max_created_endpoint_gap_m": 0.0,
+    "max_observed_turn_deg": 2.254,
+    "skipped": {
+      "covered_by_corner_fillet": 3
+    }
+  },
+  "lane_upgrade_system": {
+    "system": "LaneForge",
+    "overrides_source": "data/processed/pattaya_central_500m_lane_upgrade_overrides.json",
+    "geometry_application_policy": "defer_lane_upgrade_overrides_keep_all_roads_bidirectional_two_lane_v1",
+    "applied_road_ids": [],
+    "deferred_road_ids": [
+      "e_0005",
+      "e_0013",
+      "e_0014",
+      "e_0015",
+      "e_0017"
+    ],
+    "missing_road_ids": [],
+    "ignored": [],
+    "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+    "note": "Manual lane upgrades are applied to geometry according to geometry_application_policy; source map, canonical and road_graph truth layers remain unchanged."
+  },
+  "junction_type_counts": {
+    "T": 47,
+    "cross": 2
+  },
+  "turn_counts": {
+    "left": 102,
+    "right": 102,
+    "through": 102
+  },
+  "lane_source_counts": {
+    "temporary_bidirectional_two_lane_policy": 200
+  },
+  "lane_centerline_source_counts": {
+    "optimized_approach_centerline": 158,
+    "optimized_approach_centerline+lane_bundle_centerline_smoothing_v1": 42
+  },
+  "lane_centerline_derivation_counts": {
+    "none": 200
+  },
+  "width_source_counts": {
+    "fixed_default": 200
+  },
+  "connection_source_counts": {
+    "geometry_inferred_from_osm_plus_temporary_bidirectional_two_lane_policy": 306
+  },
+  "lane_link_source_counts": {
+    "junction_semantics": 306
+  },
+  "lane_link_curve_source_counts": {
+    "junction_lane_endpoint_bezier": 306
+  },
+  "lane_link_connector_kind_counts": {
+    "none": 306
+  },
+  "continuity_link_source_counts": {
+    "degree2_connector_through_continuity_v1": 14,
+    "optimized_corner_fillet": 6
+  },
+  "continuity_rounding_style_counts": {
+    "unified_lane_geometry_rounding_style_v1": 20
+  },
+  "continuity_rounding_curve_family_counts": {
+    "straight_infinite_radius": 14,
+    "tangent_circular_arc": 6
+  },
+  "fallback_counts": {
+    "not_generated_layer3_lane_graph_only": 49
+  },
+  "skipped_counts": {},
+  "metrics": {
+    "junctions_with_connections_ratio": 1.0,
+    "fan_fallback_ratio": 0.0,
+    "avg_lane_links_per_junction": 6.245,
+    "lane_link_reference_errors": 0,
+    "blocked_lane_links": 0,
+    "empty_connection_curves": 0,
+    "avg_lane_link_confidence": 0.82,
+    "min_lane_link_confidence": 0.82,
+    "avg_curve_length_m": 20.368,
+    "max_curve_length_m": 28.812,
+    "avg_continuity_curve_length_m": 1.392,
+    "max_continuity_curve_length_m": 7.301,
+    "avg_lane_width_m": 3.2,
+    "min_lane_width_m": 3.2,
+    "max_lane_width_m": 3.2,
+    "avg_lane_width_confidence": 0.45,
+    "max_lane_width_start_end_delta_m": 0.0,
+    "lane_bundle_centerline_smoothed_edges": 21,
+    "lane_bundle_centerline_smoothed_bends": 40,
+    "lane_bundle_centerline_max_min_arc_radius_m": 6.4,
+    "derived_lane_centerline_smoothed_lanes": 0,
+    "derived_lane_centerline_smoothed_bends": 0,
+    "derived_lane_centerline_inserted_sample_points": 0,
+    "derived_lane_centerline_max_derivation_offset_m": 0.0,
+    "derived_lane_centerline_max_source_bend_offset_m": 0.0,
+    "derived_lane_centerline_smoothing_curve_family_counts": {},
+    "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
+    "continuity_rounding_style_counts": {
+      "unified_lane_geometry_rounding_style_v1": 20
+    },
+    "continuity_rounding_curve_family_counts": {
+      "straight_infinite_radius": 14,
+      "tangent_circular_arc": 6
+    },
+    "lane_level_radius_regularized_continuity_links": 1,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
+    "standalone_physical_lane_centerlines": 174,
+    "same_physical_lane_continuity_links": 14,
+    "physical_lane_groups_created": 12,
+    "physical_lane_grouped_lanes": 26,
+    "min_optimized_corner_continuity_radius_m": 0.728
+  },
+  "notes": [
+    "M2/M3 redesign: lane graph now consumes junction_semantics road-level movements.",
+    "Temporary policy: every source road is generated as bidirectional two-lane geometry, including source one-way roads.",
+    "LaneForge lane upgrades can override the generated physical lane count per road through versioned transactions.",
+    "Derived lane centerline smoothing only adds low-offset samples to lane_graph/lane_surface outputs; raw/repaired/canonical/road_graph truth layers are unchanged.",
+    "physical_lane_centerlines is the clean continuous lane centerline contract; lanes remain source road-edge lane segments.",
+    "Final lane centerline smoothing and continuity links declare unified_lane_geometry_rounding_style_v1 for consistent downstream road styling.",
+    "Lane widths use a fixed default width for this replay state.",
+    "Junction laneLinks are generated only for allowed semantic movements and stay independent from road-level optimized junction connectors.",
+    "Degree-2 road bends are bridged by optimized_corner_fillet continuity links; near-straight degree-2 connectors get direct through continuity links.",
+    "Near-straight degree-2 direct connector links with endpoint gaps inside the micro-seam threshold are annotated as derived physical lane groups without merging road truth layers.",
+    "Because the current OSM sample lacks reliable turn restrictions, movement and laneLink confidence is inherited from geometry inference.",
+    "No road surface, junction fan polygon or envelope mesh is generated in this layer."
+  ]
+}

@@ -1,14 +1,14 @@
 {
   "area_id": "pattaya_central_500m",
   "system": "LaneForge",
-  "latest_package_version": "lane_package_v0028",
+  "latest_package_version": "lane_package_v0049",
   "path_policy": "portable_lane_package_paths_v1",
-  "latest_package_dir": "lane_package_v0028",
+  "latest_package_dir": "lane_package_v0049",
   "manifest": "manifest.json",
   "qa_gate_status": "manual_review_required",
   "qa_warning_summary": {
     "publishable_warn": 0,
-    "manual_review_required": 3,
+    "manual_review_required": 4,
     "blocker": 0
   }
 }

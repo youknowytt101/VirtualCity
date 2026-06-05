@@ -13,8 +13,15 @@ import argparse
 import json
 import re
 import shutil
+import sys
 from pathlib import Path
 from typing import Any
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from artifact_manifest import artifact_records
 
 
 SYSTEM_NAME = "LaneForge"
@@ -156,6 +163,48 @@ def qa_gate_from_audit(audit: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def optional_report(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return read_json(path)
+
+
+def build_semantic_review_summary(
+    *,
+    road_graph_report: dict[str, Any],
+    lane_attribute_report: dict[str, Any],
+    junction_semantics_report: dict[str, Any],
+    qa_gate: dict[str, Any],
+) -> dict[str, Any]:
+    road_metrics = road_graph_report.get("metrics") or {}
+    lane_metrics = lane_attribute_report.get("metrics") or {}
+    lane_counts = lane_attribute_report.get("counts") or {}
+    junction_counts = junction_semantics_report.get("counts") or {}
+    qa_entries = [
+        entry
+        for entry in qa_gate.get("entries", [])
+        if str(entry.get("stage") or "") in {"road_graph", "junction_semantics", "lane_attribute_model"}
+    ]
+    return {
+        "schema": "lane_upgrade_system.semantic_review_summary.v1",
+        "status": "manual_review_required" if qa_entries else "pass",
+        "active_lane_policy": str(lane_attribute_report.get("active_lane_policy") or ""),
+        "width_fallback_ratio": road_metrics.get("width_fallback_ratio"),
+        "lanes_fallback_ratio": road_metrics.get("lanes_fallback_ratio"),
+        "missing_turn_lanes_ratio": lane_metrics.get("missing_turn_lanes_ratio"),
+        "lane_count_policy_override_ratio": lane_metrics.get("lane_count_policy_override_ratio"),
+        "direction_policy_override_ratio": lane_metrics.get("direction_policy_override_ratio"),
+        "source_oneway_ignored_approaches": junction_counts.get("source_oneway_ignored_approaches"),
+        "source_oneway_blocked_movements_if_trusted": junction_counts.get("source_oneway_blocked_movements_if_trusted"),
+        "turn_lanes_source_counts": lane_counts.get("turn_lanes_source_counts", {}),
+        "qa_review_entries": qa_entries,
+        "production_note": (
+            "Lane geometry is publishable for research when qa_gate allows it, but traffic semantics remain review-gated "
+            "until width, lanes, oneway and turn-lanes sources are promoted from temporary policy/fallback inputs."
+        ),
+    }
+
+
 def build_package(
     *,
     area_id: str,
@@ -177,6 +226,9 @@ def build_package(
     audit_path = reports / f"{area_id}_pipeline_audit_report.json"
     lane_report_path = reports / f"{area_id}_lane_graph_report.json"
     surface_report_path = reports / f"{area_id}_lane_surface_v1_report.json"
+    road_graph_report_path = reports / f"{area_id}_road_graph_report.json"
+    lane_attribute_report_path = reports / f"{area_id}_lane_attribute_model_report.json"
+    junction_semantics_report_path = reports / f"{area_id}_junction_semantics_report.json"
     active_overrides_path = processed / f"{area_id}_lane_upgrade_overrides.json"
     active_corner_overrides_path = processed / f"{area_id}_corner_optimization_overrides.json"
     corner_candidates_path = processed / f"{area_id}_corner_optimization_candidates.json"
@@ -208,6 +260,21 @@ def build_package(
     if qa_gate_status == "manual_review_required" and not allow_manual_review:
         raise RuntimeError("Pipeline QA gate requires manual review; refusing to publish package.")
 
+    source_artifacts = artifact_records(
+        {
+            "lane_graph": lane_graph_path,
+            "standard_lane_surfaces_source": lane_surface_path,
+            "standard_lane_surfaces_obj_source": lane_surface_obj_path,
+            "lane_debug_geometry_source": lane_debug_path,
+            "pipeline_audit_report": audit_path,
+            "lane_graph_report": lane_report_path,
+            "lane_surface_report": surface_report_path,
+            "road_graph_report": road_graph_report_path,
+            "lane_attribute_model_report": lane_attribute_report_path,
+            "junction_semantics_report": junction_semantics_report_path,
+        },
+        root=root,
+    )
     lane_graph = read_json(lane_graph_path)
     lanes = lane_graph.get("lanes", [])
     physical_lane_centerlines = lane_graph.get("physical_lane_centerlines", [])
@@ -283,6 +350,12 @@ def build_package(
 
     surface_report = read_json(surface_report_path)
     lane_report = read_json(lane_report_path)
+    semantic_review = build_semantic_review_summary(
+        road_graph_report=optional_report(road_graph_report_path),
+        lane_attribute_report=optional_report(lane_attribute_report_path),
+        junction_semantics_report=optional_report(junction_semantics_report_path),
+        qa_gate=qa_gate,
+    )
     corner_report_counts = (corner_report or {}).get("counts", {})
     manifest = {
         "type": "standard_lane_package_manifest",
@@ -301,6 +374,7 @@ def build_package(
             "lane_geometry_rounding_style": rounding_style,
         },
         "human_model": "raw map data -> LaneForge lane upgrade system -> standard lane package -> Houdini construction pipeline",
+        "source_artifacts": source_artifacts,
         "contents": {
             "standard_lanes": "standard_lanes.json",
             "standard_junctions": "standard_junctions.json",
@@ -337,6 +411,7 @@ def build_package(
             "lane_upgrade_propagation_candidates": len((propagation_plan or {}).get("candidates", [])),
             "lane_upgrade_propagation_high_confidence": (propagation_report or {}).get("counts", {}).get("high_confidence_candidates", 0),
         },
+        "semantic_review": semantic_review,
         "metrics": {
             "lane_graph": lane_report.get("metrics", {}),
             "lane_surface": surface_report.get("metrics", {}),
@@ -383,8 +458,23 @@ def build_package(
             "junction_envelope_surface_v1",
         ],
     }
-    write_json(package_dir / "manifest.json", manifest)
     write_json(package_dir / "houdini_manifest.json", houdini_manifest)
+    package_artifacts = artifact_records(
+        {
+            "standard_lanes": package_dir / "standard_lanes.json",
+            "standard_junctions": package_dir / "standard_junctions.json",
+            "standard_lane_surfaces": package_dir / "standard_lane_surfaces.geojson",
+            "standard_lane_surfaces_obj": package_dir / "standard_lane_surfaces.obj",
+            "lane_debug_geometry": package_dir / "lane_debug_geometry.geojson",
+            "qa_report": package_dir / "qa_report.json",
+            "lane_graph_report": package_dir / "lane_graph_report.json",
+            "lane_surface_report": package_dir / "lane_surface_report.json",
+            "houdini_manifest": package_dir / "houdini_manifest.json",
+        },
+        root=root,
+    )
+    manifest["package_artifacts"] = package_artifacts
+    write_json(package_dir / "manifest.json", manifest)
     latest = {
         "area_id": area_id,
         "system": SYSTEM_NAME,
@@ -394,6 +484,10 @@ def build_package(
         "manifest": "manifest.json",
         "qa_gate_status": qa_gate_status,
         "qa_warning_summary": qa_gate.get("summary", {}),
+        "source_artifacts": {
+            "lane_graph": source_artifacts["lane_graph"],
+            "pipeline_audit_report": source_artifacts["pipeline_audit_report"],
+        },
     }
     write_json(package_dir.parent / "latest.json", latest)
     return {

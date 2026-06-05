@@ -4,7 +4,7 @@
     "area_id": "pattaya_central_500m",
     "schema": "road_test_pipeline.junction_semantics.v1",
     "coord_domain": "local_xz_m",
-    "source": "data/processed/pattaya_central_500m_road_graph.json",
+    "source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
     "active_direction_policy": "temporary_all_roads_bidirectional_two_lane_v1",
     "design_note": "Road-level semantic model for later laneLink and junction surface generation."
   },

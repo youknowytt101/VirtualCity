@@ -70,6 +70,9 @@
   "metrics": {
     "counts": {
       "lanes": 200,
+      "physical_lane_centerlines": 186,
+      "physical_lane_group_centerlines": 12,
+      "standalone_physical_lane_centerlines": 174,
       "junctions": 49,
       "approach_lane_records": 149,
       "connections": 306,
@@ -81,14 +84,19 @@
       "optimized_junction_connector_lane_links": 0,
       "optimized_corner_fillet_links": 6,
       "direct_connector_continuity_links": 14,
-      "active_lane_upgrades": 4,
+      "same_physical_lane_continuity_links": 14,
+      "physical_lane_groups_created": 12,
+      "physical_lane_grouped_lanes": 26,
+      "active_lane_upgrades": 5,
       "active_lane_upgrades_applied": 0,
-      "active_lane_upgrades_deferred": 4,
+      "active_lane_upgrades_deferred": 5,
       "active_lane_upgrades_missing_roads": 0,
       "active_lane_upgrades_ignored": 0,
-      "derived_lane_centerline_smoothed_lanes": 38,
-      "derived_lane_centerline_smoothed_bends": 72,
-      "derived_lane_centerline_inserted_sample_points": 615,
+      "lane_bundle_centerline_smoothed_edges": 20,
+      "lane_bundle_centerline_smoothed_bends": 39,
+      "derived_lane_centerline_smoothed_lanes": 1,
+      "derived_lane_centerline_smoothed_bends": 0,
+      "derived_lane_centerline_inserted_sample_points": 0,
       "lane_level_radius_regularized_continuity_links": 1,
       "fan_fallback_junctions": 0
     },
@@ -119,26 +127,25 @@
       "empty_connection_curves": 0,
       "avg_lane_link_confidence": 0.82,
       "min_lane_link_confidence": 0.82,
-      "avg_curve_length_m": 20.363,
-      "max_curve_length_m": 28.802,
-      "avg_continuity_curve_length_m": 1.406,
-      "max_continuity_curve_length_m": 7.299,
+      "avg_curve_length_m": 10.35,
+      "max_curve_length_m": 14.954,
+      "avg_continuity_curve_length_m": 1.392,
+      "max_continuity_curve_length_m": 7.301,
       "avg_lane_width_m": 3.2,
       "min_lane_width_m": 3.2,
       "max_lane_width_m": 3.2,
       "avg_lane_width_confidence": 0.45,
       "max_lane_width_start_end_delta_m": 0.0,
-      "derived_lane_centerline_smoothed_lanes": 38,
-      "derived_lane_centerline_smoothed_bends": 72,
-      "derived_lane_centerline_inserted_sample_points": 615,
-      "derived_lane_centerline_max_derivation_offset_m": 2.39,
-      "derived_lane_centerline_max_source_bend_offset_m": 80.416,
-      "derived_lane_centerline_smoothing_curve_family_counts": {
-        "tangent_circular_arc": 72
-      },
-      "derived_lane_centerline_smoothing_arc_fit_status_counts": {
-        "exact_tangent_arc": 72
-      },
+      "lane_bundle_centerline_smoothed_edges": 20,
+      "lane_bundle_centerline_smoothed_bends": 39,
+      "lane_bundle_centerline_max_min_arc_radius_m": 6.4,
+      "derived_lane_centerline_smoothed_lanes": 1,
+      "derived_lane_centerline_smoothed_bends": 0,
+      "derived_lane_centerline_inserted_sample_points": 0,
+      "derived_lane_centerline_max_derivation_offset_m": 0.0,
+      "derived_lane_centerline_max_source_bend_offset_m": 0.0,
+      "derived_lane_centerline_smoothing_curve_family_counts": {},
+      "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
       "continuity_rounding_style_counts": {
         "unified_lane_geometry_rounding_style_v1": 20
       },
@@ -147,13 +154,19 @@
         "tangent_circular_arc": 6
       },
       "lane_level_radius_regularized_continuity_links": 1,
-      "min_optimized_corner_continuity_radius_m": 0.645
+      "physical_lane_centerlines": 186,
+      "physical_lane_group_centerlines": 12,
+      "standalone_physical_lane_centerlines": 174,
+      "same_physical_lane_continuity_links": 14,
+      "physical_lane_groups_created": 12,
+      "physical_lane_grouped_lanes": 26,
+      "min_optimized_corner_continuity_radius_m": 0.728
     }
   },
   "inputs": {
-    "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
-    "lane_graph_report": "reports/pattaya_central_500m_lane_graph_report.json",
-    "rules": "qa/qa_rules.json"
+    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "lane_graph_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
+    "rules": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
   },
   "next_action": "Use lane_graph as the topology contract for movement corridor solver; do not treat offset previews as final lane geometry."
 }

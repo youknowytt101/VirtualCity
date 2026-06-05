@@ -14,6 +14,12 @@ from typing import Any
 
 
 JUNCTION_TYPES = {"T", "cross", "Y", "offset", "complex"}
+FINAL_LANE_CENTERLINE_LOW_RADIUS_MIN_M = 4.0
+FINAL_LANE_CENTERLINE_LOW_RADIUS_MAX_SAMPLE_SEGMENT_M = 1.0
+FINAL_LANE_CENTERLINE_LOW_RADIUS_MAX_RUN_SPAN_M = 4.0
+COMPOUND_ALTERNATING_BEND_GUARD_STATUS = "skipped_compound_alternating_bend_guard"
+ENDPOINT_CONTRACT_MAX_GAP_M = 0.50
+SURFACE_LENGTH_CONTRACT_MAX_DELTA_M = 0.05
 QA_WARNING_SEVERITY_POLICY_ID = "qa_warning_severity_tiers_v1"
 QA_WARNING_TIERS = ("publishable_warn", "manual_review_required", "blocker")
 QA_GATE_STATUS_ORDER = {
@@ -219,6 +225,100 @@ def polyline_length(points: list[tuple[float, float]]) -> float:
     return sum(distance(points[i], points[i + 1]) for i in range(len(points) - 1))
 
 
+def circumradius_or_inf(
+    a: tuple[float, float],
+    b: tuple[float, float],
+    c: tuple[float, float],
+) -> float:
+    side_a = distance(b, c)
+    side_b = distance(a, c)
+    side_c = distance(a, b)
+    area_twice = abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]))
+    if area_twice <= 1e-9:
+        return float("inf")
+    return side_a * side_b * side_c / (2.0 * area_twice)
+
+
+def low_radius_sampled_arc_issues(
+    centerlines: list[dict[str, Any]],
+    *,
+    min_radius_m: float = FINAL_LANE_CENTERLINE_LOW_RADIUS_MIN_M,
+    max_sample_segment_m: float = FINAL_LANE_CENTERLINE_LOW_RADIUS_MAX_SAMPLE_SEGMENT_M,
+    max_run_span_m: float = FINAL_LANE_CENTERLINE_LOW_RADIUS_MAX_RUN_SPAN_M,
+) -> list[dict[str, Any]]:
+    issues: list[dict[str, Any]] = []
+    for centerline in centerlines:
+        points = as_points(centerline.get("centerline_xz") or [])
+        if len(points) < 5:
+            continue
+        segment_lengths = [distance(points[index], points[index + 1]) for index in range(len(points) - 1)]
+        bad_indices: list[tuple[int, float]] = []
+        for index in range(1, len(points) - 1):
+            if max(segment_lengths[index - 1], segment_lengths[index]) > max_sample_segment_m:
+                continue
+            radius = circumradius_or_inf(points[index - 1], points[index], points[index + 1])
+            if radius < min_radius_m:
+                bad_indices.append((index, radius))
+        if not bad_indices:
+            continue
+
+        groups: list[list[tuple[int, float]]] = []
+        current: list[tuple[int, float]] = []
+        for item in bad_indices:
+            index = item[0]
+            if not current or index == current[-1][0] + 1:
+                current.append(item)
+            else:
+                groups.append(current)
+                current = [item]
+        if current:
+            groups.append(current)
+
+        for group in groups:
+            if len(group) < 2:
+                continue
+            start_index = max(1, group[0][0] - 1)
+            end_index = min(len(points) - 2, group[-1][0] + 1)
+            span = distance(points[start_index], points[end_index])
+            if span > max_run_span_m:
+                continue
+            issues.append({
+                "centerline_id": str(
+                    centerline.get("centerline_id")
+                    or centerline.get("physical_lane_id")
+                    or centerline.get("lane_id")
+                    or ""
+                ),
+                "lane_ids": list(centerline.get("source_lane_ids") or centerline.get("lane_ids") or []),
+                "start_index": start_index,
+                "end_index": end_index,
+                "span_m": round(span, 3),
+                "min_radius_m": round(min(radius for _index, radius in group), 3),
+                "threshold_m": min_radius_m,
+            })
+    return issues
+
+
+def compound_alternating_bend_guard_skips(optimized_report: dict[str, Any]) -> list[dict[str, Any]]:
+    issues: list[dict[str, Any]] = []
+    by_edge = optimized_report.get("internal_bend_smoothing_by_edge") or {}
+    for edge_id, records in sorted(by_edge.items()):
+        for record in records or []:
+            if str(record.get("status") or "") != COMPOUND_ALTERNATING_BEND_GUARD_STATUS:
+                continue
+            guard = record.get("compound_alternating_bend") or {}
+            issues.append({
+                "edge_id": str(edge_id),
+                "candidate_id": str(record.get("candidate_id") or ""),
+                "point_index": int(record.get("point_index") or 0),
+                "guard_policy": str(record.get("guard_policy") or guard.get("policy") or ""),
+                "significant_turn_count": int(guard.get("significant_turn_count") or 0),
+                "sign_change_count": int(guard.get("sign_change_count") or 0),
+                "turns": list(guard.get("turns") or [])[:8],
+            })
+    return issues
+
+
 def resolve_trim_distances(
     length: float,
     trim_start_m: float,
@@ -378,6 +478,166 @@ def lane_curve_gap_metrics(
     }
 
 
+def normalized_movement_lane_id(lane_id: str) -> str:
+    parts = str(lane_id or "").split("_")
+    if len(parts) >= 5 and parts[0] == "ln" and parts[-2] in {"f", "b"}:
+        edge_id = "_".join(parts[1:-2])
+        return f"{edge_id}_{parts[-2]}_1"
+    return str(lane_id or "")
+
+
+def candidate_for_endpoint_audit(case: dict[str, Any]) -> dict[str, Any] | None:
+    candidates = [candidate for candidate in case.get("candidates") or [] if isinstance(candidate, dict)]
+    if not candidates:
+        return None
+    best_family = str(case.get("best_candidate_family") or "")
+    for candidate in candidates:
+        if str(candidate.get("family") or "") == best_family:
+            return candidate
+    return candidates[0]
+
+
+def movement_corridor_endpoint_contract(
+    lane_links: list[dict[str, Any]],
+    movement_corridors: dict[str, Any] | None,
+    *,
+    max_gap_m: float = ENDPOINT_CONTRACT_MAX_GAP_M,
+    sample_limit: int = 20,
+) -> dict[str, Any]:
+    links_by_key: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    for link in lane_links:
+        key = (
+            str(link.get("from_lane") or ""),
+            str(link.get("to_lane") or ""),
+            str(link.get("turn") or link.get("connection_turn") or ""),
+        )
+        links_by_key.setdefault(key, []).append(link)
+
+    cases = list((movement_corridors or {}).get("cases") or [])
+    max_start_gap = 0.0
+    max_end_gap = 0.0
+    comparable_cases = 0
+    stale_cases: list[dict[str, Any]] = []
+    missing_final_lane_link = 0
+    missing_candidate_geometry = 0
+
+    for case in cases:
+        candidate = candidate_for_endpoint_audit(case)
+        points = as_points((candidate or {}).get("centerline_xz") or [])
+        if len(points) < 2:
+            missing_candidate_geometry += 1
+            continue
+        from_lane = normalized_movement_lane_id(str(case.get("from_lane_id") or ""))
+        to_lane = normalized_movement_lane_id(str(case.get("to_lane_id") or ""))
+        turn = str(case.get("movement_kind") or "")
+        matches = links_by_key.get((from_lane, to_lane, turn), [])
+        if not matches:
+            missing_final_lane_link += 1
+            continue
+
+        best_start_gap = float("inf")
+        best_end_gap = float("inf")
+        best_link_id = ""
+        for link in matches:
+            curve = as_points(link.get("connecting_curve_xz") or [])
+            if len(curve) < 2:
+                continue
+            start_gap = distance(points[0], curve[0])
+            end_gap = distance(points[-1], curve[-1])
+            if max(start_gap, end_gap) < max(best_start_gap, best_end_gap):
+                best_start_gap = start_gap
+                best_end_gap = end_gap
+                best_link_id = str(link.get("lane_link_id") or "")
+        if best_start_gap == float("inf") or best_end_gap == float("inf"):
+            missing_final_lane_link += 1
+            continue
+
+        comparable_cases += 1
+        max_start_gap = max(max_start_gap, best_start_gap)
+        max_end_gap = max(max_end_gap, best_end_gap)
+        if max(best_start_gap, best_end_gap) > max_gap_m:
+            stale_cases.append({
+                "corridor_id": str(case.get("corridor_id") or ""),
+                "lane_link_id": best_link_id,
+                "from_lane_id": str(case.get("from_lane_id") or ""),
+                "to_lane_id": str(case.get("to_lane_id") or ""),
+                "normalized_from_lane_id": from_lane,
+                "normalized_to_lane_id": to_lane,
+                "movement_kind": turn,
+                "candidate_family": str((candidate or {}).get("family") or ""),
+                "start_gap_m": round(best_start_gap, 3),
+                "end_gap_m": round(best_end_gap, 3),
+                "max_gap_m": round(max(best_start_gap, best_end_gap), 3),
+            })
+
+    return {
+        "policy": "movement_corridor_final_lane_link_endpoint_contract_v1",
+        "max_allowed_gap_m": max_gap_m,
+        "corridor_cases": len(cases),
+        "comparable_cases": comparable_cases,
+        "missing_final_lane_link": missing_final_lane_link,
+        "missing_candidate_geometry": missing_candidate_geometry,
+        "stale_cases": len(stale_cases),
+        "max_start_gap_m": round(max_start_gap, 3),
+        "max_end_gap_m": round(max_end_gap, 3),
+        "max_endpoint_gap_m": round(max(max_start_gap, max_end_gap), 3),
+        "stale_case_samples": stale_cases[:sample_limit],
+    }
+
+
+def lane_turn_surface_contract(
+    lane_links: list[dict[str, Any]],
+    lane_surface_geojson: dict[str, Any],
+    *,
+    max_length_delta_m: float = SURFACE_LENGTH_CONTRACT_MAX_DELTA_M,
+    sample_limit: int = 20,
+) -> dict[str, Any]:
+    surfaces_by_link_id: dict[str, dict[str, Any]] = {}
+    for feature in lane_surface_geojson.get("features", []):
+        props = feature.get("properties") or {}
+        if props.get("vc_part") != "lane_turn_surface_v1":
+            continue
+        link_id = str(props.get("lane_link_id") or "")
+        if link_id:
+            surfaces_by_link_id[link_id] = props
+
+    missing_surfaces: list[str] = []
+    length_mismatches: list[dict[str, Any]] = []
+    max_length_delta = 0.0
+    checked = 0
+    for link in lane_links:
+        link_id = str(link.get("lane_link_id") or "")
+        props = surfaces_by_link_id.get(link_id)
+        if props is None:
+            missing_surfaces.append(link_id)
+            continue
+        curve_length = polyline_length(as_points(link.get("connecting_curve_xz") or []))
+        surface_length = float(props.get("length_m") or 0.0)
+        delta = abs(curve_length - surface_length)
+        max_length_delta = max(max_length_delta, delta)
+        checked += 1
+        if delta > max_length_delta_m:
+            length_mismatches.append({
+                "lane_link_id": link_id,
+                "curve_length_m": round(curve_length, 3),
+                "surface_length_m": round(surface_length, 3),
+                "delta_m": round(delta, 3),
+            })
+
+    return {
+        "policy": "lane_turn_surface_final_lane_link_contract_v1",
+        "max_allowed_length_delta_m": max_length_delta_m,
+        "lane_links": len(lane_links),
+        "turn_surfaces": len(surfaces_by_link_id),
+        "checked_surfaces": checked,
+        "missing_surfaces": len(missing_surfaces),
+        "length_mismatches": len(length_mismatches),
+        "max_length_delta_m": round(max_length_delta, 3),
+        "missing_surface_samples": missing_surfaces[:sample_limit],
+        "length_mismatch_samples": length_mismatches[:sample_limit],
+    }
+
+
 def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     processed = root / "data" / "processed"
     preview_dir = root / "data" / "preview"
@@ -390,6 +650,7 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "road_graph": processed / f"{area_id}_road_graph.json",
         "junction_semantics": processed / f"{area_id}_junction_semantics.json",
         "optimized_centerlines": processed / f"{area_id}_roads_optimized_centerlines.geojson",
+        "optimized_centerlines_report": reports / f"{area_id}_optimized_centerlines_report.json",
         "lane_graph": processed / f"{area_id}_lane_graph.json",
         "preview_geojson": preview_dir / f"{area_id}_roads_preview_surfaces.geojson",
         "preview_obj": preview_dir / f"{area_id}_roads_preview.obj",
@@ -430,8 +691,12 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     road_graph = read_json(paths["road_graph"])
     semantics = read_json(paths["junction_semantics"])
     optimized = read_json(paths["optimized_centerlines"])
+    optimized_report = read_json(paths["optimized_centerlines_report"])
     lane_graph = read_json(paths["lane_graph"])
+    movement_corridors_path = processed / f"{area_id}_movement_corridor_candidates.json"
+    movement_corridors = read_json(movement_corridors_path) if movement_corridors_path.exists() else None
     preview = read_json(paths["preview_geojson"])
+    lane_surface_geojson = read_json(paths["lane_surface_v1_geojson"])
     lane_debug_report = read_json(paths["lane_geometry_debug_report"])
     lane_surface_report = read_json(paths["lane_surface_v1_report"])
     topology_qa = read_json(paths["topology_qa"])
@@ -562,6 +827,14 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "LaneLink and corner continuity curves should start/end at the same trimmed lane endpoints used by lane surfaces.",
         gap_metrics,
     ))
+    movement_endpoint_contract = movement_corridor_endpoint_contract(lane_links, movement_corridors)
+    checks.append(make_check(
+        "movement_corridors_match_final_lane_link_endpoints",
+        movement_corridors is None or int(movement_endpoint_contract.get("stale_cases") or 0) == 0,
+        "Movement corridor candidates should not drift from final laneLink endpoints; stale candidates are QA-only and must not drive final display or geometry.",
+        movement_endpoint_contract,
+        warn=True,
+    ))
 
     fan_fallback_junctions = [
         junction["junction_id"]
@@ -633,6 +906,18 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
             "lane_link_curve_source_counts": lane_link_curve_source_counts,
         },
     ))
+    compound_guard_skips = compound_alternating_bend_guard_skips(optimized_report)
+    checks.append(make_check(
+        "compound_alternating_bends_are_tracked",
+        not compound_guard_skips,
+        "Compound alternating source/reference bends should be tracked for whole-edge review instead of accepting point-level internal bend smoothing.",
+        {
+            "issues": compound_guard_skips[:20],
+            "issue_count": len(compound_guard_skips),
+            "guard_status": COMPOUND_ALTERNATING_BEND_GUARD_STATUS,
+        },
+        warn=True,
+    ))
 
     obj_lines = paths["preview_obj"].read_text(encoding="utf-8").splitlines()
     obj_vertex_count = sum(1 for line in obj_lines if line.startswith("v "))
@@ -651,6 +936,20 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
 
     lane_debug_counts = lane_debug_report.get("counts", {})
     physical_lane_centerlines = lane_graph.get("physical_lane_centerlines") or []
+    final_centerlines = physical_lane_centerlines if physical_lane_centerlines else lane_graph.get("lanes", [])
+    low_radius_issues = low_radius_sampled_arc_issues(final_centerlines)
+    checks.append(make_check(
+        "final_lane_centerlines_no_low_radius_sampled_arc_runs",
+        not low_radius_issues,
+        "Final physical lane centerlines should not contain short low-radius sampled arc runs that create visible kink artifacts.",
+        {
+            "issues": low_radius_issues[:20],
+            "issue_count": len(low_radius_issues),
+            "min_radius_m": FINAL_LANE_CENTERLINE_LOW_RADIUS_MIN_M,
+            "max_sample_segment_m": FINAL_LANE_CENTERLINE_LOW_RADIUS_MAX_SAMPLE_SEGMENT_M,
+            "max_run_span_m": FINAL_LANE_CENTERLINE_LOW_RADIUS_MAX_RUN_SPAN_M,
+        },
+    ))
     expected_debug_centerlines = len(physical_lane_centerlines) if physical_lane_centerlines else len(lane_graph.get("lanes", []))
     actual_debug_centerlines = lane_debug_counts.get("debug_centerlines", lane_debug_counts.get("lane_centerlines"))
     lane_debug_metrics = lane_debug_report.get("metrics", {})
@@ -714,6 +1013,14 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     ))
 
     lane_surface_counts = lane_surface_report.get("counts", {})
+    turn_surface_contract = lane_turn_surface_contract(lane_links, lane_surface_geojson)
+    checks.append(make_check(
+        "lane_turn_surfaces_match_final_lane_links",
+        int(turn_surface_contract.get("missing_surfaces") or 0) == 0
+        and int(turn_surface_contract.get("length_mismatches") or 0) == 0,
+        "Lane turn surfaces should be generated from the final laneLink curves and retain their laneLink ids and curve lengths.",
+        turn_surface_contract,
+    ))
     expected_lane_surfaces = len(physical_lane_centerlines) if physical_lane_centerlines else len(lane_graph.get("lanes", []))
     junctions_with_lane_links = sum(
         1
@@ -831,6 +1138,7 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "optimized_features": len(optimized.get("features", [])),
         "optimized_corner_fillets": optimized_corner_fillet_count,
         "optimized_junction_connectors": optimized_junction_connector_count,
+        "compound_alternating_bend_guard_skips": len(compound_guard_skips),
         "optimized_points": optimized_coord_count,
         "preview_points": preview_coord_count,
         "preview_obj_vertices": obj_vertex_count,

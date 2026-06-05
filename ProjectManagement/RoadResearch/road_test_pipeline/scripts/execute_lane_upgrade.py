@@ -121,6 +121,23 @@ def write_json(path: Path, data: dict[str, Any]) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def resolved_road_id(root: Path, area_id: str, road_id: str, canonical_road_id: str) -> str:
+    road_id = str(road_id or "").strip()
+    canonical_road_id = str(canonical_road_id or "").strip()
+    if road_id:
+        return road_id
+    if not canonical_road_id:
+        return ""
+    graph_path = root / "data" / "processed" / f"{area_id}_road_graph.json"
+    if not graph_path.exists():
+        return ""
+    graph = read_json(graph_path)
+    for edge in graph.get("edges", []):
+        if str(edge.get("canonical_road_id") or edge.get("source_feature_id") or "") == canonical_road_id:
+            return str(edge.get("edge_id") or "")
+    return ""
+
+
 def next_versioned_name(directory: Path, *, prefix: str, width: int = 4) -> str:
     highest = 0
     if directory.exists():
@@ -215,6 +232,8 @@ def execute_upgrade(
     with_houdini: bool,
     dry_run: bool,
     restore_default: bool = False,
+    apply_selected_geometry: bool = False,
+    apply_all_active_geometry: bool = False,
 ) -> dict[str, Any]:
     execution_id, execution_path = next_execution_id(root, area_id)
     reports = root / "reports"
@@ -235,6 +254,12 @@ def execute_upgrade(
         restore_default=restore_default,
     )
     rebuild_cmd = [python_cmd(), str(root / "scripts" / "rebuild_road_test.py"), "--area-id", area_id]
+    if apply_all_active_geometry:
+        rebuild_cmd.append("--apply-all-lane-upgrades")
+    elif apply_selected_geometry and not restore_default:
+        selected_road_id = resolved_road_id(root, area_id, road_id, canonical_road_id)
+        if selected_road_id:
+            rebuild_cmd.extend(["--apply-lane-upgrade-road-id", selected_road_id])
     if not with_houdini:
         rebuild_cmd.append("--skip-houdini")
     package_cmd = [
@@ -271,6 +296,8 @@ def execute_upgrade(
             "reason": reason,
             "reviewer": reviewer,
             "source": source,
+            "apply_selected_geometry": apply_selected_geometry and not restore_default and not apply_all_active_geometry,
+            "apply_all_active_geometry": apply_all_active_geometry,
         },
         "planned_outputs": {
             "package_version": package_version,
@@ -333,6 +360,16 @@ def main() -> int:
     parser.add_argument("--source", default="web_lane_count_menu")
     parser.add_argument("--with-houdini", action="store_true", help="Run the Houdini cook during rebuild.")
     parser.add_argument("--dry-run", action="store_true", help="Write the execution plan without mutating pipeline data.")
+    parser.add_argument(
+        "--apply-selected-geometry",
+        action="store_true",
+        help="Apply the selected road's active lane-count override to lane geometry during rebuild.",
+    )
+    parser.add_argument(
+        "--apply-all-active-geometry",
+        action="store_true",
+        help="Apply all active lane-count overrides to lane geometry during rebuild.",
+    )
     args = parser.parse_args()
 
     if not args.road_id and not args.canonical_road_id:
@@ -353,6 +390,8 @@ def main() -> int:
         with_houdini=args.with_houdini,
         dry_run=args.dry_run,
         restore_default=args.restore_default,
+        apply_selected_geometry=args.apply_selected_geometry,
+        apply_all_active_geometry=args.apply_all_active_geometry,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0

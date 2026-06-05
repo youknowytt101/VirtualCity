@@ -1,9 +1,9 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "optimized_centerlines_v1",
-  "input": "data/processed/pattaya_central_500m_road_graph.json",
-  "output": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
-  "movement_debug_output": "data/processed/pattaya_central_500m_junction_movements_debug.geojson",
+  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+  "movement_debug_output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_movements_debug.geojson",
   "lane_geometry_rounding_style": {
     "style_id": "unified_lane_geometry_rounding_style_v1",
     "primary_curve_family": "tangent_circular_arc",
@@ -16,10 +16,10 @@
     "semantic_boundary": "geometry_style_only_no_traffic_semantics_inference"
   },
   "regularization_inputs": {
-    "junction_areas_path": "data/processed/pattaya_central_500m_junction_areas.json",
+    "junction_areas_path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
     "junction_areas_loaded": true,
     "junction_area_count": 49,
-    "engineering_reference_path": "data/processed/pattaya_central_500m_engineering_reference_lines.json",
+    "engineering_reference_path": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
     "engineering_reference_loaded": true,
     "engineering_reference_entry_poses": 149,
     "regularized_entry_pose_trims": 149,
@@ -35,8 +35,8 @@
     "dropped_short_edges": 0,
     "heuristic_junction_trim_keys": 0,
     "regularized_junction_nodes": 49,
-    "regularized_endpoint_exact": 131,
-    "regularized_endpoint_scaled_for_edge_length": 18,
+    "regularized_endpoint_exact": 130,
+    "regularized_endpoint_scaled_for_edge_length": 19,
     "junction_nodes": 49,
     "junction_connectors": 149,
     "t_junctions": 47,
@@ -49,7 +49,7 @@
     "corner_transaction_fillets": 3,
     "corner_heuristic_fillets": 0,
     "internal_bend_smoothing_applied": 1,
-    "internal_bend_smoothing_skipped": 0,
+    "internal_bend_smoothing_skipped": 1,
     "corner_circular_arcs": 3,
     "corner_bezier_tangent_fallback": 0,
     "corner_straight_infinite_radius": 0,
@@ -58,6 +58,58 @@
     "t_branch_trim_locked_skips": 47,
     "t_branch_trim_max_delta_m": 0.0,
     "t_branch_trim_avg_delta_m": 0.0,
+    "near_junction_bend_absorptions": 0,
+    "near_junction_bend_absorption_trim_raises": 0,
+    "near_junction_bend_absorption_max_trim_raise_m": 0.0,
+    "near_junction_bend_absorption_avg_trim_raise_m": 0.0,
+    "near_junction_bend_preservations": 1,
+    "near_junction_bend_preservation_records": [
+      {
+        "policy": "near_junction_bend_preserve_when_smoothing_feasible_v1",
+        "candidate_id": "corner_0013",
+        "corner_optimization_id": "corner_optimization_application_v0007_corner_0000",
+        "application_id": "corner_optimization_application_v0007",
+        "source_edge_id": "e_0079",
+        "node_id": "n_0075",
+        "point_index": 1,
+        "distance_to_junction_m": 9.295,
+        "status": "preserved_for_internal_bend_smoothing",
+        "reason": "target_radius_relaxed_for_endpoint_reserve",
+        "visible_junction_leg_m": 8.545,
+        "source_leg_m": 123.491,
+        "turn_angle_deg": 93.359,
+        "target_radius_m": 7.2,
+        "width_radius_m": 4.8,
+        "lane_offset_radius_policy": "lane_offset_aware_centerline_radius_v1",
+        "lane_width_m": 3.2,
+        "lane_centerline_min_radius_m": 4.8,
+        "max_abs_lane_offset_m": 1.6,
+        "lane_offset_nominal_centerline_min_radius_m": 6.4,
+        "lane_offset_radius_safety_margin_m": 0.8,
+        "lane_offset_centerline_min_radius_m": 7.2,
+        "target_cut_m": 7.635,
+        "requested_cut_m": 1.138,
+        "available_cut_m": 7.545,
+        "endpoint_reserve_m": 1.0,
+        "endpoint_reserve_min_m": 1.0,
+        "endpoint_reserve_lane_width_factor": 0.25,
+        "target_cut_ratio": 0.988,
+        "target_radius_feasible_with_endpoint_reserve": false,
+        "radius_tradeoff_policy": "near_junction_bend_endpoint_reserve_radius_tradeoff_v1",
+        "radius_tradeoff_min_target_cut_ratio": 0.75,
+        "previous_trim_m": 6.3,
+        "relaxed_trim_m": 0.75,
+        "trim_relaxation_m": 5.55,
+        "min_preserve_leg_m": 2.5,
+        "min_preserve_cut_m": 0.75,
+        "preserve_max_cut_ratio": 0.9,
+        "relaxed_min_trim_m": 0.75
+      }
+    ],
+    "near_junction_bend_absorption_skipped": {
+      "not_near_junction": 1,
+      "preserved_for_internal_bend_smoothing": 1
+    },
     "junction_common_trim_nodes": 0,
     "junction_common_trim_raised": 0,
     "junction_common_trim_lowered": 0,
@@ -66,10 +118,10 @@
     "junction_common_trim_max_lower_m": 0.0,
     "junction_common_trim_avg_lower_m": 0.0,
     "junction_common_trim_skipped_regularized_nodes": 49,
-    "corner_override_records": 4,
-    "active_corner_overrides": 4,
+    "corner_override_records": 5,
+    "active_corner_overrides": 5,
     "active_degree2_corner_overrides": 3,
-    "active_internal_bend_overrides": 1,
+    "active_internal_bend_overrides": 2,
     "corner_override_issue_counts": {}
   },
   "junction_degree_counts": {
@@ -82,13 +134,13 @@
     "t_turn": 94
   },
   "junction_connector_arc_geometry_counts": {
-    "bezier_tangent_fallback": 30,
-    "circular_arc": 77,
+    "bezier_tangent_fallback": 31,
+    "circular_arc": 76,
     "straight_infinite_radius": 42
   },
   "junction_connector_arc_fit_status_counts": {
-    "exact_tangent_arc": 77,
-    "incompatible_tangent_endpoints_bezier_fallback": 30,
+    "exact_tangent_arc": 76,
+    "incompatible_tangent_endpoints_bezier_fallback": 31,
     "near_straight_infinite_radius": 42
   },
   "corner_arc_geometry_counts": {
@@ -103,16 +155,83 @@
         "policy": "low_risk_internal_centerline_bend_smoothing_v1",
         "source_edge_id": "e_0017",
         "point_index": 1,
-        "cut_m": 1.95,
+        "guard_policy": "compound_alternating_bend_guard_v1",
+        "compound_alternating_bend": {
+          "policy": "compound_alternating_bend_guard_v1",
+          "is_compound_alternating_bend": true,
+          "significant_turn_count": 4,
+          "sign_change_count": 2,
+          "min_turn_deg": 8.0,
+          "min_significant_turns": 3,
+          "min_sign_changes": 2,
+          "turns": [
+            {
+              "point_index": 1,
+              "turn_deg": -41.331,
+              "sign": -1,
+              "prev_segment_m": 74.142,
+              "next_segment_m": 20.299
+            },
+            {
+              "point_index": 2,
+              "turn_deg": 40.926,
+              "sign": 1,
+              "prev_segment_m": 20.299,
+              "next_segment_m": 65.634
+            },
+            {
+              "point_index": 3,
+              "turn_deg": 54.493,
+              "sign": 1,
+              "prev_segment_m": 65.634,
+              "next_segment_m": 22.126
+            },
+            {
+              "point_index": 4,
+              "turn_deg": -53.933,
+              "sign": -1,
+              "prev_segment_m": 22.126,
+              "next_segment_m": 62.361
+            }
+          ]
+        },
+        "status": "skipped_compound_alternating_bend_guard"
+      }
+    ],
+    "e_0079": [
+      {
+        "candidate_id": "corner_0013",
+        "corner_optimization_id": "corner_optimization_application_v0007_corner_0000",
+        "application_id": "corner_optimization_application_v0007",
+        "policy": "reviewed_internal_centerline_bend_smoothing_v1",
+        "source_edge_id": "e_0079",
+        "point_index": 1,
+        "cut_m": 7.545,
         "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
         "rounding_curve_family": "tangent_circular_arc",
         "arc_geometry": "circular_arc",
         "arc_fit_status": "exact_tangent_arc",
-        "arc_radius_m": 5.17,
+        "arc_radius_m": 7.115,
+        "internal_bend_requested_cut_m": 7.635,
+        "internal_bend_target_radius_m": 7.2,
+        "internal_bend_endpoint_reserve_m": 1.0,
+        "internal_bend_endpoint_reserve_side": "next",
+        "internal_bend_endpoint_reserve_limited": true,
+        "internal_bend_radius_target_met": false,
+        "max_cut_ratio": 0.9,
+        "target_radius_m": 7.2,
+        "target_radius_cut_m": 7.635,
+        "ratio_limited_cut_m": 7.635,
+        "endpoint_reserve_m": 1.0,
+        "endpoint_reserve_side": "next",
+        "endpoint_reserve_limited": true,
+        "target_radius_cut_met": false,
+        "radius_tradeoff_policy": "near_junction_bend_endpoint_reserve_radius_tradeoff_v1",
         "status": "applied"
       }
     ]
   },
+  "near_junction_bend_absorption_by_edge": {},
   "corner_fillet_metrics": {
     "min_turn_deg": 87.416,
     "max_turn_deg": 91.525,

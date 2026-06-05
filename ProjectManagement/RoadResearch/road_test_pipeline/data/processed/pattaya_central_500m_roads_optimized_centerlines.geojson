@@ -6,10 +6,10 @@
     "coord_domain": "WGS84",
     "origin_lon": 100.8837,
     "origin_lat": 12.93425,
-    "source": "data/processed/pattaya_central_500m_road_graph.json",
-    "source_junction_areas": "data/processed/pattaya_central_500m_junction_areas.json",
-    "source_engineering_reference": "data/processed/pattaya_central_500m_engineering_reference_lines.json",
-    "source_corner_overrides": "data/processed/pattaya_central_500m_corner_optimization_overrides.json",
+    "source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "source_junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+    "source_engineering_reference": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
+    "source_corner_overrides": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_overrides.json",
     "lane_geometry_rounding_style": {
       "style_id": "unified_lane_geometry_rounding_style_v1",
       "primary_curve_family": "tangent_circular_arc",
@@ -20,6 +20,17 @@
       "sample_strategy": "arc_angle_limited_min_profile_samples",
       "sample_angle_deg": 5.0,
       "semantic_boundary": "geometry_style_only_no_traffic_semantics_inference"
+    },
+    "near_junction_bend_absorption": {
+      "policy": "near_junction_bend_absorption_v1",
+      "max_distance_m": 12.0,
+      "margin_m": 1.5,
+      "max_edge_fraction": 0.45,
+      "lane_offset_radius_policy": "lane_offset_aware_centerline_radius_v1",
+      "lane_width_m": 3.2,
+      "lane_centerline_min_radius_m": 4.800000000000001,
+      "lane_offset_radius_safety_margin_factor": 0.5,
+      "relaxed_min_trim_m": 0.75
     },
     "strategy": "use regularized junction entry poses where available, trim approaches, add tangent circular-arc junction connectors and corner fillets, then extrude widths"
   },
@@ -572,44 +583,8 @@
             12.93168899
           ],
           [
-            100.88217369,
-            12.93210477
-          ],
-          [
-            100.88217086,
-            12.93210727
-          ],
-          [
-            100.88216825,
-            12.93210998
-          ],
-          [
-            100.88216586,
-            12.93211288
-          ],
-          [
-            100.88216373,
-            12.93211597
-          ],
-          [
-            100.88216185,
-            12.93211921
-          ],
-          [
-            100.88216024,
-            12.93212258
-          ],
-          [
-            100.88215892,
-            12.93212608
-          ],
-          [
-            100.88215789,
-            12.93212966
-          ],
-          [
-            100.88215715,
-            12.93213331
+            100.8821599,
+            12.932116
           ],
           [
             100.8821313,
@@ -645,11 +620,7 @@
         "start_trim_source": "regularized_entry_pose",
         "end_trim_source": "regularized_entry_pose",
         "start_entry_pose_id": "j_011_e_0017_entry",
-        "end_entry_pose_id": "j_001_e_0017_entry",
-        "internal_bend_smoothing_count": 1,
-        "internal_bend_smoothing_candidate_ids": "corner_0003",
-        "internal_bend_smoothing_point_indices": "1",
-        "internal_bend_smoothing_policies": "low_risk_internal_centerline_bend_smoothing_v1"
+        "end_entry_pose_id": "j_001_e_0017_entry"
       }
     },
     {
@@ -2608,12 +2579,88 @@
             12.93401876
           ],
           [
-            100.8858054,
-            12.9334191
+            100.88574825,
+            12.93345771
           ],
           [
-            100.88581977,
-            12.93344208
+            100.885753,
+            12.93345478
+          ],
+          [
+            100.88575799,
+            12.93345226
+          ],
+          [
+            100.88576319,
+            12.93345017
+          ],
+          [
+            100.88576855,
+            12.93344852
+          ],
+          [
+            100.88577404,
+            12.93344733
+          ],
+          [
+            100.88577961,
+            12.93344659
+          ],
+          [
+            100.88578523,
+            12.93344632
+          ],
+          [
+            100.88579085,
+            12.93344653
+          ],
+          [
+            100.88579643,
+            12.9334472
+          ],
+          [
+            100.88580193,
+            12.93344834
+          ],
+          [
+            100.88580731,
+            12.93344993
+          ],
+          [
+            100.88581253,
+            12.93345196
+          ],
+          [
+            100.88581755,
+            12.93345442
+          ],
+          [
+            100.88582234,
+            12.93345729
+          ],
+          [
+            100.88582686,
+            12.93346055
+          ],
+          [
+            100.88583107,
+            12.93346418
+          ],
+          [
+            100.88583495,
+            12.93346815
+          ],
+          [
+            100.88583847,
+            12.93347242
+          ],
+          [
+            100.8858416,
+            12.93347697
+          ],
+          [
+            100.8858464,
+            12.93348464
           ]
         ]
       },
@@ -2627,9 +2674,13 @@
         "width_m": 4.0,
         "oneway": false,
         "start_trim_source": "regularized_entry_pose",
-        "end_trim_source": "regularized_entry_pose",
+        "end_trim_source": "regularized_scaled_for_edge_length",
         "start_entry_pose_id": "j_035_e_0079_entry",
-        "end_entry_pose_id": "j_047_e_0079_entry"
+        "end_entry_pose_id": "j_047_e_0079_entry",
+        "internal_bend_smoothing_count": 1,
+        "internal_bend_smoothing_candidate_ids": "corner_0013",
+        "internal_bend_smoothing_point_indices": "1",
+        "internal_bend_smoothing_policies": "reviewed_internal_centerline_bend_smoothing_v1"
       }
     },
     {
@@ -16411,8 +16462,8 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88581977,
-            12.93344208
+            100.8858464,
+            12.93348464
           ],
           [
             100.88588021,
@@ -16435,7 +16486,7 @@
         "regularized_junction_id": "j_047",
         "junction_area_status": "pass",
         "conflict_zone_radius_m": 7.8,
-        "from_trim_source": "regularized_entry_pose",
+        "from_trim_source": "regularized_scaled_for_edge_length",
         "to_trim_source": "regularized_entry_pose",
         "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
         "rounding_curve_family": "straight_infinite_radius",
@@ -16462,72 +16513,44 @@
             12.93346929
           ],
           [
-            100.88589853,
-            12.93347113
+            100.88589697,
+            12.93347249
           ],
           [
-            100.88589305,
-            12.93347254
+            100.88589023,
+            12.93347638
           ],
           [
-            100.88588747,
-            12.93347351
+            100.88588368,
+            12.93348055
           ],
           [
-            100.88588183,
-            12.93347402
+            100.88587736,
+            12.93348462
           ],
           [
-            100.88587617,
-            12.93347408
+            100.88587131,
+            12.93348819
           ],
           [
-            100.88587051,
-            12.93347368
+            100.88586557,
+            12.93349086
           ],
           [
-            100.88586492,
-            12.93347282
+            100.88586017,
+            12.93349223
           ],
           [
-            100.88585941,
-            12.93347152
+            100.88585515,
+            12.93349192
           ],
           [
-            100.88585403,
-            12.93346978
+            100.88585055,
+            12.93348952
           ],
           [
-            100.88584882,
-            12.93346762
-          ],
-          [
-            100.88584381,
-            12.93346504
-          ],
-          [
-            100.88583904,
-            12.93346206
-          ],
-          [
-            100.88583453,
-            12.93345872
-          ],
-          [
-            100.88583032,
-            12.93345502
-          ],
-          [
-            100.88582644,
-            12.93345099
-          ],
-          [
-            100.88582292,
-            12.93344667
-          ],
-          [
-            100.88581977,
-            12.93344208
+            100.8858464,
+            12.93348464
           ]
         ]
       },
@@ -16547,20 +16570,20 @@
         "junction_area_status": "pass",
         "conflict_zone_radius_m": 7.8,
         "from_trim_source": "regularized_entry_pose",
-        "to_trim_source": "regularized_entry_pose",
+        "to_trim_source": "regularized_scaled_for_edge_length",
         "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
-        "rounding_curve_family": "tangent_circular_arc",
+        "rounding_curve_family": "tangent_continuous_bezier_fallback",
         "rounding_sample_strategy": "arc_angle_limited_min_profile_samples",
         "rounding_sample_angle_deg": 5.0,
-        "arc_geometry": "circular_arc",
-        "arc_fit_status": "exact_tangent_arc",
-        "arc_radius_m": 7.436,
-        "arc_center_x": 236.336,
-        "arc_center_z": -93.808,
+        "arc_geometry": "bezier_tangent_fallback",
+        "arc_fit_status": "incompatible_tangent_endpoints_bezier_fallback",
+        "arc_radius_m": 1.312,
+        "arc_center_x": null,
+        "arc_center_z": null,
         "arc_sweep_deg": 80.542,
-        "arc_sample_count": 18,
+        "arc_sample_count": 11,
         "arc_design_min_radius_m": 3.0,
-        "arc_radius_margin_m": 4.436
+        "arc_radius_margin_m": -1.688
       }
     },
     {

@@ -6,7 +6,7 @@
     "lanes": 200,
     "physical_lane_centerlines": 186,
     "visible_lane_centerlines": 186,
-    "lane_links_total": 0,
+    "lane_links_total": 306,
     "continuity_links_total": 20,
     "junction_connections_rendered": 306,
     "continuity_links_rendered": 8,
@@ -15,33 +15,14 @@
       "degree2_connector_through_continuity_v1": 2,
       "optimized_corner_fillet": 6
     },
-    "movement_corridors_rendered": 306,
-    "anchor_markers_rendered": 612,
-    "anchor_source_counts": {
-      "engineering_entry_pose_lateral_offset": 604,
-      "junction_zone_expansion_planned_pose_lateral_offset": 8
-    },
-    "visual_candidate_family_counts": {
-      "bezier_g1_preview": 195,
-      "param_poly3_hermite_proxy": 6,
-      "topology_straight_baseline": 105
-    },
-    "visual_candidate_issue_counts": {
-      "entry_anchor_entry_trim_capacity_limited": 16,
-      "exit_anchor_entry_trim_capacity_limited": 16,
-      "inferred_without_turn_lanes": 306,
-      "low_confidence_from_lane": 306,
-      "low_confidence_lane_link": 306,
-      "low_confidence_to_lane": 306,
-      "outgoing_turn_lanes_missing": 306,
-      "radius_proxy_below_lane_min": 12
-    },
+    "movement_corridors_rendered": 0,
+    "anchor_markers_rendered": 0,
+    "anchor_source_counts": {},
+    "visual_candidate_family_counts": {},
+    "visual_candidate_issue_counts": {},
     "movement_corridors_skipped": 0,
     "movement_corridor_skip_reason_counts": {},
-    "movement_corridor_scoring_status_counts": {
-      "needs_review": 8,
-      "scored_qa_candidate": 298
-    },
+    "movement_corridor_scoring_status_counts": {},
     "raw_roads_rendered": 44,
     "raw_road_endpoint_markers_rendered": 88,
     "raw_road_internal_vertex_markers_rendered": 215,
@@ -65,12 +46,12 @@
       "internal_centerline_bend": 16
     },
     "corner_candidate_risk_counts": {
-      "low": 8,
-      "medium": 11
+      "low": 9,
+      "medium": 10
     },
     "corner_candidate_status_counts": {
-      "accepted_active": 3,
-      "candidate_review": 16
+      "accepted_active": 4,
+      "candidate_review": 15
     },
     "repaired_roads_rendered": 171,
     "repaired_roads_class_counts": {
@@ -92,7 +73,7 @@
     "centerline_buffer_preview_source_counts": {
       "continuity_curve": 8,
       "lane_centerline": 174,
-      "movement_corridor_centerline": 306,
+      "lane_link_centerline": 306,
       "physical_lane_group_centerline_v1": 12
     },
     "centerline_buffer_preview_skipped_movement_corridors": 0,
@@ -110,9 +91,10 @@
     "repaired_roads_overlay": "blue_dashed_hidden_by_default",
     "canonical_roads_overlay": "rose_solid_hidden_by_default",
     "centerline_buffer_preview_overlay": "uniform_gray_hidden_by_default",
-    "movement_corridor_preview_gate": "qa_visible_not_publish_gate"
+    "movement_corridor_preview_gate": "fallback_when_no_lane_graph_junction_lane_links"
   },
-  "link_source": "movement_corridor_anchors",
+  "link_source": "lane_graph_junction_lane_links",
+  "final_lane_link_precedence": "lane_graph_junction_lane_links_before_movement_corridor_candidates",
   "note": "SVG visualization（可视化） only. lane_graph.json and movement_corridor_candidates.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
   "inputs": {
     "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",

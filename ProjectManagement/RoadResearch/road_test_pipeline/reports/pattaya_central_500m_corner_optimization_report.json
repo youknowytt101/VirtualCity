@@ -4,39 +4,39 @@
   "schema": "road_upgrade_system.corner_optimization_report.v1",
   "status": "pass",
   "inputs": {
-    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
-    "optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
-    "corner_overrides": "data/processed/pattaya_central_500m_corner_optimization_overrides.json"
+    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "corner_overrides": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_overrides.json"
   },
   "outputs": {
-    "candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json",
-    "report": "reports/pattaya_central_500m_corner_optimization_report.json"
+    "candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_candidates.json",
+    "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_corner_optimization_report.json"
   },
   "counts": {
     "candidates": 19,
     "degree2_connector_corner": 3,
     "internal_centerline_bend": 16,
-    "low_risk": 8,
-    "medium_risk": 11,
+    "low_risk": 9,
+    "medium_risk": 10,
     "high_risk": 0,
-    "accepted_active": 4,
-    "accepted_active_candidates": 3,
-    "accepted_active_overrides": 4,
+    "accepted_active": 5,
+    "accepted_active_candidates": 4,
+    "accepted_active_overrides": 5,
     "active_degree2_corner_overrides": 3,
-    "active_internal_bend_overrides": 1,
-    "candidate_id_reassignments": 16
+    "active_internal_bend_overrides": 2,
+    "candidate_id_reassignments": 6
   },
   "type_counts": {
     "degree2_connector_corner": 3,
     "internal_centerline_bend": 16
   },
   "risk_counts": {
-    "low": 8,
-    "medium": 11
+    "low": 9,
+    "medium": 10
   },
   "status_counts": {
-    "accepted_active": 3,
-    "candidate_review": 16
+    "accepted_active": 4,
+    "candidate_review": 15
   },
   "note": "Corner optimization candidates are proposal records; accepted_active counts active geometry transactions, including internal bends that no longer appear as candidates after smoothing."
 }

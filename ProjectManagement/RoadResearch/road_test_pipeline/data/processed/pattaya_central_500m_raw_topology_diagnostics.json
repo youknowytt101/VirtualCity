@@ -3,7 +3,7 @@
   "metadata": {
     "area_id": "pattaya_central_500m",
     "schema": "road_test_pipeline.raw_topology_diagnostics.v1",
-    "source": "data/processed/pattaya_central_500m_roads_raw.geojson",
+    "source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_raw.geojson",
     "contract": "non_destructive_raw_vertex_classification（非破坏式原始顶点分类）"
   },
   "thresholds": {

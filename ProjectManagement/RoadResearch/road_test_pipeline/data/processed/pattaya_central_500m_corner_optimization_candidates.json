@@ -4,9 +4,9 @@
     "area_id": "pattaya_central_500m",
     "schema": "road_upgrade_system.corner_optimization_candidates.v1",
     "policy": "proposal_only_no_geometry_mutation",
-    "source_road_graph": "data/processed/pattaya_central_500m_road_graph.json",
-    "source_optimized_centerlines": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
-    "source_corner_overrides": "data/processed/pattaya_central_500m_corner_optimization_overrides.json"
+    "source_road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "source_optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "source_corner_overrides": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_overrides.json"
   },
   "candidates": [
     {
@@ -133,6 +133,44 @@
       "corner_optimization_policy": "low_risk_degree2_connector_only_v1"
     },
     {
+      "candidate_id": "corner_0003",
+      "candidate_type": "internal_centerline_bend",
+      "status": "accepted_active",
+      "risk_level": "low",
+      "recommended_action": "active_geometry_transaction",
+      "source_edge_id": "e_0017",
+      "canonical_road_id": "cr_0017",
+      "road_class": "service",
+      "point_index": 1,
+      "turn_angle_deg": 41.331,
+      "interior_angle_deg": 138.669,
+      "suggested_cut_m": 1.95,
+      "suggested_radius_m": 2.4,
+      "nearest_junction_distance_m": 80.442,
+      "center_xz": [
+        -167.094,
+        -237.557
+      ],
+      "context_polyline_xz": [
+        [
+          -110.195,
+          -285.092
+        ],
+        [
+          -167.094,
+          -237.557
+        ],
+        [
+          -170.197,
+          -217.497
+        ]
+      ],
+      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
+      "corner_optimization_id": "corner_optimization_application_v0006_corner_0000",
+      "corner_optimization_application_id": "corner_optimization_application_v0006",
+      "corner_optimization_policy": "low_risk_internal_centerline_bend_smoothing_v1"
+    },
+    {
       "candidate_id": "corner_0004",
       "candidate_type": "internal_centerline_bend",
       "status": "candidate_review",
@@ -141,9 +179,9 @@
       "source_edge_id": "e_0017",
       "canonical_road_id": "cr_0017",
       "road_class": "service",
-      "point_index": 11,
-      "turn_angle_deg": 40.926,
-      "interior_angle_deg": 139.074,
+      "point_index": 2,
+      "turn_angle_deg": 40.925,
+      "interior_angle_deg": 139.075,
       "suggested_cut_m": 1.95,
       "suggested_radius_m": 2.4,
       "nearest_junction_distance_m": 96.619,
@@ -153,8 +191,8 @@
       ],
       "context_polyline_xz": [
         [
-          -167.392,
-          -235.63
+          -167.094,
+          -237.557
         ],
         [
           -170.197,
@@ -165,9 +203,7 @@
           -175.062
         ]
       ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0003",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
     },
     {
       "candidate_id": "corner_0005",
@@ -178,7 +214,7 @@
       "source_edge_id": "e_0017",
       "canonical_road_id": "cr_0017",
       "road_class": "service",
-      "point_index": 12,
+      "point_index": 3,
       "turn_angle_deg": 54.494,
       "interior_angle_deg": 125.506,
       "suggested_cut_m": 1.95,
@@ -202,9 +238,7 @@
           -180.494
         ]
       ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0004",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
     },
     {
       "candidate_id": "corner_0006",
@@ -215,7 +249,7 @@
       "source_edge_id": "e_0017",
       "canonical_road_id": "cr_0017",
       "road_class": "service",
-      "point_index": 13,
+      "point_index": 4,
       "turn_angle_deg": 53.934,
       "interior_angle_deg": 126.066,
       "suggested_cut_m": 1.95,
@@ -239,9 +273,7 @@
           -140.642
         ]
       ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0005",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
     },
     {
       "candidate_id": "corner_0007",
@@ -276,9 +308,7 @@
           -105.687
         ]
       ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0006",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
     },
     {
       "candidate_id": "corner_0008",
@@ -313,9 +343,7 @@
           -127.061
         ]
       ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0007",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
     },
     {
       "candidate_id": "corner_0009",
@@ -350,9 +378,7 @@
           -143.48
         ]
       ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0008",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
     },
     {
       "candidate_id": "corner_0010",
@@ -387,9 +413,7 @@
           -154.568
         ]
       ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0009",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
     },
     {
       "candidate_id": "corner_0011",
@@ -424,9 +448,7 @@
           -163.273
         ]
       ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0010",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
     },
     {
       "candidate_id": "corner_0012",
@@ -461,46 +483,7 @@
           -325.502
         ]
       ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0011",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
-    },
-    {
-      "candidate_id": "corner_0013",
-      "candidate_type": "internal_centerline_bend",
-      "status": "candidate_review",
-      "risk_level": "medium",
-      "recommended_action": "proposal_only_review_short_context",
-      "source_edge_id": "e_0079",
-      "canonical_road_id": "cr_0079",
-      "road_class": "service",
-      "point_index": 1,
-      "turn_angle_deg": 93.363,
-      "interior_angle_deg": 86.637,
-      "suggested_cut_m": 1.138,
-      "suggested_radius_m": 4.268,
-      "nearest_junction_distance_m": 9.295,
-      "center_xz": [
-        228.427,
-        -92.496
-      ],
-      "context_polyline_xz": [
-        [
-          132.107,
-          -25.742
-        ],
-        [
-          228.427,
-          -92.496
-        ],
-        [
-          229.986,
-          -89.938
-        ]
-      ],
-      "rationale": "Optimized approach centerline still contains a sharp interior bend.",
-      "candidate_id_reassigned_from": "corner_0012",
-      "candidate_id_reassignment_reason": "avoid_active_corner_override_candidate_id_reuse"
+      "rationale": "Optimized approach centerline still contains a sharp interior bend."
     },
     {
       "candidate_id": "corner_0014",

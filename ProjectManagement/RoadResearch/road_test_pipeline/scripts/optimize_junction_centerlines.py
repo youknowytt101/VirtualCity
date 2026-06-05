@@ -42,6 +42,10 @@ JUNCTION_TURN_MIN_RADIUS_BY_CLASS = {
     "trunk": 15.0,
     "motorway": 20.0,
 }
+DEFAULT_LANE_WIDTH_M = 3.2
+LANE_CENTERLINE_MIN_RADIUS_FACTOR = 1.5
+LANE_OFFSET_RADIUS_SAFETY_MARGIN_FACTOR = 0.5
+LANE_OFFSET_AWARE_RADIUS_POLICY = "lane_offset_aware_centerline_radius_v1"
 MIN_CORNER_TURN_DEG = 18.0
 MIN_CORNER_ANGLE_DEG = 35.0
 CORNER_MIN_CUT_M = 2.0
@@ -58,6 +62,22 @@ T_JUNCTION_THROUGH_HANDLE = 0.36
 T_JUNCTION_TURN_HANDLE = 0.52
 T_BRANCH_EDGE_CLEARANCE_M = 0.25
 T_BRANCH_MAX_TRIM_M = 14.0
+COMPOUND_ALTERNATING_BEND_GUARD_POLICY = "compound_alternating_bend_guard_v1"
+COMPOUND_BEND_MIN_TURN_DEG = 8.0
+COMPOUND_BEND_MIN_SIGNIFICANT_TURNS = 3
+COMPOUND_BEND_MIN_SIGN_CHANGES = 2
+NEAR_JUNCTION_BEND_ABSORPTION_POLICY = "near_junction_bend_absorption_v1"
+NEAR_JUNCTION_BEND_MAX_DISTANCE_M = 12.0
+NEAR_JUNCTION_BEND_MARGIN_M = 1.5
+NEAR_JUNCTION_BEND_MAX_EDGE_FRACTION = 0.45
+NEAR_JUNCTION_BEND_MIN_PRESERVE_LEG_M = 2.5
+NEAR_JUNCTION_BEND_MIN_PRESERVE_CUT_M = 0.75
+NEAR_JUNCTION_BEND_PRESERVE_MAX_CUT_RATIO = 0.9
+NEAR_JUNCTION_BEND_RELAXED_MIN_TRIM_M = 0.75
+NEAR_JUNCTION_BEND_ENDPOINT_RESERVE_MIN_M = 1.0
+NEAR_JUNCTION_BEND_ENDPOINT_RESERVE_LANE_WIDTH_FACTOR = 0.25
+NEAR_JUNCTION_BEND_MIN_TARGET_CUT_RATIO = 0.75
+NEAR_JUNCTION_BEND_RADIUS_TRADEOFF_POLICY = "near_junction_bend_endpoint_reserve_radius_tradeoff_v1"
 
 ROAD_CLASS_RANK = {
     "motorway": 7,
@@ -265,6 +285,36 @@ def trim_endpoint(
     trimmed = trim_from_start(points, trim_start)
     trimmed = list(reversed(trim_from_start(list(reversed(trimmed)), trim_end)))
     return trimmed if len(trimmed) >= 2 and polyline_length(trimmed) > 0.05 else []
+
+
+def point_and_tangent_along_from_node(
+    edge: dict[str, Any],
+    node_id: str,
+    amount_m: float,
+) -> tuple[tuple[float, float], tuple[float, float]]:
+    points = edge_points(edge)
+    if len(points) < 2:
+        point = points[0] if points else (float(edge.get("x") or 0.0), float(edge.get("z") or 0.0))
+        return point, (0.0, 0.0)
+    if node_id != str(edge.get("from_node") or ""):
+        points = list(reversed(points))
+    remaining = max(0.0, amount_m)
+    last_tangent = normalize((points[-1][0] - points[-2][0], points[-1][1] - points[-2][1]))
+    for index in range(len(points) - 1):
+        start = points[index]
+        end = points[index + 1]
+        segment_len = distance(start, end)
+        if segment_len <= 1e-9:
+            continue
+        tangent = normalize((end[0] - start[0], end[1] - start[1]))
+        if remaining <= segment_len:
+            return (
+                (start[0] + tangent[0] * remaining, start[1] + tangent[1] * remaining),
+                tangent,
+            )
+        remaining -= segment_len
+        last_tangent = tangent
+    return points[-1], last_tangent
 
 
 def line_intersection(
@@ -493,6 +543,52 @@ def lane_geometry_rounding_style_metadata() -> dict[str, Any]:
 def road_class_min_turn_radius(edge: dict[str, Any]) -> float:
     road_class = str(edge.get("road_class") or edge.get("highway") or "unclassified")
     return JUNCTION_TURN_MIN_RADIUS_BY_CLASS.get(road_class, JUNCTION_TURN_MIN_RADIUS_M)
+
+
+def lane_offset_radius_constraints(edge: dict[str, Any]) -> dict[str, float | str | int]:
+    lane_width = DEFAULT_LANE_WIDTH_M
+    lane_min_radius = lane_width * LANE_CENTERLINE_MIN_RADIUS_FACTOR
+    upgrade = edge.get("lane_upgrade") or {}
+    target = int(upgrade.get("target_physical_lane_count") or 0)
+    shared_single_lane = target == 1
+    if target > 0:
+        target = max(1, min(4, target))
+        if target == 1:
+            forward_count = 1
+            backward_count = 1
+        else:
+            forward_count = max(1, (target + 1) // 2)
+            backward_count = max(1, target - forward_count)
+    else:
+        forward_count = 1
+        backward_count = 1
+
+    if shared_single_lane:
+        max_abs_offset = 0.0
+    else:
+        max_index = max(forward_count, backward_count) - 1
+        max_abs_offset = (max_index + 0.5) * lane_width
+    safety_margin = max_abs_offset * LANE_OFFSET_RADIUS_SAFETY_MARGIN_FACTOR
+    nominal_centerline_radius = lane_min_radius + max_abs_offset
+    return {
+        "policy": LANE_OFFSET_AWARE_RADIUS_POLICY,
+        "lane_width_m": lane_width,
+        "lane_centerline_min_radius_m": lane_min_radius,
+        "max_abs_lane_offset_m": max_abs_offset,
+        "lane_offset_nominal_centerline_min_radius_m": nominal_centerline_radius,
+        "lane_offset_radius_safety_margin_m": safety_margin,
+        "road_centerline_min_radius_m": nominal_centerline_radius + safety_margin,
+        "forward_lane_count": forward_count,
+        "backward_lane_count": backward_count,
+    }
+
+
+def near_junction_bend_endpoint_reserve_m(edge: dict[str, Any], lane_radius: dict[str, float | str | int]) -> float:
+    lane_width = float(lane_radius.get("lane_width_m") or DEFAULT_LANE_WIDTH_M)
+    return max(
+        NEAR_JUNCTION_BEND_ENDPOINT_RESERVE_MIN_M,
+        lane_width * NEAR_JUNCTION_BEND_ENDPOINT_RESERVE_LANE_WIDTH_FACTOR,
+    )
 
 
 def design_min_radius_for_connector(
@@ -741,13 +837,421 @@ def override_cut_m(override: dict[str, Any], fallback: float, edge_a: dict[str, 
 
 
 def internal_bend_cut_m(override: dict[str, Any], previous: tuple[float, float], center: tuple[float, float], nxt: tuple[float, float]) -> float:
+    return float(internal_bend_cut_resolution(override, previous, center, nxt)["cut_m"])
+
+
+def internal_bend_cut_resolution(
+    override: dict[str, Any],
+    previous: tuple[float, float],
+    center: tuple[float, float],
+    nxt: tuple[float, float],
+) -> dict[str, Any]:
     try:
         cut = float(override.get("suggested_cut_m") or override.get("cut_m") or 0.0)
     except (TypeError, ValueError):
         cut = 0.0
+    requested_cut = cut
     cut = max(0.25, cut)
-    cut = min(cut, distance(previous, center) * 0.45, distance(center, nxt) * 0.45)
-    return max(0.0, cut)
+    try:
+        max_cut_ratio = float(override.get("internal_bend_max_cut_ratio") or 0.45)
+    except (TypeError, ValueError):
+        max_cut_ratio = 0.45
+    max_cut_ratio = max(0.1, min(0.95, max_cut_ratio))
+    try:
+        target_radius = float(override.get("internal_bend_target_radius_m") or 0.0)
+    except (TypeError, ValueError):
+        target_radius = 0.0
+    target_radius_cut = 0.0
+    if target_radius > 0.0:
+        incoming = normalize((center[0] - previous[0], center[1] - previous[1]))
+        outgoing = normalize((nxt[0] - center[0], nxt[1] - center[1]))
+        turn_angle = angle_between(incoming, outgoing) if incoming != (0.0, 0.0) and outgoing != (0.0, 0.0) else 0.0
+        if 0.0 < turn_angle < math.radians(170.0):
+            target_radius_cut = target_radius * math.tan(turn_angle * 0.5)
+            cut = max(cut, target_radius_cut)
+    previous_len = distance(previous, center)
+    next_len = distance(center, nxt)
+    ratio_limited_cut = min(cut, previous_len * max_cut_ratio, next_len * max_cut_ratio)
+    cut = ratio_limited_cut
+    try:
+        endpoint_reserve = float(override.get("internal_bend_endpoint_reserve_m") or 0.0)
+    except (TypeError, ValueError):
+        endpoint_reserve = 0.0
+    endpoint_reserve_side = str(override.get("internal_bend_endpoint_reserve_side") or "")
+    endpoint_limited_cut = cut
+    if endpoint_reserve > 0.0:
+        if endpoint_reserve_side == "previous":
+            endpoint_limited_cut = min(endpoint_limited_cut, max(0.0, previous_len - endpoint_reserve))
+        elif endpoint_reserve_side == "next":
+            endpoint_limited_cut = min(endpoint_limited_cut, max(0.0, next_len - endpoint_reserve))
+    cut = max(0.0, endpoint_limited_cut)
+    return {
+        "cut_m": cut,
+        "requested_cut_m": requested_cut,
+        "max_cut_ratio": max_cut_ratio,
+        "target_radius_m": target_radius,
+        "target_radius_cut_m": target_radius_cut,
+        "ratio_limited_cut_m": ratio_limited_cut,
+        "endpoint_reserve_m": endpoint_reserve,
+        "endpoint_reserve_side": endpoint_reserve_side,
+        "endpoint_reserve_limited": endpoint_limited_cut + 1e-6 < ratio_limited_cut,
+        "target_radius_cut_met": target_radius_cut <= 0.0 or cut + 0.05 >= target_radius_cut,
+        "radius_tradeoff_policy": str(override.get("internal_bend_radius_tradeoff_policy") or ""),
+    }
+
+
+def vertex_stations(points: list[tuple[float, float]]) -> list[float]:
+    stations = [0.0]
+    for index in range(1, len(points)):
+        stations.append(stations[-1] + distance(points[index - 1], points[index]))
+    return stations
+
+
+def point_at_station(points: list[tuple[float, float]], station_m: float) -> tuple[float, float]:
+    if not points:
+        return 0.0, 0.0
+    if len(points) == 1:
+        return points[0]
+    remaining = max(0.0, station_m)
+    for index in range(len(points) - 1):
+        segment_len = distance(points[index], points[index + 1])
+        if segment_len <= 1e-9:
+            continue
+        if remaining <= segment_len:
+            tangent = normalize((points[index + 1][0] - points[index][0], points[index + 1][1] - points[index][1]))
+            return (
+                points[index][0] + tangent[0] * remaining,
+                points[index][1] + tangent[1] * remaining,
+            )
+        remaining -= segment_len
+    return points[-1]
+
+
+def edge_slice_from_node(
+    edge: dict[str, Any],
+    node_id: str,
+    start_trim_m: float,
+    end_trim_m: float,
+) -> list[tuple[float, float]]:
+    points = edge_points(edge)
+    if len(points) < 2:
+        return points
+    if node_id != str(edge.get("from_node") or ""):
+        points = list(reversed(points))
+    total = polyline_length(points)
+    start_trim_m = min(max(0.0, start_trim_m), total)
+    end_trim_m = min(max(start_trim_m, end_trim_m), total)
+    if end_trim_m - start_trim_m <= 0.05:
+        return []
+    stations = vertex_stations(points)
+    sliced = [point_at_station(points, start_trim_m)]
+    for index in range(1, len(points) - 1):
+        station = stations[index]
+        if start_trim_m + 0.001 < station < end_trim_m - 0.001:
+            if distance(sliced[-1], points[index]) > 0.001:
+                sliced.append(points[index])
+    end_point = point_at_station(points, end_trim_m)
+    if distance(sliced[-1], end_point) > 0.001:
+        sliced.append(end_point)
+    return sliced
+
+
+def append_points_unique(
+    target: list[tuple[float, float]],
+    points: list[tuple[float, float]],
+) -> None:
+    for point in points:
+        if not target or distance(target[-1], point) > 0.001:
+            target.append(point)
+
+
+def near_junction_bend_preservation_record(
+    *,
+    edge: dict[str, Any],
+    node_id: str,
+    points: list[tuple[float, float]],
+    point_index: int,
+    override: dict[str, Any],
+    dist_to_node: float,
+    previous_trim: float,
+) -> dict[str, Any]:
+    visible_junction_leg = max(0.0, dist_to_node - previous_trim)
+    if node_id == str(edge.get("from_node") or ""):
+        source_leg = distance(points[point_index], points[point_index + 1])
+    else:
+        source_leg = distance(points[point_index - 1], points[point_index])
+    incoming = normalize((
+        points[point_index][0] - points[point_index - 1][0],
+        points[point_index][1] - points[point_index - 1][1],
+    ))
+    outgoing = normalize((
+        points[point_index + 1][0] - points[point_index][0],
+        points[point_index + 1][1] - points[point_index][1],
+    ))
+    turn_angle_deg = math.degrees(angle_between(incoming, outgoing)) if incoming != (0.0, 0.0) and outgoing != (0.0, 0.0) else 0.0
+    try:
+        requested_cut = float(override.get("suggested_cut_m") or override.get("cut_m") or 0.0)
+    except (TypeError, ValueError):
+        requested_cut = 0.0
+    try:
+        target_radius = float(override.get("suggested_radius_m") or 0.0)
+    except (TypeError, ValueError):
+        target_radius = 0.0
+    width_radius = float(edge.get("width_m") or 0.0) * 1.2
+    lane_radius = lane_offset_radius_constraints(edge)
+    endpoint_reserve = near_junction_bend_endpoint_reserve_m(edge, lane_radius)
+    lane_offset_centerline_radius = float(lane_radius["road_centerline_min_radius_m"])
+    target_radius = max(target_radius, road_class_min_turn_radius(edge), width_radius, lane_offset_centerline_radius)
+    target_cut = (
+        target_radius * math.tan(math.radians(turn_angle_deg * 0.5))
+        if 0.0 < turn_angle_deg < 170.0 and target_radius > 0.0
+        else 0.0
+    )
+    relaxed_trim = previous_trim
+    required_visible_leg = (
+        max(
+            target_cut / NEAR_JUNCTION_BEND_PRESERVE_MAX_CUT_RATIO,
+            target_cut + endpoint_reserve,
+        )
+        if target_cut > 0.0
+        else 0.0
+    )
+    if required_visible_leg > visible_junction_leg + 0.05:
+        candidate_trim = max(NEAR_JUNCTION_BEND_RELAXED_MIN_TRIM_M, dist_to_node - required_visible_leg)
+        if candidate_trim < previous_trim:
+            relaxed_trim = candidate_trim
+            visible_junction_leg = max(0.0, dist_to_node - relaxed_trim)
+    available_cut = min(
+        max(0.25, requested_cut, target_cut),
+        source_leg * NEAR_JUNCTION_BEND_PRESERVE_MAX_CUT_RATIO,
+        visible_junction_leg * NEAR_JUNCTION_BEND_PRESERVE_MAX_CUT_RATIO,
+        max(0.0, visible_junction_leg - endpoint_reserve),
+    )
+    target_cut_ratio = available_cut / target_cut if target_cut > 0.0 else 1.0
+    target_radius_feasible = target_cut <= 0.0 or available_cut + 0.05 >= target_cut
+    radius_tradeoff_feasible = (
+        target_cut > 0.0
+        and target_cut_ratio >= NEAR_JUNCTION_BEND_MIN_TARGET_CUT_RATIO
+        and available_cut >= max(NEAR_JUNCTION_BEND_MIN_PRESERVE_CUT_M, requested_cut)
+    )
+    preserve = (
+        visible_junction_leg >= NEAR_JUNCTION_BEND_MIN_PRESERVE_LEG_M
+        and available_cut >= NEAR_JUNCTION_BEND_MIN_PRESERVE_CUT_M
+        and (target_radius_feasible or radius_tradeoff_feasible)
+    )
+    if visible_junction_leg < NEAR_JUNCTION_BEND_MIN_PRESERVE_LEG_M:
+        reason = "junction_side_leg_too_short"
+    elif available_cut < NEAR_JUNCTION_BEND_MIN_PRESERVE_CUT_M:
+        reason = "preserved_cut_too_small"
+    elif target_radius_feasible:
+        reason = "local_internal_bend_smoothing_feasible"
+    elif radius_tradeoff_feasible:
+        reason = "target_radius_relaxed_for_endpoint_reserve"
+    else:
+        reason = "target_radius_not_feasible"
+    return {
+        "preserve": preserve,
+        "reason": reason,
+        "visible_junction_leg_m": round(visible_junction_leg, 3),
+        "source_leg_m": round(source_leg, 3),
+        "turn_angle_deg": round(turn_angle_deg, 3),
+        "target_radius_m": round(target_radius, 3),
+        "width_radius_m": round(width_radius, 3),
+        "lane_offset_radius_policy": str(lane_radius["policy"]),
+        "lane_width_m": round(float(lane_radius["lane_width_m"]), 3),
+        "lane_centerline_min_radius_m": round(float(lane_radius["lane_centerline_min_radius_m"]), 3),
+        "max_abs_lane_offset_m": round(float(lane_radius["max_abs_lane_offset_m"]), 3),
+        "lane_offset_nominal_centerline_min_radius_m": round(float(lane_radius["lane_offset_nominal_centerline_min_radius_m"]), 3),
+        "lane_offset_radius_safety_margin_m": round(float(lane_radius["lane_offset_radius_safety_margin_m"]), 3),
+        "lane_offset_centerline_min_radius_m": round(lane_offset_centerline_radius, 3),
+        "target_cut_m": round(target_cut, 3),
+        "requested_cut_m": round(requested_cut, 3),
+        "available_cut_m": round(available_cut, 3),
+        "endpoint_reserve_m": round(endpoint_reserve, 3),
+        "endpoint_reserve_min_m": NEAR_JUNCTION_BEND_ENDPOINT_RESERVE_MIN_M,
+        "endpoint_reserve_lane_width_factor": NEAR_JUNCTION_BEND_ENDPOINT_RESERVE_LANE_WIDTH_FACTOR,
+        "target_cut_ratio": round(target_cut_ratio, 3),
+        "target_radius_feasible_with_endpoint_reserve": target_radius_feasible,
+        "radius_tradeoff_policy": NEAR_JUNCTION_BEND_RADIUS_TRADEOFF_POLICY,
+        "radius_tradeoff_min_target_cut_ratio": NEAR_JUNCTION_BEND_MIN_TARGET_CUT_RATIO,
+        "previous_trim_m": round(previous_trim, 3),
+        "relaxed_trim_m": round(relaxed_trim, 3),
+        "trim_relaxation_m": round(max(0.0, previous_trim - relaxed_trim), 3),
+        "min_preserve_leg_m": NEAR_JUNCTION_BEND_MIN_PRESERVE_LEG_M,
+        "min_preserve_cut_m": NEAR_JUNCTION_BEND_MIN_PRESERVE_CUT_M,
+        "preserve_max_cut_ratio": NEAR_JUNCTION_BEND_PRESERVE_MAX_CUT_RATIO,
+        "relaxed_min_trim_m": NEAR_JUNCTION_BEND_RELAXED_MIN_TRIM_M,
+    }
+
+
+def near_junction_bend_absorption_plan(
+    *,
+    edges: dict[str, dict[str, Any]],
+    nodes: dict[str, dict[str, Any]],
+    overrides_by_key: dict[tuple[str, int], dict[str, Any]],
+    trim_by_edge_node: dict[tuple[str, str], float],
+) -> tuple[dict[tuple[str, int], dict[str, Any]], dict[tuple[str, str], dict[str, Any]], dict[str, Any]]:
+    absorbed_by_bend: dict[tuple[str, int], dict[str, Any]] = {}
+    absorbed_by_trim_key: dict[tuple[str, str], dict[str, Any]] = {}
+    trim_raises: list[float] = []
+    preserved_records: list[dict[str, Any]] = []
+    skipped: Counter[str] = Counter()
+
+    for (edge_id, point_index), override in sorted(overrides_by_key.items()):
+        edge = edges.get(edge_id)
+        if edge is None:
+            skipped["missing_edge"] += 1
+            continue
+        points = edge_points(edge)
+        if point_index <= 0 or point_index >= len(points) - 1:
+            skipped["point_index_not_internal"] += 1
+            continue
+        stations = vertex_stations(points)
+        length = stations[-1]
+        if length <= 0.05:
+            skipped["degenerate_edge"] += 1
+            continue
+
+        endpoint_options = [
+            (str(edge.get("from_node") or ""), stations[point_index]),
+            (str(edge.get("to_node") or ""), length - stations[point_index]),
+        ]
+        eligible = [
+            (node_id, dist_to_node)
+            for node_id, dist_to_node in endpoint_options
+            if node_id in nodes
+            and int(nodes[node_id].get("degree") or 0) >= MIN_JUNCTION_DEGREE
+            and dist_to_node <= NEAR_JUNCTION_BEND_MAX_DISTANCE_M
+        ]
+        if not eligible:
+            skipped["not_near_junction"] += 1
+            continue
+        node_id, dist_to_node = min(eligible, key=lambda item: item[1])
+        trim_key = (edge_id, node_id)
+        target_trim = dist_to_node + NEAR_JUNCTION_BEND_MARGIN_M
+        target_trim = min(target_trim, length * NEAR_JUNCTION_BEND_MAX_EDGE_FRACTION)
+        previous_trim = trim_by_edge_node.get(trim_key, 0.0)
+        preservation = near_junction_bend_preservation_record(
+            edge=edge,
+            node_id=node_id,
+            points=points,
+            point_index=point_index,
+            override=override,
+            dist_to_node=dist_to_node,
+            previous_trim=previous_trim,
+        )
+        if bool(preservation["preserve"]):
+            relaxed_trim = float(preservation.get("relaxed_trim_m") or previous_trim)
+            if relaxed_trim < previous_trim - 0.05:
+                trim_by_edge_node[trim_key] = relaxed_trim
+            if float(preservation.get("target_cut_m") or 0.0) > 0.0:
+                override["suggested_cut_m"] = max(
+                    float(override.get("suggested_cut_m") or 0.0),
+                    float(preservation["target_cut_m"]),
+                )
+            override["internal_bend_max_cut_ratio"] = NEAR_JUNCTION_BEND_PRESERVE_MAX_CUT_RATIO
+            override["internal_bend_target_radius_m"] = float(preservation.get("target_radius_m") or 0.0)
+            override["internal_bend_endpoint_reserve_m"] = float(preservation.get("endpoint_reserve_m") or 0.0)
+            override["internal_bend_endpoint_reserve_side"] = (
+                "previous" if node_id == str(edge.get("from_node") or "") else "next"
+            )
+            override["internal_bend_radius_tradeoff_policy"] = NEAR_JUNCTION_BEND_RADIUS_TRADEOFF_POLICY
+            override["near_junction_preservation_policy"] = "near_junction_bend_preserve_when_smoothing_feasible_v1"
+            skipped["preserved_for_internal_bend_smoothing"] += 1
+            preserved_records.append({
+                "policy": "near_junction_bend_preserve_when_smoothing_feasible_v1",
+                "candidate_id": str(override.get("candidate_id") or ""),
+                "corner_optimization_id": str(override.get("corner_optimization_id") or ""),
+                "application_id": str(override.get("application_id") or ""),
+                "source_edge_id": edge_id,
+                "node_id": node_id,
+                "point_index": point_index,
+                "distance_to_junction_m": round(dist_to_node, 3),
+                "status": "preserved_for_internal_bend_smoothing",
+                **{key: value for key, value in preservation.items() if key != "preserve"},
+            })
+            continue
+        if target_trim <= previous_trim + 0.05:
+            skipped["existing_trim_already_absorbs_bend"] += 1
+            continue
+
+        trim_by_edge_node[trim_key] = target_trim
+        raise_m = target_trim - previous_trim
+        trim_raises.append(raise_m)
+        record = {
+            "policy": NEAR_JUNCTION_BEND_ABSORPTION_POLICY,
+            "candidate_id": str(override.get("candidate_id") or ""),
+            "corner_optimization_id": str(override.get("corner_optimization_id") or ""),
+            "application_id": str(override.get("application_id") or ""),
+            "source_edge_id": edge_id,
+            "node_id": node_id,
+            "point_index": point_index,
+            "distance_to_junction_m": round(dist_to_node, 3),
+            "previous_trim_m": round(previous_trim, 3),
+            "target_trim_m": round(target_trim, 3),
+            "trim_raise_m": round(raise_m, 3),
+            "threshold_m": NEAR_JUNCTION_BEND_MAX_DISTANCE_M,
+            "status": "absorbed_into_junction_approach_trim",
+        }
+        absorbed_by_bend[(edge_id, point_index)] = record
+        absorbed_by_trim_key[trim_key] = record
+
+    return absorbed_by_bend, absorbed_by_trim_key, {
+        "near_junction_bend_absorptions": len(absorbed_by_bend),
+        "near_junction_bend_absorption_trim_raises": len(trim_raises),
+        "near_junction_bend_absorption_max_trim_raise_m": round(max(trim_raises), 3) if trim_raises else 0.0,
+        "near_junction_bend_absorption_avg_trim_raise_m": round(sum(trim_raises) / len(trim_raises), 3) if trim_raises else 0.0,
+        "near_junction_bend_preservations": len(preserved_records),
+        "near_junction_bend_preservation_records": preserved_records,
+        "near_junction_bend_absorption_skipped": dict(sorted(skipped.items())),
+    }
+
+
+def signed_turn_deg(
+    previous: tuple[float, float],
+    center: tuple[float, float],
+    nxt: tuple[float, float],
+) -> float:
+    incoming = normalize((center[0] - previous[0], center[1] - previous[1]))
+    outgoing = normalize((nxt[0] - center[0], nxt[1] - center[1]))
+    if incoming == (0.0, 0.0) or outgoing == (0.0, 0.0):
+        return 0.0
+    return math.degrees(math.atan2(cross(incoming, outgoing), dot(incoming, outgoing)))
+
+
+def compound_alternating_bend_diagnostics(points: list[tuple[float, float]]) -> dict[str, Any]:
+    significant_turns: list[dict[str, Any]] = []
+    for point_index in range(1, len(points) - 1):
+        turn_deg = signed_turn_deg(points[point_index - 1], points[point_index], points[point_index + 1])
+        if abs(turn_deg) < COMPOUND_BEND_MIN_TURN_DEG:
+            continue
+        significant_turns.append({
+            "point_index": point_index,
+            "turn_deg": round(turn_deg, 3),
+            "sign": 1 if turn_deg > 0.0 else -1,
+            "prev_segment_m": round(distance(points[point_index - 1], points[point_index]), 3),
+            "next_segment_m": round(distance(points[point_index], points[point_index + 1]), 3),
+        })
+
+    sign_changes = 0
+    for previous, current in zip(significant_turns, significant_turns[1:]):
+        if int(previous["sign"]) * int(current["sign"]) < 0:
+            sign_changes += 1
+
+    is_compound = (
+        len(significant_turns) >= COMPOUND_BEND_MIN_SIGNIFICANT_TURNS
+        and sign_changes >= COMPOUND_BEND_MIN_SIGN_CHANGES
+    )
+    return {
+        "policy": COMPOUND_ALTERNATING_BEND_GUARD_POLICY,
+        "is_compound_alternating_bend": is_compound,
+        "significant_turn_count": len(significant_turns),
+        "sign_change_count": sign_changes,
+        "min_turn_deg": COMPOUND_BEND_MIN_TURN_DEG,
+        "min_significant_turns": COMPOUND_BEND_MIN_SIGNIFICANT_TURNS,
+        "min_sign_changes": COMPOUND_BEND_MIN_SIGN_CHANGES,
+        "turns": significant_turns,
+    }
 
 
 def smooth_internal_bends_for_edge(
@@ -763,6 +1267,23 @@ def smooth_internal_bends_for_edge(
     if not selected or len(points) < 3:
         return points, []
 
+    compound_guard = compound_alternating_bend_diagnostics(points)
+    if bool(compound_guard["is_compound_alternating_bend"]):
+        return points, [
+            {
+                "candidate_id": str(override.get("candidate_id") or ""),
+                "corner_optimization_id": str(override.get("corner_optimization_id") or ""),
+                "application_id": str(override.get("application_id") or ""),
+                "policy": str(override.get("policy") or ""),
+                "source_edge_id": edge_id,
+                "point_index": int(point_index),
+                "guard_policy": COMPOUND_ALTERNATING_BEND_GUARD_POLICY,
+                "compound_alternating_bend": compound_guard,
+                "status": "skipped_compound_alternating_bend_guard",
+            }
+            for point_index, override in sorted(selected, key=lambda item: item[0])
+        ]
+
     smoothed = points[:]
     applied: list[dict[str, Any]] = []
     for point_index, override in sorted(selected, key=lambda item: item[0], reverse=True):
@@ -777,13 +1298,19 @@ def smooth_internal_bends_for_edge(
         previous = smoothed[point_index - 1]
         center = smoothed[point_index]
         nxt = smoothed[point_index + 1]
-        cut = internal_bend_cut_m(override, previous, center, nxt)
+        cut_resolution = internal_bend_cut_resolution(override, previous, center, nxt)
+        cut = float(cut_resolution["cut_m"])
         if cut <= 0.05:
             applied.append({
                 "candidate_id": str(override.get("candidate_id") or ""),
                 "source_edge_id": edge_id,
                 "point_index": point_index,
                 "status": "skipped_degenerate_cut",
+                **{
+                    key: round(float(value), 3) if isinstance(value, float) else value
+                    for key, value in cut_resolution.items()
+                    if key != "cut_m"
+                },
             })
             continue
         incoming = normalize((center[0] - previous[0], center[1] - previous[1]))
@@ -800,6 +1327,13 @@ def smooth_internal_bends_for_edge(
         end = (center[0] + outgoing[0] * cut, center[1] + outgoing[1] * cut)
         arc = connector_arc_from_tangents(start, incoming, end, outgoing, CORNER_SAMPLES)
         smoothed = smoothed[:point_index] + arc["points"] + smoothed[point_index + 1 :]
+        target_radius = float(cut_resolution.get("target_radius_m") or 0.0)
+        endpoint_reserve = float(cut_resolution.get("endpoint_reserve_m") or 0.0)
+        cut_metadata = {
+            key: round(float(value), 3) if isinstance(value, float) else value
+            for key, value in cut_resolution.items()
+            if key not in {"cut_m", "requested_cut_m"}
+        }
         applied.append({
             "candidate_id": str(override.get("candidate_id") or ""),
             "corner_optimization_id": str(override.get("corner_optimization_id") or ""),
@@ -813,6 +1347,16 @@ def smooth_internal_bends_for_edge(
             "arc_geometry": arc["geometry"],
             "arc_fit_status": arc["fit_status"],
             "arc_radius_m": round(float(arc["radius_m"]), 3),
+            "internal_bend_requested_cut_m": round(float(cut_resolution.get("requested_cut_m") or 0.0), 3),
+            "internal_bend_target_radius_m": round(target_radius, 3),
+            "internal_bend_endpoint_reserve_m": round(endpoint_reserve, 3),
+            "internal_bend_endpoint_reserve_side": str(cut_resolution.get("endpoint_reserve_side") or ""),
+            "internal_bend_endpoint_reserve_limited": bool(cut_resolution.get("endpoint_reserve_limited")),
+            "internal_bend_radius_target_met": (
+                target_radius <= 0.0
+                or float(arc["radius_m"]) + ARC_RADIUS_TOLERANCE_M >= target_radius
+            ),
+            **cut_metadata,
             "status": "applied",
         })
     return smoothed, list(reversed(applied))
@@ -893,21 +1437,14 @@ def endpoint_from_trim(
     trim_m: float,
     regularized_pose: dict[str, Any] | None,
 ) -> tuple[tuple[float, float], tuple[float, float], str]:
-    direction = direction_out(edge, node["node_id"])
     if regularized_pose is not None:
         regularized_trim = float(regularized_pose["entry_trim_m"])
         if abs(trim_m - regularized_trim) <= 0.05:
             return regularized_pose["entry_xz"], regularized_pose["tangent_out_xz"], "regularized_entry_pose"
-        return (
-            (float(node["x"]) + direction[0] * trim_m, float(node["z"]) + direction[1] * trim_m),
-            direction,
-            "regularized_scaled_for_edge_length",
-        )
-    return (
-        (float(node["x"]) + direction[0] * trim_m, float(node["z"]) + direction[1] * trim_m),
-        direction,
-        "heuristic_trim",
-    )
+        point, tangent = point_and_tangent_along_from_node(edge, node["node_id"], trim_m)
+        return point, tangent, "regularized_scaled_for_edge_length"
+    point, tangent = point_and_tangent_along_from_node(edge, node["node_id"], trim_m)
+    return point, tangent, "heuristic_trim"
 
 
 def pair_key(a: dict[str, Any], b: dict[str, Any]) -> tuple[str, str]:
@@ -1170,6 +1707,28 @@ def optimize_centerlines(
             "corner_optimization_policy": str((override or {}).get("policy") or ""),
         }
 
+    near_junction_absorbed_by_bend, near_junction_absorbed_by_trim_key, near_junction_absorption_metrics = near_junction_bend_absorption_plan(
+        edges=edges,
+        nodes=nodes,
+        overrides_by_key=active_internal_bend_overrides,
+        trim_by_edge_node=trim_by_edge_node,
+    )
+    active_internal_bends_for_smoothing = {
+        key: value
+        for key, value in active_internal_bend_overrides.items()
+        if key not in near_junction_absorbed_by_bend
+    }
+    for record in near_junction_absorption_metrics.get("near_junction_bend_preservation_records", []):
+        try:
+            trim_relaxation = float(record.get("trim_relaxation_m") or 0.0)
+        except (TypeError, ValueError):
+            trim_relaxation = 0.0
+        if trim_relaxation > 0.05:
+            locked_trim_keys.add((str(record.get("source_edge_id") or ""), str(record.get("node_id") or "")))
+    near_junction_absorption_by_edge: dict[str, list[dict[str, Any]]] = {}
+    for record in near_junction_absorbed_by_bend.values():
+        near_junction_absorption_by_edge.setdefault(str(record["source_edge_id"]), []).append(record)
+
     junction_common_trim_metrics = equalize_junction_trims(nodes, edges, trim_by_edge_node, locked_trim_keys)
 
     features: list[dict[str, Any]] = []
@@ -1199,6 +1758,8 @@ def optimize_centerlines(
                 trim_m=start_trim,
                 regularized_pose=regularized_entry_by_key.get(start_key),
             )
+            if start_key in near_junction_absorbed_by_trim_key:
+                source = NEAR_JUNCTION_BEND_ABSORPTION_POLICY
             trimmed[0] = endpoint
             trimmed_endpoint[start_key] = trimmed[0]
             trimmed_tangent[start_key] = tangent
@@ -1215,6 +1776,8 @@ def optimize_centerlines(
                 trim_m=end_trim,
                 regularized_pose=regularized_entry_by_key.get(end_key),
             )
+            if end_key in near_junction_absorbed_by_trim_key:
+                source = NEAR_JUNCTION_BEND_ABSORPTION_POLICY
             trimmed[-1] = endpoint
             trimmed_endpoint[end_key] = trimmed[-1]
             trimmed_tangent[end_key] = tangent
@@ -1226,7 +1789,7 @@ def optimize_centerlines(
         smoothed, bend_applications = smooth_internal_bends_for_edge(
             trimmed,
             str(edge["edge_id"]),
-            active_internal_bend_overrides,
+            active_internal_bends_for_smoothing,
         )
         if bend_applications:
             trimmed = smoothed
@@ -1255,6 +1818,14 @@ def optimize_centerlines(
                 "internal_bend_smoothing_candidate_ids": ",".join(str(item.get("candidate_id") or "") for item in applied_bends),
                 "internal_bend_smoothing_point_indices": ",".join(str(item.get("point_index") or "") for item in applied_bends),
                 "internal_bend_smoothing_policies": ",".join(sorted({str(item.get("policy") or "") for item in applied_bends})),
+            })
+        absorbed_bends = near_junction_absorption_by_edge.get(str(edge["edge_id"]), [])
+        if absorbed_bends:
+            approach_props.update({
+                "near_junction_bend_absorption_count": len(absorbed_bends),
+                "near_junction_bend_absorption_candidate_ids": ",".join(str(item.get("candidate_id") or "") for item in absorbed_bends),
+                "near_junction_bend_absorption_point_indices": ",".join(str(item.get("point_index") or "") for item in absorbed_bends),
+                "near_junction_bend_absorption_policy": NEAR_JUNCTION_BEND_ABSORPTION_POLICY,
             })
         features.append(feature(trimmed, approach_props, origin_lon, origin_lat))
 
@@ -1444,6 +2015,17 @@ def optimize_centerlines(
             "source_engineering_reference": str(engineering_reference_path) if engineering_reference_path and engineering_reference_path.exists() else "",
             "source_corner_overrides": str(corner_overrides_path) if corner_overrides_path and corner_overrides_path.exists() else "",
             "lane_geometry_rounding_style": lane_geometry_rounding_style_metadata(),
+            "near_junction_bend_absorption": {
+                "policy": NEAR_JUNCTION_BEND_ABSORPTION_POLICY,
+                "max_distance_m": NEAR_JUNCTION_BEND_MAX_DISTANCE_M,
+                "margin_m": NEAR_JUNCTION_BEND_MARGIN_M,
+                "max_edge_fraction": NEAR_JUNCTION_BEND_MAX_EDGE_FRACTION,
+                "lane_offset_radius_policy": LANE_OFFSET_AWARE_RADIUS_POLICY,
+                "lane_width_m": DEFAULT_LANE_WIDTH_M,
+                "lane_centerline_min_radius_m": DEFAULT_LANE_WIDTH_M * LANE_CENTERLINE_MIN_RADIUS_FACTOR,
+                "lane_offset_radius_safety_margin_factor": LANE_OFFSET_RADIUS_SAFETY_MARGIN_FACTOR,
+                "relaxed_min_trim_m": NEAR_JUNCTION_BEND_RELAXED_MIN_TRIM_M,
+            },
             "strategy": "use regularized junction entry poses where available, trim approaches, add tangent circular-arc junction connectors and corner fillets, then extrude widths",
         },
         "features": features,
@@ -1506,6 +2088,7 @@ def optimize_centerlines(
             "corner_straight_infinite_radius": corner_arc_geometry_counts.get("straight_infinite_radius", 0),
             "output_features": len(features),
             **t_branch_trim_metrics,
+            **near_junction_absorption_metrics,
             **junction_common_trim_metrics,
             **corner_override_metrics,
         },
@@ -1515,6 +2098,7 @@ def optimize_centerlines(
         "junction_connector_arc_fit_status_counts": dict(sorted(connector_arc_fit_status_counts.items())),
         "corner_arc_geometry_counts": dict(sorted(corner_arc_geometry_counts.items())),
         "internal_bend_smoothing_by_edge": internal_bend_smoothing_by_edge,
+        "near_junction_bend_absorption_by_edge": near_junction_absorption_by_edge,
         "corner_fillet_metrics": {
             "min_turn_deg": round(min(corner_turn_degrees), 3) if corner_turn_degrees else 0.0,
             "max_turn_deg": round(max(corner_turn_degrees), 3) if corner_turn_degrees else 0.0,

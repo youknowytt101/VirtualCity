@@ -1,8 +1,8 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "junction_semantics_v1",
-  "input": "data/processed/pattaya_central_500m_road_graph.json",
-  "output": "data/processed/pattaya_central_500m_junction_semantics.json",
+  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+  "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
   "counts": {
     "junctions": 49,
     "approaches": 149,

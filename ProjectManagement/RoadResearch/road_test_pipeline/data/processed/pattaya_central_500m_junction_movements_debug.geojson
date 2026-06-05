@@ -6,9 +6,9 @@
     "coord_domain": "WGS84",
     "origin_lon": 100.8837,
     "origin_lat": 12.93425,
-    "source": "data/processed/pattaya_central_500m_road_graph.json",
-    "source_junction_areas": "data/processed/pattaya_central_500m_junction_areas.json",
-    "source_engineering_reference": "data/processed/pattaya_central_500m_engineering_reference_lines.json",
+    "source": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "source_junction_areas": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_areas.json",
+    "source_engineering_reference": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_engineering_reference_lines.json",
     "display_note": "Debug-only movement layer. Do not mix this into OUT_roads_centerlines."
   },
   "features": [
@@ -8985,36 +8985,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88581977,
-            12.93344208
+            100.8858464,
+            12.93348464
           ],
           [
-            100.88582951,
-            12.93345719
+            100.88585298,
+            12.93349336
           ],
           [
-            100.88583781,
-            12.93346843
+            100.88585867,
+            12.93349711
           ],
           [
-            100.88584551,
-            12.93347605
+            100.88586399,
+            12.93349684
           ],
           [
-            100.88585343,
-            12.93348032
+            100.88586949,
+            12.93349353
           ],
           [
-            100.8858624,
-            12.93348151
+            100.88587569,
+            12.93348816
           ],
           [
-            100.88587325,
-            12.93347989
+            100.88588313,
+            12.93348168
           ],
           [
-            100.88588679,
-            12.93347573
+            100.88589235,
+            12.93347507
           ],
           [
             100.88590387,
@@ -9036,7 +9036,7 @@
         "oneway": false,
         "regularized_junction_id": "j_047",
         "junction_area_status": "pass",
-        "from_trim_source": "regularized_entry_pose",
+        "from_trim_source": "regularized_scaled_for_edge_length",
         "to_trim_source": "regularized_entry_pose"
       }
     },
@@ -9046,36 +9046,36 @@
         "type": "LineString",
         "coordinates": [
           [
-            100.88581977,
-            12.93344208
+            100.8858464,
+            12.93348464
           ],
           [
-            100.88582862,
-            12.93345622
+            100.88585135,
+            12.93349256
           ],
           [
-            100.88583636,
-            12.93346859
+            100.88585568,
+            12.93349948
           ],
           [
-            100.88584336,
-            12.93347979
+            100.88585959,
+            12.93350575
           ],
           [
-            100.88584999,
-            12.9334904
+            100.8858633,
+            12.93351168
           ],
           [
-            100.88585663,
-            12.93350101
+            100.88586702,
+            12.93351762
           ],
           [
-            100.88586363,
-            12.93351221
+            100.88587093,
+            12.93352389
           ],
           [
-            100.88587137,
-            12.93352458
+            100.88587526,
+            12.93353081
           ],
           [
             100.88588021,
@@ -9097,7 +9097,7 @@
         "oneway": false,
         "regularized_junction_id": "j_047",
         "junction_area_status": "pass",
-        "from_trim_source": "regularized_entry_pose",
+        "from_trim_source": "regularized_scaled_for_edge_length",
         "to_trim_source": "regularized_entry_pose"
       }
     },

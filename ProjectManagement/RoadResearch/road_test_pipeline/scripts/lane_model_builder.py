@@ -25,8 +25,11 @@ SURFACE_STRATEGY_PENDING = "not_generated_layer3_lane_graph_only"
 TEMPORARY_LANE_POLICY_ID = "temporary_all_roads_bidirectional_two_lane_v1"
 TEMPORARY_TRAFFIC_SIDE = "left"
 LANE_UPGRADE_GEOMETRY_APPLICATION_POLICY = "defer_lane_upgrade_overrides_keep_all_roads_bidirectional_two_lane_v1"
+SELECTED_LANE_UPGRADE_GEOMETRY_APPLICATION_POLICY = "apply_selected_lane_upgrade_overrides_to_geometry_v1"
+ALL_LANE_UPGRADE_GEOMETRY_APPLICATION_POLICY = "apply_all_lane_upgrade_overrides_to_geometry_v1"
 LANE_UPGRADE_SYSTEM_ID = "LaneForge"
 LANE_UPGRADE_OVERRIDE_SCHEMA = "lane_upgrade_system.active_overrides.v1"
+LANE_BUNDLE_CENTERLINE_SMOOTHING_POLICY = "lane_bundle_centerline_smoothing_v1"
 DERIVED_LANE_CENTERLINE_SMOOTHING_POLICY = "derived_lane_centerline_smoothing_v1"
 DERIVED_SMOOTHING_MICRO_PROFILE = "micro_bend"
 DERIVED_SMOOTHING_HARD_PROFILE = "hard_bend_lane_level_rounding"
@@ -47,6 +50,8 @@ DERIVED_HARD_SMOOTHING_CUT_RATIO = 0.32
 DERIVED_HARD_SMOOTHING_MAX_CUT_M = 9.0
 DERIVED_HARD_SMOOTHING_SAMPLE_COUNT = 9
 DERIVED_HARD_SMOOTHING_MAX_DERIVATION_OFFSET_M = 2.6
+DERIVED_HARD_SMOOTHING_LOW_RADIUS_MAX_CUT_RATIO = 0.90
+DERIVED_SMOOTHING_WINDOW_OVERLAP_EPSILON_M = 0.05
 UNIFIED_LANE_GEOMETRY_ROUNDING_STYLE_ID = "unified_lane_geometry_rounding_style_v1"
 UNIFIED_ROUNDING_PRIMARY_CURVE_FAMILY = "tangent_circular_arc"
 UNIFIED_ROUNDING_STRAIGHT_CURVE_FAMILY = "straight_infinite_radius"
@@ -66,6 +71,13 @@ DIRECT_CONNECTOR_MAX_ENDPOINT_GAP_M = 2.0
 DIRECT_CONNECTOR_MICRO_SEAM_SNAP_M = 0.10
 DIRECT_CONNECTOR_PHYSICAL_LANE_MAX_TURN_DEG = 5.0
 DIRECT_CONNECTOR_PHYSICAL_LANE_MAX_ENDPOINT_GAP_M = DIRECT_CONNECTOR_MICRO_SEAM_SNAP_M
+LANE_CENTERLINE_MICRO_SEGMENT_CLEANUP_POLICY = "lane_centerline_micro_segment_cleanup_v1"
+LANE_CENTERLINE_MICRO_SEGMENT_M = 0.5
+LANE_CENTERLINE_MICRO_RUN_MAX_SPAN_M = 1.25
+LANE_CENTERLINE_LOW_RADIUS_SAMPLED_ARC_CLEANUP_POLICY = "lane_centerline_low_radius_sampled_arc_cleanup_v1"
+LANE_CENTERLINE_LOW_RADIUS_SAMPLE_SEGMENT_M = 1.0
+LANE_CENTERLINE_LOW_RADIUS_RUN_MAX_SPAN_M = 4.0
+LANE_CENTERLINE_LOW_RADIUS_MIN_RADIUS_M = DEFAULT_LANE_WIDTH_M * 1.5
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -446,32 +458,40 @@ def apply_lane_upgrade_overrides(
     active_upgrades_by_road: dict[str, dict[str, Any]],
     *,
     apply_to_geometry: bool = False,
+    apply_road_ids: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     updated: list[dict[str, Any]] = []
     applied: list[str] = []
     deferred: list[str] = []
     missing = set(active_upgrades_by_road)
+    selected_road_ids = {str(road_id) for road_id in (apply_road_ids or set()) if str(road_id)}
     for edge in edges:
         item = dict(edge)
         edge_id = str(edge.get("edge_id") or "")
         upgrade = active_upgrades_by_road.get(edge_id)
         if upgrade:
-            if apply_to_geometry:
+            should_apply = apply_to_geometry or edge_id in selected_road_ids
+            if should_apply:
                 item["lane_upgrade"] = dict(upgrade)
                 applied.append(edge_id)
             else:
                 deferred.append(edge_id)
             missing.discard(edge_id)
+        elif edge_id in selected_road_ids:
+            missing.add(edge_id)
         updated.append(item)
+    if apply_to_geometry:
+        policy = ALL_LANE_UPGRADE_GEOMETRY_APPLICATION_POLICY
+    elif selected_road_ids:
+        policy = SELECTED_LANE_UPGRADE_GEOMETRY_APPLICATION_POLICY
+    else:
+        policy = LANE_UPGRADE_GEOMETRY_APPLICATION_POLICY
     return updated, {
         "applied_road_ids": sorted(applied),
         "deferred_road_ids": sorted(deferred),
         "missing_road_ids": sorted(missing),
-        "geometry_application_policy": (
-            "apply_lane_upgrade_overrides_to_geometry_v1"
-            if apply_to_geometry
-            else LANE_UPGRADE_GEOMETRY_APPLICATION_POLICY
-        ),
+        "requested_apply_road_ids": sorted(selected_road_ids),
+        "geometry_application_policy": policy,
     }
 
 
@@ -501,22 +521,34 @@ def offset_points(points: list[tuple[float, float]], offset: float) -> list[tupl
 def offset_points_profile(points: list[tuple[float, float]], offset_start: float, offset_end: float) -> list[tuple[float, float]]:
     if len(points) < 2:
         return points
-    shifted: list[tuple[float, float]] = []
     factors = station_factors(points)
-    for i, point in enumerate(points):
-        if i == 0:
-            d = normalize((points[1][0] - point[0], points[1][1] - point[1]))
-        elif i == len(points) - 1:
-            d = normalize((point[0] - points[i - 1][0], point[1] - points[i - 1][1]))
-        else:
-            d0 = normalize((point[0] - points[i - 1][0], point[1] - points[i - 1][1]))
-            d1 = normalize((points[i + 1][0] - point[0], points[i + 1][1] - point[1]))
-            d = normalize((d0[0] + d1[0], d0[1] + d1[1]))
-            if d == (0.0, 0.0):
-                d = d1
-        n = rotate90(d)
-        offset = lerp(offset_start, offset_end, factors[i])
-        shifted.append((point[0] + n[0] * offset, point[1] + n[1] * offset))
+    offsets = [lerp(offset_start, offset_end, factor) for factor in factors]
+    shifted_segments: list[tuple[tuple[float, float], tuple[float, float]]] = []
+    for i in range(len(points) - 1):
+        direction = normalize((points[i + 1][0] - points[i][0], points[i + 1][1] - points[i][1]))
+        if direction == (0.0, 0.0):
+            shifted_segments.append((points[i], points[i + 1]))
+            continue
+        normal = rotate90(direction)
+        shifted_segments.append((
+            (points[i][0] + normal[0] * offsets[i], points[i][1] + normal[1] * offsets[i]),
+            (points[i + 1][0] + normal[0] * offsets[i + 1], points[i + 1][1] + normal[1] * offsets[i + 1]),
+        ))
+
+    shifted: list[tuple[float, float]] = [shifted_segments[0][0]]
+    for i in range(1, len(points) - 1):
+        prev_a, prev_b = shifted_segments[i - 1]
+        next_a, next_b = shifted_segments[i]
+        prev_dir = (prev_b[0] - prev_a[0], prev_b[1] - prev_a[1])
+        next_dir = (next_b[0] - next_a[0], next_b[1] - next_a[1])
+        intersection = line_intersection(prev_a, prev_dir, next_a, next_dir)
+        if intersection is None:
+            intersection = ((prev_b[0] + next_a[0]) * 0.5, (prev_b[1] + next_a[1]) * 0.5)
+        max_miter_m = max(20.0, abs(offsets[i]) * 8.0)
+        if distance(points[i], intersection) > max_miter_m:
+            intersection = ((prev_b[0] + next_a[0]) * 0.5, (prev_b[1] + next_a[1]) * 0.5)
+        shifted.append(intersection)
+    shifted.append(shifted_segments[-1][1])
     return shifted
 
 
@@ -645,6 +677,8 @@ def smoothing_policy_config() -> dict[str, Any]:
         "sample_strategy": UNIFIED_ROUNDING_SAMPLE_STRATEGY,
         "sample_angle_deg": UNIFIED_ROUNDING_SAMPLE_ANGLE_DEG,
         "profiles": [DERIVED_SMOOTHING_MICRO_PROFILE, DERIVED_SMOOTHING_HARD_PROFILE],
+        "lane_bundle_centerline_smoothing_policy": LANE_BUNDLE_CENTERLINE_SMOOTHING_POLICY,
+        "lane_bundle_min_base_radius_policy": "max_abs_lane_offset_plus_lane_min_radius",
         "min_angle_deg": DERIVED_SMOOTHING_MIN_ANGLE_DEG,
         "max_angle_deg": DERIVED_SMOOTHING_MAX_ANGLE_DEG,
         "min_source_offset_m": DERIVED_SMOOTHING_MIN_SOURCE_OFFSET_M,
@@ -662,8 +696,12 @@ def smoothing_policy_config() -> dict[str, Any]:
         "hard_bend_max_cut_m": DERIVED_HARD_SMOOTHING_MAX_CUT_M,
         "hard_bend_sample_count": DERIVED_HARD_SMOOTHING_SAMPLE_COUNT,
         "hard_bend_max_derivation_offset_m": DERIVED_HARD_SMOOTHING_MAX_DERIVATION_OFFSET_M,
+        "hard_bend_min_arc_radius_m": LANE_CENTERLINE_LOW_RADIUS_MIN_RADIUS_M,
+        "hard_bend_low_radius_max_cut_ratio": DERIVED_HARD_SMOOTHING_LOW_RADIUS_MAX_CUT_RATIO,
+        "hard_bend_low_radius_fallback": "straight_chord_when_min_radius_arc_is_infeasible",
         "short_connector_hard_bend_smoothing": "enabled_when_local_derivation_offset_stays_within_limit",
         "adjacent_bend_chain_smoothing": "enabled_with_non_overlapping_cut_windows",
+        "low_radius_sampled_arc_cleanup": "enabled_before_derived_bend_rounding",
         "truth_layers_unchanged": ["raw", "repaired", "canonical", "road_graph"],
     }
 
@@ -713,6 +751,204 @@ def smoothing_profile_or_skip_reason(metrics: dict[str, float]) -> tuple[str, st
     ):
         return "", "short_adjacent_segment"
     return DERIVED_SMOOTHING_HARD_PROFILE, ""
+
+
+def collapse_micro_segment_runs(
+    points: list[tuple[float, float]],
+    *,
+    min_segment_m: float = LANE_CENTERLINE_MICRO_SEGMENT_M,
+    max_run_span_m: float = LANE_CENTERLINE_MICRO_RUN_MAX_SPAN_M,
+) -> tuple[list[tuple[float, float]], dict[str, Any]]:
+    if len(points) < 4:
+        return points, {
+            "policy": LANE_CENTERLINE_MICRO_SEGMENT_CLEANUP_POLICY,
+            "runs_collapsed": 0,
+            "removed_points": 0,
+            "max_run_span_m": 0.0,
+        }
+
+    segment_lengths = [distance(points[index], points[index + 1]) for index in range(len(points) - 1)]
+    cleaned: list[tuple[float, float]] = []
+    runs_collapsed = 0
+    removed_points = 0
+    max_observed_span = 0.0
+    index = 0
+    while index < len(points):
+        if index >= len(points) - 1:
+            cleaned.append(points[index])
+            break
+
+        if segment_lengths[index] < min_segment_m:
+            start_index = index
+            end_index = index + 1
+            while end_index < len(points) - 1 and segment_lengths[end_index] < min_segment_m:
+                end_index += 1
+            run_segments = end_index - start_index
+            span = distance(points[start_index], points[end_index])
+            touches_endpoint = start_index == 0 or end_index == len(points) - 1
+            if run_segments >= 2 and span <= max_run_span_m and not touches_endpoint:
+                run_points = points[start_index : end_index + 1]
+                representative = (
+                    sum(point[0] for point in run_points) / len(run_points),
+                    sum(point[1] for point in run_points) / len(run_points),
+                )
+                cleaned.append(representative)
+                runs_collapsed += 1
+                removed_points += len(run_points) - 1
+                max_observed_span = max(max_observed_span, span)
+                index = end_index + 1
+                continue
+
+        cleaned.append(points[index])
+        index += 1
+
+    return cleaned, {
+        "policy": LANE_CENTERLINE_MICRO_SEGMENT_CLEANUP_POLICY,
+        "runs_collapsed": runs_collapsed,
+        "removed_points": removed_points,
+        "max_run_span_m": round(max_observed_span, 6),
+        "min_segment_m": min_segment_m,
+        "max_run_span_threshold_m": max_run_span_m,
+    }
+
+
+def circumradius_or_inf(
+    a: tuple[float, float],
+    b: tuple[float, float],
+    c: tuple[float, float],
+) -> float:
+    side_a = distance(b, c)
+    side_b = distance(a, c)
+    side_c = distance(a, b)
+    area_twice = abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]))
+    if area_twice <= 1e-9:
+        return float("inf")
+    return side_a * side_b * side_c / (2.0 * area_twice)
+
+
+def collapse_low_radius_sampled_arc_runs(
+    points: list[tuple[float, float]],
+    *,
+    max_sample_segment_m: float = LANE_CENTERLINE_LOW_RADIUS_SAMPLE_SEGMENT_M,
+    max_run_span_m: float = LANE_CENTERLINE_LOW_RADIUS_RUN_MAX_SPAN_M,
+    min_radius_m: float = LANE_CENTERLINE_LOW_RADIUS_MIN_RADIUS_M,
+) -> tuple[list[tuple[float, float]], dict[str, Any]]:
+    if len(points) < 5:
+        return points, {
+            "policy": LANE_CENTERLINE_LOW_RADIUS_SAMPLED_ARC_CLEANUP_POLICY,
+            "runs_collapsed": 0,
+            "removed_points": 0,
+            "max_run_span_m": 0.0,
+            "min_radius_m": min_radius_m,
+        }
+
+    segment_lengths = [distance(points[index], points[index + 1]) for index in range(len(points) - 1)]
+    bad_indices: list[int] = []
+    min_observed_radius = float("inf")
+    for index in range(1, len(points) - 1):
+        if max(segment_lengths[index - 1], segment_lengths[index]) > max_sample_segment_m:
+            continue
+        radius = circumradius_or_inf(points[index - 1], points[index], points[index + 1])
+        if radius < min_radius_m:
+            bad_indices.append(index)
+            min_observed_radius = min(min_observed_radius, radius)
+
+    if not bad_indices:
+        return points, {
+            "policy": LANE_CENTERLINE_LOW_RADIUS_SAMPLED_ARC_CLEANUP_POLICY,
+            "runs_collapsed": 0,
+            "removed_points": 0,
+            "max_run_span_m": 0.0,
+            "min_radius_m": min_radius_m,
+        }
+
+    groups: list[list[int]] = []
+    current: list[int] = []
+    for index in bad_indices:
+        if not current or index == current[-1] + 1:
+            current.append(index)
+        else:
+            groups.append(current)
+            current = [index]
+    if current:
+        groups.append(current)
+
+    collapse_ranges: list[tuple[int, int]] = []
+    max_observed_span = 0.0
+    for group in groups:
+        if len(group) < 2:
+            continue
+        start_index = max(1, group[0] - 1)
+        end_index = min(len(points) - 2, group[-1] + 1)
+        span = distance(points[start_index], points[end_index])
+        if span > max_run_span_m:
+            continue
+        collapse_ranges.append((start_index, end_index))
+        max_observed_span = max(max_observed_span, span)
+
+    if not collapse_ranges:
+        return points, {
+            "policy": LANE_CENTERLINE_LOW_RADIUS_SAMPLED_ARC_CLEANUP_POLICY,
+            "runs_collapsed": 0,
+            "removed_points": 0,
+            "max_run_span_m": 0.0,
+            "min_radius_m": min_radius_m,
+            "min_observed_radius_m": round(min_observed_radius, 6) if min_observed_radius < float("inf") else 0.0,
+        }
+
+    cleaned: list[tuple[float, float]] = []
+    removed_points = 0
+    range_index = 0
+    index = 0
+    while index < len(points):
+        if range_index < len(collapse_ranges) and index == collapse_ranges[range_index][0]:
+            start_index, end_index = collapse_ranges[range_index]
+            run_points = points[start_index : end_index + 1]
+            representative = (
+                sum(point[0] for point in run_points) / len(run_points),
+                sum(point[1] for point in run_points) / len(run_points),
+            )
+            cleaned.append(representative)
+            removed_points += len(run_points) - 1
+            index = end_index + 1
+            range_index += 1
+            continue
+        cleaned.append(points[index])
+        index += 1
+
+    original_min_radius = polyline_min_radius_m(points)
+    cleaned_min_radius = polyline_min_radius_m(cleaned)
+    if (
+        original_min_radius > 0.0
+        and cleaned_min_radius > 0.0
+        and cleaned_min_radius + 1e-6 < original_min_radius
+    ):
+        return points, {
+            "policy": LANE_CENTERLINE_LOW_RADIUS_SAMPLED_ARC_CLEANUP_POLICY,
+            "runs_collapsed": 0,
+            "removed_points": 0,
+            "max_run_span_m": 0.0,
+            "min_radius_m": min_radius_m,
+            "min_observed_radius_m": round(min_observed_radius, 6) if min_observed_radius < float("inf") else 0.0,
+            "cleanup_rejected_reason": "cleanup_would_reduce_min_radius",
+            "rejected_runs": len(collapse_ranges),
+            "rejected_removed_points": removed_points,
+            "rejected_min_radius_m": round(cleaned_min_radius, 6),
+            "source_min_radius_m": round(original_min_radius, 6),
+            "max_sample_segment_m": max_sample_segment_m,
+            "max_run_span_threshold_m": max_run_span_m,
+        }
+
+    return cleaned, {
+        "policy": LANE_CENTERLINE_LOW_RADIUS_SAMPLED_ARC_CLEANUP_POLICY,
+        "runs_collapsed": len(collapse_ranges),
+        "removed_points": removed_points,
+        "max_run_span_m": round(max_observed_span, 6),
+        "min_radius_m": min_radius_m,
+        "min_observed_radius_m": round(min_observed_radius, 6) if min_observed_radius < float("inf") else 0.0,
+        "max_sample_segment_m": max_sample_segment_m,
+        "max_run_span_threshold_m": max_run_span_m,
+    }
 
 
 def point_lerp(a: tuple[float, float], b: tuple[float, float], t: float) -> tuple[float, float]:
@@ -805,6 +1041,7 @@ def derived_smoothing_curve_record(
     next_point: tuple[float, float],
     profile: str = DERIVED_SMOOTHING_MICRO_PROFILE,
     cut_m: float | None = None,
+    min_arc_radius_m: float = LANE_CENTERLINE_LOW_RADIUS_MIN_RADIUS_M,
 ) -> dict[str, Any]:
     prev_len = distance(prev_point, point)
     next_len = distance(point, next_point)
@@ -829,6 +1066,7 @@ def derived_smoothing_curve_record(
 
     start = point_lerp(point, prev_point, resolved_cut_m / prev_len)
     end = point_lerp(point, next_point, resolved_cut_m / next_len)
+    low_radius_metadata: dict[str, Any] = {}
     record = tangent_circular_arc_record(
         start,
         (point[0] - prev_point[0], point[1] - prev_point[1]),
@@ -836,11 +1074,51 @@ def derived_smoothing_curve_record(
         (next_point[0] - point[0], next_point[1] - point[1]),
         sample_count,
     )
+    if (
+        profile == DERIVED_SMOOTHING_HARD_PROFILE
+        and str(record.get("curve_family") or "") == UNIFIED_ROUNDING_PRIMARY_CURVE_FAMILY
+        and 0.0 < float(record.get("arc_radius_m") or 0.0) < min_arc_radius_m
+    ):
+        turn_angle = angle_between(
+            (point[0] - prev_point[0], point[1] - prev_point[1]),
+            (next_point[0] - point[0], next_point[1] - point[1]),
+        )
+        desired_cut_m = min_arc_radius_m * math.tan(math.radians(turn_angle * 0.5))
+        max_regularized_cut_m = min(
+            prev_len * DERIVED_HARD_SMOOTHING_LOW_RADIUS_MAX_CUT_RATIO,
+            next_len * DERIVED_HARD_SMOOTHING_LOW_RADIUS_MAX_CUT_RATIO,
+            max_cut_m,
+        )
+        low_radius_metadata = {
+            "low_radius_arc_policy": "hard_bend_min_radius_guard_v1",
+            "low_radius_arc_original_radius_m": float(record.get("arc_radius_m") or 0.0),
+            "low_radius_arc_min_radius_m": min_arc_radius_m,
+            "low_radius_arc_desired_cut_m": desired_cut_m,
+            "low_radius_arc_max_regularized_cut_m": max_regularized_cut_m,
+        }
+        if desired_cut_m <= max_regularized_cut_m and desired_cut_m > resolved_cut_m:
+            resolved_cut_m = desired_cut_m
+            start = point_lerp(point, prev_point, resolved_cut_m / prev_len)
+            end = point_lerp(point, next_point, resolved_cut_m / next_len)
+            record = tangent_circular_arc_record(
+                start,
+                (point[0] - prev_point[0], point[1] - prev_point[1]),
+                end,
+                (next_point[0] - point[0], next_point[1] - point[1]),
+                sample_count,
+            )
+            low_radius_metadata["low_radius_arc_action"] = "increased_cut_to_min_radius"
+            low_radius_metadata["low_radius_arc_regularized"] = True
+        else:
+            record = straight_rounding_curve_record(start, end, "low_radius_arc_regularization_unavailable")
+            low_radius_metadata["low_radius_arc_action"] = "straight_chord_fallback"
+            low_radius_metadata["low_radius_arc_regularized"] = False
     record.update({
         "rounding_style_id": UNIFIED_LANE_GEOMETRY_ROUNDING_STYLE_ID,
         "profile": profile,
         "cut_m": resolved_cut_m,
         "sample_strategy": UNIFIED_ROUNDING_SAMPLE_STRATEGY,
+        **low_radius_metadata,
     })
     return record
 
@@ -854,7 +1132,70 @@ def derived_smoothing_curve(
     return list(derived_smoothing_curve_record(prev_point, point, next_point, profile).get("points") or [point])
 
 
+def select_non_overlapping_bend_records(
+    points: list[tuple[float, float]],
+    bend_records: dict[int, dict[str, Any]],
+    skipped: Counter,
+) -> dict[int, dict[str, Any]]:
+    if len(bend_records) <= 1:
+        return bend_records
+
+    stations = [0.0]
+    for index in range(len(points) - 1):
+        stations.append(stations[-1] + distance(points[index], points[index + 1]))
+
+    candidates: list[dict[str, Any]] = []
+    for index, record in bend_records.items():
+        cut_m = max(0.0, float(record.get("cut_m") or 0.0))
+        profile_priority = 2 if str(record.get("profile") or "") == DERIVED_SMOOTHING_HARD_PROFILE else 1
+        candidates.append({
+            "index": index,
+            "start_station": max(stations[index - 1], stations[index] - cut_m),
+            "end_station": min(stations[index + 1], stations[index] + cut_m),
+            "profile_priority": profile_priority,
+            "source_offset_m": float(record.get("source_offset_m") or 0.0),
+            "angle_deg": float(record.get("angle_deg") or 0.0),
+            "cut_m": cut_m,
+        })
+
+    candidates.sort(
+        key=lambda item: (
+            item["profile_priority"],
+            item["source_offset_m"],
+            item["angle_deg"],
+            item["cut_m"],
+            -item["index"],
+        ),
+        reverse=True,
+    )
+
+    selected: list[dict[str, Any]] = []
+    for candidate in candidates:
+        overlaps = any(
+            candidate["start_station"] < existing["end_station"] - DERIVED_SMOOTHING_WINDOW_OVERLAP_EPSILON_M
+            and candidate["end_station"] > existing["start_station"] + DERIVED_SMOOTHING_WINDOW_OVERLAP_EPSILON_M
+            for existing in selected
+        )
+        if overlaps:
+            skipped["overlapping_bend_window"] += 1
+            continue
+        selected.append(candidate)
+
+    return {candidate["index"]: bend_records[candidate["index"]] for candidate in sorted(selected, key=lambda item: item["index"])}
+
+
 def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[list[tuple[float, float]], dict[str, Any]]:
+    return smooth_lane_centerline_points_with_policy(points)
+
+
+def smooth_lane_centerline_points_with_policy(
+    points: list[tuple[float, float]],
+    *,
+    min_arc_radius_m: float = LANE_CENTERLINE_LOW_RADIUS_MIN_RADIUS_M,
+) -> tuple[list[tuple[float, float]], dict[str, Any]]:
+    source_point_count = len(points)
+    points, cleanup_stats = collapse_micro_segment_runs(points)
+    points, low_radius_cleanup_stats = collapse_low_radius_sampled_arc_runs(points, min_radius_m=min_arc_radius_m)
     skipped: Counter = Counter()
     profile_counts: Counter = Counter()
     curve_family_counts: Counter = Counter()
@@ -870,6 +1211,8 @@ def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[li
         return points, {
             "smoothed_bends": 0,
             "inserted_sample_points": 0,
+            "source_point_count": source_point_count,
+            "cleaned_source_point_count": len(points),
             "max_derivation_offset_m": 0.0,
             "max_source_bend_offset_m": 0.0,
             "max_smoothed_angle_deg": 0.0,
@@ -877,6 +1220,8 @@ def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[li
             "curve_family_counts": {},
             "arc_fit_status_counts": {},
             "derivation_limit_adjustments": 0,
+            "micro_segment_cleanup": cleanup_stats,
+            "low_radius_sampled_arc_cleanup": low_radius_cleanup_stats,
             "skipped_bends": dict(skipped),
         }
 
@@ -894,13 +1239,20 @@ def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[li
             if profile == DERIVED_SMOOTHING_HARD_PROFILE
             else DERIVED_SMOOTHING_MAX_DERIVATION_OFFSET_M
         )
-        curve_record = derived_smoothing_curve_record(prev_point, point, next_point, profile)
+        curve_record = derived_smoothing_curve_record(
+            prev_point,
+            point,
+            next_point,
+            profile,
+            min_arc_radius_m=min_arc_radius_m,
+        )
         curve = list(curve_record.get("points") or [])
         if len(curve) < 2:
             skipped["degenerate_derived_curve"] += 1
             continue
         local_polyline = [prev_point, point, next_point]
         derivation_offset = max(point_polyline_distance(curve_point, local_polyline) for curve_point in curve)
+        derivation_limit_adjusted = False
         if derivation_offset > derivation_limit and derivation_offset > 1e-9:
             adjusted_cut_m = float(curve_record.get("cut_m") or 0.0) * (derivation_limit / derivation_offset) * 0.98
             if adjusted_cut_m > 0.05:
@@ -910,6 +1262,7 @@ def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[li
                     next_point,
                     profile,
                     cut_m=adjusted_cut_m,
+                    min_arc_radius_m=min_arc_radius_m,
                 )
                 adjusted_curve = list(adjusted_record.get("points") or [])
                 if len(adjusted_curve) >= 2:
@@ -920,7 +1273,7 @@ def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[li
                     curve_record = adjusted_record
                     curve = adjusted_curve
                     derivation_offset = adjusted_offset
-                    derivation_limit_adjustments += 1
+                    derivation_limit_adjusted = True
         if derivation_offset > derivation_limit:
             skipped["derived_offset_exceeds_limit"] += 1
             continue
@@ -937,18 +1290,29 @@ def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[li
             "cut_m": float(curve_record.get("cut_m") or 0.0),
             "arc_radius_m": float(curve_record.get("arc_radius_m") or 0.0),
             "arc_sweep_deg": float(curve_record.get("arc_sweep_deg") or 0.0),
+            "derivation_limit_adjusted": derivation_limit_adjusted,
         }
+
+    bend_records = select_non_overlapping_bend_records(points, bend_records, skipped)
+    for record in bend_records.values():
+        profile = str(record.get("profile") or "unknown")
+        curve_family = str(record.get("curve_family") or "unknown")
+        arc_fit_status = str(record.get("arc_fit_status") or "unknown")
         profile_counts[profile] += 1
         curve_family_counts[curve_family] += 1
         arc_fit_status_counts[arc_fit_status] += 1
-        max_derivation_offset = max(max_derivation_offset, derivation_offset)
-        max_source_offset = max(max_source_offset, metrics["source_offset_m"])
-        max_angle = max(max_angle, metrics["angle_deg"])
+        max_derivation_offset = max(max_derivation_offset, float(record.get("derivation_offset_m") or 0.0))
+        max_source_offset = max(max_source_offset, float(record.get("source_offset_m") or 0.0))
+        max_angle = max(max_angle, float(record.get("angle_deg") or 0.0))
+        if bool(record.get("derivation_limit_adjusted")):
+            derivation_limit_adjustments += 1
 
     if not bend_records:
         return points, {
             "smoothed_bends": 0,
             "inserted_sample_points": 0,
+            "source_point_count": source_point_count,
+            "cleaned_source_point_count": len(points),
             "max_derivation_offset_m": 0.0,
             "max_source_bend_offset_m": 0.0,
             "max_smoothed_angle_deg": 0.0,
@@ -956,6 +1320,8 @@ def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[li
             "curve_family_counts": {},
             "arc_fit_status_counts": {},
             "derivation_limit_adjustments": derivation_limit_adjustments,
+            "micro_segment_cleanup": cleanup_stats,
+            "low_radius_sampled_arc_cleanup": low_radius_cleanup_stats,
             "skipped_bends": dict(skipped),
         }
 
@@ -973,6 +1339,8 @@ def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[li
     return smoothed, {
         "smoothed_bends": len(bend_records),
         "inserted_sample_points": max(0, len(smoothed) - len(points)),
+        "source_point_count": source_point_count,
+        "cleaned_source_point_count": len(points),
         "max_derivation_offset_m": round(max_derivation_offset, 6),
         "max_source_bend_offset_m": round(max_source_offset, 6),
         "max_smoothed_angle_deg": round(max_angle, 6),
@@ -980,6 +1348,8 @@ def smooth_lane_centerline_points(points: list[tuple[float, float]]) -> tuple[li
         "curve_family_counts": dict(sorted(curve_family_counts.items())),
         "arc_fit_status_counts": dict(sorted(arc_fit_status_counts.items())),
         "derivation_limit_adjustments": derivation_limit_adjustments,
+        "micro_segment_cleanup": cleanup_stats,
+        "low_radius_sampled_arc_cleanup": low_radius_cleanup_stats,
         "skipped_bends": dict(skipped),
     }
 
@@ -1000,14 +1370,51 @@ def apply_derived_lane_centerline_smoothing(lanes: list[dict[str, Any]]) -> dict
     max_source_bend_offset = 0.0
     max_smoothed_angle = 0.0
     derivation_limit_adjustments = 0
+    micro_cleanup_lanes = 0
+    micro_cleanup_runs = 0
+    micro_cleanup_removed_points = 0
+    micro_cleanup_max_run_span = 0.0
+    low_radius_cleanup_lanes = 0
+    low_radius_cleanup_runs = 0
+    low_radius_cleanup_removed_points = 0
+    low_radius_cleanup_max_run_span = 0.0
+    low_radius_cleanup_min_observed_radius = float("inf")
+    lane_bundle_managed_lanes = 0
 
     for lane in lanes:
         lane_id = str(lane.get("lane_id") or "")
         road_id = str(lane.get("road_id") or "")
         points = [(float(point[0]), float(point[1])) for point in lane.get("centerline_xz") or []]
         source_points += len(points)
+        if LANE_BUNDLE_CENTERLINE_SMOOTHING_POLICY in str(lane.get("centerline_source") or ""):
+            derived_points += len(points)
+            lane_bundle_managed_lanes += 1
+            continue
         smoothed, lane_stats = smooth_lane_centerline_points(points)
         derived_points += len(smoothed)
+        cleanup = lane_stats.get("micro_segment_cleanup") or {}
+        cleanup_removed = int(cleanup.get("removed_points") or 0)
+        if cleanup_removed > 0:
+            micro_cleanup_lanes += 1
+            micro_cleanup_runs += int(cleanup.get("runs_collapsed") or 0)
+            micro_cleanup_removed_points += cleanup_removed
+            micro_cleanup_max_run_span = max(micro_cleanup_max_run_span, float(cleanup.get("max_run_span_m") or 0.0))
+        low_radius_cleanup = lane_stats.get("low_radius_sampled_arc_cleanup") or {}
+        low_radius_removed = int(low_radius_cleanup.get("removed_points") or 0)
+        if low_radius_removed > 0:
+            low_radius_cleanup_lanes += 1
+            low_radius_cleanup_runs += int(low_radius_cleanup.get("runs_collapsed") or 0)
+            low_radius_cleanup_removed_points += low_radius_removed
+            low_radius_cleanup_max_run_span = max(
+                low_radius_cleanup_max_run_span,
+                float(low_radius_cleanup.get("max_run_span_m") or 0.0),
+            )
+            observed_radius = float(low_radius_cleanup.get("min_observed_radius_m") or 0.0)
+            if observed_radius > 0.0:
+                low_radius_cleanup_min_observed_radius = min(
+                    low_radius_cleanup_min_observed_radius,
+                    observed_radius,
+                )
         for reason, count in (lane_stats.get("skipped_bends") or {}).items():
             skipped_bends[str(reason)] += int(count)
             if road_id:
@@ -1019,7 +1426,8 @@ def apply_derived_lane_centerline_smoothing(lanes: list[dict[str, Any]]) -> dict
         for fit_status, count in (lane_stats.get("arc_fit_status_counts") or {}).items():
             arc_fit_status_counts[str(fit_status)] += int(count)
         derivation_limit_adjustments += int(lane_stats.get("derivation_limit_adjustments") or 0)
-        if int(lane_stats.get("smoothed_bends") or 0) <= 0:
+        geometry_changed = int(lane_stats.get("smoothed_bends") or 0) > 0 or cleanup_removed > 0 or low_radius_removed > 0
+        if not geometry_changed:
             continue
         lane["centerline_xz"] = [[round(x, 3), round(z, 3)] for x, z in smoothed]
         lane["centerline_derivation_policy"] = DERIVED_LANE_CENTERLINE_SMOOTHING_POLICY
@@ -1029,7 +1437,8 @@ def apply_derived_lane_centerline_smoothing(lanes: list[dict[str, Any]]) -> dict
             "rounding_style_id": UNIFIED_LANE_GEOMETRY_ROUNDING_STYLE_ID,
             "curve_family": UNIFIED_ROUNDING_PRIMARY_CURVE_FAMILY,
             "sample_strategy": UNIFIED_ROUNDING_SAMPLE_STRATEGY,
-            "source_point_count": len(points),
+            "source_point_count": int(lane_stats.get("source_point_count") or len(points)),
+            "cleaned_source_point_count": int(lane_stats.get("cleaned_source_point_count") or len(points)),
             "derived_point_count": len(smoothed),
             "smoothed_bends": int(lane_stats["smoothed_bends"]),
             "inserted_sample_points": int(lane_stats["inserted_sample_points"]),
@@ -1040,6 +1449,8 @@ def apply_derived_lane_centerline_smoothing(lanes: list[dict[str, Any]]) -> dict
             "curve_family_counts": dict(sorted((lane_stats.get("curve_family_counts") or {}).items())),
             "arc_fit_status_counts": dict(sorted((lane_stats.get("arc_fit_status_counts") or {}).items())),
             "derivation_limit_adjustments": int(lane_stats.get("derivation_limit_adjustments") or 0),
+            "micro_segment_cleanup": cleanup,
+            "low_radius_sampled_arc_cleanup": low_radius_cleanup,
         }
         smoothed_lane_ids.append(lane_id)
         if road_id:
@@ -1065,6 +1476,31 @@ def apply_derived_lane_centerline_smoothing(lanes: list[dict[str, Any]]) -> dict
         "curve_family_counts": dict(sorted(curve_family_counts.items())),
         "arc_fit_status_counts": dict(sorted(arc_fit_status_counts.items())),
         "derivation_limit_adjustments": derivation_limit_adjustments,
+        "lane_bundle_managed_lanes": lane_bundle_managed_lanes,
+        "micro_segment_cleanup": {
+            "policy": LANE_CENTERLINE_MICRO_SEGMENT_CLEANUP_POLICY,
+            "lanes_cleaned": micro_cleanup_lanes,
+            "runs_collapsed": micro_cleanup_runs,
+            "removed_points": micro_cleanup_removed_points,
+            "max_run_span_m": round(micro_cleanup_max_run_span, 3),
+            "min_segment_m": LANE_CENTERLINE_MICRO_SEGMENT_M,
+            "max_run_span_threshold_m": LANE_CENTERLINE_MICRO_RUN_MAX_SPAN_M,
+        },
+        "low_radius_sampled_arc_cleanup": {
+            "policy": LANE_CENTERLINE_LOW_RADIUS_SAMPLED_ARC_CLEANUP_POLICY,
+            "lanes_cleaned": low_radius_cleanup_lanes,
+            "runs_collapsed": low_radius_cleanup_runs,
+            "removed_points": low_radius_cleanup_removed_points,
+            "max_run_span_m": round(low_radius_cleanup_max_run_span, 3),
+            "min_radius_m": LANE_CENTERLINE_LOW_RADIUS_MIN_RADIUS_M,
+            "min_observed_radius_m": (
+                round(low_radius_cleanup_min_observed_radius, 3)
+                if low_radius_cleanup_min_observed_radius < float("inf")
+                else 0.0
+            ),
+            "max_sample_segment_m": LANE_CENTERLINE_LOW_RADIUS_SAMPLE_SEGMENT_M,
+            "max_run_span_threshold_m": LANE_CENTERLINE_LOW_RADIUS_RUN_MAX_SPAN_M,
+        },
         "smoothed_lane_ids": smoothed_lane_ids,
         "smoothed_road_ids": sorted(smoothed_road_ids),
         "skipped_bends": dict(sorted(skipped_bends.items())),
@@ -1072,6 +1508,112 @@ def apply_derived_lane_centerline_smoothing(lanes: list[dict[str, Any]]) -> dict
             reason: sorted(road_ids)
             for reason, road_ids in sorted(skipped_road_ids_by_reason.items())
         },
+    }
+
+
+def lane_bundle_max_abs_offset(edge: dict[str, Any]) -> float:
+    forward_count, backward_count = lane_counts(edge)
+    generated_lane_count = forward_count + backward_count
+    width_profile = edge_width_profile(edge, generated_lane_count)
+    lane_width_start = float(width_profile["lane_width_start_m"])
+    lane_width_end = float(width_profile["lane_width_end_m"])
+    shared_single_lane = edge_has_shared_single_lane_upgrade(edge)
+    offsets: list[float] = []
+    for index in range(forward_count):
+        offsets.extend([
+            directional_lane_offset("forward", index, lane_width_start, shared_single_lane=shared_single_lane),
+            directional_lane_offset("forward", index, lane_width_end, shared_single_lane=shared_single_lane),
+        ])
+    for index in range(backward_count):
+        offsets.extend([
+            directional_lane_offset("backward", index, lane_width_start, shared_single_lane=shared_single_lane),
+            directional_lane_offset("backward", index, lane_width_end, shared_single_lane=shared_single_lane),
+        ])
+    return max((abs(offset) for offset in offsets), default=0.0)
+
+
+def apply_lane_bundle_centerline_smoothing(edges: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    updated: list[dict[str, Any]] = []
+    smoothed_edge_ids: list[str] = []
+    profile_counts: Counter = Counter()
+    curve_family_counts: Counter = Counter()
+    arc_fit_status_counts: Counter = Counter()
+    skipped_bends: Counter = Counter()
+    max_abs_lane_offset = 0.0
+    max_min_arc_radius = 0.0
+    smoothed_bends = 0
+    inserted_sample_points = 0
+    low_radius_cleanup_edges = 0
+    low_radius_cleanup_removed_points = 0
+
+    for edge in edges:
+        item = dict(edge)
+        edge_id = str(edge.get("edge_id") or "")
+        points = edge_points(edge)
+        abs_offset = lane_bundle_max_abs_offset(edge)
+        min_arc_radius = LANE_CENTERLINE_LOW_RADIUS_MIN_RADIUS_M + abs_offset
+        smoothed, stats = smooth_lane_centerline_points_with_policy(
+            points,
+            min_arc_radius_m=min_arc_radius,
+        )
+        for profile, count in (stats.get("profile_counts") or {}).items():
+            profile_counts[str(profile)] += int(count)
+        for curve_family, count in (stats.get("curve_family_counts") or {}).items():
+            curve_family_counts[str(curve_family)] += int(count)
+        for fit_status, count in (stats.get("arc_fit_status_counts") or {}).items():
+            arc_fit_status_counts[str(fit_status)] += int(count)
+        for reason, count in (stats.get("skipped_bends") or {}).items():
+            skipped_bends[str(reason)] += int(count)
+        cleanup = stats.get("low_radius_sampled_arc_cleanup") or {}
+        cleanup_removed = int(cleanup.get("removed_points") or 0)
+        if cleanup_removed > 0:
+            low_radius_cleanup_edges += 1
+            low_radius_cleanup_removed_points += cleanup_removed
+        geometry_changed = int(stats.get("smoothed_bends") or 0) > 0 or cleanup_removed > 0
+        if geometry_changed:
+            item["geometry_xz"] = [[round(x, 3), round(z, 3)] for x, z in smoothed]
+            item["lane_bundle_centerline_smoothing"] = {
+                "policy": LANE_BUNDLE_CENTERLINE_SMOOTHING_POLICY,
+                "source_point_count": int(stats.get("source_point_count") or len(points)),
+                "cleaned_source_point_count": int(stats.get("cleaned_source_point_count") or len(points)),
+                "derived_point_count": len(smoothed),
+                "max_abs_lane_offset_m": round(abs_offset, 3),
+                "min_arc_radius_m": round(min_arc_radius, 3),
+                "smoothed_bends": int(stats.get("smoothed_bends") or 0),
+                "inserted_sample_points": int(stats.get("inserted_sample_points") or 0),
+                "profile_counts": dict(sorted((stats.get("profile_counts") or {}).items())),
+                "curve_family_counts": dict(sorted((stats.get("curve_family_counts") or {}).items())),
+                "arc_fit_status_counts": dict(sorted((stats.get("arc_fit_status_counts") or {}).items())),
+                "micro_segment_cleanup": stats.get("micro_segment_cleanup") or {},
+                "low_radius_sampled_arc_cleanup": cleanup,
+            }
+            item["centerline_geometry_source"] = (
+                f"{str(edge.get('centerline_geometry_source') or 'road_graph')}+{LANE_BUNDLE_CENTERLINE_SMOOTHING_POLICY}"
+            )
+            smoothed_edge_ids.append(edge_id)
+            smoothed_bends += int(stats.get("smoothed_bends") or 0)
+            inserted_sample_points += int(stats.get("inserted_sample_points") or 0)
+        max_abs_lane_offset = max(max_abs_lane_offset, abs_offset)
+        max_min_arc_radius = max(max_min_arc_radius, min_arc_radius)
+        updated.append(item)
+
+    return updated, {
+        "policy": LANE_BUNDLE_CENTERLINE_SMOOTHING_POLICY,
+        "edges_evaluated": len(edges),
+        "smoothed_edge_count": len(smoothed_edge_ids),
+        "smoothed_edge_ids": smoothed_edge_ids,
+        "smoothed_bend_count": smoothed_bends,
+        "inserted_sample_points": inserted_sample_points,
+        "max_abs_lane_offset_m": round(max_abs_lane_offset, 3),
+        "max_min_arc_radius_m": round(max_min_arc_radius, 3),
+        "profile_counts": dict(sorted(profile_counts.items())),
+        "curve_family_counts": dict(sorted(curve_family_counts.items())),
+        "arc_fit_status_counts": dict(sorted(arc_fit_status_counts.items())),
+        "low_radius_sampled_arc_cleanup": {
+            "edges_cleaned": low_radius_cleanup_edges,
+            "removed_points": low_radius_cleanup_removed_points,
+        },
+        "skipped_bends": dict(sorted(skipped_bends.items())),
     }
 
 
@@ -1224,6 +1766,14 @@ def curve_points(
     return curve
 
 
+def default_lane_link_trim_m(lane: dict[str, Any]) -> float:
+    if bool(lane.get("approach_centerline_trimmed")):
+        return 0.0
+    if "optimized_approach_centerline" in str(lane.get("centerline_source") or ""):
+        return 0.0
+    return JUNCTION_TRIM_M
+
+
 def select_lanes(lanes: list[dict[str, Any]], turn: str, incoming: bool) -> list[dict[str, Any]]:
     if not lanes:
         return []
@@ -1278,8 +1828,8 @@ def lane_connection_curve(
     to_pts = [(float(p[0]), float(p[1])) for p in to_lane["centerline_xz"]]
     if len(from_pts) < 2 or len(to_pts) < 2:
         return []
-    from_trim = from_trim or {"start": 0.0, "end": JUNCTION_TRIM_M}
-    to_trim = to_trim or {"start": JUNCTION_TRIM_M, "end": 0.0}
+    from_trim = from_trim or {"start": 0.0, "end": default_lane_link_trim_m(from_lane)}
+    to_trim = to_trim or {"start": default_lane_link_trim_m(to_lane), "end": 0.0}
     start, incoming_tangent = trimmed_endpoint_and_tangent(
         from_pts,
         "end",
@@ -1500,8 +2050,8 @@ def lane_trim_distances(
 
     def default_lane_link_trim(lane_id: str) -> float:
         lane = lanes_by_id.get(lane_id)
-        if lane is not None and bool(lane.get("approach_centerline_trimmed")):
-            return 0.0
+        if lane is not None:
+            return default_lane_link_trim_m(lane)
         return trim_m
 
     def link_trim_value(link: dict[str, Any], key: str, default: float) -> float:
@@ -1541,8 +2091,14 @@ def refresh_lane_link_curves(
                     curve = lane_connection_curve(
                         from_lane,
                         to_lane,
-                        trim_by_lane.get(str(from_lane.get("lane_id") or ""), {"start": 0.0, "end": JUNCTION_TRIM_M}),
-                        trim_by_lane.get(str(to_lane.get("lane_id") or ""), {"start": JUNCTION_TRIM_M, "end": 0.0}),
+                        trim_by_lane.get(
+                            str(from_lane.get("lane_id") or ""),
+                            {"start": 0.0, "end": default_lane_link_trim_m(from_lane)},
+                        ),
+                        trim_by_lane.get(
+                            str(to_lane.get("lane_id") or ""),
+                            {"start": default_lane_link_trim_m(to_lane), "end": 0.0},
+                        ),
                     )
                 stats = curve_stats(curve)
                 trim_metadata = lane_link_endpoint_trim_metadata(curve, from_lane, to_lane)
@@ -2550,6 +3106,8 @@ def build_lane_graph(
     area_id: str,
     optimized_centerlines_path: Path | None = None,
     lane_upgrades_path: Path | None = None,
+    lane_upgrade_apply_road_ids: set[str] | None = None,
+    apply_all_lane_upgrades: bool = False,
 ) -> dict[str, Any]:
     graph = read_json(input_path)
     semantics = read_json(semantics_path)
@@ -2563,7 +3121,10 @@ def build_lane_graph(
     lane_edges, lane_upgrade_stats = apply_lane_upgrade_overrides(
         lane_edges,
         lane_upgrade_refs["active_upgrades_by_road"],
+        apply_to_geometry=apply_all_lane_upgrades,
+        apply_road_ids=lane_upgrade_apply_road_ids,
     )
+    lane_edges, lane_bundle_smoothing_stats = apply_lane_bundle_centerline_smoothing(lane_edges)
     approach_centerlines_trimmed = optimized_approaches_applied > 0
     lanes = build_lanes(lane_edges)
     derived_smoothing_stats = apply_derived_lane_centerline_smoothing(lanes)
@@ -2672,6 +3233,7 @@ def build_lane_graph(
             "physical_lane_centerlines": physical_lane_centerline_stats,
             "lane_geometry_rounding_style": lane_geometry_rounding_style_config(),
             "direct_connector_continuity": direct_connector_continuity_stats,
+            "lane_bundle_centerline_smoothing": lane_bundle_smoothing_stats,
             "temporary_lane_policy": TEMPORARY_LANE_POLICY_ID,
             "traffic_side_assumption": TEMPORARY_TRAFFIC_SIDE,
             "traffic_direction_strategy": "force_every_edge_bidirectional_two_lane",
@@ -2722,12 +3284,15 @@ def build_lane_graph(
             "active_lane_upgrades_deferred": len(lane_upgrade_stats["deferred_road_ids"]),
             "active_lane_upgrades_missing_roads": len(lane_upgrade_stats["missing_road_ids"]),
             "active_lane_upgrades_ignored": len(lane_upgrade_refs["ignored"]),
+            "lane_bundle_centerline_smoothed_edges": lane_bundle_smoothing_stats["smoothed_edge_count"],
+            "lane_bundle_centerline_smoothed_bends": lane_bundle_smoothing_stats["smoothed_bend_count"],
             "derived_lane_centerline_smoothed_lanes": derived_smoothing_stats["smoothed_lane_count"],
             "derived_lane_centerline_smoothed_bends": derived_smoothing_stats["smoothed_bend_count"],
             "derived_lane_centerline_inserted_sample_points": derived_smoothing_stats["inserted_sample_points"],
             "lane_level_radius_regularized_continuity_links": lane_level_radius_regularized_links,
             "fan_fallback_junctions": fan_fallback,
         },
+        "lane_bundle_centerline_smoothing": lane_bundle_smoothing_stats,
         "derived_lane_centerline_smoothing": derived_smoothing_stats,
         "physical_lane_centerlines": physical_lane_centerline_stats,
         "direct_connector_continuity": direct_connector_continuity_stats,
@@ -2740,7 +3305,7 @@ def build_lane_graph(
             "missing_road_ids": lane_upgrade_stats["missing_road_ids"],
             "ignored": lane_upgrade_refs["ignored"],
             "distribution_policy": "balanced_bidirectional_left_traffic_v1",
-            "note": "Manual lane upgrades are currently deferred from geometry; source map data remains unchanged and every road emits bidirectional two-lane geometry.",
+            "note": "Manual lane upgrades are applied to geometry according to geometry_application_policy; source map, canonical and road_graph truth layers remain unchanged.",
         },
         "junction_type_counts": dict(sorted(junction_type_counts.items())),
         "turn_counts": dict(sorted(turn_counts.items())),
@@ -2778,6 +3343,9 @@ def build_lane_graph(
             "max_lane_width_m": round(max(lane_widths), 3) if lane_widths else 0.0,
             "avg_lane_width_confidence": round(sum(width_confidences) / max(1, len(width_confidences)), 3),
             "max_lane_width_start_end_delta_m": round(max(lane_width_deltas), 3) if lane_width_deltas else 0.0,
+            "lane_bundle_centerline_smoothed_edges": lane_bundle_smoothing_stats["smoothed_edge_count"],
+            "lane_bundle_centerline_smoothed_bends": lane_bundle_smoothing_stats["smoothed_bend_count"],
+            "lane_bundle_centerline_max_min_arc_radius_m": lane_bundle_smoothing_stats["max_min_arc_radius_m"],
             "derived_lane_centerline_smoothed_lanes": derived_smoothing_stats["smoothed_lane_count"],
             "derived_lane_centerline_smoothed_bends": derived_smoothing_stats["smoothed_bend_count"],
             "derived_lane_centerline_inserted_sample_points": derived_smoothing_stats["inserted_sample_points"],
@@ -2822,6 +3390,17 @@ def main() -> int:
     parser.add_argument("--semantics", default="")
     parser.add_argument("--optimized-centerlines", default="")
     parser.add_argument("--lane-upgrades", default="")
+    parser.add_argument(
+        "--apply-lane-upgrade-road-id",
+        action="append",
+        default=[],
+        help="Apply an active lane upgrade to geometry for this explicit road id. Can be repeated.",
+    )
+    parser.add_argument(
+        "--apply-all-lane-upgrades",
+        action="store_true",
+        help="Apply all active lane upgrades to geometry. Use only for controlled review.",
+    )
     parser.add_argument("--output", default="")
     parser.add_argument("--report", default="")
     args = parser.parse_args()
@@ -2854,6 +3433,8 @@ def main() -> int:
         args.area_id,
         optimized_centerlines_path,
         lane_upgrades_path,
+        set(args.apply_lane_upgrade_road_id or []),
+        args.apply_all_lane_upgrades,
     )
     print(json.dumps({
         "area_id": args.area_id,

@@ -110,9 +110,9 @@
     }
   },
   "inputs": {
-    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
-    "road_graph_report": "reports/pattaya_central_500m_road_graph_report.json",
-    "rules": "qa/qa_rules.json"
+    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "road_graph_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_road_graph_report.json",
+    "rules": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
   },
   "next_action": "Use road_graph.json as the contract for junction_solver and lane_graph_builder v1."
 }

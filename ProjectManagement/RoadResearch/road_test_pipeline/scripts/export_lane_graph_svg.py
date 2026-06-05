@@ -63,6 +63,29 @@ def points_from_lanes(lane_graph: dict[str, Any]) -> list[tuple[float, float]]:
     return points
 
 
+def lane_link_records(lane_graph: dict[str, Any]) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = [dict(link) for link in lane_graph.get("lane_links", [])]
+    for junction in lane_graph.get("junctions", []):
+        for connection in junction.get("connections", []):
+            for link in connection.get("lane_links", []):
+                item = dict(link)
+                item.setdefault("junction_id", junction.get("junction_id", ""))
+                item.setdefault("node_id", junction.get("node_id", ""))
+                item.setdefault("connection_id", connection.get("connection_id", ""))
+                item.setdefault("connection_turn", connection.get("turn", ""))
+                records.append(item)
+    return records
+
+
+def points_from_lane_links(links: list[dict[str, Any]]) -> list[tuple[float, float]]:
+    points: list[tuple[float, float]] = []
+    for link in links:
+        for point in link.get("connecting_curve_xz") or []:
+            if len(point) >= 2:
+                points.append((float(point[0]), float(point[1])))
+    return points
+
+
 def points_from_movement_corridors(movement_corridors: dict[str, Any] | None) -> list[tuple[float, float]]:
     points: list[tuple[float, float]] = []
     if not movement_corridors:
@@ -553,31 +576,51 @@ def lane_link_preview_lines(
     for link in links:
         if rendered_links >= max_links:
             break
-        if str(link.get("link_kind") or "") != "junction_movement":
-            continue
-        from_lane = lanes_by_id.get(str(link.get("from_lane_id") or ""))
-        to_lane = lanes_by_id.get(str(link.get("to_lane_id") or ""))
-        if not from_lane or not to_lane:
-            continue
-        start = endpoint(from_lane, "end")
-        end = endpoint(to_lane, "start")
-        if start is None or end is None:
-            continue
-        sx, sy = transform(start[0], start[1])
-        ex, ey = transform(end[0], end[1])
+        from_lane_id = str(link.get("from_lane") or link.get("from_lane_id") or "")
+        to_lane_id = str(link.get("to_lane") or link.get("to_lane_id") or "")
+        points = link.get("connecting_curve_xz") or []
+        if len(points) < 2:
+            if str(link.get("link_kind") or "") != "junction_movement":
+                continue
+            from_lane = lanes_by_id.get(from_lane_id)
+            to_lane = lanes_by_id.get(to_lane_id)
+            if not from_lane or not to_lane:
+                continue
+            start = endpoint(from_lane, "end")
+            end = endpoint(to_lane, "start")
+            if start is None or end is None:
+                continue
+            points = [[start[0], start[1]], [end[0], end[1]]]
         confidence = float(link.get("confidence") or 0.0)
-        opacity = 0.2 + min(0.5, confidence * 0.5)
+        opacity = 0.34 + min(0.42, confidence * 0.38)
+        turn = str(link.get("turn") or link.get("connection_turn") or "unknown")
+        color = {
+            "through": "#0ea5e9",
+            "left": "#f97316",
+            "right": "#a855f7",
+        }.get(turn, "#f59e0b")
+        link_id = str(link.get("lane_link_id") or link.get("link_id") or "")
+        tooltip = (
+            f"lane_link={link_id}; from={from_lane_id}; to={to_lane_id}; "
+            f"turn={turn}; source={link.get('source', '')}; curve={link.get('curve_source', '')}"
+        )
         attrs = svg_attrs({
             "kind": "lane_link_preview",
-            "source": "lane_graph.json",
-            "id": link.get("lane_link_id", ""),
-            "from_lane_id": link.get("from_lane_id", ""),
-            "to_lane_id": link.get("to_lane_id", ""),
+            "source": "lane_graph.junction_lane_links",
+            "id": link_id,
+            "lane_link_id": link_id,
+            "junction_id": link.get("junction_id", ""),
+            "connection_id": link.get("connection_id", ""),
+            "from_lane_id": from_lane_id,
+            "to_lane_id": to_lane_id,
+            "turn": turn,
+            "curve_source": link.get("curve_source", ""),
             "confidence": f"{confidence:.3f}",
         })
         link_lines.append(
-            f'<line {attrs} x1="{sx}" y1="{sy}" x2="{ex}" y2="{ey}" '
-            f'stroke="#d97706" stroke-width="0.7" stroke-opacity="{opacity:.2f}" />'
+            f'<polyline {attrs} points="{polyline(points, transform)}" fill="none" '
+            f'stroke="{color}" stroke-width="1.15" stroke-opacity="{opacity:.2f}" '
+            f'stroke-linecap="round" stroke-linejoin="round">{svg_title(tooltip)}</polyline>'
         )
         rendered_links += 1
     return link_lines, rendered_links
@@ -1097,7 +1140,34 @@ def centerline_buffer_preview_polygons(
         )
 
     rendered_links = 0
-    if movement_corridors:
+    if lane_links:
+        for link in lane_links:
+            if rendered_links >= max_links:
+                break
+            from_lane_id = str(link.get("from_lane") or link.get("from_lane_id") or "")
+            to_lane_id = str(link.get("to_lane") or link.get("to_lane_id") or "")
+            points = as_xz_points(link.get("connecting_curve_xz") or [])
+            if len(points) < 2:
+                from_lane = lanes_by_id.get(from_lane_id)
+                to_lane = lanes_by_id.get(to_lane_id)
+                if not from_lane or not to_lane:
+                    continue
+                start = endpoint(from_lane, "end")
+                end = endpoint(to_lane, "start")
+                if not start or not end:
+                    continue
+                points = [start, end]
+            append_polygon(
+                source="lane_link_centerline",
+                record_id=str(link.get("lane_link_id") or link.get("link_id") or ""),
+                points=points,
+                width_m=float(link.get("width_m") or 3.2),
+                from_lane_id=from_lane_id,
+                to_lane_id=to_lane_id,
+                movement=str(link.get("turn") or link.get("connection_turn") or ""),
+            )
+            rendered_links += 1
+    elif movement_corridors:
         for case in movement_corridors.get("cases", []):
             if rendered_links >= max_links:
                 break
@@ -1169,14 +1239,16 @@ def build_svg(
     movement_corridor_scoring: dict[str, Any] | None = None,
 ) -> tuple[str, dict[str, Any]]:
     lanes = lane_graph.get("lanes", [])
-    links = lane_graph.get("lane_links", [])
+    links = lane_link_records(lane_graph)
     continuity_links = lane_graph.get("continuity_links", [])
     lanes_by_id = lane_by_id(lane_graph)
     movement_scoring_by_case = movement_corridor_scoring_index(movement_corridor_scoring)
     road_graph_edge_by_canonical = road_graph_edge_ids_by_canonical(road_graph)
+    movement_corridors_for_scale = None if links else movement_corridors
     all_points = (
         points_from_lanes(lane_graph)
-        + points_from_movement_corridors(movement_corridors)
+        + points_from_lane_links(links)
+        + points_from_movement_corridors(movement_corridors_for_scale)
         + points_from_raw_roads(raw_roads)
         + points_from_road_layer(repaired_roads, "repaired")
         + points_from_road_layer(canonical_roads, "canonical")
@@ -1278,16 +1350,7 @@ def build_svg(
         transform=transform,
     )
 
-    if movement_corridors:
-        link_lines, anchor_marks, movement_metrics = movement_case_lines(
-            movement_corridors=movement_corridors,
-            movement_scoring_by_case=movement_scoring_by_case,
-            transform=transform,
-            max_cases=max_lane_links,
-        )
-        rendered_links = int(movement_metrics["movement_corridors_rendered"])
-        link_source = "movement_corridor_anchors"
-    else:
+    if links:
         link_lines, rendered_links = lane_link_preview_lines(
             links=links,
             lanes_by_id=lanes_by_id,
@@ -1305,7 +1368,31 @@ def build_svg(
             "movement_corridor_skip_reason_counts": {},
             "movement_corridor_scoring_status_counts": {},
         }
-        link_source = "lane_graph_endpoint_preview"
+        link_source = "lane_graph_junction_lane_links"
+    elif movement_corridors:
+        link_lines, anchor_marks, movement_metrics = movement_case_lines(
+            movement_corridors=movement_corridors,
+            movement_scoring_by_case=movement_scoring_by_case,
+            transform=transform,
+            max_cases=max_lane_links,
+        )
+        rendered_links = int(movement_metrics["movement_corridors_rendered"])
+        link_source = "movement_corridor_anchors"
+    else:
+        link_lines = []
+        anchor_marks = []
+        rendered_links = 0
+        movement_metrics = {
+            "movement_corridors_rendered": 0,
+            "anchor_markers_rendered": 0,
+            "anchor_source_counts": {},
+            "visual_candidate_family_counts": {},
+            "visual_candidate_issue_counts": {},
+            "movement_corridors_skipped": 0,
+            "movement_corridor_skip_reason_counts": {},
+            "movement_corridor_scoring_status_counts": {},
+        }
+        link_source = "missing"
 
     if raw_roads:
         raw_lines, raw_endpoint_marks, raw_metrics = raw_road_lines(
@@ -1505,9 +1592,10 @@ def build_svg(
             "repaired_roads_overlay": "blue_dashed_hidden_by_default" if repaired_roads else "missing",
             "canonical_roads_overlay": "rose_solid_hidden_by_default" if canonical_roads else "missing",
             "centerline_buffer_preview_overlay": "uniform_gray_hidden_by_default",
-            "movement_corridor_preview_gate": "qa_visible_not_publish_gate",
+            "movement_corridor_preview_gate": "fallback_when_no_lane_graph_junction_lane_links",
         },
         "link_source": link_source,
+        "final_lane_link_precedence": "lane_graph_junction_lane_links_before_movement_corridor_candidates",
         "note": (
             "SVG visualization（可视化） only. lane_graph.json and movement_corridor_candidates.json "
             "are structured artifacts（结构化产物）. "

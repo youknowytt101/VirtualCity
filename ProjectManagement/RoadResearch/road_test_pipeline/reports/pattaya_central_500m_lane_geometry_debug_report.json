@@ -1,11 +1,11 @@
 {
   "area_id": "pattaya_central_500m",
   "stage": "lane_geometry_debug_v1",
-  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
   "outputs": {
-    "geojson": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.geojson",
-    "obj": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.obj",
-    "svg": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.svg"
+    "geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.geojson",
+    "obj": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.obj",
+    "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.svg"
   },
   "counts": {
     "lanes": 200,
@@ -21,7 +21,7 @@
     "lane_continuity_ribbons": 8,
     "lane_continuity_curves": 8,
     "skipped_micro_seam_continuity_curve": 12,
-    "obj_vertices": 11989,
+    "obj_vertices": 12226,
     "obj_lines": 500,
     "obj_faces": 500
   },
@@ -34,10 +34,10 @@
     "lane_geometry_debug_centerline_source": "physical_lane_centerlines",
     "empty_lane_link_curves": 0,
     "empty_continuity_curves": 0,
-    "avg_lane_link_curve_length_m": 20.366,
-    "max_lane_link_curve_length_m": 28.812,
-    "avg_continuity_curve_length_m": 1.39,
-    "max_continuity_curve_length_m": 7.299,
+    "avg_lane_link_curve_length_m": 10.35,
+    "max_lane_link_curve_length_m": 14.954,
+    "avg_continuity_curve_length_m": 1.392,
+    "max_continuity_curve_length_m": 7.301,
     "avg_lane_width_m": 3.2,
     "min_lane_width_m": 3.2,
     "max_lane_width_m": 3.2,
