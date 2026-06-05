@@ -18,6 +18,8 @@ JUNCTION_TYPES = {"T", "cross", "Y", "offset", "complex"}
 FINAL_LANE_CENTERLINE_LOW_RADIUS_MIN_M = 4.0
 FINAL_LANE_CENTERLINE_LOW_RADIUS_MAX_SAMPLE_SEGMENT_M = 1.0
 FINAL_LANE_CENTERLINE_LOW_RADIUS_MAX_RUN_SPAN_M = 4.0
+UPGRADED_INTERNAL_BEND_MIN_TARGET_LANES = 3
+UPGRADED_INTERNAL_BEND_MIN_TURN_DEG = 55.0
 COMPOUND_ALTERNATING_BEND_GUARD_STATUS = "skipped_compound_alternating_bend_guard"
 ENDPOINT_CONTRACT_MAX_GAP_M = 0.50
 SURFACE_LENGTH_CONTRACT_MAX_DELTA_M = 0.05
@@ -64,6 +66,12 @@ QA_WARNING_RULES: dict[tuple[str, str], dict[str, Any]] = {
 
 def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def read_optional_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    return read_json(path)
 
 
 def write_json(path: Path, data: dict[str, Any]) -> None:
@@ -736,6 +744,67 @@ def lane_turn_surface_contract(
     }
 
 
+def active_upgraded_road_ids(
+    lane_upgrade_overrides: dict[str, Any],
+    *,
+    min_target_lanes: int = UPGRADED_INTERNAL_BEND_MIN_TARGET_LANES,
+) -> set[str]:
+    road_ids: set[str] = set()
+    for item in lane_upgrade_overrides.get("active_upgrades", []):
+        if not bool(item.get("enabled", True)):
+            continue
+        try:
+            target_lanes = int(item.get("target_physical_lane_count") or 0)
+        except (TypeError, ValueError):
+            target_lanes = 0
+        if target_lanes < min_target_lanes:
+            continue
+        road_id = str(item.get("road_id") or "")
+        if road_id:
+            road_ids.add(road_id)
+    return road_ids
+
+
+def unresolved_upgraded_internal_bends(
+    corner_candidates: dict[str, Any],
+    upgraded_road_ids: set[str],
+    *,
+    min_turn_deg: float = UPGRADED_INTERNAL_BEND_MIN_TURN_DEG,
+    sample_limit: int = 20,
+) -> dict[str, Any]:
+    issues: list[dict[str, Any]] = []
+    for candidate in corner_candidates.get("candidates", []):
+        if str(candidate.get("candidate_type") or "") != "internal_centerline_bend":
+            continue
+        if str(candidate.get("status") or "") == "accepted_active":
+            continue
+        source_edge_id = str(candidate.get("source_edge_id") or "")
+        if source_edge_id not in upgraded_road_ids:
+            continue
+        turn_deg = as_float(candidate.get("turn_angle_deg")) or 0.0
+        if turn_deg < min_turn_deg:
+            continue
+        issues.append({
+            "candidate_id": str(candidate.get("candidate_id") or ""),
+            "source_edge_id": source_edge_id,
+            "canonical_road_id": str(candidate.get("canonical_road_id") or ""),
+            "point_index": candidate.get("point_index"),
+            "turn_angle_deg": round(turn_deg, 3),
+            "risk_level": str(candidate.get("risk_level") or ""),
+            "recommended_action": str(candidate.get("recommended_action") or ""),
+            "nearest_junction_distance_m": candidate.get("nearest_junction_distance_m"),
+        })
+
+    return {
+        "policy": "upgraded_road_internal_bend_review_gate_v1",
+        "min_target_physical_lane_count": UPGRADED_INTERNAL_BEND_MIN_TARGET_LANES,
+        "min_turn_angle_deg": min_turn_deg,
+        "active_upgraded_roads": len(upgraded_road_ids),
+        "issue_count": len(issues),
+        "issues": issues[:sample_limit],
+    }
+
+
 def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     processed = root / "data" / "processed"
     preview_dir = root / "data" / "preview"
@@ -791,6 +860,8 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
     optimized = read_json(paths["optimized_centerlines"])
     optimized_report = read_json(paths["optimized_centerlines_report"])
     lane_graph = read_json(paths["lane_graph"])
+    lane_upgrade_overrides = read_optional_json(processed / f"{area_id}_lane_upgrade_overrides.json")
+    corner_candidates = read_optional_json(processed / f"{area_id}_corner_optimization_candidates.json")
     movement_corridors_path = processed / f"{area_id}_movement_corridor_candidates.json"
     movement_corridors = read_json(movement_corridors_path) if movement_corridors_path.exists() else None
     preview = read_json(paths["preview_geojson"])
@@ -1024,6 +1095,17 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         },
         warn=True,
     ))
+    upgraded_bend_contract = unresolved_upgraded_internal_bends(
+        corner_candidates,
+        active_upgraded_road_ids(lane_upgrade_overrides),
+    )
+    checks.append(make_check(
+        "upgraded_roads_no_unresolved_sharp_internal_bends",
+        int(upgraded_bend_contract.get("issue_count") or 0) == 0,
+        "Roads upgraded to 3+ physical lanes should not publish unresolved sharp internal centerline bends; accept reviewed smoothing or reduce the upgrade before packaging.",
+        upgraded_bend_contract,
+        warn=True,
+    ))
 
     obj_lines = paths["preview_obj"].read_text(encoding="utf-8").splitlines()
     obj_vertex_count = sum(1 for line in obj_lines if line.startswith("v "))
@@ -1246,6 +1328,7 @@ def audit(root: Path, area_id: str, output_path: Path) -> dict[str, Any]:
         "optimized_corner_fillets": optimized_corner_fillet_count,
         "optimized_junction_connectors": optimized_junction_connector_count,
         "compound_alternating_bend_guard_skips": len(compound_guard_skips),
+        "unresolved_upgraded_internal_bends": int(upgraded_bend_contract.get("issue_count") or 0),
         "optimized_points": optimized_coord_count,
         "preview_points": preview_coord_count,
         "preview_obj_vertices": obj_vertex_count,

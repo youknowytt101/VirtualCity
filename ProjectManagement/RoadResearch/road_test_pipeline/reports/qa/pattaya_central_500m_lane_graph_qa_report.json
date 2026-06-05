@@ -129,7 +129,7 @@
       "avg_lane_link_confidence": 0.82,
       "min_lane_link_confidence": 0.82,
       "avg_curve_length_m": 10.693,
-      "max_curve_length_m": 17.562,
+      "max_curve_length_m": 17.755,
       "avg_continuity_curve_length_m": 1.16,
       "max_continuity_curve_length_m": 7.301,
       "avg_lane_width_m": 3.2,

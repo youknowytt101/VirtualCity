@@ -1,7 +1,8 @@
-[RoadTest] rebuild started 2026-06-05 19:04:01
+[LaneForge] corner optimization application started 2026-06-05 19:03:13
 
-[2026-06-05 19:04:01] Running topology repair
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\topology_repair.py --area-id pattaya_central_500m
+[2026-06-05 19:03:13] Rebuilding after accepted corner optimization
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\rebuild_road_test.py --area-id pattaya_central_500m --skip-houdini
+[RoadTest] Running topology repair...
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
@@ -45,10 +46,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "dangling_endpoint_ratio": 0.193
   }
 }
-[exit] 0
-
-[2026-06-05 19:04:02] Analyzing repaired roads
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_repaired.geojson --output D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_repaired_analysis.json
+[RoadTest] Analyzing repaired roads...
 {
   "area_id": "pattaya_central_500m",
   "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
@@ -57,10 +55,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
   "possible_unsplit_crossings": 0,
   "dangling_endpoint_clusters": 31
 }
-[exit] 0
-
-[2026-06-05 19:04:02] Running topology repair QA
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage topology_repair --area-id pattaya_central_500m
+[RoadTest] Running topology repair QA...
 topology_repair QA status: warn
 [pass] output_edges: 171 / 40
 [pass] empty_geometry: 0 / 0
@@ -69,10 +64,7 @@ topology_repair QA status: warn
 [warn] dangling_endpoint_ratio: 0.193 / 0.15
 [pass] possible_unsplit_crossings: 0 / 0
 [pass] repair_ops_when_dangling_high: 0 / 0
-[exit] 0
-
-[2026-06-05 19:04:02] Building canonical roads
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_canonical_roads.py --area-id pattaya_central_500m
+[RoadTest] Building canonical roads...
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
@@ -95,10 +87,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "total_length_m": 8325.773
   }
 }
-[exit] 0
-
-[2026-06-05 19:04:02] Analyzing canonical roads
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\analyze_raw_roads.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_canonical.geojson --output D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\reports\pattaya_central_500m_canonical_analysis.json
+[RoadTest] Analyzing canonical roads...
 {
   "area_id": "pattaya_central_500m",
   "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
@@ -107,10 +96,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
   "possible_unsplit_crossings": 0,
   "dangling_endpoint_clusters": 31
 }
-[exit] 0
-
-[2026-06-05 19:04:02] Building road graph
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_road_graph.py --area-id pattaya_central_500m --input D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\data\processed\pattaya_central_500m_roads_canonical.geojson
+[RoadTest] Building road graph...
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
@@ -130,10 +116,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "junction": 49
   }
 }
-[exit] 0
-
-[2026-06-05 19:04:02] Running road graph QA
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage road_graph --area-id pattaya_central_500m
+[RoadTest] Running road graph QA...
 road_graph QA status: warn
 [pass] nodes: 90 / 40
 [pass] edges: 100 / 40
@@ -144,10 +127,7 @@ road_graph QA status: warn
 [warn] dead_end_ratio: 0.311 / 0.12
 [warn] width_fallback_ratio: 1.0 / 0.8
 [pass] lanes_fallback_ratio: 0.36 / 0.6
-[exit] 0
-
-[2026-06-05 19:04:02] Building junction semantic model
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_junction_semantics.py --area-id pattaya_central_500m
+[RoadTest] Building junction semantic model...
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
@@ -169,10 +149,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "complex": 0
   }
 }
-[exit] 0
-
-[2026-06-05 19:04:02] Optimizing junction centerlines
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\optimize_junction_centerlines.py --area-id pattaya_central_500m
+[RoadTest] Optimizing junction centerlines...
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
@@ -273,10 +250,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "corner_override_issue_counts": {}
   }
 }
-[exit] 0
-
-[2026-06-05 19:04:02] Planning corner optimization candidates
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\plan_corner_optimization.py --area-id pattaya_central_500m
+[RoadTest] Planning corner optimization candidates...
 {
   "area_id": "pattaya_central_500m",
   "stage": "corner_optimization_candidates_v1",
@@ -319,36 +293,33 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
   },
   "note": "Corner optimization candidates are proposal records; accepted_active counts active geometry transactions, including internal bends that no longer appear as candidates after smoothing."
 }
-[exit] 0
-
-[2026-06-05 19:04:02] Building lane graph and junction connections
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\lane_model_builder.py --area-id pattaya_central_500m --apply-all-lane-upgrades
+[RoadTest] Building lane graph and junction connections...
 {
   "area_id": "pattaya_central_500m",
   "output": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
   "report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
   "counts": {
-    "lanes": 230,
-    "physical_lane_centerlines": 212,
-    "physical_lane_group_centerlines": 14,
-    "standalone_physical_lane_centerlines": 198,
+    "lanes": 200,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
+    "standalone_physical_lane_centerlines": 174,
     "junctions": 49,
     "approach_lane_records": 149,
     "connections": 306,
-    "lane_links": 320,
-    "continuity_links": 24,
+    "lane_links": 306,
+    "continuity_links": 20,
     "optimized_approach_centerlines": 100,
     "optimized_approach_centerlines_applied": 100,
     "optimized_junction_connectors": 149,
     "optimized_junction_connector_lane_links": 0,
     "optimized_corner_fillet_links": 6,
-    "direct_connector_continuity_links": 18,
-    "same_physical_lane_continuity_links": 18,
-    "physical_lane_groups_created": 14,
-    "physical_lane_grouped_lanes": 32,
+    "direct_connector_continuity_links": 14,
+    "same_physical_lane_continuity_links": 14,
+    "physical_lane_groups_created": 12,
+    "physical_lane_grouped_lanes": 26,
     "active_lane_upgrades": 15,
-    "active_lane_upgrades_applied": 15,
-    "active_lane_upgrades_deferred": 0,
+    "active_lane_upgrades_applied": 0,
+    "active_lane_upgrades_deferred": 15,
     "active_lane_upgrades_missing_roads": 0,
     "active_lane_upgrades_ignored": 0,
     "lane_bundle_centerline_smoothed_edges": 20,
@@ -362,15 +333,15 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
   "metrics": {
     "junctions_with_connections_ratio": 1.0,
     "fan_fallback_ratio": 0.0,
-    "avg_lane_links_per_junction": 6.531,
+    "avg_lane_links_per_junction": 6.245,
     "lane_link_reference_errors": 0,
     "blocked_lane_links": 0,
     "empty_connection_curves": 0,
     "avg_lane_link_confidence": 0.82,
     "min_lane_link_confidence": 0.82,
-    "avg_curve_length_m": 10.693,
-    "max_curve_length_m": 17.755,
-    "avg_continuity_curve_length_m": 1.16,
+    "avg_curve_length_m": 10.35,
+    "max_curve_length_m": 14.954,
+    "avg_continuity_curve_length_m": 1.392,
     "max_continuity_curve_length_m": 7.301,
     "avg_lane_width_m": 3.2,
     "min_lane_width_m": 3.2,
@@ -379,7 +350,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "max_lane_width_start_end_delta_m": 0.0,
     "lane_bundle_centerline_smoothed_edges": 20,
     "lane_bundle_centerline_smoothed_bends": 39,
-    "lane_bundle_centerline_max_min_arc_radius_m": 9.6,
+    "lane_bundle_centerline_max_min_arc_radius_m": 6.4,
     "derived_lane_centerline_smoothed_lanes": 1,
     "derived_lane_centerline_smoothed_bends": 0,
     "derived_lane_centerline_inserted_sample_points": 0,
@@ -388,40 +359,34 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "derived_lane_centerline_smoothing_curve_family_counts": {},
     "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
     "continuity_rounding_style_counts": {
-      "unified_lane_geometry_rounding_style_v1": 24
+      "unified_lane_geometry_rounding_style_v1": 20
     },
     "continuity_rounding_curve_family_counts": {
-      "straight_infinite_radius": 18,
+      "straight_infinite_radius": 14,
       "tangent_circular_arc": 6
     },
     "lane_level_radius_regularized_continuity_links": 1,
-    "physical_lane_centerlines": 212,
-    "physical_lane_group_centerlines": 14,
-    "standalone_physical_lane_centerlines": 198,
-    "same_physical_lane_continuity_links": 18,
-    "physical_lane_groups_created": 14,
-    "physical_lane_grouped_lanes": 32,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
+    "standalone_physical_lane_centerlines": 174,
+    "same_physical_lane_continuity_links": 14,
+    "physical_lane_groups_created": 12,
+    "physical_lane_grouped_lanes": 26,
     "min_optimized_corner_continuity_radius_m": 0.728
   }
 }
-[exit] 0
-
-[2026-06-05 19:04:03] Running lane graph QA
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\run_auto_qa.py --stage lane_graph --area-id pattaya_central_500m
+[RoadTest] Running lane graph QA...
 lane_graph QA status: pass
-[pass] lanes: 230 / 40
+[pass] lanes: 200 / 40
 [pass] junctions: 49 / 1
 [pass] connections: 306 / 1
-[pass] lane_links: 320 / 1
+[pass] lane_links: 306 / 1
 [pass] lane_link_reference_errors: 0 / 0
 [pass] blocked_lane_links: 0 / 0
 [pass] empty_connection_curves: 0 / 0
 [pass] fan_fallback_ratio: 0.0 / 0.95
-[pass] avg_lane_links_per_junction: 6.531 / 1.0
-[exit] 0
-
-[2026-06-05 19:04:03] Generating standalone preview
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_road_preview.py --area-id pattaya_central_500m
+[pass] avg_lane_links_per_junction: 6.245 / 1.0
+[RoadTest] Generating standalone preview...
 {
   "area_id": "pattaya_central_500m",
   "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
@@ -473,10 +438,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "Road surfaces, junction fan polygons and OBJ faces are intentionally disabled."
   ]
 }
-[exit] 0
-
-[2026-06-05 19:04:03] Generating lane-level debug geometry
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_geometry_debug.py --area-id pattaya_central_500m
+[RoadTest] Generating lane-level debug geometry...
 {
   "area_id": "pattaya_central_500m",
   "outputs": {
@@ -485,30 +447,30 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_geometry_debug.svg"
   },
   "counts": {
-    "lanes": 230,
-    "physical_lane_centerlines": 212,
-    "debug_centerlines": 212,
-    "lane_links": 320,
-    "continuity_links": 24,
-    "debug_centerline_source_physical_lane_centerlines": 212,
-    "lane_ribbons": 212,
-    "lane_centerlines": 212,
-    "lane_link_ribbons": 320,
-    "lane_link_curves": 320,
+    "lanes": 200,
+    "physical_lane_centerlines": 186,
+    "debug_centerlines": 186,
+    "lane_links": 306,
+    "continuity_links": 20,
+    "debug_centerline_source_physical_lane_centerlines": 186,
+    "lane_ribbons": 186,
+    "lane_centerlines": 186,
+    "lane_link_ribbons": 306,
+    "lane_link_curves": 306,
     "lane_continuity_ribbons": 8,
     "lane_continuity_curves": 8,
-    "skipped_micro_seam_continuity_curve": 16,
-    "obj_vertices": 13330,
-    "obj_lines": 540,
-    "obj_faces": 540
+    "skipped_micro_seam_continuity_curve": 12,
+    "obj_vertices": 12226,
+    "obj_lines": 500,
+    "obj_faces": 500
   },
   "metrics": {
     "lane_geometry_debug_centerline_source": "physical_lane_centerlines",
     "empty_lane_link_curves": 0,
     "empty_continuity_curves": 0,
-    "avg_lane_link_curve_length_m": 10.693,
-    "max_lane_link_curve_length_m": 17.755,
-    "avg_continuity_curve_length_m": 1.16,
+    "avg_lane_link_curve_length_m": 10.35,
+    "max_lane_link_curve_length_m": 14.954,
+    "avg_continuity_curve_length_m": 1.392,
     "max_continuity_curve_length_m": 7.301,
     "avg_lane_width_m": 3.2,
     "min_lane_width_m": 3.2,
@@ -518,10 +480,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "lane_link_ribbon_width_m": 1.0
   }
 }
-[exit] 0
-
-[2026-06-05 19:04:03] Generating lane surface v1 geometry
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_lane_surface_v1.py --area-id pattaya_central_500m
+[RoadTest] Generating lane surface v1 geometry...
 {
   "area_id": "pattaya_central_500m",
   "outputs": {
@@ -530,25 +489,25 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "svg": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\preview\\pattaya_central_500m_lane_surfaces_v1.svg"
   },
   "counts": {
-    "lanes": 230,
-    "lane_links": 320,
-    "continuity_links": 24,
-    "lane_surfaces": 212,
+    "lanes": 200,
+    "lane_links": 306,
+    "continuity_links": 20,
+    "lane_surfaces": 186,
     "junction_envelope_surfaces": 49,
-    "lane_turn_surfaces": 320,
+    "lane_turn_surfaces": 306,
     "lane_continuity_surfaces": 8,
-    "skipped_micro_seam_continuity_surface": 16,
-    "obj_vertices": 9419,
-    "obj_faces": 589
+    "skipped_micro_seam_continuity_surface": 12,
+    "obj_vertices": 8684,
+    "obj_faces": 549
   },
   "metrics": {
     "lane_surface_centerline_source": "physical_lane_centerlines",
-    "physical_lane_centerlines": 212,
+    "physical_lane_centerlines": 186,
     "trim_start_lane_count": 0,
     "trim_end_lane_count": 0,
     "junction_trim_m": 8.0,
     "approach_centerlines_trimmed": true,
-    "corner_continuity_trimmed_lane_count": 42,
+    "corner_continuity_trimmed_lane_count": 36,
     "lane_geometry_rounding_style_id": "unified_lane_geometry_rounding_style_v1",
     "lane_geometry_rounding_curve_family": "tangent_circular_arc",
     "derived_lane_centerline_smoothing_policy": "derived_lane_centerline_smoothing_v1",
@@ -560,10 +519,10 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "derived_lane_centerline_smoothing_curve_family_counts": {},
     "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
     "continuity_rounding_style_counts": {
-      "unified_lane_geometry_rounding_style_v1": 24
+      "unified_lane_geometry_rounding_style_v1": 20
     },
     "continuity_rounding_curve_family_counts": {
-      "straight_infinite_radius": 18,
+      "straight_infinite_radius": 14,
       "tangent_circular_arc": 6
     },
     "lane_level_radius_regularized_continuity_links": 1,
@@ -571,22 +530,19 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "avg_lane_surface_width_m": 3.2,
     "avg_turn_surface_width_m": 3.2,
     "avg_continuity_surface_width_m": 3.2,
-    "avg_junction_envelope_area_m2": 122.733,
-    "max_junction_envelope_area_m2": 181.909,
+    "avg_junction_envelope_area_m2": 113.636,
+    "max_junction_envelope_area_m2": 154.603,
     "junction_envelope_padding_m": 0.25,
     "area_by_part_m2": {
-      "lane_surface_v1": 53342.47,
-      "junction_envelope_surface_v1": 6013.936,
-      "lane_turn_surface_v1": 10919.024,
+      "lane_surface_v1": 47302.592,
+      "junction_envelope_surface_v1": 5568.187,
+      "lane_turn_surface_v1": 10105.673,
       "lane_continuity_surface_v1": 88.996
     },
-    "total_area_m2": 70364.426
+    "total_area_m2": 63065.448
   }
 }
-[exit] 0
-
-[2026-06-05 19:04:03] Auditing road pipeline contracts
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\audit_road_pipeline.py --area-id pattaya_central_500m
+[RoadTest] Auditing road pipeline contracts...
 {
   "area_id": "pattaya_central_500m",
   "status": "warn",
@@ -933,11 +889,11 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "junctions": 49,
     "allowed_movements": 306,
     "blocked_movements": 0,
-    "lanes": 230,
+    "lanes": 200,
     "lane_connections": 306,
-    "lane_links": 320,
-    "continuity_links": 24,
-    "micro_seam_continuity_links": 16,
+    "lane_links": 306,
+    "continuity_links": 20,
+    "micro_seam_continuity_links": 12,
     "surface_continuity_links": 8,
     "lane_curve_gap_metrics": {
       "max_lane_link_start_gap_m": 0.0,
@@ -946,7 +902,7 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
       "max_continuity_end_gap_m": 0.0
     },
     "lane_link_curve_source_counts": {
-      "junction_lane_endpoint_bezier": 320
+      "junction_lane_endpoint_bezier": 306
     },
     "optimized_features": 252,
     "optimized_corner_fillets": 3,
@@ -956,10 +912,10 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     "optimized_points": 2223,
     "preview_points": 2223,
     "preview_obj_vertices": 2223,
-    "lane_debug_obj_vertices": 13330,
-    "lane_debug_obj_faces": 540,
-    "lane_surface_v1_obj_vertices": 9419,
-    "lane_surface_v1_obj_faces": 589,
+    "lane_debug_obj_vertices": 12226,
+    "lane_debug_obj_faces": 500,
+    "lane_surface_v1_obj_vertices": 8684,
+    "lane_surface_v1_obj_faces": 549,
     "junction_envelope_surfaces": 49,
     "qa_statuses": {
       "topology_repair": "warn",
@@ -1314,10 +1270,10 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
         "policy": "movement_corridor_final_lane_link_endpoint_contract_v1",
         "max_allowed_gap_m": 0.5,
         "corridor_cases": 306,
-        "comparable_cases": 278,
-        "missing_final_lane_link": 28,
+        "comparable_cases": 306,
+        "missing_final_lane_link": 0,
         "missing_candidate_geometry": 0,
-        "stale_cases": 79,
+        "stale_cases": 86,
         "max_start_gap_m": 5.549,
         "max_end_gap_m": 5.549,
         "max_endpoint_gap_m": 5.549,
@@ -1531,6 +1487,19 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
             "max_gap_m": 2.602
           },
           {
+            "corridor_id": "mc_00072",
+            "lane_link_id": "j_012_c_000_ll_00",
+            "from_lane_id": "ln_e_0045_b_00",
+            "to_lane_id": "ln_e_0000_f_00",
+            "normalized_from_lane_id": "e_0045_b_1",
+            "normalized_to_lane_id": "e_0000_f_1",
+            "movement_kind": "right",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 0.0,
+            "end_gap_m": 2.279,
+            "max_gap_m": 2.279
+          },
+          {
             "corridor_id": "mc_00074",
             "lane_link_id": "j_012_c_002_ll_00",
             "from_lane_id": "ln_e_0000_b_00",
@@ -1538,6 +1507,19 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
             "normalized_from_lane_id": "e_0000_b_1",
             "normalized_to_lane_id": "e_0045_f_1",
             "movement_kind": "left",
+            "candidate_family": "topology_straight_baseline",
+            "start_gap_m": 2.276,
+            "end_gap_m": 0.0,
+            "max_gap_m": 2.276
+          },
+          {
+            "corridor_id": "mc_00075",
+            "lane_link_id": "j_012_c_003_ll_00",
+            "from_lane_id": "ln_e_0000_b_00",
+            "to_lane_id": "ln_e_0044_b_00",
+            "normalized_from_lane_id": "e_0000_b_1",
+            "normalized_to_lane_id": "e_0044_b_1",
+            "movement_kind": "right",
             "candidate_family": "topology_straight_baseline",
             "start_gap_m": 2.276,
             "end_gap_m": 0.0,
@@ -1555,32 +1537,6 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
             "start_gap_m": 0.0,
             "end_gap_m": 2.279,
             "max_gap_m": 2.279
-          },
-          {
-            "corridor_id": "mc_00085",
-            "lane_link_id": "j_014_c_001_ll_00",
-            "from_lane_id": "ln_e_0095_f_00",
-            "to_lane_id": "ln_e_0010_f_00",
-            "normalized_from_lane_id": "e_0095_f_1",
-            "normalized_to_lane_id": "e_0010_f_1",
-            "movement_kind": "left",
-            "candidate_family": "topology_straight_baseline",
-            "start_gap_m": 0.001,
-            "end_gap_m": 1.19,
-            "max_gap_m": 1.19
-          },
-          {
-            "corridor_id": "mc_00087",
-            "lane_link_id": "j_014_c_003_ll_00",
-            "from_lane_id": "ln_e_0096_b_00",
-            "to_lane_id": "ln_e_0010_f_00",
-            "normalized_from_lane_id": "e_0096_b_1",
-            "normalized_to_lane_id": "e_0010_f_1",
-            "movement_kind": "right",
-            "candidate_family": "topology_straight_baseline",
-            "start_gap_m": 0.001,
-            "end_gap_m": 1.19,
-            "max_gap_m": 1.19
           }
         ]
       },
@@ -1637,23 +1593,148 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
     }
   ]
 }
-[exit] 0
-
-[2026-06-05 19:04:03] Publishing LaneForge standard lane package
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_upgrade_package.py --area-id pattaya_central_500m --version lane_package_v0080
+[RoadTest] Publishing LaneForge standard lane package...
 {
   "area_id": "pattaya_central_500m",
-  "package_version": "lane_package_v0080",
-  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080",
-  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080/manifest.json",
+  "package_version": "lane_package_v0079",
+  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0079",
+  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0079/manifest.json",
   "path_policy": "portable_lane_package_paths_v1",
   "counts": {
-    "lanes": 230,
-    "physical_lane_centerlines": 212,
-    "physical_lane_group_centerlines": 14,
+    "lanes": 200,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
     "junctions": 49,
-    "lane_links": 320,
-    "continuity_links": 24,
+    "lane_links": 306,
+    "continuity_links": 20,
+    "junction_envelope_surfaces": 49,
+    "active_lane_upgrades": 15,
+    "active_corner_optimizations": 6,
+    "corner_optimization_candidates": 18,
+    "corner_optimization_accepted_active": 6,
+    "corner_optimization_accepted_active_candidates": 4,
+    "corner_optimization_accepted_active_overrides": 6,
+    "lane_upgrade_propagation_candidates": 23,
+    "lane_upgrade_propagation_high_confidence": 12
+  },
+  "qa_status": "warn",
+  "qa_gate_status": "manual_review_required",
+  "qa_warning_summary": {
+    "publishable_warn": 0,
+    "manual_review_required": 6,
+    "blocker": 0
+  }
+}
+[RoadTest] Generating current LaneForge status...
+{
+  "status": "generated",
+  "json_output": "reports/pattaya_central_500m_laneforge_current_status.json",
+  "md_output": "CURRENT_LANEFORGE_STATUS.md",
+  "latest_package_version": "lane_package_v0079",
+  "qa_gate_status": "manual_review_required"
+}
+[RoadTest] Rebuild complete
+{
+  "area_id": "pattaya_central_500m",
+  "status": "completed",
+  "houdini_status": "skipped",
+  "package_version": "lane_package_v0079",
+  "outputs": {
+    "repaired_geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+    "canonical_geojson": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_canonical.geojson",
+    "road_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_road_graph.json",
+    "junction_semantics": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_junction_semantics.json",
+    "optimized_centerlines": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_optimized_centerlines.geojson",
+    "corner_optimization_candidates": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_corner_optimization_candidates.json",
+    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "preview_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_road_preview_report.json",
+    "lane_geometry_debug_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_geometry_debug_report.json",
+    "lane_surface_v1_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_surface_v1_report.json",
+    "pipeline_audit_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_pipeline_audit_report.json",
+    "lane_package_manifest": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\lane_upgrade_packages\\pattaya_central_500m\\lane_package_v0079\\manifest.json",
+    "laneforge_current_status_json": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_laneforge_current_status.json",
+    "laneforge_current_status_md": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\CURRENT_LANEFORGE_STATUS.md",
+    "topology_qa_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_topology_repair_qa_report.json",
+    "road_graph_qa_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_road_graph_qa_report.json",
+    "lane_graph_qa_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\qa\\pattaya_central_500m_lane_graph_qa_report.json",
+    "log": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\last_rebuild.log"
+  },
+  "artifact_identity": {
+    "road_graph": {
+      "path": "data/processed/pattaya_central_500m_road_graph.json",
+      "exists": true,
+      "size_bytes": 228947,
+      "mtime_utc": 1780657394.0258698,
+      "sha256": "c1fb641f12f014344dfc0e56865724351527f007a1db42464ed9c9e8fa14f257"
+    },
+    "junction_semantics": {
+      "path": "data/processed/pattaya_central_500m_junction_semantics.json",
+      "exists": true,
+      "size_bytes": 332445,
+      "mtime_utc": 1780657394.166092,
+      "sha256": "25bbd7501e0febf15c99c19d5753c387b90307db17b73cf724d0fa1a9751679d"
+    },
+    "optimized_centerlines": {
+      "path": "data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson",
+      "exists": true,
+      "size_bytes": 452890,
+      "mtime_utc": 1780657394.2850914,
+      "sha256": "2faca85bbd7426f0a3971825f607561279c6f3ce507c506e4ecb0f49bfbe05d2"
+    },
+    "lane_graph": {
+      "path": "data/processed/pattaya_central_500m_lane_graph.json",
+      "exists": true,
+      "size_bytes": 1894917,
+      "mtime_utc": 1780657394.5466268,
+      "sha256": "349b6f8eab757775582658d79f58bf3999dc89283c9b2fdfba7e497ca60d8b79"
+    },
+    "lane_surface_v1_geojson": {
+      "path": "data/preview/pattaya_central_500m_lane_surfaces_v1.geojson",
+      "exists": true,
+      "size_bytes": 1178565,
+      "mtime_utc": 1780657394.9948494,
+      "sha256": "64023e1d6d686507e4896c8cd79f00e1cf084f7f89e4237c2e47dc58fdf3f9cd"
+    },
+    "lane_geometry_debug_geojson": {
+      "path": "data/preview/pattaya_central_500m_lane_geometry_debug.geojson",
+      "exists": true,
+      "size_bytes": 1746056,
+      "mtime_utc": 1780657394.840847,
+      "sha256": "867fc588b8fc9c062725263f5798612157658bc6dc276ff1d5ec7caa3f762f47"
+    },
+    "pipeline_audit_report": {
+      "path": "reports/pattaya_central_500m_pipeline_audit_report.json",
+      "exists": true,
+      "size_bytes": 71953,
+      "mtime_utc": 1780657395.2048495,
+      "sha256": "4018122ddbd7d0ea53fcd0168c5e667402d113b0caece0073f3481fb09ea4b58"
+    },
+    "lane_package_manifest": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0079/manifest.json",
+      "exists": true,
+      "size_bytes": 51611,
+      "mtime_utc": 1780657395.5791023,
+      "sha256": "ab4f88915ed02944cf07378dd98f3f753d1235f14529bbb4976a2dd6f8a19c51"
+    }
+  }
+}
+[exit] 0
+
+[2026-06-05 19:03:15] Publishing package with accepted corner optimization
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\build_lane_upgrade_package.py --area-id pattaya_central_500m --version lane_package_v0079
+{
+  "area_id": "pattaya_central_500m",
+  "package_version": "lane_package_v0079",
+  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0079",
+  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0079/manifest.json",
+  "path_policy": "portable_lane_package_paths_v1",
+  "counts": {
+    "lanes": 200,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
+    "junctions": 49,
+    "lane_links": 306,
+    "continuity_links": 20,
     "junction_envelope_surfaces": 49,
     "active_lane_upgrades": 15,
     "active_corner_optimizations": 6,
@@ -1674,13 +1755,120 @@ C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\Pr
 }
 [exit] 0
 
-[2026-06-05 19:04:04] Generating current LaneForge status
-C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\generate_laneforge_status.py --area-id pattaya_central_500m
+[2026-06-05 19:03:16] Refreshing SVG QA view
+C:\Users\YT\AppData\Local\Programs\Python\Python312\python.exe D:\VirtualCity\ProjectManagement\RoadResearch\road_test_pipeline\scripts\export_lane_graph_svg.py --area-id pattaya_central_500m
 {
-  "status": "generated",
-  "json_output": "reports/pattaya_central_500m_laneforge_current_status.json",
-  "md_output": "CURRENT_LANEFORGE_STATUS.md",
-  "latest_package_version": "lane_package_v0080",
-  "qa_gate_status": "manual_review_required"
+  "area_id": "pattaya_central_500m",
+  "stage": "lane_graph_svg_visualization",
+  "status": "pass",
+  "counts": {
+    "lanes": 200,
+    "physical_lane_centerlines": 186,
+    "visible_lane_centerlines": 186,
+    "lane_links_total": 306,
+    "continuity_links_total": 20,
+    "junction_connections_rendered": 306,
+    "continuity_links_rendered": 8,
+    "continuity_micro_seams_skipped": 12,
+    "continuity_link_source_counts": {
+      "degree2_connector_through_continuity_v1": 2,
+      "optimized_corner_fillet": 6
+    },
+    "movement_corridors_rendered": 0,
+    "anchor_markers_rendered": 0,
+    "anchor_source_counts": {},
+    "visual_candidate_family_counts": {},
+    "visual_candidate_issue_counts": {},
+    "movement_corridors_skipped": 0,
+    "movement_corridor_skip_reason_counts": {},
+    "movement_corridor_scoring_status_counts": {},
+    "raw_roads_rendered": 44,
+    "raw_road_endpoint_markers_rendered": 88,
+    "raw_road_internal_vertex_markers_rendered": 215,
+    "raw_road_vertex_markers_rendered": 303,
+    "raw_road_class_counts": {
+      "residential": 14,
+      "secondary": 3,
+      "service": 27
+    },
+    "raw_topology_issue_markers_rendered": 30,
+    "raw_topology_issue_classification_counts": {
+      "dangling_endpoint": 29,
+      "internal_vertex_near_other_edge": 1
+    },
+    "raw_topology_issue_severity_counts": {
+      "review": 30
+    },
+    "corner_candidates_rendered": 18,
+    "corner_candidate_type_counts": {
+      "degree2_connector_corner": 3,
+      "internal_centerline_bend": 15
+    },
+    "corner_candidate_risk_counts": {
+      "low": 9,
+      "medium": 9
+    },
+    "corner_candidate_status_counts": {
+      "accepted_active": 4,
+      "candidate_review": 14
+    },
+    "repaired_roads_rendered": 171,
+    "repaired_roads_class_counts": {
+      "residential": 46,
+      "secondary": 62,
+      "service": 63
+    },
+    "repaired_roads_source_edge_count_sum": 0,
+    "repaired_roads_road_graph_edge_mapped": 0,
+    "canonical_roads_rendered": 43,
+    "canonical_roads_class_counts": {
+      "residential": 14,
+      "secondary": 4,
+      "service": 25
+    },
+    "canonical_roads_source_edge_count_sum": 171,
+    "canonical_roads_road_graph_edge_mapped": 100,
+    "centerline_buffer_preview_polygons": 500,
+    "centerline_buffer_preview_source_counts": {
+      "continuity_curve": 8,
+      "lane_centerline": 174,
+      "lane_link_centerline": 306,
+      "physical_lane_group_centerline_v1": 12
+    },
+    "centerline_buffer_preview_skipped_movement_corridors": 0,
+    "centerline_buffer_preview_skip_reason_counts": {}
+  },
+  "style": {
+    "svg_width_px": 3200,
+    "svg_height_px": 2740,
+    "anchor_marker_radius_px": 0.55,
+    "anchor_marker_stroke_width_px": 0.12,
+    "lane_casing": "enabled（已启用）",
+    "visual_mode": "review_drawing（审图线稿）",
+    "raw_roads_overlay": "thin_black_solid_with_all_vertex_markers_hidden_by_default（细黑实线 + 全部原始顶点/断点标记，默认隐藏）",
+    "raw_topology_issue_overlay": "enabled_when_diagnostics_exist（诊断存在时启用）",
+    "repaired_roads_overlay": "blue_dashed_hidden_by_default",
+    "canonical_roads_overlay": "rose_solid_hidden_by_default",
+    "centerline_buffer_preview_overlay": "uniform_gray_hidden_by_default",
+    "movement_corridor_preview_gate": "fallback_when_no_lane_graph_junction_lane_links"
+  },
+  "link_source": "lane_graph_junction_lane_links",
+  "final_lane_link_precedence": "lane_graph_junction_lane_links_before_movement_corridor_candidates",
+  "note": "SVG visualization（可视化） only. lane_graph.json and movement_corridor_candidates.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
+  "inputs": {
+    "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
+    "movement_corridors": "data/processed/pattaya_central_500m_movement_corridor_candidates.json",
+    "movement_corridor_scoring": "data/processed/pattaya_central_500m_movement_corridor_scoring.json",
+    "raw_roads": "data/processed/pattaya_central_500m_roads_raw.geojson",
+    "repaired_roads": "data/processed/pattaya_central_500m_roads_repaired.geojson",
+    "canonical_roads": "data/processed/pattaya_central_500m_roads_canonical.geojson",
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+    "raw_topology_diagnostics": "data/processed/pattaya_central_500m_raw_topology_diagnostics.json",
+    "corner_candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json"
+  },
+  "outputs": {
+    "svg": "reports/visualizations/pattaya_central_500m_lane_graph_topology.svg",
+    "report": "reports/pattaya_central_500m_lane_graph_svg_report.json"
+  }
 }
 [exit] 0

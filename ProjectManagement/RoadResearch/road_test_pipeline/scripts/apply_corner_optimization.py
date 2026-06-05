@@ -458,7 +458,13 @@ def apply_corner_optimizations(
         write_json(application_path, application)
         return application
 
-    rebuild_cmd = [python_cmd(), str(root / "scripts" / "rebuild_road_test.py"), "--area-id", area_id]
+    rebuild_cmd = [
+        python_cmd(),
+        str(root / "scripts" / "rebuild_road_test.py"),
+        "--area-id",
+        area_id,
+        "--apply-all-lane-upgrades",
+    ]
     if not with_houdini:
         rebuild_cmd.append("--skip-houdini")
     package_cmd = [

@@ -40,18 +40,18 @@
     "raw_topology_issue_severity_counts": {
       "review": 30
     },
-    "corner_candidates_rendered": 19,
+    "corner_candidates_rendered": 18,
     "corner_candidate_type_counts": {
       "degree2_connector_corner": 3,
-      "internal_centerline_bend": 16
+      "internal_centerline_bend": 15
     },
     "corner_candidate_risk_counts": {
       "low": 9,
-      "medium": 10
+      "medium": 9
     },
     "corner_candidate_status_counts": {
       "accepted_active": 4,
-      "candidate_review": 15
+      "candidate_review": 14
     },
     "repaired_roads_rendered": 171,
     "repaired_roads_class_counts": {

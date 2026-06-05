@@ -48,7 +48,7 @@
     "corner_fillets": 3,
     "corner_transaction_fillets": 3,
     "corner_heuristic_fillets": 0,
-    "internal_bend_smoothing_applied": 1,
+    "internal_bend_smoothing_applied": 2,
     "internal_bend_smoothing_skipped": 1,
     "corner_circular_arcs": 3,
     "corner_bezier_tangent_fallback": 0,
@@ -107,7 +107,7 @@
       }
     ],
     "near_junction_bend_absorption_skipped": {
-      "not_near_junction": 1,
+      "not_near_junction": 2,
       "preserved_for_internal_bend_smoothing": 1
     },
     "junction_common_trim_nodes": 0,
@@ -118,10 +118,10 @@
     "junction_common_trim_max_lower_m": 0.0,
     "junction_common_trim_avg_lower_m": 0.0,
     "junction_common_trim_skipped_regularized_nodes": 49,
-    "corner_override_records": 5,
-    "active_corner_overrides": 5,
+    "corner_override_records": 6,
+    "active_corner_overrides": 6,
     "active_degree2_corner_overrides": 3,
-    "active_internal_bend_overrides": 2,
+    "active_internal_bend_overrides": 3,
     "corner_override_issue_counts": {}
   },
   "junction_degree_counts": {
@@ -227,6 +227,38 @@
         "endpoint_reserve_limited": true,
         "target_radius_cut_met": false,
         "radius_tradeoff_policy": "near_junction_bend_endpoint_reserve_radius_tradeoff_v1",
+        "status": "applied"
+      }
+    ],
+    "e_0083": [
+      {
+        "candidate_id": "corner_0018",
+        "corner_optimization_id": "corner_optimization_application_v0008_corner_0000",
+        "application_id": "corner_optimization_application_v0008",
+        "policy": "reviewed_internal_centerline_bend_smoothing_v1",
+        "source_edge_id": "e_0083",
+        "point_index": 1,
+        "cut_m": 3.0,
+        "rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+        "rounding_curve_family": "tangent_circular_arc",
+        "arc_geometry": "circular_arc",
+        "arc_fit_status": "exact_tangent_arc",
+        "arc_radius_m": 3.001,
+        "internal_bend_requested_cut_m": 3.0,
+        "internal_bend_target_radius_m": 0.0,
+        "internal_bend_endpoint_reserve_m": 0.0,
+        "internal_bend_endpoint_reserve_side": "",
+        "internal_bend_endpoint_reserve_limited": false,
+        "internal_bend_radius_target_met": true,
+        "max_cut_ratio": 0.45,
+        "target_radius_m": 0.0,
+        "target_radius_cut_m": 0.0,
+        "ratio_limited_cut_m": 3.0,
+        "endpoint_reserve_m": 0.0,
+        "endpoint_reserve_side": "",
+        "endpoint_reserve_limited": false,
+        "target_radius_cut_met": true,
+        "radius_tradeoff_policy": "",
         "status": "applied"
       }
     ]

@@ -2,10 +2,10 @@
   "type": "laneforge_current_status",
   "schema": "lane_upgrade_system.current_status.v1",
   "area_id": "pattaya_central_500m",
-  "latest_package_version": "lane_package_v0078",
-  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078",
-  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/manifest.json",
-  "houdini_manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/houdini_manifest.json",
+  "latest_package_version": "lane_package_v0080",
+  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080",
+  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080/manifest.json",
+  "houdini_manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080/houdini_manifest.json",
   "path_policy": "portable_lane_package_paths_v1",
   "qa_status": "warn",
   "qa_gate_status": "manual_review_required",
@@ -23,12 +23,12 @@
     "continuity_links": 24,
     "junction_envelope_surfaces": 49,
     "active_lane_upgrades": 15,
-    "active_corner_optimizations": 5,
-    "corner_optimization_candidates": 19,
-    "corner_optimization_accepted_active": 5,
+    "active_corner_optimizations": 6,
+    "corner_optimization_candidates": 18,
+    "corner_optimization_accepted_active": 6,
     "corner_optimization_accepted_active_candidates": 4,
-    "corner_optimization_accepted_active_overrides": 5,
-    "lane_upgrade_propagation_candidates": 27,
+    "corner_optimization_accepted_active_overrides": 6,
+    "lane_upgrade_propagation_candidates": 23,
     "lane_upgrade_propagation_high_confidence": 12
   },
   "semantic_review": {
@@ -79,23 +79,23 @@
     "latest": {
       "path": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
       "exists": true,
-      "size_bytes": 1004,
-      "mtime_utc": 1780656704.9240415,
-      "sha256": "ac93233f4ec3bcbcad8a3d700fcd9ba02e52dc84b5345d1c483c471665dd4758"
+      "size_bytes": 1003,
+      "mtime_utc": 1780657444.1628225,
+      "sha256": "e4e607ed43d6daad538ce975ae05e7ee0d126f73b1fee6eadfeeea466290138e"
     },
     "manifest": {
-      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/manifest.json",
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080/manifest.json",
       "exists": true,
-      "size_bytes": 51566,
-      "mtime_utc": 1780656704.9240415,
-      "sha256": "09a4b4784df1734cdcd178761c062aa134b69ef2100721fa30acfa1faab65876"
+      "size_bytes": 51611,
+      "mtime_utc": 1780657444.1628225,
+      "sha256": "00b34fcc8cce20f01f7597e990c5f5051a4e1d086a45d96e15921563a9a2af29"
     },
     "houdini_manifest": {
-      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0078/houdini_manifest.json",
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080/houdini_manifest.json",
       "exists": true,
       "size_bytes": 964,
-      "mtime_utc": 1780656704.864596,
-      "sha256": "10f10db1d96e63e5c1125df558e19ed6a408523c7833b29536faf2bb2f80ac52"
+      "mtime_utc": 1780657444.1038246,
+      "sha256": "965efc44a1481cb1bec5aa7f3eb6a05fa8971076838b794bd1964bd8a8e4448c"
     }
   },
   "handoff_rule": "Houdini and downstream systems consume the latest standard lane package, not data/processed internals."

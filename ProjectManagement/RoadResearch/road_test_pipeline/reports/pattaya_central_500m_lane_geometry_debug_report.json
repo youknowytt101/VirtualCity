@@ -21,7 +21,7 @@
     "lane_continuity_ribbons": 8,
     "lane_continuity_curves": 8,
     "skipped_micro_seam_continuity_curve": 16,
-    "obj_vertices": 13126,
+    "obj_vertices": 13330,
     "obj_lines": 540,
     "obj_faces": 540
   },
@@ -35,7 +35,7 @@
     "empty_lane_link_curves": 0,
     "empty_continuity_curves": 0,
     "avg_lane_link_curve_length_m": 10.693,
-    "max_lane_link_curve_length_m": 17.562,
+    "max_lane_link_curve_length_m": 17.755,
     "avg_continuity_curve_length_m": 1.16,
     "max_continuity_curve_length_m": 7.301,
     "avg_lane_width_m": 3.2,
