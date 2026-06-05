@@ -29,6 +29,7 @@ PACKAGE_SCHEMA = "lane_upgrade_system.standard_lane_package.v1"
 DEFAULT_PACKAGE_VERSION = "auto"
 PATH_POLICY = "portable_lane_package_paths_v1"
 QA_WARNING_SEVERITY_POLICY_ID = "qa_warning_severity_tiers_v1"
+HOUDINI_HANDOFF_COMPATIBILITY_VERSION = "laneforge_houdini_handoff.v1"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -458,7 +459,6 @@ def build_package(
             "junction_envelope_surface_v1",
         ],
     }
-    write_json(package_dir / "houdini_manifest.json", houdini_manifest)
     package_artifacts = artifact_records(
         {
             "standard_lanes": package_dir / "standard_lanes.json",
@@ -473,6 +473,29 @@ def build_package(
         },
         root=root,
     )
+    houdini_manifest["metadata"]["compatibility_version"] = HOUDINI_HANDOFF_COMPATIBILITY_VERSION
+    houdini_manifest["metadata"]["compatibility_contract"] = {
+        "contract_id": HOUDINI_HANDOFF_COMPATIBILITY_VERSION,
+        "input_hash_source": "manifest.package_artifacts（数据包资产记录）",
+        "houdini_reads_package_outputs_only": True,
+        "stable_output_nodes": houdini_manifest["expected_houdini_outputs"],
+        "stable_primitive_groups": houdini_manifest["primitive_groups"],
+    }
+    houdini_manifest["input_asset_hashes"] = {
+        name: {
+            "path": record.get("path", ""),
+            "exists": record.get("exists", False),
+            "size_bytes": record.get("size_bytes", 0),
+            "sha256": record.get("sha256", ""),
+        }
+        for name, record in package_artifacts.items()
+        if name in houdini_manifest["inputs"]
+    }
+    write_json(package_dir / "houdini_manifest.json", houdini_manifest)
+    package_artifacts["houdini_manifest"] = artifact_records(
+        {"houdini_manifest": package_dir / "houdini_manifest.json"},
+        root=root,
+    )["houdini_manifest"]
     manifest["package_artifacts"] = package_artifacts
     write_json(package_dir / "manifest.json", manifest)
     latest = {

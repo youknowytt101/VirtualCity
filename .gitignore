@@ -64,6 +64,11 @@ Config/_*.py
 Config/houdini_build_status.json
 Reports/model_qa/*.json
 
+# LaneForge local viewer runtime files（本地网页查看器运行文件）
+ProjectManagement/RoadResearch/road_test_pipeline/reports/visualizations/.laneforge_viewer.pid
+ProjectManagement/RoadResearch/road_test_pipeline/reports/visualizations/laneforge_viewer_server.err.log
+ProjectManagement/RoadResearch/road_test_pipeline/reports/visualizations/laneforge_viewer_server.out.log
+
 # ===== 数据精炼管线缓存（体积大，不提交）=====
 RawData/_downloads/
 RawData/_cleaned/

@@ -94,6 +94,11 @@ lane_model_builder.py
   生成 lane graph、laneLinks、continuity links。
   消费 active lane upgrades 和 optimized corner geometry。
 
+generate_semantic_evidence_summary.py
+  汇总每条 road edge 的 OSM lanes、oneway、width source、active lane
+  upgrade、最终 geometry lane count 和 review flags。该文件是审查证据，
+  不修改 raw / repaired / canonical / road_graph / lane_graph 真值。
+
 generate_lane_geometry_debug.py
   生成 lane/debug curves 与 ribbons。存在 physical_lane_centerlines 时，
   debug 中心线跟随最终干净车道中心线契约。

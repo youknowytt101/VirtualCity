@@ -638,6 +638,205 @@
       white-space: nowrap;
     }
 
+    .semantic-evidence-status {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .propagation-status {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .semantic-evidence-flags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .semantic-evidence-flag {
+      min-width: 0;
+      max-width: 100%;
+      padding: 4px 7px;
+      border: 1px solid rgba(180, 83, 9, 0.28);
+      border-radius: 999px;
+      background: #fffbeb;
+      color: #92400e;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .qa-warning-list {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .qa-warning-item {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+      padding: 7px 8px;
+      border: 1px solid rgba(180, 83, 9, 0.28);
+      border-radius: 7px;
+      background: #fffaf0;
+    }
+
+    .qa-warning-item.info {
+      border-color: rgba(14, 116, 144, 0.22);
+      background: #ecfeff;
+    }
+
+    .qa-warning-item-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+      color: #334155;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .qa-warning-item-title span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .qa-warning-tier {
+      flex: 0 0 auto;
+      color: #92400e;
+      font-size: 9.5px;
+      font-weight: 800;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .qa-warning-item.info .qa-warning-tier {
+      color: #0e7490;
+    }
+
+    .qa-warning-detail {
+      color: #64748b;
+      font-size: 9.5px;
+      line-height: 1.3;
+    }
+
+    .propagation-candidate-list {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .propagation-candidate-item {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+      padding: 7px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 7px;
+      background: #ffffff;
+    }
+
+    .propagation-candidate-item.high {
+      border-color: rgba(15, 118, 110, 0.30);
+      background: #f0fdfa;
+    }
+
+    .propagation-candidate-item.medium {
+      border-color: rgba(180, 83, 9, 0.30);
+      background: #fffbeb;
+    }
+
+    .propagation-candidate-item.low {
+      border-color: rgba(220, 38, 38, 0.25);
+      background: #fef2f2;
+    }
+
+    .propagation-candidate-item.satisfied {
+      border-color: rgba(14, 116, 144, 0.22);
+      background: #ecfeff;
+    }
+
+    .propagation-candidate-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+      color: #334155;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .propagation-candidate-title span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .propagation-tier {
+      flex: 0 0 auto;
+      color: #475569;
+      font-size: 9.5px;
+      font-weight: 800;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .propagation-candidate-item.high .propagation-tier {
+      color: var(--accent-strong);
+    }
+
+    .propagation-candidate-item.medium .propagation-tier {
+      color: #92400e;
+    }
+
+    .propagation-candidate-item.low .propagation-tier {
+      color: var(--danger);
+    }
+
+    .propagation-candidate-item.satisfied .propagation-tier {
+      color: #0e7490;
+    }
+
+    .propagation-candidate-detail {
+      color: #64748b;
+      font-size: 9.5px;
+      line-height: 1.32;
+      overflow-wrap: anywhere;
+    }
+
+    .propagation-queue-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .propagation-queue-actions button {
+      width: auto;
+      height: 30px;
+      min-width: 0;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .propagation-queue-note {
+      color: #64748b;
+      font-size: 9.8px;
+      line-height: 1.32;
+    }
+
     .lane-upgrade-actions {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -738,12 +937,147 @@
       background: var(--danger);
     }
 
+    .lane-upgrade-preview-box {
+      display: grid;
+      gap: 7px;
+      padding: 8px 9px;
+      border: 1px solid rgba(15, 118, 110, 0.22);
+      border-radius: 7px;
+      background: rgba(240, 253, 250, 0.72);
+    }
+
+    .lane-upgrade-preview-box[hidden] {
+      display: none;
+    }
+
+    .lane-upgrade-preview-title {
+      color: var(--accent-strong);
+      font-size: 10.5px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .lane-upgrade-preview-note {
+      color: #475569;
+      font-size: 10.5px;
+      line-height: 1.35;
+    }
+
     .lane-upgrade-progress-label {
       flex: 0 0 auto;
       color: #64748b;
       font-size: 10px;
       line-height: 1.2;
       white-space: nowrap;
+    }
+
+    .lane-upgrade-timeline {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+      padding-top: 2px;
+    }
+
+    .lane-upgrade-timeline-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .lane-upgrade-timeline-title {
+      color: #334155;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .lane-upgrade-timeline-package {
+      min-width: 0;
+      overflow: hidden;
+      color: #64748b;
+      font-size: 9.5px;
+      line-height: 1.2;
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .lane-upgrade-timeline-row {
+      display: grid;
+      grid-template-columns: 11px minmax(0, 1fr) auto;
+      gap: 6px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .lane-upgrade-timeline-dot {
+      width: 7px;
+      height: 7px;
+      margin-top: 4px;
+      border: 1px solid rgba(100, 116, 139, 0.45);
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .lane-upgrade-timeline-row.completed .lane-upgrade-timeline-dot {
+      border-color: rgba(15, 118, 110, 0.75);
+      background: #0f766e;
+    }
+
+    .lane-upgrade-timeline-row.running .lane-upgrade-timeline-dot {
+      border-color: rgba(37, 99, 235, 0.78);
+      background: #2563eb;
+    }
+
+    .lane-upgrade-timeline-row.failed .lane-upgrade-timeline-dot {
+      border-color: rgba(220, 38, 38, 0.85);
+      background: var(--danger);
+    }
+
+    .lane-upgrade-timeline-main {
+      min-width: 0;
+    }
+
+    .lane-upgrade-timeline-label {
+      overflow: hidden;
+      color: #334155;
+      font-size: 10px;
+      font-weight: 750;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .lane-upgrade-timeline-detail {
+      overflow: hidden;
+      color: #64748b;
+      font-size: 9.5px;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .lane-upgrade-timeline-badge {
+      padding-top: 1px;
+      color: #64748b;
+      font-size: 9.5px;
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .lane-upgrade-timeline-row.completed .lane-upgrade-timeline-badge {
+      color: var(--accent-strong);
+    }
+
+    .lane-upgrade-timeline-row.running .lane-upgrade-timeline-badge {
+      color: #2563eb;
+    }
+
+    .lane-upgrade-timeline-row.failed .lane-upgrade-timeline-badge {
+      color: var(--danger);
     }
 
     .lane-upgrade-output {
@@ -1428,7 +1762,14 @@
       fixedSizingScale: 0,
       suppressMouseSelectionUntil: 0,
       suppressMouseSelectionPoint: null,
-      laneForgeJobInFlight: false
+      laneForgeJobInFlight: false,
+      semanticEvidenceCache: new Map(),
+      qaWarningsCache: new Map(),
+      roadChainReviewCache: new Map(),
+      junctionReviewCache: new Map(),
+      packageLifecycleCache: new Map(),
+      houdiniHandoffCache: new Map(),
+      propagationReviewCache: new Map()
     };
 
     const SVG_NS = "http://www.w3.org/2000/svg";
@@ -2575,6 +2916,1482 @@
       return fetchJson(url);
     }
 
+    const SEMANTIC_FLAG_LABELS = {
+      active_lane_upgrade_transaction: "active_lane_upgrade_transaction（激活车道升级事务）",
+      lane_count_set_by_lane_upgrade_transaction: "lane_count_set_by_lane_upgrade_transaction（车道数由事务设定）",
+      missing_turn_lanes: "missing_turn_lanes（缺失转向车道）",
+      road_chain_fragment: "road_chain_fragment（道路链片段）",
+      source_lane_count_differs_from_geometry: "source_lane_count_differs_from_geometry（源车道数不同于几何）",
+      source_oneway_overridden_by_temporary_bidirectional_policy: "source_oneway_overridden_by_temporary_bidirectional_policy（源单行被临时双向策略覆盖）",
+      width_fallback: "width_fallback（宽度兜底）"
+    };
+
+    const SEMANTIC_CONFIDENCE_LABELS = {
+      manual_reviewed_override: "manual_reviewed_override（人工复核覆盖）",
+      temporary_policy_review_required: "temporary_policy_review_required（临时策略需复核）"
+    };
+
+    const QA_TIER_LABELS = {
+      blocker: "blocker（阻断）",
+      manual_review_required: "manual_review_required（需要人工复核）",
+      publishable_warn: "publishable_warn（可发布警告）",
+      info: "info（信息）"
+    };
+
+    const QA_SCOPE_LABELS = {
+      selected_roads: "selected roads（选中道路）",
+      selected_endpoints: "selected endpoints（选中端点）",
+      selected_road_chain: "selected road-chain（选中道路链）",
+      global_qa_gate: "global QA gate（全局质量门禁）"
+    };
+
+    const QA_CHECK_LABELS = {
+      width_fallback_ratio: "width_fallback_ratio（宽度兜底比例）",
+      lanes_fallback_selected: "lanes_fallback_selected（选中道路车道默认值）",
+      selected_dead_end_nodes: "selected_dead_end_nodes（选中断头节点）",
+      selected_endpoint_review: "selected_endpoint_review（选中端点复核）",
+      road_identity_fragmentation_tracked: "road_identity_fragmentation_tracked（道路身份碎片化）"
+    };
+
+    const ROAD_CHAIN_TIER_LABELS = {
+      pass: "pass（通过）",
+      info: "info（信息）",
+      manual_review_required: "manual_review_required（需要人工复核）"
+    };
+
+    const ROAD_CHAIN_CHECK_LABELS = {
+      arterial_chain_lane_consistency: "arterial_chain_lane_consistency（主干路车道一致性）",
+      short_edge_absorption: "short_edge_absorption（短边吸收相邻主路语义）",
+      junction_approach_continuity: "junction_approach_continuity（路口入口连续性）",
+      lane_count_transition_review: "lane_count_transition_review（车道数变化复核）"
+    };
+
+    const JUNCTION_TIER_LABELS = {
+      pass: "pass（通过）",
+      info: "info（信息）",
+      manual_review_required: "manual_review_required（需要人工复核）"
+    };
+
+    const JUNCTION_CHECK_LABELS = {
+      junction_lane_count_balance_check: "junction_lane_count_balance_check（路口车道数平衡检查）",
+      approach_exit_lane_compatibility_check: "approach_exit_lane_compatibility_check（入口 / 出口车道兼容检查）",
+      turn_curve_radius_review: "turn_curve_radius_review（转弯半径复核）",
+      lane_link_conflict_check: "lane_link_conflict_check（车道连接冲突检查）",
+      orphan_lane_link_check: "orphan_lane_link_check（孤立车道连接检查）"
+    };
+
+    const PACKAGE_LIFECYCLE_TIER_LABELS = {
+      pass: "pass（通过）",
+      info: "info（信息）",
+      manual_review_required: "manual_review_required（需要人工复核）"
+    };
+
+    const PACKAGE_LIFECYCLE_CHECK_LABELS = {
+      latest_pointer_consistency: "latest_pointer_consistency（最新指针一致性）",
+      package_changelog_presence: "package_changelog_presence（数据包变更日志存在性）",
+      package_changelog_latest_coverage: "package_changelog_latest_coverage（最新数据包变更日志覆盖）",
+      milestone_registry_presence: "milestone_registry_presence（里程碑注册存在性）",
+      milestone_candidate_registry: "milestone_candidate_registry（里程碑候选注册）",
+      stable_handoff_milestone_readiness: "stable_handoff_milestone_readiness（稳定交付里程碑就绪度）",
+      package_diff_summary_available: "package_diff_summary_available（数据包差异摘要可用性）",
+      experimental_package_archive_review: "experimental_package_archive_review（实验数据包归档复核）",
+      package_manifest_presence: "package_manifest_presence（数据包清单存在性）"
+    };
+
+    const HOUDINI_HANDOFF_TIER_LABELS = {
+      pass: "pass（通过）",
+      info: "info（信息）",
+      manual_review_required: "manual_review_required（需要人工复核）",
+      blocker: "blocker（阻断）"
+    };
+
+    const HOUDINI_HANDOFF_CHECK_LABELS = {
+      manifest_schema_compatibility: "manifest_schema_compatibility（清单架构兼容性）",
+      compatibility_version_declared: "compatibility_version_declared（兼容版本声明）",
+      houdini_input_missing_file_check: "houdini_input_missing_file_check（Houdini 输入缺失文件检查）",
+      input_asset_hash_validation: "input_asset_hash_validation（输入资产哈希校验）",
+      houdini_outputs_contract: "houdini_outputs_contract（Houdini 输出合同）",
+      package_boundary_contract: "package_boundary_contract（数据包边界合同）",
+      houdini_import_qa_report: "houdini_import_qa_report（Houdini 导入质量报告）",
+      stable_handoff_readiness: "stable_handoff_readiness（稳定交付就绪度）"
+    };
+
+    const PROPAGATION_TIER_LABELS = {
+      high_confidence: "high confidence（高置信）",
+      medium_confidence: "medium confidence（中置信）",
+      low_confidence: "low confidence（低置信）",
+      already_satisfies_target: "already satisfies target（已满足目标）"
+    };
+
+    const PROPAGATION_STATUS_LABELS = {
+      candidate_high_confidence: "candidate_high_confidence（高置信候选）",
+      candidate_review: "candidate_review（候选复核）",
+      context_review: "context_review（上下文复核）",
+      already_satisfies_target: "already_satisfies_target（已满足目标）"
+    };
+
+    const PROPAGATION_RELATION_LABELS = {
+      target_candidate: "target candidate（目标候选）",
+      source_upgrade: "source upgrade（来源升级）",
+      junction_context: "junction context（路口上下文）"
+    };
+
+    const PROPAGATION_RULE_LABELS = {
+      short_edge_absorption_lane_count_v2: "short_edge_absorption（短边吸收）",
+      adjacent_junction_context_review_v2: "adjacent_junction_context_review（相邻路口上下文复核）",
+      same_class_adjacent_approach_review_v2: "same_class_adjacent_approach_review（同等级相邻入口复核）"
+    };
+
+    function semanticLabel(value, labels) {
+      const key = String(value || "");
+      return labels[key] || (key ? `${key}（未注释）` : "");
+    }
+
+    function uniqueValues(values) {
+      return Array.from(new Set(values.map((value) => String(value || "").trim()).filter(Boolean)));
+    }
+
+    function joinedUnique(values, fallback = "") {
+      const unique = uniqueValues(values);
+      return unique.length ? unique.join(", ") : fallback;
+    }
+
+    function selectionStableKey() {
+      if (!state.selectedRef) {
+        return "";
+      }
+      return `${state.selectedRef.kind}:${state.selectedRef.id}`;
+    }
+
+    function semanticEvidenceUrlForData(data) {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const params = new URLSearchParams({ area_id: areaId });
+      const selectionScope = laneForgeSelectionScopeFromData(data);
+      const roadChainId = data.vcRoadChainId || "";
+      const roadId = laneForgeRoadIdFromData(data);
+      const canonicalRoadId = laneForgeCanonicalRoadIdsFromData(data)[0] || data.vcCanonicalRoadId || "";
+      if (selectionScope === "road_chain" && roadChainId) {
+        params.set("road_chain_id", roadChainId);
+      } else if (roadId) {
+        params.set("road_id", roadId);
+      } else if (canonicalRoadId) {
+        params.set("canonical_road_id", canonicalRoadId);
+      } else {
+        return "";
+      }
+      return `/api/semantic-evidence/lookup?${params.toString()}`;
+    }
+
+    function qaWarningsUrlForData(data) {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const params = new URLSearchParams({ area_id: areaId });
+      const selectionScope = laneForgeSelectionScopeFromData(data);
+      const roadChainId = data.vcRoadChainId || "";
+      const roadIds = laneForgeRoadIdsFromData(data);
+      const canonicalRoadIds = laneForgeCanonicalRoadIdsFromData(data);
+      if (selectionScope === "road_chain" && roadChainId) {
+        params.set("road_chain_id", roadChainId);
+      } else if (roadIds.length) {
+        params.set("road_id", roadIds.join(","));
+      } else if (canonicalRoadIds.length) {
+        params.set("canonical_road_id", canonicalRoadIds.join(","));
+      } else {
+        return "";
+      }
+      return `/api/qa-warnings/lookup?${params.toString()}`;
+    }
+
+    function roadChainReviewUrlForData(data) {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const params = new URLSearchParams({ area_id: areaId });
+      const selectionScope = laneForgeSelectionScopeFromData(data);
+      const roadChainId = data.vcRoadChainId || "";
+      const roadIds = laneForgeRoadIdsFromData(data);
+      const canonicalRoadIds = laneForgeCanonicalRoadIdsFromData(data);
+      if (selectionScope === "road_chain" && roadChainId) {
+        params.set("road_chain_id", roadChainId);
+      } else if (roadChainId) {
+        params.set("road_chain_id", roadChainId);
+      } else if (roadIds.length) {
+        params.set("road_id", roadIds.join(","));
+      } else if (canonicalRoadIds.length) {
+        params.set("canonical_road_id", canonicalRoadIds.join(","));
+      } else {
+        return "";
+      }
+      return `/api/road-chain/lookup?${params.toString()}`;
+    }
+
+    function junctionReviewUrlForData(data) {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const params = new URLSearchParams({ area_id: areaId });
+      const nodeId = data.vcNodeId || data.vcCornerNodeId || "";
+      const junctionId = data.vcJunctionId || "";
+      const selectionScope = laneForgeSelectionScopeFromData(data);
+      const roadChainId = data.vcRoadChainId || "";
+      const roadIds = laneForgeRoadIdsFromData(data);
+      const canonicalRoadIds = laneForgeCanonicalRoadIdsFromData(data);
+      if (junctionId) {
+        params.set("junction_id", junctionId);
+      } else if (nodeId) {
+        params.set("node_id", nodeId);
+      } else if (selectionScope === "road_chain" && roadChainId) {
+        params.set("road_chain_id", roadChainId);
+      } else if (roadChainId) {
+        params.set("road_chain_id", roadChainId);
+      } else if (roadIds.length) {
+        params.set("road_id", roadIds.join(","));
+      } else if (canonicalRoadIds.length) {
+        params.set("canonical_road_id", canonicalRoadIds.join(","));
+      } else {
+        return "";
+      }
+      return `/api/junction/lookup?${params.toString()}`;
+    }
+
+    function packageLifecycleUrlForData() {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const params = new URLSearchParams({ area_id: areaId });
+      return `/api/package-lifecycle/lookup?${params.toString()}`;
+    }
+
+    function houdiniHandoffUrlForData() {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const params = new URLSearchParams({ area_id: areaId });
+      return `/api/houdini-handoff/lookup?${params.toString()}`;
+    }
+
+    function propagationReviewUrlForData(data) {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const params = new URLSearchParams({ area_id: areaId });
+      const selectionScope = laneForgeSelectionScopeFromData(data);
+      const roadChainId = data.vcRoadChainId || "";
+      const roadIds = laneForgeRoadIdsFromData(data);
+      const canonicalRoadIds = laneForgeCanonicalRoadIdsFromData(data);
+      if (selectionScope === "road_chain" && roadChainId) {
+        params.set("road_chain_id", roadChainId);
+      } else if (roadIds.length) {
+        params.set("road_id", roadIds.join(","));
+      } else if (canonicalRoadIds.length) {
+        params.set("canonical_road_id", canonicalRoadIds.join(","));
+      } else {
+        return "";
+      }
+      return `/api/propagation/lookup?${params.toString()}`;
+    }
+
+    function propagationReviewQueuePayload(data, candidateIds, dryRun = false) {
+      const areaId = areaIdFromSvgPath(svgPath);
+      const selectionScope = laneForgeSelectionScopeFromData(data);
+      const roadChainId = data.vcRoadChainId || "";
+      const roadIds = laneForgeRoadIdsFromData(data);
+      const canonicalRoadIds = laneForgeCanonicalRoadIdsFromData(data);
+      const payload = {
+        area_id: areaId,
+        candidate_ids: candidateIds,
+        dry_run: dryRun,
+        queued_by: "web_user",
+        source_surface: "svg_live_viewer"
+      };
+      if (selectionScope === "road_chain" && roadChainId) {
+        payload.road_chain_id = roadChainId;
+      } else if (roadIds.length) {
+        payload.road_id = roadIds.join(",");
+      } else if (canonicalRoadIds.length) {
+        payload.canonical_road_id = canonicalRoadIds.join(",");
+      }
+      return payload;
+    }
+
+    function semanticRecordSummary(records) {
+      const activeCount = records.filter((record) => record.active_lane_upgrade && Object.keys(record.active_lane_upgrade).length).length;
+      const sourceLaneValues = joinedUnique(records.map((record) => record.source?.lanes ?? ""));
+      const geometryLaneValues = joinedUnique(records.map((record) => record.geometry?.physical_lane_count ?? ""));
+      const confidenceValues = joinedUnique(records.map((record) => semanticLabel(record.review?.confidence_tier, SEMANTIC_CONFIDENCE_LABELS)));
+      const widthSources = joinedUnique(records.map((record) => record.source?.width_source || record.geometry?.width_source));
+      const onewayCount = records.filter((record) => Boolean(record.source?.oneway)).length;
+      const flagCounts = new Map();
+      for (const record of records) {
+        for (const flag of record.review?.flags || []) {
+          flagCounts.set(flag, (flagCounts.get(flag) || 0) + 1);
+        }
+      }
+      return {
+        activeCount,
+        sourceLaneValues,
+        geometryLaneValues,
+        confidenceValues,
+        widthSources,
+        onewayCount,
+        flags: Array.from(flagCounts.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      };
+    }
+
+    function appendSemanticStatusItem(container, label, value) {
+      const item = document.createElement("div");
+      item.className = "lane-upgrade-status-item";
+      item.title = value;
+      const key = document.createElement("strong");
+      key.textContent = label;
+      const val = document.createElement("span");
+      val.textContent = value;
+      item.append(key, val);
+      container.append(item);
+    }
+
+    function qaCheckLabel(checkId) {
+      const key = String(checkId || "");
+      if (QA_CHECK_LABELS[key]) {
+        return QA_CHECK_LABELS[key];
+      }
+      if (key.startsWith("semantic_flag:")) {
+        return semanticLabel(key.slice("semantic_flag:".length), SEMANTIC_FLAG_LABELS);
+      }
+      return key ? `${key}（未注释）` : "";
+    }
+
+    function qaValueText(value) {
+      if (value === undefined || value === null || value === "") {
+        return "";
+      }
+      if (typeof value === "number" || typeof value === "boolean") {
+        return String(value);
+      }
+      if (typeof value === "string") {
+        return value;
+      }
+      if (Array.isArray(value)) {
+        return value.join(", ");
+      }
+      return Object.entries(value)
+        .map(([key, item]) => `${key}=${item}`)
+        .join(", ");
+    }
+
+    function renderQaWarningsPanel(panel, payload) {
+      const qaGate = payload.qa_gate || {};
+      const entries = Array.isArray(payload.entries) ? payload.entries : [];
+      const warnings = entries.filter((entry) => entry.tier !== "info");
+      const infoEntries = entries.filter((entry) => entry.tier === "info");
+      panel.replaceChildren();
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "QA Warnings（质量警告）";
+      panel.append(title);
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      const summary = qaGate.summary || {};
+      note.textContent = `${warnings.length} scoped warning（选中范围警告） · QA gate（质量门禁） ${qaGate.status || "unknown"} · blocker（阻断） ${summary.blocker ?? 0}`;
+      panel.append(note);
+
+      const status = document.createElement("div");
+      status.className = "lane-upgrade-status semantic-evidence-status";
+      appendSemanticStatusItem(status, "QA gate", qaGate.status || "unknown");
+      appendSemanticStatusItem(status, "Scoped", String(payload.scoped_warning_count ?? warnings.length));
+      appendSemanticStatusItem(status, "Info", String(infoEntries.length));
+      panel.append(status);
+
+      const flags = document.createElement("div");
+      flags.className = "semantic-evidence-flags";
+      const tierCounts = payload.tier_counts || {};
+      const tierEntries = Object.entries(tierCounts);
+      if (tierEntries.length) {
+        for (const [tier, count] of tierEntries) {
+          const item = document.createElement("span");
+          item.className = "semantic-evidence-flag";
+          item.textContent = `${semanticLabel(tier, QA_TIER_LABELS)} · ${count}`;
+          flags.append(item);
+        }
+      } else {
+        const item = document.createElement("span");
+        item.className = "semantic-evidence-flag";
+        item.textContent = "no_scoped_warnings（无选中范围警告）";
+        flags.append(item);
+      }
+      panel.append(flags);
+
+      const body = document.createElement("div");
+      body.className = "inspector-details-body";
+      const selection = payload.selection || {};
+      appendRowTo(body, "road ids（道路编号）", previewListText(selection.road_ids, ""), true);
+      appendRowTo(body, "road-chain（道路链）", previewListText(selection.road_chain_ids, ""), true);
+      appendRowTo(body, "endpoint nodes（端点节点）", previewListText(selection.endpoint_node_ids, ""), true);
+      appendRowTo(body, "endpoint kinds（端点类型）", qaValueText(selection.endpoint_node_kind_counts), true);
+      panel.append(body);
+
+      const list = document.createElement("div");
+      list.className = "qa-warning-list";
+      const visibleEntries = [...warnings, ...infoEntries].slice(0, 8);
+      if (!visibleEntries.length) {
+        const item = document.createElement("div");
+        item.className = "qa-warning-item info";
+        const line = document.createElement("div");
+        line.className = "qa-warning-detail";
+        line.textContent = "No scoped QA warnings matched this selection（当前选择没有匹配的局部质量警告）。";
+        item.append(line);
+        list.append(item);
+      }
+      for (const entry of visibleEntries) {
+        const item = document.createElement("div");
+        item.className = `qa-warning-item ${entry.tier === "info" ? "info" : ""}`;
+        const head = document.createElement("div");
+        head.className = "qa-warning-item-title";
+        const label = document.createElement("span");
+        label.textContent = qaCheckLabel(entry.check_id);
+        label.title = label.textContent;
+        const tier = document.createElement("div");
+        tier.className = "qa-warning-tier";
+        tier.textContent = semanticLabel(entry.tier, QA_TIER_LABELS);
+        head.append(label, tier);
+        const detail = document.createElement("div");
+        detail.className = "qa-warning-detail";
+        const scope = semanticLabel(entry.scope, QA_SCOPE_LABELS);
+        const value = qaValueText(entry.value);
+        detail.textContent = `${scope}${value ? ` · ${value}` : ""} · ${entry.message || ""}`;
+        item.append(head, detail);
+        list.append(item);
+      }
+      panel.append(list);
+    }
+
+    function appendQaWarningsPanel(data) {
+      const url = qaWarningsUrlForData(data);
+      if (!url) {
+        return;
+      }
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "QA Warnings（质量警告）";
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = "loading QA warnings（正在加载质量警告）...";
+      panel.append(title, note);
+      inspectorBody.append(panel);
+
+      const key = url;
+      const stableKey = selectionStableKey();
+      const cached = state.qaWarningsCache.get(key);
+      if (cached) {
+        renderQaWarningsPanel(panel, cached);
+        return;
+      }
+      getJson(url)
+        .then((payload) => {
+          state.qaWarningsCache.set(key, payload);
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          renderQaWarningsPanel(panel, payload);
+        })
+        .catch((error) => {
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          note.textContent = `QA warning load failed（质量警告加载失败） · ${error instanceof Error ? error.message : String(error)}`;
+        });
+    }
+
+    function roadChainCheckLabel(checkId) {
+      const key = String(checkId || "");
+      return ROAD_CHAIN_CHECK_LABELS[key] || (key ? `${key}（未注释）` : "");
+    }
+
+    function roadChainTierTone(tier) {
+      if (tier === "manual_review_required") {
+        return "";
+      }
+      if (tier === "pass") {
+        return "info";
+      }
+      return "info";
+    }
+
+    function roadChainEvidenceText(check) {
+      const evidence = check.evidence || {};
+      if (check.check_id === "short_edge_absorption") {
+        const shortEdges = Array.isArray(evidence.short_edges) ? evidence.short_edges : [];
+        return shortEdges.length
+          ? shortEdges.slice(0, 4).map((item) => (
+            `${item.road_id} ${Number(item.length_m || 0).toFixed(1)}m · ${item.current_physical_lane_count ?? "?"}->${item.recommended_physical_lane_count ?? "?"} · ${item.status || ""}`
+          )).join("；")
+          : "no short edge（无短边）";
+      }
+      if (check.check_id === "junction_approach_continuity") {
+        const value = check.value || {};
+        const issues = Array.isArray(evidence.issues) ? evidence.issues : [];
+        const firstIssues = issues.slice(0, 3).map((item) => `${item.road_id || item.edge_a || ""}@${item.node_id || ""} ${item.reason || ""}`).filter(Boolean);
+        return firstIssues.length
+          ? `${value.issue_count || firstIssues.length} issue（问题） · ${firstIssues.join("；")}`
+          : `${value.approach_count || 0} approach（入口） continuous（连续）`;
+      }
+      if (check.check_id === "lane_count_transition_review") {
+        const transitions = Array.isArray(evidence.transitions) ? evidence.transitions : [];
+        return transitions.length
+          ? transitions.slice(0, 4).map((item) => `${item.from_road_id}->${item.to_road_id} ${item.from_physical_lane_count}->${item.to_physical_lane_count}`).join("；")
+          : "no transition（无变化）";
+      }
+      if (check.check_id === "arterial_chain_lane_consistency") {
+        return `lane counts（车道数） ${qaValueText(evidence.lane_count_by_road || {}) || "unknown"} · highway（道路等级） ${qaValueText(evidence.highway_counts || {}) || "unknown"}`;
+      }
+      return qaValueText(check.value);
+    }
+
+    function renderRoadChainReviewPanel(panel, payload) {
+      const checks = Array.isArray(payload.checks) ? payload.checks : [];
+      const selection = payload.selection || {};
+      const tierCounts = payload.tier_counts || {};
+      panel.replaceChildren();
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Road-chain Review（道路链审查）";
+      panel.append(title);
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = `${selection.edge_count || 0} edge（边） · ${Number(selection.total_length_m || 0).toFixed(1)} m · ${selection.active_override_count || 0} active override（激活覆盖） · ${payload.mutation_policy || "review_only_no_geometry_mutation（只审查不修改几何）"}`;
+      panel.append(note);
+
+      const status = document.createElement("div");
+      status.className = "lane-upgrade-status semantic-evidence-status";
+      appendSemanticStatusItem(status, "Status", payload.status || "unknown");
+      appendSemanticStatusItem(status, "Review", String(payload.scoped_warning_count || 0));
+      appendSemanticStatusItem(status, "Short", String(selection.short_edge_count || 0));
+      panel.append(status);
+
+      const flags = document.createElement("div");
+      flags.className = "semantic-evidence-flags";
+      const tierEntries = Object.entries(tierCounts);
+      if (tierEntries.length) {
+        for (const [tier, count] of tierEntries) {
+          const item = document.createElement("span");
+          item.className = "semantic-evidence-flag";
+          item.textContent = `${semanticLabel(tier, ROAD_CHAIN_TIER_LABELS)} · ${count}`;
+          flags.append(item);
+        }
+      } else {
+        const item = document.createElement("span");
+        item.className = "semantic-evidence-flag";
+        item.textContent = "no_road_chain_checks（无道路链检查）";
+        flags.append(item);
+      }
+      panel.append(flags);
+
+      const body = document.createElement("div");
+      body.className = "inspector-details-body";
+      appendRowTo(body, "road-chain（道路链）", previewListText(selection.road_chain_ids, ""), true);
+      appendRowTo(body, "road ids（道路编号）", previewListText(selection.road_ids, ""), true);
+      appendRowTo(body, "lane counts（车道数）", qaValueText(selection.lane_count_counts), true);
+      appendRowTo(body, "source lanes（源车道）", qaValueText(selection.source_lane_count_counts), true);
+      appendRowTo(body, "highway（道路等级）", qaValueText(selection.highway_counts), true);
+      appendRowTo(body, "endpoint kinds（端点类型）", qaValueText(selection.endpoint_node_kind_counts), true);
+      panel.append(body);
+
+      const list = document.createElement("div");
+      list.className = "qa-warning-list";
+      if (!checks.length) {
+        const item = document.createElement("div");
+        item.className = "qa-warning-item info";
+        const detail = document.createElement("div");
+        detail.className = "qa-warning-detail";
+        detail.textContent = "No road-chain review result matched this selection（当前选择没有道路链审查结果）。";
+        item.append(detail);
+        list.append(item);
+      }
+      for (const check of checks.slice(0, 8)) {
+        const item = document.createElement("div");
+        item.className = `qa-warning-item ${roadChainTierTone(check.tier)}`;
+        const head = document.createElement("div");
+        head.className = "qa-warning-item-title";
+        const label = document.createElement("span");
+        label.textContent = roadChainCheckLabel(check.check_id);
+        label.title = label.textContent;
+        const tier = document.createElement("div");
+        tier.className = "qa-warning-tier";
+        tier.textContent = semanticLabel(check.tier, ROAD_CHAIN_TIER_LABELS);
+        head.append(label, tier);
+
+        const detail = document.createElement("div");
+        detail.className = "qa-warning-detail";
+        detail.textContent = `${check.message || ""} · ${roadChainEvidenceText(check)}`;
+
+        const recommendation = document.createElement("div");
+        recommendation.className = "qa-warning-detail";
+        recommendation.textContent = `recommendation（建议） ${check.recommendation || "manual review（人工复核）"}`;
+
+        item.append(head, detail, recommendation);
+        list.append(item);
+      }
+      panel.append(list);
+    }
+
+    function appendRoadChainReviewPanel(data) {
+      const url = roadChainReviewUrlForData(data);
+      if (!url) {
+        return;
+      }
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Road-chain Review（道路链审查）";
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = "loading road-chain review（正在加载道路链审查）...";
+      panel.append(title, note);
+      inspectorBody.append(panel);
+
+      const key = url;
+      const stableKey = selectionStableKey();
+      const cached = state.roadChainReviewCache.get(key);
+      if (cached) {
+        renderRoadChainReviewPanel(panel, cached);
+        return;
+      }
+      getJson(url)
+        .then((payload) => {
+          state.roadChainReviewCache.set(key, payload);
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          renderRoadChainReviewPanel(panel, payload);
+        })
+        .catch((error) => {
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          note.textContent = `road-chain review load failed（道路链审查加载失败） · ${error instanceof Error ? error.message : String(error)}`;
+        });
+    }
+
+    function junctionCheckLabel(checkId) {
+      const key = String(checkId || "");
+      return JUNCTION_CHECK_LABELS[key] || (key ? `${key}（未注释）` : "");
+    }
+
+    function junctionTierTone(tier) {
+      return tier === "manual_review_required" ? "" : "info";
+    }
+
+    function junctionEvidenceText(check) {
+      const value = check.value || {};
+      const evidence = check.evidence || {};
+      const issues = Array.isArray(evidence.issues) ? evidence.issues : [];
+      if (!issues.length) {
+        if (check.check_id === "turn_curve_radius_review") {
+          return `${value.curve_count || 0} curve（曲线） · min radius（最小半径） ${value.min_radius_m ?? "unknown"}`;
+        }
+        if (check.check_id === "approach_exit_lane_compatibility_check") {
+          return `${value.connection_count || 0} movement（通行关系） compatible（兼容）`;
+        }
+        if (check.check_id === "junction_lane_count_balance_check") {
+          return `${value.approach_count || 0} approach（入口） balanced（平衡）`;
+        }
+        return `${value.lane_link_count || 0} laneLinks（车道连接） checked（已检查）`;
+      }
+      return issues.slice(0, 3).map((item) => {
+        const where = item.lane_link_id || item.connection_id || item.edge_id || item.from_lane || item.junction_id || "issue";
+        const radius = item.min_radius_m !== undefined ? ` · radius（半径） ${item.min_radius_m}m` : "";
+        return `${where}${radius} · ${item.reason || ""}`;
+      }).join("；");
+    }
+
+    function renderJunctionReviewPanel(panel, payload) {
+      const checks = Array.isArray(payload.checks) ? payload.checks : [];
+      const selection = payload.selection || {};
+      const tierCounts = payload.tier_counts || {};
+      panel.replaceChildren();
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Junction Review（路口审查）";
+      panel.append(title);
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = `${selection.junction_count || 0} junction（路口） · ${selection.connection_count || 0} movement（通行关系） · ${selection.lane_link_count || 0} laneLinks（车道连接） · ${payload.mutation_policy || "review_only_no_geometry_mutation（只审查不修改几何）"}`;
+      panel.append(note);
+
+      const status = document.createElement("div");
+      status.className = "lane-upgrade-status semantic-evidence-status";
+      appendSemanticStatusItem(status, "Status", payload.status || "unknown");
+      appendSemanticStatusItem(status, "Review", String(payload.scoped_warning_count || 0));
+      appendSemanticStatusItem(status, "Links", String(selection.lane_link_count || 0));
+      panel.append(status);
+
+      const flags = document.createElement("div");
+      flags.className = "semantic-evidence-flags";
+      const tierEntries = Object.entries(tierCounts);
+      if (tierEntries.length) {
+        for (const [tier, count] of tierEntries) {
+          const item = document.createElement("span");
+          item.className = "semantic-evidence-flag";
+          item.textContent = `${semanticLabel(tier, JUNCTION_TIER_LABELS)} · ${count}`;
+          flags.append(item);
+        }
+      } else {
+        const item = document.createElement("span");
+        item.className = "semantic-evidence-flag";
+        item.textContent = "no_junction_checks（无路口检查）";
+        flags.append(item);
+      }
+      panel.append(flags);
+
+      const body = document.createElement("div");
+      body.className = "inspector-details-body";
+      appendRowTo(body, "junction ids（路口编号）", previewListText(selection.junction_ids, ""), true);
+      appendRowTo(body, "node ids（节点编号）", previewListText(selection.node_ids, ""), true);
+      appendRowTo(body, "road-chain（道路链）", previewListText(selection.road_chain_ids, ""), true);
+      appendRowTo(body, "turn counts（转向统计）", qaValueText(selection.turn_counts), true);
+      appendRowTo(body, "approach roles（入口角色）", qaValueText(selection.approach_role_counts), true);
+      panel.append(body);
+
+      const list = document.createElement("div");
+      list.className = "qa-warning-list";
+      if (!checks.length) {
+        const item = document.createElement("div");
+        item.className = "qa-warning-item info";
+        const detail = document.createElement("div");
+        detail.className = "qa-warning-detail";
+        detail.textContent = "No junction review result matched this selection（当前选择没有路口审查结果）。";
+        item.append(detail);
+        list.append(item);
+      }
+      for (const check of checks.slice(0, 8)) {
+        const item = document.createElement("div");
+        item.className = `qa-warning-item ${junctionTierTone(check.tier)}`;
+        const head = document.createElement("div");
+        head.className = "qa-warning-item-title";
+        const label = document.createElement("span");
+        label.textContent = junctionCheckLabel(check.check_id);
+        label.title = label.textContent;
+        const tier = document.createElement("div");
+        tier.className = "qa-warning-tier";
+        tier.textContent = semanticLabel(check.tier, JUNCTION_TIER_LABELS);
+        head.append(label, tier);
+
+        const detail = document.createElement("div");
+        detail.className = "qa-warning-detail";
+        detail.textContent = `${check.message || ""} · ${junctionEvidenceText(check)}`;
+
+        const recommendation = document.createElement("div");
+        recommendation.className = "qa-warning-detail";
+        recommendation.textContent = `recommendation（建议） ${check.recommendation || "manual review（人工复核）"}`;
+
+        item.append(head, detail, recommendation);
+        list.append(item);
+      }
+      panel.append(list);
+    }
+
+    function appendJunctionReviewPanel(data) {
+      const url = junctionReviewUrlForData(data);
+      if (!url) {
+        return;
+      }
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Junction Review（路口审查）";
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = "loading junction review（正在加载路口审查）...";
+      panel.append(title, note);
+      inspectorBody.append(panel);
+
+      const key = url;
+      const stableKey = selectionStableKey();
+      const cached = state.junctionReviewCache.get(key);
+      if (cached) {
+        renderJunctionReviewPanel(panel, cached);
+        return;
+      }
+      getJson(url)
+        .then((payload) => {
+          state.junctionReviewCache.set(key, payload);
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          renderJunctionReviewPanel(panel, payload);
+        })
+        .catch((error) => {
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          note.textContent = `junction review load failed（路口审查加载失败） · ${error instanceof Error ? error.message : String(error)}`;
+        });
+    }
+
+    function packageLifecycleCheckLabel(checkId) {
+      const key = String(checkId || "");
+      return PACKAGE_LIFECYCLE_CHECK_LABELS[key] || (key ? `${key}（未注释）` : "");
+    }
+
+    function packageLifecycleTierTone(tier) {
+      return tier === "manual_review_required" ? "" : "info";
+    }
+
+    function packageLifecycleEvidenceText(check) {
+      const value = check.value || {};
+      const evidence = check.evidence || {};
+      if (check.check_id === "package_changelog_presence") {
+        return `entries（正式条目） ${value.entry_count || 0} · latest（最新） ${value.latest_entry_count || 0} · ${value.path || ""}`;
+      }
+      if (check.check_id === "package_changelog_latest_coverage") {
+        return `${value.package_version || ""} · registered（已登记） ${value.latest_entry_count || 0} · draft（草案） ${value.draft_item_count || 0}`;
+      }
+      if (check.check_id === "milestone_registry_presence") {
+        return `entries（正式条目） ${value.entry_count || 0} · latest（最新） ${value.latest_entry_count || 0} · ${value.path || ""}`;
+      }
+      if (check.check_id === "milestone_candidate_registry") {
+        return `${value.package_version || ""} · latest entries（最新条目） ${value.latest_entry_count || 0} · ${(value.registered_statuses || []).join(", ")}`;
+      }
+      if (check.check_id === "stable_handoff_milestone_readiness") {
+        return `${value.package_version || ""} · stable（稳定） ${value.stable_milestone_count || 0} · candidate（候选） ${value.candidate_milestone_count || 0} · QA ${value.qa_gate_status || ""}`;
+      }
+      if (check.check_id === "experimental_package_archive_review") {
+        return `${value.archive_candidate_count || 0}/${value.package_count || 0} archive candidate（归档候选） · keep latest（保留最近） ${value.keep_latest_count || 0}`;
+      }
+      if (check.check_id === "package_diff_summary_available") {
+        return `${value.previous_package || ""} -> ${value.latest_package || ""} · count changes（计数变化） ${value.count_change_count || 0} · artifact changes（资产变化） ${value.source_artifact_change_count || 0}`;
+      }
+      if (check.check_id === "latest_pointer_consistency") {
+        return `${value.latest_pointer_version || ""} · highest（最高版本） ${value.highest_package_version || ""}`;
+      }
+      return qaValueText(value);
+    }
+
+    function renderPackageLifecyclePanel(panel, payload) {
+      const checks = Array.isArray(payload.checks) ? payload.checks : [];
+      const latest = payload.latest || {};
+      const previous = payload.previous || {};
+      const milestone = payload.milestone_candidate || {};
+      const archive = payload.archive_review || {};
+      const changelog = payload.changelog_draft || {};
+      const changelogRegistry = payload.changelog_registry || {};
+      const milestoneRegistry = payload.milestone_registry || {};
+      const stableHandoff = payload.stable_handoff || {};
+      const tierCounts = payload.tier_counts || {};
+      panel.replaceChildren();
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Package Lifecycle（数据包生命周期）";
+      panel.append(title);
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = `${latest.version || "unknown"} latest（最新） · ${payload.package_count || 0} package（数据包） · ${archive.archive_candidate_count || 0} archive candidate（归档候选） · ${payload.mutation_policy || "review_only_no_package_mutation（只审查不修改数据包）"}`;
+      panel.append(note);
+
+      const status = document.createElement("div");
+      status.className = "lane-upgrade-status semantic-evidence-status";
+      appendSemanticStatusItem(status, "Status", payload.status || "unknown");
+      appendSemanticStatusItem(status, "Review", String(payload.scoped_warning_count || 0));
+      appendSemanticStatusItem(status, "Milestone", milestone.status || "unknown");
+      appendSemanticStatusItem(status, "Handoff", stableHandoff.status || "unknown");
+      panel.append(status);
+
+      const flags = document.createElement("div");
+      flags.className = "semantic-evidence-flags";
+      const tierEntries = Object.entries(tierCounts);
+      if (tierEntries.length) {
+        for (const [tier, count] of tierEntries) {
+          const item = document.createElement("span");
+          item.className = "semantic-evidence-flag";
+          item.textContent = `${semanticLabel(tier, PACKAGE_LIFECYCLE_TIER_LABELS)} · ${count}`;
+          flags.append(item);
+        }
+      } else {
+        const item = document.createElement("span");
+        item.className = "semantic-evidence-flag";
+        item.textContent = "no_lifecycle_checks（无生命周期检查）";
+        flags.append(item);
+      }
+      panel.append(flags);
+
+      const body = document.createElement("div");
+      body.className = "inspector-details-body";
+      appendRowTo(body, "latest package（最新数据包）", latest.version || "", true);
+      appendRowTo(body, "previous package（上一数据包）", previous.version || "", true);
+      appendRowTo(body, "QA gate（质量门禁）", latest.qa_gate_status || "", true);
+      appendRowTo(body, "counts（计数）", qaValueText(latest.counts || {}), true);
+      appendRowTo(body, "changelog draft（变更日志草案）", `${(changelog.items || []).length || 0} item（条目）`, true);
+      appendRowTo(body, "changelog registry（变更日志注册）", `${changelogRegistry.entry_count || 0} entry（条目） · latest（最新） ${changelogRegistry.latest_entry_count || 0}`, true);
+      appendRowTo(body, "milestone registry（里程碑注册）", `${milestoneRegistry.entry_count || 0} entry（条目） · latest（最新） ${milestoneRegistry.latest_entry_count || 0}`, true);
+      appendRowTo(body, "milestone label（里程碑标签）", milestone.recommended_label || "", true);
+      appendRowTo(body, "stable handoff（稳定交付）", stableHandoff.status || "", true);
+      panel.append(body);
+
+      const list = document.createElement("div");
+      list.className = "qa-warning-list";
+      for (const check of checks.slice(0, 8)) {
+        const item = document.createElement("div");
+        item.className = `qa-warning-item ${packageLifecycleTierTone(check.tier)}`;
+        const head = document.createElement("div");
+        head.className = "qa-warning-item-title";
+        const label = document.createElement("span");
+        label.textContent = packageLifecycleCheckLabel(check.check_id);
+        label.title = label.textContent;
+        const tier = document.createElement("div");
+        tier.className = "qa-warning-tier";
+        tier.textContent = semanticLabel(check.tier, PACKAGE_LIFECYCLE_TIER_LABELS);
+        head.append(label, tier);
+
+        const detail = document.createElement("div");
+        detail.className = "qa-warning-detail";
+        detail.textContent = `${check.message || ""} · ${packageLifecycleEvidenceText(check)}`;
+
+        const recommendation = document.createElement("div");
+        recommendation.className = "qa-warning-detail";
+        recommendation.textContent = `recommendation（建议） ${check.recommendation || "manual review（人工复核）"}`;
+
+        item.append(head, detail, recommendation);
+        list.append(item);
+      }
+      panel.append(list);
+    }
+
+    function appendPackageLifecyclePanel() {
+      const url = packageLifecycleUrlForData();
+      if (!url) {
+        return;
+      }
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Package Lifecycle（数据包生命周期）";
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = "loading package lifecycle（正在加载数据包生命周期）...";
+      panel.append(title, note);
+      inspectorBody.append(panel);
+
+      const cached = state.packageLifecycleCache.get(url);
+      if (cached) {
+        renderPackageLifecyclePanel(panel, cached);
+        return;
+      }
+      getJson(url)
+        .then((payload) => {
+          state.packageLifecycleCache.set(url, payload);
+          if (!panel.isConnected) {
+            return;
+          }
+          renderPackageLifecyclePanel(panel, payload);
+        })
+        .catch((error) => {
+          if (!panel.isConnected) {
+            return;
+          }
+          note.textContent = `package lifecycle load failed（数据包生命周期加载失败） · ${error instanceof Error ? error.message : String(error)}`;
+        });
+    }
+
+    function houdiniHandoffCheckLabel(checkId) {
+      const key = String(checkId || "");
+      return HOUDINI_HANDOFF_CHECK_LABELS[key] || (key ? `${key}（未注释）` : "");
+    }
+
+    function houdiniHandoffTierTone(tier) {
+      if (tier === "blocker") {
+        return "";
+      }
+      return tier === "manual_review_required" ? "" : "info";
+    }
+
+    function houdiniHandoffEvidenceText(check) {
+      const value = check.value || {};
+      if (check.check_id === "compatibility_version_declared") {
+        return `${value.actual_compatibility_version || "missing"} / required（要求） ${value.required_compatibility_version || ""}`;
+      }
+      if (check.check_id === "houdini_input_missing_file_check") {
+        return `${value.input_count || 0} input（输入） · missing（缺失） ${value.missing_input_count || 0}`;
+      }
+      if (check.check_id === "input_asset_hash_validation") {
+        return `${value.input_count || 0} input（输入） · missing hash（缺失哈希） ${value.missing_hash_count || 0} · mismatch（不匹配） ${value.hash_mismatch_count || 0}`;
+      }
+      if (check.check_id === "houdini_outputs_contract") {
+        return `missing outputs（缺失输出） ${value.missing_output_count || 0} · missing groups（缺失图元组） ${value.missing_primitive_group_count || 0}`;
+      }
+      if (check.check_id === "houdini_import_qa_report") {
+        return `${value.status || "unknown"} · houdini_status（Houdini 状态） ${value.houdini_status || "unknown"}`;
+      }
+      if (check.check_id === "stable_handoff_readiness") {
+        return `QA ${value.qa_gate_status || ""} · semantic（语义） ${value.semantic_review_status || ""} · import（导入） ${value.import_qa_status || ""}`;
+      }
+      return qaValueText(value);
+    }
+
+    function renderHoudiniHandoffPanel(panel, payload) {
+      const checks = Array.isArray(payload.checks) ? payload.checks : [];
+      const pkg = payload.package || {};
+      const compatibility = payload.compatibility || {};
+      const importQa = payload.import_qa_report || {};
+      const tierCounts = payload.tier_counts || {};
+      const inputAssets = Array.isArray(payload.input_assets) ? payload.input_assets : [];
+      panel.replaceChildren();
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Houdini Handoff（Houdini 交付）";
+      panel.append(title);
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = `${pkg.version || "unknown"} package（数据包） · ${inputAssets.length} input asset（输入资产） · ${payload.mutation_policy || "review_only_no_houdini_or_package_mutation（只审查不修改 Houdini 或数据包）"}`;
+      panel.append(note);
+
+      const status = document.createElement("div");
+      status.className = "lane-upgrade-status semantic-evidence-status";
+      appendSemanticStatusItem(status, "Status", payload.status || "unknown");
+      appendSemanticStatusItem(status, "Review", String(payload.scoped_warning_count || 0));
+      appendSemanticStatusItem(status, "Compat", compatibility.actual_compatibility_version || "missing");
+      appendSemanticStatusItem(status, "Import", importQa.status || "unknown");
+      panel.append(status);
+
+      const flags = document.createElement("div");
+      flags.className = "semantic-evidence-flags";
+      const tierEntries = Object.entries(tierCounts);
+      if (tierEntries.length) {
+        for (const [tier, count] of tierEntries) {
+          const item = document.createElement("span");
+          item.className = "semantic-evidence-flag";
+          item.textContent = `${semanticLabel(tier, HOUDINI_HANDOFF_TIER_LABELS)} · ${count}`;
+          flags.append(item);
+        }
+      } else {
+        const item = document.createElement("span");
+        item.className = "semantic-evidence-flag";
+        item.textContent = "no_houdini_handoff_checks（无 Houdini 交付检查）";
+        flags.append(item);
+      }
+      panel.append(flags);
+
+      const body = document.createElement("div");
+      body.className = "inspector-details-body";
+      appendRowTo(body, "package（数据包）", pkg.version || "", true);
+      appendRowTo(body, "QA gate（质量门禁）", pkg.qa_gate_status || "", true);
+      appendRowTo(body, "semantic review（语义复核）", pkg.semantic_review_status || "", true);
+      appendRowTo(body, "compatibility（兼容版本）", `${compatibility.actual_compatibility_version || "missing"} / ${compatibility.required_compatibility_version || ""}`, true);
+      appendRowTo(body, "manifest（清单）", pkg.manifest || "", true);
+      appendRowTo(body, "houdini manifest（Houdini 清单）", (payload.houdini_manifest || {}).path || "", true);
+      appendRowTo(body, "input hashes（输入哈希）", `${inputAssets.filter((asset) => asset.package_artifact_hash_matches).length}/${inputAssets.length} match（匹配）`, true);
+      appendRowTo(body, "import QA（导入质量）", `${importQa.status || "unknown"} · ${importQa.houdini_status || "unknown"}`, true);
+      panel.append(body);
+
+      const list = document.createElement("div");
+      list.className = "qa-warning-list";
+      for (const check of checks.slice(0, 8)) {
+        const item = document.createElement("div");
+        item.className = `qa-warning-item ${houdiniHandoffTierTone(check.tier)}`;
+        const head = document.createElement("div");
+        head.className = "qa-warning-item-title";
+        const label = document.createElement("span");
+        label.textContent = houdiniHandoffCheckLabel(check.check_id);
+        label.title = label.textContent;
+        const tier = document.createElement("div");
+        tier.className = "qa-warning-tier";
+        tier.textContent = semanticLabel(check.tier, HOUDINI_HANDOFF_TIER_LABELS);
+        head.append(label, tier);
+
+        const detail = document.createElement("div");
+        detail.className = "qa-warning-detail";
+        detail.textContent = `${check.message || ""} · ${houdiniHandoffEvidenceText(check)}`;
+
+        const recommendation = document.createElement("div");
+        recommendation.className = "qa-warning-detail";
+        recommendation.textContent = `recommendation（建议） ${check.recommendation || "manual review（人工复核）"}`;
+
+        item.append(head, detail, recommendation);
+        list.append(item);
+      }
+      panel.append(list);
+    }
+
+    function appendHoudiniHandoffPanel() {
+      const url = houdiniHandoffUrlForData();
+      if (!url) {
+        return;
+      }
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Houdini Handoff（Houdini 交付）";
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = "loading Houdini handoff（正在加载 Houdini 交付）...";
+      panel.append(title, note);
+      inspectorBody.append(panel);
+
+      const cached = state.houdiniHandoffCache.get(url);
+      if (cached) {
+        renderHoudiniHandoffPanel(panel, cached);
+        return;
+      }
+      getJson(url)
+        .then((payload) => {
+          state.houdiniHandoffCache.set(url, payload);
+          if (!panel.isConnected) {
+            return;
+          }
+          renderHoudiniHandoffPanel(panel, payload);
+        })
+        .catch((error) => {
+          if (!panel.isConnected) {
+            return;
+          }
+          note.textContent = `Houdini handoff load failed（Houdini 交付加载失败） · ${error instanceof Error ? error.message : String(error)}`;
+        });
+    }
+
+    function propagationTone(tier) {
+      if (tier === "high_confidence") {
+        return "high";
+      }
+      if (tier === "medium_confidence") {
+        return "medium";
+      }
+      if (tier === "low_confidence") {
+        return "low";
+      }
+      if (tier === "already_satisfies_target") {
+        return "satisfied";
+      }
+      return "";
+    }
+
+    function propagationConfidenceText(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number.toFixed(2) : "unknown";
+    }
+
+    function propagationLengthText(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? `${number.toFixed(1)} m` : "unknown";
+    }
+
+    function renderPropagationReviewPanel(panel, payload, data = null) {
+      const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
+      const plan = payload.plan || {};
+      const report = payload.report || {};
+      const queue = payload.review_queue || {};
+      const matchedTierCounts = payload.matched_tier_counts || {};
+      const eligibleCandidates = candidates.filter((candidate) => (
+        candidate.confidence_tier === "high_confidence" &&
+        candidate.status === "candidate_high_confidence" &&
+        !(candidate.review_queue || {}).queued
+      ));
+      panel.replaceChildren();
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Propagation Review（传播审查）";
+      panel.append(title);
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = `${payload.matched_candidate_count || 0} matched candidate（匹配候选） / ${payload.total_candidate_count || 0} total（全局总数） · queued（已入队） ${queue.matched_queued_count || 0} · ${plan.policy || "proposal_only_no_active_override"}（只提建议不自动覆盖）`;
+      panel.append(note);
+
+      const status = document.createElement("div");
+      status.className = "lane-upgrade-status propagation-status";
+      appendSemanticStatusItem(status, "High", String(matchedTierCounts.high_confidence || 0));
+      appendSemanticStatusItem(status, "Medium", String(matchedTierCounts.medium_confidence || 0));
+      appendSemanticStatusItem(status, "Low", String(matchedTierCounts.low_confidence || 0));
+      appendSemanticStatusItem(status, "Satisfied", String(matchedTierCounts.already_satisfies_target || 0));
+      panel.append(status);
+
+      const actions = document.createElement("div");
+      actions.className = "propagation-queue-actions";
+      const previewQueueButton = document.createElement("button");
+      previewQueueButton.type = "button";
+      previewQueueButton.className = "lane-upgrade-copy lane-upgrade-secondary";
+      previewQueueButton.textContent = "预览入队";
+      previewQueueButton.disabled = !data || eligibleCandidates.length === 0;
+      const enqueueButton = document.createElement("button");
+      enqueueButton.type = "button";
+      enqueueButton.className = "lane-upgrade-copy";
+      enqueueButton.textContent = "加入审查队列";
+      enqueueButton.disabled = !data || eligibleCandidates.length === 0;
+      actions.append(previewQueueButton, enqueueButton);
+
+      const queueNote = document.createElement("div");
+      queueNote.className = "propagation-queue-note";
+      queueNote.textContent = eligibleCandidates.length
+        ? `${eligibleCandidates.length} high confidence candidate（高置信候选）可入队；入队只记录 review intent（复核意图），不会应用 geometry（几何）。`
+        : "没有新的 high confidence candidate（高置信候选）可入队；已满足目标或已入队项不会重复加入。";
+
+      async function enqueuePropagationCandidates(dryRun) {
+        if (!data || eligibleCandidates.length === 0) {
+          return;
+        }
+        previewQueueButton.disabled = true;
+        enqueueButton.disabled = true;
+        const candidateIds = eligibleCandidates.map((candidate) => candidate.candidate_id).filter(Boolean);
+        queueNote.textContent = dryRun ? "checking review queue preview（正在预览审查队列）..." : "writing review queue（正在写入审查队列）...";
+        try {
+          const result = await postJson(
+            "/api/propagation/review-queue/enqueue",
+            propagationReviewQueuePayload(data, candidateIds, dryRun)
+          );
+          queueNote.textContent = dryRun
+            ? `预览：${result.proposed_enqueue_count || 0} 个 candidate（候选项）可入队，${result.skipped_count || 0} 个跳过；不会写文件。`
+            : `已入队：${result.enqueued_count || 0} 个 candidate（候选项）；后续仍需逐条确认并通过 transaction（事务）应用。`;
+          if (!dryRun) {
+            const url = propagationReviewUrlForData(data);
+            if (url) {
+              state.propagationReviewCache.delete(url);
+              const refreshed = await getJson(url);
+              state.propagationReviewCache.set(url, refreshed);
+              if (panel.isConnected && selectionStableKey()) {
+                renderPropagationReviewPanel(panel, refreshed, data);
+              }
+            }
+          }
+        } catch (error) {
+          queueNote.textContent = `review queue failed（审查队列失败） · ${error instanceof Error ? error.message : String(error)}`;
+        } finally {
+          if (dryRun || queueNote.textContent.startsWith("review queue failed")) {
+            previewQueueButton.disabled = !data || eligibleCandidates.length === 0;
+            enqueueButton.disabled = !data || eligibleCandidates.length === 0;
+          }
+        }
+      }
+
+      previewQueueButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        enqueuePropagationCandidates(true);
+      });
+      enqueueButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        enqueuePropagationCandidates(false);
+      });
+      panel.append(actions, queueNote);
+
+      const flags = document.createElement("div");
+      flags.className = "semantic-evidence-flags";
+      const tierEntries = Object.entries(matchedTierCounts);
+      if (tierEntries.length) {
+        for (const [tier, count] of tierEntries) {
+          const item = document.createElement("span");
+          item.className = "semantic-evidence-flag";
+          item.textContent = `${semanticLabel(tier, PROPAGATION_TIER_LABELS)} · ${count}`;
+          flags.append(item);
+        }
+      } else {
+        const item = document.createElement("span");
+        item.className = "semantic-evidence-flag";
+        item.textContent = "no_matched_candidate（无匹配传播候选）";
+        flags.append(item);
+      }
+      panel.append(flags);
+
+      const body = document.createElement("div");
+      body.className = "inspector-details-body";
+      const selection = payload.selection || {};
+      appendRowTo(body, "plan version（计划版本）", plan.version || "", true);
+      appendRowTo(body, "road ids（道路编号）", previewListText(selection.road_ids, ""), true);
+      appendRowTo(body, "road-chain（道路链）", previewListText(selection.road_chain_ids, ""), true);
+      appendRowTo(body, "endpoint nodes（端点节点）", previewListText(selection.endpoint_node_ids, ""), true);
+      appendRowTo(body, "global status（全局状态）", qaValueText(report.status_counts), true);
+      appendRowTo(body, "rule counts（规则计数）", qaValueText(report.rule_counts), true);
+      panel.append(body);
+
+      const list = document.createElement("div");
+      list.className = "propagation-candidate-list";
+      if (!candidates.length) {
+        const item = document.createElement("div");
+        item.className = "propagation-candidate-item satisfied";
+        const detail = document.createElement("div");
+        detail.className = "propagation-candidate-detail";
+        detail.textContent = "当前选择没有直接匹配的 propagation candidate（传播候选）；系统仍保留全局 proposal-only（只提建议）计划供后续道路审查使用。";
+        item.append(detail);
+        list.append(item);
+      }
+      for (const candidate of candidates.slice(0, 8)) {
+        const tier = candidate.confidence_tier || "";
+        const source = candidate.source || {};
+        const target = candidate.target || {};
+        const junction = candidate.junction || {};
+        const item = document.createElement("div");
+        item.className = `propagation-candidate-item ${propagationTone(tier)}`;
+        const head = document.createElement("div");
+        head.className = "propagation-candidate-title";
+        const label = document.createElement("span");
+        label.textContent = `${candidate.candidate_id || "candidate"} · ${semanticLabel(candidate.rule_id, PROPAGATION_RULE_LABELS)}`;
+        label.title = label.textContent;
+        const tierNode = document.createElement("div");
+        tierNode.className = "propagation-tier";
+        tierNode.textContent = semanticLabel(tier, PROPAGATION_TIER_LABELS);
+        head.append(label, tierNode);
+
+        const scope = document.createElement("div");
+        scope.className = "propagation-candidate-detail";
+        scope.textContent = `${semanticLabel(candidate.relation, PROPAGATION_RELATION_LABELS)} · confidence（置信度） ${propagationConfidenceText(candidate.confidence)} · status（状态） ${semanticLabel(candidate.status, PROPAGATION_STATUS_LABELS)}`;
+
+        const flow = document.createElement("div");
+        flow.className = "propagation-candidate-detail";
+        flow.textContent = `source（来源） ${source.road_id || "unknown"} -> target（目标） ${target.road_id || "unknown"} · lanes（车道） ${target.current_physical_lane_count ?? "?"} -> ${target.proposed_target_physical_lane_count ?? "?"} · length（长度） ${propagationLengthText(target.length_m)}`;
+
+        const context = document.createElement("div");
+        context.className = "propagation-candidate-detail";
+        context.textContent = `junction（路口） ${junction.junction_node_id || "none"} · risk policy（风险策略） ${candidate.risk_policy || "manual_review_required（需要人工复核）"}`;
+
+        const reason = document.createElement("div");
+        reason.className = "propagation-candidate-detail";
+        reason.textContent = `reason（原因） ${candidate.rationale || "no rationale（无理由）"}`;
+
+        item.append(head, scope, flow, context, reason);
+        list.append(item);
+      }
+      panel.append(list);
+    }
+
+    function appendPropagationReviewPanel(data) {
+      const url = propagationReviewUrlForData(data);
+      if (!url) {
+        return;
+      }
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Propagation Review（传播审查）";
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = "loading propagation candidates（正在加载传播候选）...";
+      panel.append(title, note);
+      inspectorBody.append(panel);
+
+      const key = url;
+      const stableKey = selectionStableKey();
+      const cached = state.propagationReviewCache.get(key);
+      if (cached) {
+        renderPropagationReviewPanel(panel, cached, data);
+        return;
+      }
+      getJson(url)
+        .then((payload) => {
+          state.propagationReviewCache.set(key, payload);
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          renderPropagationReviewPanel(panel, payload, data);
+        })
+        .catch((error) => {
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          note.textContent = `propagation review load failed（传播审查加载失败） · ${error instanceof Error ? error.message : String(error)}`;
+        });
+    }
+
+    function renderSemanticEvidencePanel(panel, payload) {
+      const records = payload.records || [];
+      panel.replaceChildren();
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Semantic Evidence（语义证据）";
+      panel.append(title);
+
+      if (!records.length) {
+        const note = document.createElement("div");
+        note.className = "lane-upgrade-note";
+        note.textContent = "当前选择没有匹配的 semantic evidence（语义证据）。";
+        panel.append(note);
+        return;
+      }
+
+      const summary = semanticRecordSummary(records);
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = `${records.length} road edge（道路边） · ${summary.activeCount} active override（激活覆盖） · ${summary.onewayCount} source oneway（源单行）`;
+      panel.append(note);
+
+      const status = document.createElement("div");
+      status.className = "lane-upgrade-status semantic-evidence-status";
+      appendSemanticStatusItem(status, "源车道", summary.sourceLaneValues || "unknown");
+      appendSemanticStatusItem(status, "几何车道", summary.geometryLaneValues || "unknown");
+      appendSemanticStatusItem(status, "置信度", summary.confidenceValues || "unknown");
+      panel.append(status);
+
+      const flags = document.createElement("div");
+      flags.className = "semantic-evidence-flags";
+      if (summary.flags.length) {
+        for (const [flag, count] of summary.flags) {
+          const item = document.createElement("span");
+          item.className = "semantic-evidence-flag";
+          item.title = `${flag} · ${count}`;
+          item.textContent = `${semanticLabel(flag, SEMANTIC_FLAG_LABELS)}${records.length > 1 ? ` · ${count}` : ""}`;
+          flags.append(item);
+        }
+      } else {
+        const item = document.createElement("span");
+        item.className = "semantic-evidence-flag";
+        item.textContent = "no_review_flags（无复核标记）";
+        flags.append(item);
+      }
+      panel.append(flags);
+
+      const body = document.createElement("div");
+      body.className = "inspector-details-body";
+      appendRowTo(body, "width source（宽度来源）", summary.widthSources || "unknown", true);
+      appendRowTo(body, "road ids（道路编号）", joinedUnique(records.map((record) => record.road_id)), true);
+      appendRowTo(body, "road-chain（道路链）", joinedUnique(records.map((record) => record.road_chain_id)), true);
+      appendRowTo(body, "highway（道路等级）", joinedUnique(records.map((record) => record.highway)), true);
+      appendRowTo(body, "source lanes（源车道）", joinedUnique(records.map((record) => record.source?.lanes_raw || record.source?.lanes)), true);
+      appendRowTo(body, "oneway（单行）", `${summary.onewayCount}/${records.length}`, true);
+      panel.append(body);
+    }
+
+    function appendSemanticEvidencePanel(data) {
+      const url = semanticEvidenceUrlForData(data);
+      if (!url) {
+        return;
+      }
+      const panel = document.createElement("div");
+      panel.className = "lane-upgrade-panel";
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-title";
+      title.textContent = "Semantic Evidence（语义证据）";
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-note";
+      note.textContent = "loading semantic evidence（正在加载语义证据）...";
+      panel.append(title, note);
+      inspectorBody.append(panel);
+
+      const key = url;
+      const stableKey = selectionStableKey();
+      const cached = state.semanticEvidenceCache.get(key);
+      if (cached) {
+        renderSemanticEvidencePanel(panel, cached);
+        return;
+      }
+      getJson(url)
+        .then((payload) => {
+          state.semanticEvidenceCache.set(key, payload);
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          renderSemanticEvidencePanel(panel, payload);
+        })
+        .catch((error) => {
+          if (!panel.isConnected || selectionStableKey() !== stableKey) {
+            return;
+          }
+          note.textContent = `semantic evidence load failed（语义证据加载失败） · ${error instanceof Error ? error.message : String(error)}`;
+        });
+    }
+
     function laneForgeAffectedText(job) {
       const scope = job?.preview?.affected_scope || {};
       const nodes = Array.isArray(scope.adjacent_junction_node_ids) ? scope.adjacent_junction_node_ids : [];
@@ -2593,6 +4410,311 @@
         }
         await sleep(1200);
       }
+    }
+
+    const LANE_FORGE_TIMELINE_FALLBACK = [
+      {
+        id: "submit_request",
+        label: "submit request（提交请求）",
+        description: "viewer validates scope and queues a background job"
+      },
+      {
+        id: "create_transaction",
+        label: "create transaction（创建事务）",
+        description: "write auditable lane upgrade or restore transaction"
+      },
+      {
+        id: "rebuild_lane_graph",
+        label: "rebuild lane graph（重建车道图）",
+        description: "rebuild lane centerlines, laneLinks and junction surfaces"
+      },
+      {
+        id: "run_qa_gate",
+        label: "run QA gate（运行质量门禁）",
+        description: "evaluate rebuilt QA reports and package gate status"
+      },
+      {
+        id: "plan_propagation",
+        label: "plan propagation（规划传播）",
+        description: "refresh proposal-only propagation candidates"
+      },
+      {
+        id: "publish_package",
+        label: "publish package（发布数据包）",
+        description: "publish the next LaneForge package"
+      },
+      {
+        id: "export_svg",
+        label: "export SVG QA view（导出 SVG 审查图）",
+        description: "regenerate the SVG review drawing"
+      }
+    ];
+
+    const LANE_FORGE_TIMELINE_STATUS_LABELS = {
+      pending: "pending（待执行）",
+      running: "running（执行中）",
+      completed: "done（完成）",
+      failed: "failed（失败）"
+    };
+
+    const LANE_FORGE_TIMELINE_SHORT_LABELS = {
+      submit_request: "提交请求",
+      create_transaction: "创建事务",
+      rebuild_lane_graph: "重建车道图",
+      run_qa_gate: "运行 QA",
+      plan_propagation: "规划传播",
+      publish_package: "发布数据包",
+      export_svg: "导出 SVG",
+      refresh_viewer_svg: "刷新网页"
+    };
+
+    function plannedLaneForgeTimeline(statusForSubmit = "pending") {
+      return LANE_FORGE_TIMELINE_FALLBACK.map((step, index) => ({
+        ...step,
+        status: index === 0 ? statusForSubmit : "pending",
+        detail: step.description
+      }));
+    }
+
+    function laneForgeCurrentStageLabel(job) {
+      const step = job?.job_summary?.current_timeline_step || {};
+      return LANE_FORGE_TIMELINE_SHORT_LABELS[step.id] || "重建管线";
+    }
+
+    function packageTimelineText(summary, previewSummary) {
+      const before = summary?.package_before || previewSummary?.package_before || "";
+      const after = summary?.package_after || "";
+      const qa = summary?.qa_gate_status_after || previewSummary?.qa_gate_status_before || "";
+      const parts = [];
+      if (before || after) {
+        parts.push(after ? `${before || "unknown"} -> ${after}` : `${before} -> pending`);
+      }
+      if (qa) {
+        parts.push(`QA ${qa}`);
+      }
+      return parts.join(" · ");
+    }
+
+    function renderLaneForgeTimeline(timelineBox, source = null, options = {}) {
+      timelineBox.replaceChildren();
+      const summary = source?.job_summary || {};
+      const previewSummary = source?.preview_summary || source?.preview?.preview_summary || {};
+      let timeline = Array.isArray(summary.timeline) && summary.timeline.length
+        ? summary.timeline
+        : plannedLaneForgeTimeline(options.submitStatus || (source ? "completed" : "pending"));
+
+      const refreshStatus = options.viewerRefreshStatus || (source ? "pending" : "");
+      if (refreshStatus && !timeline.some((step) => step.id === "refresh_viewer_svg")) {
+        timeline = [
+          ...timeline,
+          {
+            id: "refresh_viewer_svg",
+            label: "refresh viewer SVG（刷新网页 SVG）",
+            description: "reload the live SVG layer after package publish",
+            detail: options.viewerRefreshDetail || "browser-side refresh after backend export（后端导出后的网页刷新）",
+            status: refreshStatus
+          }
+        ];
+      }
+
+      const head = document.createElement("div");
+      head.className = "lane-upgrade-timeline-head";
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-timeline-title";
+      title.textContent = "Job Timeline（任务时间线）";
+      const packageText = document.createElement("div");
+      packageText.className = "lane-upgrade-timeline-package";
+      packageText.textContent = packageTimelineText(summary, previewSummary) || "waiting for preview（等待预览）";
+      packageText.title = packageText.textContent;
+      head.append(title, packageText);
+      timelineBox.append(head);
+
+      for (const step of timeline) {
+        const status = step.status || "pending";
+        const row = document.createElement("div");
+        row.className = `lane-upgrade-timeline-row ${status}`;
+
+        const dot = document.createElement("div");
+        dot.className = "lane-upgrade-timeline-dot";
+
+        const main = document.createElement("div");
+        main.className = "lane-upgrade-timeline-main";
+        const label = document.createElement("div");
+        label.className = "lane-upgrade-timeline-label";
+        label.textContent = step.label || step.id || "";
+        label.title = label.textContent;
+        const detail = document.createElement("div");
+        detail.className = "lane-upgrade-timeline-detail";
+        detail.textContent = step.detail || step.description || "";
+        detail.title = detail.textContent;
+        main.append(label, detail);
+
+        const badge = document.createElement("div");
+        badge.className = "lane-upgrade-timeline-badge";
+        badge.textContent = LANE_FORGE_TIMELINE_STATUS_LABELS[status] || status;
+
+        row.append(dot, main, badge);
+        timelineBox.append(row);
+      }
+    }
+
+    function previewListText(values, fallback = "unknown") {
+      if (!Array.isArray(values) || !values.length) {
+        return fallback;
+      }
+      return values.join(", ");
+    }
+
+    function previewNumberText(value) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) {
+        return "0";
+      }
+      if (Math.abs(number - Math.round(number)) < 0.001) {
+        return String(Math.round(number));
+      }
+      return number.toFixed(1);
+    }
+
+    function previewDiffText(diff, unit = "") {
+      const current = previewNumberText(diff?.current ?? 0);
+      const after = previewNumberText(diff?.estimated_after ?? 0);
+      const deltaNumber = Number(diff?.delta ?? 0);
+      const delta = `${deltaNumber > 0 ? "+" : ""}${previewNumberText(deltaNumber)}`;
+      const suffix = unit ? ` ${unit}` : "";
+      return `${current}${suffix} -> ~${after}${suffix} (${delta}${suffix})`;
+    }
+
+    function appendTopologySurfacePreviewRows(body, topology) {
+      if (!topology || !Object.keys(topology).length) {
+        return;
+      }
+      const laneLinks = topology.lane_links || {};
+      const surfaces = topology.surfaces || {};
+      appendRowTo(
+        body,
+        "laneLinks junction scope（路口连接范围）",
+        previewDiffText(laneLinks.junction_scope),
+        true
+      );
+      appendRowTo(
+        body,
+        "laneLinks selected road（选中道路连接）",
+        previewDiffText(laneLinks.selected_road_scope),
+        true
+      );
+      appendRowTo(
+        body,
+        "lane surfaces（车道面）",
+        previewDiffText(surfaces.selected_lane_surfaces),
+        true
+      );
+      appendRowTo(
+        body,
+        "turn surfaces（转向面）",
+        previewDiffText(surfaces.turn_surfaces),
+        true
+      );
+      appendRowTo(
+        body,
+        "junction envelopes（路口包络面）",
+        previewDiffText(surfaces.junction_envelope_surfaces),
+        true
+      );
+      appendRowTo(
+        body,
+        "surface area touched（影响面面积）",
+        `${previewNumberText(surfaces.current_touched_area_m2)} m² current（当前）`,
+        true
+      );
+      appendRowTo(
+        body,
+        "estimate policy（估算策略）",
+        topology.estimate_policy || "estimate only（只读估算）",
+        true
+      );
+    }
+
+    function renderLaneUpgradePreviewLoading(previewBox) {
+      previewBox.hidden = false;
+      previewBox.replaceChildren();
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-preview-title";
+      title.textContent = "Before / After Preview（前后预览）";
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-preview-note";
+      note.textContent = "loading preview（正在计算预览）...";
+      previewBox.append(title, note);
+    }
+
+    function renderLaneUpgradePreviewError(previewBox, message) {
+      previewBox.hidden = false;
+      previewBox.replaceChildren();
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-preview-title";
+      title.textContent = "Before / After Preview（前后预览）";
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-preview-note";
+      note.textContent = `preview failed（预览失败） · ${message}`;
+      previewBox.append(title, note);
+    }
+
+    function renderLaneUpgradePreview(previewBox, preview) {
+      const summary = preview.preview_summary || {};
+      const items = preview.preview_items || [];
+      const topology = preview.topology_surface_preview || summary.topology_surface_preview || {};
+      previewBox.hidden = false;
+      previewBox.replaceChildren();
+
+      const title = document.createElement("div");
+      title.className = "lane-upgrade-preview-title";
+      title.textContent = "Before / After Preview（前后预览）";
+
+      const note = document.createElement("div");
+      note.className = "lane-upgrade-preview-note";
+      note.textContent = `${summary.affected_road_count || items.length || 0} road edge（道路边） · ${summary.affected_junction_count || 0} junction（路口） · ${summary.execution_effect || "transaction -> rebuild -> QA -> publish package"}`;
+
+      const status = document.createElement("div");
+      status.className = "lane-upgrade-status semantic-evidence-status";
+      appendSemanticStatusItem(status, "当前", `${previewListText(summary.current_lane_counts)} 车道`);
+      appendSemanticStatusItem(status, "目标", summary.target_label || "unknown");
+      appendSemanticStatusItem(status, "QA gate", summary.qa_gate_status_before || "unknown");
+
+      const flags = document.createElement("div");
+      flags.className = "semantic-evidence-flags";
+      const flagCounts = summary.semantic_review_flag_counts || {};
+      const entries = Object.entries(flagCounts);
+      if (topology.estimate_only) {
+        const item = document.createElement("span");
+        item.className = "semantic-evidence-flag";
+        item.textContent = "estimate_only（只读估算）";
+        flags.append(item);
+      }
+      if (entries.length) {
+        for (const [flag, count] of entries) {
+          const item = document.createElement("span");
+          item.className = "semantic-evidence-flag";
+          item.title = `${flag} · ${count}`;
+          item.textContent = `${semanticLabel(flag, SEMANTIC_FLAG_LABELS)} · ${count}`;
+          flags.append(item);
+        }
+      } else {
+        const item = document.createElement("span");
+        item.className = "semantic-evidence-flag";
+        item.textContent = "no_semantic_flags（无语义复核标记）";
+        flags.append(item);
+      }
+
+      const body = document.createElement("div");
+      body.className = "inspector-details-body";
+      appendRowTo(body, "package before（修改前包）", summary.package_before || "", true);
+      appendRowTo(body, "road ids（道路编号）", previewListText(summary.road_ids, ""), true);
+      appendRowTo(body, "road-chain（道路链）", previewListText(summary.road_chain_ids, ""), true);
+      appendRowTo(body, "active overrides（激活覆盖）", String(summary.active_override_count_before ?? 0), true);
+      appendRowTo(body, "junction ids（路口编号）", previewListText(summary.affected_junction_node_ids, "none"), true);
+      appendTopologySurfacePreviewRows(body, topology);
+
+      previewBox.append(title, note, status, flags, body);
     }
 
     function appendLaneUpgradePanelV2(data) {
@@ -2703,12 +4825,22 @@
       progressMeta.className = "lane-upgrade-progress-meta";
       progressMeta.append(jobStatus, progressLabel);
 
+      const timelineBox = document.createElement("div");
+      timelineBox.className = "lane-upgrade-timeline";
+      renderLaneForgeTimeline(timelineBox);
+
       const progressBox = document.createElement("div");
       progressBox.className = "lane-upgrade-progress-box";
-      progressBox.append(progressMeta, progressTrack);
+      progressBox.append(progressMeta, progressTrack, timelineBox);
+
+      const previewBox = document.createElement("div");
+      previewBox.className = "lane-upgrade-preview-box";
+      previewBox.hidden = true;
 
       let progressValue = 0;
       let progressTimer = 0;
+      let previewToken = 0;
+      let lastLaneForgeJob = null;
 
       function setProgress(value, label, tone = "") {
         progressValue = clamp(Number(value) || 0, 0, 100);
@@ -2728,6 +4860,7 @@
 
       function startRunningProgress(label) {
         if (progressTimer) {
+          setProgress(progressValue, label);
           return;
         }
         setProgress(Math.max(progressValue, 32), label);
@@ -2754,7 +4887,29 @@
         selectedRequest = requestText;
         output.value = selectedRequest;
         setPanelBusy(false);
-        jobStatus.textContent = `已选择：${label}。点“确定应用”会重建道路和相邻路口。`;
+        jobStatus.textContent = `已选择：${label}。正在生成 before / after preview（前后预览）。`;
+        renderLaneUpgradePreviewLoading(previewBox);
+        renderLaneForgeTimeline(timelineBox, null, { submitStatus: "running" });
+        const token = ++previewToken;
+        postJson("/api/lane-upgrades/preview", payload)
+          .then((preview) => {
+            if (token !== previewToken) {
+              return;
+            }
+            renderLaneUpgradePreview(previewBox, preview);
+            renderLaneForgeTimeline(timelineBox, preview, { viewerRefreshStatus: "pending" });
+            const summary = preview.preview_summary || {};
+            jobStatus.textContent = `预览完成：${summary.affected_road_count || 0} 条 road edge，${summary.affected_junction_count || 0} 个 junction。点“确定应用”会重建道路和相邻路口。`;
+          })
+          .catch((error) => {
+            if (token !== previewToken) {
+              return;
+            }
+            const message = error instanceof Error ? error.message : String(error);
+            renderLaneUpgradePreviewError(previewBox, message);
+            renderLaneForgeTimeline(timelineBox);
+            jobStatus.textContent = `预览失败：${message}`;
+          });
       }
 
       for (const count of [1, 2, 3, 4]) {
@@ -2818,18 +4973,27 @@
         jobStatus.textContent = "正在提交 LaneForge 后台任务...";
         stopRunningProgress();
         setProgress(8, "提交任务");
+        renderLaneForgeTimeline(timelineBox, null, { submitStatus: "running" });
         setStatus("busy", "LaneForge job queued（车道任务已提交）");
         try {
           const job = await postJson("/api/lane-upgrades/apply", selectedPayload);
+          lastLaneForgeJob = job;
           jobStatus.textContent = `任务 ${job.job_id} 已提交，${laneForgeAffectedText(job)}，正在重建。`;
           setProgress(18, "任务已提交");
+          renderLaneForgeTimeline(timelineBox, job, { viewerRefreshStatus: "pending" });
           setStatus("busy", `LaneForge rebuilding（正在重建） · ${job.job_id}`);
           const completed = await waitForLaneForgeJob(job.job_id, (nextJob) => {
-            jobStatus.textContent = `任务 ${nextJob.status} · ${laneForgeAffectedText(nextJob)}`;
+            lastLaneForgeJob = nextJob;
+            renderLaneForgeTimeline(timelineBox, nextJob, { viewerRefreshStatus: "pending" });
+            jobStatus.textContent = `任务 ${nextJob.status} · ${laneForgeCurrentStageLabel(nextJob)} · ${laneForgeAffectedText(nextJob)}`;
             if (nextJob.status === "queued") {
               setProgress(Math.max(progressValue, 18), "排队中");
             } else if (nextJob.status === "running") {
-              startRunningProgress("重建管线中");
+              const percent = Number(nextJob.job_summary?.progress_percent || 0);
+              if (Number.isFinite(percent) && percent > progressValue) {
+                setProgress(Math.min(88, percent), laneForgeCurrentStageLabel(nextJob));
+              }
+              startRunningProgress(laneForgeCurrentStageLabel(nextJob));
             } else if (nextJob.status === "completed") {
               stopRunningProgress();
               setProgress(92, "后台完成，刷新 SVG");
@@ -2843,15 +5007,22 @@
           }
           jobStatus.textContent = `完成：已重建道路和${laneForgeAffectedText(completed)}，正在刷新 SVG。`;
           setProgress(96, "刷新 SVG");
+          renderLaneForgeTimeline(timelineBox, completed, { viewerRefreshStatus: "running" });
           await loadSvg(true);
           await loadScoring(true);
           setProgress(100, "完成");
+          renderLaneForgeTimeline(timelineBox, completed, { viewerRefreshStatus: "completed" });
           setStatus("ready", `LaneForge completed（车道与路口已刷新） · ${new Date().toLocaleTimeString()}`);
           jobStatus.textContent = `完成：道路车道、相邻路口和 SVG 已刷新。`;
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
           stopRunningProgress();
           setProgress(100, "执行失败", "failed");
+          if (lastLaneForgeJob) {
+            renderLaneForgeTimeline(timelineBox, lastLaneForgeJob, { viewerRefreshStatus: "pending" });
+          } else {
+            renderLaneForgeTimeline(timelineBox);
+          }
           jobStatus.textContent = `执行失败：${message}`;
           setStatus("error", `LaneForge failed（执行失败） · ${message}`);
         } finally {
@@ -2867,7 +5038,7 @@
         detailsButton.textContent = output.hidden ? "显示详情" : "隐藏详情";
       });
 
-      panel.append(actions, commandRow, progressBox, output);
+      panel.append(actions, commandRow, previewBox, progressBox, output);
       inspectorBody.append(panel);
     }
 
@@ -3059,6 +5230,13 @@
       selectionReadout.textContent = inspectorTitle.textContent;
       inspectorBody.replaceChildren();
       appendLaneUpgradePanelV2(data);
+      appendQaWarningsPanel(data);
+      appendRoadChainReviewPanel(data);
+      appendJunctionReviewPanel(data);
+      appendPackageLifecyclePanel();
+      appendHoudiniHandoffPanel();
+      appendPropagationReviewPanel(data);
+      appendSemanticEvidencePanel(data);
       appendCornerOptimizationPanel(data);
       appendHitStackPanel(hitStack, state.selectedRef);
       if (caseScore) {
@@ -3475,6 +5653,13 @@
         const text = await response.text();
         const nextSignature = signature(text);
         if (force || nextSignature !== state.lastSignature) {
+          state.semanticEvidenceCache.clear();
+          state.qaWarningsCache.clear();
+          state.roadChainReviewCache.clear();
+          state.junctionReviewCache.clear();
+          state.packageLifecycleCache.clear();
+          state.houdiniHandoffCache.clear();
+          state.propagationReviewCache.clear();
           renderSvg(text);
           state.lastSignature = nextSignature;
           setStatus("ready", `vector viewBox updated（矢量视图框已更新） ${new Date().toLocaleTimeString()} · ${svgPath}${scoringStatusText()}`);

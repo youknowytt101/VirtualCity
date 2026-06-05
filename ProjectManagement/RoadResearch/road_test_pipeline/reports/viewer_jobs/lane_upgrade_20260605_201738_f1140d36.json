@@ -1,0 +1,615 @@
+{
+  "type": "lane_upgrade_viewer_job",
+  "schema": "lane_upgrade_system.viewer_job.v1",
+  "job_id": "lane_upgrade_20260605_201738_f1140d36",
+  "status": "failed",
+  "created_at_local": "2026-06-05T20:17:38",
+  "request": {
+    "action": "set_road_physical_lane_count",
+    "road_id": "e_0000",
+    "canonical_road_id": "cr_0000",
+    "road_ids": [
+      "e_0000",
+      "e_0001",
+      "e_0002",
+      "e_0003",
+      "e_0004",
+      "e_0005",
+      "e_0006",
+      "e_0007"
+    ],
+    "canonical_road_ids": [
+      "cr_0000",
+      "cr_0001",
+      "cr_0002",
+      "cr_0003",
+      "cr_0004",
+      "cr_0005",
+      "cr_0006",
+      "cr_0007"
+    ],
+    "road_chain_id": "rc_27443571",
+    "selection_scope": "road_chain",
+    "target_physical_lane_count": 2,
+    "apply_selected_geometry": false,
+    "apply_all_active_geometry": true
+  },
+  "preview": {
+    "type": "lane_upgrade_preview",
+    "metadata": {
+      "schema": "lane_upgrade_system.viewer_api.v1",
+      "system": "LaneForge",
+      "area_id": "pattaya_central_500m"
+    },
+    "request": {
+      "action": "set_road_physical_lane_count",
+      "road_id": "e_0000",
+      "canonical_road_id": "cr_0000",
+      "road_ids": [
+        "e_0000",
+        "e_0001",
+        "e_0002",
+        "e_0003",
+        "e_0004",
+        "e_0005",
+        "e_0006",
+        "e_0007"
+      ],
+      "canonical_road_ids": [
+        "cr_0000",
+        "cr_0001",
+        "cr_0002",
+        "cr_0003",
+        "cr_0004",
+        "cr_0005",
+        "cr_0006",
+        "cr_0007"
+      ],
+      "road_chain_id": "rc_27443571",
+      "selection_scope": "road_chain",
+      "target_physical_lane_count": 2,
+      "apply_selected_geometry": false,
+      "apply_all_active_geometry": true
+    },
+    "current_active_override": {},
+    "affected_scope": {
+      "scope_policy": "road_chain_ordered_edges_v1",
+      "road_chain_id": "rc_27443571",
+      "target_count": 8,
+      "targets": [
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0000",
+          "canonical_road_id": "cr_0000",
+          "endpoint_node_ids": [
+            "n_0018",
+            "n_0019"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0018"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        },
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0001",
+          "canonical_road_id": "cr_0001",
+          "endpoint_node_ids": [
+            "n_0019",
+            "n_0020"
+          ],
+          "adjacent_junction_node_ids": [],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        },
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0002",
+          "canonical_road_id": "cr_0002",
+          "endpoint_node_ids": [
+            "n_0020",
+            "n_0028"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0028"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        },
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0003",
+          "canonical_road_id": "cr_0003",
+          "endpoint_node_ids": [
+            "n_0028",
+            "n_0030"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0028",
+            "n_0030"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        },
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0004",
+          "canonical_road_id": "cr_0004",
+          "endpoint_node_ids": [
+            "n_0030",
+            "n_0050"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0030",
+            "n_0050"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        },
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0005",
+          "canonical_road_id": "cr_0005",
+          "endpoint_node_ids": [
+            "n_0050",
+            "n_0055"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0050",
+            "n_0055"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        },
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0006",
+          "canonical_road_id": "cr_0006",
+          "endpoint_node_ids": [
+            "n_0055",
+            "n_0060"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0055",
+            "n_0060"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        },
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0007",
+          "canonical_road_id": "cr_0007",
+          "endpoint_node_ids": [
+            "n_0060",
+            "n_0070"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0060",
+            "n_0070"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        }
+      ]
+    },
+    "geometry_application_policy": "apply_all_lane_upgrade_overrides_to_geometry_v1",
+    "execution_cli_command": "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0000 --canonical-road-id cr_0000 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"\npython scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0001 --canonical-road-id cr_0001 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"\npython scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0002 --canonical-road-id cr_0002 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"\npython scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0003 --canonical-road-id cr_0003 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"\npython scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0004 --canonical-road-id cr_0004 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"\npython scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0005 --canonical-road-id cr_0005 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"\npython scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0006 --canonical-road-id cr_0006 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"\npython scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0007 --canonical-road-id cr_0007 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"",
+    "execution_cli_commands": [
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0000 --canonical-road-id cr_0000 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"",
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0001 --canonical-road-id cr_0001 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"",
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0002 --canonical-road-id cr_0002 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"",
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0003 --canonical-road-id cr_0003 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"",
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0004 --canonical-road-id cr_0004 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"",
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0005 --canonical-road-id cr_0005 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"",
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0006 --canonical-road-id cr_0006 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\"",
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0007 --canonical-road-id cr_0007 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443571 to 2 physical lanes\""
+    ],
+    "latest_package": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
+      "data": {
+        "area_id": "pattaya_central_500m",
+        "system": "LaneForge",
+        "latest_package_version": "lane_package_v0083",
+        "path_policy": "portable_lane_package_paths_v1",
+        "latest_package_dir": "lane_package_v0083",
+        "manifest": "manifest.json",
+        "qa_gate_status": "manual_review_required",
+        "qa_warning_summary": {
+          "publishable_warn": 0,
+          "manual_review_required": 6,
+          "blocker": 0
+        },
+        "source_artifacts": {
+          "lane_graph": {
+            "path": "data/processed/pattaya_central_500m_lane_graph.json",
+            "exists": true,
+            "size_bytes": 2002149,
+            "mtime_utc": 1780661839.094464,
+            "sha256": "5a98eaa9e94a0cdd8848a7c758249bdea4599dde027d616a162cdf6de1c82aba"
+          },
+          "pipeline_audit_report": {
+            "path": "reports/pattaya_central_500m_pipeline_audit_report.json",
+            "exists": true,
+            "size_bytes": 71953,
+            "mtime_utc": 1780661839.6535535,
+            "sha256": "51c674d3e063e04d3240040b91dfe7755b420176e0419a9a0bc27a254df9313f"
+          }
+        }
+      }
+    },
+    "notes": [
+      "All active LaneForge lane-count overrides are applied to geometry during the rebuild.",
+      "The selected road's endpoint junction laneLinks and lane surfaces are regenerated before SVG refresh.",
+      "Raw, repaired, canonical and road_graph truth layers are not edited."
+    ]
+  },
+  "command": [
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0000",
+      "--reason",
+      "viewer request: set rc_27443571 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0000",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ],
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0001",
+      "--reason",
+      "viewer request: set rc_27443571 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0001",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ],
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0002",
+      "--reason",
+      "viewer request: set rc_27443571 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0002",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ],
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0003",
+      "--reason",
+      "viewer request: set rc_27443571 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0003",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ],
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0004",
+      "--reason",
+      "viewer request: set rc_27443571 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0004",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ],
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0005",
+      "--reason",
+      "viewer request: set rc_27443571 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0005",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ],
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0006",
+      "--reason",
+      "viewer request: set rc_27443571 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0006",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ],
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0007",
+      "--reason",
+      "viewer request: set rc_27443571 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0007",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ]
+  ],
+  "job_summary": {
+    "type": "lane_upgrade_viewer_job_summary",
+    "schema": "lane_upgrade_system.viewer_job_summary.v1",
+    "job_id": "lane_upgrade_20260605_201738_f1140d36",
+    "status": "failed",
+    "action": "set_road_physical_lane_count",
+    "target_physical_lane_count": 2,
+    "road_ids": [
+      "e_0000",
+      "e_0001",
+      "e_0002",
+      "e_0003",
+      "e_0004",
+      "e_0005",
+      "e_0006",
+      "e_0007"
+    ],
+    "canonical_road_ids": [
+      "cr_0000",
+      "cr_0001",
+      "cr_0002",
+      "cr_0003",
+      "cr_0004",
+      "cr_0005",
+      "cr_0006",
+      "cr_0007"
+    ],
+    "road_chain_id": "rc_27443571",
+    "selection_scope": "road_chain",
+    "affected_road_count": 8,
+    "affected_junction_count": 7,
+    "affected_junction_node_ids": [
+      "n_0018",
+      "n_0028",
+      "n_0030",
+      "n_0050",
+      "n_0055",
+      "n_0060",
+      "n_0070"
+    ],
+    "geometry_application_policy": "apply_all_lane_upgrade_overrides_to_geometry_v1",
+    "package_before": "lane_package_v0083",
+    "package_after": "lane_package_v0089",
+    "qa_gate_status_after": "manual_review_required",
+    "qa_warning_summary_after": {
+      "publishable_warn": 0,
+      "manual_review_required": 6,
+      "blocker": 0
+    },
+    "package_before_summary": {
+      "latest_pointer": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
+      "version": "lane_package_v0083",
+      "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0083/manifest.json",
+      "qa_status": "warn",
+      "qa_gate_status": "manual_review_required",
+      "qa_warning_summary": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "counts": {
+        "lanes": 224,
+        "physical_lane_centerlines": 210,
+        "physical_lane_group_centerlines": 12,
+        "junctions": 49,
+        "lane_links": 318,
+        "continuity_links": 20,
+        "junction_envelope_surfaces": 49,
+        "active_lane_upgrades": 12,
+        "active_corner_optimizations": 6,
+        "corner_optimization_candidates": 18,
+        "corner_optimization_accepted_active": 6,
+        "corner_optimization_accepted_active_candidates": 4,
+        "corner_optimization_accepted_active_overrides": 6,
+        "lane_upgrade_propagation_candidates": 23,
+        "lane_upgrade_propagation_high_confidence": 13
+      }
+    },
+    "package_after_summary": {
+      "latest_pointer": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
+      "version": "lane_package_v0089",
+      "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0089/manifest.json",
+      "qa_status": "warn",
+      "qa_gate_status": "manual_review_required",
+      "qa_warning_summary": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "counts": {
+        "lanes": 218,
+        "physical_lane_centerlines": 204,
+        "physical_lane_group_centerlines": 12,
+        "junctions": 49,
+        "lane_links": 312,
+        "continuity_links": 20,
+        "junction_envelope_surfaces": 49,
+        "active_lane_upgrades": 15,
+        "active_corner_optimizations": 6,
+        "corner_optimization_candidates": 18,
+        "corner_optimization_accepted_active": 6,
+        "corner_optimization_accepted_active_candidates": 4,
+        "corner_optimization_accepted_active_overrides": 6,
+        "lane_upgrade_propagation_candidates": 23,
+        "lane_upgrade_propagation_high_confidence": 12
+      }
+    },
+    "package_diff": {
+      "type": "lane_upgrade_package_diff_summary",
+      "schema": "lane_upgrade_system.package_diff_summary.v1",
+      "package_before": "lane_package_v0083",
+      "package_after": "lane_package_v0089",
+      "package_version_changed": true,
+      "qa_gate_status_before": "manual_review_required",
+      "qa_gate_status_after": "manual_review_required",
+      "qa_gate_status_changed": false,
+      "qa_warning_summary_before": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "qa_warning_summary_after": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "count_changes": {
+        "active_lane_upgrades": {
+          "before": 12,
+          "after": 15,
+          "delta": 3.0
+        },
+        "lane_links": {
+          "before": 318,
+          "after": 312,
+          "delta": -6.0
+        },
+        "lane_upgrade_propagation_high_confidence": {
+          "before": 13,
+          "after": 12,
+          "delta": -1.0
+        },
+        "lanes": {
+          "before": 224,
+          "after": 218,
+          "delta": -6.0
+        },
+        "physical_lane_centerlines": {
+          "before": 210,
+          "after": 204,
+          "delta": -6.0
+        }
+      }
+    },
+    "current_step": 6,
+    "total_steps": 8,
+    "command_count": 8,
+    "exit_code": 1,
+    "created_at_local": "2026-06-05T20:17:38",
+    "started_at_local": "2026-06-05T20:17:38",
+    "completed_at_local": "2026-06-05T20:17:54",
+    "reload_url": ""
+  },
+  "started_at_local": "2026-06-05T20:17:38",
+  "current_step": 6,
+  "total_steps": 8,
+  "current_command": [
+    "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+    "--area-id",
+    "pattaya_central_500m",
+    "--road-id",
+    "e_0005",
+    "--reason",
+    "viewer request: set rc_27443571 to 2 physical lanes",
+    "--reviewer",
+    "web_user",
+    "--source",
+    "web_lane_count_menu",
+    "--canonical-road-id",
+    "cr_0005",
+    "--target-lane-count",
+    "2",
+    "--apply-all-active-geometry"
+  ],
+  "exit_code": 1,
+  "stdout_tail": "_pipeline\\\\reports\\\\pattaya_central_500m_laneforge_current_status.json\",\n    \"laneforge_current_status_md\": \"E:\\\\VirtualCity\\\\ProjectManagement\\\\RoadResearch\\\\road_test_pipeline\\\\CURRENT_LANEFORGE_STATUS.md\",\n    \"topology_qa_report\": \"E:\\\\VirtualCity\\\\ProjectManagement\\\\RoadResearch\\\\road_test_pipeline\\\\reports\\\\qa\\\\pattaya_central_500m_topology_repair_qa_report.json\",\n    \"road_graph_qa_report\": \"E:\\\\VirtualCity\\\\ProjectManagement\\\\RoadResearch\\\\road_test_pipeline\\\\reports\\\\qa\\\\pattaya_central_500m_road_graph_qa_report.json\",\n    \"lane_graph_qa_report\": \"E:\\\\VirtualCity\\\\ProjectManagement\\\\RoadResearch\\\\road_test_pipeline\\\\reports\\\\qa\\\\pattaya_central_500m_lane_graph_qa_report.json\",\n    \"log\": \"E:\\\\VirtualCity\\\\ProjectManagement\\\\RoadResearch\\\\road_test_pipeline\\\\reports\\\\last_rebuild.log\"\n  },\n  \"artifact_identity\": {\n    \"road_graph\": {\n      \"path\": \"data/processed/pattaya_central_500m_road_graph.json\",\n      \"exists\": true,\n      \"size_bytes\": 228947,\n      \"mtime_utc\": 1780661872.8793662,\n      \"sha256\": \"f1b76d7947fc3cf77559be0780e670814872b858fc459b03a404d5ceef32e57f\"\n    },\n    \"junction_semantics\": {\n      \"path\": \"data/processed/pattaya_central_500m_junction_semantics.json\",\n      \"exists\": true,\n      \"size_bytes\": 332445,\n      \"mtime_utc\": 1780661872.9710023,\n      \"sha256\": \"5288bd414e39dad020b6430f30dc5bc1c43887ed6dc1ec51af20e8bb367af4c1\"\n    },\n    \"optimized_centerlines\": {\n      \"path\": \"data/processed/pattaya_central_500m_roads_optimized_centerlines.geojson\",\n      \"exists\": true,\n      \"size_bytes\": 452890,\n      \"mtime_utc\": 1780661873.0375297,\n      \"sha256\": \"5aa3b439c2aede28f645bb52e54459ce3e6e85a528c583a2f92470b2552b502c\"\n    },\n    \"lane_graph\": {\n      \"path\": \"data/processed/pattaya_central_500m_lane_graph.json\",\n      \"exists\": true,\n      \"size_bytes\": 1975213,\n      \"mtime_utc\": 1780661873.224028,\n      \"sha256\": \"b1f6ea6d01c28bcd99fb517e4c128caf53e563bd3a5fa00c2c502d5f825951c8\"\n    },\n    \"lane_surface_v1_geojson\": {\n      \"path\": \"data/preview/pattaya_central_500m_lane_surfaces_v1.geojson\",\n      \"exists\": true,\n      \"size_bytes\": 1241807,\n      \"mtime_utc\": 1780661873.586351,\n      \"sha256\": \"bc966d4d257938446d934bce101ac9ef0f0e3e1cb29e0acecdfae42def031fd9\"\n    },\n    \"lane_geometry_debug_geojson\": {\n      \"path\": \"data/preview/pattaya_central_500m_lane_geometry_debug.geojson\",\n      \"exists\": true,\n      \"size_bytes\": 1847488,\n      \"mtime_utc\": 1780661873.4731941,\n      \"sha256\": \"40c8f3b54438bce4b96b7d6d51ec9afd023b9b8baf7d3ff305c78de9c054c8ff\"\n    },\n    \"pipeline_audit_report\": {\n      \"path\": \"reports/pattaya_central_500m_pipeline_audit_report.json\",\n      \"exists\": true,\n      \"size_bytes\": 71952,\n      \"mtime_utc\": 1780661873.7548757,\n      \"sha256\": \"ba752417ebe111b5e83920e258d97d6b9ca9b8ea7f0bbb3e928546c22a045137\"\n    },\n    \"lane_package_manifest\": {\n      \"path\": \"data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0089/manifest.json\",\n      \"exists\": true,\n      \"size_bytes\": 51612,\n      \"mtime_utc\": 1780661874.0636594,\n      \"sha256\": \"f6701d14da9973c194f56c4cd00b7fb34711b2312768a9fb7c7e9088c3eaa940\"\n    }\n  }\n}\n[LaneForge] Planning LaneForge propagation candidates...\n{\n  \"area_id\": \"pattaya_central_500m\",\n  \"stage\": \"lane_upgrade_propagation_v2\",\n  \"schema\": \"lane_upgrade_system.propagation_report.v2\",\n  \"path_policy\": \"pipeline_root_relative_paths_v1\",\n  \"status\": \"pass\",\n  \"inputs\": {\n    \"road_graph\": \"data/processed/pattaya_central_500m_road_graph.json\",\n    \"junction_semantics\": \"data/processed/pattaya_central_500m_junction_semantics.json\",\n    \"active_overrides\": \"data/processed/pattaya_central_500m_lane_upgrade_overrides.json\"\n  },\n  \"outputs\": {\n    \"plan\": \"data/lane_upgrade_system/propagation/pattaya_central_500m_lane_upgrade_propagation_plan_v0047.json\",\n    \"report\": \"reports/pattaya_central_500m_lane_upgrade_propagation_report.json\"\n  },\n  \"counts\": {\n    \"active_upgrades\": 15,\n    \"candidates\": 23,\n    \"high_confidence_candidates\": 12,\n    \"review_candidates\": 4,\n    \"context_review_candidates\": 2,\n    \"already_satisfies_target\": 5\n  },\n  \"status_counts\": {\n    \"already_satisfies_target\": 5,\n    \"candidate_high_confidence\": 12,\n    \"candidate_review\": 4,\n    \"context_review\": 2\n  },\n  \"rule_counts\": {\n    \"adjacent_junction_context_review_v2\": 5,\n    \"same_class_adjacent_approach_review_v2\": 4,\n    \"short_edge_absorption_lane_count_v2\": 11,\n    \"through_pair_lane_count_continuity_v2\": 3\n  },\n  \"note\": \"Propagation v2 is proposal-only; no active overrides are modified by this stage.\"\n}\n[LaneForge] Publishing next LaneForge package...\n{\n  \"area_id\": \"pattaya_central_500m\",\n  \"package_version\": \"lane_package_v0089\",\n  \"package_dir\": \"data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0089\",\n  \"manifest\": \"data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0089/manifest.json\",\n  \"path_policy\": \"portable_lane_package_paths_v1\",\n  \"counts\": {\n    \"lanes\": 218,\n    \"physical_lane_centerlines\": 204,\n    \"physical_lane_group_centerlines\": 12,\n    \"junctions\": 49,\n    \"lane_links\": 312,\n    \"continuity_links\": 20,\n    \"junction_envelope_surfaces\": 49,\n    \"active_lane_upgrades\": 15,\n    \"active_corner_optimizations\": 6,\n    \"corner_optimization_candidates\": 18,\n    \"corner_optimization_accepted_active\": 6,\n    \"corner_optimization_accepted_active_candidates\": 4,\n    \"corner_optimization_accepted_active_overrides\": 6,\n    \"lane_upgrade_propagation_candidates\": 23,\n    \"lane_upgrade_propagation_high_confidence\": 12\n  },\n  \"qa_status\": \"warn\",\n  \"qa_gate_status\": \"manual_review_required\",\n  \"qa_warning_summary\": {\n    \"publishable_warn\": 0,\n    \"manual_review_required\": 6,\n    \"blocker\": 0\n  }\n}\n[LaneForge] Refreshing SVG QA view...\nTraceback (most recent call last):\n  File \"E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\export_lane_graph_svg.py\", line 1903, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\export_lane_graph_svg.py\", line 1896, in main\n    write_text(output_path, svg)\n  File \"E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\export_lane_graph_svg.py\", line 30, in write_text\n    path.write_text(text, encoding=\"utf-8\")\n  File \"C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\pathlib.py\", line 1047, in write_text\n    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\pathlib.py\", line 1013, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: [Errno 22] Invalid argument: 'E:\\\\VirtualCity\\\\ProjectManagement\\\\RoadResearch\\\\road_test_pipeline\\\\reports\\\\visualizations\\\\pattaya_central_500m_lane_graph_topology.svg'\nTraceback (most recent call last):\n  File \"E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py\", line 401, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py\", line 381, in main\n    result = execute_upgrade(\n             ^^^^^^^^^^^^^^^^\n  File \"E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py\", line 330, in execute_upgrade\n    run_command(\"Refreshing SVG QA view\", svg_cmd, root, log_path)\n  File \"E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py\", line 181, in run_command\n    raise RuntimeError(f\"{name} failed with exit code {proc.returncode}; see {log_path}\")\nRuntimeError: Refreshing SVG QA view failed with exit code 1; see E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_upgrade_execution_v0043.log\n",
+  "completed_at_local": "2026-06-05T20:17:54",
+  "latest_package": {
+    "path": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
+    "data": {
+      "area_id": "pattaya_central_500m",
+      "system": "LaneForge",
+      "latest_package_version": "lane_package_v0089",
+      "path_policy": "portable_lane_package_paths_v1",
+      "latest_package_dir": "lane_package_v0089",
+      "manifest": "manifest.json",
+      "qa_gate_status": "manual_review_required",
+      "qa_warning_summary": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "source_artifacts": {
+        "lane_graph": {
+          "path": "data/processed/pattaya_central_500m_lane_graph.json",
+          "exists": true,
+          "size_bytes": 1975213,
+          "mtime_utc": 1780661873.224028,
+          "sha256": "b1f6ea6d01c28bcd99fb517e4c128caf53e563bd3a5fa00c2c502d5f825951c8"
+        },
+        "pipeline_audit_report": {
+          "path": "reports/pattaya_central_500m_pipeline_audit_report.json",
+          "exists": true,
+          "size_bytes": 71952,
+          "mtime_utc": 1780661873.7548757,
+          "sha256": "ba752417ebe111b5e83920e258d97d6b9ca9b8ea7f0bbb3e928546c22a045137"
+        }
+      }
+    }
+  }
+}

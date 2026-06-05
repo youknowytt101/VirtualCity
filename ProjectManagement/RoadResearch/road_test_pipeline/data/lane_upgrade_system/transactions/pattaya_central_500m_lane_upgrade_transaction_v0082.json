@@ -1,0 +1,47 @@
+{
+  "type": "lane_upgrade_transaction",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "lane_upgrade_system.transaction.v1",
+    "system": "LaneForge",
+    "path_policy": "pipeline_root_relative_paths_v1"
+  },
+  "transaction_id": "lane_upgrade_transaction_v0082",
+  "version": "v0082",
+  "created_at_utc": "2026-06-05T12:38:14+00:00",
+  "status": "active",
+  "request": {
+    "action": "set_road_physical_lane_count",
+    "road_id": "e_0039",
+    "canonical_road_id": "cr_0039",
+    "target_physical_lane_count": 2,
+    "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+    "source": "web_lane_count_menu",
+    "reason": "viewer request: set rc_317141442 to 2 physical lanes",
+    "reviewer": "web_user"
+  },
+  "resolution": {
+    "policy": "road_graph_edge_lookup_v1",
+    "road_graph": "data/processed/pattaya_central_500m_road_graph.json"
+  },
+  "affected_scope": {
+    "scope_policy": "direct_edge_endpoints_v1",
+    "road_id": "e_0039",
+    "canonical_road_id": "cr_0039",
+    "endpoint_node_ids": [
+      "n_0036",
+      "n_0032"
+    ],
+    "adjacent_junction_node_ids": [],
+    "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+  },
+  "qa_policy": {
+    "rebuild_required": true,
+    "publish_only_if_pipeline_audit_passes": true,
+    "rollback_behavior": "remove_or_disable_active_override_then_rebuild"
+  },
+  "notes": [
+    "This transaction is an upgrade request, not source map truth.",
+    "Adjacent junction laneLinks are rebuilt from lane_graph semantics during the next pipeline run."
+  ]
+}

@@ -2,10 +2,10 @@
   "type": "laneforge_current_status",
   "schema": "lane_upgrade_system.current_status.v1",
   "area_id": "pattaya_central_500m",
-  "latest_package_version": "lane_package_v0080",
-  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080",
-  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080/manifest.json",
-  "houdini_manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080/houdini_manifest.json",
+  "latest_package_version": "lane_package_v0170",
+  "package_dir": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0170",
+  "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0170/manifest.json",
+  "houdini_manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0170/houdini_manifest.json",
   "path_policy": "portable_lane_package_paths_v1",
   "qa_status": "warn",
   "qa_gate_status": "manual_review_required",
@@ -15,21 +15,21 @@
     "blocker": 0
   },
   "counts": {
-    "lanes": 230,
-    "physical_lane_centerlines": 212,
-    "physical_lane_group_centerlines": 14,
+    "lanes": 200,
+    "physical_lane_centerlines": 186,
+    "physical_lane_group_centerlines": 12,
     "junctions": 49,
-    "lane_links": 320,
-    "continuity_links": 24,
+    "lane_links": 306,
+    "continuity_links": 20,
     "junction_envelope_surfaces": 49,
-    "active_lane_upgrades": 15,
+    "active_lane_upgrades": 52,
     "active_corner_optimizations": 6,
     "corner_optimization_candidates": 18,
     "corner_optimization_accepted_active": 6,
     "corner_optimization_accepted_active_candidates": 4,
     "corner_optimization_accepted_active_overrides": 6,
-    "lane_upgrade_propagation_candidates": 23,
-    "lane_upgrade_propagation_high_confidence": 12
+    "lane_upgrade_propagation_candidates": 58,
+    "lane_upgrade_propagation_high_confidence": 18
   },
   "semantic_review": {
     "schema": "lane_upgrade_system.semantic_review_summary.v1",
@@ -79,23 +79,23 @@
     "latest": {
       "path": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
       "exists": true,
-      "size_bytes": 1003,
-      "mtime_utc": 1780657444.1628225,
-      "sha256": "e4e607ed43d6daad538ce975ae05e7ee0d126f73b1fee6eadfeeea466290138e"
+      "size_bytes": 1004,
+      "mtime_utc": 1780682729.4371898,
+      "sha256": "e2542d0b6e5b6e88d4bfcaac27f513f726128a6a36c78c896dbb2561124dac35"
     },
     "manifest": {
-      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080/manifest.json",
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0170/manifest.json",
       "exists": true,
-      "size_bytes": 51611,
-      "mtime_utc": 1780657444.1628225,
-      "sha256": "00b34fcc8cce20f01f7597e990c5f5051a4e1d086a45d96e15921563a9a2af29"
+      "size_bytes": 51617,
+      "mtime_utc": 1780682729.4361002,
+      "sha256": "d2cec13f35f9e7f1dec34dff6153568f314a62e25b24a9680c4f4ce8c68485a4"
     },
     "houdini_manifest": {
-      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0080/houdini_manifest.json",
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0170/houdini_manifest.json",
       "exists": true,
-      "size_bytes": 964,
-      "mtime_utc": 1780657444.1038246,
-      "sha256": "965efc44a1481cb1bec5aa7f3eb6a05fa8971076838b794bd1964bd8a8e4448c"
+      "size_bytes": 2765,
+      "mtime_utc": 1780682729.427097,
+      "sha256": "1038a6a4dedf12d2e9b4d5ea2d9d235875e500434a786e9729bcdc49d5d38a1f"
     }
   },
   "handoff_rule": "Houdini and downstream systems consume the latest standard lane package, not data/processed internals."

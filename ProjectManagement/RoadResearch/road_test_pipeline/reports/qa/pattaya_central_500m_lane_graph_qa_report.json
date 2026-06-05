@@ -6,7 +6,7 @@
     {
       "id": "lanes",
       "status": "pass",
-      "value": 230,
+      "value": 200,
       "threshold": 40,
       "message": "Lane graph should expose enough directed lane records for junction connection research."
     },
@@ -27,7 +27,7 @@
     {
       "id": "lane_links",
       "status": "pass",
-      "value": 320,
+      "value": 306,
       "threshold": 1,
       "message": "Allowed movements should produce laneLinks for downstream movement corridor research."
     },
@@ -62,33 +62,33 @@
     {
       "id": "avg_lane_links_per_junction",
       "status": "pass",
-      "value": 6.531,
+      "value": 6.245,
       "threshold": 1.0,
       "message": "LaneLink density is low; review oneway, lane count and movement inference."
     }
   ],
   "metrics": {
     "counts": {
-      "lanes": 230,
-      "physical_lane_centerlines": 212,
-      "physical_lane_group_centerlines": 14,
-      "standalone_physical_lane_centerlines": 198,
+      "lanes": 200,
+      "physical_lane_centerlines": 186,
+      "physical_lane_group_centerlines": 12,
+      "standalone_physical_lane_centerlines": 174,
       "junctions": 49,
       "approach_lane_records": 149,
       "connections": 306,
-      "lane_links": 320,
-      "continuity_links": 24,
+      "lane_links": 306,
+      "continuity_links": 20,
       "optimized_approach_centerlines": 100,
       "optimized_approach_centerlines_applied": 100,
       "optimized_junction_connectors": 149,
       "optimized_junction_connector_lane_links": 0,
       "optimized_corner_fillet_links": 6,
-      "direct_connector_continuity_links": 18,
-      "same_physical_lane_continuity_links": 18,
-      "physical_lane_groups_created": 14,
-      "physical_lane_grouped_lanes": 32,
-      "active_lane_upgrades": 15,
-      "active_lane_upgrades_applied": 15,
+      "direct_connector_continuity_links": 14,
+      "same_physical_lane_continuity_links": 14,
+      "physical_lane_groups_created": 12,
+      "physical_lane_grouped_lanes": 26,
+      "active_lane_upgrades": 52,
+      "active_lane_upgrades_applied": 52,
       "active_lane_upgrades_deferred": 0,
       "active_lane_upgrades_missing_roads": 0,
       "active_lane_upgrades_ignored": 0,
@@ -106,15 +106,15 @@
       "through": 102
     },
     "lane_source_counts": {
-      "lane_upgrade_system_manual_override": 60,
-      "temporary_bidirectional_two_lane_policy": 170
+      "lane_upgrade_system_manual_override": 104,
+      "temporary_bidirectional_two_lane_policy": 96
     },
     "traffic_direction_policy_counts": {},
     "connection_source_counts": {
       "geometry_inferred_from_osm_plus_temporary_bidirectional_two_lane_policy": 306
     },
     "lane_link_source_counts": {
-      "junction_semantics": 320
+      "junction_semantics": 306
     },
     "fallback_counts": {
       "not_generated_layer3_lane_graph_only": 49
@@ -122,15 +122,15 @@
     "lane_graph_metrics": {
       "junctions_with_connections_ratio": 1.0,
       "fan_fallback_ratio": 0.0,
-      "avg_lane_links_per_junction": 6.531,
+      "avg_lane_links_per_junction": 6.245,
       "lane_link_reference_errors": 0,
       "blocked_lane_links": 0,
       "empty_connection_curves": 0,
       "avg_lane_link_confidence": 0.82,
       "min_lane_link_confidence": 0.82,
-      "avg_curve_length_m": 10.693,
-      "max_curve_length_m": 17.755,
-      "avg_continuity_curve_length_m": 1.16,
+      "avg_curve_length_m": 10.35,
+      "max_curve_length_m": 14.954,
+      "avg_continuity_curve_length_m": 1.392,
       "max_continuity_curve_length_m": 7.301,
       "avg_lane_width_m": 3.2,
       "min_lane_width_m": 3.2,
@@ -139,7 +139,7 @@
       "max_lane_width_start_end_delta_m": 0.0,
       "lane_bundle_centerline_smoothed_edges": 20,
       "lane_bundle_centerline_smoothed_bends": 39,
-      "lane_bundle_centerline_max_min_arc_radius_m": 9.6,
+      "lane_bundle_centerline_max_min_arc_radius_m": 6.4,
       "derived_lane_centerline_smoothed_lanes": 1,
       "derived_lane_centerline_smoothed_bends": 0,
       "derived_lane_centerline_inserted_sample_points": 0,
@@ -148,26 +148,26 @@
       "derived_lane_centerline_smoothing_curve_family_counts": {},
       "derived_lane_centerline_smoothing_arc_fit_status_counts": {},
       "continuity_rounding_style_counts": {
-        "unified_lane_geometry_rounding_style_v1": 24
+        "unified_lane_geometry_rounding_style_v1": 20
       },
       "continuity_rounding_curve_family_counts": {
-        "straight_infinite_radius": 18,
+        "straight_infinite_radius": 14,
         "tangent_circular_arc": 6
       },
       "lane_level_radius_regularized_continuity_links": 1,
-      "physical_lane_centerlines": 212,
-      "physical_lane_group_centerlines": 14,
-      "standalone_physical_lane_centerlines": 198,
-      "same_physical_lane_continuity_links": 18,
-      "physical_lane_groups_created": 14,
-      "physical_lane_grouped_lanes": 32,
+      "physical_lane_centerlines": 186,
+      "physical_lane_group_centerlines": 12,
+      "standalone_physical_lane_centerlines": 174,
+      "same_physical_lane_continuity_links": 14,
+      "physical_lane_groups_created": 12,
+      "physical_lane_grouped_lanes": 26,
       "min_optimized_corner_continuity_radius_m": 0.728
     }
   },
   "inputs": {
-    "lane_graph": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
-    "lane_graph_report": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
-    "rules": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
+    "lane_graph": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_lane_graph.json",
+    "lane_graph_report": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\reports\\pattaya_central_500m_lane_graph_report.json",
+    "rules": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\qa\\qa_rules.json"
   },
   "next_action": "Use lane_graph as the topology contract for movement corridor solver; do not treat offset previews as final lane geometry."
 }

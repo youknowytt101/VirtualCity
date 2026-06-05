@@ -1,0 +1,72 @@
+{
+  "type": "houdini_lane_package_manifest",
+  "metadata": {
+    "area_id": "pattaya_central_500m",
+    "schema": "lane_upgrade_system.houdini_manifest.v1",
+    "system": "LaneForge",
+    "package_version": "lane_package_v0167",
+    "path_policy": "portable_lane_package_paths_v1",
+    "qa_gate_status": "manual_review_required",
+    "lane_geometry_rounding_style_id": "unified_lane_geometry_rounding_style_v1",
+    "compatibility_version": "laneforge_houdini_handoff.v1",
+    "compatibility_contract": {
+      "contract_id": "laneforge_houdini_handoff.v1",
+      "input_hash_source": "manifest.package_artifacts（数据包资产记录）",
+      "houdini_reads_package_outputs_only": true,
+      "stable_output_nodes": [
+        "OUT_roads_centerlines",
+        "OUT_lane_connections_debug",
+        "OUT_lane_surfaces_v1"
+      ],
+      "stable_primitive_groups": [
+        "lane_surface_v1",
+        "lane_turn_surface_v1",
+        "lane_continuity_surface_v1",
+        "junction_envelope_surface_v1"
+      ]
+    }
+  },
+  "inputs": {
+    "standard_lanes": "standard_lanes.json",
+    "standard_junctions": "standard_junctions.json",
+    "standard_lane_surfaces": "standard_lane_surfaces.geojson",
+    "standard_lane_surfaces_obj": "standard_lane_surfaces.obj"
+  },
+  "expected_houdini_outputs": [
+    "OUT_roads_centerlines",
+    "OUT_lane_connections_debug",
+    "OUT_lane_surfaces_v1"
+  ],
+  "primitive_groups": [
+    "lane_surface_v1",
+    "lane_turn_surface_v1",
+    "lane_continuity_surface_v1",
+    "junction_envelope_surface_v1"
+  ],
+  "input_asset_hashes": {
+    "standard_lanes": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0167/standard_lanes.json",
+      "exists": true,
+      "size_bytes": 632703,
+      "sha256": "89760ca8f2536e4c5dd1a730cad967644ad3dc7a960337c9bb71472e40eb3ae1"
+    },
+    "standard_junctions": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0167/standard_junctions.json",
+      "exists": true,
+      "size_bytes": 1265651,
+      "sha256": "29ca1f8fd0b8db6926dacecaee39bc1d38f3e8d6f4fd8eab70a1775a4e775d9e"
+    },
+    "standard_lane_surfaces": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0167/standard_lane_surfaces.geojson",
+      "exists": true,
+      "size_bytes": 1183851,
+      "sha256": "15abc5918103460266a0bcce00fe3500542a4c3055fbf0a68a5a9f0930e18665"
+    },
+    "standard_lane_surfaces_obj": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0167/standard_lane_surfaces.obj",
+      "exists": true,
+      "size_bytes": 290436,
+      "sha256": "94e8607e3644c484a0c744cb12b8c93b30eb5bfe1ca83fdc58a920af285bd86d"
+    }
+  }
+}

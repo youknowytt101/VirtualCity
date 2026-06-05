@@ -1,6 +1,6 @@
 {
   "area_id": "pattaya_central_500m",
-  "input": "D:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
+  "input": "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\data\\processed\\pattaya_central_500m_roads_repaired.geojson",
   "origin": {
     "lon": 100.8837,
     "lat": 12.93425

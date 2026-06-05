@@ -1,0 +1,47 @@
+{
+  "type": "lane_upgrade_package_changelog_registry",
+  "schema": "lane_upgrade_system.package_changelog_registry.v1",
+  "area_id": "pattaya_central_500m",
+  "system": "LaneForge",
+  "registry_policy": "append_only_package_lifecycle_registry（只追加的数据包生命周期注册表）",
+  "mutation_policy": "review_only_no_package_mutation（只审查不修改数据包）",
+  "created_at_local": "2026-06-06T01:28:39",
+  "entries": [
+    {
+      "schema": "lane_upgrade_system.package_changelog_entry.v1",
+      "package_version": "lane_package_v0166",
+      "previous_package_version": "lane_package_v0165",
+      "registered_at_local": "2026-06-06T01:28:39",
+      "registered_by": "Codex local lifecycle review",
+      "change_class": "source_artifact_refresh（源资产刷新）",
+      "qa_gate_status_before": "manual_review_required",
+      "qa_gate_status_after": "manual_review_required",
+      "qa_gate_status_changed": false,
+      "qa_warning_summary_before": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "qa_warning_summary_after": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "count_changes": {},
+      "source_artifact_changes": {
+        "lane_graph": {
+          "before_path": "data/processed/pattaya_central_500m_lane_graph.json",
+          "after_path": "data/processed/pattaya_central_500m_lane_graph.json",
+          "before_sha256": "11108b181898089d42dbc9dddbbf0fff8b6b3c32a4aa425c51041382ddf1b676",
+          "after_sha256": "9c893743cc38c0f853c3141289e8bfcfa0e18bc665980db64a78baef64290f66"
+        }
+      },
+      "summary": "lane_package_v0166 keeps the same package counts and QA gate as lane_package_v0165, while the lane_graph source artifact hash changed.",
+      "review_notes": [
+        "No blocker（阻断项） is present in the package QA summary.",
+        "The package still requires manual_review_required（需要人工复核） before stable Houdini handoff（Houdini 稳定交付）.",
+        "This changelog entry records lifecycle evidence only and does not mutate latest.json（最新指针） or package contents（数据包内容）."
+      ]
+    }
+  ]
+}

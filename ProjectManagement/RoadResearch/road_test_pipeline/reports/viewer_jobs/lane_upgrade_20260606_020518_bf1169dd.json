@@ -1,0 +1,922 @@
+{
+  "type": "lane_upgrade_viewer_job",
+  "schema": "lane_upgrade_system.viewer_job.v1",
+  "job_id": "lane_upgrade_20260606_020518_bf1169dd",
+  "status": "completed",
+  "created_at_local": "2026-06-06T02:05:18",
+  "request": {
+    "action": "set_road_physical_lane_count",
+    "road_id": "e_0010",
+    "canonical_road_id": "cr_0010",
+    "road_ids": [
+      "e_0010",
+      "e_0011"
+    ],
+    "canonical_road_ids": [
+      "cr_0010",
+      "cr_0011"
+    ],
+    "road_chain_id": "rc_27443579",
+    "selection_scope": "road_chain",
+    "target_physical_lane_count": 2,
+    "apply_selected_geometry": false,
+    "apply_all_active_geometry": true
+  },
+  "preview": {
+    "type": "lane_upgrade_preview",
+    "metadata": {
+      "schema": "lane_upgrade_system.viewer_api.v1",
+      "system": "LaneForge",
+      "area_id": "pattaya_central_500m"
+    },
+    "request": {
+      "action": "set_road_physical_lane_count",
+      "road_id": "e_0010",
+      "canonical_road_id": "cr_0010",
+      "road_ids": [
+        "e_0010",
+        "e_0011"
+      ],
+      "canonical_road_ids": [
+        "cr_0010",
+        "cr_0011"
+      ],
+      "road_chain_id": "rc_27443579",
+      "selection_scope": "road_chain",
+      "target_physical_lane_count": 2,
+      "apply_selected_geometry": false,
+      "apply_all_active_geometry": true
+    },
+    "current_active_override": {
+      "enabled": true,
+      "upgrade_id": "lane_upgrade_transaction_v0128",
+      "transaction_id": "lane_upgrade_transaction_v0128",
+      "version": "v0128",
+      "road_id": "e_0010",
+      "canonical_road_id": "cr_0010",
+      "target_physical_lane_count": 1,
+      "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+      "source": "web_lane_count_menu",
+      "reason": "viewer request: set rc_27443579 to 1 physical lanes",
+      "reviewer": "web_user",
+      "affected_scope": {
+        "scope_policy": "direct_edge_endpoints_v1",
+        "road_id": "e_0010",
+        "canonical_road_id": "cr_0010",
+        "endpoint_node_ids": [
+          "n_0023",
+          "n_0022"
+        ],
+        "adjacent_junction_node_ids": [
+          "n_0023"
+        ],
+        "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+      }
+    },
+    "affected_scope": {
+      "scope_policy": "road_chain_ordered_edges_v1",
+      "road_chain_id": "rc_27443579",
+      "target_count": 2,
+      "targets": [
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0010",
+          "canonical_road_id": "cr_0010",
+          "endpoint_node_ids": [
+            "n_0023",
+            "n_0022"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0023"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        },
+        {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0011",
+          "canonical_road_id": "cr_0011",
+          "endpoint_node_ids": [
+            "n_0022",
+            "n_0004"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0004"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        }
+      ]
+    },
+    "preview_summary": {
+      "type": "lane_upgrade_preview_summary",
+      "schema": "lane_upgrade_system.preview_summary.v1",
+      "action": "set_road_physical_lane_count",
+      "target_label": "2 physical lanes（2 物理车道）",
+      "target_physical_lane_count": 2,
+      "affected_road_count": 2,
+      "affected_junction_count": 2,
+      "affected_junction_node_ids": [
+        "n_0023",
+        "n_0004"
+      ],
+      "active_override_count_before": 2,
+      "current_lane_counts": [
+        "1"
+      ],
+      "source_lane_counts": [
+        "2"
+      ],
+      "road_ids": [
+        "e_0010",
+        "e_0011"
+      ],
+      "canonical_road_ids": [
+        "cr_0010",
+        "cr_0011"
+      ],
+      "road_chain_ids": [
+        "rc_27443579"
+      ],
+      "semantic_review_flag_counts": {
+        "active_lane_upgrade_transaction": 2,
+        "lane_count_set_by_lane_upgrade_transaction": 2,
+        "missing_turn_lanes": 2,
+        "road_chain_fragment": 2,
+        "source_lane_count_differs_from_geometry": 2,
+        "source_oneway_overridden_by_temporary_bidirectional_policy": 2,
+        "width_fallback": 2
+      },
+      "package_before": "lane_package_v0168",
+      "qa_gate_status_before": "manual_review_required",
+      "qa_warning_summary_before": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "execution_effect": "transaction -> rebuild -> QA -> publish package -> refresh SVG",
+      "topology_surface_preview": {
+        "type": "lane_upgrade_topology_surface_preview",
+        "schema": "lane_upgrade_system.topology_surface_preview.v1",
+        "estimate_only": true,
+        "estimate_policy": "current_artifact_scope_plus_lane_count_rebuild_estimate_v1",
+        "selected_road_ids": [
+          "e_0010",
+          "e_0011"
+        ],
+        "affected_junction_node_ids": [
+          "n_0004",
+          "n_0023"
+        ],
+        "affected_junction_ids": [
+          "j_002",
+          "j_014"
+        ],
+        "target_physical_lane_counts_by_road": {
+          "e_0010": 2,
+          "e_0011": 2
+        },
+        "lane_links": {
+          "junction_scope": {
+            "current": 12,
+            "estimated_after": 12,
+            "delta": 0.0
+          },
+          "selected_road_scope": {
+            "current": 8,
+            "estimated_after": 8,
+            "delta": 0.0
+          }
+        },
+        "surfaces": {
+          "selected_lane_surfaces": {
+            "current": 2,
+            "estimated_after": 4,
+            "delta": 2.0
+          },
+          "turn_surfaces": {
+            "current": 12,
+            "estimated_after": 12,
+            "delta": 0.0
+          },
+          "continuity_surfaces": {
+            "current": 2,
+            "estimated_after": 2,
+            "delta": 0.0
+          },
+          "junction_envelope_surfaces": {
+            "current": 2,
+            "estimated_after": 2,
+            "delta": 0.0
+          },
+          "total_touched_surfaces": {
+            "current": 18,
+            "estimated_after": 20,
+            "delta": 2.0
+          },
+          "current_touched_area_m2": 2457.329
+        },
+        "junction_details": [
+          {
+            "junction_id": "j_002",
+            "node_id": "n_0004",
+            "junction_type": "T",
+            "current_lane_links": 6,
+            "estimated_after_lane_links": 6,
+            "current_selected_road_lane_links": 4,
+            "estimated_after_selected_road_lane_links": 4
+          },
+          {
+            "junction_id": "j_014",
+            "node_id": "n_0023",
+            "junction_type": "T",
+            "current_lane_links": 6,
+            "estimated_after_lane_links": 6,
+            "current_selected_road_lane_links": 4,
+            "estimated_after_selected_road_lane_links": 4
+          }
+        ],
+        "notes": [
+          "This is a non-mutating estimate derived from current lane_graph and lane_surface artifacts.",
+          "Actual lane surface counts may be lower after degree-2 physical lane grouping during rebuild.",
+          "QA gate remains authoritative after the real transaction -> rebuild -> package publish flow."
+        ]
+      }
+    },
+    "preview_items": [
+      {
+        "road_id": "e_0010",
+        "canonical_road_id": "cr_0010",
+        "road_chain_id": "rc_27443579",
+        "current_physical_lane_count": 1,
+        "source_lanes": 2,
+        "source_lanes_raw": "2",
+        "target_physical_lane_count": 2,
+        "after_label": "2 physical lanes（2 物理车道）",
+        "current_lane_count_source": "lane_upgrade_transaction",
+        "confidence_tier": "manual_reviewed_override",
+        "review_flags": [
+          "width_fallback",
+          "missing_turn_lanes",
+          "source_oneway_overridden_by_temporary_bidirectional_policy",
+          "source_lane_count_differs_from_geometry",
+          "active_lane_upgrade_transaction",
+          "road_chain_fragment",
+          "lane_count_set_by_lane_upgrade_transaction"
+        ],
+        "active_lane_upgrade": {
+          "enabled": true,
+          "upgrade_id": "lane_upgrade_transaction_v0128",
+          "transaction_id": "lane_upgrade_transaction_v0128",
+          "version": "v0128",
+          "road_id": "e_0010",
+          "canonical_road_id": "cr_0010",
+          "target_physical_lane_count": 1,
+          "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+          "source": "web_lane_count_menu",
+          "reason": "viewer request: set rc_27443579 to 1 physical lanes",
+          "reviewer": "web_user",
+          "affected_scope": {
+            "scope_policy": "direct_edge_endpoints_v1",
+            "road_id": "e_0010",
+            "canonical_road_id": "cr_0010",
+            "endpoint_node_ids": [
+              "n_0023",
+              "n_0022"
+            ],
+            "adjacent_junction_node_ids": [
+              "n_0023"
+            ],
+            "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+          }
+        },
+        "affected_scope": {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0010",
+          "canonical_road_id": "cr_0010",
+          "endpoint_node_ids": [
+            "n_0023",
+            "n_0022"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0023"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        }
+      },
+      {
+        "road_id": "e_0011",
+        "canonical_road_id": "cr_0011",
+        "road_chain_id": "rc_27443579",
+        "current_physical_lane_count": 1,
+        "source_lanes": 2,
+        "source_lanes_raw": "2",
+        "target_physical_lane_count": 2,
+        "after_label": "2 physical lanes（2 物理车道）",
+        "current_lane_count_source": "lane_upgrade_transaction",
+        "confidence_tier": "manual_reviewed_override",
+        "review_flags": [
+          "width_fallback",
+          "missing_turn_lanes",
+          "source_oneway_overridden_by_temporary_bidirectional_policy",
+          "source_lane_count_differs_from_geometry",
+          "active_lane_upgrade_transaction",
+          "road_chain_fragment",
+          "lane_count_set_by_lane_upgrade_transaction"
+        ],
+        "active_lane_upgrade": {
+          "enabled": true,
+          "upgrade_id": "lane_upgrade_transaction_v0129",
+          "transaction_id": "lane_upgrade_transaction_v0129",
+          "version": "v0129",
+          "road_id": "e_0011",
+          "canonical_road_id": "cr_0011",
+          "target_physical_lane_count": 1,
+          "distribution_policy": "balanced_bidirectional_left_traffic_v1",
+          "source": "web_lane_count_menu",
+          "reason": "viewer request: set rc_27443579 to 1 physical lanes",
+          "reviewer": "web_user",
+          "affected_scope": {
+            "scope_policy": "direct_edge_endpoints_v1",
+            "road_id": "e_0011",
+            "canonical_road_id": "cr_0011",
+            "endpoint_node_ids": [
+              "n_0022",
+              "n_0004"
+            ],
+            "adjacent_junction_node_ids": [
+              "n_0004"
+            ],
+            "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+          }
+        },
+        "affected_scope": {
+          "scope_policy": "direct_edge_endpoints_v1",
+          "road_id": "e_0011",
+          "canonical_road_id": "cr_0011",
+          "endpoint_node_ids": [
+            "n_0022",
+            "n_0004"
+          ],
+          "adjacent_junction_node_ids": [
+            "n_0004"
+          ],
+          "rebuild_contract": "lane graph and direct endpoint junction laneLinks are regenerated before package publish"
+        }
+      }
+    ],
+    "topology_surface_preview": {
+      "type": "lane_upgrade_topology_surface_preview",
+      "schema": "lane_upgrade_system.topology_surface_preview.v1",
+      "estimate_only": true,
+      "estimate_policy": "current_artifact_scope_plus_lane_count_rebuild_estimate_v1",
+      "selected_road_ids": [
+        "e_0010",
+        "e_0011"
+      ],
+      "affected_junction_node_ids": [
+        "n_0004",
+        "n_0023"
+      ],
+      "affected_junction_ids": [
+        "j_002",
+        "j_014"
+      ],
+      "target_physical_lane_counts_by_road": {
+        "e_0010": 2,
+        "e_0011": 2
+      },
+      "lane_links": {
+        "junction_scope": {
+          "current": 12,
+          "estimated_after": 12,
+          "delta": 0.0
+        },
+        "selected_road_scope": {
+          "current": 8,
+          "estimated_after": 8,
+          "delta": 0.0
+        }
+      },
+      "surfaces": {
+        "selected_lane_surfaces": {
+          "current": 2,
+          "estimated_after": 4,
+          "delta": 2.0
+        },
+        "turn_surfaces": {
+          "current": 12,
+          "estimated_after": 12,
+          "delta": 0.0
+        },
+        "continuity_surfaces": {
+          "current": 2,
+          "estimated_after": 2,
+          "delta": 0.0
+        },
+        "junction_envelope_surfaces": {
+          "current": 2,
+          "estimated_after": 2,
+          "delta": 0.0
+        },
+        "total_touched_surfaces": {
+          "current": 18,
+          "estimated_after": 20,
+          "delta": 2.0
+        },
+        "current_touched_area_m2": 2457.329
+      },
+      "junction_details": [
+        {
+          "junction_id": "j_002",
+          "node_id": "n_0004",
+          "junction_type": "T",
+          "current_lane_links": 6,
+          "estimated_after_lane_links": 6,
+          "current_selected_road_lane_links": 4,
+          "estimated_after_selected_road_lane_links": 4
+        },
+        {
+          "junction_id": "j_014",
+          "node_id": "n_0023",
+          "junction_type": "T",
+          "current_lane_links": 6,
+          "estimated_after_lane_links": 6,
+          "current_selected_road_lane_links": 4,
+          "estimated_after_selected_road_lane_links": 4
+        }
+      ],
+      "notes": [
+        "This is a non-mutating estimate derived from current lane_graph and lane_surface artifacts.",
+        "Actual lane surface counts may be lower after degree-2 physical lane grouping during rebuild.",
+        "QA gate remains authoritative after the real transaction -> rebuild -> package publish flow."
+      ]
+    },
+    "geometry_application_policy": "apply_all_lane_upgrade_overrides_to_geometry_v1",
+    "execution_cli_command": "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0010 --canonical-road-id cr_0010 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443579 to 2 physical lanes\"\npython scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0011 --canonical-road-id cr_0011 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443579 to 2 physical lanes\"",
+    "execution_cli_commands": [
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0010 --canonical-road-id cr_0010 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443579 to 2 physical lanes\"",
+      "python scripts\\execute_lane_upgrade.py --area-id pattaya_central_500m --road-id e_0011 --canonical-road-id cr_0011 --target-lane-count 2 --apply-all-active-geometry --reason \"viewer request: set rc_27443579 to 2 physical lanes\""
+    ],
+    "latest_package": {
+      "path": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
+      "data": {
+        "area_id": "pattaya_central_500m",
+        "system": "LaneForge",
+        "latest_package_version": "lane_package_v0168",
+        "path_policy": "portable_lane_package_paths_v1",
+        "latest_package_dir": "lane_package_v0168",
+        "manifest": "manifest.json",
+        "qa_gate_status": "manual_review_required",
+        "qa_warning_summary": {
+          "publishable_warn": 0,
+          "manual_review_required": 6,
+          "blocker": 0
+        },
+        "source_artifacts": {
+          "lane_graph": {
+            "path": "data/processed/pattaya_central_500m_lane_graph.json",
+            "exists": true,
+            "size_bytes": 1905345,
+            "mtime_utc": 1780682697.8387659,
+            "sha256": "1861fe729f2e64062c09c50e6dbb5ebd0326c456330b15815a9a16d7ffc831be"
+          },
+          "pipeline_audit_report": {
+            "path": "reports/pattaya_central_500m_pipeline_audit_report.json",
+            "exists": true,
+            "size_bytes": 71934,
+            "mtime_utc": 1780682698.5981421,
+            "sha256": "4b8c7a946bb34fa63893fb6968013827d2d28e972d682d9e6bfc318e4f976dc4"
+          }
+        }
+      }
+    },
+    "notes": [
+      "All active LaneForge lane-count overrides are applied to geometry during the rebuild.",
+      "The selected road's endpoint junction laneLinks and lane surfaces are regenerated before SVG refresh.",
+      "Raw, repaired, canonical and road_graph truth layers are not edited."
+    ]
+  },
+  "command": [
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0010",
+      "--reason",
+      "viewer request: set rc_27443579 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0010",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ],
+    [
+      "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+      "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+      "--area-id",
+      "pattaya_central_500m",
+      "--road-id",
+      "e_0011",
+      "--reason",
+      "viewer request: set rc_27443579 to 2 physical lanes",
+      "--reviewer",
+      "web_user",
+      "--source",
+      "web_lane_count_menu",
+      "--canonical-road-id",
+      "cr_0011",
+      "--target-lane-count",
+      "2",
+      "--apply-all-active-geometry"
+    ]
+  ],
+  "job_summary": {
+    "type": "lane_upgrade_viewer_job_summary",
+    "schema": "lane_upgrade_system.viewer_job_summary.v1",
+    "job_id": "lane_upgrade_20260606_020518_bf1169dd",
+    "status": "completed",
+    "action": "set_road_physical_lane_count",
+    "target_physical_lane_count": 2,
+    "road_ids": [
+      "e_0010",
+      "e_0011"
+    ],
+    "canonical_road_ids": [
+      "cr_0010",
+      "cr_0011"
+    ],
+    "road_chain_id": "rc_27443579",
+    "selection_scope": "road_chain",
+    "affected_road_count": 2,
+    "affected_junction_count": 2,
+    "affected_junction_node_ids": [
+      "n_0023",
+      "n_0004"
+    ],
+    "geometry_application_policy": "apply_all_lane_upgrade_overrides_to_geometry_v1",
+    "package_before": "lane_package_v0168",
+    "package_after": "lane_package_v0170",
+    "qa_gate_status_after": "manual_review_required",
+    "qa_warning_summary_after": {
+      "publishable_warn": 0,
+      "manual_review_required": 6,
+      "blocker": 0
+    },
+    "package_before_summary": {
+      "latest_pointer": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
+      "version": "lane_package_v0168",
+      "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0168/manifest.json",
+      "qa_status": "warn",
+      "qa_gate_status": "manual_review_required",
+      "qa_warning_summary": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "counts": {
+        "lanes": 200,
+        "physical_lane_centerlines": 186,
+        "physical_lane_group_centerlines": 12,
+        "junctions": 49,
+        "lane_links": 306,
+        "continuity_links": 20,
+        "junction_envelope_surfaces": 49,
+        "active_lane_upgrades": 52,
+        "active_corner_optimizations": 6,
+        "corner_optimization_candidates": 18,
+        "corner_optimization_accepted_active": 6,
+        "corner_optimization_accepted_active_candidates": 4,
+        "corner_optimization_accepted_active_overrides": 6,
+        "lane_upgrade_propagation_candidates": 58,
+        "lane_upgrade_propagation_high_confidence": 18
+      }
+    },
+    "package_after_summary": {
+      "latest_pointer": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
+      "version": "lane_package_v0170",
+      "manifest": "data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0170/manifest.json",
+      "qa_status": "warn",
+      "qa_gate_status": "manual_review_required",
+      "qa_warning_summary": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "counts": {
+        "lanes": 200,
+        "physical_lane_centerlines": 186,
+        "physical_lane_group_centerlines": 12,
+        "junctions": 49,
+        "lane_links": 306,
+        "continuity_links": 20,
+        "junction_envelope_surfaces": 49,
+        "active_lane_upgrades": 52,
+        "active_corner_optimizations": 6,
+        "corner_optimization_candidates": 18,
+        "corner_optimization_accepted_active": 6,
+        "corner_optimization_accepted_active_candidates": 4,
+        "corner_optimization_accepted_active_overrides": 6,
+        "lane_upgrade_propagation_candidates": 58,
+        "lane_upgrade_propagation_high_confidence": 18
+      }
+    },
+    "package_diff": {
+      "type": "lane_upgrade_package_diff_summary",
+      "schema": "lane_upgrade_system.package_diff_summary.v1",
+      "package_before": "lane_package_v0168",
+      "package_after": "lane_package_v0170",
+      "package_version_changed": true,
+      "qa_gate_status_before": "manual_review_required",
+      "qa_gate_status_after": "manual_review_required",
+      "qa_gate_status_changed": false,
+      "qa_warning_summary_before": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "qa_warning_summary_after": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "count_changes": {}
+    },
+    "current_step": 2,
+    "total_steps": 2,
+    "command_count": 2,
+    "exit_code": 0,
+    "created_at_local": "2026-06-06T02:05:18",
+    "started_at_local": "2026-06-06T02:05:18",
+    "completed_at_local": "2026-06-06T02:05:30",
+    "reload_url": "svg_live_viewer.html?cache=1780682730",
+    "current_pipeline_stage": "export_svg",
+    "current_timeline_step": {},
+    "timeline": [
+      {
+        "id": "submit_request",
+        "label": "submit request（提交请求）",
+        "description": "viewer validates the selected road scope and queues a background job",
+        "status": "completed",
+        "detail": "lane_upgrade_20260606_020518_bf1169dd",
+        "batch_progress": {
+          "current": 2,
+          "total": 2,
+          "label": "road batch（道路批次） 2/2"
+        }
+      },
+      {
+        "id": "create_transaction",
+        "label": "create transaction（创建事务）",
+        "description": "write an auditable lane upgrade transaction or restore transaction",
+        "status": "completed",
+        "detail": "2 road edge（道路边） / 2 junction（路口）",
+        "batch_progress": {
+          "current": 2,
+          "total": 2,
+          "label": "road batch（道路批次） 2/2"
+        }
+      },
+      {
+        "id": "rebuild_lane_graph",
+        "label": "rebuild lane graph（重建车道图）",
+        "description": "rebuild lane centerlines, laneLinks and junction surfaces",
+        "status": "completed",
+        "detail": "apply_all_lane_upgrade_overrides_to_geometry_v1",
+        "batch_progress": {
+          "current": 2,
+          "total": 2,
+          "label": "road batch（道路批次） 2/2"
+        }
+      },
+      {
+        "id": "run_qa_gate",
+        "label": "run QA gate（运行质量门禁）",
+        "description": "evaluate QA reports and package gate status from rebuilt artifacts",
+        "status": "completed",
+        "detail": "QA gate（质量门禁） manual_review_required / blocker（阻断项） 0",
+        "batch_progress": {
+          "current": 2,
+          "total": 2,
+          "label": "road batch（道路批次） 2/2"
+        }
+      },
+      {
+        "id": "plan_propagation",
+        "label": "plan propagation（规划传播）",
+        "description": "refresh proposal-only lane upgrade propagation candidates",
+        "status": "completed",
+        "detail": "proposal-only propagation plan（只生成传播建议）",
+        "batch_progress": {
+          "current": 2,
+          "total": 2,
+          "label": "road batch（道路批次） 2/2"
+        }
+      },
+      {
+        "id": "publish_package",
+        "label": "publish package（发布数据包）",
+        "description": "publish the next standard LaneForge package and update latest pointer",
+        "status": "completed",
+        "detail": "lane_package_v0168 -> lane_package_v0170",
+        "batch_progress": {
+          "current": 2,
+          "total": 2,
+          "label": "road batch（道路批次） 2/2"
+        }
+      },
+      {
+        "id": "export_svg",
+        "label": "export SVG QA view（导出 SVG 审查图）",
+        "description": "regenerate the SVG review drawing consumed by the live viewer",
+        "status": "completed",
+        "detail": "svg_live_viewer.html?cache=1780682730",
+        "batch_progress": {
+          "current": 2,
+          "total": 2,
+          "label": "road batch（道路批次） 2/2"
+        }
+      }
+    ],
+    "progress_percent": 100
+  },
+  "started_at_local": "2026-06-06T02:05:18",
+  "current_step": 2,
+  "total_steps": 2,
+  "current_command": [
+    "C:\\Users\\yintong\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+    "E:\\VirtualCity\\ProjectManagement\\RoadResearch\\road_test_pipeline\\scripts\\execute_lane_upgrade.py",
+    "--area-id",
+    "pattaya_central_500m",
+    "--road-id",
+    "e_0011",
+    "--reason",
+    "viewer request: set rc_27443579 to 2 physical lanes",
+    "--reviewer",
+    "web_user",
+    "--source",
+    "web_lane_count_menu",
+    "--canonical-road-id",
+    "cr_0011",
+    "--target-lane-count",
+    "2",
+    "--apply-all-active-geometry"
+  ],
+  "current_pipeline_stage": "export_svg",
+  "stdout_tail": "w/pattaya_central_500m_lane_surfaces_v1.svg\",\n      \"lane_surface_v1_report\": \"reports/pattaya_central_500m_lane_surface_v1_report.json\",\n      \"topology_qa\": \"reports/qa/pattaya_central_500m_topology_repair_qa_report.json\",\n      \"road_graph_qa\": \"reports/qa/pattaya_central_500m_road_graph_qa_report.json\",\n      \"lane_graph_qa\": \"reports/qa/pattaya_central_500m_lane_graph_qa_report.json\"\n    },\n    \"next_action\": \"Use this audit as the automated gate before curb, island, marking and swept-envelope geometry.\"\n  },\n  \"propagation_report\": {\n    \"area_id\": \"pattaya_central_500m\",\n    \"stage\": \"lane_upgrade_propagation_v2\",\n    \"schema\": \"lane_upgrade_system.propagation_report.v2\",\n    \"path_policy\": \"pipeline_root_relative_paths_v1\",\n    \"status\": \"pass\",\n    \"inputs\": {\n      \"road_graph\": \"data/processed/pattaya_central_500m_road_graph.json\",\n      \"junction_semantics\": \"data/processed/pattaya_central_500m_junction_semantics.json\",\n      \"active_overrides\": \"data/processed/pattaya_central_500m_lane_upgrade_overrides.json\"\n    },\n    \"outputs\": {\n      \"plan\": \"data/lane_upgrade_system/propagation/pattaya_central_500m_lane_upgrade_propagation_plan_v0128.json\",\n      \"report\": \"reports/pattaya_central_500m_lane_upgrade_propagation_report.json\"\n    },\n    \"counts\": {\n      \"active_upgrades\": 52,\n      \"candidates\": 58,\n      \"high_confidence_candidates\": 18,\n      \"review_candidates\": 0,\n      \"context_review_candidates\": 25,\n      \"already_satisfies_target\": 15\n    },\n    \"status_counts\": {\n      \"already_satisfies_target\": 15,\n      \"candidate_high_confidence\": 18,\n      \"context_review\": 25\n    },\n    \"rule_counts\": {\n      \"adjacent_junction_context_review_v2\": 34,\n      \"same_class_adjacent_approach_review_v2\": 2,\n      \"short_edge_absorption_lane_count_v2\": 21,\n      \"through_pair_lane_count_continuity_v2\": 1\n    },\n    \"note\": \"Propagation v2 is proposal-only; no active overrides are modified by this stage.\"\n  },\n  \"published_package\": {\n    \"area_id\": \"pattaya_central_500m\",\n    \"package_version\": \"lane_package_v0170\",\n    \"package_dir\": \"data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0170\",\n    \"manifest\": \"data/lane_upgrade_packages/pattaya_central_500m/lane_package_v0170/manifest.json\",\n    \"path_policy\": \"portable_lane_package_paths_v1\",\n    \"counts\": {\n      \"lanes\": 200,\n      \"physical_lane_centerlines\": 186,\n      \"physical_lane_group_centerlines\": 12,\n      \"junctions\": 49,\n      \"lane_links\": 306,\n      \"continuity_links\": 20,\n      \"junction_envelope_surfaces\": 49,\n      \"active_lane_upgrades\": 52,\n      \"active_corner_optimizations\": 6,\n      \"corner_optimization_candidates\": 18,\n      \"corner_optimization_accepted_active\": 6,\n      \"corner_optimization_accepted_active_candidates\": 4,\n      \"corner_optimization_accepted_active_overrides\": 6,\n      \"lane_upgrade_propagation_candidates\": 58,\n      \"lane_upgrade_propagation_high_confidence\": 18\n    },\n    \"qa_status\": \"warn\",\n    \"qa_gate_status\": \"manual_review_required\",\n    \"qa_warning_summary\": {\n      \"publishable_warn\": 0,\n      \"manual_review_required\": 6,\n      \"blocker\": 0\n    }\n  },\n  \"svg_report\": {\n    \"area_id\": \"pattaya_central_500m\",\n    \"stage\": \"lane_graph_svg_visualization\",\n    \"status\": \"pass\",\n    \"counts\": {\n      \"lanes\": 200,\n      \"physical_lane_centerlines\": 186,\n      \"visible_lane_centerlines\": 186,\n      \"lane_links_total\": 306,\n      \"continuity_links_total\": 20,\n      \"junction_connections_rendered\": 306,\n      \"continuity_links_rendered\": 8,\n      \"continuity_micro_seams_skipped\": 12,\n      \"continuity_link_source_counts\": {\n        \"degree2_connector_through_continuity_v1\": 2,\n        \"optimized_corner_fillet\": 6\n      },\n      \"movement_corridors_rendered\": 0,\n      \"anchor_markers_rendered\": 0,\n      \"anchor_source_counts\": {},\n      \"visual_candidate_family_counts\": {},\n      \"visual_candidate_issue_counts\": {},\n      \"movement_corridors_skipped\": 0,\n      \"movement_corridor_skip_reason_counts\": {},\n      \"movement_corridor_scoring_status_counts\": {},\n      \"raw_roads_rendered\": 44,\n      \"raw_road_endpoint_markers_rendered\": 88,\n      \"raw_road_internal_vertex_markers_rendered\": 215,\n      \"raw_road_vertex_markers_rendered\": 303,\n      \"raw_road_class_counts\": {\n        \"residential\": 14,\n        \"secondary\": 3,\n        \"service\": 27\n      },\n      \"raw_topology_issue_markers_rendered\": 30,\n      \"raw_topology_issue_classification_counts\": {\n        \"dangling_endpoint\": 29,\n        \"internal_vertex_near_other_edge\": 1\n      },\n      \"raw_topology_issue_severity_counts\": {\n        \"review\": 30\n      },\n      \"corner_candidates_rendered\": 18,\n      \"corner_candidate_type_counts\": {\n        \"degree2_connector_corner\": 3,\n        \"internal_centerline_bend\": 15\n      },\n      \"corner_candidate_risk_counts\": {\n        \"low\": 9,\n        \"medium\": 9\n      },\n      \"corner_candidate_status_counts\": {\n        \"accepted_active\": 4,\n        \"candidate_review\": 14\n      },\n      \"repaired_roads_rendered\": 171,\n      \"repaired_roads_class_counts\": {\n        \"residential\": 46,\n        \"secondary\": 62,\n        \"service\": 63\n      },\n      \"repaired_roads_source_edge_count_sum\": 0,\n      \"repaired_roads_road_graph_edge_mapped\": 0,\n      \"canonical_roads_rendered\": 43,\n      \"canonical_roads_class_counts\": {\n        \"residential\": 14,\n        \"secondary\": 4,\n        \"service\": 25\n      },\n      \"canonical_roads_source_edge_count_sum\": 171,\n      \"canonical_roads_road_graph_edge_mapped\": 100,\n      \"centerline_buffer_preview_polygons\": 500,\n      \"centerline_buffer_preview_source_counts\": {\n        \"continuity_curve\": 8,\n        \"lane_centerline\": 174,\n        \"lane_link_centerline\": 306,\n        \"physical_lane_group_centerline_v1\": 12\n      },\n      \"centerline_buffer_preview_skipped_movement_corridors\": 0,\n      \"centerline_buffer_preview_skip_reason_counts\": {}\n    },\n    \"style\": {\n      \"svg_width_px\": 3200,\n      \"svg_height_px\": 2740,\n      \"anchor_marker_radius_px\": 0.55,\n      \"anchor_marker_stroke_width_px\": 0.12,\n      \"lane_casing\": \"enabled（已启用）\",\n      \"visual_mode\": \"review_drawing（审图线稿）\",\n      \"raw_roads_overlay\": \"thin_black_solid_with_all_vertex_markers_hidden_by_default（细黑实线 + 全部原始顶点/断点标记，默认隐藏）\",\n      \"raw_topology_issue_overlay\": \"enabled_when_diagnostics_exist（诊断存在时启用）\",\n      \"repaired_roads_overlay\": \"blue_dashed_hidden_by_default\",\n      \"canonical_roads_overlay\": \"rose_solid_hidden_by_default\",\n      \"centerline_buffer_preview_overlay\": \"uniform_gray_hidden_by_default\",\n      \"movement_corridor_preview_gate\": \"fallback_when_no_lane_graph_junction_lane_links\"\n    },\n    \"link_source\": \"lane_graph_junction_lane_links\",\n    \"final_lane_link_precedence\": \"lane_graph_junction_lane_links_before_movement_corridor_candidates\",\n    \"note\": \"SVG visualization（可视化） only. lane_graph.json and movement_corridor_candidates.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.\",\n    \"inputs\": {\n      \"lane_graph\": \"data/processed/pattaya_central_500m_lane_graph.json\",\n      \"movement_corridors\": \"data/processed/pattaya_central_500m_movement_corridor_candidates.json\",\n      \"movement_corridor_scoring\": \"data/processed/pattaya_central_500m_movement_corridor_scoring.json\",\n      \"raw_roads\": \"data/processed/pattaya_central_500m_roads_raw.geojson\",\n      \"repaired_roads\": \"data/processed/pattaya_central_500m_roads_repaired.geojson\",\n      \"canonical_roads\": \"data/processed/pattaya_central_500m_roads_canonical.geojson\",\n      \"road_graph\": \"data/processed/pattaya_central_500m_road_graph.json\",\n      \"raw_topology_diagnostics\": \"data/processed/pattaya_central_500m_raw_topology_diagnostics.json\",\n      \"corner_candidates\": \"data/processed/pattaya_central_500m_corner_optimization_candidates.json\"\n    },\n    \"outputs\": {\n      \"svg\": \"reports/visualizations/pattaya_central_500m_lane_graph_topology.svg\",\n      \"report\": \"reports/pattaya_central_500m_lane_graph_svg_report.json\"\n    }\n  }\n}\n",
+  "completed_command_count": 2,
+  "exit_code": 0,
+  "completed_at_local": "2026-06-06T02:05:30",
+  "latest_package": {
+    "path": "data/lane_upgrade_packages/pattaya_central_500m/latest.json",
+    "data": {
+      "area_id": "pattaya_central_500m",
+      "system": "LaneForge",
+      "latest_package_version": "lane_package_v0170",
+      "path_policy": "portable_lane_package_paths_v1",
+      "latest_package_dir": "lane_package_v0170",
+      "manifest": "manifest.json",
+      "qa_gate_status": "manual_review_required",
+      "qa_warning_summary": {
+        "publishable_warn": 0,
+        "manual_review_required": 6,
+        "blocker": 0
+      },
+      "source_artifacts": {
+        "lane_graph": {
+          "path": "data/processed/pattaya_central_500m_lane_graph.json",
+          "exists": true,
+          "size_bytes": 1907011,
+          "mtime_utc": 1780682724.0524304,
+          "sha256": "a3180f47b5fa4f3b43fee62d928c004a1f61da26dea1a7aae3c72a5eb60adb2c"
+        },
+        "pipeline_audit_report": {
+          "path": "reports/pattaya_central_500m_pipeline_audit_report.json",
+          "exists": true,
+          "size_bytes": 71952,
+          "mtime_utc": 1780682726.2897918,
+          "sha256": "c140848aec3658174cfe73ba8f7caf1f386a43f2756ce7e1270f670fd3812dd9"
+        }
+      }
+    }
+  },
+  "svg_report": {
+    "area_id": "pattaya_central_500m",
+    "stage": "lane_graph_svg_visualization",
+    "status": "pass",
+    "counts": {
+      "lanes": 200,
+      "physical_lane_centerlines": 186,
+      "visible_lane_centerlines": 186,
+      "lane_links_total": 306,
+      "continuity_links_total": 20,
+      "junction_connections_rendered": 306,
+      "continuity_links_rendered": 8,
+      "continuity_micro_seams_skipped": 12,
+      "continuity_link_source_counts": {
+        "degree2_connector_through_continuity_v1": 2,
+        "optimized_corner_fillet": 6
+      },
+      "movement_corridors_rendered": 0,
+      "anchor_markers_rendered": 0,
+      "anchor_source_counts": {},
+      "visual_candidate_family_counts": {},
+      "visual_candidate_issue_counts": {},
+      "movement_corridors_skipped": 0,
+      "movement_corridor_skip_reason_counts": {},
+      "movement_corridor_scoring_status_counts": {},
+      "raw_roads_rendered": 44,
+      "raw_road_endpoint_markers_rendered": 88,
+      "raw_road_internal_vertex_markers_rendered": 215,
+      "raw_road_vertex_markers_rendered": 303,
+      "raw_road_class_counts": {
+        "residential": 14,
+        "secondary": 3,
+        "service": 27
+      },
+      "raw_topology_issue_markers_rendered": 30,
+      "raw_topology_issue_classification_counts": {
+        "dangling_endpoint": 29,
+        "internal_vertex_near_other_edge": 1
+      },
+      "raw_topology_issue_severity_counts": {
+        "review": 30
+      },
+      "corner_candidates_rendered": 18,
+      "corner_candidate_type_counts": {
+        "degree2_connector_corner": 3,
+        "internal_centerline_bend": 15
+      },
+      "corner_candidate_risk_counts": {
+        "low": 9,
+        "medium": 9
+      },
+      "corner_candidate_status_counts": {
+        "accepted_active": 4,
+        "candidate_review": 14
+      },
+      "repaired_roads_rendered": 171,
+      "repaired_roads_class_counts": {
+        "residential": 46,
+        "secondary": 62,
+        "service": 63
+      },
+      "repaired_roads_source_edge_count_sum": 0,
+      "repaired_roads_road_graph_edge_mapped": 0,
+      "canonical_roads_rendered": 43,
+      "canonical_roads_class_counts": {
+        "residential": 14,
+        "secondary": 4,
+        "service": 25
+      },
+      "canonical_roads_source_edge_count_sum": 171,
+      "canonical_roads_road_graph_edge_mapped": 100,
+      "centerline_buffer_preview_polygons": 500,
+      "centerline_buffer_preview_source_counts": {
+        "continuity_curve": 8,
+        "lane_centerline": 174,
+        "lane_link_centerline": 306,
+        "physical_lane_group_centerline_v1": 12
+      },
+      "centerline_buffer_preview_skipped_movement_corridors": 0,
+      "centerline_buffer_preview_skip_reason_counts": {}
+    },
+    "style": {
+      "svg_width_px": 3200,
+      "svg_height_px": 2740,
+      "anchor_marker_radius_px": 0.55,
+      "anchor_marker_stroke_width_px": 0.12,
+      "lane_casing": "enabled（已启用）",
+      "visual_mode": "review_drawing（审图线稿）",
+      "raw_roads_overlay": "thin_black_solid_with_all_vertex_markers_hidden_by_default（细黑实线 + 全部原始顶点/断点标记，默认隐藏）",
+      "raw_topology_issue_overlay": "enabled_when_diagnostics_exist（诊断存在时启用）",
+      "repaired_roads_overlay": "blue_dashed_hidden_by_default",
+      "canonical_roads_overlay": "rose_solid_hidden_by_default",
+      "centerline_buffer_preview_overlay": "uniform_gray_hidden_by_default",
+      "movement_corridor_preview_gate": "fallback_when_no_lane_graph_junction_lane_links"
+    },
+    "link_source": "lane_graph_junction_lane_links",
+    "final_lane_link_precedence": "lane_graph_junction_lane_links_before_movement_corridor_candidates",
+    "note": "SVG visualization（可视化） only. lane_graph.json and movement_corridor_candidates.json are structured artifacts（结构化产物）. Corridor curves are preview candidates（候选预览）, not final lane geometry（最终车道几何）.",
+    "inputs": {
+      "lane_graph": "data/processed/pattaya_central_500m_lane_graph.json",
+      "movement_corridors": "data/processed/pattaya_central_500m_movement_corridor_candidates.json",
+      "movement_corridor_scoring": "data/processed/pattaya_central_500m_movement_corridor_scoring.json",
+      "raw_roads": "data/processed/pattaya_central_500m_roads_raw.geojson",
+      "repaired_roads": "data/processed/pattaya_central_500m_roads_repaired.geojson",
+      "canonical_roads": "data/processed/pattaya_central_500m_roads_canonical.geojson",
+      "road_graph": "data/processed/pattaya_central_500m_road_graph.json",
+      "raw_topology_diagnostics": "data/processed/pattaya_central_500m_raw_topology_diagnostics.json",
+      "corner_candidates": "data/processed/pattaya_central_500m_corner_optimization_candidates.json"
+    },
+    "outputs": {
+      "svg": "reports/visualizations/pattaya_central_500m_lane_graph_topology.svg",
+      "report": "reports/pattaya_central_500m_lane_graph_svg_report.json"
+    }
+  },
+  "reload_url": "svg_live_viewer.html?cache=1780682730"
+}
