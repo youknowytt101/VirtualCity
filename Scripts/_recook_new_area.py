@@ -50,7 +50,8 @@ _roads_cut_fill_enabled = bool(_cfg.get('roads_cut_fill_enabled', False))
 _dev_quick_roads = bool(_cfg.get('dev_quick_roads', False))
 _roads_topology_preferred = str(_cfg.get('roads_topology_preferred', 'strips')).lower().strip()
 _road_source_mode = str(_cfg.get('road_source_mode', _roads_topology_preferred)).lower().strip()
-_lane_package_manifest = str(_cfg.get('lane_package_manifest', '') or '').strip()
+if _road_source_mode not in ('auto', 'legacy_debug', 'strips', 'builder', 'topology', 'rtb'):
+    _road_source_mode = 'auto'
 _qa_autorevert_topology_builder = bool(_cfg.get('qa_autorevert_topology_builder', True))
 _junction_min_angle_deg = float(_cfg.get('junction_min_angle_deg', 2.0))
 _sliver_edge_min_m = float(_cfg.get('sliver_edge_min_m', 0.01))
@@ -295,7 +296,7 @@ try:
         rtb_node = net.createNode('python', 'road_topology_builder')
     rtb_node.setInput(0, _road_mesh_input, 0)
     rtb_node.parm('python').set(RTB_CODE)
-    # 路径选择器：0=road_strips（默认），1=road_topology_builder，2=LaneForge package surface
+    # 路径选择器：0=road_strips（默认），1=road_topology_builder
     source_switch = hou.node(OBJ_PATH + '/road_source')
     if source_switch is None:
         source_switch = net.createNode('switch', 'road_source')
@@ -304,141 +305,8 @@ try:
     if rs_node_ref:
         source_switch.setInput(0, rs_node_ref, 0)
     source_switch.setInput(1, rtb_node, 0)
-    laneforge_surface_node = None
-    laneforge_surface_prims = 0
-    laneforge_surface_ok = False
-    laneforge_surface_reason = 'not_requested'
-    if _road_source_mode in ('laneforge_auto', 'laneforge', 'laneforge_required'):
-        try:
-            manifest_path = Path(_lane_package_manifest)
-            if not manifest_path.is_absolute():
-                manifest_path = ROOT / manifest_path
-            if not manifest_path.exists():
-                raise FileNotFoundError('lane_package_manifest missing: {}'.format(manifest_path))
-            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
-            meta = manifest.get('metadata') or {}
-            source_identity = manifest.get('source_identity') or meta.get('source_identity') or {}
-            if str(meta.get('area_id') or '') != str(_area_id):
-                raise ValueError('LaneForge manifest area_id mismatch: {} != {}'.format(meta.get('area_id'), _area_id))
-            if _run_id and str(source_identity.get('run_id') or '') != str(_run_id):
-                raise ValueError('LaneForge source run_id mismatch: {} != {}'.format(source_identity.get('run_id'), _run_id))
-            if str(source_identity.get('source_system') or '') != 'VirtualCity':
-                raise ValueError('LaneForge manifest is not sourced from VirtualCity bridge')
-            qa_gate_status = str(meta.get('qa_gate_status') or '').lower()
-            if qa_gate_status == 'blocker':
-                raise ValueError('LaneForge qa_gate_status=blocker')
-            inputs = manifest.get('inputs') or {}
-            surface_rel = inputs.get('standard_lane_surfaces') or ''
-            if not surface_rel:
-                raise ValueError('LaneForge manifest missing inputs.standard_lane_surfaces')
-            surface_path = Path(str(surface_rel))
-            if not surface_path.is_absolute():
-                surface_path = manifest_path.parent / surface_path
-            if not surface_path.exists():
-                raise FileNotFoundError('LaneForge standard_lane_surfaces missing: {}'.format(surface_path))
-
-            surface_import_code = r'''
-import hou
-import json
-
-SURFACE_GEOJSON_PATH = __SURFACE_GEOJSON_PATH__
-
-node = hou.pwd()
-geo = node.geometry()
-geo.clear()
-
-geo.addAttrib(hou.attribType.Prim, "source_provider", "")
-geo.addAttrib(hou.attribType.Prim, "source_feature_id", "")
-geo.addAttrib(hou.attribType.Prim, "highway", "")
-geo.addAttrib(hou.attribType.Prim, "name", "")
-geo.addAttrib(hou.attribType.Prim, "lanes", 0)
-geo.addAttrib(hou.attribType.Prim, "osm_width", 0.0)
-geo.addAttrib(hou.attribType.Prim, "half_width", 0.0)
-geo.addAttrib(hou.attribType.Prim, "oneway", 0)
-geo.addAttrib(hou.attribType.Prim, "seg_id", -1)
-geo.addAttrib(hou.attribType.Prim, "is_junction", 0)
-geo.addAttrib(hou.attribType.Prim, "vc_part", "")
-geo.addAttrib(hou.attribType.Prim, "lane_id", "")
-geo.addAttrib(hou.attribType.Prim, "lane_link_id", "")
-geo.addAttrib(hou.attribType.Prim, "continuity_link_id", "")
-geo.addAttrib(hou.attribType.Prim, "junction_id", "")
-geo.addAttrib(hou.attribType.Prim, "turn", "")
-geo.addAttrib(hou.attribType.Prim, "width_m", 0.0)
-geo.addAttrib(hou.attribType.Prim, "area_m2", 0.0)
-
-lane_surface_group = geo.createPrimGroup("lane_surface_v1")
-turn_surface_group = geo.createPrimGroup("lane_turn_surface_v1")
-continuity_surface_group = geo.createPrimGroup("lane_continuity_surface_v1")
-junction_envelope_group = geo.createPrimGroup("junction_envelope_surface_v1")
-
-with open(SURFACE_GEOJSON_PATH, encoding="utf-8") as f:
-    fc = json.load(f)
-
-for index, feature in enumerate(fc.get("features", [])):
-    geom = feature.get("geometry") or {}
-    props = feature.get("properties") or {}
-    if geom.get("type") != "Polygon":
-        continue
-    rings = geom.get("coordinates") or []
-    if not rings or len(rings[0]) < 4:
-        continue
-    ring = rings[0]
-    if ring and ring[0] == ring[-1]:
-        ring = ring[:-1]
-    if len(ring) < 3:
-        continue
-    part = str(props.get("vc_part") or "lane_surface_v1")
-    prim = geo.createPolygon(is_closed=True)
-    for x, z in ring:
-        pt = geo.createPoint()
-        pt.setPosition(hou.Vector3(float(x), 0.0, -float(z)))
-        prim.addVertex(pt)
-    width = float(props.get("width_m") or 3.2)
-    prim.setAttribValue("source_provider", "LaneForge")
-    prim.setAttribValue("source_feature_id", str(props.get("lane_id") or props.get("lane_link_id") or props.get("junction_id") or index))
-    prim.setAttribValue("highway", "residential")
-    prim.setAttribValue("name", str(props.get("lane_id") or props.get("junction_id") or "LaneForge"))
-    prim.setAttribValue("lanes", 1)
-    prim.setAttribValue("osm_width", width)
-    prim.setAttribValue("half_width", width * 0.5)
-    prim.setAttribValue("oneway", 1)
-    prim.setAttribValue("seg_id", int(index))
-    prim.setAttribValue("is_junction", 1 if part in ("lane_turn_surface_v1", "junction_envelope_surface_v1") else 0)
-    prim.setAttribValue("vc_part", part)
-    prim.setAttribValue("lane_id", str(props.get("lane_id") or ""))
-    prim.setAttribValue("lane_link_id", str(props.get("lane_link_id") or ""))
-    prim.setAttribValue("continuity_link_id", str(props.get("continuity_link_id") or ""))
-    prim.setAttribValue("junction_id", str(props.get("junction_id") or ""))
-    prim.setAttribValue("turn", str(props.get("turn") or ""))
-    prim.setAttribValue("width_m", width)
-    prim.setAttribValue("area_m2", float(props.get("area_m2") or 0.0))
-    if part == "lane_turn_surface_v1":
-        turn_surface_group.add(prim)
-    elif part == "lane_continuity_surface_v1":
-        continuity_surface_group.add(prim)
-    elif part == "junction_envelope_surface_v1":
-        junction_envelope_group.add(prim)
-    else:
-        lane_surface_group.add(prim)
-'''.replace('__SURFACE_GEOJSON_PATH__', json.dumps(surface_path.as_posix()))
-
-            laneforge_surface_node = hou.node(OBJ_PATH + '/laneforge_lane_surfaces')
-            if laneforge_surface_node is None:
-                laneforge_surface_node = net.createNode('python', 'laneforge_lane_surfaces')
-            laneforge_surface_node.parm('python').set(surface_import_code)
-            laneforge_surface_node.cook(force=True)
-            laneforge_surface_prims = int(laneforge_surface_node.geometry().intrinsicValue('primitivecount'))
-            laneforge_surface_ok = laneforge_surface_prims > 0
-            laneforge_surface_reason = 'ok' if laneforge_surface_ok else 'empty_surface'
-            source_switch.setInput(2, laneforge_surface_node, 0)
-            print('  LaneForge package surface: prims={} qa_gate={} manifest={}'.format(
-                laneforge_surface_prims, qa_gate_status or 'unknown', manifest_path.as_posix()))
-        except Exception as _lf_e:
-            laneforge_surface_ok = False
-            laneforge_surface_reason = str(_lf_e)
-            print('  [WARN] LaneForge package surface 不可用，保留 legacy road_source: {}'.format(_lf_e))
     # 默认策略：auto。builder 通过轻量 QA 就使用；失败则回退 legacy road_strips。
-    _pref_mode = _roads_topology_preferred
+    _pref_mode = _road_source_mode or _roads_topology_preferred
     _pref = 1 if _pref_mode in ('builder', 'topology', 'rtb') else 0
 
     def _xz_min_angle(pts):
@@ -508,24 +376,18 @@ for index, feature in enumerate(fc.get("features", [])):
             _builder_qa_ok = False
             print(f"  [road_source] builder QA 评估失败: {_qe}")
 
-    if _road_source_mode in ('laneforge_auto', 'laneforge') and laneforge_surface_ok:
-        _pref = 2
-    elif _road_source_mode == 'laneforge_required':
-        if not laneforge_surface_ok:
-            raise RuntimeError('LaneForge road source required but unavailable: {}'.format(laneforge_surface_reason))
-        _pref = 2
-    elif _pref_mode == 'auto':
+    if _pref_mode == 'auto':
         _pref = 1 if _builder_qa_ok else 0
+    elif _pref_mode in ('legacy_debug', 'strips'):
+        _pref = 0
     elif _pref in (1,) and _qa_autorevert_topology_builder and not _builder_qa_ok:
         _pref = 0
         print("  [auto-revert] road_topology_builder QA 未通过，已回退为 road_strips")
     source_switch.parm('input').set(_pref)
-    _chosen = 'laneforge_lane_surfaces' if _pref == 2 else 'road_topology_builder' if _pref == 1 else 'road_strips'
+    _chosen = 'road_topology_builder' if _pref == 1 else 'road_strips'
     print("  road_source: mode={} selected={} builder_prims={} strips_prims={} ratio={:.2f} bad={}/{}".format(
         _road_source_mode or _pref_mode, _chosen, _builder_prims, _strips_prims, _builder_ratio, _builder_bad, _builder_checked))
 except Exception as _e:
-    if _road_source_mode == 'laneforge_required':
-        raise
     print(f"  [WARN] Road Topology Builder 注入失败，保持使用 road_strips: {_e}")
 
 # ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────

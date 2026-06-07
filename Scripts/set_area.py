@@ -27,13 +27,10 @@ Google Maps URL 获取方式:
     5. validate_data.py 验证 → Houdini recook + 更新裁剪节点
     [WARN] 导出（export_and_import.py）需用户确认视口后手动运行
 
-完整生成模式要求 Houdini 已打开。`--data-only` 与 `--lane-upgrade-only` 不依赖 Houdini。UE5 可稍后打开。
+完整生成模式要求 Houdini 已打开。`--data-only` 不依赖 Houdini。UE5 可稍后打开。
 
 只下载数据、不触发 Houdini:
     uv run python Scripts/set_area.py --data-only <west> <south> <east> <north> [area_name]
-
-只准备车道升级数据、不触发 Houdini:
-    uv run python Scripts/set_area.py --lane-upgrade-only <west> <south> <east> <north> [area_name]
 """
 
 import sys, os, json, math, subprocess, time, re, atexit
@@ -47,11 +44,7 @@ HIP = str(HIP)
 
 ACQUISITION_PROFILE = dcc.CURRENT_ACQUISITION_PROFILE
 DATA_ONLY = "--data-only" in sys.argv[1:]
-LANE_UPGRADE_ONLY = "--lane-upgrade-only" in sys.argv[1:]
-ARGS = [arg for arg in sys.argv[1:] if arg not in ("--data-only", "--lane-upgrade-only")]
-if DATA_ONLY and LANE_UPGRADE_ONLY:
-    print("  [ERR] --data-only 与 --lane-upgrade-only 不能同时使用")
-    sys.exit(1)
+ARGS = [arg for arg in sys.argv[1:] if arg != "--data-only"]
 
 # ── 0. 解析参数（支持三种用法）─────────────────────────
 def _center_to_bbox(lon: float, lat: float, radius_km: float):
@@ -128,8 +121,6 @@ print(f"  中心: ({origin_lon:.4f}, {origin_lat:.4f})")
 print(f"  尺寸: {bbox_w/1000:.1f} km × {bbox_h/1000:.1f} km")
 if DATA_ONLY:
     print("  模式: 仅下载数据（跳过 refine_data 与 Houdini 重算）")
-if LANE_UPGRADE_ONLY:
-    print("  模式: 车道升级准备（执行 refine_data + LaneForge bridge，跳过 Houdini 重算）")
 print(f"{'='*50}\n")
 
 osm_path       = str(DATA_ROOT / f"OSM/{area_name}_osm_v001.osm")
@@ -381,37 +372,6 @@ refine_result = subprocess.run(
 if refine_result.returncode != 0:
     _abort("refine_data", "数据精炼未通过，中止流程")
 _phase("refine_data_completed", "data refinement completed")
-
-# 5b. LaneForge bridge — 用主工程当前 Houdini-ready 道路生成标准车道包。
-# 失败不阻断主流程；_recook_new_area.py 会保留 legacy road_strips 兜底。
-print(f"\n[5b/6] LaneForge 车道预览包（同源道路 bridge）...")
-_phase("laneforge_bridge", "LaneForge bridge started")
-bridge_cmd = [sys.executable, str(SCRIPTS / "build_laneforge_area_package.py")]
-if not LANE_UPGRADE_ONLY:
-    bridge_cmd.append("--allow-failure")
-bridge_result = subprocess.run(bridge_cmd, cwd=str(SCRIPTS), capture_output=False)
-if bridge_result.returncode != 0:
-    if LANE_UPGRADE_ONLY:
-        _abort("laneforge_bridge", "车道预览包生成失败，无法进入 LaneForge 预览")
-    else:
-        print("  [WARN] LaneForge bridge 未完成；Houdini 将使用 legacy road_strips 兜底")
-        _phase("laneforge_bridge_warn", "LaneForge bridge returned non-zero; legacy roads fallback remains available")
-else:
-    _phase("laneforge_bridge_completed", "LaneForge bridge completed or fallback recorded")
-
-if LANE_UPGRADE_ONLY:
-    pipeline_state.complete_run(RUN_ID, phase="lane_upgrade_prepare_completed",
-                                message="data acquisition, refinement, and LaneForge bridge completed")
-    _RUN_FINALIZED = True
-    print(f"""
-{'='*50}
-[OK] 车道预览数据准备完成: {area_name}
-{'='*50}
-
-[INFO] 已生成当前 BBOX 的 Houdini-ready 数据与 LaneForge 车道 package。
-       可进入 LaneForge 页面进行预览/编辑；之后再回到主操作台点击 [Houdini 生成]。
-""")
-    raise SystemExit(0)
 
 # ── 6. Houdini recook ────────────────────────────────
 print(f"\n[6/6] Houdini 重算...")

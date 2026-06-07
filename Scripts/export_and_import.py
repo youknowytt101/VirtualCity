@@ -9,6 +9,7 @@ Houdini 必须已运行（RPYC 端口 18811）。
     uv run python Scripts/export_and_import.py --fbx-only
 """
 import sys, os, time
+import pipeline_status
 from vc_paths import HIP, EXPORT, TRIGGER, SCRIPTS, load_active_area
 
 HIP = HIP.as_posix()
@@ -20,10 +21,22 @@ _cfg = load_active_area()
 _OBJ_NET = _cfg.get('obj_network', 'city_gen')
 _OBJ = '/obj/' + _OBJ_NET
 
+
+_pre_gate = pipeline_status.export_gate(active_cfg=_cfg, live_model_ready=None)
+if not _pre_gate.get("allowed"):
+    print("[FAIL] 当前区域未通过导出 gate: " + str(_pre_gate.get("primary_reason") or "unknown"))
+    for reason in _pre_gate.get("reasons", [])[1:]:
+        print("  - " + str(reason))
+    if _pre_gate.get("requires_manual_review"):
+        area_id = _pre_gate.get("status", {}).get("area_id", _cfg.get("area_id", ""))
+        run_id = _pre_gate.get("status", {}).get("run_id", _cfg.get("run_id", ""))
+        print(f"  [INFO] 人工审核通过后记录: uv run python manual_review.py approved --area-id {area_id} --run-id {run_id}")
+    sys.exit(1)
+
 # label, 候选SOP（从最终输出往上游兜底）, 输出FBX
 EXPORTS = [
     ('buildings', [f'{_OBJ}/bld_with_foundation', f'{_OBJ}/bld_clipped', f'{_OBJ}/post_normals'], 'buildings_v001.fbx'),
-    ('roads',     [f'{_OBJ}/road_color', f'{_OBJ}/road_profile_apply', f'{_OBJ}/road_clipped', f'{_OBJ}/laneforge_lane_surfaces', f'{_OBJ}/road_strips'], 'roads_v001.fbx'),
+    ('roads',     [f'{_OBJ}/road_color', f'{_OBJ}/road_profile_apply', f'{_OBJ}/road_clipped', f'{_OBJ}/road_strips'], 'roads_v001.fbx'),
     ('terrain',   [f'{_OBJ}/terrain_color', f'{_OBJ}/dem_subdivide', f'{_OBJ}/dem_terrain'], 'terrain_v001.fbx'),
 ]
 

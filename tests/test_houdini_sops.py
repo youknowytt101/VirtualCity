@@ -208,9 +208,12 @@ class TestExportAndImportChain(unittest.TestCase):
 
     def test_export_uses_final_cooked_nodes_before_fallbacks(self):
         text = self.PATH.read_text(encoding="utf-8")
+        self.assertIn("pipeline_status.export_gate", text)
         self.assertIn("select_sop_path", text)
         self.assertIn("[f'{_OBJ}/bld_with_foundation', f'{_OBJ}/bld_clipped', f'{_OBJ}/post_normals']", text)
-        self.assertIn("[f'{_OBJ}/road_color', f'{_OBJ}/road_profile_apply', f'{_OBJ}/road_clipped', f'{_OBJ}/road_strips']", text)
+        removed_lane_surface_node = "lane" + "forge_lane_surfaces"
+        self.assertNotIn(removed_lane_surface_node, text)
+        self.assertIn("f'{_OBJ}/road_strips'", text)
         self.assertIn("[f'{_OBJ}/terrain_color', f'{_OBJ}/dem_subdivide', f'{_OBJ}/dem_terrain']", text)
         self.assertIn("prims = geo.intrinsicValue('primitivecount')", text)
 

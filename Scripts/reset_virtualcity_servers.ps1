@@ -1,7 +1,6 @@
 [CmdletBinding()]
 param(
     [int]$AreaPickerPort = 8765,
-    [int]$LaneForgePort = 8766,
     [string]$BindAddress = "127.0.0.1",
     [int]$StartupTimeoutSec = 25,
     [switch]$NoStart,
@@ -16,7 +15,6 @@ $Root = Split-Path -Parent $Scripts
 $AreaPickerUrl = "http://${BindAddress}:$AreaPickerPort/"
 $AreaPickerHealthUrl = "http://${BindAddress}:$AreaPickerPort/health"
 $AreaPickerShutdownUrl = "http://${BindAddress}:$AreaPickerPort/shutdown"
-$LaneForgeApiUrl = "http://${BindAddress}:$LaneForgePort/api/status"
 
 function Write-ResetStep {
     param([string]$Message)
@@ -40,11 +38,6 @@ function Get-JsonEndpoint {
 function Test-AreaPickerReady {
     $payload = Get-JsonEndpoint -Url $AreaPickerHealthUrl
     return $null -ne $payload -and $payload.app -eq "VirtualCity area_picker"
-}
-
-function Test-LaneForgeReady {
-    $payload = Get-JsonEndpoint -Url $LaneForgeApiUrl
-    return $null -ne $payload -and $payload.status -eq "ok" -and $payload.system -eq "LaneForge"
 }
 
 function Get-PortListeners {
@@ -73,7 +66,6 @@ function Test-VirtualCityServerProcess {
     $path = [string]$Process.Path
     return (
         $CommandLine -match "area_picker\.py" -or
-        $CommandLine -match "laneforge_viewer_server\.py" -or
         $CommandLine -match [regex]::Escape($Root) -or
         ($path -and $path.StartsWith($Root, [System.StringComparison]::OrdinalIgnoreCase))
     )
@@ -167,21 +159,14 @@ function Wait-AreaPickerReady {
 
 Write-ResetStep "Resetting local web servers only. Data, caches, Houdini, and UE are not touched."
 Write-ResetStep "AreaPicker: $AreaPickerUrl"
-Write-ResetStep "LaneForge API: $LaneForgeApiUrl"
 
 Request-AreaPickerShutdown
 
-if (Test-LaneForgeReady) {
-    Write-ResetStep "LaneForge viewer is reachable; it will be stopped so the next preview starts cleanly."
-}
-
 Stop-PortListeners -Port $AreaPickerPort -Label "area_picker"
-Stop-PortListeners -Port $LaneForgePort -Label "LaneForge"
 
 $areaFree = Wait-PortFree -Port $AreaPickerPort
-$laneFree = Wait-PortFree -Port $LaneForgePort
-if (-not $areaFree -or -not $laneFree) {
-    throw "Could not release one or more web server ports. area_picker_free=$areaFree LaneForge_free=$laneFree"
+if (-not $areaFree) {
+    throw "Could not release area_picker port. area_picker_free=$areaFree"
 }
 
 if ($NoStart) {
