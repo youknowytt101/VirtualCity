@@ -1,8 +1,0 @@
-{
-  "area_id": "pattaya_central_500m",
-  "system": "LaneForge",
-  "latest_plan_version": "v0128",
-  "path_policy": "pipeline_root_relative_paths_v1",
-  "latest_plan": "data/lane_upgrade_system/propagation/pattaya_central_500m_lane_upgrade_propagation_plan_v0128.json",
-  "latest_report": "reports/pattaya_central_500m_lane_upgrade_propagation_report.json"
-}

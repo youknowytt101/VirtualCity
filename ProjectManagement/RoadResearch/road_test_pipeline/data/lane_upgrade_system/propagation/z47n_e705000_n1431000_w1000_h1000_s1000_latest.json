@@ -1,8 +1,0 @@
-{
-  "area_id": "z47n_e705000_n1431000_w1000_h1000_s1000",
-  "system": "LaneForge",
-  "latest_plan_version": "v0001",
-  "path_policy": "pipeline_root_relative_paths_v1",
-  "latest_plan": "data/lane_upgrade_system/propagation/z47n_e705000_n1431000_w1000_h1000_s1000_lane_upgrade_propagation_plan_v0001.json",
-  "latest_report": "reports/z47n_e705000_n1431000_w1000_h1000_s1000_lane_upgrade_propagation_report.json"
-}
