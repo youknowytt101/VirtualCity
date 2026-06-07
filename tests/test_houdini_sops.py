@@ -156,7 +156,7 @@ class TestRoadStripsV2(unittest.TestCase):
 
 
 class TestRecookRoadChain(unittest.TestCase):
-    PATH = ROOT / "Scripts" / "_recook_new_area.py"
+    PATH = ROOT / "Scripts" / "houdini_build" / "recook_new_area.py"
 
     def test_outputs_flat_road_surface_without_polyextrude(self):
         text = self.PATH.read_text(encoding="utf-8")
@@ -185,6 +185,18 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn("houdini_sops.load('road_profile_apply.py', ROOT=ROOT_STR)", text)
         self.assertIn("road_prof.cook(force=True)", text)
         self.assertIn("'road_profile_apply'", text)
+
+    def test_recook_only_preflights_houdini_ready_data(self):
+        text = self.PATH.read_text(encoding="utf-8")
+        self.assertIn("Houdini-ready preflight failed", text)
+        self.assertIn("dcc.ready_outputs_exist", text)
+        self.assertNotIn("_refine_result", text)
+        self.assertNotIn("str(ROOT / 'Scripts' / 'refine_data.py')", text)
+
+    def test_legacy_recook_wrapper_points_to_houdini_build_layer(self):
+        text = (ROOT / "Scripts" / "_recook_new_area.py").read_text(encoding="utf-8")
+        self.assertIn('SCRIPTS / "houdini_build" / "recook_new_area.py"', text)
+        self.assertIn("runpy.run_path", text)
 
 
 class TestModelQaRoadChain(unittest.TestCase):

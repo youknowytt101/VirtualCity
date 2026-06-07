@@ -8,6 +8,7 @@
 > 当前状态和下一步见：`ProjectManagement/02_当前状态与下一步.md`。
 >
 > 当前主线自动化流程见：`Scripts/README.md` 和 `ProjectManagement/04_稳定流程规范.md`。
+> 三大模块架构边界见：`ProjectManagement/14_三大模块架构边界.md`。
 
 ## 目录结构
 
@@ -64,11 +65,14 @@ VirtualCity/
 │   └── Export/
 │
 ├── Scripts/                 ← 数据获取、清洗、Houdini recook、QA 自动化
-│   ├── 插件清单.md
-│   ├── 工具开发规范.md
-│   ├── 数据处理自动化/
-│   ├── Houdini自动化/
-│   └── UE5自动化/
+│   ├── orchestration/
+│   ├── acquisition/
+│   ├── cleaning/
+│   ├── houdini_build/
+│   ├── houdini_sops/
+│   ├── shared/
+│   ├── ue5/
+│   └── _archive/
 │
 └── UE5/                       ← Unreal Engine 5 工程
     └── （UE5 项目文件夹）
@@ -79,11 +83,13 @@ VirtualCity/
 ```
 area_picker.py (Leaflet 网页框选 / 用户级入口)
     ↓
-set_area.py (区域状态 + 数据获取)
+orchestration/run_pipeline.py (完整管线编排)
     ↓
-refine_data.py (数据清洗 + 数据 QA)
+acquisition/set_area.py --acquire-only (区域状态 + 数据获取)
     ↓
-_recook_new_area.py (Houdini 自动构建)
+cleaning/refine_data.py (数据清洗 + 数据 QA)
+    ↓
+houdini_build/recook_new_area.py (Houdini 自动构建)
     ↓
 houdini_model_qa.py (模型 QA)
     ↓
@@ -91,6 +97,27 @@ houdini_model_qa.py (模型 QA)
     ↓
 export_and_import.py (审核后再进入 UE5)
 ```
+
+## 三大模块架构
+
+当前官方架构口径是三大模块：
+
+```text
+数据获取 / 下载 / 缓存
+    ↓
+数据清洗 / 语义 / QA
+    ↓
+Houdini 构建 / Model QA / 审核出口
+```
+
+这三大块是当前业务流程和验收口径；核心执行入口已开始物理分层到 `Scripts/acquisition/`、`Scripts/cleaning/`、`Scripts/houdini_build/`，`Scripts/` 根目录保留旧命令 wrapper 兼容历史调用。详细边界、评分和目标目录形态见 `ProjectManagement/14_三大模块架构边界.md`。
+
+完整构建的正式编排入口是 `Scripts/orchestration/run_pipeline.py`。`Scripts/set_area.py`、`Scripts/refine_data.py`、`Scripts/_recook_new_area.py` 保留旧命令兼容；新主线分别调用 `acquisition/set_area.py`、`cleaning/refine_data.py`、`houdini_build/recook_new_area.py`。Houdini 构建层只消费 `RawData/_houdini_ready/{area_id}/ready_manifest.json` 声明的当前 run 数据。
+
+配套图：
+
+- `ProjectManagement/VirtualCity_三大模块流程图.svg`
+- `ProjectManagement/VirtualCity_自动化管线完整流程图.svg`
 
 ## AI 快速入口
 
@@ -106,6 +133,7 @@ export_and_import.py (审核后再进入 UE5)
 - 决策记录：`ProjectManagement/09_决策记录.md`
 - AI 启动自检清单：`ProjectManagement/10_AI启动自检清单.md`
 - 版本路线图：`ProjectManagement/11_版本路线图.md`
+- 三大模块架构边界：`ProjectManagement/14_三大模块架构边界.md`
 - 机器可读项目清单：`ProjectManagement/project_manifest.json`
 - 机器可读文档索引：`ProjectManagement/document_index.json`
 - 配置模板目录：`Config/README.md`

@@ -556,14 +556,34 @@ class TestExportAvailability(unittest.TestCase):
 
 class TestSetAreaDataOnly(unittest.TestCase):
     def test_set_area_exposes_data_only_mode(self):
-        source = (ROOT / "Scripts" / "set_area.py").read_text(encoding="utf-8")
+        source = (ROOT / "Scripts" / "acquisition" / "set_area.py").read_text(encoding="utf-8")
         self.assertIn("--data-only", source)
+        self.assertIn("--acquire-only", source)
         self.assertIn("data_download_completed", source)
         self.assertIn("跳过 refine_data 与 Houdini 重算", source)
+
+    def test_legacy_set_area_wrapper_points_to_acquisition_layer(self):
+        source = (ROOT / "Scripts" / "set_area.py").read_text(encoding="utf-8")
+        self.assertIn('SCRIPTS / "acquisition" / "set_area.py"', source)
+        self.assertIn("runpy.run_path", source)
 
     def test_data_only_does_not_emit_houdini_completion_warning(self):
         source = (ROOT / "Scripts" / "area_picker.py").read_text(encoding="utf-8")
         self.assertIn("if ok and not houdini_done and not data_only:", source)
+
+    def test_full_pipeline_uses_explicit_orchestrator(self):
+        source = (ROOT / "Scripts" / "area_picker.py").read_text(encoding="utf-8")
+        self.assertIn("orchestration/run_pipeline.py", source)
+        self.assertIn("--tile-ids", source)
+        self.assertIn("'acquisition/set_area.py', '--data-only'", source)
+
+    def test_run_pipeline_orchestrator_exists(self):
+        source = (ROOT / "Scripts" / "orchestration" / "run_pipeline.py").read_text(encoding="utf-8")
+        self.assertIn("acquisition/set_area.py", source)
+        self.assertIn("--acquire-only", source)
+        self.assertIn("VC_PIPELINE_TILE_IDS", source)
+        self.assertIn("cleaning/refine_data.py", source)
+        self.assertIn("houdini_build/recook_new_area.py", source)
 
 
 class TestServerStartup(unittest.TestCase):

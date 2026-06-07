@@ -1,0 +1,503 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="3080" viewBox="0 0 1680 3080" font-family="Segoe UI, Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="11" markerHeight="11" refX="9" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3.5 L0,7 Z" fill="#334155"/>
+    </marker>
+    <marker id="arrowSoft" markerWidth="11" markerHeight="11" refX="9" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3.5 L0,7 Z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowWarn" markerWidth="11" markerHeight="11" refX="9" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3.5 L0,7 Z" fill="#d97706"/>
+    </marker>
+    <style>
+      .page { fill:#f8fafc; }
+      .grid { stroke:#e2e8f0; stroke-width:1; }
+      .laneHead { fill:#0f172a; font-size:14px; font-weight:700; letter-spacing:.7px; }
+      .h1 { fill:#0f172a; font-size:29px; font-weight:750; }
+      .sub { fill:#475569; font-size:13px; }
+      .tiny { fill:#64748b; font-size:10.8px; }
+      .small { fill:#475569; font-size:12px; }
+      .title { fill:#0f172a; font-size:15px; font-weight:700; }
+      .step { fill:#334155; font-size:11px; font-weight:700; letter-spacing:.6px; }
+      .box { stroke-width:1.4; }
+      .ui { fill:#ede9fe; stroke:#7c3aed; }
+      .state { fill:#e0f2fe; stroke:#0284c7; }
+      .data { fill:#dbeafe; stroke:#2563eb; }
+      .cache { fill:#ccfbf1; stroke:#0d9488; }
+      .clean { fill:#dcfce7; stroke:#16a34a; }
+      .houdini { fill:#ffedd5; stroke:#ea580c; }
+      .qa { fill:#f5f3ff; stroke:#7c3aed; }
+      .export { fill:#fce7f3; stroke:#db2777; }
+      .warn { fill:#fef3c7; stroke:#d97706; }
+      .optional { fill:#f1f5f9; stroke:#94a3b8; stroke-dasharray:5 4; }
+      .panel { fill:#ffffff; stroke:#e2e8f0; stroke-width:1.2; }
+      .flow { stroke:#334155; stroke-width:2.2; fill:none; marker-end:url(#arrow); }
+      .softFlow { stroke:#64748b; stroke-width:1.8; fill:none; marker-end:url(#arrowSoft); }
+      .dashFlow { stroke:#94a3b8; stroke-width:1.7; fill:none; stroke-dasharray:7 5; marker-end:url(#arrowSoft); }
+      .warnFlow { stroke:#d97706; stroke-width:1.9; fill:none; stroke-dasharray:6 5; marker-end:url(#arrowWarn); }
+      .cacheFlow { stroke:#0d9488; stroke-width:1.8; fill:none; stroke-dasharray:4 4; marker-end:url(#arrowSoft); }
+      .tag { fill:#ffffff; stroke:#cbd5e1; stroke-width:1; }
+      .tagText { fill:#475569; font-size:10.5px; font-weight:700; }
+    </style>
+  </defs>
+
+  <rect class="page" x="0" y="0" width="1680" height="3080"/>
+
+  <text x="42" y="48" class="h1">VirtualCity 自动化管线完整流程图</text>
+  <text x="44" y="75" class="sub">完整测试定义：必须从 area_picker.py 网页入口开始，到 Houdini build status completed 且 Model QA 无 fail 为止；UE5 导入在人工审核后手动触发。</text>
+  <text x="44" y="97" class="tiny">更新：2026-06-08 · 主线文件：area_picker.py / set_area.py / pipeline_state.py / refine_data.py / _recook_new_area.py / houdini_model_qa.py / export_and_import.py</text>
+
+  <!-- Legend -->
+  <g transform="translate(1130,28)">
+    <rect class="panel" x="0" y="0" width="500" height="80" rx="9"/>
+    <text x="14" y="22" class="laneHead">图例</text>
+    <rect x="14" y="36" width="16" height="12" rx="3" class="ui"/><text x="38" y="46" class="tiny">用户/UI</text>
+    <rect x="92" y="36" width="16" height="12" rx="3" class="state"/><text x="116" y="46" class="tiny">编排/状态</text>
+    <rect x="188" y="36" width="16" height="12" rx="3" class="data"/><text x="212" y="46" class="tiny">远程数据</text>
+    <rect x="282" y="36" width="16" height="12" rx="3" class="cache"/><text x="306" y="46" class="tiny">缓存/RawData</text>
+    <rect x="392" y="36" width="16" height="12" rx="3" class="clean"/><text x="416" y="46" class="tiny">清洗</text>
+    <rect x="14" y="58" width="16" height="12" rx="3" class="houdini"/><text x="38" y="68" class="tiny">Houdini</text>
+    <rect x="92" y="58" width="16" height="12" rx="3" class="qa"/><text x="116" y="68" class="tiny">QA/审核</text>
+    <rect x="188" y="58" width="16" height="12" rx="3" class="export"/><text x="212" y="68" class="tiny">导出/UE5</text>
+    <rect x="282" y="58" width="16" height="12" rx="3" class="optional"/><text x="306" y="68" class="tiny">可选/兜底</text>
+    <rect x="392" y="58" width="16" height="12" rx="3" class="warn"/><text x="416" y="68" class="tiny">门禁/风险</text>
+  </g>
+
+  <!-- Swimlane background -->
+  <g transform="translate(40,130)">
+    <rect x="0" y="0" width="260" height="1940" rx="12" fill="#faf5ff" stroke="#e9d5ff"/>
+    <rect x="270" y="0" width="260" height="1940" rx="12" fill="#f0f9ff" stroke="#bae6fd"/>
+    <rect x="540" y="0" width="260" height="1940" rx="12" fill="#eff6ff" stroke="#bfdbfe"/>
+    <rect x="810" y="0" width="260" height="1940" rx="12" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <rect x="1080" y="0" width="260" height="1940" rx="12" fill="#fff7ed" stroke="#fed7aa"/>
+    <rect x="1350" y="0" width="250" height="1940" rx="12" fill="#fdf2f8" stroke="#fbcfe8"/>
+
+    <text x="18" y="28" class="laneHead">用户 / Web UI</text>
+    <text x="288" y="28" class="laneHead">编排 / 状态</text>
+    <text x="558" y="28" class="laneHead">数据源 / 缓存</text>
+    <text x="828" y="28" class="laneHead">清洗 / 语义 / QA</text>
+    <text x="1098" y="28" class="laneHead">Houdini 构建</text>
+    <text x="1368" y="28" class="laneHead">审核 / 导出 / UE5</text>
+
+    <line class="grid" x1="0" y1="80" x2="1600" y2="80"/>
+    <line class="grid" x1="0" y1="250" x2="1600" y2="250"/>
+    <line class="grid" x1="0" y1="430" x2="1600" y2="430"/>
+    <line class="grid" x1="0" y1="700" x2="1600" y2="700"/>
+    <line class="grid" x1="0" y1="980" x2="1600" y2="980"/>
+    <line class="grid" x1="0" y1="1220" x2="1600" y2="1220"/>
+    <line class="grid" x1="0" y1="1500" x2="1600" y2="1500"/>
+    <line class="grid" x1="0" y1="1740" x2="1600" y2="1740"/>
+  </g>
+
+  <!-- Helper labels -->
+  <g>
+    <rect class="tag" x="50" y="200" width="90" height="24" rx="12"/><text x="67" y="216" class="tagText">启动</text>
+    <rect class="tag" x="50" y="370" width="90" height="24" rx="12"/><text x="67" y="386" class="tagText">选区</text>
+    <rect class="tag" x="50" y="550" width="90" height="24" rx="12"/><text x="67" y="566" class="tagText">创建运行</text>
+    <rect class="tag" x="50" y="820" width="90" height="24" rx="12"/><text x="67" y="836" class="tagText">取数</text>
+    <rect class="tag" x="50" y="1100" width="90" height="24" rx="12"/><text x="67" y="1116" class="tagText">精炼</text>
+    <rect class="tag" x="50" y="1340" width="90" height="24" rx="12"/><text x="67" y="1356" class="tagText">构建</text>
+    <rect class="tag" x="50" y="1620" width="90" height="24" rx="12"/><text x="67" y="1636" class="tagText">门禁</text>
+    <rect class="tag" x="50" y="1860" width="90" height="24" rx="12"/><text x="67" y="1876" class="tagText">出口</text>
+  </g>
+
+  <!-- Row 1 Startup -->
+  <g>
+    <rect class="box ui" x="78" y="230" width="186" height="76" rx="8"/>
+    <text x="94" y="255" class="title">启动 VirtualCity 操作台</text>
+    <text x="94" y="276" class="small">双击 .cmd / PowerShell launcher</text>
+    <text x="94" y="294" class="tiny">可设置页面关闭后自动退出</text>
+
+    <rect class="box state" x="348" y="230" width="190" height="76" rx="8"/>
+    <text x="364" y="255" class="title">area_picker.py 服务</text>
+    <text x="364" y="276" class="small">ThreadingHTTPServer :8765</text>
+    <text x="364" y="294" class="tiny">/health /status /run /export</text>
+
+    <rect class="box houdini" x="1158" y="230" width="190" height="76" rx="8"/>
+    <text x="1174" y="255" class="title">Houdini 预条件</text>
+    <text x="1174" y="276" class="small">RPYC 端口 18811 可连接</text>
+    <text x="1174" y="294" class="tiny">未连接时禁止生成</text>
+
+    <path class="flow" d="M264,268 L348,268"/>
+    <path class="dashFlow" d="M538,268 C800,190 996,190 1158,268"/>
+  </g>
+
+  <!-- Row 2 Selection -->
+  <g>
+    <rect class="box ui" x="78" y="405" width="186" height="92" rx="8"/>
+    <text x="94" y="430" class="title">Leaflet 网页框选</text>
+    <text x="94" y="451" class="small">本地 Leaflet / draw 资源</text>
+    <text x="94" y="469" class="tiny">OSM 在线底图只用于 UI</text>
+    <text x="94" y="486" class="tiny">用户选择 1km UTM 网格</text>
+
+    <rect class="box state" x="348" y="405" width="190" height="92" rx="8"/>
+    <text x="364" y="430" class="title">vc_grid.py</text>
+    <text x="364" y="451" class="small">tile_ids → 连续矩形验证</text>
+    <text x="364" y="469" class="tiny">生成 bbox / center / area_id</text>
+    <text x="364" y="486" class="tiny">限制 MAX_SELECTION_TILES</text>
+
+    <rect class="box optional" x="618" y="405" width="190" height="92" rx="8"/>
+    <text x="634" y="430" class="title">缓存覆盖显示</text>
+    <text x="634" y="451" class="small">_tile_cache / _clip_cache</text>
+    <text x="634" y="469" class="tiny">蓝色格 = 三类原始数据可恢复</text>
+    <text x="634" y="486" class="tiny">不影响 bbox 计算</text>
+
+    <path class="flow" d="M264,451 L348,451"/>
+    <path class="cacheFlow" d="M538,451 L618,451"/>
+  </g>
+
+  <!-- Row 3 Run creation -->
+  <g>
+    <rect class="box ui" x="78" y="590" width="186" height="96" rx="8"/>
+    <text x="94" y="615" class="title">用户动作</text>
+    <text x="94" y="636" class="small">Houdini 生成：POST /run</text>
+    <text x="94" y="654" class="small">下载数据：POST /download-data</text>
+    <text x="94" y="672" class="tiny">同一时间只允许一个管线运行</text>
+
+    <rect class="box state" x="348" y="590" width="190" height="96" rx="8"/>
+    <text x="364" y="615" class="title">set_area.py</text>
+    <text x="364" y="636" class="small">接收 bbox / area_id</text>
+    <text x="364" y="654" class="tiny">--data-only 跳过 refine/Houdini</text>
+    <text x="364" y="672" class="tiny">stdout 回传进度给网页</text>
+
+    <rect class="box state" x="618" y="590" width="190" height="96" rx="8"/>
+    <text x="634" y="615" class="title">pipeline_state.py</text>
+    <text x="634" y="636" class="small">new_run_id / create_run</text>
+    <text x="634" y="654" class="tiny">Reports/pipeline_runs/{run}.json</text>
+    <text x="634" y="672" class="tiny">latest.json 指向最近动作</text>
+
+    <rect class="box state" x="888" y="590" width="190" height="96" rx="8"/>
+    <text x="904" y="615" class="title">Config/active_area.json</text>
+    <text x="904" y="636" class="small">当前区域唯一状态</text>
+    <text x="904" y="654" class="tiny">bbox / origin / RawData paths</text>
+    <text x="904" y="672" class="tiny">sources / dem_source / run_id</text>
+
+    <path class="flow" d="M264,638 L348,638"/>
+    <path class="flow" d="M538,638 L618,638"/>
+    <path class="flow" d="M808,638 L888,638"/>
+  </g>
+
+  <!-- Row 4 Data acquisition -->
+  <g>
+    <rect class="box cache" x="618" y="770" width="190" height="80" rx="8"/>
+    <text x="634" y="795" class="title">优先恢复 clip cache</text>
+    <text x="634" y="816" class="small">bbox + source_signature</text>
+    <text x="634" y="834" class="tiny">命中时跳过远程下载</text>
+
+    <rect class="box data" x="618" y="872" width="190" height="96" rx="8"/>
+    <text x="634" y="897" class="title">道路数据</text>
+    <text x="634" y="918" class="small">_tile_cache.filter_osm</text>
+    <text x="634" y="936" class="small">否则 Overpass API</text>
+    <text x="634" y="954" class="tiny">RawData/OSM/{area}_osm_v001.osm</text>
+
+    <rect class="box data" x="618" y="990" width="190" height="106" rx="8"/>
+    <text x="634" y="1015" class="title">地形 DEM</text>
+    <text x="634" y="1036" class="small">FABDEM 30m DTM 优先</text>
+    <text x="634" y="1054" class="small">tile cache / NASADEM 兜底</text>
+    <text x="634" y="1072" class="tiny">GeoTIFF → CSV</text>
+    <text x="634" y="1089" class="tiny">RawData/DEM/{area}_dem_v001.csv</text>
+
+    <rect class="box data" x="618" y="1118" width="190" height="116" rx="8"/>
+    <text x="634" y="1143" class="title">建筑数据</text>
+    <text x="634" y="1164" class="small">_tile_cache.filter_buildings</text>
+    <text x="634" y="1182" class="small">否则 Overture Maps</text>
+    <text x="634" y="1200" class="tiny">Google Open Buildings 高度补全</text>
+    <text x="634" y="1217" class="tiny">RawData/Overture/*.geojson</text>
+
+    <rect class="box cache" x="888" y="930" width="190" height="96" rx="8"/>
+    <text x="904" y="955" class="title">write_clip_cache</text>
+    <text x="904" y="976" class="small">保存可复用原始裁切</text>
+    <text x="904" y="994" class="tiny">RawData/_clip_cache/{key}</text>
+    <text x="904" y="1011" class="tiny">记录 dem_source / source_signature</text>
+
+    <rect class="box warn" x="348" y="930" width="190" height="96" rx="8"/>
+    <text x="364" y="955" class="title">data-only 分支</text>
+    <text x="364" y="976" class="small">/download-data 到这里结束</text>
+    <text x="364" y="994" class="tiny">pipeline phase=data_download_completed</text>
+    <text x="364" y="1011" class="tiny">不切换或不触发 Houdini</text>
+
+    <path class="flow" d="M443,686 C443,735 520,810 618,810"/>
+    <path class="cacheFlow" d="M713,850 L713,872"/>
+    <path class="softFlow" d="M713,968 L713,990"/>
+    <path class="softFlow" d="M713,1096 L713,1118"/>
+    <path class="cacheFlow" d="M808,978 L888,978"/>
+    <path class="warnFlow" d="M618,1026 C560,1026 540,996 538,978"/>
+  </g>
+
+  <!-- Row 5 Refinement -->
+  <g>
+    <rect class="box clean" x="888" y="1280" width="190" height="94" rx="8"/>
+    <text x="904" y="1305" class="title">refine_data.py</text>
+    <text x="904" y="1326" class="small">统一精炼入口</text>
+    <text x="904" y="1344" class="tiny">InputQA → cache fingerprint</text>
+    <text x="904" y="1361" class="tiny">probe_sources 可跳过</text>
+
+    <rect class="box cache" x="618" y="1280" width="190" height="94" rx="8"/>
+    <text x="634" y="1305" class="title">Raw snapshot</text>
+    <text x="634" y="1326" class="small">RawData/_downloads/{area}</text>
+    <text x="634" y="1344" class="tiny">保持不可变原始输入</text>
+    <text x="634" y="1361" class="tiny">支持清洗 cache 复用</text>
+
+    <rect class="box clean" x="888" y="1402" width="190" height="106" rx="8"/>
+    <text x="904" y="1427" class="title">分级清洗 L1/L2/L3</text>
+    <text x="904" y="1448" class="small">建筑：vc_buildings + OSM levels</text>
+    <text x="904" y="1466" class="small">道路：vc_data_cleaner + graph</text>
+    <text x="904" y="1484" class="small">DEM：DTM 修正 / FABDEM 跳过</text>
+    <text x="904" y="1501" class="tiny">RawData/_cleaned/{area}</text>
+
+    <rect class="box clean" x="888" y="1536" width="190" height="100" rx="8"/>
+    <text x="904" y="1561" class="title">语义与坐标权威</text>
+    <text x="904" y="1582" class="small">vc_geo：WGS84/local/Houdini</text>
+    <text x="904" y="1600" class="small">vc_schema：height_source / road QA</text>
+    <text x="904" y="1618" class="tiny">坐标 z 翻转只在 vc_geo 中发生</text>
+
+    <rect class="box qa" x="888" y="1664" width="190" height="98" rx="8"/>
+    <text x="904" y="1689" class="title">Data QA Gate</text>
+    <text x="904" y="1710" class="small">InputQA / ProcessQA / OutputQA</text>
+    <text x="904" y="1728" class="tiny">Config/qa/{area}_qa_*.json</text>
+    <text x="904" y="1745" class="tiny">fail 时不发布新 ready</text>
+
+    <rect class="box cache" x="888" y="1790" width="190" height="88" rx="8"/>
+    <text x="904" y="1815" class="title">发布 Houdini-ready</text>
+    <text x="904" y="1836" class="small">先 staging，QA 通过再替换</text>
+    <text x="904" y="1854" class="tiny">RawData/_houdini_ready/{area}</text>
+    <text x="904" y="1871" class="tiny">meta.json 校验 area_id / run_id</text>
+
+    <path class="flow" d="M713,1234 C713,1260 780,1327 888,1327"/>
+    <path class="cacheFlow" d="M808,1327 L888,1327"/>
+    <path class="flow" d="M983,1374 L983,1402"/>
+    <path class="flow" d="M983,1508 L983,1536"/>
+    <path class="flow" d="M983,1636 L983,1664"/>
+    <path class="flow" d="M983,1762 L983,1790"/>
+  </g>
+
+  <!-- Row 6 Houdini recook -->
+  <g>
+    <rect class="box houdini" x="1158" y="1280" width="190" height="92" rx="8"/>
+    <text x="1174" y="1305" class="title">_recook_new_area.py</text>
+    <text x="1174" y="1326" class="small">检查 ready_outputs_exist</text>
+    <text x="1174" y="1344" class="tiny">缺失则先调用 refine_data</text>
+    <text x="1174" y="1361" class="tiny">写 Config/houdini_build_status</text>
+
+    <rect class="box houdini" x="1158" y="1402" width="190" height="104" rx="8"/>
+    <text x="1174" y="1427" class="title">连接 Houdini</text>
+    <text x="1174" y="1448" class="small">rpyc.classic.connect localhost:18811</text>
+    <text x="1174" y="1466" class="small">加载 VC_master_citygen_v001.hip</text>
+    <text x="1174" y="1484" class="tiny">OBJ 默认 city_gen，兼容 pattaya_osm</text>
+
+    <rect class="box houdini" x="1158" y="1536" width="190" height="112" rx="8"/>
+    <text x="1174" y="1561" class="title">SOP/VEX 注入与重连</text>
+    <text x="1174" y="1582" class="small">houdini_sops/*.py / *.vex</text>
+    <text x="1174" y="1600" class="small">osm_import / dem_terrain / road_strips</text>
+    <text x="1174" y="1618" class="small">bld_snap / foundation / road_profile</text>
+    <text x="1174" y="1635" class="tiny">外置源码可 diff / review</text>
+
+    <rect class="box houdini" x="1158" y="1676" width="190" height="100" rx="8"/>
+    <text x="1174" y="1701" class="title">Cook 输出链</text>
+    <text x="1174" y="1722" class="small">terrain / buildings / roads</text>
+    <text x="1174" y="1740" class="small">merge_all → OUT_city</text>
+    <text x="1174" y="1758" class="tiny">保存 master hip + 区域 hip archive</text>
+
+    <path class="flow" d="M1078,1834 C1136,1834 1120,1326 1158,1326"/>
+    <path class="flow" d="M1253,1372 L1253,1402"/>
+    <path class="flow" d="M1253,1506 L1253,1536"/>
+    <path class="flow" d="M1253,1648 L1253,1676"/>
+  </g>
+
+  <!-- Row 7 QA / gates -->
+  <g>
+    <rect class="box qa" x="1158" y="1810" width="190" height="110" rx="8"/>
+    <text x="1174" y="1835" class="title">houdini_model_qa.py</text>
+    <text x="1174" y="1856" class="small">--mode quick 自动回归</text>
+    <text x="1174" y="1874" class="tiny">required_nodes / terrain_density</text>
+    <text x="1174" y="1891" class="tiny">building_terrain_fit / road_faces</text>
+    <text x="1174" y="1908" class="tiny">road_profile / junction_quality</text>
+
+    <rect class="box state" x="888" y="1910" width="190" height="98" rx="8"/>
+    <text x="904" y="1935" class="title">状态聚合</text>
+    <text x="904" y="1956" class="small">pipeline_status.py</text>
+    <text x="904" y="1974" class="tiny">active_area + build_status + QA</text>
+    <text x="904" y="1991" class="tiny">校验 area_id / run_id 防陈旧报告</text>
+
+    <rect class="box qa" x="1428" y="1810" width="170" height="110" rx="8"/>
+    <text x="1444" y="1835" class="title">人工审核</text>
+    <text x="1444" y="1856" class="small">Houdini OUT_city 视口确认</text>
+    <text x="1444" y="1874" class="tiny">QA warn 不能直接晋级</text>
+    <text x="1444" y="1891" class="tiny">manual_review.py 记录同 run 批准</text>
+    <text x="1444" y="1908" class="tiny">Reports/manual_review/*.json</text>
+
+    <rect class="box warn" x="1428" y="1948" width="170" height="72" rx="8"/>
+    <text x="1444" y="1973" class="title">Export Gate</text>
+    <text x="1444" y="1994" class="small">pass 或 warn+人工批准</text>
+    <text x="1444" y="2012" class="tiny">还需 live OUT_city 非空</text>
+
+    <path class="flow" d="M1253,1776 L1253,1810"/>
+    <path class="softFlow" d="M1158,1865 C1120,1865 1105,1959 1078,1959"/>
+    <path class="warnFlow" d="M1348,1865 L1428,1865"/>
+    <path class="flow" d="M1513,1920 L1513,1948"/>
+  </g>
+
+  <!-- Row 8 Export / UE -->
+  <g>
+    <rect class="box export" x="1428" y="2042" width="170" height="84" rx="8"/>
+    <text x="1444" y="2067" class="title">export_and_import.py</text>
+    <text x="1444" y="2088" class="small">导出 Houdini/Export/*.fbx</text>
+    <text x="1444" y="2106" class="tiny">Buildings / Roads / Terrain</text>
+    <text x="1444" y="2123" class="tiny">UE5 导入仍为审核后动作</text>
+
+    <rect class="box export" x="1158" y="2042" width="190" height="84" rx="8"/>
+    <text x="1174" y="2067" class="title">UE5 辅助脚本</text>
+    <text x="1174" y="2088" class="small">ue5_import_fbx / remote_control</text>
+    <text x="1174" y="2106" class="tiny">当前不属于默认完整测试终点</text>
+    <text x="1174" y="2123" class="tiny">人工确认后再进入 UE5</text>
+
+    <path class="flow" d="M1513,2020 L1513,2042"/>
+    <path class="dashFlow" d="M1428,2084 L1348,2084"/>
+  </g>
+
+  <!-- Side status outputs panel -->
+  <g>
+    <rect class="panel" x="78" y="1935" width="460" height="190" rx="12"/>
+    <text x="100" y="1963" class="laneHead">排查时优先看的状态文件</text>
+    <text x="100" y="1992" class="small">1. Config/active_area.json：当前 area_id / bbox / run_id / 输入路径</text>
+    <text x="100" y="2017" class="small">2. Reports/pipeline_runs/latest.json：最近一次动作和阶段事件</text>
+    <text x="100" y="2042" class="small">3. Config/houdini_build_status.json：Houdini 构建状态与 qa_report</text>
+    <text x="100" y="2067" class="small">4. Reports/model_qa/latest.json：模型 QA pass/warn/fail 明细</text>
+    <text x="100" y="2092" class="small">5. Reports/manual_review/*.json：warn 场景的人工批准</text>
+  </g>
+
+  <!-- Failure behavior panel -->
+  <g>
+    <rect class="panel" x="588" y="1935" width="250" height="190" rx="12"/>
+    <text x="610" y="1963" class="laneHead">失败保护</text>
+    <text x="610" y="1992" class="small">InputQA fail：停止精炼</text>
+    <text x="610" y="2017" class="small">Data QA fail：保留上一版 ready</text>
+    <text x="610" y="2042" class="small">Recook fail：写 failed build_status</text>
+    <text x="610" y="2067" class="small">Model QA fail：禁止导出</text>
+    <text x="610" y="2092" class="small">Stale run_id：Export Gate 拦截</text>
+  </g>
+
+  <!-- Strategy matrix -->
+  <g>
+    <rect class="panel" x="40" y="2190" width="1600" height="810" rx="14"/>
+    <text x="64" y="2224" class="h1" font-size="22">每一步使用的策略矩阵</text>
+    <text x="66" y="2248" class="sub">读法：左列是流程节点，中列是当前自动化策略，右列是产物、门禁或失败处理。</text>
+
+    <rect x="64" y="2272" width="246" height="34" rx="6" fill="#e2e8f0"/>
+    <rect x="320" y="2272" width="760" height="34" rx="6" fill="#e2e8f0"/>
+    <rect x="1090" y="2272" width="520" height="34" rx="6" fill="#e2e8f0"/>
+    <text x="82" y="2294" class="laneHead">步骤</text>
+    <text x="338" y="2294" class="laneHead">策略</text>
+    <text x="1108" y="2294" class="laneHead">产物 / 门禁 / 失败处理</text>
+
+    <g transform="translate(64,2318)">
+      <rect x="0" y="0" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="20" class="step">1. 启动服务</text>
+      <text x="274" y="20" class="small">复用同版本 area_picker；检测旧版本服务时尝试 /shutdown；Houdini 生成前探测 RPYC 18811。</text>
+      <text x="1040" y="20" class="small">端口 8765；/health 暴露 server_version；未连接 Houdini 禁止 /run。</text>
+
+      <rect x="0" y="36" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="56" class="step">2. 网格选区</text>
+      <text x="274" y="56" class="small">固定 1km UTM 网格；前端提交 tile_ids；服务端重新计算 bbox；必须连续矩形且不跨 UTM zone。</text>
+      <text x="1040" y="56" class="small">生成 selection_id / bbox / center；最多 MAX_SELECTION_TILES。</text>
+
+      <rect x="0" y="72" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="92" class="step">3. 运行身份</text>
+      <text x="274" y="92" class="small">每次 set_area 创建唯一 run_id；active_area、pipeline_runs、Houdini status、Model QA 全部绑定同一 run。</text>
+      <text x="1040" y="92" class="small">陈旧 area/run 的 QA 或 build status 会被 export_gate 拦截。</text>
+
+      <rect x="0" y="108" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="128" class="step">4. 执行分支</text>
+      <text x="274" y="128" class="small">/run 跑完整管线；/download-data 只准备原始数据和缓存；全局状态锁防止并发覆盖 active_area。</text>
+      <text x="1040" y="128" class="small">data-only phase=data_download_completed，不等同完整测试。</text>
+
+      <rect x="0" y="144" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="164" class="step">5. 道路取数</text>
+      <text x="274" y="164" class="small">优先 clip cache；再试 _tile_cache.filter_osm；最后 Overpass 多服务器下载 highway ways + OSM building fallback。</text>
+      <text x="1040" y="164" class="small">RawData/OSM/{area}_osm_v001.osm；失败则 pipeline failed。</text>
+
+      <rect x="0" y="180" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="200" class="step">6. 地形取数</text>
+      <text x="274" y="200" class="small">FABDEM 30m DTM 优先；失败后本地 DEM 裁剪；再失败用 GEE NASADEM；转换 CSV 时统一走 vc_geo。</text>
+      <text x="1040" y="200" class="small">RawData/DEM/{area}_dem_v001.csv；记录 dem_source。</text>
+
+      <rect x="0" y="216" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="236" class="step">7. 建筑取数</text>
+      <text x="274" y="236" class="small">优先 _tile_cache.filter_buildings；否则 Overture building theme；高度覆盖率低于 80% 时 join Google Open Buildings。</text>
+      <text x="1040" y="236" class="small">RawData/Overture/{area}_buildings_overture_v001.geojson。</text>
+
+      <rect x="0" y="252" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="272" class="step">8. 原始裁切缓存</text>
+      <text x="274" y="272" class="small">write_clip_cache 以 bbox + source_signature 存 OSM/DEM/建筑三类原始裁切，后续小区域可直接恢复。</text>
+      <text x="1040" y="272" class="small">RawData/_clip_cache/{key}；source_signature 不一致不复用。</text>
+
+      <rect x="0" y="288" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="308" class="step">9. Raw snapshot</text>
+      <text x="274" y="308" class="small">refine_data 先把 active_area 指向的输入复制到 RawData/_downloads/{area}，清洗只操作工作副本。</text>
+      <text x="1040" y="308" class="small">保护原始输入可追溯；旧 active path 会被归一回 raw 输入。</text>
+
+      <rect x="0" y="324" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="344" class="step">10. 清洗缓存</text>
+      <text x="274" y="344" class="small">fingerprint = bbox + 文件 hash + source providers + CLEAN_RECIPE_VERSION；命中则恢复清洗缓存。</text>
+      <text x="1040" y="344" class="small">文件或 recipe 变化时 reset_levels 并重跑对应 L 阶段。</text>
+
+      <rect x="0" y="360" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="380" class="step">11. 建筑精炼</text>
+      <text x="274" y="380" class="small">L1 过滤 null/退化/过小/近重复并修正高度；L3 用 OSM building:height / building:levels 近邻补全。</text>
+      <text x="1040" y="380" class="small">height_source=overture/osm/estimated_pending，由 vc_schema 校验。</text>
+
+      <rect x="0" y="396" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="416" class="step">12. 道路精炼</text>
+      <text x="274" y="416" class="small">Road2D5Cleaner 做层级隔离、窄路吸附、交点分割、链式合并；road_graph_builder 生成道路图。</text>
+      <text x="1040" y="416" class="small">roads.osm / roads_clean.geojson / road_graph.json。</text>
+
+      <rect x="0" y="432" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="452" class="step">13. DEM 精炼</text>
+      <text x="274" y="452" class="small">FABDEM 被视为裸地 DTM，跳过 DSM→DTM 修正；NASADEM/SRTM 才结合建筑掩码做 correct_dem_dtm。</text>
+      <text x="1040" y="452" class="small">dem.csv 进入 _cleaned；记录 correction_applied / skip_reason。</text>
+
+      <rect x="0" y="468" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="488" class="step">14. Data QA 发布</text>
+      <text x="274" y="488" class="small">先导出 staging；跑 InputQA / ProcessQA / OutputQA；只有 0 fail 才替换 RawData/_houdini_ready/{area}。</text>
+      <text x="1040" y="488" class="small">fail 时保留上一版 ready；Config/qa 写报告。</text>
+
+      <rect x="0" y="504" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="524" class="step">15. Houdini 预检</text>
+      <text x="274" y="524" class="small">_recook_new_area 检查 ready_outputs_exist(area_id, run_id)；不匹配则自动先跑 refine_data。</text>
+      <text x="1040" y="524" class="small">Config/houdini_build_status 写 running / failed / completed。</text>
+
+      <rect x="0" y="540" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="560" class="step">16. Houdini 构建</text>
+      <text x="274" y="560" class="small">RPYC 连接 Houdini；加载 master hip；外置 houdini_sops 源码注入 SOP/VEX；重连并 cook OUT_city。</text>
+      <text x="1040" y="560" class="small">保存 master hip，并复制 VC_{area}_citygen_v001.hip。</text>
+
+      <rect x="0" y="576" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="596" class="step">17. Model QA</text>
+      <text x="274" y="596" class="small">quick 模式作为自动回归门禁，检查节点存在、地形密度、建筑贴地、道路面片、road profile、junction quality。</text>
+      <text x="1040" y="596" class="small">fail 阻断导出；warn 允许流程完成但需要人工审核。</text>
+
+      <rect x="0" y="612" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="632" class="step">18. 人工审核 / 导出</text>
+      <text x="274" y="632" class="small">pipeline_status.export_gate 汇总 active_area/build_status/model_qa/manual_review/live OUT_city，全部同 run 才放行。</text>
+      <text x="1040" y="632" class="small">export_and_import 只在 gate 通过后导出 FBX；UE5 导入仍后置。</text>
+
+      <rect x="0" y="648" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="668" class="step">19. 操作台状态接口</text>
+      <text x="274" y="668" class="small">/status 聚合 _state、Houdini 连接、export availability、failure_summary；/data-sources 展示当前三类数据源文件。</text>
+      <text x="1040" y="668" class="small">网页可以显示上次失败、QA 报告路径、当前数据源和导出就绪状态。</text>
+
+      <rect x="0" y="684" width="1546" height="30" fill="#ffffff"/>
+      <text x="12" y="704" class="step">20. 选区与页面生命周期</text>
+      <text x="274" y="704" class="small">/selection 记住 tile_ids，刷新页面可恢复；/session 与 /session/closed 跟踪页面关闭，launcher 可设置随页面退出。</text>
+      <text x="1040" y="704" class="small">不会中断正在运行的生成或导出任务。</text>
+
+      <rect x="0" y="720" width="1546" height="30" fill="#f8fafc"/>
+      <text x="12" y="740" class="step">21. 网页导出按钮</text>
+      <text x="274" y="740" class="small">POST /export 先检查 _export_available 和 Houdini 连接，再后台运行 export_and_import.py --fbx-only。</text>
+      <text x="1040" y="740" class="small">只导出 FBX，不触发 UE5 导入；完整 UE5 导入需手动运行非 fbx-only 模式。</text>
+    </g>
+  </g>
+
+  <!-- Bottom footnote -->
+  <text x="42" y="3050" class="tiny">注：/download-data 是数据准备分支，不等同于完整测试；完整测试必须走 /run，并完成 Houdini recook + Model QA。Houdini warn 代表流程完成但需要人工审核，不代表可直接进入 UE5。</text>
+</svg>

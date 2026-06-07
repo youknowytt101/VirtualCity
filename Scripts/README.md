@@ -21,13 +21,15 @@ uv run python area_picker.py
 ```text
 area_picker.py
     ↓
-set_area.py
+orchestration/run_pipeline.py（完整管线编排）
+    ↓
+acquisition/set_area.py --acquire-only
     ↓
 pipeline_state.py（生成 run_id，持续记录阶段状态）
     ↓
-refine_data.py
+cleaning/refine_data.py
     ↓
-_recook_new_area.py
+houdini_build/recook_new_area.py
     ↓
 houdini_model_qa.py --mode quick
     ↓
@@ -39,11 +41,34 @@ export_and_import.py（审核后）
 注意：
 
 - `area_picker.py` 是用户级入口。
-- `set_area.py` 是底层 bbox 命令入口。
-- `_recook_new_area.py` 是 Houdini 当前区域重构入口。
+- `orchestration/run_pipeline.py` 是完整构建的正式编排入口。
+- `acquisition/set_area.py --acquire-only` 是数据获取 / 缓存入口；`acquisition/set_area.py --data-only` 只下载数据且不切换主线区域。
+- `set_area.py` 是旧命令兼容 wrapper；不带参数模式仍保留旧完整流程兼容，但新自动化应优先调用 `orchestration/run_pipeline.py`。
+- `houdini_build/recook_new_area.py` 是 Houdini 当前区域重构入口，只消费已发布的 `_houdini_ready`。
 - `houdini_model_qa.py` 是 Houdini 输出后的自动模型审查工具。
 
-当用户说“重新测试 / 从头测试 / 全流程测试”时，默认必须从 `area_picker.py` 开始，不能只运行 `_recook_new_area.py`。
+当用户说“重新测试 / 从头测试 / 全流程测试”时，默认必须从 `area_picker.py` 开始，不能只运行 `houdini_build/recook_new_area.py`。
+
+---
+
+## 三大模块边界
+
+当前主线按三大模块理解和验收：
+
+| 模块 | 当前脚本 / 目录 | 交付物 | 说明 |
+|---|---|---|---|
+| 数据获取 / 下载 / 缓存 | `acquisition/set_area.py`, `area_picker.py`, `download_osm.py`, `download_dem.py`, `download_overture_buildings.py`, `_tile_cache.py` | `RawData/OSM/`, `RawData/DEM/`, `RawData/Overture/`, `RawData/_tiles/`, `RawData/_clip_cache/` | 缓存优先，缺失下载；`data-only` 只到这一层 |
+| 数据清洗 / 语义 / QA | `cleaning/refine_data.py`, `clean_raw_data.py`, `data_cleaning_cache.py`, `vc_geo.py`, `vc_schema.py`, `vc_buildings.py` | `RawData/_cleaned/{area_id}/`, `RawData/_houdini_ready/{area_id}/`, `Config/qa/*.json` | QA 通过后才发布 Houdini-ready；失败保留上一版 |
+| Houdini 构建 / Model QA / 审核出口 | `houdini_build/recook_new_area.py`, `houdini_sops/`, `_osm_import_canonical.py`, `_road_strips_v2.py`, `houdini_model_qa.py`, `export_and_import.py` | `Houdini/Hip/*.hip`, `Reports/model_qa/*.json`, `Houdini/Export/*.fbx` | Houdini 只应消费 `_houdini_ready`；导出必须在人工审核后 |
+
+重要判断：
+
+- 业务流程已经是三大块。
+- 核心执行入口已经物理分层：`acquisition/`、`cleaning/`、`houdini_build/`。
+- `Scripts/set_area.py`、`Scripts/refine_data.py`、`Scripts/_recook_new_area.py` 是兼容 wrapper，不是新实现位置。
+- 共享工具和部分辅助脚本仍保留在 `Scripts/` 根目录，后续可继续迁到 `shared/` 和对应模块。
+
+详细口径见 `ProjectManagement/14_三大模块架构边界.md`。
 
 ---
 
@@ -52,12 +77,13 @@ export_and_import.py（审核后）
 | 脚本 | 职责 |
 |---|---|
 | `area_picker.py` | Leaflet 网页框选固定 1km UTM 网格块，触发完整管线，监控流程状态 |
-| `set_area.py` | 更新 `active_area.json`，获取 / 恢复 OSM、DEM、Overture 数据 |
+| `orchestration/run_pipeline.py` | 显式编排数据获取、数据清洗、Houdini 构建三大模块 |
+| `acquisition/set_area.py` | 更新 `active_area.json`，获取 / 恢复 OSM、DEM、Overture 数据；旧完整流程兼容入口由根目录 `set_area.py` 转发 |
 | `pipeline_state.py` | 为每次完整构建生成 `run_id`，写入 `Reports/pipeline_runs/` 运行清单 |
-| `refine_data.py` | 执行数据清洗、raw snapshot、缓存、数据 QA |
+| `cleaning/refine_data.py` | 执行数据清洗、raw snapshot、缓存、数据 QA |
 | `clean_raw_data.py` | 建筑、道路、DEM 的清洗逻辑 |
 | `data_cleaning_cache.py` | 数据清洗 cache fingerprint 与复用 |
-| `_recook_new_area.py` | 通过 RPYC 驱动 Houdini SOP/VEX patch 与 recook |
+| `houdini_build/recook_new_area.py` | 通过 RPYC 驱动 Houdini SOP/VEX patch 与 recook；根目录 `_recook_new_area.py` 仅兼容旧命令 |
 | `_osm_import_canonical.py` | Houdini `osm_import` Python SOP 源码 |
 | `_road_strips_v2.py` | Houdini `road_strips` Python SOP 源码 |
 | `houdini_model_qa.py` | Houdini 模型 QA quick/full |
@@ -94,7 +120,9 @@ export_and_import.py（审核后）
 - 同一时间只运行一个完整管线，避免 `active_area.json` 和 Houdini status 被互相覆盖。
 - `active_area.json`、Houdini build status、数据 QA 和 Model QA 使用同一个 `run_id`。排查问题时优先查看 `Reports/pipeline_runs/latest.json`。
 - `Reports/pipeline_runs/latest.json` 表示最近一次管线动作，可能是 `data-only` 下载；不要把它直接等同于最近一次 Houdini 成功构建。判断 Houdini 可导出状态时必须同时检查 `Config/active_area.json`、`Config/houdini_build_status.json` 和 Model QA 报告的 `area_id` / `run_id`。
-- `refine_data.py` 只在 QA 通过后发布 `_houdini_ready/{area_id}`；失败时保留上一版可用数据。
+- `cleaning/refine_data.py` 只在 QA 通过后发布 `_houdini_ready/{area_id}`；失败时保留上一版可用数据。
+- `_houdini_ready/{area_id}/ready_manifest.json` 是 Houdini 构建层的硬契约，必须匹配当前 `area_id` / `run_id` 和关键输出文件指纹。
+- `houdini_build/recook_new_area.py` 不再兜底运行 `cleaning/refine_data.py`；preflight 未通过时直接失败，完整流程应从 `orchestration/run_pipeline.py` 启动。
 - `area_picker.py` 在 `http://localhost:8765/health` 暴露服务版本。重复启动会复用同版本服务，检测到旧版服务则拒绝继续，避免误跑旧代码。
 - `area_picker.py` 默认用矩形工具框选固定 1km x 1km UTM 基础格；框选结果会吸附并补齐成连续矩形网格块，`/run` 接受 `tile_ids` 后由服务端重新计算 bbox。
 - `area_picker.py` 使用 OpenStreetMap 在线底图；数据获取仍然缓存优先，缺失时联网下载。
@@ -114,18 +142,26 @@ export_and_import.py（审核后）
 Scripts/
 ├── README.md
 ├── area_picker.py
-├── set_area.py
+├── orchestration/
+│   └── run_pipeline.py
+├── acquisition/
+│   └── set_area.py
+├── cleaning/
+│   └── refine_data.py
+├── houdini_build/
+│   └── recook_new_area.py
+├── set_area.py              # compatibility wrapper
 ├── pipeline_state.py
-├── refine_data.py
-├── _recook_new_area.py
+├── refine_data.py           # compatibility wrapper
+├── _recook_new_area.py      # compatibility wrapper
 ├── houdini_model_qa.py
 ├── _osm_import_canonical.py
 ├── _road_strips_v2.py
 ├── vc_paths.py
-├── 数据处理自动化/
-├── Houdini自动化/
-├── UE5自动化/
+├── shared/
+├── ue5/
+├── houdini_sops/
 └── _archive/
 ```
 
-`_archive/` 中保留历史 one-off 修复和道路生成实验脚本，仅供追溯，不作为当前主流程入口。
+`_archive/` 中保留历史 one-off 修复、道路生成实验脚本和 legacy 入口，仅供追溯，不作为当前主流程入口。

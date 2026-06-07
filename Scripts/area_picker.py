@@ -3024,14 +3024,21 @@ class _Handler(BaseHTTPRequestHandler):
                            'export_done': False, 'export_ok': False, 'export_returncode': None,
                            'export_log_lines': []})
 
-        cmd = [
-            'uv', 'run', 'python', '-u', 'set_area.py',
-            str(bbox['west']), str(bbox['south']),
-            str(bbox['east']), str(bbox['north']),
-            name,
-        ]
         if data_only:
-            cmd.insert(5, '--data-only')
+            cmd = [
+                'uv', 'run', 'python', '-u', 'acquisition/set_area.py', '--data-only',
+                str(bbox['west']), str(bbox['south']),
+                str(bbox['east']), str(bbox['north']),
+                name,
+            ]
+        else:
+            cmd = [
+                'uv', 'run', 'python', '-u', 'orchestration/run_pipeline.py',
+                '--tile-ids', ','.join(selection.get('tile_ids') or tile_ids),
+                str(bbox['west']), str(bbox['south']),
+                str(bbox['east']), str(bbox['north']),
+                name,
+            ]
         _safe_print(f"\n[area_picker] 启动管线: {' '.join(cmd)}")
 
         def _run():
@@ -3083,7 +3090,7 @@ class _Handler(BaseHTTPRequestHandler):
 
             with _state_lock:
                 if ok and not houdini_done and not data_only:
-                    _state['log_lines'].append(f'[WARN] Houdini 状态文件未确认，但 set_area.py 已成功退出: {houdini_message}')
+                    _state['log_lines'].append(f'[WARN] Houdini 状态文件未确认，但 run_pipeline.py 已成功退出: {houdini_message}')
                 _state.update({'running': False, 'done': True,
                                'ok': ok,
                                'returncode': returncode,

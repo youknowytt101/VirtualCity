@@ -1,5 +1,6 @@
 """Offline regression tests for pipeline run state and ready publication."""
 import json
+import hashlib
 import sys
 import tempfile
 import unittest
@@ -16,6 +17,16 @@ import refine_data
 
 def _write_ready_file(path: Path, marker: str) -> None:
     path.write_text(marker * 1200, encoding="utf-8")
+
+
+def _fingerprint(path: Path) -> dict:
+    data = path.read_bytes()
+    return {
+        "path": path.name,
+        "exists": True,
+        "size": len(data),
+        "sha256": hashlib.sha256(data).hexdigest(),
+    }
 
 
 class TestPipelineState(unittest.TestCase):
@@ -50,6 +61,15 @@ class TestReadyPublication(unittest.TestCase):
         (directory / "meta.json").write_text(json.dumps({
             "area_id": "area_test",
             "run_id": run_id,
+        }), encoding="utf-8")
+        (directory / "ready_manifest.json").write_text(json.dumps({
+            "manifest_type": "virtualcity.houdini_ready",
+            "area_id": "area_test",
+            "run_id": run_id,
+            "outputs": {
+                name: _fingerprint(directory / name)
+                for name in dcc.OUTPUT_NAMES.values()
+            },
         }), encoding="utf-8")
 
     def test_ready_outputs_require_matching_run(self):
@@ -98,6 +118,36 @@ class TestReadyPublication(unittest.TestCase):
             meta = json.loads((final / "meta.json").read_text(encoding="utf-8"))
             self.assertEqual(meta["run_id"], "run_old")
             self.assertTrue(staging.exists())
+
+    def test_ready_manifest_uses_final_ready_paths(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            staging = root / ".staging" / "candidate"
+            staging.mkdir(parents=True)
+            for name in dcc.OUTPUT_NAMES.values():
+                _write_ready_file(staging / name, "new")
+            (staging / "meta.json").write_text("{}", encoding="utf-8")
+
+            with patch.object(refine_data, "HOUDINI_READY", ROOT / "RawData" / "_houdini_ready"):
+                ready = refine_data._write_ready_manifest(
+                    staging,
+                    {
+                        "area_id": "area_test",
+                        "run_id": "run_test",
+                        "bbox": [1, 2, 3, 4],
+                        "tile_ids": ["tile_a"],
+                    },
+                    {"levels": {"buildings": {"current": 3}, "roads": {"current": 2}, "dem": {"current": 2}}},
+                    {"key": "cache_key", "fingerprint": "cache_fp"},
+                    {"time": "now", "passed": True, "summary": {"pass": 1, "warn": 0, "fail": 0}},
+                )
+
+            self.assertEqual(ready["tile_ids"], ["tile_a"])
+            self.assertEqual(
+                ready["outputs"]["buildings.geojson"]["path"],
+                "RawData/_houdini_ready/area_test/buildings.geojson",
+            )
+            self.assertNotIn(".staging", ready["outputs"]["buildings.geojson"]["path"])
 
 
 if __name__ == "__main__":

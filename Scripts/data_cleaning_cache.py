@@ -129,18 +129,31 @@ def ready_outputs_exist(base_dir: str | Path, *, expected_area_id: str | None = 
     base = Path(base_dir)
     if not outputs_exist(base, min_bytes=min_bytes):
         return False
-    meta_path = base / "meta.json"
-    if not meta_path.exists():
+    manifest_path = base / "ready_manifest.json"
+    if not manifest_path.exists():
         return False
     try:
-        with open(meta_path, encoding="utf-8") as f:
-            meta = json.load(f)
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
     except (OSError, json.JSONDecodeError):
         return False
-    if expected_area_id and meta.get("area_id") != expected_area_id:
+    if manifest.get("manifest_type") != "virtualcity.houdini_ready":
         return False
-    if expected_run_id and meta.get("run_id") != expected_run_id:
+    if expected_area_id and manifest.get("area_id") != expected_area_id:
         return False
+    if expected_run_id and manifest.get("run_id") != expected_run_id:
+        return False
+    outputs = manifest.get("outputs", {})
+    for name in OUTPUT_NAMES.values():
+        fp = outputs.get(name, {})
+        if not fp.get("exists"):
+            return False
+        path = base / name
+        if not path.exists() or path.stat().st_size <= min_bytes:
+            return False
+        expected_sha = fp.get("sha256")
+        if expected_sha and file_fingerprint(path).get("sha256") != expected_sha:
+            return False
     return True
 
 

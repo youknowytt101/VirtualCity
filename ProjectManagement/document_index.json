@@ -3,76 +3,88 @@
   "purpose": "AI-readable document index for fast handoff and task routing",
   "entry_points": {
     "first_read": "AI_HANDOFF.md",
-    "ai_startup_guide": "项目管理/00_AI接手指南.md",
-    "current_status": "项目管理/02_当前状态与下一步.md",
-    "task_board": "项目管理/08_任务看板.md",
-    "known_issues": "项目管理/12_已知坑点与解决方案.md",
-    "decision_records": "项目管理/09_决策记录.md",
-    "manifest": "项目管理/project_manifest.json"
+    "ai_startup_guide": "ProjectManagement/00_AI接手指南.md",
+    "current_status": "ProjectManagement/02_当前状态与下一步.md",
+    "task_board": "ProjectManagement/08_任务看板.md",
+    "known_issues": "ProjectManagement/12_已知坑点与解决方案.md",
+    "decision_records": "ProjectManagement/09_决策记录.md",
+    "architecture_boundaries": "ProjectManagement/14_三大模块架构边界.md",
+    "manifest": "ProjectManagement/project_manifest.json"
   },
   "by_task": {
     "understand_project": [
       "AI_HANDOFF.md",
       "README.md",
-      "项目管理/00_AI接手指南.md",
-      "项目管理/01_资料地图.md",
+      "ProjectManagement/00_AI接手指南.md",
+      "ProjectManagement/01_资料地图.md",
+      "ProjectManagement/14_三大模块架构边界.md",
       "VirtualCity完整执行计划.md"
+    ],
+    "understand_architecture": [
+      "README.md",
+      "Scripts/README.md",
+      "ProjectManagement/14_三大模块架构边界.md",
+      "ProjectManagement/04_稳定流程规范.md",
+      "ProjectManagement/VirtualCity_三大模块流程图.svg",
+      "ProjectManagement/VirtualCity_自动化管线完整流程图.svg"
     ],
     "find_next_step": [
       "AI_HANDOFF.md",
-      "项目管理/02_当前状态与下一步.md",
-      "项目管理/08_任务看板.md",
-      "项目管理/10_AI启动自检清单.md"
+      "ProjectManagement/02_当前状态与下一步.md",
+      "ProjectManagement/08_任务看板.md",
+      "ProjectManagement/10_AI启动自检清单.md"
     ],
     "continue_iteration": [
       "AI_HANDOFF.md",
-      "项目管理/05_自动迭代协议.md",
-      "项目管理/03_迭代日志.md",
-      "项目管理/08_任务看板.md"
+      "ProjectManagement/05_自动迭代协议.md",
+      "ProjectManagement/03_迭代日志.md",
+      "ProjectManagement/08_任务看板.md"
     ],
     "run_full_pipeline_test": [
-      "项目管理/10_AI启动自检清单.md",
-      "项目管理/04_稳定流程规范.md",
+      "ProjectManagement/10_AI启动自检清单.md",
+      "ProjectManagement/04_稳定流程规范.md",
       "Scripts/README.md",
-      "Scripts/area_picker.py"
+      "Scripts/area_picker.py",
+      "Scripts/orchestration/run_pipeline.py"
     ],
     "work_on_houdini_quality": [
-      "项目管理/02_当前状态与下一步.md",
-      "项目管理/12_已知坑点与解决方案.md",
+      "ProjectManagement/02_当前状态与下一步.md",
+      "ProjectManagement/12_已知坑点与解决方案.md",
       "Houdini/README.md",
-      "Scripts/_recook_new_area.py",
+      "Scripts/houdini_build/recook_new_area.py",
       "Scripts/houdini_model_qa.py"
     ],
     "work_on_roads": [
-      "项目管理/12_已知坑点与解决方案.md",
+      "ProjectManagement/12_已知坑点与解决方案.md",
       "Scripts/houdini_road_pipeline.py",
       "Scripts/_road_strips_v2.py",
-      "Scripts/_recook_new_area.py",
+      "Scripts/houdini_build/recook_new_area.py",
       "Reports/model_qa/latest.json"
     ],
     "work_on_buildings": [
-      "项目管理/12_已知坑点与解决方案.md",
-      "Scripts/_recook_new_area.py",
+      "ProjectManagement/12_已知坑点与解决方案.md",
+      "Scripts/houdini_build/recook_new_area.py",
       "Scripts/houdini_model_qa.py",
       "Reports/model_qa/latest.json"
     ],
     "work_on_data_cleaning": [
-      "Scripts/refine_data.py",
+      "Scripts/cleaning/refine_data.py",
       "Scripts/clean_raw_data.py",
       "Scripts/data_cleaning_cache.py",
+      "RawData/_houdini_ready/{area_id}/ready_manifest.json",
       "Config/qa/"
     ],
     "check_decisions": [
-      "项目管理/09_决策记录.md",
-      "项目管理/03_迭代日志.md"
+      "ProjectManagement/09_决策记录.md",
+      "ProjectManagement/03_迭代日志.md"
     ],
     "plan_mvp": [
       "VirtualCity完整执行计划.md",
-      "项目管理/07_MVP_QA检查清单.md",
+      "ProjectManagement/07_MVP_QA检查清单.md",
       "Config/pipeline_config.template.json"
     ],
     "create_new_area": [
-      "项目管理/区域记录/_template.md",
+      "ProjectManagement/区域记录/_template.md",
       "Config/area_config.template.json",
       "RawData/README.md"
     ],
@@ -93,6 +105,6 @@
       "Config/README.md"
     ]
   },
-  "version_roadmap": "项目管理/11_版本路线图.md",
-  "last_updated": "2026-05-29"
+  "version_roadmap": "ProjectManagement/11_版本路线图.md",
+  "last_updated": "2026-06-08"
 }
