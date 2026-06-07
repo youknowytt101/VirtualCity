@@ -67,14 +67,13 @@ def download_copernicus_10m(bbox, output_tif, output_csv):
 
 
 def _init_ee():
-    """初始化 Earth Engine，自动安装 + 认证"""
+    """初始化 Earth Engine。依赖由 Scripts/pyproject.toml 管理。"""
     try:
         import ee
     except ImportError:
-        print("安装 earthengine-api...")
-        os.system('uv pip install earthengine-api '
-                  '--index-url https://mirrors.aliyun.com/pypi/simple/')
-        import ee
+        raise RuntimeError(
+            "Missing dependency: earthengine-api. Run `cd Scripts; uv sync` first."
+        )
     print("Earth Engine 认证...")
     try:
         ee.Initialize(project=EE_PROJECT)
@@ -186,11 +185,9 @@ def convert_to_csv(tif_path, csv_path, bbox):
         import rasterio
         import numpy as np
     except ImportError:
-        print("  安装 rasterio...")
-        os.system("uv pip install rasterio numpy "
-                  "--index-url https://mirrors.aliyun.com/pypi/simple/")
-        import rasterio
-        import numpy as np
+        raise RuntimeError(
+            "Missing dependency: rasterio/numpy. Run `cd Scripts; uv sync` first."
+        )
 
     ORIGIN_LON = (bbox[0] + bbox[2]) / 2
     ORIGIN_LAT = (bbox[1] + bbox[3]) / 2

@@ -3,35 +3,29 @@
 > Start here when taking over this project. This file is intentionally short,
 > current-state focused, and should be updated after major iteration rounds.
 
-Last updated: 2026-06-04
+Last updated: 2026-06-07
 
 ## 0. 当前活跃交接入口
 
-当前最新工作集中在独立道路研究管线：
+当前工作已回到 VirtualCity 主线自动化流程，不再使用独立车道研究管线。
+
+主入口：
 
 ```text
-ProjectManagement/RoadResearch/road_test_pipeline/
+Scripts/area_picker.py
+Scripts/set_area.py
+Scripts/refine_data.py
+Scripts/_recook_new_area.py
+Scripts/houdini_model_qa.py
 ```
 
-下一位 AI 如果是继续“道路修复 / 车道级路口 / lane graph（车道拓扑图） / movement corridor（通行走廊）”工作，先读：
+下一位 AI 如果继续自动化或道路生成工作，先读：
 
 ```text
-ProjectManagement/RoadResearch/road_test_pipeline/AI_START_HERE.md
-ProjectManagement/RoadResearch/road_test_pipeline/CURRENT_STAGE_SNAPSHOT.md
-ProjectManagement/RoadResearch/road_test_pipeline/NEXT_AI_HANDOFF.md
+Scripts/README.md
+ProjectManagement/04_稳定流程规范.md
+ProjectManagement/12_已知坑点与解决方案.md
 ```
-
-当前道路管线已经完成 `road skeleton repair（道路骨架修复） -> lane attribute model（车道属性模型） -> lane graph topology（车道拓扑图拓扑） -> movement corridor candidates（通行走廊候选） -> compound junction merge transaction（复合路口合并事务） -> staged compound movement SVG visualization（暂存复合通行走廊 SVG 可视化）` 的非破坏式闭环。
-
-`L8.5 staged compound movement SVG visualization（暂存复合通行走廊 SVG 可视化）` 已升级为 `review_drawing（审图线稿）`：默认 3200px 宽画布、`lane road casing（车道道路底线）`、更小的 `entry / exit anchors（入口 / 出口锚点）`，并高亮 24 条 `compound trial corridor（复合试运行走廊）`。当前 SVG 路径：
-
-```text
-ProjectManagement/RoadResearch/road_test_pipeline/reports/visualizations/pattaya_central_500m_lane_graph_topology.svg
-```
-
-当前道路研究管线临时启用 `temporary_all_roads_bidirectional_two_lane_v1（临时全道路双向两车道策略）`：所有 road edge（道路边）统一展开为双向 2 车道，明确 `OSM oneway（OSM 单行）` 也只作为 `source_observation（源数据观察值）` 保留，不再阻断 L5/L7/L8 的 movement（通行动作）。
-
-`L8.3 compound junction merge planner（复合路口合并规划器）` 和 `L8.4 compound junction merge transaction（复合路口合并事务）` 已闭环：24 个 `adjacent_junction_short_link（相邻路口短连接）` 锚点已归并成 3 个 low-risk `transaction_candidate（低风险事务候选）`，并生成 24 条 staged compound movement corridor（暂存复合通行走廊）。下一步是 `L8.6 movement corridor scoring（通行走廊评分）`：补 `collision_score（碰撞评分） / swept_envelope_score（扫掠包络评分） / curvature_score（曲率评分）`，不是写回 clean skeleton（干净道路骨架）。
 
 ## 1. Current Goal
 
@@ -54,25 +48,36 @@ UE5 export/import remains manual and should happen only after Houdini visual out
 ## 2. Required Reading Order
 
 1. `AI_HANDOFF.md`
-2. `项目管理/00_AI接手指南.md`
-3. `项目管理/02_当前状态与下一步.md`
-4. `项目管理/03_迭代日志.md`
-5. `项目管理/08_任务看板.md`
-6. `项目管理/12_已知坑点与解决方案.md`
+2. `ProjectManagement/00_AI接手指南.md`
+3. `ProjectManagement/02_当前状态与下一步.md`
+4. `ProjectManagement/03_迭代日志.md`
+5. `ProjectManagement/08_任务看板.md`
+6. `ProjectManagement/12_已知坑点与解决方案.md`
 
 For implementation work, also inspect the relevant code before changing it.
 
 ## 3. Current Git Baseline
 
-GitHub `main` and local `main` were confirmed identical at:
+The last known clean baseline before the current workspace snapshot was:
 
 ```text
-93a359b chore: sync handoff and experimental area snapshot
+4c6e7de7 Improve VirtualCity launcher and lane preview startup
 ```
 
-Key commits in the latest hardening rounds (newest first):
+Current workspace note:
 
 ```text
+The working tree contains a large cleanup / migration snapshot, including removal
+of the old independent RoadResearch/LaneForge pipeline and new mainline
+VirtualCity automation work. Treat `git status` as part of the current handoff;
+do not assume every Git-visible deletion is accidental.
+```
+
+Key commits in the recent hardening rounds:
+
+```text
+4c6e7de7 Improve VirtualCity launcher and lane preview startup
+75d334a1 Integrate LaneForge preview bridge into BBOX flow
 93a359b chore: sync handoff and experimental area snapshot
 f3a5ce9 docs: architecture panorama SVG
 ce89a53 feat(semantics): semantic contract vc_schema + height provenance + QA
@@ -162,7 +167,7 @@ Architecture / semantics hardening (this round, behavior-preserving):
 - `Scripts/vc_buildings.py` is the pure building-cleaning function (filter / height-fix, geometry passthrough).
 - `Scripts/vc_schema.py` is the semantic contract (single authority): per-layer attribute specs + `check_buildings` / `check_roads` (attribute completeness, height provenance, road connectivity). `refine_data` OutputQA runs these; `meta.json` records `schema_version`.
 - Building `height_source` provenance is stamped end-to-end: `overture` / `osm` (L3 enrich) / `estimated_pending` (Houdini procedural).
-- `项目管理/VirtualCity_架构全景图.svg` is a full-pipeline architecture panorama.
+- `ProjectManagement/VirtualCity_架构全景图.svg` is a full-pipeline architecture panorama.
 - `tests/` now has 35 offline unit tests (`vc_geo`, `houdini_sops`, `vc_buildings`, `vc_schema`).
 
 Building / terrain:
@@ -195,7 +200,7 @@ Roads:
 3. If roads look stable, start visual road layering:
    `road_surface / sidewalk_strip / curb_edge`.
 4. Keep UE5 export/import outside the default test loop until Houdini output is visually approved.
-5. Continue updating this file and `项目管理/02_当前状态与下一步.md` after each major iteration.
+5. Continue updating this file and `ProjectManagement/02_当前状态与下一步.md` after each major iteration.
 
 ## 8. Key Files
 
@@ -228,8 +233,8 @@ State / reports:
 
 Project docs:
 
-- `项目管理/00_AI接手指南.md`
-- `项目管理/02_当前状态与下一步.md`
-- `项目管理/03_迭代日志.md`
-- `项目管理/08_任务看板.md`
-- `项目管理/12_已知坑点与解决方案.md`
+- `ProjectManagement/00_AI接手指南.md`
+- `ProjectManagement/02_当前状态与下一步.md`
+- `ProjectManagement/03_迭代日志.md`
+- `ProjectManagement/08_任务看板.md`
+- `ProjectManagement/12_已知坑点与解决方案.md`

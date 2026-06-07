@@ -93,6 +93,7 @@ export_and_import.py（审核后）
 - Houdini RPYC 默认端口为 `18811`。
 - 同一时间只运行一个完整管线，避免 `active_area.json` 和 Houdini status 被互相覆盖。
 - `active_area.json`、Houdini build status、数据 QA 和 Model QA 使用同一个 `run_id`。排查问题时优先查看 `Reports/pipeline_runs/latest.json`。
+- `Reports/pipeline_runs/latest.json` 表示最近一次管线动作，可能是 `data-only` 下载；不要把它直接等同于最近一次 Houdini 成功构建。判断 Houdini 可导出状态时必须同时检查 `Config/active_area.json`、`Config/houdini_build_status.json` 和 Model QA 报告的 `area_id` / `run_id`。
 - `refine_data.py` 只在 QA 通过后发布 `_houdini_ready/{area_id}`；失败时保留上一版可用数据。
 - `area_picker.py` 在 `http://localhost:8765/health` 暴露服务版本。重复启动会复用同版本服务，检测到旧版服务则拒绝继续，避免误跑旧代码。
 - `area_picker.py` 默认用矩形工具框选固定 1km x 1km UTM 基础格；框选结果会吸附并补齐成连续矩形网格块，`/run` 接受 `tile_ids` 后由服务端重新计算 bbox。

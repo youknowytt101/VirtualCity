@@ -4,6 +4,8 @@ Desktop.ini
 $RECYCLE.BIN/
 *.lnk
 Scripts/logs/
+*.tmp
+*.pid
 
 # ===== Houdini =====
 # 缓存和模拟数据（体积大，不提交）
@@ -63,8 +65,13 @@ RawData/DEM/*.hgt
 # ===== 临时结果文件 =====
 Config/_*.txt
 Config/_*.py
+Config/.*.tmp
+Config/active_area.json
 Config/houdini_build_status.json
+Config/qa/*.json
 Reports/model_qa/*.json
+Reports/pipeline_runs/*.json
+Reports/manual_review/*.json
 
 # LaneForge local viewer runtime files（本地网页查看器运行文件）
 ProjectManagement/RoadResearch/road_test_pipeline/reports/visualizations/.laneforge_viewer.pid
@@ -75,6 +82,15 @@ ProjectManagement/RoadResearch/road_test_pipeline/reports/visualizations/lanefor
 RawData/_downloads/
 RawData/_cleaned/
 RawData/_houdini_ready/
+RawData/_clip_cache/
+RawData/_clean_cache_index.json
+
+# ===== 区域运行快照（默认不提交；如需基准样例，请放 tests/fixtures/）=====
+RawData/DEM/*_dem_v001.csv
+RawData/OSM/*_osm_v001.osm
+RawData/Overture/*_buildings_overture_v001.geojson
+Houdini/Hip/VC_*_citygen_v001.hip
+!Houdini/Hip/VC_master_citygen_v001.hip
 
 # ===== 大型测试数据（>5MB，不提交）=====
 RawData/Overture/*stress_test*
@@ -83,11 +99,13 @@ RawData/DEM/*stress_test*
 
 # ===== Python =====
 __pycache__/
+.pytest_cache/
 *.py[cod]
 *.pyo
 .env
 .venv/
 venv/
+Scripts/.uv-cache/
 
 # ===== 编辑器 =====
 .vscode/

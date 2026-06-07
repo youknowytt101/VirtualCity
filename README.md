@@ -3,12 +3,11 @@
 > **Git 仓库**：`https://github.com/youknowytt101/VirtualCity.git`  
 > 新机器首次使用：`git clone https://github.com/youknowytt101/VirtualCity.git`
 
-> AI / 新成员接手项目时，先阅读根目录：`AI_HANDOFF.md`。  
-> 然后阅读：`项目管理/00_AI接手指南.md`。  
-> 当前状态和下一步见：`项目管理/02_当前状态与下一步.md`。
+> AI / 新成员接手项目时，先阅读根目录：`AI_HANDOFF.md`。
+> 然后阅读：`ProjectManagement/00_AI接手指南.md`。
+> 当前状态和下一步见：`ProjectManagement/02_当前状态与下一步.md`。
 >
-> 当前最新道路研究工作见：`ProjectManagement/RoadResearch/road_test_pipeline/AI_START_HERE.md` 和
-> `ProjectManagement/RoadResearch/road_test_pipeline/CURRENT_STAGE_SNAPSHOT.md`。
+> 当前主线自动化流程见：`Scripts/README.md` 和 `ProjectManagement/04_稳定流程规范.md`。
 
 ## 目录结构
 
@@ -19,7 +18,7 @@ VirtualCity/
 ├── VirtualCity完整执行计划.md   ← 当前完整执行计划
 ├── 执行方案.md                  ← 早期可执行方案
 │
-├── 项目管理/                   ← AI 接手、状态、迭代日志、稳定流程
+├── ProjectManagement/         ← AI 接手、状态、迭代日志、稳定流程
 │   ├── 00_AI接手指南.md
 │   ├── 01_资料地图.md
 │   ├── 02_当前状态与下一步.md
@@ -95,20 +94,20 @@ export_and_import.py (审核后再进入 UE5)
 
 ## AI 快速入口
 
-- AI 接手指南：`项目管理/00_AI接手指南.md`
-- 当前状态与下一步：`项目管理/02_当前状态与下一步.md`
-- 资料地图：`项目管理/01_资料地图.md`
-- 迭代日志：`项目管理/03_迭代日志.md`
-- 稳定流程规范：`项目管理/04_稳定流程规范.md`
-- 自动迭代协议：`项目管理/05_自动迭代协议.md`
-- 任务记录模板：`项目管理/06_任务记录模板.md`
-- MVP QA 检查清单：`项目管理/07_MVP_QA检查清单.md`
-- 任务看板：`项目管理/08_任务看板.md`
-- 决策记录：`项目管理/09_决策记录.md`
-- AI 启动自检清单：`项目管理/10_AI启动自检清单.md`
-- 版本路线图：`项目管理/11_版本路线图.md`
-- 机器可读项目清单：`项目管理/project_manifest.json`
-- 机器可读文档索引：`项目管理/document_index.json`
+- AI 接手指南：`ProjectManagement/00_AI接手指南.md`
+- 当前状态与下一步：`ProjectManagement/02_当前状态与下一步.md`
+- 资料地图：`ProjectManagement/01_资料地图.md`
+- 迭代日志：`ProjectManagement/03_迭代日志.md`
+- 稳定流程规范：`ProjectManagement/04_稳定流程规范.md`
+- 自动迭代协议：`ProjectManagement/05_自动迭代协议.md`
+- 任务记录模板：`ProjectManagement/06_任务记录模板.md`
+- MVP QA 检查清单：`ProjectManagement/07_MVP_QA检查清单.md`
+- 任务看板：`ProjectManagement/08_任务看板.md`
+- 决策记录：`ProjectManagement/09_决策记录.md`
+- AI 启动自检清单：`ProjectManagement/10_AI启动自检清单.md`
+- 版本路线图：`ProjectManagement/11_版本路线图.md`
+- 机器可读项目清单：`ProjectManagement/project_manifest.json`
+- 机器可读文档索引：`ProjectManagement/document_index.json`
 - 配置模板目录：`Config/README.md`
 
 ## 计划与调研快速入口

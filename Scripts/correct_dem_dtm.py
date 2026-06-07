@@ -19,10 +19,7 @@ from pathlib import Path
 try:
     import numpy as np
 except ImportError:
-    print('[dtm] numpy not found, installing...')
-    import subprocess
-    subprocess.run([sys.executable, '-m', 'pip', 'install', 'numpy'], check=True)
-    import numpy as np
+    raise RuntimeError("Missing dependency: numpy. Run `cd Scripts; uv sync` first.")
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'Scripts'))
