@@ -374,6 +374,28 @@ def _remembered_selection_status() -> dict:
     return payload
 
 
+def _pipeline_command_for_selection(selection: dict, *, data_only: bool,
+                                    submitted_tile_ids: list | None = None) -> list[str]:
+    """Build the CLI command for a validated fixed-grid selection."""
+    west, south, east, north = selection['bbox']
+    name = selection['selection_id']
+    if data_only:
+        return [
+            'uv', 'run', 'python', '-u', 'acquisition/set_area.py', '--data-only',
+            str(west), str(south),
+            str(east), str(north),
+            name,
+        ]
+    tile_ids = selection.get('tile_ids') or submitted_tile_ids or []
+    return [
+        'uv', 'run', 'python', '-u', 'orchestration/run_pipeline.py',
+        '--tile-ids', ','.join(tile_ids),
+        str(west), str(south),
+        str(east), str(north),
+        name,
+    ]
+
+
 def _mark_page_seen(now: float | None = None) -> None:
     now = time.time() if now is None else now
     with _page_lock:
@@ -3024,21 +3046,11 @@ class _Handler(BaseHTTPRequestHandler):
                            'export_done': False, 'export_ok': False, 'export_returncode': None,
                            'export_log_lines': []})
 
-        if data_only:
-            cmd = [
-                'uv', 'run', 'python', '-u', 'acquisition/set_area.py', '--data-only',
-                str(bbox['west']), str(bbox['south']),
-                str(bbox['east']), str(bbox['north']),
-                name,
-            ]
-        else:
-            cmd = [
-                'uv', 'run', 'python', '-u', 'orchestration/run_pipeline.py',
-                '--tile-ids', ','.join(selection.get('tile_ids') or tile_ids),
-                str(bbox['west']), str(bbox['south']),
-                str(bbox['east']), str(bbox['north']),
-                name,
-            ]
+        cmd = _pipeline_command_for_selection(
+            selection,
+            data_only=data_only,
+            submitted_tile_ids=tile_ids,
+        )
         _safe_print(f"\n[area_picker] 启动管线: {' '.join(cmd)}")
 
         def _run():

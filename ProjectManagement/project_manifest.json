@@ -11,21 +11,21 @@
     "Houdini 输出确认后再触发 UE5 export_and_import.py"
   ],
   "active_area": {
-    "area_id": "area_12.946_100.892",
-    "display_name": "Pattaya experimental snapshot area 12.946 100.892",
+    "area_id": "z47n_e704000_n1429000_w1000_h1000_s1000",
+    "display_name": "Pattaya fixed UTM grid z47n_e704000_n1429000",
     "status": "houdini_model_qa_warn_needs_human_review",
     "bbox_accuracy": "selected_from_area_picker",
     "bbox": {
-      "west": 100.880671,
-      "south": 12.93455,
-      "east": 100.898094,
-      "north": 12.951615
+      "west": 100.8802921,
+      "south": 12.9195947,
+      "east": 100.8895736,
+      "north": 12.9286991
     },
-    "osm_target": "RawData/OSM/area_12.946_100.892_osm_v001.osm",
-    "dem_target": "RawData/DEM/area_12.946_100.892_dem_v001.csv",
-    "buildings_target": "RawData/Overture/area_12.946_100.892_buildings_overture_v001.geojson",
-    "houdini_hip": "Houdini/Hip/VC_area_12.946_100.892_citygen_v001.hip",
-    "data_qa_report": "Config/qa/area_12.946_100.892_qa_20260529_091218.json",
+    "osm_target": "RawData/OSM/z47n_e704000_n1429000_w1000_h1000_s1000_osm_v001.osm",
+    "dem_target": "RawData/DEM/z47n_e704000_n1429000_w1000_h1000_s1000_dem_v001.csv",
+    "buildings_target": "RawData/Overture/z47n_e704000_n1429000_w1000_h1000_s1000_buildings_overture_v001.geojson",
+    "houdini_hip": "Houdini/Hip/VC_z47n_e704000_n1429000_w1000_h1000_s1000_citygen_v001.hip",
+    "data_qa_report": "Config/qa/z47n_e704000_n1429000_w1000_h1000_s1000_qa_20260608_014750.json",
     "model_qa_report": "Reports/model_qa/latest.json"
   },
   "ai_entry_files": [
@@ -57,6 +57,7 @@
     "known_issues": "ProjectManagement/12_已知坑点与解决方案.md",
     "ai_startup_checklist": "ProjectManagement/10_AI启动自检清单.md",
     "version_roadmap": "ProjectManagement/11_版本路线图.md",
+    "artifact_governance": "ProjectManagement/15_仓库产物治理.md",
     "document_index": "ProjectManagement/document_index.json",
     "area_record_template": "ProjectManagement/区域记录/_template.md",
     "config_index": "Config/README.md"

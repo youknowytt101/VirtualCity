@@ -134,6 +134,7 @@ Houdini 构建 / Model QA / 审核出口
 - AI 启动自检清单：`ProjectManagement/10_AI启动自检清单.md`
 - 版本路线图：`ProjectManagement/11_版本路线图.md`
 - 三大模块架构边界：`ProjectManagement/14_三大模块架构边界.md`
+- 仓库产物治理：`ProjectManagement/15_仓库产物治理.md`
 - 机器可读项目清单：`ProjectManagement/project_manifest.json`
 - 机器可读文档索引：`ProjectManagement/document_index.json`
 - 配置模板目录：`Config/README.md`

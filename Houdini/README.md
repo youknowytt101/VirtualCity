@@ -16,7 +16,7 @@ Houdini/Hip/VC_master_citygen_v001.hip
 最新运行区实验快照 hip：
 
 ```text
-Houdini/Hip/VC_area_12.946_100.892_citygen_v001.hip
+Houdini/Hip/VC_z47n_e704000_n1429000_w1000_h1000_s1000_citygen_v001.hip
 ```
 
 当前主要输出节点：

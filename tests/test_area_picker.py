@@ -577,6 +577,22 @@ class TestSetAreaDataOnly(unittest.TestCase):
         self.assertIn("--tile-ids", source)
         self.assertIn("'acquisition/set_area.py', '--data-only'", source)
 
+    def test_pipeline_command_builder_keeps_layered_entrypoints(self):
+        selection = {
+            "selection_id": "z47n_e704000_n1429000_w1000_h1000_s1000",
+            "tile_ids": ["z47n_e704000_n1429000_s1000"],
+            "bbox": [100.8802921, 12.9195947, 100.8895736, 12.9286991],
+        }
+
+        data_cmd = area_picker._pipeline_command_for_selection(selection, data_only=True)
+        self.assertEqual(data_cmd[:6], ["uv", "run", "python", "-u", "acquisition/set_area.py", "--data-only"])
+        self.assertNotIn("orchestration/run_pipeline.py", data_cmd)
+
+        run_cmd = area_picker._pipeline_command_for_selection(selection, data_only=False)
+        self.assertIn("orchestration/run_pipeline.py", run_cmd)
+        self.assertIn("--tile-ids", run_cmd)
+        self.assertIn("z47n_e704000_n1429000_s1000", run_cmd)
+
     def test_run_pipeline_orchestrator_exists(self):
         source = (ROOT / "Scripts" / "orchestration" / "run_pipeline.py").read_text(encoding="utf-8")
         self.assertIn("acquisition/set_area.py", source)

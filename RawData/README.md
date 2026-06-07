@@ -90,7 +90,7 @@ RawData/_houdini_ready/{area_id}/
 
 ## 当前基准样区
 
-最新完整流程通过：
+稳定 clean-pass 对照样区：
 
 ```text
 area_12.918_100.865
@@ -104,3 +104,11 @@ RawData/DEM/area_12.918_100.865_dem_v001.csv
 RawData/Overture/area_12.918_100.865_buildings_overture_v001.geojson
 Config/qa/area_12.918_100.865_qa_20260528_031731.json
 ```
+
+最新完整流程运行区：
+
+```text
+z47n_e704000_n1429000_w1000_h1000_s1000
+```
+
+当前状态：Houdini build completed；Model QA quick 12 pass / 2 warn / 0 fail，需人工视口审核后再晋级为基准。

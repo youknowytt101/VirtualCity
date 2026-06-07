@@ -3,7 +3,7 @@
 > Start here when taking over this project. This file is intentionally short,
 > current-state focused, and should be updated after major iteration rounds.
 
-Last updated: 2026-06-07
+Last updated: 2026-06-08
 
 ## 0. 当前活跃交接入口
 
@@ -109,9 +109,9 @@ git -c http.proxy= -c https.proxy= push origin main
 Latest full-pipeline area (from `area_picker.py`):
 
 ```text
-area_12.946_100.892
+z47n_e704000_n1429000_w1000_h1000_s1000
 OBJ path: /obj/pattaya_osm
-latest area HIP: Houdini/Hip/VC_area_12.946_100.892_citygen_v001.hip
+latest area HIP: Houdini/Hip/VC_z47n_e704000_n1429000_w1000_h1000_s1000_citygen_v001.hip
 master HIP: Houdini/Hip/VC_master_citygen_v001.hip
 ```
 
@@ -127,15 +127,16 @@ Latest Model QA:
 
 ```text
 Reports/model_qa/latest.json
-summary: 11 pass / 1 warn / 0 fail
-warn: road_faces (single long-thin road_strips sliver near bbox edge; BENIGN)
+summary: 12 pass / 2 warn / 0 fail
+warn: road_terrain_fit (many terrain ray misses, but no below-threshold points)
+warn: junction_quality (8 sliver-edge road_strips patches below 0.01m)
 ```
 
-The `road_faces` warn is benign: it is one intermediate-geometry sliver
-(`max_aspect_ratio` just over the 150 warn threshold) on a larger/denser area.
-The final `road_clipped` output passes (`road_clipped_faces: pass`,
-`road_terrain_fit: pass`), so downstream geometry is clean. Stable clean-pass
-areas from the previous round remain useful as visual baselines.
+This latest run completed the full pipeline and has no Model QA failures, but
+it still needs human viewport review before being promoted to a baseline. The
+current Houdini-ready manifest was refreshed on 2026-06-08 so its output paths
+now point at the published `_houdini_ready/{area_id}` directory rather than the
+temporary staging directory.
 
 ## 5. Full Pipeline Definition
 
