@@ -35,14 +35,23 @@ class TestProgressParsing(unittest.TestCase):
 class TestPickerHtml(unittest.TestCase):
     def test_picker_uses_draw_rectangle_for_fixed_grid_blocks(self):
         self.assertIn("固定网格框选器", area_picker._HTML)
-        self.assertIn("cached-only", area_picker._HTML)
         self.assertIn("leaflet.draw", area_picker._HTML)
         self.assertIn("selectTilesByBounds", area_picker._HTML)
         self.assertIn("tile_ids", area_picker._HTML)
         self.assertIn("downloadData", area_picker._HTML)
         self.assertIn("zoomControl: false", area_picker._HTML)
         self.assertIn(".leaflet-control-zoom", area_picker._HTML)
-        self.assertIn(".leaflet-draw-edit-remove", area_picker._HTML)
+        self.assertIn('id="selection-tools"', area_picker._HTML)
+        self.assertIn("map-tool-control", area_picker._HTML)
+        self.assertIn("activateRectangleTool", area_picker._HTML)
+        self.assertIn("selectTileByLatLng", area_picker._HTML)
+        self.assertIn("clearSelectionFromMapTool", area_picker._HTML)
+        self.assertIn("bindSelectionTools", area_picker._HTML)
+        self.assertNotIn("L.Control.Draw", area_picker._HTML)
+        self.assertNotIn("leaflet-draw-edit-remove", area_picker._HTML)
+        self.assertNotIn('id="clear-btn"', area_picker._HTML)
+        self.assertNotIn("cached-only", area_picker._HTML)
+        self.assertNotIn("只显示已有缓存", area_picker._HTML)
 
     def test_picker_uses_local_web_assets_and_online_basemap(self):
         self.assertIn('/static/leaflet/leaflet.css', area_picker._HTML)
@@ -569,11 +578,11 @@ class TestSetAreaDataOnly(unittest.TestCase):
         self.assertIn("runpy.run_path", source)
 
     def test_data_only_does_not_emit_houdini_completion_warning(self):
-        source = (ROOT / "Scripts" / "area_picker.py").read_text(encoding="utf-8")
+        source = (ROOT / "Scripts" / "app" / "area_picker" / "server.py").read_text(encoding="utf-8")
         self.assertIn("if ok and not houdini_done and not data_only:", source)
 
     def test_full_pipeline_uses_explicit_orchestrator(self):
-        source = (ROOT / "Scripts" / "area_picker.py").read_text(encoding="utf-8")
+        source = (ROOT / "Scripts" / "app" / "area_picker" / "server.py").read_text(encoding="utf-8")
         self.assertIn("orchestration/run_pipeline.py", source)
         self.assertIn("--tile-ids", source)
         self.assertIn("'acquisition/set_area.py', '--data-only'", source)

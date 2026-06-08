@@ -22,8 +22,8 @@ ROOT = SCRIPTS.parent
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-import pipeline_state
-import vc_paths
+from orchestration import pipeline_state
+from shared import vc_paths
 
 
 def _run(cmd: list[str], *, phase: str, run_id: str | None = None) -> int:

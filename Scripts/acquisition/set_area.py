@@ -43,10 +43,10 @@ SCRIPTS_ROOT = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_ROOT))
 
-from vc_paths import ROOT, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
-from vc_geo import bbox_size_m
+from shared.vc_paths import ROOT, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
+from shared.vc_geo import bbox_size_m
 import data_cleaning_cache as dcc
-import pipeline_state
+from orchestration import pipeline_state
 
 HIP = str(HIP)
 

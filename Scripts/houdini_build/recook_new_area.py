@@ -18,8 +18,8 @@ if str(SCRIPTS_ROOT) not in sys.path:
 import houdini_road_pipeline as road_pipe
 import houdini_sops
 import data_cleaning_cache as dcc
-import pipeline_state
-from vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area, project_relative
+from orchestration import pipeline_state
+from shared.vc_paths import ROOT, ACTIVE_AREA, HIP as MASTER_HIP, HOUDINI, load_active_area, project_relative
 
 PASS = '[OK]'
 FAIL = '[FAIL]'
@@ -792,7 +792,6 @@ else:
 
 if conn:
     conn.close()
-
 
 
 

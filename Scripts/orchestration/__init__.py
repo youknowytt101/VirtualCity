@@ -1,1 +1,1 @@
-"""Pipeline orchestration entrypoints for VirtualCity."""
+"""Pipeline orchestration and durable run state for VirtualCity."""

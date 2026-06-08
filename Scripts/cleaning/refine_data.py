@@ -27,7 +27,7 @@ SCRIPTS_ROOT = Path(__file__).resolve().parents[1]
 if str(SCRIPTS_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_ROOT))
 
-import vc_paths
+from shared import vc_paths
 import data_cleaning_cache as dcc
 
 # ── 目录常量 ──────────────────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ def _publish_ready_dir(staging_dir: Path, final_dir: Path) -> None:
 def _write_ready_manifest(staging_dir: Path, area_cfg: dict, manifest: dict,
                           cache_state: dict, qa_report: dict) -> dict:
     """Write the explicit contract consumed by Houdini preflight."""
-    import vc_schema
+    from shared import vc_schema
 
     output_names = [
         "buildings.geojson",
@@ -482,7 +482,7 @@ def _run_output_qa(area_id: str, area_cfg: dict,
 
     # 语义契约检查（vc_schema）：属性完整性 + 道路连通性
     try:
-        import vc_schema
+        from shared import vc_schema
         if bld_path.exists():
             with open(bld_path, encoding="utf-8") as f:
                 checks.extend(vc_schema.check_buildings(json.load(f).get("features", [])))
@@ -800,7 +800,7 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
             dst = staging_dir / name
             if src.exists():
                 _copy_file(src, dst)
-        import vc_schema
+        from shared import vc_schema
         meta = {
             "area_id": area_id,
             "run_id": area_cfg.get("run_id", ""),

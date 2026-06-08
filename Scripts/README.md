@@ -25,7 +25,7 @@ orchestration/run_pipeline.py（完整管线编排）
     ↓
 acquisition/set_area.py --acquire-only
     ↓
-pipeline_state.py（生成 run_id，持续记录阶段状态）
+orchestration/pipeline_state.py（生成 run_id，持续记录阶段状态）
     ↓
 cleaning/refine_data.py
     ↓
@@ -58,7 +58,7 @@ export_and_import.py（审核后）
 | 模块 | 当前脚本 / 目录 | 交付物 | 说明 |
 |---|---|---|---|
 | 数据获取 / 下载 / 缓存 | `acquisition/set_area.py`, `area_picker.py`, `download_osm.py`, `download_dem.py`, `download_overture_buildings.py`, `_tile_cache.py` | `RawData/OSM/`, `RawData/DEM/`, `RawData/Overture/`, `RawData/_tiles/`, `RawData/_clip_cache/` | 缓存优先，缺失下载；`data-only` 只到这一层 |
-| 数据清洗 / 语义 / QA | `cleaning/refine_data.py`, `clean_raw_data.py`, `data_cleaning_cache.py`, `vc_geo.py`, `vc_schema.py`, `vc_buildings.py` | `RawData/_cleaned/{area_id}/`, `RawData/_houdini_ready/{area_id}/`, `Config/qa/*.json` | QA 通过后才发布 Houdini-ready；失败保留上一版 |
+| 数据清洗 / 语义 / QA | `cleaning/refine_data.py`, `clean_raw_data.py`, `data_cleaning_cache.py`, `shared/vc_geo.py`, `shared/vc_schema.py`, `shared/vc_buildings.py` | `RawData/_cleaned/{area_id}/`, `RawData/_houdini_ready/{area_id}/`, `Config/qa/*.json` | QA 通过后才发布 Houdini-ready；失败保留上一版 |
 | Houdini 构建 / Model QA / 审核出口 | `houdini_build/recook_new_area.py`, `houdini_sops/`, `_osm_import_canonical.py`, `_road_strips_v2.py`, `houdini_model_qa.py`, `export_and_import.py` | `Houdini/Hip/*.hip`, `Reports/model_qa/*.json`, `Houdini/Export/*.fbx` | Houdini 只应消费 `_houdini_ready`；导出必须在人工审核后 |
 
 重要判断：
@@ -66,7 +66,8 @@ export_and_import.py（审核后）
 - 业务流程已经是三大块。
 - 核心执行入口已经物理分层：`acquisition/`、`cleaning/`、`houdini_build/`。
 - `Scripts/set_area.py`、`Scripts/refine_data.py`、`Scripts/_recook_new_area.py` 是兼容 wrapper，不是新实现位置。
-- 共享工具和部分辅助脚本仍保留在 `Scripts/` 根目录，后续可继续迁到 `shared/` 和对应模块。
+- 坐标、路径、语义契约和纯建筑清洗已经迁入 `shared/`；根目录同名文件只作为兼容 wrapper。
+- 共享辅助脚本和部分数据 / Houdini 工具仍保留在 `Scripts/` 根目录，后续可继续迁到对应模块。
 
 详细口径见 `ProjectManagement/14_三大模块架构边界.md`。
 
@@ -76,10 +77,13 @@ export_and_import.py（审核后）
 
 | 脚本 | 职责 |
 |---|---|
-| `area_picker.py` | Leaflet 网页框选固定 1km UTM 网格块，触发完整管线，监控流程状态 |
+| `area_picker.py` | 用户级兼容入口，转发到 `app/area_picker/server.py` |
+| `app/area_picker/server.py` | Leaflet 网页框选固定 1km UTM 网格块，触发完整管线，监控流程状态 |
+| `app/area_picker/template.py` | area picker 的 HTML / CSS / JS 模板 |
+| `app/area_picker/software_paths.py` | Houdini / UE 等本机软件路径配置读写 |
 | `orchestration/run_pipeline.py` | 显式编排数据获取、数据清洗、Houdini 构建三大模块 |
 | `acquisition/set_area.py` | 更新 `active_area.json`，获取 / 恢复 OSM、DEM、Overture 数据；旧完整流程兼容入口由根目录 `set_area.py` 转发 |
-| `pipeline_state.py` | 为每次完整构建生成 `run_id`，写入 `Reports/pipeline_runs/` 运行清单 |
+| `orchestration/pipeline_state.py` | 为每次完整构建生成 `run_id`，写入 `Reports/pipeline_runs/` 运行清单 |
 | `cleaning/refine_data.py` | 执行数据清洗、raw snapshot、缓存、数据 QA |
 | `clean_raw_data.py` | 建筑、道路、DEM 的清洗逻辑 |
 | `data_cleaning_cache.py` | 数据清洗 cache fingerprint 与复用 |
@@ -87,7 +91,7 @@ export_and_import.py（审核后）
 | `_osm_import_canonical.py` | Houdini `osm_import` Python SOP 源码 |
 | `_road_strips_v2.py` | Houdini `road_strips` Python SOP 源码 |
 | `houdini_model_qa.py` | Houdini 模型 QA quick/full |
-| `vc_paths.py` | 项目路径统一入口，禁止硬编码盘符 |
+| `shared/vc_paths.py` | 项目路径统一入口，禁止硬编码盘符；根目录 `vc_paths.py` 仅兼容旧导入 |
 | `export_and_import.py` | Houdini 审核后导出并触发 UE5 导入 |
 
 ---
@@ -141,9 +145,15 @@ export_and_import.py（审核后）
 ```text
 Scripts/
 ├── README.md
-├── area_picker.py
+├── area_picker.py            # compatibility entrypoint
+├── app/
+│   └── area_picker/
+│       ├── server.py
+│       ├── template.py
+│       └── software_paths.py
 ├── orchestration/
-│   └── run_pipeline.py
+│   ├── run_pipeline.py
+│   └── pipeline_state.py
 ├── acquisition/
 │   └── set_area.py
 ├── cleaning/
@@ -151,14 +161,21 @@ Scripts/
 ├── houdini_build/
 │   └── recook_new_area.py
 ├── set_area.py              # compatibility wrapper
-├── pipeline_state.py
+├── pipeline_state.py        # compatibility alias
 ├── refine_data.py           # compatibility wrapper
 ├── _recook_new_area.py      # compatibility wrapper
 ├── houdini_model_qa.py
 ├── _osm_import_canonical.py
 ├── _road_strips_v2.py
-├── vc_paths.py
+├── vc_paths.py              # compatibility wrapper
+├── vc_geo.py                # compatibility wrapper
+├── vc_schema.py             # compatibility wrapper
+├── vc_buildings.py          # compatibility wrapper
 ├── shared/
+│   ├── vc_paths.py
+│   ├── vc_geo.py
+│   ├── vc_schema.py
+│   └── vc_buildings.py
 ├── ue5/
 ├── houdini_sops/
 └── _archive/
