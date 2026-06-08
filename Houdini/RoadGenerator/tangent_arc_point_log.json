@@ -1,0 +1,122 @@
+[
+  {
+    "arc_id": 0,
+    "branch_pair": [
+      0,
+      2
+    ],
+    "crossing_center_xz": [
+      -7.250739,
+      -16.377182
+    ],
+    "circle_center_xz": [
+      -7.22217,
+      -16.604869
+    ],
+    "circle_radius": 7.498492,
+    "tangent_a_xz": [
+      -11.239617,
+      -22.936338
+    ],
+    "tangent_b_xz": [
+      -2.272117,
+      -22.237306
+    ],
+    "equal_branch_distance_from_crossing": 7.692475,
+    "euclidean_distance_a_from_crossing": 7.676827,
+    "euclidean_distance_b_from_crossing": 7.689456,
+    "radius_balance_error": 0.0,
+    "shortest_arc_angle_degrees": 73.706506,
+    "arc_point_count": 25
+  },
+  {
+    "arc_id": 1,
+    "branch_pair": [
+      2,
+      3
+    ],
+    "crossing_center_xz": [
+      -7.250739,
+      -16.377182
+    ],
+    "circle_center_xz": [
+      -7.059429,
+      -16.353181
+    ],
+    "circle_radius": 7.585597,
+    "tangent_a_xz": [
+      -2.272117,
+      -22.237306
+    ],
+    "tangent_b_xz": [
+      -5.111298,
+      -9.02201
+    ],
+    "equal_branch_distance_from_crossing": 7.692475,
+    "euclidean_distance_a_from_crossing": 7.689456,
+    "euclidean_distance_b_from_crossing": 7.660011,
+    "radius_balance_error": 0.0,
+    "shortest_arc_angle_degrees": 125.986836,
+    "arc_point_count": 25
+  },
+  {
+    "arc_id": 2,
+    "branch_pair": [
+      3,
+      1
+    ],
+    "crossing_center_xz": [
+      -7.250739,
+      -16.377182
+    ],
+    "circle_center_xz": [
+      -8.735311,
+      -4.545739
+    ],
+    "circle_radius": 6.145307,
+    "tangent_a_xz": [
+      -4.999928,
+      -6.500033
+    ],
+    "tangent_b_xz": [
+      -13.283767,
+      -8.130769
+    ],
+    "equal_branch_distance_from_crossing": 10.218718,
+    "euclidean_distance_a_from_crossing": 10.130362,
+    "euclidean_distance_b_from_crossing": 10.217669,
+    "radius_balance_error": 0.0,
+    "shortest_arc_angle_degrees": 114.137463,
+    "arc_point_count": 25
+  },
+  {
+    "arc_id": 3,
+    "branch_pair": [
+      1,
+      0
+    ],
+    "crossing_center_xz": [
+      -7.250739,
+      -16.377182
+    ],
+    "circle_center_xz": [
+      -79.574312,
+      -25.453283
+    ],
+    "circle_radius": 62.465985,
+    "tangent_a_xz": [
+      -29.965754,
+      13.477277
+    ],
+    "tangent_b_xz": [
+      -35.391068,
+      -39.852601
+    ],
+    "equal_branch_distance_from_crossing": 37.564286,
+    "euclidean_distance_a_from_crossing": 37.513472,
+    "euclidean_distance_b_from_crossing": 36.646602,
+    "radius_balance_error": 0.0,
+    "shortest_arc_angle_degrees": 56.174012,
+    "arc_point_count": 25
+  }
+]
