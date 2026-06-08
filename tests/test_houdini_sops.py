@@ -19,6 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "Scripts"))
 
 import houdini_sops
+from houdini_build.context import BuildContext, FULL_REFRESH_CHAIN, QUICK_ROAD_REFRESH_CHAIN
+from houdini_build.domains import BUILD_ORDER, domain_summary
 
 
 class TestSopFilesExist(unittest.TestCase):
@@ -34,6 +36,9 @@ class TestSopFilesExist(unittest.TestCase):
         "road_vertical_smoother.py",
         "road_graph_filter.py",
         "road_api_raw_lines.py",
+        "road_shared_topology.py",
+        "road_centerline_resample.py",
+        "road_junction_curve_smooth.py",
         "road_junction_arc_smoother.py",
         "road_topology_builder.py",
         "road_profile_apply.py",
@@ -86,6 +91,28 @@ class TestPythonSopValidity(unittest.TestCase):
             "road_vertical_smoother.py": {},
             "road_graph_filter.py": dict(ROOT="/proj/VirtualCity", CFG="/proj/VirtualCity/Config/active_area.json"),
             "road_api_raw_lines.py": {},
+            "road_shared_topology.py": dict(
+                ENABLED=1,
+                FUSE_TOLERANCE=0.35,
+                INTERSECTION_TOLERANCE=0.08,
+                MAX_SEGMENTS=2500,
+            ),
+            "road_centerline_resample.py": dict(
+                ENABLED=1,
+                TARGET_SPACING=2.0,
+                PRESERVE_BEND_DEG=8.0,
+            ),
+            "road_junction_curve_smooth.py": dict(
+                ENABLED=1,
+                CURVE_DISTANCE=5.0,
+                MIN_BRANCH_DISTANCE=2.0,
+                MIN_ANGLE_DEG=25.0,
+                MAX_ANGLE_DEG=155.0,
+                ARC_SPACING=1.0,
+                SMOOTH_ITERATIONS=1,
+                MAX_JUNCTIONS=800,
+                REUSE_TOLERANCE=0.01,
+            ),
             "road_junction_arc_smoother.py": dict(
                 ENABLED=1,
                 ARC_DISTANCE=6.0,
@@ -139,6 +166,56 @@ class TestSentinels(unittest.TestCase):
         self.assertIn("cubic_bezier", text)
         self.assertIn("shared junction endpoints are preserved exactly", text)
 
+    def test_road_centerline_resample_preserves_raw_source_contract(self):
+        text = houdini_sops.load(
+            "road_centerline_resample.py",
+            ENABLED=1,
+            TARGET_SPACING=2.0,
+            PRESERVE_BEND_DEG=8.0,
+        )
+        self.assertIn("road_centerline_resample_status", text)
+        self.assertIn("road_centerline_resample_max_segment_after", text)
+        self.assertIn("primitive attributes and primitive groups are copied through", text)
+        self.assertIn("endpoints are kept exactly", text)
+        self.assertIn("shared input points from road_api_shared_topology stay shared", text)
+        self.assertIn("shared_input_point_numbers", text)
+        self.assertIn("output_point_by_input_number", text)
+        self.assertIn("road_centerline_resample_preserved_shared_points", text)
+        self.assertIn("road_centerline_resample_reused_shared_points", text)
+
+    def test_road_shared_topology_creates_shared_crossing_points(self):
+        text = houdini_sops.load(
+            "road_shared_topology.py",
+            ENABLED=1,
+            FUSE_TOLERANCE=0.35,
+            INTERSECTION_TOLERANCE=0.08,
+            MAX_SEGMENTS=2500,
+        )
+        self.assertIn("road_shared_topology_intersections", text)
+        self.assertIn("road_shared_topology_endpoint_splits", text)
+        self.assertIn("segment_intersection_xz", text)
+        self.assertIn("crossing line segments are split", text)
+
+    def test_road_junction_curve_smooth_rewrites_centerline_spans(self):
+        text = houdini_sops.load(
+            "road_junction_curve_smooth.py",
+            ENABLED=1,
+            CURVE_DISTANCE=5.0,
+            MIN_BRANCH_DISTANCE=2.0,
+            MIN_ANGLE_DEG=25.0,
+            MAX_ANGLE_DEG=155.0,
+            ARC_SPACING=1.0,
+            SMOOTH_ITERATIONS=1,
+            MAX_JUNCTIONS=800,
+            REUSE_TOLERANCE=0.01,
+        )
+        self.assertIn("road_junction_curve_smooth_status", text)
+        self.assertIn("build_tangent_arc", text)
+        self.assertIn("project_center_to_equal_radii", text)
+        self.assertIn("T junctions keep the nearly straight through road untrimmed", text)
+        self.assertIn("road_junction_curve_smooth_t_junctions", text)
+        self.assertIn("through_keys", text)
+        self.assertIn("original centerline spans near the crossing are trimmed away", text)
 
 class TestOsmImportCanonical(unittest.TestCase):
     """osm_import SOP（Houdini 内运行）已接入 vc_geo，移除内嵌第 4 份 UTM 实现。"""
@@ -185,50 +262,198 @@ class TestRoadStripsV2(unittest.TestCase):
 
 class TestRecookRoadChain(unittest.TestCase):
     PATH = ROOT / "Scripts" / "houdini_build" / "recook_new_area.py"
+    PREFLIGHT_PATH = ROOT / "Scripts" / "houdini_build" / "preflight.py"
+    CONTEXT_PATH = ROOT / "Scripts" / "houdini_build" / "context.py"
+    NETWORK_LAYOUT_PATH = ROOT / "Scripts" / "houdini_build" / "network_layout.py"
+    TERRAIN_PATH = ROOT / "Scripts" / "houdini_build" / "domains" / "terrain.py"
+    BUILDINGS_PATH = ROOT / "Scripts" / "houdini_build" / "domains" / "buildings.py"
+    ROADS_PATH = ROOT / "Scripts" / "houdini_build" / "domains" / "roads.py"
 
     def test_outputs_road_centerlines_without_polyextrude(self):
         text = self.PATH.read_text(encoding="utf-8")
-        self.assertIn("_road_output_mode = 'lines'", text)
-        self.assertIn("road_mesh_src = _road_mesh_input", text)
-        self.assertIn("road_surface = road_colored", text)
+        context = self.CONTEXT_PATH.read_text(encoding="utf-8")
+        roads = self.ROADS_PATH.read_text(encoding="utf-8")
+        self.assertEqual(BuildContext.from_config({}).road_output_mode, "lines")
+        self.assertIn("road_source_chain = roads_domain.build_source_chain", text)
+        self.assertIn("_road_mesh_input = road_source_chain.mesh_input", text)
+        self.assertIn("road_surface = road_colored", roads)
         self.assertIn("merge.setInput(1, road_surface)", text)
-        self.assertIn("houdini_sops.load('road_api_raw_lines.py'", text)
-        self.assertIn("_api_raw_node.setInput(0, osm, 0)", text)
-        self.assertIn("houdini_sops.load(", text)
-        self.assertIn("_road_mesh_input = _api_raw_node", text)
-        self.assertIn("raw map API road line output locked", text)
-        self.assertIn("'road_junction_arc_smoother', 'road_source', 'road_topology_builder', 'road_strips', 'road_graph_filter'", text)
-        self.assertIn("'road_api_raw_lines',", text)
+        self.assertIn('houdini_sops.load("road_api_raw_lines.py"', roads)
+        self.assertIn('"road_shared_topology.py"', roads)
+        self.assertIn('houdini_sops.load(\n        "road_centerline_resample.py"', roads)
+        self.assertIn('"road_junction_curve_smooth.py"', roads)
+        self.assertIn("api_raw_node.setInput(0, osm, 0)", roads)
+        self.assertIn("\"road_api_shared_topology\"", roads)
+        self.assertIn("resample_node.setInput(0, raw_node, 0)", roads)
+        self.assertIn("mesh_input=junction_curve_smooth_node", roads)
+        self.assertIn("road chain locked", roads)
+        self.assertIn('"extract_roads"', roads)
+        self.assertIn('"snap_roads_to_terrain1"', roads)
+        self.assertIn('"road_width_flat"', roads)
+        self.assertNotIn("extract_roads = hou.node", roads)
+        self.assertNotIn("downstream_node=resample_roads", roads)
+        self.assertNotIn('"road_shared_topology"', context)
+        self.assertIn('"road_api_raw_lines",', context)
+        self.assertIn('"road_api_shared_topology"', context)
+        self.assertIn('"road_centerline_resample",', context)
+        self.assertIn('"road_junction_curve_smooth"', context)
         self.assertNotIn("if _road_output_mode == 'surfaces':", text)
         self.assertNotIn("_cfg.get('road_output_mode'", text)
         self.assertNotIn("_cfg.get('road_junction_arc_smoothing_enabled'", text)
         self.assertNotIn("ROAD_GRAPH_FILTER_CODE = houdini_sops.load('road_graph_filter.py'", text)
         self.assertNotIn("net.createNode('polyextrude::2.0', 'road_extrude')", text)
+        self.assertNotIn("net.createNode(\"polyextrude::2.0\", \"road_extrude\")", roads)
         self.assertNotIn("road_pre_extrude_fuse = net.createNode", text)
         self.assertNotIn("road_pre_extrude_dissolve = net.createNode", text)
 
     def test_road_topology_builder_is_not_in_raw_line_main_flow(self):
         text = self.PATH.read_text(encoding="utf-8")
-        self.assertIn("raw map API road line output locked", text)
-        self.assertIn("_road_mesh_input = _api_raw_node", text)
+        roads = self.ROADS_PATH.read_text(encoding="utf-8")
+        self.assertIn("road chain locked", roads)
+        self.assertIn("mesh_input=junction_curve_smooth_node", roads)
         self.assertNotIn("RTB_CODE = houdini_sops.load('road_topology_builder.py')", text)
+        self.assertNotIn('RTB_CODE = houdini_sops.load("road_topology_builder.py")', roads)
         self.assertNotIn("rtb_node = hou.node", text)
         self.assertNotIn("_builder_qa_ok", text)
         self.assertNotIn("source_switch = hou.node", text)
 
     def test_road_profiles_are_enabled_and_in_full_chain(self):
         text = self.PATH.read_text(encoding="utf-8")
-        self.assertIn("_cfg.get('apply_road_profiles', True)", text)
-        self.assertIn("houdini_sops.load('road_profile_apply.py', ROOT=ROOT_STR)", text)
-        self.assertIn("road_prof.cook(force=True)", text)
-        self.assertIn("'road_profile_apply'", text)
+        context = self.CONTEXT_PATH.read_text(encoding="utf-8")
+        roads = self.ROADS_PATH.read_text(encoding="utf-8")
+        self.assertIn('apply_road_profiles=bool(cfg.get("apply_road_profiles", True))', context)
+        self.assertIn('houdini_sops.load("road_profile_apply.py", ROOT=root_str)', roads)
+        self.assertIn("road_prof.cook(force=True)", roads)
+        self.assertIn('"road_profile_apply"', context)
 
     def test_recook_only_preflights_houdini_ready_data(self):
         text = self.PATH.read_text(encoding="utf-8")
-        self.assertIn("Houdini-ready preflight failed", text)
-        self.assertIn("dcc.ready_outputs_exist", text)
+        preflight = self.PREFLIGHT_PATH.read_text(encoding="utf-8")
+        self.assertIn("Houdini-ready preflight failed", preflight)
+        self.assertIn("check_houdini_ready", text)
+        self.assertIn("dcc.ready_outputs_exist", preflight)
         self.assertNotIn("_refine_result", text)
         self.assertNotIn("str(ROOT / 'Scripts' / 'refine_data.py')", text)
+
+    def test_houdini_build_domain_registry_documents_asset_boundaries(self):
+        keys = [domain.key for domain in BUILD_ORDER]
+        self.assertEqual(keys, ["terrain", "buildings", "roads", "nature", "assembly"])
+        self.assertIn("自然 (no-op)", domain_summary())
+        deps = {domain.key: domain.depends_on for domain in BUILD_ORDER}
+        self.assertEqual(deps["buildings"], ("terrain",))
+        self.assertEqual(deps["roads"], ("terrain",))
+        self.assertEqual(deps["nature"], ("terrain", "buildings", "roads"))
+
+    def test_houdini_build_context_preserves_current_external_contract(self):
+        ctx = BuildContext.from_config({
+            "area_id": "area_test",
+            "run_id": "run_test",
+            "obj_network": "city_gen",
+        })
+        self.assertEqual(ctx.obj_path, "/obj/city_gen")
+        self.assertEqual(ctx.road_output_mode, "lines")
+        self.assertTrue(ctx.apply_road_profiles)
+        self.assertEqual(ctx.output_refresh_chain(), FULL_REFRESH_CHAIN)
+
+        quick = BuildContext.from_config({
+            "area_id": "area_test",
+            "run_id": "run_test",
+            "dev_quick_roads": True,
+        })
+        self.assertEqual(quick.output_refresh_chain(), QUICK_ROAD_REFRESH_CHAIN)
+
+    def test_terrain_domain_owns_dem_nodes_and_public_output(self):
+        text = self.PATH.read_text(encoding="utf-8")
+        terrain = self.TERRAIN_PATH.read_text(encoding="utf-8")
+        self.assertIn("terrain_domain.inject_dem_sops", text)
+        self.assertIn("terrain_domain.build_snap_target", text)
+        self.assertIn("terrain_domain.color_terrain", text)
+        self.assertIn('houdini_sops.load("dem_import.py"', terrain)
+        self.assertIn('houdini_sops.load("dem_terrain.py"', terrain)
+        self.assertIn('net.createNode("subdivide", "dem_subdivide")', terrain)
+        self.assertIn('net.createNode("attribwrangle", "terrain_color")', terrain)
+        self.assertIn('final_nodes=("dem_subdivide", "terrain_color")', terrain)
+
+    def test_buildings_domain_owns_building_nodes_and_public_outputs(self):
+        text = self.PATH.read_text(encoding="utf-8")
+        buildings = self.BUILDINGS_PATH.read_text(encoding="utf-8")
+        self.assertIn("buildings_domain.patch_footprint_divide_sop", text)
+        self.assertIn("buildings_domain.patch_snap_and_height_sops", text)
+        self.assertIn("buildings_domain.build_footprint_bevel", text)
+        self.assertIn("buildings_domain.clip_buildings", text)
+        self.assertIn("buildings_domain.build_foundation", text)
+        self.assertIn("buildings_domain.color_and_finalize_buildings", text)
+        self.assertIn('houdini_sops.load("bld_snap.vex")', buildings)
+        self.assertIn('houdini_sops.load("procedural_height.vex")', buildings)
+        self.assertIn('houdini_sops.load("bld_footprint_bevel.py")', buildings)
+        self.assertIn('houdini_sops.load("bld_foundation.py")', buildings)
+        self.assertIn('return remake_asset_filter("post_normals", "bld_clip_mark", "bld_clipped", "component")', buildings)
+        self.assertIn('"bld_foundation_clipped"', buildings)
+        self.assertIn('net.createNode("normal", "bld_with_foundation")', buildings)
+        self.assertIn('final_nodes=("bld_clipped", "bld_with_foundation")', buildings)
+
+    def test_roads_domain_owns_road_nodes_and_public_outputs(self):
+        text = self.PATH.read_text(encoding="utf-8")
+        roads = self.ROADS_PATH.read_text(encoding="utf-8")
+        self.assertIn("roads_domain.build_source_chain", text)
+        self.assertIn("roads_domain.build_clipped_lines", text)
+        self.assertIn("roads_domain.apply_profiles", text)
+        self.assertIn("roads_domain.apply_curb_variation", text)
+        self.assertIn("roads_domain.color_roads", text)
+        self.assertIn("roads_domain.finalize_surface", text)
+        self.assertIn('houdini_sops.load("road_api_raw_lines.py")', roads)
+        self.assertIn('"road_shared_topology.py"', roads)
+        self.assertIn('"road_centerline_resample.py"', roads)
+        self.assertIn('"road_junction_curve_smooth.py"', roads)
+        self.assertIn('houdini_sops.load("road_fragment_cleanup.py")', roads)
+        self.assertIn('houdini_sops.load("road_profile_apply.py", ROOT=root_str)', roads)
+        self.assertIn('houdini_sops.load("road_curb_variation.py", ROOT=root_str)', roads)
+        self.assertNotIn('net.createNode("attribwrangle", "snap_roads_to_terrain1")', roads)
+        self.assertNotIn('houdini_sops.load("road_vertical_smoother.py")', roads)
+        self.assertIn('net.createNode("python", "road_api_raw_lines")', roads)
+        self.assertIn('net.createNode("python", node_name)', roads)
+        self.assertIn('net.createNode("python", "road_centerline_resample")', roads)
+        self.assertIn('net.createNode("python", "road_junction_curve_smooth")', roads)
+        self.assertIn('net.createNode("attribwrangle", "snap_road_strips")', roads)
+        self.assertIn('net.createNode("python", "road_bbox_clip")', roads)
+        self.assertIn('net.createNode("attribwrangle", "snap_road_clipped")', roads)
+        self.assertIn('net.createNode("python", "road_fragment_cleanup")', roads)
+        self.assertIn('net.createNode("attribwrangle", "road_color")', roads)
+        self.assertIn('final_nodes=("road_clipped", "road_color")', roads)
+
+    def test_network_layout_groups_domain_nodes_visually_only(self):
+        text = self.PATH.read_text(encoding="utf-8")
+        layout = self.NETWORK_LAYOUT_PATH.read_text(encoding="utf-8")
+        self.assertIn("from houdini_build.network_layout import apply_domain_network_layout", text)
+        self.assertIn("apply_domain_network_layout(hou, net, OBJ_PATH)", text)
+        self.assertIn("[WARN] Houdini 网络分组失败", text)
+        self.assertIn('"[VC] 地形 Terrain"', layout)
+        self.assertIn('"[VC] 建筑 Buildings"', layout)
+        self.assertIn('"[VC] 道路 Roads"', layout)
+        self.assertIn('"[VC] 总装 Assembly"', layout)
+        self.assertIn('"dem_subdivide"', layout)
+        self.assertIn('"bld_with_foundation"', layout)
+        self.assertNotIn('"road_shared_topology"', layout)
+        self.assertNotIn('"extract_roads"', layout)
+        self.assertNotIn('"resample_roads"', layout)
+        self.assertNotIn('"snap_roads_to_terrain1"', layout)
+        self.assertNotIn('"road_width_flat"', layout)
+        self.assertIn('"road_api_raw_lines"', layout)
+        self.assertIn('"road_api_shared_topology"', layout)
+        self.assertIn('"road_centerline_resample"', layout)
+        self.assertIn('"road_junction_curve_smooth"', layout)
+        self.assertIn('"road_color"', layout)
+        self.assertIn('"merge_all"', layout)
+        self.assertIn('"OUT_city"', layout)
+        self.assertNotIn('"laneforge_lane_surfaces"', layout)
+        self.assertNotIn('"UnrealEngine_lane_surfaces"', layout)
+        self.assertIn("'laneforge_lane_surfaces'", text)
+        self.assertIn("'UnrealEngine_lane_surfaces'", text)
+        self.assertIn("net.createNetworkBox()", layout)
+        self.assertIn("box.fitAroundContents()", layout)
+        self.assertIn("BOX_PAD_X", layout)
+        self.assertIn("COLUMN_SPACING", layout)
+        self.assertIn("box.setBounds", layout)
 
     def test_legacy_recook_wrapper_points_to_houdini_build_layer(self):
         text = (ROOT / "Scripts" / "_recook_new_area.py").read_text(encoding="utf-8")
@@ -242,6 +467,9 @@ class TestModelQaRoadChain(unittest.TestCase):
     def test_required_nodes_match_flat_road_chain(self):
         text = self.PATH.read_text(encoding="utf-8")
         self.assertIn('"road_api_raw_lines"', text)
+        self.assertIn('"road_api_shared_topology"', text)
+        self.assertIn('"road_centerline_resample"', text)
+        self.assertIn('"road_junction_curve_smooth"', text)
         self.assertIn('"road_color"', text)
         self.assertIn('"road_clipped_lines"', text)
         self.assertNotIn('"road_extrude"', text)
@@ -263,6 +491,9 @@ class TestExportAndImportChain(unittest.TestCase):
         self.assertIn("[f'{_OBJ}/bld_with_foundation', f'{_OBJ}/bld_clipped', f'{_OBJ}/post_normals']", text)
         removed_lane_surface_node = "lane" + "forge_lane_surfaces"
         self.assertNotIn(removed_lane_surface_node, text)
+        self.assertIn("f'{_OBJ}/road_centerline_resample'", text)
+        self.assertIn("f'{_OBJ}/road_junction_curve_smooth'", text)
+        self.assertIn("f'{_OBJ}/road_api_shared_topology'", text)
         self.assertIn("f'{_OBJ}/road_api_raw_lines'", text)
         self.assertNotIn("f'{_OBJ}/road_junction_arc_smoother'", text)
         self.assertNotIn("f'{_OBJ}/road_strips'", text)

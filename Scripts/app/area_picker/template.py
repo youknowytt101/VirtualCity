@@ -1054,12 +1054,12 @@ button, input { font: inherit; }
           <span class="btn-main">地形</span>
           <span class="btn-sub">待接入</span>
         </button>
-        <button type="button" disabled class="action-btn placeholder-btn" title="植被数据清洗入口待接入">
-          <span class="btn-main">植被</span>
+        <button type="button" disabled class="action-btn placeholder-btn" title="自然数据处理入口待接入">
+          <span class="btn-main">自然</span>
           <span class="btn-sub">待接入</span>
         </button>
-        <button type="button" disabled class="action-btn placeholder-btn" title="车道数据处理入口待接入">
-          <span class="btn-main">车道</span>
+        <button type="button" disabled class="action-btn placeholder-btn" title="道路数据处理入口待接入">
+          <span class="btn-main">道路</span>
           <span class="btn-sub">待接入</span>
         </button>
       </div>

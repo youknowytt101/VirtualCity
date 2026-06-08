@@ -65,6 +65,8 @@ export_and_import.py（审核后）
 
 - 业务流程已经是三大块。
 - 核心执行入口已经物理分层：`acquisition/`、`cleaning/`、`houdini_build/`。
+- Houdini 构建内部按资产域分层：`terrain` 是底座，`buildings` / `roads` 依赖地形，`nature` 当前为 no-op 占位，最后统一进入 `assembly` / `OUT_city`。
+- 对外仍保持一个自动构建入口：`orchestration/run_pipeline.py` 调用 `houdini_build/recook_new_area.py`。不要把四个资产域拆成四个会分别写 `active_area` / status / hip 的独立命令。
 - `Scripts/set_area.py`、`Scripts/refine_data.py`、`Scripts/_recook_new_area.py` 是兼容 wrapper，不是新实现位置。
 - 坐标、路径、语义契约和纯建筑清洗已经迁入 `shared/`；根目录同名文件只作为兼容 wrapper。
 - 共享辅助脚本和部分数据 / Houdini 工具仍保留在 `Scripts/` 根目录，后续可继续迁到对应模块。
@@ -88,6 +90,10 @@ export_and_import.py（审核后）
 | `clean_raw_data.py` | 建筑、道路、DEM 的清洗逻辑 |
 | `data_cleaning_cache.py` | 数据清洗 cache fingerprint 与复用 |
 | `houdini_build/recook_new_area.py` | 通过 RPYC 驱动 Houdini SOP/VEX patch 与 recook；根目录 `_recook_new_area.py` 仅兼容旧命令 |
+| `houdini_build/context.py` | Houdini 构建上下文：active area、run_id、颜色、刷新链和输出路径 |
+| `houdini_build/preflight.py` | Houdini-ready 数据契约校验，确保只消费当前 area/run |
+| `houdini_build/status.py` | 写入 `Config/houdini_build_status.json`，供 UI / export gate 读取 |
+| `houdini_build/domains/` | 资产域注册表：地形、建筑、道路、自然占位、总装 |
 | `_osm_import_canonical.py` | Houdini `osm_import` Python SOP 源码 |
 | `_road_strips_v2.py` | Houdini `road_strips` Python SOP 源码 |
 | `houdini_model_qa.py` | Houdini 模型 QA quick/full |
@@ -159,7 +165,11 @@ Scripts/
 ├── cleaning/
 │   └── refine_data.py
 ├── houdini_build/
-│   └── recook_new_area.py
+│   ├── recook_new_area.py
+│   ├── context.py
+│   ├── preflight.py
+│   ├── status.py
+│   └── domains/
 ├── set_area.py              # compatibility wrapper
 ├── pipeline_state.py        # compatibility alias
 ├── refine_data.py           # compatibility wrapper
