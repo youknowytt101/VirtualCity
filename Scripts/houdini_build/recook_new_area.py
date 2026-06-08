@@ -62,6 +62,7 @@ _junction_min_angle_deg = float(_cfg.get('junction_min_angle_deg', 2.0))
 _sliver_edge_min_m = float(_cfg.get('sliver_edge_min_m', 0.01))
 _roads_topology_max_prim_ratio = float(_cfg.get('roads_topology_max_prim_ratio', 5.0))
 _roads_topology_qa_sample_prims = int(_cfg.get('roads_topology_qa_sample_prims', 500))
+_road_output_mode = 'lines'
 _apply_road_profiles = bool(_cfg.get('apply_road_profiles', True))
 _apply_curb_variation = bool(_cfg.get('apply_curb_variation', True))
 _RECOOK_FINALIZED = False
@@ -256,133 +257,32 @@ if _road_width_input:
     _rwf_node.setInput(0, _road_width_input, 0)
 _rwf_node.parm('class').set(1)  # Primitive
 _rwf_node.parm('snippet').set(ROAD_WIDTH_VEX)
+
+# Map API raw road lines: extract road ways directly from osm_import.
+ROAD_API_RAW_LINES_CODE = houdini_sops.load('road_api_raw_lines.py')
+_api_raw_node = hou.node(OBJ_PATH + '/road_api_raw_lines')
+if _api_raw_node is None:
+    _api_raw_node = net.createNode('python', 'road_api_raw_lines')
+_api_raw_node.setInput(0, osm, 0)
+_api_raw_node.parm('python').set(ROAD_API_RAW_LINES_CODE)
+_api_raw_node.cook(force=True)
+print('  road_api_raw_lines connected: osm_import -> raw map API road lines')
 print('  road_width_flat VEX + 输入已更新（road_vertical_smoother → road_width_flat）')
 
-# ── 1b3. road_graph 过滤：把离线折叠掉的短冲突边同步回 Houdini ─────────────
-ROAD_GRAPH_FILTER_CODE = houdini_sops.load('road_graph_filter.py', ROOT=ROOT_STR, CFG=CFG_FILE)
-_rgf_node = hou.node(OBJ_PATH + '/road_graph_filter')
-if _rgf_node is None:
-    _rgf_node = net.createNode('python', 'road_graph_filter')
-_rgf_node.setInput(0, _rwf_node, 0)
-_rgf_node.parm('python').set(ROAD_GRAPH_FILTER_CODE)
-_road_mesh_input = _rgf_node
-print('  road_graph_filter 已接入（road_width_flat → road_graph_filter → road surface builders）')
-
-
-# ── 1d. road_strips v2: 路段修剪 + 路口凸包填充 ──────────────────────
-_rs_v2_code = road_pipe.load_road_strips_code(ROOT)
-_rs_node = hou.node(OBJ_PATH + '/road_strips')
-if _rs_node is None:
-    _rs_node = net.createNode('python', 'road_strips')
-_rs_node.parm('python').set(_rs_v2_code)
-_rs_node.setInput(0, _road_mesh_input, 0)
-print('  road_strips v5 已更新（复杂路口降级 + 调试属性 + 自交保护）')
-
-# ── 1d2. Road Topology Builder（A/B 可选）────────────────────────────
-# 说明：该节点在 'road_width_flat' 之后按拓扑半径截断 + 扇面缝合生成道路面片，
-# 通过 'road_source' Switch 在现有 road_strips 与新生成之间切换，默认仍选用 road_strips。
-try:
-    RTB_CODE = houdini_sops.load('road_topology_builder.py')
-    rtb_node = hou.node(OBJ_PATH + '/road_topology_builder')
-    if rtb_node is None:
-        rtb_node = net.createNode('python', 'road_topology_builder')
-    rtb_node.setInput(0, _road_mesh_input, 0)
-    rtb_node.parm('python').set(RTB_CODE)
-    # 路径选择器：0=road_strips（默认），1=road_topology_builder
-    source_switch = hou.node(OBJ_PATH + '/road_source')
-    if source_switch is None:
-        source_switch = net.createNode('switch', 'road_source')
-    # 确保两路输入就绪
-    rs_node_ref = hou.node(OBJ_PATH + '/road_strips')
-    if rs_node_ref:
-        source_switch.setInput(0, rs_node_ref, 0)
-    source_switch.setInput(1, rtb_node, 0)
-    # 默认策略：auto。builder 通过轻量 QA 就使用；失败则回退 legacy road_strips。
-    _pref_mode = _road_source_mode or _roads_topology_preferred
-    _pref = 1 if _pref_mode in ('builder', 'topology', 'rtb') else 0
-
-    def _xz_min_angle(pts):
-        if len(pts) < 3:
-            return None
-        import math as _m
-        mn = None
-        for i, cur in enumerate(pts):
-            prev = pts[(i-1) % len(pts)]
-            nxt = pts[(i+1) % len(pts)]
-            ax, az = prev[0]-cur[0], prev[2]-cur[2]
-            bx, bz = nxt[0]-cur[0], nxt[2]-cur[2]
-            al = (_m.hypot(ax, az))
-            bl = (_m.hypot(bx, bz))
-            if al < 1e-9 or bl < 1e-9:
-                continue
-            dt = max(-1.0, min(1.0, (ax*bx + az*bz) / (al*bl)))
-            ang = _m.degrees(_m.acos(dt))
-            mn = ang if mn is None else min(mn, ang)
-        return mn
-
-    def _xz_min_edge(pts):
-        import math as _m
-        if len(pts) < 2:
-            return 0.0
-        mn = 1e9
-        for i, p in enumerate(pts):
-            q = pts[(i+1) % len(pts)]
-            mn = min(mn, _m.hypot(q[0]-p[0], q[2]-p[2]))
-        return 0.0 if mn == 1e9 else mn
-
-    _builder_bad = 0
-    _builder_checked = 0
-    _builder_prims = 0
-    _strips_prims = 0
-    _builder_ratio = 0.0
-    _builder_qa_ok = False
-    if _pref_mode in ('auto', 'builder', 'topology', 'rtb'):
+# Fixed baseline: Houdini roads are raw map API lines only.
+_road_mesh_input = _api_raw_node
+for _road_legacy_node_name in (
+    'road_junction_arc_smoother', 'road_source', 'road_topology_builder', 'road_strips', 'road_graph_filter'
+):
+    _road_legacy_node = hou.node(OBJ_PATH + '/' + _road_legacy_node_name)
+    if _road_legacy_node is not None:
         try:
-            rtb_node.cook(force=True)
-            geo_b = rtb_node.geometry()
-            _builder_prims = int(geo_b.intrinsicValue('primitivecount'))
-            if rs_node_ref:
-                try:
-                    _strips_prims = int(rs_node_ref.geometry().intrinsicValue('primitivecount'))
-                except Exception:
-                    _strips_prims = 0
-            _builder_ratio = (_builder_prims / float(_strips_prims)) if _strips_prims else 0.0
-            _builder_sample_limit = max(50, min(_roads_topology_qa_sample_prims, _builder_prims))
-            for prim in geo_b.prims():
-                pts = [v.point().position() for v in prim.vertices()]
-                if len(pts) < 3:
-                    continue
-                ang = _xz_min_angle(pts)
-                edge = _xz_min_edge(pts)
-                if (ang is not None and ang < _junction_min_angle_deg) or (edge < _sliver_edge_min_m):
-                    _builder_bad += 1
-                _builder_checked += 1
-                if _builder_checked >= _builder_sample_limit:
-                    break
-            _builder_qa_ok = (
-                _builder_bad == 0
-                and _builder_prims > 0
-                and (_builder_ratio <= _roads_topology_max_prim_ratio or _strips_prims <= 0)
-            )
-        except Exception as _qe:
-            _builder_qa_ok = False
-            print(f"  [road_source] builder QA 评估失败: {_qe}")
-
-    if _pref_mode == 'auto':
-        _pref = 1 if _builder_qa_ok else 0
-    elif _pref_mode in ('legacy_debug', 'strips'):
-        _pref = 0
-    elif _pref in (1,) and _qa_autorevert_topology_builder and not _builder_qa_ok:
-        _pref = 0
-        print("  [auto-revert] road_topology_builder QA 未通过，已回退为 road_strips")
-    source_switch.parm('input').set(_pref)
-    _chosen = 'road_topology_builder' if _pref == 1 else 'road_strips'
-    print("  road_source: mode={} selected={} builder_prims={} strips_prims={} ratio={:.2f} bad={}/{}".format(
-        _road_source_mode or _pref_mode, _chosen, _builder_prims, _strips_prims, _builder_ratio, _builder_bad, _builder_checked))
-except Exception as _e:
-    print(f"  [WARN] Road Topology Builder 注入失败，保持使用 road_strips: {_e}")
-
-# ── 1c. 修复建筑地形吸附（H-011：坡面建筑底面埋入地形）──────────────
+            _road_legacy_node.destroy()
+            print('  raw road output: removed legacy road node ' + _road_legacy_node_name)
+        except Exception as _remove_exc:
+            print('  [WARN] could not remove legacy road node {}: {}'.format(
+                _road_legacy_node_name, _remove_exc))
+print('  raw map API road line output locked: road_api_raw_lines -> Houdini road chain')
 BLD_SNAP_VEX = houdini_sops.load('bld_snap.vex')
 snap_bld = hou.node(OBJ_PATH + '/snap_bld_to_terrain')
 if snap_bld:
@@ -493,7 +393,7 @@ CHECKS = [
     ('bld_footprint_bevel',  50,   None,  'building footprints chamfered'),
     ('extrude_buildings',    50,   None,  'buildings extruded'),
     ('post_normals',         50,   None,  'normals computed'),
-    ('road_strips',          100,  None,  'roads generated'),
+    ('road_api_raw_lines', 100, None, 'raw map API road lines generated'),
 ]
 for name, min_pts, max_y, desc in CHECKS:
     node_path = OBJ_PATH + '/' + name
@@ -578,9 +478,7 @@ ROAD_DRAPE_VEX = road_pipe.ROAD_DRAPE_VEX
 old_drape = hou.node(OBJ_PATH + '/snap_road_strips')
 if old_drape:
     old_drape.destroy()
-road_strips_node = hou.node(OBJ_PATH + '/road_strips')
-road_source_switch = hou.node(OBJ_PATH + '/road_source')
-road_mesh_src = road_source_switch if road_source_switch is not None else road_strips_node
+road_mesh_src = _road_mesh_input
 snap_road_strips = net.createNode('attribwrangle', 'snap_road_strips')
 snap_road_strips.setInput(0, road_mesh_src)
 snap_road_strips.setInput(1, snap_target)
@@ -591,7 +489,8 @@ _rs_geo  = snap_road_strips.geometry()
 _rs_pts  = _rs_geo.intrinsicValue('pointcount')
 _rs_bb   = _rs_geo.boundingBox()
 _rs_ymin = _rs_bb.minvec()[1]
-print('  snap_road_strips: pts={} Y_min={:.2f}m'.format(_rs_pts, _rs_ymin))
+print('  snap_road_strips: mode={} pts={} prims={} Y_min={:.2f}m'.format(
+    _road_output_mode, _rs_pts, _rs_geo.intrinsicValue('primitivecount'), _rs_ymin))
 
 # ── 4b2. 道路完整面片边界过滤（不再几何切割边界面）──────────────
 old_bbox_clip = hou.node(OBJ_PATH + '/road_bbox_clip')
@@ -808,9 +707,7 @@ if ARCHIVE_HIP != HIP:
 # ── 6. 强制刷新整条输出链（视口同步）────────────────────
 if _dev_quick_roads:
     FULL_CHAIN = [
-        'snap_roads_to_terrain1', 'road_vertical_smoother', 'road_width_flat',
-        'road_graph_filter',
-        'road_strips', 'road_topology_builder', 'road_source',
+        'snap_roads_to_terrain1', 'road_vertical_smoother', 'road_width_flat', 'road_api_raw_lines',
         'snap_road_strips', 'road_bbox_clip', 'snap_road_clipped',
         'road_clipped', 'road_fragment_cleanup', 'road_profile_apply', 'road_curb_variation', 'road_color', 'OUT_city',
     ]
@@ -818,9 +715,7 @@ else:
     FULL_CHAIN = [
         'osm_import', 'dem_terrain', 'dem_cut_and_fill', 'dem_subdivide',
         'extract_buildings', 'snap_bld_to_terrain', 'bld_footprint_bevel', 'extrude_buildings', 'post_normals',
-        'snap_roads_to_terrain1', 'road_vertical_smoother', 'road_width_flat',
-        'road_graph_filter',
-        'road_strips', 'road_topology_builder', 'road_source',
+        'snap_roads_to_terrain1', 'road_vertical_smoother', 'road_width_flat', 'road_api_raw_lines',
         'snap_road_strips', 'road_bbox_clip', 'snap_road_clipped',
         'bld_clipped', 'bld_foundation', 'bld_foundation_clipped',
         'road_clipped', 'road_fragment_cleanup', 'road_profile_apply', 'road_curb_variation', 'road_color',
@@ -897,3 +792,7 @@ else:
 
 if conn:
     conn.close()
+
+
+
+

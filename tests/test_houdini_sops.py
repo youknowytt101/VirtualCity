@@ -33,6 +33,8 @@ class TestSopFilesExist(unittest.TestCase):
         "bld_foundation.py",
         "road_vertical_smoother.py",
         "road_graph_filter.py",
+        "road_api_raw_lines.py",
+        "road_junction_arc_smoother.py",
         "road_topology_builder.py",
         "road_profile_apply.py",
     ]
@@ -83,6 +85,16 @@ class TestPythonSopValidity(unittest.TestCase):
             "bld_foundation.py": {},
             "road_vertical_smoother.py": {},
             "road_graph_filter.py": dict(ROOT="/proj/VirtualCity", CFG="/proj/VirtualCity/Config/active_area.json"),
+            "road_api_raw_lines.py": {},
+            "road_junction_arc_smoother.py": dict(
+                ENABLED=1,
+                ARC_DISTANCE=6.0,
+                ARC_SEGMENTS=5,
+                JUNCTION_GRID=1.0,
+                MIN_DEGREE=3,
+                MAX_BEND=0.32,
+                MAX_APPROACH_FRACTION=0.38,
+            ),
             "road_topology_builder.py": {},
             "road_profile_apply.py": dict(ROOT="/proj/VirtualCity"),
         }
@@ -110,6 +122,22 @@ class TestSentinels(unittest.TestCase):
         self.assertIn("rtb_skipped_degenerate_junction_tris", text)
         self.assertIn("q_area < 0.05 or q_min_edge < 0.05", text)
         self.assertIn("t_angle is not None and t_angle < 2.0", text)
+
+    def test_road_junction_arc_smoother_preserves_centerline_contract(self):
+        text = houdini_sops.load(
+            "road_junction_arc_smoother.py",
+            ENABLED=1,
+            ARC_DISTANCE=6.0,
+            ARC_SEGMENTS=5,
+            JUNCTION_GRID=1.0,
+            MIN_DEGREE=3,
+            MAX_BEND=0.32,
+            MAX_APPROACH_FRACTION=0.38,
+        )
+        self.assertIn("road_junction_arc_smoothed_roads", text)
+        self.assertIn("copy_prim_attrs", text)
+        self.assertIn("cubic_bezier", text)
+        self.assertIn("shared junction endpoints are preserved exactly", text)
 
 
 class TestOsmImportCanonical(unittest.TestCase):
@@ -158,26 +186,35 @@ class TestRoadStripsV2(unittest.TestCase):
 class TestRecookRoadChain(unittest.TestCase):
     PATH = ROOT / "Scripts" / "houdini_build" / "recook_new_area.py"
 
-    def test_outputs_flat_road_surface_without_polyextrude(self):
+    def test_outputs_road_centerlines_without_polyextrude(self):
         text = self.PATH.read_text(encoding="utf-8")
+        self.assertIn("_road_output_mode = 'lines'", text)
+        self.assertIn("road_mesh_src = _road_mesh_input", text)
         self.assertIn("road_surface = road_colored", text)
         self.assertIn("merge.setInput(1, road_surface)", text)
-        self.assertIn("houdini_sops.load('road_graph_filter.py'", text)
-        self.assertIn("_rs_node.setInput(0, _road_mesh_input, 0)", text)
-        self.assertIn("rtb_node.setInput(0, _road_mesh_input, 0)", text)
-        self.assertIn("'road_graph_filter'", text)
+        self.assertIn("houdini_sops.load('road_api_raw_lines.py'", text)
+        self.assertIn("_api_raw_node.setInput(0, osm, 0)", text)
+        self.assertIn("houdini_sops.load(", text)
+        self.assertIn("_road_mesh_input = _api_raw_node", text)
+        self.assertIn("raw map API road line output locked", text)
+        self.assertIn("'road_junction_arc_smoother', 'road_source', 'road_topology_builder', 'road_strips', 'road_graph_filter'", text)
+        self.assertIn("'road_api_raw_lines',", text)
+        self.assertNotIn("if _road_output_mode == 'surfaces':", text)
+        self.assertNotIn("_cfg.get('road_output_mode'", text)
+        self.assertNotIn("_cfg.get('road_junction_arc_smoothing_enabled'", text)
+        self.assertNotIn("ROAD_GRAPH_FILTER_CODE = houdini_sops.load('road_graph_filter.py'", text)
         self.assertNotIn("net.createNode('polyextrude::2.0', 'road_extrude')", text)
         self.assertNotIn("road_pre_extrude_fuse = net.createNode", text)
         self.assertNotIn("road_pre_extrude_dissolve = net.createNode", text)
 
-    def test_road_topology_builder_keeps_qa_guarded_auto_mode(self):
+    def test_road_topology_builder_is_not_in_raw_line_main_flow(self):
         text = self.PATH.read_text(encoding="utf-8")
-        self.assertIn("_cfg.get('roads_topology_preferred', 'strips')", text)
-        self.assertIn("_roads_topology_max_prim_ratio", text)
-        self.assertIn("_roads_topology_qa_sample_prims", text)
-        self.assertIn("_builder_qa_ok", text)
-        self.assertIn("_pref_mode == 'auto'", text)
-        self.assertIn("selected={}", text)
+        self.assertIn("raw map API road line output locked", text)
+        self.assertIn("_road_mesh_input = _api_raw_node", text)
+        self.assertNotIn("RTB_CODE = houdini_sops.load('road_topology_builder.py')", text)
+        self.assertNotIn("rtb_node = hou.node", text)
+        self.assertNotIn("_builder_qa_ok", text)
+        self.assertNotIn("source_switch = hou.node", text)
 
     def test_road_profiles_are_enabled_and_in_full_chain(self):
         text = self.PATH.read_text(encoding="utf-8")
@@ -204,8 +241,9 @@ class TestModelQaRoadChain(unittest.TestCase):
 
     def test_required_nodes_match_flat_road_chain(self):
         text = self.PATH.read_text(encoding="utf-8")
-        self.assertIn('"road_graph_filter"', text)
+        self.assertIn('"road_api_raw_lines"', text)
         self.assertIn('"road_color"', text)
+        self.assertIn('"road_clipped_lines"', text)
         self.assertNotIn('"road_extrude"', text)
 
     def test_qa_checks_road_profile_attributes(self):
@@ -225,7 +263,9 @@ class TestExportAndImportChain(unittest.TestCase):
         self.assertIn("[f'{_OBJ}/bld_with_foundation', f'{_OBJ}/bld_clipped', f'{_OBJ}/post_normals']", text)
         removed_lane_surface_node = "lane" + "forge_lane_surfaces"
         self.assertNotIn(removed_lane_surface_node, text)
-        self.assertIn("f'{_OBJ}/road_strips'", text)
+        self.assertIn("f'{_OBJ}/road_api_raw_lines'", text)
+        self.assertNotIn("f'{_OBJ}/road_junction_arc_smoother'", text)
+        self.assertNotIn("f'{_OBJ}/road_strips'", text)
         self.assertIn("[f'{_OBJ}/terrain_color', f'{_OBJ}/dem_subdivide', f'{_OBJ}/dem_terrain']", text)
         self.assertIn("prims = geo.intrinsicValue('primitivecount')", text)
 

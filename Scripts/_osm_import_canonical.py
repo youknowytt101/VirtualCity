@@ -20,10 +20,9 @@ def _resolve_project_path(value):
 
 AREA_ID = _cfg.get("area_id", "")
 READY_DIR = r'__ROOT__' + '/RawData/_houdini_ready/' + AREA_ID
-OSM_READY = READY_DIR + '/roads.osm'
 BUILDINGS_READY = READY_DIR + '/buildings.geojson'
 
-OSM_FILE = OSM_READY if os.path.exists(OSM_READY) else _resolve_project_path(_cfg["osm_file"])
+OSM_FILE = _resolve_project_path(_cfg["osm_file"])
 BUILDINGS_FILE = (BUILDINGS_READY if os.path.exists(BUILDINGS_READY)
                   else _resolve_project_path(_cfg["buildings_file"]))
 ORIGIN_LON     = _cfg["origin_lon"]

@@ -837,8 +837,7 @@ class QA:
             "dem_subdivide",
             "bld_footprint_bevel",
             "bld_with_foundation",
-            "road_graph_filter",
-            "road_strips",
+            "road_api_raw_lines",
             "road_clipped",
             "road_color",
             "merge_all",
@@ -1227,10 +1226,23 @@ class QA:
             self.add(label, PASS, f"{node_name} faces look bounded", **detail)
 
     def check_road_faces(self) -> None:
-        self._add_road_face_check("road_faces", "road_strips", "road_strips is missing")
+        self.add("road_faces", INFO, "road output is locked to raw map API lines; surface face QA skipped")
 
     def check_road_clipped_faces(self) -> None:
-        self._add_road_face_check("road_clipped_faces", "road_clipped", "road_clipped is missing")
+        geo = self.geo("road_clipped")
+        if geo is None:
+            self.add("road_clipped_lines", FAIL, "road_clipped is missing")
+            return
+        detail = {
+            "points": int(geo.intrinsicValue("pointcount")),
+            "prims": int(geo.intrinsicValue("primitivecount")),
+            "mode": "lines",
+        }
+        self.metrics["road_clipped_lines"] = detail
+        if detail["points"] <= 0 or detail["prims"] <= 0:
+            self.add("road_clipped_lines", FAIL, "road_clipped line geometry is empty", **detail)
+        else:
+            self.add("road_clipped_lines", PASS, "road_clipped line geometry is present", **detail)
 
     def check_road_profile_attrs(self) -> None:
         geo = self.geo("road_profile_apply")
@@ -1291,46 +1303,7 @@ class QA:
             self.add("terrain_density", PASS, "terrain snap target is subdivided", **detail)
 
     def check_junction_quality(self) -> None:
-        try:
-            # thresholds from active area (already loaded in main)
-            cfg = load_active_area(absolute=False)
-            min_angle = float(cfg.get("junction_min_angle_deg", 2.0))
-            min_edge = float(cfg.get("sliver_edge_min_m", 0.01))
-        except Exception:
-            min_angle, min_edge = 2.0, 0.01
-
-        # Follow the actual A/B switch so auto-revert evaluates the mesh that
-        # continues downstream. Fall back to the legacy node for older HIPs.
-        used = None
-        source_switch = self.node("road_source")
-        if source_switch is not None:
-            try:
-                selected = int(source_switch.parm("input").eval())
-                inputs = source_switch.inputs()
-                if 0 <= selected < len(inputs) and inputs[selected] is not None:
-                    used = inputs[selected].name()
-            except Exception:
-                used = None
-        if used is None and self.node("road_strips") is not None:
-            used = "road_strips"
-        if used is None:
-            self.add("junction_quality", WARN, "no road mesh node to evaluate")
-            return
-
-        node_path = f"{self.obj_path}/{used}"
-        detail = json.loads(self.conn.eval("_vc_model_qa_junction_quality({}, {}, {})".format(
-            json.dumps(node_path), json.dumps(min_angle), json.dumps(min_edge)
-        )))
-        self.metrics["junction_quality"] = detail
-        if detail.get("missing"):
-            self.add("junction_quality", WARN, f"{used} is missing")
-            return
-        bad = (detail.get("small_angle_count", 0) or 0) + (detail.get("sliver_edge_count", 0) or 0)
-        if bad > 0:
-            self.add("junction_quality", WARN, f"{used} has thin/acute patches", **detail)
-        else:
-            self.add("junction_quality", PASS, f"{used} junction patches look reasonable", **detail)
-
+        self.add("junction_quality", INFO, "road output is locked to raw map API lines; junction patch QA skipped")
     def run(self) -> None:
         self.check_required_nodes()
         self.check_terrain_density()

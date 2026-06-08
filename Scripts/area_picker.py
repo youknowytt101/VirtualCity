@@ -58,6 +58,38 @@ ROOT    = SCRIPTS.parent
 STATIC_ROOT = SCRIPTS / 'web_assets'
 PICKER_HOST = '127.0.0.1'
 PORT    = 8765
+SOFTWARE_PATHS_FILE = ROOT / 'Config' / 'software_paths.json'
+
+
+def _read_software_paths() -> dict:
+    try:
+        if SOFTWARE_PATHS_FILE.exists():
+            data = json.loads(SOFTWARE_PATHS_FILE.read_text(encoding='utf-8'))
+            if isinstance(data, dict):
+                return data
+    except Exception:
+        pass
+    return {}
+
+
+def _write_software_paths(data: dict) -> None:
+    SOFTWARE_PATHS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = SOFTWARE_PATHS_FILE.with_name(f'.{SOFTWARE_PATHS_FILE.name}.{time.time_ns()}.tmp')
+    with open(tmp, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+        f.write('\n')
+    tmp.replace(SOFTWARE_PATHS_FILE)
+
+
+def _software_path_status() -> dict:
+    data = _read_software_paths()
+    houdini_exe = str(data.get('houdini_exe') or '').strip()
+    exists = bool(houdini_exe) and Path(houdini_exe).exists()
+    return {
+        'houdini_exe': houdini_exe,
+        'houdini_exe_exists': exists,
+        'config_path': str(SOFTWARE_PATHS_FILE),
+    }
 
 _STEP_RE = re.compile(r'^\[(\d+)/(\d+)\]')
 _RUN_RE = re.compile(r'^\[RUN\] run_id=(\S+)$')
@@ -232,6 +264,7 @@ def _service_payload() -> dict:
         'shutdown_with_page': SHUTDOWN_WITH_PAGE,
         'houdini_available': houdini_available,
         'houdini_asset': houdini_asset,
+        'software_paths': _software_path_status(),
         'export_available': False if running or export_running else bool(houdini_asset.get('export_ready')),
         'selection': _remembered_selection_status(),
         'downloaded_areas': _downloaded_area_status(),
@@ -473,6 +506,22 @@ def _probe_houdini(timeout: float = 0.35) -> bool:
             return True
     except OSError:
         return False
+
+
+def _open_houdini_from_config() -> dict:
+    status = _software_path_status()
+    houdini_exe = status.get('houdini_exe') or ''
+    if _probe_houdini():
+        return {'ok': True, 'message': 'Houdini 已连接', 'already_connected': True, 'software_paths': status}
+    if not houdini_exe:
+        return {'ok': False, 'message': '请先输入 Houdini 软件路径', 'software_paths': status}
+    if not status.get('houdini_exe_exists'):
+        return {'ok': False, 'message': 'Houdini 软件路径不存在', 'software_paths': status}
+    try:
+        subprocess.Popen([houdini_exe], cwd=str(Path(houdini_exe).parent), close_fds=True)
+    except Exception as exc:
+        return {'ok': False, 'message': f'Houdini 启动失败: {exc}', 'software_paths': status}
+    return {'ok': True, 'message': 'Houdini 已启动，等待连接', 'started': True, 'software_paths': status}
 
 
 def _export_available() -> bool:
@@ -1037,6 +1086,34 @@ button, input { font: inherit; }
   min-height: 34px;
   justify-content: center;
 }
+.software-path-editor {
+  display: block;
+  width: 100%;
+}
+.software-path-editor input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  min-height: 34px;
+  padding: 7px 8px;
+  color: var(--text);
+  background: rgba(255,255,255,0.035);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  font-size: 11.5px;
+  line-height: 1.35;
+  outline: none;
+}
+.software-path-editor input:focus {
+  border-color: rgba(33,182,168,0.65);
+}
+.software-path-note {
+  min-height: 14px;
+  color: var(--subtle);
+  font-size: 10.5px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
 .run-status-panel {
   display: grid;
   gap: 8px;
@@ -1188,25 +1265,28 @@ button, input { font: inherit; }
 }
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(96px, 0.75fr) minmax(0, 1.25fr);
   gap: 8px;
-  margin-top: 10px;
 }
 .metric {
-  min-height: 58px;
-  padding: 9px 10px;
+  min-height: 52px;
+  padding: 8px 10px;
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--line-soft);
   border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 .metric-label {
   display: block;
   color: var(--subtle);
-  font-size: 11px;
+  font-size: 10.5px;
 }
 .metric-value {
   display: block;
-  margin-top: 5px;
+  margin-top: 4px;
   color: var(--text);
   font-size: 15px;
   font-weight: 760;
@@ -1215,8 +1295,7 @@ button, input { font: inherit; }
   white-space: nowrap;
 }
 .metric-wide {
-  grid-column: 1 / -1;
-  min-height: 52px;
+  grid-column: auto;
 }
 .metric-wide .metric-value {
   font-family: Consolas, 'Cascadia Mono', monospace;
@@ -1224,6 +1303,19 @@ button, input { font: inherit; }
   font-weight: 600;
   white-space: normal;
   overflow-wrap: anywhere;
+}
+.data-overview {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+}
+.data-overview .section-row {
+  align-items: center;
+}
+.data-overview .filter {
+  margin-left: auto;
 }
 .source-list {
   display: grid;
@@ -1631,6 +1723,15 @@ button, input { font: inherit; }
   .metric-grid, .action-grid {
     grid-template-columns: 1fr;
   }
+  .data-overview .section-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .data-overview .filter {
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
   .panel-section .section-row {
     flex-wrap: wrap;
     align-items: flex-start;
@@ -1651,7 +1752,7 @@ button, input { font: inherit; }
   <div class="brand-lockup">
     <div class="brand-mark">VC</div>
     <div class="brand-copy">
-      <h1>VirtualCity 操作台</h1>
+      <h1>CityEngine</h1>
       <p>固定 1km UTM 网格 · 数据缓存 · Houdini 构建</p>
     </div>
   </div>
@@ -1672,31 +1773,31 @@ button, input { font: inherit; }
     <section class="panel-section">
       <div class="selection-title-row">
         <div>
-          <div class="section-kicker">区域框选</div>
+          <div class="section-kicker">区域选择</div>
           <div class="section-note">连续矩形网格块</div>
         </div>
         <button id="clear-btn" onclick="clearSelection()">清除</button>
       </div>
       <div id="area-id-chip">未选择区域</div>
       <div id="tile-display">尚未框选网格</div>
-      <div class="metric-grid">
-        <div class="metric">
-          <span class="metric-label">完整数据区域</span>
-          <span id="downloaded-area-count" class="metric-value">--</span>
+      <div class="data-overview">
+        <div class="section-row">
+          <div>
+            <div class="section-kicker">视口数据</div>
+            <div id="grid-status" class="section-note">加载网格中...</div>
+          </div>
+          <label class="filter"><input id="cached-only" type="checkbox"> 只显示已有缓存</label>
         </div>
-        <div class="metric metric-wide">
-          <span class="metric-label">BBox</span>
-          <span id="selection-bbox" class="metric-value">--</span>
+        <div class="metric-grid">
+          <div class="metric">
+            <span class="metric-label">完整数据区域</span>
+            <span id="downloaded-area-count" class="metric-value">--</span>
+          </div>
+          <div class="metric metric-wide">
+            <span class="metric-label">BBox</span>
+            <span id="selection-bbox" class="metric-value">--</span>
+          </div>
         </div>
-      </div>
-    </section>
-    <section class="panel-section">
-      <div class="section-row">
-        <div>
-          <div class="section-kicker">视口数据</div>
-          <div id="grid-status" class="section-note">加载网格中...</div>
-        </div>
-        <label class="filter"><input id="cached-only" type="checkbox"> 只显示已有缓存</label>
       </div>
     </section>
     <section class="panel-section">
@@ -1706,7 +1807,7 @@ button, input { font: inherit; }
           <div id="source-status" class="section-note">读取当前区域数据源...</div>
         </div>
         <button id="download-btn" disabled onclick="downloadData()" class="source-action-btn">
-          <span class="btn-main">准备数据源</span>
+          <span class="btn-main">下载地图数据</span>
           <span class="btn-sub">OSM / DEM / 建筑</span>
         </button>
       </div>
@@ -1772,13 +1873,17 @@ button, input { font: inherit; }
         </button>
       </div>
     </section>
-    <section class="action-module" aria-label="Houdini 遥控">
+    <section class="action-module" aria-label="软件链接">
       <div class="action-module-head">
-        <div class="action-module-title">Houdini 遥控</div>
+        <div class="action-module-title">软件链接</div>
         <div class="action-module-state">本地会话</div>
       </div>
       <div class="houdini-status-stack" aria-label="Houdini 状态">
-        <button id="houdini-badge" type="button" class="badge badge-warn" onclick="probeHoudini()" title="点击探测 Houdini RPYC 连接">检查 Houdini</button>
+        <div class="software-path-editor">
+          <input id="houdini-path-input" type="text" spellcheck="false" placeholder="输入 Houdini 软件路径，例如 D:\houdini21\bin\houdini.exe">
+        </div>
+        <div id="houdini-path-note" class="software-path-note">未设置软件路径</div>
+        <button id="houdini-badge" type="button" class="badge badge-warn" onclick="openOrProbeHoudini()" title="未连接时启动路径里的 Houdini；已连接时刷新状态">打开 Houdini</button>
         <div id="houdini-connection-row" class="status-row status-warn">
           <span class="status-label">软件连接</span>
           <span id="houdini-connection-value" class="status-value">待检查</span>
@@ -1906,6 +2011,15 @@ map.on(L.Draw.Event.DELETED, function() {
 document.getElementById('cached-only').addEventListener('change', function() {
   renderGrid(lastGridData);
 });
+document.getElementById('houdini-path-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    saveSoftwarePath(false);
+  }
+});
+document.getElementById('houdini-path-input').addEventListener('blur', function() {
+  saveSoftwarePath(false);
+});
 
 function setStatusRow(rowId, valueId, state, text, title) {
   var row = document.getElementById(rowId);
@@ -1916,27 +2030,117 @@ function setStatusRow(rowId, valueId, state, text, title) {
   row.title = title || text;
 }
 
+function updateSoftwarePath(paths) {
+  var input = document.getElementById('houdini-path-input');
+  var note = document.getElementById('houdini-path-note');
+  if (!input || !note || !paths) return;
+  var value = paths.houdini_exe || '';
+  if (document.activeElement !== input) {
+    input.value = value;
+  }
+  if (!value) {
+    note.textContent = '未设置软件路径';
+    note.style.color = '';
+  } else if (paths.houdini_exe_exists) {
+    note.textContent = '已设置: ' + value;
+    note.style.color = '#b9efa9';
+  } else {
+    note.textContent = '文件不存在: ' + value;
+    note.style.color = '#ffe3a9';
+  }
+}
+
+function saveSoftwarePath(refreshAfter) {
+  var input = document.getElementById('houdini-path-input');
+  var note = document.getElementById('houdini-path-note');
+  if (!input) return Promise.resolve({ ok: false });
+  return fetch('/software-paths', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ houdini_exe: input.value || '' })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.software_paths) updateSoftwarePath(d.software_paths);
+    if (!d.ok && note) {
+      note.textContent = d.message || '保存失败';
+      note.style.color = '#ffaca6';
+    }
+    if (refreshAfter) refreshServiceState();
+    return d;
+  })
+  .catch(function(e) {
+    if (note) {
+      note.textContent = '保存失败: ' + e;
+      note.style.color = '#ffaca6';
+    }
+    return { ok: false, message: String(e) };
+  });
+}
+
 function setHoudiniBadge(available, asset) {
   var el = document.getElementById('houdini-badge');
   el.disabled = false;
   if (available) {
     el.className = 'badge badge-ok';
     el.textContent = 'Houdini 已连接';
+    el.title = 'Houdini 已打开并可连接；点击刷新状态';
   } else {
     el.className = 'badge badge-warn';
-    el.textContent = 'Houdini 未连接';
+    el.textContent = '打开 Houdini';
+    el.title = '启动输入路径里的 Houdini';
   }
   updateHoudiniStatusPanel(available, asset || null);
 }
 
-function setHoudiniChecking() {
+function setHoudiniChecking(text) {
   var el = document.getElementById('houdini-badge');
   el.className = 'badge badge-warn';
-  el.textContent = '探测中...';
+  el.textContent = text || '处理中...';
   el.disabled = true;
-  setStatusRow('houdini-connection-row', 'houdini-connection-value', 'warn', '探测中', '正在探测 Houdini RPYC 连接');
+  setStatusRow('houdini-connection-row', 'houdini-connection-value', 'warn', '处理中', '正在处理 Houdini 连接');
 }
 
+function openOrProbeHoudini() {
+  var badge = document.getElementById('houdini-badge');
+  var connected = badge && badge.classList.contains('badge-ok');
+  if (connected) {
+    setHoudiniChecking('刷新中...');
+    refreshServiceState();
+    return;
+  }
+  setHoudiniChecking('启动中...');
+  saveSoftwarePath(false).then(function() {
+    var input = document.getElementById('houdini-path-input');
+    return fetch('/open-houdini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ houdini_exe: input ? input.value : '' })
+    });
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.software_paths) updateSoftwarePath(d.software_paths);
+    if (!d.ok) {
+      var note = document.getElementById('houdini-path-note');
+      if (note) {
+        note.textContent = d.message || '启动失败';
+        note.style.color = '#ffaca6';
+      }
+      refreshServiceState();
+      return;
+    }
+    pollHoudiniAfterOpen(8);
+  })
+  .catch(function(e) {
+    var note = document.getElementById('houdini-path-note');
+    if (note) {
+      note.textContent = '启动失败: ' + e;
+      note.style.color = '#ffaca6';
+    }
+    refreshServiceState();
+  });
+}
 function updateExportButton(available, running) {
   var btn = document.getElementById('export-btn');
   btn.disabled = !available || !!running;
@@ -2186,6 +2390,7 @@ function refreshServiceState() {
   .then(function(r) { return r.json(); })
   .then(function(d) {
     setHoudiniBadge(!!d.houdini_available, d.houdini_asset);
+    updateSoftwarePath(d.software_paths);
     updateExportButton(!!d.export_available, !!d.running);
     updateSelectionButtons(!!d.running);
     updateDownloadedAreaCount(d);
@@ -2199,8 +2404,7 @@ function refreshServiceState() {
 }
 
 function probeHoudini() {
-  setHoudiniChecking();
-  refreshServiceState();
+  openOrProbeHoudini();
 }
 
 function touchPageSession() {
@@ -2694,6 +2898,16 @@ var _pollTimer = null;
 var _lastLogLen = 0;
 var _lastExportLogLen = 0;
 var _lastFailureKey = '';
+var _houdiniOpenPollTimer = null;
+
+function pollHoudiniAfterOpen(remaining) {
+  clearTimeout(_houdiniOpenPollTimer);
+  refreshServiceState();
+  if (remaining <= 0) return;
+  _houdiniOpenPollTimer = setTimeout(function() {
+    pollHoudiniAfterOpen(remaining - 1);
+  }, 2000);
+}
 
 function pollStatus() {
   fetch('/status')
@@ -2704,6 +2918,7 @@ function pollStatus() {
     document.getElementById('progress-text').textContent = pct + '%';
     document.getElementById('step-label').textContent = d.step_label || '运行中...';
     updateRunStatusFromHealth(d);
+    updateSoftwarePath(d.software_paths);
 
     if (d.log_lines && d.log_lines.length > _lastLogLen) {
       var newLines = d.log_lines.slice(_lastLogLen);
@@ -2883,6 +3098,9 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == '/data-sources':
             self._json(_data_sources_status())
             return
+        if parsed.path == '/software-paths':
+            self._json(_software_path_status())
+            return
         if parsed.path == '/selection':
             self._json(_remembered_selection_status())
             return
@@ -2928,6 +3146,7 @@ class _Handler(BaseHTTPRequestHandler):
                 snapshot = dict(resp)
             resp['houdini_available'] = _probe_houdini()
             resp['houdini_asset'] = _houdini_asset_status(resp['houdini_available'])
+            resp['software_paths'] = _software_path_status()
             if not resp.get('running') and not resp.get('export_running'):
                 resp['export_available'] = bool(resp['houdini_asset'].get('export_ready'))
             resp['selection'] = _remembered_selection_status()
@@ -2995,6 +3214,12 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == '/selection/clear':
             _clear_remembered_selection()
             self._json({'ok': True})
+            return
+        if parsed.path == '/software-paths':
+            self._post_software_paths()
+            return
+        if parsed.path == '/open-houdini':
+            self._post_open_houdini()
             return
         if parsed.path == '/export':
             self._post_export()
@@ -3154,6 +3379,44 @@ class _Handler(BaseHTTPRequestHandler):
             return
         self._json({'ok': True, 'selection': payload})
 
+    def _post_software_paths(self):
+        length = int(self.headers.get('Content-Length', 0))
+        try:
+            body = json.loads(self.rfile.read(length) or b'{}')
+        except json.JSONDecodeError:
+            self._json({'ok': False, 'message': '请求 JSON 无法解析'})
+            return
+        houdini_exe = str(body.get('houdini_exe') or '').strip().strip('"')
+        data = _read_software_paths()
+        data['houdini_exe'] = houdini_exe
+        try:
+            _write_software_paths(data)
+        except Exception as exc:
+            self._json({'ok': False, 'message': f'软件路径保存失败: {exc}'})
+            return
+        status = _software_path_status()
+        message = '软件路径已保存'
+        if houdini_exe and not status.get('houdini_exe_exists'):
+            message = '软件路径已保存，但文件不存在'
+        self._json({'ok': True, 'message': message, 'software_paths': status})
+    def _post_open_houdini(self):
+        if not _probe_houdini():
+            length = int(self.headers.get('Content-Length', 0))
+            try:
+                body = json.loads(self.rfile.read(length) or b'{}')
+            except json.JSONDecodeError:
+                self._json({'ok': False, 'message': '请求 JSON 无法解析'})
+                return
+            houdini_exe = str(body.get('houdini_exe') or '').strip().strip('"')
+            if houdini_exe:
+                data = _read_software_paths()
+                data['houdini_exe'] = houdini_exe
+                try:
+                    _write_software_paths(data)
+                except Exception as exc:
+                    self._json({'ok': False, 'message': f'软件路径保存失败: {exc}'})
+                    return
+        self._json(_open_houdini_from_config())
     def _post_export(self):
         if not _export_available():
             self._json({'ok': False, 'message': '当前区域还没有通过 Houdini Model QA，不能导出 FBX。'})
