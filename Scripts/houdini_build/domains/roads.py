@@ -278,7 +278,7 @@ def build_clipped_lines(
     asset_filter_code,
     remake_asset_filter,
 ):
-    """Drape raw road lines to terrain, filter bounds, and clean final fragments."""
+    """Drape raw road lines to terrain and filter them to the active area."""
     old_drape = hou.node(obj_path + "/snap_road_strips")
     if old_drape:
         old_drape.destroy()
@@ -322,21 +322,11 @@ def build_clipped_lines(
 
     road_clip = remake_asset_filter("snap_road_clipped", "road_clip_mark", "road_clipped", "primitive")
 
-    fragment_cleanup_code = houdini_sops.load("road_fragment_cleanup.py")
     old_frag_cleanup = hou.node(obj_path + "/road_fragment_cleanup")
     if old_frag_cleanup:
         old_frag_cleanup.destroy()
-    road_frag_cleanup = net.createNode("python", "road_fragment_cleanup")
-    road_frag_cleanup.setInput(0, road_clip)
-    road_frag_cleanup.parm("python").set(fragment_cleanup_code)
-    road_frag_cleanup.cook(force=True)
-    frag_geo = road_frag_cleanup.geometry()
-    frag_tiny = frag_geo.attribValue("rfc_removed_tiny_triangles") if frag_geo.findGlobalAttrib("rfc_removed_tiny_triangles") else 0
-    frag_sliver = frag_geo.attribValue("rfc_removed_sliver_triangles") if frag_geo.findGlobalAttrib("rfc_removed_sliver_triangles") else 0
-    frag_sharp = frag_geo.attribValue("rfc_removed_sharp_triangles") if frag_geo.findGlobalAttrib("rfc_removed_sharp_triangles") else 0
-    print("  road_fragment_cleanup: 移除微小={} 细长={} 尖锐={}".format(
-        frag_tiny, frag_sliver, frag_sharp))
-    return road_frag_cleanup
+        print("  road_fragment_cleanup: 已移除，road_clipped 直接进入 road_profile_apply")
+    return road_clip
 
 
 def apply_profiles(hou, net, obj_path: str, root_str: str, road_clip, enabled: bool):

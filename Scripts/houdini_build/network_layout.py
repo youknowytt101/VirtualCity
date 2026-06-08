@@ -78,7 +78,6 @@ GROUPS: tuple[NetworkGroup, ...] = (
             "road_bbox_clip",
             "snap_road_clipped",
             "road_clipped",
-            "road_fragment_cleanup",
             "road_profile_apply",
             "road_curb_variation",
             "road_color",

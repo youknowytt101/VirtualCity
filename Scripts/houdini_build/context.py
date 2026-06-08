@@ -20,7 +20,7 @@ FULL_REFRESH_CHAIN = [
     "road_api_raw_lines", "road_api_shared_topology", "road_centerline_resample", "road_junction_curve_smooth",
     "snap_road_strips", "road_bbox_clip", "snap_road_clipped",
     "bld_clipped", "bld_foundation", "bld_foundation_clipped",
-    "road_clipped", "road_fragment_cleanup", "road_profile_apply", "road_curb_variation", "road_color",
+    "road_clipped", "road_profile_apply", "road_curb_variation", "road_color",
     "bld_color", "bld_foundation_color", "bld_with_foundation_merge", "bld_with_foundation",
     "terrain_color", "merge_all", "OUT_city",
 ]
@@ -28,7 +28,7 @@ FULL_REFRESH_CHAIN = [
 QUICK_ROAD_REFRESH_CHAIN = [
     "road_api_raw_lines", "road_api_shared_topology", "road_centerline_resample", "road_junction_curve_smooth",
     "snap_road_strips", "road_bbox_clip", "snap_road_clipped",
-    "road_clipped", "road_fragment_cleanup", "road_profile_apply", "road_curb_variation", "road_color", "OUT_city",
+    "road_clipped", "road_profile_apply", "road_curb_variation", "road_color", "OUT_city",
 ]
 
 
