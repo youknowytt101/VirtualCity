@@ -3,7 +3,7 @@
 > Start here when taking over this project. This file is intentionally short,
 > current-state focused, and should be updated after major iteration rounds.
 
-Last updated: 2026-06-08
+Last updated: 2026-06-09
 
 ## 0. 当前活跃交接入口
 
@@ -12,7 +12,8 @@ Last updated: 2026-06-08
 主入口：
 
 ```text
-Scripts/area_picker.py
+Scripts/area_picker.py  (compat entrypoint)
+Scripts/app/area_picker/server.py
 Scripts/set_area.py
 Scripts/refine_data.py
 Scripts/_recook_new_area.py
@@ -58,24 +59,26 @@ For implementation work, also inspect the relevant code before changing it.
 
 ## 3. Current Git Baseline
 
-The last known clean baseline before the current workspace snapshot was:
+Latest pushed architecture baseline:
 
 ```text
-4c6e7de7 Improve VirtualCity launcher and lane preview startup
+58b6480d refactor: split area picker and shared modules
 ```
 
 Current workspace note:
 
 ```text
-The working tree contains a large cleanup / migration snapshot, including removal
-of the old independent RoadResearch/LaneForge pipeline and new mainline
-VirtualCity automation work. Treat `git status` as part of the current handoff;
-do not assume every Git-visible deletion is accidental.
+The architecture split is committed and pushed to origin/main. The remaining
+known local changes at handoff time are machine/runtime state:
+Config/software_paths.json and Houdini/Hip/VC_master_citygen_v001.hip.
+Do not mix those into architecture/documentation commits without explicit intent.
 ```
 
 Key commits in the recent hardening rounds:
 
 ```text
+58b6480d refactor: split area picker and shared modules
+c5472866 Lock raw road output and update control room UI
 4c6e7de7 Improve VirtualCity launcher and lane preview startup
 75d334a1 Integrate LaneForge preview bridge into BBOX flow
 93a359b chore: sync handoff and experimental area snapshot
@@ -88,15 +91,16 @@ a7a1129 refactor(houdini): externalize inline SOP code into houdini_sops
 de8f11e refactor(coords): centralize WGS84/local/Houdini conversions in vc_geo
 ```
 
-This handoff update closes the next small round: `download_dem.py` and
-`clean_raw_data.py` were migrated off direct `_utm_lite` use onto
-`vc_geo.LocalProjector`; offline tests now cover that coordinate-authority
-closeout.
+This handoff update closes the physical-layer split round:
 
-This round also treats the latest Git-visible test outputs (OSM / DEM /
-Overture / HIP / Config QA JSON / clip cache) as an experimental snapshot on
-`main`, so a new machine can resume without rebuilding all inputs. If visual
-review rejects it, revert or clean this snapshot as one follow-up.
+- Shared authority modules moved to `Scripts/shared/` with root-level
+  compatibility aliases.
+- Pipeline run state moved to `Scripts/orchestration/pipeline_state.py`.
+- Area picker implementation moved to `Scripts/app/area_picker/server.py`,
+  with `template.py` and `software_paths.py` split out.
+- `Scripts/area_picker.py` remains the user-facing command entrypoint.
+- A regression in `shared/vc_paths.py` root detection was fixed and covered by
+  `tests/test_vc_paths.py`; offline tests are now 111 passing.
 
 If pushing to GitHub fails with TLS handshake errors, check Git proxy settings. On this machine, pushing succeeded by bypassing Git proxy:
 
@@ -106,12 +110,13 @@ git -c http.proxy= -c https.proxy= push origin main
 
 ## 4. Current Tested Area
 
-Latest full-pipeline area (from `area_picker.py`):
+Latest full-pipeline attempt (from `area_picker.py`):
 
 ```text
-z47n_e704000_n1429000_w1000_h1000_s1000
+z47n_e702000_n1428000_w1000_h1000_s1000
+run_id: 20260609_003032_z47n_e702000_n1428000_w1000_h1000_s1000_e7a33766
 OBJ path: /obj/pattaya_osm
-latest area HIP: Houdini/Hip/VC_z47n_e704000_n1429000_w1000_h1000_s1000_citygen_v001.hip
+latest area HIP: Houdini/Hip/VC_z47n_e702000_n1428000_w1000_h1000_s1000_citygen_v001.hip
 master HIP: Houdini/Hip/VC_master_citygen_v001.hip
 ```
 
@@ -119,24 +124,31 @@ Latest Houdini build status:
 
 ```text
 Config/houdini_build_status.json
-status: completed
-qa_status: warn
+status: failed
+qa_status: fail
 ```
 
 Latest Model QA:
 
 ```text
 Reports/model_qa/latest.json
-summary: 12 pass / 2 warn / 0 fail
-warn: road_terrain_fit (many terrain ray misses, but no below-threshold points)
-warn: junction_quality (8 sliver-edge road_strips patches below 0.01m)
+summary: 11 pass / 0 warn / 1 fail
+fail: building_terrain_fit
+details: bld_with_foundation has 1 sampled point below terrain threshold
+min_delta: -0.0668m, threshold: -0.05m
 ```
 
-This latest run completed the full pipeline and has no Model QA failures, but
-it still needs human viewport review before being promoted to a baseline. The
-current Houdini-ready manifest was refreshed on 2026-06-08 so its output paths
-now point at the published `_houdini_ready/{area_id}` directory rather than the
-temporary staging directory.
+The latest run confirms the refactored entrypoints and path helpers reach the
+Houdini / Model QA stage, but it is not a passing baseline. Next work should
+inspect the `building_terrain_fit` failure before promoting this area.
+
+Most recent clean successful reference before this failure:
+
+```text
+z47n_e704000_n1431000_w1000_h1000_s1000
+Model QA quick: 12 pass / 0 warn / 0 fail
+report timestamp: 2026-06-09 00:02:00
+```
 
 ## 5. Full Pipeline Definition
 
@@ -163,13 +175,18 @@ Do not call `_recook_new_area.py` or `set_area.py` a full test unless the user e
 
 Architecture / semantics hardening (this round, behavior-preserving):
 
-- `Scripts/vc_geo.py` is the single coordinate authority (WGS84 / local (x,z) / Houdini). z-flip happens only in `local_to_houdini` / `local_xz_to_houdini_xz`. `download_dem.py` and `clean_raw_data.py` are now migrated onto it (no more direct `_utm_lite` use in business scripts).
+- `Scripts/shared/vc_geo.py` is the single coordinate authority (WGS84 / local (x,z) / Houdini). z-flip happens only in `local_to_houdini` / `local_xz_to_houdini_xz`. Root `Scripts/vc_geo.py` remains a compatibility alias.
 - `Scripts/houdini_sops/` holds the externalized SOP Python/VEX text (previously inline in `_recook_new_area.py`).
-- `Scripts/vc_buildings.py` is the pure building-cleaning function (filter / height-fix, geometry passthrough).
-- `Scripts/vc_schema.py` is the semantic contract (single authority): per-layer attribute specs + `check_buildings` / `check_roads` (attribute completeness, height provenance, road connectivity). `refine_data` OutputQA runs these; `meta.json` records `schema_version`.
+- `Scripts/shared/vc_buildings.py` is the pure building-cleaning function (filter / height-fix, geometry passthrough).
+- `Scripts/shared/vc_schema.py` is the semantic contract (single authority): per-layer attribute specs + `check_buildings` / `check_roads` (attribute completeness, height provenance, road connectivity). `refine_data` OutputQA runs these; `meta.json` records `schema_version`.
+- `Scripts/app/area_picker/` now owns the area picker web implementation:
+  `server.py`, `template.py`, `software_paths.py`. `Scripts/area_picker.py`
+  stays as the stable user entrypoint.
+- `Scripts/orchestration/pipeline_state.py` now owns durable run state.
+- `tests/test_vc_paths.py` locks project-root discovery after the package move.
 - Building `height_source` provenance is stamped end-to-end: `overture` / `osm` (L3 enrich) / `estimated_pending` (Houdini procedural).
 - `ProjectManagement/VirtualCity_架构全景图.svg` is a full-pipeline architecture panorama.
-- `tests/` now has 35 offline unit tests (`vc_geo`, `houdini_sops`, `vc_buildings`, `vc_schema`).
+- `tests/` now has 111 offline tests passing after the physical split.
 
 Building / terrain:
 
@@ -196,18 +213,22 @@ Roads:
 
 ## 7. High-Value Next Steps
 
-1. Human-review `OUT_city` in Houdini.
-2. Inspect road junction visuals after the v5 downgrade strategy.
-3. If roads look stable, start visual road layering:
+1. Investigate latest Model QA failure: `building_terrain_fit` on
+   `z47n_e702000_n1428000_w1000_h1000_s1000` (1 sampled point below threshold).
+2. Human-review `OUT_city` in Houdini after the failure is understood.
+3. Inspect road visuals and raw line output after the latest control-room changes.
+4. If roads look stable, start visual road layering:
    `road_surface / sidewalk_strip / curb_edge`.
-4. Keep UE5 export/import outside the default test loop until Houdini output is visually approved.
-5. Continue updating this file and `ProjectManagement/02_当前状态与下一步.md` after each major iteration.
+5. Keep UE5 export/import outside the default test loop until Houdini output is visually approved.
+6. Continue updating this file and `ProjectManagement/02_当前状态与下一步.md` after each major iteration.
 
 ## 8. Key Files
 
 Pipeline:
 
 - `Scripts/area_picker.py`
+- `Scripts/app/area_picker/server.py`
+- `Scripts/app/area_picker/template.py`
 - `Scripts/set_area.py`
 - `Scripts/refine_data.py`
 - `Scripts/_recook_new_area.py`
@@ -220,9 +241,10 @@ Roads:
 
 Core authority modules:
 
-- `Scripts/vc_geo.py` (coordinates)
-- `Scripts/vc_buildings.py` (building cleaning)
-- `Scripts/vc_schema.py` (semantic contract)
+- `Scripts/shared/vc_geo.py` (coordinates)
+- `Scripts/shared/vc_buildings.py` (building cleaning)
+- `Scripts/shared/vc_schema.py` (semantic contract)
+- `Scripts/orchestration/pipeline_state.py` (run state)
 - `Scripts/houdini_sops/` (externalized SOP code)
 - `tests/` (offline unit tests)
 
