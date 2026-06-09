@@ -28,8 +28,11 @@ ARC_SPACING = max(0.25, float("__ARC_SPACING__"))
 SMOOTH_ITERATIONS = max(0, int("__SMOOTH_ITERATIONS__"))
 MAX_BENDS = max(50, int("__MAX_BENDS__"))
 REUSE_TOLERANCE = max(0.001, float("__REUSE_TOLERANCE__"))
+MIN_TURN_WALK_DISTANCE = max(0.75, min(MIN_BRANCH_DISTANCE, ARC_SPACING * 1.5))
 TURN_DETECT_TOLERANCE = max(0.15, min(0.75, CURVE_DISTANCE * 0.08))
 CHAIN_ENDPOINT_TOLERANCE = max(REUSE_TOLERANCE * 2.0, min(0.25, CURVE_DISTANCE * 0.04))
+PROTECTED_CLUSTER_TOLERANCE = max(CHAIN_ENDPOINT_TOLERANCE, min(0.35, CURVE_DISTANCE * 0.08))
+TURN_WINDOW_JOIN_TOLERANCE = 0.01
 DIRECTION_MERGE_COS = math.cos(math.radians(12.0))
 EPS = 1.0e-8
 
@@ -105,6 +108,14 @@ def append_unique(points, pos, eps=0.01):
     if points and length_xz(points[-1], pos) <= eps:
         return
     points.append(pos)
+
+
+def append_unique_ref(point_refs, pos, point_number=None, eps=0.01):
+    if point_refs and length_xz(point_refs[-1][0], pos) <= eps:
+        if point_refs[-1][1] is None and point_number is not None:
+            point_refs[-1] = (point_refs[-1][0], point_number)
+        return
+    point_refs.append((pos, point_number))
 
 
 def point_line_distance_xz(pos, a, b):
@@ -190,10 +201,60 @@ def cyclic_marker_distance(markers, total, idx_a, idx_b):
     return min(delta, total - delta)
 
 
-def rotate_closed_chain(points, point_numbers):
+def primitive_is_closed(prim):
+    try:
+        return bool(prim.isClosed())
+    except Exception:
+        return False
+
+
+def closed_chain_endpoint_match(points, point_numbers):
     if len(points) < 4:
-        return points, point_numbers
-    if point_numbers[0] != point_numbers[-1] and length_xz(points[0], points[-1]) > CHAIN_ENDPOINT_TOLERANCE:
+        return False
+    if point_numbers[0] == point_numbers[-1]:
+        return True
+    return length_xz(points[0], points[-1]) <= CHAIN_ENDPOINT_TOLERANCE
+
+
+def cyclic_distance(total, marker_a, marker_b):
+    if total <= EPS:
+        return 0.0
+    delta = abs(marker_a - marker_b)
+    return min(delta, total - delta)
+
+
+def choose_closed_chain_seam_edge(ring_points):
+    if len(ring_points) < 3:
+        return None
+    markers, total = ring_distance_markers(ring_points)
+    if total <= EPS:
+        return None
+
+    hard_indices = []
+    for idx in range(len(ring_points)):
+        angle = ring_turn_angle_deg(ring_points, idx)
+        if angle is not None and angle >= MIN_ANGLE_DEG:
+            hard_indices.append(idx)
+
+    best = None
+    for edge_idx in range(len(ring_points)):
+        next_idx = (edge_idx + 1) % len(ring_points)
+        edge_len = length_xz(ring_points[edge_idx], ring_points[next_idx])
+        if edge_len <= EPS:
+            continue
+        seam_marker = (markers[edge_idx] + edge_len * 0.5) % total
+        if hard_indices:
+            nearest_hard = min(cyclic_distance(total, seam_marker, markers[hard_idx]) for hard_idx in hard_indices)
+        else:
+            nearest_hard = edge_len * 0.5
+        score = (nearest_hard, edge_len)
+        if best is None or score > best[0]:
+            best = (score, edge_idx)
+    return best[1] if best else None
+
+
+def rotate_closed_chain(points, point_numbers):
+    if not closed_chain_endpoint_match(points, point_numbers):
         return points, point_numbers
 
     ring_points = list(points[:-1])
@@ -201,41 +262,15 @@ def rotate_closed_chain(points, point_numbers):
     if len(ring_points) < 3:
         return points, point_numbers
 
-    angles = []
-    hard_indices = []
-    for idx in range(len(ring_points)):
-        angle = ring_turn_angle_deg(ring_points, idx)
-        if angle is None:
-            continue
-        angles.append((idx, angle))
-        if angle >= MIN_ANGLE_DEG:
-            hard_indices.append(idx)
-
-    if not angles:
+    seam_edge_idx = choose_closed_chain_seam_edge(ring_points)
+    if seam_edge_idx is None:
         return ring_points + [ring_points[0]], ring_numbers + [ring_numbers[0]]
 
-    best_idx = 0
-    if hard_indices:
-        markers, total = ring_distance_markers(ring_points)
-        best_score = None
-        for idx, angle in angles:
-            nearest_hard = min(cyclic_marker_distance(markers, total, idx, hard_idx) for hard_idx in hard_indices)
-            score = (nearest_hard, -angle)
-            if best_score is None or score > best_score:
-                best_idx = idx
-                best_score = score
-    else:
-        best_angle = None
-        for idx, angle in angles:
-            if best_angle is None or angle < best_angle:
-                best_idx = idx
-                best_angle = angle
-
-    if best_idx == 0:
-        return ring_points + [ring_points[0]], ring_numbers + [ring_numbers[0]]
+    next_idx = (seam_edge_idx + 1) % len(ring_points)
+    seam_pos = lerp(ring_points[seam_edge_idx], ring_points[next_idx], 0.5)
     return (
-        ring_points[best_idx:] + ring_points[:best_idx + 1],
-        ring_numbers[best_idx:] + ring_numbers[:best_idx + 1],
+        [seam_pos] + ring_points[next_idx:] + ring_points[:next_idx] + [seam_pos],
+        [None] + ring_numbers[next_idx:] + ring_numbers[:next_idx] + [None],
     )
 
 
@@ -246,6 +281,79 @@ def add_unique_direction(directions, direction):
         if dot2(existing, direction) >= DIRECTION_MERGE_COS:
             return
     directions.append(direction)
+
+
+def is_simple_closed_seam_occurrence(indices, vertices):
+    return (
+        len(indices) == 2
+        and indices[0] == 0
+        and indices[1] == len(vertices) - 1
+        and length_xz(vertices[0].point().position(), vertices[-1].point().position()) <= CHAIN_ENDPOINT_TOLERANCE
+    )
+
+
+def classify_primitive_topology(prim):
+    vertices = list(prim.vertices())
+    points = []
+    point_numbers = []
+    prim_occurrences = {}
+    seen_point_numbers = set()
+
+    for vertex_idx, vertex in enumerate(vertices):
+        try:
+            point = vertex.point()
+            pos = point.position()
+            point_number = point.number()
+        except Exception:
+            continue
+        seen_point_numbers.add(point_number)
+        prim_occurrences.setdefault(point_number, []).append(vertex_idx)
+        if points and length_xz(points[-1], pos) <= EPS:
+            continue
+        points.append(pos)
+        point_numbers.append(point_number)
+
+    closed_loop_seam_point_numbers = set()
+    protected_self_touch_point_numbers = set()
+    for point_number, indices in prim_occurrences.items():
+        if len(indices) <= 1:
+            continue
+        if is_simple_closed_seam_occurrence(indices, vertices):
+            closed_loop_seam_point_numbers.add(point_number)
+        else:
+            protected_self_touch_point_numbers.add(point_number)
+
+    is_implicit_primitive_closed = primitive_is_closed(prim) and len(points) >= 3
+    if is_implicit_primitive_closed and not closed_chain_endpoint_match(points, point_numbers):
+        points.append(points[0])
+        point_numbers.append(point_numbers[0])
+
+    endpoint_closed = closed_chain_endpoint_match(points, point_numbers)
+    if endpoint_closed:
+        for point_number in (point_numbers[0], point_numbers[-1]):
+            if point_number not in protected_self_touch_point_numbers:
+                closed_loop_seam_point_numbers.add(point_number)
+
+    if protected_self_touch_point_numbers:
+        topology_kind = "self_touch"
+    elif endpoint_closed:
+        topology_kind = "closed_ring"
+    else:
+        topology_kind = "open_chain"
+
+    return {
+        "prim": prim,
+        "vertices": vertices,
+        "points": points,
+        "point_numbers": point_numbers,
+        "prim_occurrences": prim_occurrences,
+        "seen_point_numbers": seen_point_numbers,
+        "closed_loop_seam_point_numbers": closed_loop_seam_point_numbers,
+        "protected_self_touch_point_numbers": protected_self_touch_point_numbers,
+        "is_implicit_primitive_closed": is_implicit_primitive_closed,
+        "endpoint_closed": endpoint_closed,
+        "topology_kind": topology_kind,
+    }
 
 
 def turn_candidate_indices(points, point_numbers, shared_point_numbers):
@@ -299,29 +407,38 @@ def point_at_distance(points, distances, distance):
     return points[-1]
 
 
-def extract_interval(points, distances, start, end):
+def point_number_at_distance(point_numbers, distances, distance, eps=0.01):
+    for idx, marker in enumerate(distances):
+        if abs(marker - distance) <= eps:
+            return point_numbers[idx]
+    return None
+
+
+def extract_interval(points, point_numbers, distances, start, end):
     if end - start <= 0.05:
         return []
     out = []
-    append_unique(out, point_at_distance(points, distances, start), eps=0.01)
+    append_unique_ref(
+        out,
+        point_at_distance(points, distances, start),
+        point_number_at_distance(point_numbers, distances, start),
+        eps=0.01,
+    )
     for idx, distance in enumerate(distances):
         if start + 0.01 < distance < end - 0.01:
-            append_unique(out, points[idx], eps=0.01)
-    append_unique(out, point_at_distance(points, distances, end), eps=0.01)
+            append_unique_ref(out, points[idx], point_numbers[idx], eps=0.01)
+    append_unique_ref(
+        out,
+        point_at_distance(points, distances, end),
+        point_number_at_distance(point_numbers, distances, end),
+        eps=0.01,
+    )
     return out if len(out) >= 2 else []
 
 
 def clean_road_points(prim):
-    points = []
-    point_numbers = []
-    for vertex in prim.vertices():
-        point = vertex.point()
-        pos = point.position()
-        if points and length_xz(points[-1], pos) <= EPS:
-            continue
-        points.append(pos)
-        point_numbers.append(point.number())
-    return points, point_numbers
+    topology = classify_primitive_topology(prim)
+    return topology["points"], topology["point_numbers"]
 
 
 def nearest_boundary_indices(idx, point_numbers, shared_point_numbers):
@@ -336,6 +453,18 @@ def nearest_boundary_indices(idx, point_numbers, shared_point_numbers):
             next_idx = scan
             break
     return prev_idx, next_idx
+
+
+def adjacent_candidate_walk_limit(candidate_indices, distances, order):
+    cur_s = distances[candidate_indices[order]]
+    limit = CURVE_DISTANCE
+    if order > 0:
+        prev_s = distances[candidate_indices[order - 1]]
+        limit = min(limit, max(0.0, (cur_s - prev_s) * 0.5))
+    if order + 1 < len(candidate_indices):
+        next_s = distances[candidate_indices[order + 1]]
+        limit = min(limit, max(0.0, (next_s - cur_s) * 0.5))
+    return limit
 
 
 def incident_degree(points, vertex_idx):
@@ -490,6 +619,9 @@ def passthrough(status, fallbacks=0, message=""):
     set_global("road_turn_curve_smooth_candidate_bends", 0)
     set_global("road_turn_curve_smooth_processed_bends", 0)
     set_global("road_turn_curve_smooth_skipped_bends", 0)
+    set_global("road_turn_curve_smooth_spacing_limited_bends", 0)
+    set_global("road_turn_curve_smooth_short_walk_bends", 0)
+    set_global("road_turn_curve_smooth_closed_loop_seams", 0)
     set_global("road_turn_curve_smooth_fallbacks", int(fallbacks))
     if message:
         set_global("road_turn_curve_smooth_message", str(message)[:240])
@@ -521,37 +653,57 @@ else:
                 pass
 
         point_usage = {}
+        same_prim_repeated_point_numbers = set()
+        closed_loop_seam_point_numbers = set()
         point_incident_directions = {}
+        primitive_topologies = []
         for prim in geo_in.prims():
-            seen = set()
-            vertices = list(prim.vertices())
-            for vertex_idx, vertex in enumerate(vertices):
+            topology = classify_primitive_topology(prim)
+            primitive_topologies.append(topology)
+            points = topology["points"]
+            point_numbers = topology["point_numbers"]
+            for point_idx, point_number in enumerate(point_numbers):
                 try:
-                    point_number = vertex.point().number()
-                    pos = vertex.point().position()
-                    seen.add(point_number)
-                    if vertex_idx > 0:
-                        prev_pos = vertices[vertex_idx - 1].point().position()
+                    pos = points[point_idx]
+                    if point_idx > 0:
+                        prev_pos = points[point_idx - 1]
                         direction = normalize_xz(*vec_xz(pos, prev_pos))
                         add_unique_direction(point_incident_directions.setdefault(point_number, []), direction)
-                    if vertex_idx + 1 < len(vertices):
-                        next_pos = vertices[vertex_idx + 1].point().position()
+                    if point_idx + 1 < len(points):
+                        next_pos = points[point_idx + 1]
                         direction = normalize_xz(*vec_xz(pos, next_pos))
                         add_unique_direction(point_incident_directions.setdefault(point_number, []), direction)
                 except Exception:
                     pass
-            for point_number in seen:
+            closed_loop_seam_point_numbers.update(topology["closed_loop_seam_point_numbers"])
+            same_prim_repeated_point_numbers.update(topology["protected_self_touch_point_numbers"])
+            for point_number in topology["seen_point_numbers"]:
                 point_usage[point_number] = point_usage.get(point_number, 0) + 1
-        shared_point_numbers = {
+        topological_shared_point_numbers = {
             point_number
             for point_number, count in point_usage.items()
-            if count > 1 and len(point_incident_directions.get(point_number, ())) >= 3
+            if count > 1
         }
+        repeated_point_numbers = set(same_prim_repeated_point_numbers)
+        junction_point_numbers = {
+            point_number
+            for point_number, directions in point_incident_directions.items()
+            if len(directions) >= 3
+        }
+        # Valence-two endpoint joins should be chain-merged and smoothed like an
+        # ordinary turn. Only true junctions/repeated self-touch points stop
+        # turn smoothing; repeated points fix the "smooth creates a gap" case.
+        protected_point_numbers = set(repeated_point_numbers) | set(junction_point_numbers)
+        shared_point_numbers = set(protected_point_numbers)
 
         candidate_bends = 0
         processed_bends = 0
         skipped_bends = 0
+        spacing_limited_bends = 0
+        short_walk_bends = 0
         output_point_by_key = {}
+        output_point_by_input_number = {}
+        protected_endpoint_clusters = 0
 
         def point_key(pos):
             return (
@@ -559,23 +711,43 @@ else:
                 round(float(pos[2]) / REUSE_TOLERANCE),
             )
 
-        def shared_point(pos):
+        def shared_point(pos, source_point_number=None):
+            if source_point_number is not None:
+                point = output_point_by_input_number.get(source_point_number)
+                if point is not None:
+                    return point
             key = point_key(pos)
             point = output_point_by_key.get(key)
             if point is not None and length_xz(point.position(), pos) <= REUSE_TOLERANCE:
+                if source_point_number is not None:
+                    output_point_by_input_number[source_point_number] = point
                 return point
             point = geo.createPoint()
             point.setPosition(pos)
             output_point_by_key[key] = point
+            if source_point_number is not None:
+                output_point_by_input_number[source_point_number] = point
             return point
 
-        def add_polyline(points, src_prim, is_arc):
-            if len(points) < 2:
+        def normalize_point_refs(point_refs):
+            out = []
+            for item in point_refs:
+                try:
+                    pos, point_number = item
+                except Exception:
+                    pos = item
+                    point_number = None
+                append_unique_ref(out, pos, point_number, eps=0.01)
+            return out
+
+        def add_polyline(point_refs, src_prim, is_arc):
+            refs = normalize_point_refs(point_refs)
+            if len(refs) < 2:
                 return None
             poly = geo.createPolygon()
             poly.setIsClosed(False)
-            for pos in points:
-                poly.addVertex(shared_point(pos))
+            for pos, point_number in refs:
+                poly.addVertex(shared_point(pos, point_number))
             copy_prim_attrs(src_prim, poly, dst_attrs)
             try:
                 poly.setAttribValue(arc_attr, 1 if is_arc else 0)
@@ -589,12 +761,89 @@ else:
                         pass
             return poly
 
+        def attach_protected_endpoint_clusters(chains):
+            global protected_endpoint_clusters
+            by_key = {}
+
+            def cluster_key(pos):
+                return (
+                    round(float(pos[0]) / PROTECTED_CLUSTER_TOLERANCE),
+                    round(float(pos[2]) / PROTECTED_CLUSTER_TOLERANCE),
+                )
+
+            def neighbor_keys(key):
+                for dx in (-1, 0, 1):
+                    for dz in (-1, 0, 1):
+                        yield key[0] + dx, key[1] + dz
+
+            def find_cluster(pos):
+                key = cluster_key(pos)
+                for near_key in neighbor_keys(key):
+                    refs = by_key.get(near_key)
+                    if refs and length_xz(refs[0]["pos"], pos) <= PROTECTED_CLUSTER_TOLERANCE:
+                        return near_key
+                return key
+
+            for chain_idx, chain in enumerate(chains):
+                points = chain["points"]
+                point_numbers = chain["point_numbers"]
+                if not points:
+                    continue
+                for endpoint_idx in (0, len(points) - 1):
+                    key = find_cluster(points[endpoint_idx])
+                    by_key.setdefault(key, []).append({
+                        "chain_idx": chain_idx,
+                        "point_idx": endpoint_idx,
+                        "pos": points[endpoint_idx],
+                        "point_number": point_numbers[endpoint_idx],
+                        "endpoint": True,
+                    })
+                for point_idx, point_number in enumerate(point_numbers):
+                    if point_number in protected_point_numbers:
+                        key = find_cluster(points[point_idx])
+                        by_key.setdefault(key, []).append({
+                            "chain_idx": chain_idx,
+                            "point_idx": point_idx,
+                            "pos": points[point_idx],
+                            "point_number": point_number,
+                            "endpoint": False,
+                        })
+
+            for refs in by_key.values():
+                if len(refs) < 2:
+                    continue
+                has_endpoint = any(ref["endpoint"] for ref in refs)
+                has_interior = any(not ref["endpoint"] for ref in refs)
+                if not (has_endpoint and has_interior):
+                    continue
+                protected_number = None
+                for ref in refs:
+                    if not ref["endpoint"] and ref["point_number"] in protected_point_numbers:
+                        protected_number = ref["point_number"]
+                        break
+                if protected_number is None:
+                    protected_number = refs[0]["point_number"]
+                for ref in refs:
+                    if ref["endpoint"]:
+                        chain = chains[ref["chain_idx"]]
+                        chain["point_numbers"][ref["point_idx"]] = protected_number
+                        protected_point_numbers.add(protected_number)
+                        shared_point_numbers.add(protected_number)
+                        protected_endpoint_clusters += 1
+
         def build_chains():
             roads = []
-            for prim in geo_in.prims():
-                pts, nums = clean_road_points(prim)
+            for topology in primitive_topologies:
+                pts = topology["points"]
+                nums = topology["point_numbers"]
                 if len(pts) >= 2:
-                    roads.append({"src_prim": prim, "points": pts, "point_numbers": nums})
+                    roads.append({
+                        "src_prim": topology["prim"],
+                        "points": pts,
+                        "point_numbers": nums,
+                        "endpoint_closed": topology["endpoint_closed"],
+                        "topology_kind": topology["topology_kind"],
+                    })
 
             endpoint_map = {}
 
@@ -618,6 +867,8 @@ else:
                 return grid_key
 
             for road_idx, road in enumerate(roads):
+                if road["endpoint_closed"]:
+                    continue
                 pts = road["points"]
                 for endpoint_idx in (0, len(pts) - 1):
                     key = endpoint_cluster_key(pts[endpoint_idx])
@@ -739,6 +990,7 @@ else:
                     "points": points,
                     "point_numbers": point_numbers,
                 })
+            attach_protected_endpoint_clusters(chains)
             return chains
 
         for chain in build_chains():
@@ -746,13 +998,14 @@ else:
             points = chain["points"]
             point_numbers = chain["point_numbers"]
             if len(points) < 3:
-                add_polyline(points, prim, False)
+                add_polyline(list(zip(points, point_numbers)), prim, False)
                 continue
             distances = cumulative_lengths(points)
             total = distances[-1]
             turns = []
             last_end = -1.0
-            for idx in turn_candidate_indices(points, point_numbers, shared_point_numbers):
+            candidate_indices = turn_candidate_indices(points, point_numbers, shared_point_numbers)
+            for candidate_order, idx in enumerate(candidate_indices):
                 prev_boundary_idx, next_boundary_idx = nearest_boundary_indices(
                     idx, point_numbers, shared_point_numbers
                 )
@@ -772,13 +1025,19 @@ else:
                     continue
                 before_len = distances[idx] - distances[prev_boundary_idx]
                 after_len = distances[next_boundary_idx] - distances[idx]
-                walk_distance = min(CURVE_DISTANCE, before_len * 0.45, after_len * 0.45)
-                if walk_distance < MIN_BRANCH_DISTANCE:
+                base_walk_distance = min(CURVE_DISTANCE, before_len * 0.45, after_len * 0.45)
+                spacing_walk_limit = adjacent_candidate_walk_limit(candidate_indices, distances, candidate_order)
+                walk_distance = min(base_walk_distance, spacing_walk_limit)
+                if walk_distance < base_walk_distance - EPS:
+                    spacing_limited_bends += 1
+                if walk_distance < MIN_TURN_WALK_DISTANCE:
                     skipped_bends += 1
                     continue
+                if walk_distance < MIN_BRANCH_DISTANCE:
+                    short_walk_bends += 1
                 start_s = distances[idx] - walk_distance
                 end_s = distances[idx] + walk_distance
-                if start_s <= last_end + 0.05:
+                if start_s < last_end - TURN_WINDOW_JOIN_TOLERANCE:
                     skipped_bends += 1
                     continue
                 turn = {
@@ -800,14 +1059,14 @@ else:
                 processed_bends += 1
 
             if not turns:
-                add_polyline(points, prim, False)
+                add_polyline(list(zip(points, point_numbers)), prim, False)
                 continue
             cursor = 0.0
             for turn in turns:
-                add_polyline(extract_interval(points, distances, cursor, turn["start_s"]), prim, False)
+                add_polyline(extract_interval(points, point_numbers, distances, cursor, turn["start_s"]), prim, False)
                 add_polyline(turn["arc_points"], prim, True)
                 cursor = turn["end_s"]
-            add_polyline(extract_interval(points, distances, cursor, total), prim, False)
+            add_polyline(extract_interval(points, point_numbers, distances, cursor, total), prim, False)
 
             set_global("road_turn_curve_smooth_status", "smoothed")
             set_global("road_turn_curve_smooth_enabled", int(ENABLED))
@@ -815,7 +1074,12 @@ else:
             set_global("road_turn_curve_smooth_candidate_bends", int(candidate_bends))
             set_global("road_turn_curve_smooth_processed_bends", int(processed_bends))
             set_global("road_turn_curve_smooth_skipped_bends", int(skipped_bends))
+            set_global("road_turn_curve_smooth_spacing_limited_bends", int(spacing_limited_bends))
+            set_global("road_turn_curve_smooth_short_walk_bends", int(short_walk_bends))
             set_global("road_turn_curve_smooth_output_prims", int(geo.intrinsicValue("primitivecount")))
+            set_global("road_turn_curve_smooth_protected_points", int(len(protected_point_numbers)))
+            set_global("road_turn_curve_smooth_protected_endpoint_clusters", int(protected_endpoint_clusters))
+            set_global("road_turn_curve_smooth_closed_loop_seams", int(len(closed_loop_seam_point_numbers)))
             set_global("road_turn_curve_smooth_fallbacks", 0)
     except Exception as exc:
         passthrough("fallback", 1, "{}: {}".format(type(exc).__name__, exc))
