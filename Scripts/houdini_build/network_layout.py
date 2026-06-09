@@ -18,6 +18,51 @@ class NetworkGroup:
     nodes: tuple[str, ...]
 
 
+NODE_NOTES: dict[str, str] = {
+    "osm_import": "[输入] 读取 active_area 指定范围的 OSM/地图道路与建筑原始数据。",
+    "dem_import": "[地形] 读取当前区域 DEM 高程栅格并转为 Houdini 几何。",
+    "dem_terrain": "[地形] 将 DEM 点云/网格整理为可贴附的基础地形。",
+    "dem_cut_and_fill": "[地形] 对道路附近地形做局部挖填，减少道路穿插与悬空。",
+    "dem_subdivide": "[地形] 细分地形，作为道路和建筑贴地的 snap target。",
+    "terrain_color": "[地形] 给最终地形写入基础显示颜色。",
+    "extract_buildings": "[建筑] 从 OSM/地图数据中提取建筑 footprint。",
+    "snap_bld_to_terrain": "[建筑] 将建筑 footprint 贴合到地形高度。",
+    "procedural_height": "[建筑] 根据楼层、类型或默认规则生成建筑高度。",
+    "fix_normals": "[建筑] 修正建筑面法线方向，为挤出和渲染做准备。",
+    "fix_winding": "[建筑] 统一 footprint 顶点绕序，避免反面和异常挤出。",
+    "promote_height": "[建筑] 将高度信息提升/整理到后续节点可读取的属性。",
+    "fuse_bld": "[建筑] 合并重复建筑点，减少缝隙和碎片。",
+    "divide_bld": "[建筑] 清理建筑多边形拓扑，保证后续 bevel/extrude 稳定。",
+    "restore_height": "[建筑] 在拓扑清理后恢复建筑高度属性。",
+    "bld_footprint_bevel": "[建筑] 对建筑 footprint 做倒角，软化直角轮廓。",
+    "extrude_buildings": "[建筑] 按高度挤出建筑体块。",
+    "post_normals": "[建筑] 重新计算建筑最终法线。",
+    "bld_clipped": "[建筑] 按当前区域边界裁剪建筑主体。",
+    "bld_color": "[建筑] 给建筑主体写入基础显示颜色。",
+    "bld_foundation": "[建筑] 生成建筑地基，遮盖坡地贴合处的缝隙。",
+    "bld_foundation_clipped": "[建筑] 按当前区域边界裁剪建筑地基。",
+    "bld_foundation_color": "[建筑] 给建筑地基写入基础显示颜色。",
+    "bld_with_foundation_merge": "[建筑] 合并建筑主体与地基。",
+    "bld_with_foundation": "[建筑] 输出带地基的最终建筑几何。",
+    "road_api_raw_lines": "[道路] 从地图 API/OSM 属性生成原始道路中心线。",
+    "road_api_shared_topology": "[道路] 建立共享拓扑，融合端点并补齐交叉关系。",
+    "road_centerline_resample": "[道路] 统一中心线点距，同时保留关键转角。",
+    "road_turn_curve_smooth": "[道路] 平滑普通道路硬转角；不处理真实路口。",
+    "road_vertex_cleanup": "[道路] 清理并均匀化道路顶点，保持共享点连接。",
+    "road_junction_curve_smooth": "[道路] 在真实路口附近重写局部中心线并生成相切圆弧。",
+    "snap_road_strips": "[道路] 将道路中心线/面点贴合到当前地形。",
+    "road_bbox_clip": "[道路] 按当前区域边界裁剪道路几何。",
+    "snap_road_clipped": "[道路] 裁剪后再次贴地，避免边界处高度漂移。",
+    "road_clipped": "[道路] 标记并输出区域内道路几何。",
+    "road_profile_apply": "[道路] 根据 road_profiles.json 注入车道数、车道宽、人行道和路缘属性。",
+    "road_curb_variation": "[道路] 注入路缘微小起伏属性，增加道路细节变化。",
+    "road_color": "[道路] 给最终道路输出写入基础显示颜色。",
+    "merge_all": "[总装] 合并建筑、道路和地形为城市总输出。",
+    "OUT_city": "[总装] 最终城市输出节点，供视口、导出和 QA 使用。",
+    "road_junction_tangent_arcs": "[旧实验] 早期路口相切圆弧实验节点；不属于当前主道路链路。",
+}
+
+
 GROUPS: tuple[NetworkGroup, ...] = (
     NetworkGroup(
         key="inputs",
@@ -136,6 +181,37 @@ def _add_node_to_box(box, node) -> None:
         box.addItem(node)
 
 
+def apply_node_notes(hou, obj_path: str) -> int:
+    """Write stable role comments onto known generated nodes."""
+    updated = 0
+    display_comment_flag = None
+    try:
+        display_comment_flag = hou.nodeFlag.DisplayComment
+    except Exception:
+        pass
+
+    for name, note in NODE_NOTES.items():
+        node = hou.node(obj_path + "/" + name)
+        if node is None:
+            continue
+        try:
+            node.setComment(note)
+            updated += 1
+        except Exception:
+            continue
+        if display_comment_flag is not None:
+            try:
+                node.setGenericFlag(display_comment_flag, True)
+                continue
+            except Exception:
+                pass
+        try:
+            node.setDisplayComment(True)
+        except Exception:
+            pass
+    return updated
+
+
 def _place_group(hou, nodes, group_index: int) -> None:
     x = group_index * COLUMN_SPACING
     y = 0.0
@@ -166,6 +242,7 @@ def _expand_box_bounds(hou, box) -> None:
 def apply_domain_network_layout(hou, net, obj_path: str) -> None:
     """Create visual domain lanes and network boxes without touching geometry."""
     _destroy_old_boxes(net)
+    noted = apply_node_notes(hou, obj_path)
 
     created = 0
     for group_index, group in enumerate(GROUPS):
@@ -199,4 +276,4 @@ def apply_domain_network_layout(hou, net, obj_path: str) -> None:
         _expand_box_bounds(hou, box)
         created += 1
 
-    print("  Houdini 网络分组: {} 个 [VC] Network Box 已更新".format(created))
+    print("  Houdini 网络分组: {} 个 [VC] Network Box 已更新；{} 个节点备注已写入".format(created, noted))
