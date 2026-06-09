@@ -35,7 +35,8 @@ from app.area_picker.software_paths import (
 )
 
 _HTML = area_picker_template.HTML
-APP_VERSION = "2026-06-08-panel-selection-tools-v27"
+FRONTEND_ROOT = area_picker_template.FRONTEND_ROOT
+APP_VERSION = "10-06-26_v2.23"
 STARTED_AT = time.strftime("%Y-%m-%d %H:%M:%S")
 AUTO_SHUTDOWN_ON_SUCCESS = os.environ.get("VC_AREA_PICKER_AUTO_SHUTDOWN") == "1"
 NO_BROWSER = os.environ.get("VC_AREA_PICKER_NO_BROWSER") == "1"
@@ -306,6 +307,7 @@ def _data_sources_status() -> dict:
             'provider': 'OpenStreetMap',
             'method': 'OSM highway ways · Overpass API',
             'strategy': sources.get('roads') or 'tile_cache_osm_else_overpass_v1',
+            'strategy_label': '本地缓存优先，缺失时通过 Overpass API 获取 OSM highway ways',
             'current': _source_mode(cfg, 'roads'),
             'file': _file_status(cfg.get('osm_file')),
         },
@@ -315,6 +317,7 @@ def _data_sources_status() -> dict:
             'provider': 'Overture Maps + Google Open Buildings',
             'method': 'Overture 轮廓 · Google 高度补全',
             'strategy': sources.get('buildings') or 'tile_cache_overture_else_overture_api_v1',
+            'strategy_label': '本地缓存优先，缺失时用 Overture 轮廓并用 Google 高度补全',
             'current': _source_mode(cfg, 'buildings'),
             'file': _file_status(cfg.get('buildings_file')),
         },
@@ -324,6 +327,7 @@ def _data_sources_status() -> dict:
             'provider': dem_source.upper() if dem_source != 'unknown' else 'DEM',
             'method': 'FABDEM DTM 优先 · NASADEM 兜底',
             'strategy': sources.get('dem') or 'fabdem_else_tile_cache_else_nasadem_v1',
+            'strategy_label': 'FABDEM DTM 优先，本地缓存命中直接恢复，失败时 NASADEM 兜底',
             'current': _source_mode(cfg, 'terrain') + f' · source={dem_source}',
             'file': _file_status(cfg.get('dem_csv')),
         },
@@ -946,6 +950,9 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path.startswith('/static/'):
             self._static(parsed.path)
             return
+        if parsed.path.startswith('/area-picker/'):
+            self._frontend_static(parsed.path)
+            return
         if parsed.path == '/tiles':
             try:
                 params = urllib.parse.parse_qs(parsed.query)
@@ -1294,6 +1301,30 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Type', ctype)
         self.send_header('Content-Length', str(len(body)))
         self.send_header('Cache-Control', 'public, max-age=86400')
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _frontend_static(self, request_path: str):
+        rel = urllib.parse.unquote(request_path[len('/area-picker/'):]).replace('\\', '/').lstrip('/')
+        target = (FRONTEND_ROOT / rel).resolve()
+        try:
+            target.relative_to(FRONTEND_ROOT.resolve())
+        except ValueError:
+            self.send_response(403)
+            self.end_headers()
+            return
+        if not target.exists() or not target.is_file():
+            self.send_response(404)
+            self.end_headers()
+            return
+        body = target.read_bytes()
+        ctype = mimetypes.guess_type(target.name)[0] or 'application/octet-stream'
+        self.send_response(200)
+        self.send_header('Content-Type', ctype)
+        self.send_header('Content-Length', str(len(body)))
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
         self.end_headers()
         self.wfile.write(body)
 

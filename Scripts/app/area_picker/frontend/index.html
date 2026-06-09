@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>VirtualCity — 固定网格框选器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/leaflet/leaflet.css"/>
+<link rel="stylesheet" href="/static/leaflet-draw/leaflet.draw.css"/>
+<link rel="stylesheet" href="/area-picker/styles.css?v=__VERSION__"/>
+
+</head>
+<body>
+<div id="toolbar">
+  <div class="brand-lockup">
+    <div class="brand-copy">
+      <h1>CITYENGUNE</h1>
+    </div>
+    <span class="version-chip">__VERSION__</span>
+  </div>
+  <div class="toolbar-cluster"></div>
+</div>
+<main id="workspace">
+  <div id="map-shell">
+    <div id="map">
+      <div id="selection-tools" class="map-tool-control" aria-label="区域选择工具">
+        <!-- Icons: Lucide, ISC license. -->
+        <button type="button" class="map-tool-button map-tool-rectangle" title="框选网格" aria-label="框选网格">
+          <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+          </svg>
+        </button>
+        <button type="button" class="map-tool-button map-tool-point" title="点选网格" aria-label="点选网格">
+          <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"></path>
+          </svg>
+        </button>
+        <button type="button" class="map-tool-button map-tool-clear" title="清空选择" aria-label="清空选择" disabled>
+          <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M10 11v6"></path>
+            <path d="M14 11v6"></path>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+            <path d="M3 6h18"></path>
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <aside id="control-panel" aria-label="区域操作面板">
+    <section class="panel-section">
+      <div class="location-search">
+        <form id="location-search-form" class="location-search-row">
+          <input id="location-search-input" type="search" autocomplete="off" placeholder="例如 Thailand、Tokyo、New York、Pattaya">
+          <button id="location-search-btn" class="search-btn" type="submit">搜索</button>
+        </form>
+      </div>
+    </section>
+    <section class="panel-section">
+      <div class="section-row">
+        <div>
+          <div class="section-kicker">数据源</div>
+          <div id="source-status" class="section-note">选取区域预先下载地图数据加快Houdini自动管线构建速度</div>
+        </div>
+        <button id="download-btn" disabled onclick="downloadData()" class="source-action-btn">
+          <span class="btn-main">下载地图数据</span>
+          <span class="btn-sub">OSM / DEM / 建筑</span>
+        </button>
+      </div>
+      <div id="source-list" class="source-list">
+        <div class="source-card">
+          <div class="source-head">
+            <span class="source-title">道路</span>
+          </div>
+          <div class="source-provider">数据源：OpenStreetMap</div>
+          <div class="source-detail">策略：本地缓存优先，缺失时通过 Overpass API 获取 OSM highway ways</div>
+          <div class="source-file">--</div>
+        </div>
+        <div class="source-card">
+          <div class="source-head">
+            <span class="source-title">建筑</span>
+          </div>
+          <div class="source-provider">数据源：Overture Maps + Google Open Buildings</div>
+          <div class="source-detail">策略：本地缓存优先，缺失时用 Overture 轮廓并用 Google 高度补全</div>
+          <div class="source-file">--</div>
+        </div>
+        <div class="source-card">
+          <div class="source-head">
+            <span class="source-title">地形</span>
+          </div>
+          <div class="source-provider">数据源：FABDEM / NASADEM</div>
+          <div class="source-detail">策略：FABDEM DTM 优先，本地缓存命中直接恢复，失败时 NASADEM 兜底</div>
+          <div class="source-file">--</div>
+        </div>
+      </div>
+    </section>
+  </aside>
+  <aside id="action-panel" aria-label="执行操作面板">
+    <div class="action-panel-head">
+      <div>
+        <div class="section-kicker">执行工作流</div>
+        <div class="section-note">当前框选区域</div>
+      </div>
+    </div>
+    <section class="action-module" aria-label="数据处理">
+      <div class="action-module-head">
+        <div class="action-module-title">数据处理</div>
+        <div class="action-module-state">数据准备</div>
+      </div>
+      <div class="action-grid">
+        <button type="button" disabled class="action-btn placeholder-btn" title="建筑数据清洗入口待接入">
+          <span class="btn-main">建筑</span>
+          <span class="btn-sub">待接入</span>
+        </button>
+        <button type="button" disabled class="action-btn placeholder-btn" title="地形数据清洗入口待接入">
+          <span class="btn-main">地形</span>
+          <span class="btn-sub">待接入</span>
+        </button>
+        <button type="button" disabled class="action-btn placeholder-btn" title="自然数据处理入口待接入">
+          <span class="btn-main">自然</span>
+          <span class="btn-sub">待接入</span>
+        </button>
+        <button type="button" disabled class="action-btn placeholder-btn" title="道路数据处理入口待接入">
+          <span class="btn-main">道路</span>
+          <span class="btn-sub">待接入</span>
+        </button>
+      </div>
+    </section>
+    <section class="action-module" aria-label="软件链接">
+      <div class="action-module-head">
+        <div class="action-module-title">软件链接</div>
+        <div class="action-module-state">本地会话</div>
+      </div>
+      <div class="houdini-status-stack" aria-label="Houdini 状态">
+        <div class="software-path-editor">
+          <input id="houdini-path-input" type="text" spellcheck="false" placeholder="输入 Houdini 软件路径，例如 D:\houdini21\bin\houdini.exe">
+        </div>
+        <div id="houdini-path-note" class="software-path-note">未设置软件路径</div>
+        <button id="houdini-badge" type="button" class="badge badge-warn" onclick="openOrProbeHoudini()" title="未连接时启动路径里的 Houdini；已连接时刷新状态">打开 Houdini</button>
+        <div id="houdini-connection-row" class="status-row status-warn">
+          <span class="status-label">软件连接</span>
+          <span id="houdini-connection-value" class="status-value">待检查</span>
+        </div>
+        <div id="houdini-asset-row" class="status-row status-warn">
+          <span class="status-label">模型资产</span>
+          <span id="houdini-asset-value" class="status-value">等待生成</span>
+        </div>
+        <div id="houdini-export-row" class="status-row status-warn">
+          <span class="status-label">导出就绪</span>
+          <span id="houdini-export-value" class="status-value">等待资产</span>
+        </div>
+      </div>
+      <div class="action-grid">
+        <button id="run-btn" disabled onclick="runPipeline()" class="action-btn">
+          <span class="btn-main">Houdini 生成</span>
+          <span class="btn-sub">完整构建 + QA</span>
+        </button>
+        <button id="export-btn" disabled onclick="exportFbx()" class="action-btn">
+          <span class="btn-main">导出 FBX</span>
+          <span class="btn-sub">审核后资产</span>
+        </button>
+      </div>
+    </section>
+    <section class="action-module" aria-label="执行状态">
+      <div class="action-module-head">
+        <div class="action-module-title">执行状态</div>
+        <div id="run-status-chip" class="action-module-state">待命</div>
+      </div>
+      <div id="run-status-panel" class="run-status-panel status-warn">
+        <div class="run-status-head">
+          <div id="run-status-title" class="run-state">等待选择区域</div>
+          <div id="run-status-pct" class="run-pct">0%</div>
+        </div>
+        <div class="run-progress-track" aria-label="执行进度">
+          <div id="run-status-bar" class="run-progress-bar"></div>
+        </div>
+        <div id="run-status-detail" class="run-status-detail">尚未启动任务</div>
+        <div id="failure-summary" class="failure-summary" hidden>
+          <div class="failure-row reason">
+            <span class="failure-key">原因</span>
+            <span id="failure-reason" class="failure-value">--</span>
+          </div>
+          <div class="failure-row report">
+            <span class="failure-key">报告</span>
+            <span id="failure-report" class="failure-value">--</span>
+          </div>
+          <div class="failure-row metrics">
+            <span class="failure-key">指标</span>
+            <span id="failure-metrics" class="failure-value">--</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </aside>
+</main>
+<div id="progress-container">
+  <div id="progress-bar-wrap">
+    <div id="progress-bar" style="width:0%"></div>
+    <div id="progress-text">0%</div>
+  </div>
+  <div id="step-label">准备中...</div>
+</div>
+<div id="console-dock">
+  <div id="log-tabs">
+    <button class="tab-btn active" onclick="switchTab('all')">完整控制台</button>
+    <button class="tab-btn" onclick="switchTab('clean')">离线精炼</button>
+    <button class="tab-btn" onclick="switchTab('houdini')">Houdini 算子</button>
+    <button class="tab-btn" onclick="switchTab('qa')">QA 质量审查</button>
+  </div>
+  <div id="log-panels-container">
+    <div id="log-panel-all" class="log-panel">等待选择网格...</div>
+    <div id="log-panel-clean" class="log-panel" style="display:none">等待数据下载或精炼...</div>
+    <div id="log-panel-houdini" class="log-panel" style="display:none">等待 Houdini RPYC 执行...</div>
+    <div id="log-panel-qa" class="log-panel" style="display:none">等待 Model QA 诊断报告...</div>
+  </div>
+</div>
+
+<script src="/static/leaflet/leaflet.js"></script>
+<script src="/static/leaflet-draw/leaflet.draw.js"></script>
+<script>
+window.VC_CONFIG = {
+  lat: __LAT__,
+  lon: __LON__,
+  version: "__VERSION__",
+  maxSelectionTiles: __MAX_SELECTION_TILES__,
+  shutdownWithPage: __SHUTDOWN_WITH_PAGE__
+};
+</script>
+<script src="/area-picker/app.js?v=__VERSION__"></script>
+</body>
+</html>
