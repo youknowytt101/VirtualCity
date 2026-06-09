@@ -33,6 +33,9 @@ SMOOTH_ITERATIONS = max(0, int("__SMOOTH_ITERATIONS__"))
 MAX_JUNCTIONS = max(50, int("__MAX_JUNCTIONS__"))
 REUSE_TOLERANCE = max(0.001, float("__REUSE_TOLERANCE__"))
 THROUGH_ANGLE_DEG = 150.0
+CUT_INSERT_REPLACE_DISTANCE = max(0.05, min(0.75, ARC_SPACING * 0.75))
+MIN_WALK_DISTANCE = max(0.5, min(MIN_BRANCH_DISTANCE, ARC_SPACING * 0.75))
+T_JUNCTION_SIDE_MAX_ANGLE_DEG = max(MAX_ANGLE_DEG, 170.0)
 EPS = 1.0e-8
 
 
@@ -141,15 +144,34 @@ def point_at_distance(points, distances, distance):
     return points[-1]
 
 
-def extract_interval(points, distances, start, end):
+def extract_interval(points, distances, start, end, forced_distances=None):
     if end - start <= 0.05:
         return []
-    out = []
-    append_unique(out, point_at_distance(points, distances, start), eps=0.01)
+    forced = []
+    if forced_distances:
+        for distance in forced_distances:
+            if start - CUT_INSERT_REPLACE_DISTANCE <= distance <= end + CUT_INSERT_REPLACE_DISTANCE:
+                if not any(abs(distance - existing) <= 0.01 for existing in forced):
+                    forced.append(distance)
+
+    samples = [(start, None), (end, None)]
     for idx, distance in enumerate(distances):
         if start + 0.01 < distance < end - 0.01:
-            append_unique(out, points[idx], eps=0.01)
-    append_unique(out, point_at_distance(points, distances, end), eps=0.01)
+            if any(abs(distance - forced_distance) <= CUT_INSERT_REPLACE_DISTANCE for forced_distance in forced):
+                continue
+            samples.append((distance, points[idx]))
+    for distance in forced:
+        if start + 0.01 < distance < end - 0.01:
+            samples.append((distance, None))
+    samples.sort(key=lambda item: item[0])
+
+    out = []
+    last_distance = None
+    for distance, pos in samples:
+        if last_distance is not None and abs(distance - last_distance) <= 0.01:
+            continue
+        append_unique(out, pos if pos is not None else point_at_distance(points, distances, distance), eps=0.01)
+        last_distance = distance
     return out if len(out) >= 2 else []
 
 
@@ -204,6 +226,11 @@ def sample_branch(road, vertex_idx, direction, distance):
         cur = nxt
     tangent = normalize_xz(*vec_xz(points[vertex_idx], cur))
     return cur, tangent
+
+
+def branch_cut_distance(road, branch):
+    junction_s = road["distances"][branch["vertex_idx"]]
+    return junction_s + branch["direction"] * branch["walk_distance"]
 
 
 def line_intersection_2d(p, r, q, s):
@@ -409,6 +436,7 @@ else:
                     pass
 
             trim_windows = {}
+            forced_insert_distances = {}
             arc_records = []
             processed_junctions = 0
             skipped_junctions = 0
@@ -439,7 +467,7 @@ else:
 
                 shortest = min(branch["available"] for branch in raw_branches)
                 walk_distance = min(CURVE_DISTANCE, shortest * 0.45 if shortest < CURVE_DISTANCE * 2.2 else CURVE_DISTANCE)
-                if walk_distance < MIN_BRANCH_DISTANCE:
+                if walk_distance < MIN_WALK_DISTANCE:
                     skipped_junctions += 1
                     continue
 
@@ -488,7 +516,10 @@ else:
                         continue
                     gap = angle_delta_ccw(branch_a["angle"], branch_b["angle"])
                     gap_deg = math.degrees(gap)
-                    if gap_deg < MIN_ANGLE_DEG or gap_deg > MAX_ANGLE_DEG:
+                    max_pair_angle = MAX_ANGLE_DEG
+                    if len(branches) == 3 and through_keys:
+                        max_pair_angle = T_JUNCTION_SIDE_MAX_ANGLE_DEG
+                    if gap_deg < MIN_ANGLE_DEG or gap_deg > max_pair_angle:
                         continue
                     arc_points = build_tangent_arc(branch_a, branch_b, junction_pos)
                     if not arc_points:
@@ -496,6 +527,11 @@ else:
                     local_arcs.append((arc_points, branch_a, branch_b))
                     branch_arc_count[key_a] = branch_arc_count.get(key_a, 0) + 1
                     branch_arc_count[key_b] = branch_arc_count.get(key_b, 0) + 1
+                    for branch in (branch_a, branch_b):
+                        road = roads[branch["road_idx"]]
+                        forced_insert_distances.setdefault(branch["road_idx"], []).append(
+                            branch_cut_distance(road, branch)
+                        )
 
                 if not local_arcs:
                     skipped_junctions += 1
@@ -511,7 +547,7 @@ else:
                         continue
                     road = roads[branch["road_idx"]]
                     junction_s = road["distances"][branch["vertex_idx"]]
-                    cut_s = junction_s + branch["direction"] * branch["walk_distance"]
+                    cut_s = branch_cut_distance(road, branch)
                     start = min(junction_s, cut_s)
                     end = max(junction_s, cut_s)
                     trim_windows.setdefault(branch["road_idx"], []).append((start, end))
@@ -561,7 +597,11 @@ else:
                 total = distances[-1]
                 windows = sorted(trim_windows.get(road_idx, []))
                 if not windows:
-                    add_polyline(road["points"], src_prim, False)
+                    forced_distances = forced_insert_distances.get(road_idx, ())
+                    if forced_distances:
+                        add_polyline(extract_interval(road["points"], distances, 0.0, total, forced_distances), src_prim, False)
+                    else:
+                        add_polyline(road["points"], src_prim, False)
                     continue
                 merged = []
                 for start, end in windows:
@@ -575,12 +615,13 @@ else:
                         merged.append((start, end))
                 cursor = 0.0
                 emitted = 0
+                forced_distances = forced_insert_distances.get(road_idx, ())
                 for start, end in merged:
-                    interval = extract_interval(road["points"], distances, cursor, start)
+                    interval = extract_interval(road["points"], distances, cursor, start, forced_distances)
                     if add_polyline(interval, src_prim, False):
                         emitted += 1
                     cursor = max(cursor, end)
-                interval = extract_interval(road["points"], distances, cursor, total)
+                interval = extract_interval(road["points"], distances, cursor, total, forced_distances)
                 if add_polyline(interval, src_prim, False):
                     emitted += 1
                 if emitted:

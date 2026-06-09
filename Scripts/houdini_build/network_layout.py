@@ -73,6 +73,8 @@ GROUPS: tuple[NetworkGroup, ...] = (
             "road_api_raw_lines",
             "road_api_shared_topology",
             "road_centerline_resample",
+            "road_turn_curve_smooth",
+            "road_vertex_cleanup",
             "road_junction_curve_smooth",
             "snap_road_strips",
             "road_bbox_clip",

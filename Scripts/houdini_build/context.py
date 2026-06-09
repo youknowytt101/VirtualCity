@@ -17,7 +17,8 @@ DEFAULT_COLORS = {
 FULL_REFRESH_CHAIN = [
     "osm_import", "dem_terrain", "dem_cut_and_fill", "dem_subdivide",
     "extract_buildings", "snap_bld_to_terrain", "bld_footprint_bevel", "extrude_buildings", "post_normals",
-    "road_api_raw_lines", "road_api_shared_topology", "road_centerline_resample", "road_junction_curve_smooth",
+    "road_api_raw_lines", "road_api_shared_topology", "road_centerline_resample", "road_turn_curve_smooth",
+    "road_vertex_cleanup", "road_junction_curve_smooth",
     "snap_road_strips", "road_bbox_clip", "snap_road_clipped",
     "bld_clipped", "bld_foundation", "bld_foundation_clipped",
     "road_clipped", "road_profile_apply", "road_curb_variation", "road_color",
@@ -26,7 +27,8 @@ FULL_REFRESH_CHAIN = [
 ]
 
 QUICK_ROAD_REFRESH_CHAIN = [
-    "road_api_raw_lines", "road_api_shared_topology", "road_centerline_resample", "road_junction_curve_smooth",
+    "road_api_raw_lines", "road_api_shared_topology", "road_centerline_resample", "road_turn_curve_smooth",
+    "road_vertex_cleanup", "road_junction_curve_smooth",
     "snap_road_strips", "road_bbox_clip", "snap_road_clipped",
     "road_clipped", "road_profile_apply", "road_curb_variation", "road_color", "OUT_city",
 ]
@@ -72,6 +74,19 @@ class BuildContext:
     road_junction_curve_smooth_arc_spacing_m: float = 1.0
     road_junction_curve_smooth_iterations: int = 1
     road_junction_curve_smooth_max_junctions: int = 800
+    road_turn_curve_smooth_enabled: bool = True
+    road_turn_curve_smooth_distance_m: float = 5.0
+    road_turn_curve_smooth_min_branch_distance_m: float = 2.0
+    road_turn_curve_smooth_min_angle_deg: float = 25.0
+    road_turn_curve_smooth_max_angle_deg: float = 155.0
+    road_turn_curve_smooth_arc_spacing_m: float = 1.0
+    road_turn_curve_smooth_iterations: int = 1
+    road_turn_curve_smooth_max_bends: int = 2000
+    road_vertex_cleanup_enabled: bool = True
+    road_vertex_cleanup_spacing_m: float = 2.0
+    road_vertex_cleanup_min_spacing_m: float = 0.75
+    road_vertex_cleanup_anchor_angle_deg: float = 20.0
+    road_vertex_cleanup_reuse_tolerance_m: float = 0.05
     colors: dict[str, tuple[float, float, float]] = field(default_factory=lambda: dict(DEFAULT_COLORS))
 
     @classmethod
@@ -125,6 +140,21 @@ class BuildContext:
             ),
             road_junction_curve_smooth_iterations=int(cfg.get("road_junction_curve_smooth_iterations", 1)),
             road_junction_curve_smooth_max_junctions=int(cfg.get("road_junction_curve_smooth_max_junctions", 800)),
+            road_turn_curve_smooth_enabled=bool(cfg.get("road_turn_curve_smooth_enabled", True)),
+            road_turn_curve_smooth_distance_m=float(cfg.get("road_turn_curve_smooth_distance_m", 5.0)),
+            road_turn_curve_smooth_min_branch_distance_m=float(
+                cfg.get("road_turn_curve_smooth_min_branch_distance_m", 2.0)
+            ),
+            road_turn_curve_smooth_min_angle_deg=float(cfg.get("road_turn_curve_smooth_min_angle_deg", 25.0)),
+            road_turn_curve_smooth_max_angle_deg=float(cfg.get("road_turn_curve_smooth_max_angle_deg", 155.0)),
+            road_turn_curve_smooth_arc_spacing_m=float(cfg.get("road_turn_curve_smooth_arc_spacing_m", 1.0)),
+            road_turn_curve_smooth_iterations=int(cfg.get("road_turn_curve_smooth_iterations", 1)),
+            road_turn_curve_smooth_max_bends=int(cfg.get("road_turn_curve_smooth_max_bends", 2000)),
+            road_vertex_cleanup_enabled=bool(cfg.get("road_vertex_cleanup_enabled", True)),
+            road_vertex_cleanup_spacing_m=float(cfg.get("road_vertex_cleanup_spacing_m", 2.0)),
+            road_vertex_cleanup_min_spacing_m=float(cfg.get("road_vertex_cleanup_min_spacing_m", 0.75)),
+            road_vertex_cleanup_anchor_angle_deg=float(cfg.get("road_vertex_cleanup_anchor_angle_deg", 20.0)),
+            road_vertex_cleanup_reuse_tolerance_m=float(cfg.get("road_vertex_cleanup_reuse_tolerance_m", 0.05)),
         )
 
     @property

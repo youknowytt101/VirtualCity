@@ -840,6 +840,8 @@ class QA:
             "road_api_raw_lines",
             "road_api_shared_topology",
             "road_centerline_resample",
+            "road_turn_curve_smooth",
+            "road_vertex_cleanup",
             "road_junction_curve_smooth",
             "road_clipped",
             "road_color",

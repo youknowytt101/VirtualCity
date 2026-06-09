@@ -5,43 +5,48 @@ HTML = r"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <title>VirtualCity — 固定网格框选器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/leaflet/leaflet.css"/>
 <link rel="stylesheet" href="/static/leaflet-draw/leaflet.draw.css"/>
 <style>
 :root {
-  --surface: #141615;
-  --surface-2: #1b1e1c;
-  --surface-3: #232724;
-  --line: #343a35;
-  --line-soft: rgba(255,255,255,0.08);
-  --text: #f0f3ef;
-  --muted: #aab2aa;
-  --subtle: #79837c;
-  --teal: #21b6a8;
-  --teal-strong: #18a092;
-  --green: #7fc36a;
-  --amber: #d59b38;
-  --red: #e07168;
-  --blue: #2f80c8;
-  --shadow: 0 18px 45px rgba(0,0,0,0.32);
+  --base: #0b0f0e;
+  --text: #eef7f4;
+  --accent: #35d4c4;
+  --surface: var(--base);
+  --surface-2: var(--base);
+  --surface-3: var(--base);
+  --line: color-mix(in srgb, var(--text) 18%, var(--base));
+  --line-soft: color-mix(in srgb, var(--text) 10%, transparent);
+  --muted: color-mix(in srgb, var(--text) 70%, var(--base));
+  --subtle: color-mix(in srgb, var(--text) 45%, var(--base));
+  --teal: var(--accent);
+  --teal-strong: var(--accent);
+  --green: var(--accent);
+  --amber: var(--accent);
+  --red: var(--accent);
+  --blue: var(--accent);
+  --shadow: 0 18px 45px color-mix(in srgb, var(--base) 82%, transparent);
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
   margin: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', 'Segoe UI', Arial, sans-serif;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   height: 100vh;
   overflow: hidden;
-  background: #0f1110;
+  background: var(--base);
   color: var(--text);
 }
 button, input { font: inherit; }
 #toolbar {
   min-height: 64px;
   padding: 10px 18px;
-  background: linear-gradient(180deg, #171a18, #111311);
+  background: var(--base);
   color: var(--text);
   display: flex;
   align-items: center;
@@ -53,31 +58,13 @@ button, input { font: inherit; }
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-.brand-mark {
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(33,182,168,0.48);
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  color: #dffff9;
-  background: linear-gradient(135deg, rgba(33,182,168,0.2), rgba(127,195,106,0.12));
-  font-size: 13px;
-  font-weight: 800;
+  gap: 10px;
 }
 #toolbar h1 {
   margin: 0;
-  font-size: 17px;
+  font-size: 30px;
   font-weight: 750;
   line-height: 1.15;
-}
-.brand-copy p {
-  margin: 3px 0 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.2;
 }
 .toolbar-cluster {
   display: flex;
@@ -92,13 +79,13 @@ button, input { font: inherit; }
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--muted);
-  background: rgba(255,255,255,0.04);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
   border: 1px solid var(--line-soft);
   border-radius: 999px;
   padding: 6px 10px;
   font-size: 12px;
 }
-.status-line { color: #d3ddd5; }
+.status-line { color: var(--muted); }
 #workspace {
   position: relative;
   min-height: 0;
@@ -107,7 +94,7 @@ button, input { font: inherit; }
   grid-template-columns: minmax(320px, 382px) minmax(0, 1fr) minmax(300px, 326px);
   grid-template-areas: "controls map actions";
   gap: 0;
-  background: #080a09;
+  background: var(--base);
 }
 #map-shell {
   grid-area: map;
@@ -123,7 +110,7 @@ button, input { font: inherit; }
 #map .map-tool-control {
   position: absolute;
   left: 14px;
-  bottom: 14px;
+  top: 14px;
   z-index: 480;
 }
 #control-panel {
@@ -191,7 +178,7 @@ button, input { font: inherit; }
   gap: 10px;
 }
 .action-module-title {
-  color: #dfe7df;
+  color: var(--text);
   font-size: 12px;
   font-weight: 800;
 }
@@ -200,8 +187,8 @@ button, input { font: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #9fcac2;
-  background: rgba(255,255,255,0.04);
+  color: var(--muted);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
   border: 1px solid var(--line-soft);
   border-radius: 999px;
   padding: 3px 7px;
@@ -218,7 +205,7 @@ button, input { font: inherit; }
   gap: 8px;
   min-height: 32px;
   padding: 7px 8px;
-  background: rgba(255,255,255,0.035);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
   border: 1px solid var(--line-soft);
   border-radius: 6px;
 }
@@ -231,13 +218,13 @@ button, input { font: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #d7ddd7;
+  color: var(--muted);
   font-size: 11.5px;
   font-weight: 760;
 }
-.status-ok .status-value { color: #b9efa9; }
-.status-warn .status-value { color: #ffe3a9; }
-.status-off .status-value { color: #ffaca6; }
+.status-ok .status-value,
+.status-warn .status-value,
+.status-off .status-value { color: var(--accent); }
 #houdini-badge {
   width: 100%;
   min-height: 34px;
@@ -254,7 +241,7 @@ button, input { font: inherit; }
   min-height: 34px;
   padding: 7px 8px;
   color: var(--text);
-  background: rgba(255,255,255,0.035);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
   border: 1px solid var(--line-soft);
   border-radius: 6px;
   font-size: 11.5px;
@@ -262,7 +249,7 @@ button, input { font: inherit; }
   outline: none;
 }
 .software-path-editor input:focus {
-  border-color: rgba(33,182,168,0.65);
+  border-color: var(--accent);
 }
 .software-path-note {
   min-height: 14px;
@@ -275,7 +262,7 @@ button, input { font: inherit; }
   display: grid;
   gap: 8px;
   padding: 9px;
-  background: rgba(255,255,255,0.035);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
   border: 1px solid var(--line-soft);
   border-radius: 6px;
 }
@@ -290,12 +277,12 @@ button, input { font: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #d7ddd7;
+  color: var(--muted);
   font-size: 12px;
   font-weight: 800;
 }
 .run-pct {
-  color: #9fcac2;
+  color: var(--accent);
   font-family: Consolas, 'Cascadia Mono', monospace;
   font-size: 11px;
   font-weight: 800;
@@ -304,14 +291,14 @@ button, input { font: inherit; }
   position: relative;
   height: 8px;
   overflow: hidden;
-  background: #080a09;
+  background: var(--base);
   border: 1px solid var(--line);
   border-radius: 999px;
 }
 .run-progress-bar {
   width: 0%;
   height: 100%;
-  background: linear-gradient(90deg, #137e75, #21b6a8);
+  background: var(--accent);
   border-radius: 999px;
   transition: width 0.3s ease, background 0.2s ease;
 }
@@ -347,25 +334,25 @@ button, input { font: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #d7ddd7;
+  color: var(--muted);
 }
 .failure-row.reason .failure-value {
-  color: #ffaca6;
+  color: var(--accent);
 }
 .failure-row.metrics .failure-value {
-  color: #ffe3a9;
+  color: var(--accent);
 }
 .run-status-panel.status-ok .run-state,
 .run-status-panel.status-ok .run-pct {
-  color: #b9efa9;
+  color: var(--accent);
 }
 .run-status-panel.status-off .run-state,
 .run-status-panel.status-off .run-pct {
-  color: #ffaca6;
+  color: var(--accent);
 }
 .run-status-panel.status-warn .run-state,
 .run-status-panel.status-warn .run-pct {
-  color: #ffe3a9;
+  color: var(--accent);
 }
 .panel-section {
   padding-bottom: 12px;
@@ -382,7 +369,7 @@ button, input { font: inherit; }
   gap: 10px;
 }
 .section-kicker {
-  color: #dfe7df;
+  color: var(--text);
   font-size: 13px;
   font-weight: 750;
 }
@@ -397,9 +384,9 @@ button, input { font: inherit; }
   max-width: 250px;
   min-height: 28px;
   padding: 5px 9px;
-  color: #dbfff9;
-  background: rgba(33,182,168,0.14);
-  border: 1px solid rgba(33,182,168,0.26);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 14%, var(--base));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--base));
   border-radius: 999px;
   font-size: 11px;
   overflow: hidden;
@@ -410,8 +397,8 @@ button, input { font: inherit; }
   min-height: 74px;
   margin-top: 10px;
   padding: 10px;
-  color: #c7f3e9;
-  background: #0d0f0e;
+  color: var(--text);
+  background: var(--base);
   border: 1px solid var(--line);
   border-radius: 6px;
   font-family: Consolas, 'Cascadia Mono', monospace;
@@ -419,6 +406,52 @@ button, input { font: inherit; }
   line-height: 1.55;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+.location-search {
+  display: grid;
+  gap: 8px;
+}
+.location-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.location-search input {
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 10px;
+  color: var(--text);
+  background: var(--base);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+}
+.location-search input:focus {
+  border-color: var(--accent);
+}
+.search-btn {
+  min-height: 38px;
+  padding: 8px 12px;
+  color: var(--base);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.search-btn:disabled {
+  color: var(--subtle);
+  background: color-mix(in srgb, var(--text) 6%, var(--base));
+  border-color: var(--line);
+  cursor: wait;
+}
+.search-status {
+  min-height: 16px;
+  color: var(--subtle);
+  font-size: 11px;
+  line-height: 1.35;
 }
 .metric-grid {
   display: grid;
@@ -428,7 +461,7 @@ button, input { font: inherit; }
 .metric {
   min-height: 52px;
   padding: 8px 10px;
-  background: rgba(255,255,255,0.04);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
   border: 1px solid var(--line-soft);
   border-radius: 6px;
   display: flex;
@@ -481,7 +514,7 @@ button, input { font: inherit; }
 }
 .source-card {
   padding: 9px 10px;
-  background: rgba(255,255,255,0.04);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
   border: 1px solid var(--line-soft);
   border-radius: 6px;
 }
@@ -501,16 +534,16 @@ button, input { font: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #dffdf7;
-  background: rgba(33,182,168,0.12);
-  border: 1px solid rgba(33,182,168,0.24);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 12%, var(--base));
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--base));
   border-radius: 999px;
   padding: 3px 7px;
   font-size: 10.5px;
 }
 .source-provider {
   margin-top: 6px;
-  color: #d9e2d9;
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.35;
 }
@@ -522,7 +555,7 @@ button, input { font: inherit; }
 }
 .source-file {
   margin-top: 5px;
-  color: #91cfc6;
+  color: var(--accent);
   font-family: Consolas, 'Cascadia Mono', monospace;
   font-size: 10.5px;
   line-height: 1.35;
@@ -532,8 +565,8 @@ button, input { font: inherit; }
   min-width: 112px;
   min-height: 44px;
   padding: 7px 9px;
-  color: #041614;
-  background: #c6d6d2;
+  color: var(--base);
+  background: var(--text);
   border: 1px solid transparent;
   border-radius: 6px;
   cursor: pointer;
@@ -544,8 +577,8 @@ button, input { font: inherit; }
   filter: brightness(1.04);
 }
 .source-action-btn:disabled {
-  color: #818982;
-  background: rgba(255,255,255,0.06);
+  color: var(--subtle);
+  background: color-mix(in srgb, var(--text) 6%, var(--base));
   border-color: var(--line-soft);
   cursor: not-allowed;
 }
@@ -554,10 +587,10 @@ button, input { font: inherit; }
 }
 .source-action-btn .btn-sub {
   font-size: 10px;
-  color: rgba(4,22,20,0.72);
+  color: color-mix(in srgb, var(--base) 72%, var(--text));
 }
 .source-action-btn:disabled .btn-sub {
-  color: #646d66;
+  color: var(--subtle);
 }
 .filter {
   min-height: 34px;
@@ -566,7 +599,7 @@ button, input { font: inherit; }
   display: inline-flex;
   gap: 8px;
   align-items: center;
-  background: rgba(255,255,255,0.04);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
   border: 1px solid var(--line-soft);
   border-radius: 6px;
   padding: 6px 9px;
@@ -589,14 +622,14 @@ button, input { font: inherit; }
   font-weight: 700;
 }
 .badge-ok {
-  background: rgba(127,195,106,0.16);
-  border-color: rgba(127,195,106,0.36);
-  color: #d9f7ce;
+  background: color-mix(in srgb, var(--accent) 16%, var(--base));
+  border-color: color-mix(in srgb, var(--accent) 36%, var(--base));
+  color: var(--text);
 }
 .badge-warn {
-  background: rgba(213,155,56,0.16);
-  border-color: rgba(213,155,56,0.38);
-  color: #ffe3a9;
+  background: color-mix(in srgb, var(--accent) 16%, var(--base));
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--base));
+  color: var(--text);
 }
 .badge:hover:not(:disabled) { filter: brightness(1.12); }
 .badge:disabled { opacity: 0.78; cursor: wait; }
@@ -612,7 +645,7 @@ button, input { font: inherit; }
   border-radius: 6px;
   cursor: pointer;
   text-align: left;
-  color: #041614;
+  color: var(--base);
   background: var(--teal);
   transition: transform 0.15s ease, filter 0.15s ease, background 0.15s ease;
 }
@@ -621,8 +654,8 @@ button, input { font: inherit; }
   filter: brightness(1.06);
 }
 .action-btn:disabled {
-  color: #818982;
-  background: rgba(255,255,255,0.06);
+  color: var(--subtle);
+  background: color-mix(in srgb, var(--text) 6%, var(--base));
   border-color: var(--line-soft);
   cursor: not-allowed;
 }
@@ -635,50 +668,50 @@ button, input { font: inherit; }
 .btn-sub {
   display: block;
   margin-top: 4px;
-  color: rgba(4,22,20,0.74);
+  color: color-mix(in srgb, var(--base) 74%, var(--text));
   font-size: 11px;
   line-height: 1.25;
 }
-.action-btn:disabled .btn-sub { color: #646d66; }
+.action-btn:disabled .btn-sub { color: var(--subtle); }
 .placeholder-btn,
 .placeholder-btn:disabled {
-  color: #737c75;
-  background: rgba(255,255,255,0.035);
+  color: var(--subtle);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
   border-color: var(--line-soft);
   cursor: not-allowed;
 }
 .placeholder-btn .btn-sub,
 .placeholder-btn:disabled .btn-sub {
-  color: #5f6861;
+  color: var(--subtle);
 }
 #export-btn { background: var(--amber); }
-#download-btn { background: #c6d6d2; }
+#download-btn { background: var(--text); }
 #run-btn:disabled,
 #export-btn:disabled,
 #download-btn:disabled {
-  color: #818982;
-  background: rgba(255,255,255,0.06);
+  color: var(--subtle);
+  background: color-mix(in srgb, var(--text) 6%, var(--base));
   border-color: var(--line-soft);
   cursor: not-allowed;
 }
 #run-btn:disabled .btn-sub,
 #export-btn:disabled .btn-sub,
 #download-btn:disabled .btn-sub {
-  color: #646d66;
+  color: var(--subtle);
 }
 #legend {
   position: absolute;
   z-index: 450;
   right: 12px;
-  bottom: 12px;
-  background: rgba(20,22,21,0.92);
-  color: #e5ebe5;
-  border: 1px solid rgba(255,255,255,0.12);
+  top: 12px;
+  background: color-mix(in srgb, var(--base) 92%, transparent);
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--text) 12%, transparent);
   border-radius: 8px;
   padding: 9px 11px;
   font-size: 12px;
   line-height: 1.7;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.22);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--base) 78%, transparent);
 }
 .swatch {
   display: inline-block;
@@ -686,10 +719,10 @@ button, input { font: inherit; }
   height: 12px;
   margin-right: 7px;
   vertical-align: -1px;
-  border: 1px solid #87908a;
+  border: 1px solid var(--muted);
 }
 .swatch-empty { background: transparent; border-color: var(--blue); }
-.swatch-dim { background: rgba(6,8,7,0.62); border-color: #232724; }
+.swatch-dim { background: color-mix(in srgb, var(--base) 62%, transparent); border-color: var(--line); }
 .leaflet-control-zoom {
   display: none;
 }
@@ -697,7 +730,7 @@ button, input { font: inherit; }
   flex: 0 0 auto;
   display: flex;
   overflow: hidden;
-  background: #0d0f0e;
+  background: var(--base);
   border: 1px solid var(--line);
   border-radius: 6px;
   box-shadow: none;
@@ -710,8 +743,8 @@ button, input { font: inherit; }
   place-items: center;
   border: 0;
   border-right: 1px solid var(--line);
-  background: #0d0f0e;
-  color: #f2f6f1;
+  background: var(--base);
+  color: var(--text);
   cursor: pointer;
 }
 .map-tool-control button:last-child {
@@ -719,8 +752,8 @@ button, input { font: inherit; }
 }
 .map-tool-control button:hover:not(:disabled),
 .map-tool-control button.active {
-  background: #1b1e1c;
-  color: #ffffff;
+  background: color-mix(in srgb, var(--text) 8%, var(--base));
+  color: var(--text);
 }
 .map-tool-control button:disabled {
   cursor: default;
@@ -740,6 +773,9 @@ button, input { font: inherit; }
 .point-select-active .leaflet-tile {
   cursor: crosshair;
 }
+.leaflet-tile-pane .leaflet-tile {
+  filter: grayscale(1) saturate(0) contrast(1.22) brightness(0.92);
+}
 .leaflet-touch .leaflet-bar a {
   width: 32px;
   height: 32px;
@@ -748,11 +784,11 @@ button, input { font: inherit; }
 #progress-container {
   display: none;
   padding: 10px 18px;
-  background: #111311;
+  background: var(--base);
   border-top: 1px solid var(--line);
 }
 #progress-bar-wrap {
-  background: #080a09;
+  background: var(--base);
   border-radius: 6px;
   height: 22px;
   overflow: hidden;
@@ -761,10 +797,10 @@ button, input { font: inherit; }
 }
 #progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #137e75, #21b6a8);
+  background: var(--accent);
   border-radius: 6px;
   transition: width 0.4s ease;
-  box-shadow: 0 0 10px rgba(33,182,168,0.36);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 36%, transparent);
 }
 #progress-text {
   position: absolute;
@@ -774,21 +810,21 @@ button, input { font: inherit; }
   justify-content: center;
   font-size: 12px;
   font-weight: 800;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.55);
+  color: var(--text);
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--base) 55%, transparent);
 }
 #step-label {
-  color: #bfeee7;
+  color: var(--accent);
   font-size: 12px;
   margin-top: 6px;
 }
 #console-dock {
   min-height: 166px;
-  background: #080a09;
+  background: var(--base);
   border-top: 1px solid var(--line);
 }
 #log-tabs {
-  background: #111311;
+  background: var(--base);
   display: flex;
   align-items: flex-end;
   gap: 4px;
@@ -799,7 +835,7 @@ button, input { font: inherit; }
   min-height: 32px;
   background: transparent;
   border: 1px solid transparent;
-  color: #8e9991;
+  color: var(--subtle);
   font-family: inherit;
   font-size: 12px;
   font-weight: 750;
@@ -810,18 +846,18 @@ button, input { font: inherit; }
   transition: background 0.15s ease, color 0.15s ease;
 }
 .tab-btn:hover {
-  color: #c5d0c7;
-  background: rgba(255,255,255,0.05);
+  color: var(--muted);
+  background: color-mix(in srgb, var(--text) 5%, var(--base));
 }
 .tab-btn.active {
-  color: #dffdf7;
+  color: var(--text);
   border-color: var(--line);
-  background: #080a09;
+  background: var(--base);
 }
 .log-panel {
   height: 132px;
-  background: #080a09;
-  color: #92d5ca;
+  background: var(--base);
+  color: var(--accent);
   font-family: Consolas, 'Cascadia Mono', monospace;
   font-size: 11.5px;
   line-height: 1.45;
@@ -829,10 +865,10 @@ button, input { font: inherit; }
   overflow-y: auto;
   white-space: pre-wrap;
 }
-.ok  { color: #b9efa9; }
-.err { color: #ffaca6; }
-.dim { color: #7f8a83; }
-.step { color: #7cd9cd; font-weight: 800; }
+.ok,
+.err,
+.step { color: var(--accent); font-weight: 800; }
+.dim { color: var(--subtle); }
 @media (max-width: 980px) {
   body {
     height: auto;
@@ -921,15 +957,12 @@ button, input { font: inherit; }
 <body>
 <div id="toolbar">
   <div class="brand-lockup">
-    <div class="brand-mark">VC</div>
     <div class="brand-copy">
-      <h1>CityEngine</h1>
-      <p>固定 1km UTM 网格 · 数据缓存 · Houdini 构建</p>
+      <h1>CITYENGUNE</h1>
     </div>
-  </div>
-  <div class="toolbar-cluster">
     <span class="version-chip">__VERSION__</span>
   </div>
+  <div class="toolbar-cluster"></div>
 </div>
 <main id="workspace">
   <div id="map-shell">
@@ -964,31 +997,11 @@ button, input { font: inherit; }
   </div>
   <aside id="control-panel" aria-label="区域操作面板">
     <section class="panel-section">
-      <div class="selection-title-row">
-        <div>
-          <div class="section-kicker">区域选择</div>
-          <div class="section-note">连续矩形网格块</div>
-        </div>
-      </div>
-      <div id="area-id-chip">未选择区域</div>
-      <div id="tile-display">尚未框选网格</div>
-      <div class="data-overview">
-        <div class="section-row">
-          <div>
-            <div class="section-kicker">视口数据</div>
-            <div id="grid-status" class="section-note">加载网格中...</div>
-          </div>
-        </div>
-        <div class="metric-grid">
-          <div class="metric">
-            <span class="metric-label">完整数据区域</span>
-            <span id="downloaded-area-count" class="metric-value">--</span>
-          </div>
-          <div class="metric metric-wide">
-            <span class="metric-label">BBox</span>
-            <span id="selection-bbox" class="metric-value">--</span>
-          </div>
-        </div>
+      <div class="location-search">
+        <form id="location-search-form" class="location-search-row">
+          <input id="location-search-input" type="search" autocomplete="off" placeholder="例如 Thailand、Tokyo、New York、Pattaya">
+          <button id="location-search-btn" class="search-btn" type="submit">搜索</button>
+        </form>
       </div>
     </section>
     <section class="panel-section">
@@ -1029,6 +1042,26 @@ button, input { font: inherit; }
           <div class="source-provider">FABDEM / NASADEM</div>
           <div class="source-detail">DEM CSV</div>
           <div class="source-file">--</div>
+        </div>
+      </div>
+    </section>
+    <section class="panel-section">
+      <div class="data-overview">
+        <div class="section-row">
+          <div>
+            <div class="section-kicker">视口数据</div>
+            <div id="grid-status" class="section-note">加载网格中...</div>
+          </div>
+        </div>
+        <div class="metric-grid">
+          <div class="metric">
+            <span class="metric-label">完整数据区域</span>
+            <span id="downloaded-area-count" class="metric-value">--</span>
+          </div>
+          <div class="metric metric-wide">
+            <span class="metric-label">BBox</span>
+            <span id="selection-bbox" class="metric-value">--</span>
+          </div>
         </div>
       </div>
     </section>
@@ -1172,17 +1205,19 @@ var pendingRestoreLogged = false;
 var rectangleDrawTool = null;
 var pointSelectActive = false;
 var selectionToolButtons = {};
+var gridRenderer = null;
 
 var map = L.map('map', { zoomControl: false }).setView([__LAT__, __LON__], 14);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors', maxZoom: 19
 }).addTo(map);
+gridRenderer = L.canvas({ padding: 0.35 });
 gridLayer = L.layerGroup().addTo(map);
 drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
 rectangleDrawTool = new L.Draw.Rectangle(map, {
-  shapeOptions: { color: '#ffeb3b', weight: 2, fillOpacity: 0.02 }
+  shapeOptions: { color: 'var(--accent)', weight: 2, fillOpacity: 0.02 }
 });
 
 function rectangleToolActive() {
@@ -1242,6 +1277,81 @@ function bindSelectionTools() {
 }
 bindSelectionTools();
 
+function shortSearchTitle(item) {
+  var name = item.name || item.display_name || '';
+  if (name) return name;
+  var display = item.display_name || '';
+  return display.split(',').slice(0, 2).join(', ') || '未知地点';
+}
+
+function searchResultMeta(item) {
+  var parts = [];
+  if (item.type) parts.push(item.type);
+  if (item.class) parts.push(item.class);
+  if (item.display_name) parts.push(item.display_name);
+  return parts.join(' · ');
+}
+
+function focusSearchResult(item) {
+  var lat = parseFloat(item.lat);
+  var lon = parseFloat(item.lon);
+  if (!isFinite(lat) || !isFinite(lon)) return;
+  if (item.boundingbox && item.boundingbox.length === 4) {
+    var south = parseFloat(item.boundingbox[0]);
+    var north = parseFloat(item.boundingbox[1]);
+    var west = parseFloat(item.boundingbox[2]);
+    var east = parseFloat(item.boundingbox[3]);
+    if (isFinite(south) && isFinite(north) && isFinite(west) && isFinite(east) && south < north && west < east) {
+      map.fitBounds([[south, west], [north, east]], { padding: [40, 40], maxZoom: 15 });
+    } else {
+      map.setView([lat, lon], 13);
+    }
+  } else {
+    map.setView([lat, lon], 13);
+  }
+  setText('location-search-status', '已定位：' + shortSearchTitle(item) + '。现在可以点选或框选网格。');
+  scheduleGridLoad();
+}
+
+function bindLocationSearch() {
+  var form = document.getElementById('location-search-form');
+  var input = document.getElementById('location-search-input');
+  var btn = document.getElementById('location-search-btn');
+  if (!form || !input) return;
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    var q = input.value.trim();
+    if (!q) {
+      setText('location-search-status', '请输入国家、地区、城市或地址。');
+      return;
+    }
+    setText('location-search-status', '正在搜索：' + q);
+    if (btn) btn.disabled = true;
+    fetch('/geocode?q=' + encodeURIComponent(q))
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.ok) {
+        setText('location-search-status', d.message || '搜索失败');
+        return;
+      }
+      var items = d.results || [];
+      if (!items.length) {
+        setText('location-search-status', '没有找到匹配地点。');
+        return;
+      }
+      focusSearchResult(items[0]);
+    })
+    .catch(function(e) {
+      setText('location-search-status', '搜索失败：' + e);
+    })
+    .finally(function() {
+      if (btn) btn.disabled = false;
+    });
+  });
+}
+
+bindLocationSearch();
+
 map.on(L.Draw.Event.CREATED, function(e) {
   drawnItems.clearLayers();
   e.layer.setStyle({ opacity: 0, fillOpacity: 0 });
@@ -1294,10 +1404,10 @@ function updateSoftwarePath(paths) {
     note.style.color = '';
   } else if (paths.houdini_exe_exists) {
     note.textContent = '已设置: ' + value;
-    note.style.color = '#b9efa9';
+    note.style.color = 'var(--accent)';
   } else {
     note.textContent = '文件不存在: ' + value;
-    note.style.color = '#ffe3a9';
+    note.style.color = 'var(--accent)';
   }
 }
 
@@ -1315,7 +1425,7 @@ function saveSoftwarePath(refreshAfter) {
     if (d.software_paths) updateSoftwarePath(d.software_paths);
     if (!d.ok && note) {
       note.textContent = d.message || '保存失败';
-      note.style.color = '#ffaca6';
+      note.style.color = 'var(--accent)';
     }
     if (refreshAfter) refreshServiceState();
     return d;
@@ -1323,7 +1433,7 @@ function saveSoftwarePath(refreshAfter) {
   .catch(function(e) {
     if (note) {
       note.textContent = '保存失败: ' + e;
-      note.style.color = '#ffaca6';
+      note.style.color = 'var(--accent)';
     }
     return { ok: false, message: String(e) };
   });
@@ -1376,7 +1486,7 @@ function openOrProbeHoudini() {
       var note = document.getElementById('houdini-path-note');
       if (note) {
         note.textContent = d.message || '启动失败';
-        note.style.color = '#ffaca6';
+        note.style.color = 'var(--accent)';
       }
       refreshServiceState();
       return;
@@ -1387,7 +1497,7 @@ function openOrProbeHoudini() {
     var note = document.getElementById('houdini-path-note');
     if (note) {
       note.textContent = '启动失败: ' + e;
-      note.style.color = '#ffaca6';
+      note.style.color = 'var(--accent)';
     }
     refreshServiceState();
   });
@@ -1412,13 +1522,13 @@ function setRunStatus(state, title, pct, detail) {
   pctEl.textContent = n + '%';
   bar.style.width = n + '%';
   if (state === 'ok') {
-    bar.style.background = 'linear-gradient(90deg, #2e7d32, #a5d6a7)';
+    bar.style.background = 'var(--accent)';
   } else if (state === 'off') {
-    bar.style.background = 'linear-gradient(90deg, #9f2f28, #e07168)';
+    bar.style.background = 'var(--accent)';
   } else if (state === 'warn') {
-    bar.style.background = 'linear-gradient(90deg, #a16a1c, #d59b38)';
+    bar.style.background = 'var(--accent)';
   } else {
-    bar.style.background = 'linear-gradient(90deg, #137e75, #21b6a8)';
+    bar.style.background = 'var(--accent)';
   }
   detailEl.textContent = detail || '等待任务';
 }
@@ -1690,10 +1800,10 @@ function tileStyle(tile) {
   var isSelected = !!selectedTileIds[tile.tile_id];
   var isCached = !!tile.cached;
   return {
-    color: isSelected ? '#f3cf4a' : (isCached ? '#2f80c8' : '#252b28'),
+    color: isSelected ? 'var(--accent)' : (isCached ? 'var(--accent)' : 'var(--line)'),
     weight: isSelected ? 3 : 1,
     opacity: isSelected ? 1.0 : (isCached ? 0.56 : 0.72),
-    fillColor: isSelected ? '#f3cf4a' : (isCached ? '#2f80c8' : '#050706'),
+    fillColor: isSelected ? 'var(--accent)' : (isCached ? 'var(--accent)' : 'var(--base)'),
     fillOpacity: isSelected ? 0.2 : (isCached ? 0.0 : 0.46),
     dashArray: isCached ? null : '4 4'
   };
@@ -1828,7 +1938,7 @@ function restorePendingSelection() {
 function updateTileDisplay() {
   var el = document.getElementById('tile-display');
   if (!selection) {
-    el.textContent = '尚未框选网格';
+    if (el) el.textContent = '尚未框选网格';
     setText('area-id-chip', '未选择区域');
     setText('selection-bbox', '--');
     updateSelectionButtons(false);
@@ -1841,11 +1951,13 @@ function updateTileDisplay() {
   var cacheText = cached === total ? '全部已有本地缓存' : ('已缓存 ' + cached + '/' + total + '，其余运行时下载');
   var bboxText = 'W ' + b[0].toFixed(6) + ' / S ' + b[1].toFixed(6) +
     ' / E ' + b[2].toFixed(6) + ' / N ' + b[3].toFixed(6);
-  el.textContent =
-    selection.selection_id + '\n' +
-    selection.cols + ' x ' + selection.rows + ' 格 · ' +
-    formatKm(selection.width_m) + ' x ' + formatKm(selection.height_m) + ' · ' + cacheText + '\n' +
-    bboxText;
+  if (el) {
+    el.textContent =
+      selection.selection_id + '\n' +
+      selection.cols + ' x ' + selection.rows + ' 格 · ' +
+      formatKm(selection.width_m) + ' x ' + formatKm(selection.height_m) + ' · ' + cacheText + '\n' +
+      bboxText;
+  }
   setText('area-id-chip', selection.selection_id);
   setText('selection-bbox', bboxText);
   updateSelectionButtons(false);
@@ -1999,6 +2111,7 @@ function renderGrid(data) {
     if (tile.cached) cached += 1;
     var options = tileStyle(tile);
     options.interactive = false;
+    options.renderer = gridRenderer;
     var poly = L.polygon(tile.corners, options);
     poly.vcTile = tile;
     poly.addTo(gridLayer);
@@ -2044,7 +2157,7 @@ function loadGrid() {
 
 function scheduleGridLoad() {
   clearTimeout(gridTimer);
-  gridTimer = setTimeout(loadGrid, 120);
+  gridTimer = setTimeout(loadGrid, 40);
 }
 
 map.on('moveend zoomend', scheduleGridLoad);
@@ -2234,7 +2347,7 @@ function pollStatus() {
       document.getElementById('progress-bar').style.width = '100%';
       document.getElementById('progress-text').textContent = '100%';
       if (d.ok) {
-        document.getElementById('progress-bar').style.background = 'linear-gradient(90deg, #2e7d32, #a5d6a7)';
+        document.getElementById('progress-bar').style.background = 'var(--accent)';
         var doneLabel = d.operation === 'download' ? '[OK] 数据下载完成' : '[OK] 生成完成';
         var doneLog = d.operation === 'download' ? '[OK] 数据下载完成！区域: ' : '[OK] 生成完成！区域: ';
         document.getElementById('step-label').textContent = doneLabel;
@@ -2246,7 +2359,7 @@ function pollStatus() {
           setTimeout(function() {
             window.open('', '_self');
             window.close();
-            document.body.innerHTML = '<div style="font-family:Segoe UI,Arial,sans-serif;background:#0f1110;color:#b9efa9;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;"><h2>[OK] VirtualCity 生成完成</h2><p>本地服务已自动停止，可以关闭此页面。</p></div>';
+            document.body.innerHTML = '<div style="font-family:Noto Sans SC,Microsoft YaHei,PingFang SC,Segoe UI,Arial,sans-serif;background:var(--base);color:var(--accent);height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;"><h2>[OK] VirtualCity 生成完成</h2><p>本地服务已自动停止，可以关闭此页面。</p></div>';
           }, 3000);
         } else {
           log('状态服务保持运行，可继续查看 /status 或继续选择网格测试。', 'dim');
@@ -2255,7 +2368,7 @@ function pollStatus() {
           refreshServiceState();
         }
       } else {
-        document.getElementById('progress-bar').style.background = 'linear-gradient(90deg, #c62828, #ef9a9a)';
+        document.getElementById('progress-bar').style.background = 'var(--accent)';
         var failDetail = failureStatusDetail(d.failure_summary, '[FAIL] 管线出错');
         document.getElementById('step-label').textContent = failDetail;
         setRunStatus('off', '失败', d.pct || 0, failDetail);
@@ -2284,7 +2397,7 @@ function submitSelectedArea(endpoint, actionLabel) {
   setFailureSummary(null);
   document.getElementById('progress-container').style.display = 'block';
   document.getElementById('progress-bar').style.width = '0%';
-  document.getElementById('progress-bar').style.background = 'linear-gradient(90deg, #137e75, #21b6a8)';
+  document.getElementById('progress-bar').style.background = 'var(--accent)';
   document.getElementById('progress-text').textContent = '0%';
   document.getElementById('step-label').textContent = '准备中...';
   setRunStatus('warn', '启动中', 0, actionLabel + ': ' + name);

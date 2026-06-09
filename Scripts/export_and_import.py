@@ -36,7 +36,7 @@ if not _pre_gate.get("allowed"):
 # label, 候选SOP（从最终输出往上游兜底）, 输出FBX
 EXPORTS = [
     ('buildings', [f'{_OBJ}/bld_with_foundation', f'{_OBJ}/bld_clipped', f'{_OBJ}/post_normals'], 'buildings_v001.fbx'),
-    ('roads',     [f'{_OBJ}/road_color', f'{_OBJ}/road_profile_apply', f'{_OBJ}/road_clipped', f'{_OBJ}/road_junction_curve_smooth', f'{_OBJ}/road_centerline_resample', f'{_OBJ}/road_api_shared_topology', f'{_OBJ}/road_api_raw_lines'], 'roads_v001.fbx'),
+    ('roads',     [f'{_OBJ}/road_color', f'{_OBJ}/road_profile_apply', f'{_OBJ}/road_clipped', f'{_OBJ}/road_junction_curve_smooth', f'{_OBJ}/road_vertex_cleanup', f'{_OBJ}/road_turn_curve_smooth', f'{_OBJ}/road_centerline_resample', f'{_OBJ}/road_api_shared_topology', f'{_OBJ}/road_api_raw_lines'], 'roads_v001.fbx'),
     ('terrain',   [f'{_OBJ}/terrain_color', f'{_OBJ}/dem_subdivide', f'{_OBJ}/dem_terrain'], 'terrain_v001.fbx'),
 ]
 

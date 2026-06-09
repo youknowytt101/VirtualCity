@@ -38,6 +38,8 @@ class TestSopFilesExist(unittest.TestCase):
         "road_api_raw_lines.py",
         "road_shared_topology.py",
         "road_centerline_resample.py",
+        "road_turn_curve_smooth.py",
+        "road_vertex_cleanup.py",
         "road_junction_curve_smooth.py",
         "road_junction_arc_smoother.py",
         "road_topology_builder.py",
@@ -101,6 +103,24 @@ class TestPythonSopValidity(unittest.TestCase):
                 ENABLED=1,
                 TARGET_SPACING=2.0,
                 PRESERVE_BEND_DEG=8.0,
+            ),
+            "road_turn_curve_smooth.py": dict(
+                ENABLED=1,
+                CURVE_DISTANCE=5.0,
+                MIN_BRANCH_DISTANCE=2.0,
+                MIN_ANGLE_DEG=25.0,
+                MAX_ANGLE_DEG=155.0,
+                ARC_SPACING=1.0,
+                SMOOTH_ITERATIONS=1,
+                MAX_BENDS=2000,
+                REUSE_TOLERANCE=0.01,
+            ),
+            "road_vertex_cleanup.py": dict(
+                ENABLED=1,
+                TARGET_SPACING=2.0,
+                MIN_SPACING=0.75,
+                ANCHOR_ANGLE_DEG=20.0,
+                REUSE_TOLERANCE=0.05,
             ),
             "road_junction_curve_smooth.py": dict(
                 ENABLED=1,
@@ -215,7 +235,66 @@ class TestSentinels(unittest.TestCase):
         self.assertIn("T junctions keep the nearly straight through road untrimmed", text)
         self.assertIn("road_junction_curve_smooth_t_junctions", text)
         self.assertIn("through_keys", text)
+        self.assertIn("forced_insert_distances", text)
+        self.assertIn("branch_cut_distance", text)
+        self.assertIn("MIN_WALK_DISTANCE", text)
+        self.assertIn("T_JUNCTION_SIDE_MAX_ANGLE_DEG", text)
         self.assertIn("original centerline spans near the crossing are trimmed away", text)
+
+    def test_road_turn_curve_smooth_rounds_non_junction_bends(self):
+        text = houdini_sops.load(
+            "road_turn_curve_smooth.py",
+            ENABLED=1,
+            CURVE_DISTANCE=5.0,
+            MIN_BRANCH_DISTANCE=2.0,
+            MIN_ANGLE_DEG=25.0,
+            MAX_ANGLE_DEG=155.0,
+            ARC_SPACING=1.0,
+            SMOOTH_ITERATIONS=1,
+            MAX_BENDS=2000,
+            REUSE_TOLERANCE=0.01,
+        )
+        self.assertIn("road_turn_curve_smooth_status", text)
+        self.assertIn("build_tangent_arc", text)
+        self.assertIn("project_center_to_equal_radii", text)
+        self.assertIn("turn_candidate_indices", text)
+        self.assertIn("local_turn_angle_deg", text)
+        self.assertIn("rotate_closed_chain", text)
+        self.assertIn("ring_turn_angle_deg", text)
+        self.assertIn("ring_distance_markers", text)
+        self.assertIn("cyclic_marker_distance", text)
+        self.assertIn("rdp_indices", text)
+        self.assertIn("point_incident_directions", text)
+        self.assertIn("add_unique_direction", text)
+        self.assertIn("build_chains", text)
+        self.assertIn("mergeable_endpoint", text)
+        self.assertIn("endpoint_direction_groups", text)
+        self.assertIn("CHAIN_ENDPOINT_TOLERANCE", text)
+        self.assertIn("endpoint_cluster_key", text)
+        self.assertIn("chain_endpoint_key", text)
+        self.assertIn("nearest_boundary_indices", text)
+        self.assertIn("shared_point_numbers", text)
+        self.assertIn("road_turn_curve_smooth_processed_bends", text)
+
+    def test_road_vertex_cleanup_evenly_resamples_vertices(self):
+        text = houdini_sops.load(
+            "road_vertex_cleanup.py",
+            ENABLED=1,
+            TARGET_SPACING=2.0,
+            MIN_SPACING=0.75,
+            ANCHOR_ANGLE_DEG=20.0,
+            REUSE_TOLERANCE=0.05,
+        )
+        self.assertIn("road_vertex_cleanup_status", text)
+        self.assertIn("TARGET_SPACING", text)
+        self.assertIn("MIN_SPACING", text)
+        self.assertIn("ANCHOR_ANGLE_DEG", text)
+        self.assertIn("shared_point_numbers", text)
+        self.assertIn("resample_refs", text)
+        self.assertIn("road_vertex_cleanup_close_segments_before", text)
+        self.assertIn("road_vertex_cleanup_close_segments_after", text)
+        self.assertIn("road_vertex_cleanup_reused_shared_points", text)
+        self.assertIn("road_vertex_cleanup_reused_spatial_points", text)
 
 class TestOsmImportCanonical(unittest.TestCase):
     """osm_import SOP（Houdini 内运行）已接入 vc_geo，移除内嵌第 4 份 UTM 实现。"""
@@ -281,11 +360,14 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn('houdini_sops.load("road_api_raw_lines.py"', roads)
         self.assertIn('"road_shared_topology.py"', roads)
         self.assertIn('houdini_sops.load(\n        "road_centerline_resample.py"', roads)
+        self.assertIn('"road_turn_curve_smooth.py"', roads)
+        self.assertIn('"road_vertex_cleanup.py"', roads)
         self.assertIn('"road_junction_curve_smooth.py"', roads)
         self.assertIn("api_raw_node.setInput(0, osm, 0)", roads)
         self.assertIn("\"road_api_shared_topology\"", roads)
         self.assertIn("resample_node.setInput(0, raw_node, 0)", roads)
         self.assertIn("mesh_input=junction_curve_smooth_node", roads)
+        self.assertIn("vertex_cleanup_node", roads)
         self.assertIn("road chain locked", roads)
         self.assertIn('"extract_roads"', roads)
         self.assertIn('"snap_roads_to_terrain1"', roads)
@@ -296,6 +378,8 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn('"road_api_raw_lines",', context)
         self.assertIn('"road_api_shared_topology"', context)
         self.assertIn('"road_centerline_resample",', context)
+        self.assertIn('"road_turn_curve_smooth"', context)
+        self.assertIn('"road_vertex_cleanup"', context)
         self.assertIn('"road_junction_curve_smooth"', context)
         self.assertNotIn("if _road_output_mode == 'surfaces':", text)
         self.assertNotIn("_cfg.get('road_output_mode'", text)
@@ -404,6 +488,8 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn('houdini_sops.load("road_api_raw_lines.py")', roads)
         self.assertIn('"road_shared_topology.py"', roads)
         self.assertIn('"road_centerline_resample.py"', roads)
+        self.assertIn('"road_turn_curve_smooth.py"', roads)
+        self.assertIn('"road_vertex_cleanup.py"', roads)
         self.assertIn('"road_junction_curve_smooth.py"', roads)
         self.assertIn('houdini_sops.load("road_profile_apply.py", ROOT=root_str)', roads)
         self.assertIn('houdini_sops.load("road_curb_variation.py", ROOT=root_str)', roads)
@@ -413,6 +499,8 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn('net.createNode("python", "road_api_raw_lines")', roads)
         self.assertIn('net.createNode("python", node_name)', roads)
         self.assertIn('net.createNode("python", "road_centerline_resample")', roads)
+        self.assertIn('net.createNode("python", "road_turn_curve_smooth")', roads)
+        self.assertIn('net.createNode("python", "road_vertex_cleanup")', roads)
         self.assertIn('net.createNode("python", "road_junction_curve_smooth")', roads)
         self.assertIn('net.createNode("attribwrangle", "snap_road_strips")', roads)
         self.assertIn('net.createNode("python", "road_bbox_clip")', roads)
@@ -441,6 +529,8 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn('"road_api_raw_lines"', layout)
         self.assertIn('"road_api_shared_topology"', layout)
         self.assertIn('"road_centerline_resample"', layout)
+        self.assertIn('"road_turn_curve_smooth"', layout)
+        self.assertIn('"road_vertex_cleanup"', layout)
         self.assertIn('"road_junction_curve_smooth"', layout)
         self.assertNotIn('"road_fragment_cleanup"', layout)
         self.assertIn('"road_color"', layout)
@@ -470,6 +560,7 @@ class TestModelQaRoadChain(unittest.TestCase):
         self.assertIn('"road_api_raw_lines"', text)
         self.assertIn('"road_api_shared_topology"', text)
         self.assertIn('"road_centerline_resample"', text)
+        self.assertIn('"road_vertex_cleanup"', text)
         self.assertIn('"road_junction_curve_smooth"', text)
         self.assertIn('"road_color"', text)
         self.assertIn('"road_clipped_lines"', text)
@@ -493,6 +584,7 @@ class TestExportAndImportChain(unittest.TestCase):
         removed_lane_surface_node = "lane" + "forge_lane_surfaces"
         self.assertNotIn(removed_lane_surface_node, text)
         self.assertIn("f'{_OBJ}/road_centerline_resample'", text)
+        self.assertIn("f'{_OBJ}/road_vertex_cleanup'", text)
         self.assertIn("f'{_OBJ}/road_junction_curve_smooth'", text)
         self.assertIn("f'{_OBJ}/road_api_shared_topology'", text)
         self.assertIn("f'{_OBJ}/road_api_raw_lines'", text)

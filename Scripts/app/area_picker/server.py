@@ -14,7 +14,7 @@ VirtualCity — 交互式区域选择器
     4. 在网页或终端窗口查看管线进度
 """
 
-import sys, json, subprocess, threading, webbrowser, time, os, re, socket, mimetypes, urllib.error, urllib.request, urllib.parse
+import sys, json, subprocess, threading, webbrowser, time, os, re, socket, mimetypes, urllib.error, urllib.request, urllib.parse, importlib
 from pathlib import Path
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
@@ -26,7 +26,7 @@ STATIC_ROOT = SCRIPTS / 'web_assets'
 
 import pipeline_status
 import vc_grid
-from app.area_picker.template import HTML as AREA_PICKER_HTML
+import app.area_picker.template as area_picker_template
 from app.area_picker.software_paths import (
     SOFTWARE_PATHS_FILE,
     read_software_paths as _read_software_paths,
@@ -34,6 +34,7 @@ from app.area_picker.software_paths import (
     write_software_paths as _write_software_paths,
 )
 
+_HTML = area_picker_template.HTML
 APP_VERSION = "2026-06-08-panel-selection-tools-v27"
 STARTED_AT = time.strftime("%Y-%m-%d %H:%M:%S")
 AUTO_SHUTDOWN_ON_SUCCESS = os.environ.get("VC_AREA_PICKER_AUTO_SHUTDOWN") == "1"
@@ -827,7 +828,10 @@ def _get_initial_center():
     except Exception:
         return 12.94, 100.88
 
-_HTML = AREA_PICKER_HTML
+def _template_html():
+    if os.environ.get("VC_AREA_PICKER_TEMPLATE_RELOAD", "1") == "1":
+        importlib.reload(area_picker_template)
+    return area_picker_template.HTML
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -847,6 +851,47 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/selection':
             self._json(_remembered_selection_status())
+            return
+        if parsed.path == '/geocode':
+            params = urllib.parse.parse_qs(parsed.query)
+            query = str(params.get('q', [''])[0]).strip()
+            if not query:
+                self._json({'ok': False, 'message': 'missing query', 'results': []})
+                return
+            try:
+                url = 'https://nominatim.openstreetmap.org/search?' + urllib.parse.urlencode({
+                    'q': query,
+                    'format': 'jsonv2',
+                    'addressdetails': '1',
+                    'limit': '8',
+                })
+                req = urllib.request.Request(
+                    url,
+                    headers={
+                        'User-Agent': 'VirtualCity/0.1 area-picker geocoder',
+                        'Accept': 'application/json',
+                    },
+                )
+                with urllib.request.urlopen(req, timeout=8.0) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                if not isinstance(data, list):
+                    data = []
+                results = []
+                for item in data:
+                    if not isinstance(item, dict):
+                        continue
+                    results.append({
+                        'display_name': str(item.get('display_name') or ''),
+                        'name': str(item.get('name') or ''),
+                        'lat': str(item.get('lat') or ''),
+                        'lon': str(item.get('lon') or ''),
+                        'boundingbox': item.get('boundingbox') if isinstance(item.get('boundingbox'), list) else [],
+                        'class': str(item.get('category') or item.get('class') or ''),
+                        'type': str(item.get('type') or ''),
+                    })
+                self._json({'ok': True, 'results': results})
+            except Exception as exc:
+                self._json({'ok': False, 'message': f'geocode failed: {exc}', 'results': []})
             return
         if parsed.path in ('/svg_live_viewer.html', '/reports/visualizations/svg_live_viewer.html'):
             self.send_response(302)
@@ -923,7 +968,7 @@ class _Handler(BaseHTTPRequestHandler):
             self.end_headers()
             return
         lat, lon = _get_initial_center()
-        html = (_HTML
+        html = (_template_html()
                 .replace('__LAT__', str(lat))
                 .replace('__LON__', str(lon))
                 .replace('__VERSION__', APP_VERSION)
@@ -931,6 +976,9 @@ class _Handler(BaseHTTPRequestHandler):
                 .replace('__SHUTDOWN_WITH_PAGE__', 'true' if SHUTDOWN_WITH_PAGE else 'false'))
         self.send_response(200)
         self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
         self.end_headers()
         self.wfile.write(html.encode('utf-8'))
 

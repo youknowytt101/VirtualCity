@@ -21,6 +21,8 @@ class RoadSourceChain:
     raw_node: object
     api_shared_topology_node: object
     centerline_resample_node: object
+    turn_curve_smooth_node: object
+    vertex_cleanup_node: object
     junction_curve_smooth_node: object
     mesh_input: object
 
@@ -173,6 +175,99 @@ def build_junction_curve_smooth(
     return smooth_node
 
 
+def build_turn_curve_smooth(
+    hou,
+    net,
+    obj_path: str,
+    source_node,
+    enabled: bool,
+    curve_distance_m: float,
+    min_branch_distance_m: float,
+    min_angle_deg: float,
+    max_angle_deg: float,
+    arc_spacing_m: float,
+    smooth_iterations: int,
+    max_bends: int,
+):
+    """Round hard bends inside individual roads before junction smoothing."""
+    smooth_code = houdini_sops.load(
+        "road_turn_curve_smooth.py",
+        ENABLED=1 if enabled else 0,
+        CURVE_DISTANCE=curve_distance_m,
+        MIN_BRANCH_DISTANCE=min_branch_distance_m,
+        MIN_ANGLE_DEG=min_angle_deg,
+        MAX_ANGLE_DEG=max_angle_deg,
+        ARC_SPACING=arc_spacing_m,
+        SMOOTH_ITERATIONS=smooth_iterations,
+        MAX_BENDS=max_bends,
+        REUSE_TOLERANCE=0.01,
+    )
+    smooth_node = hou.node(obj_path + "/road_turn_curve_smooth")
+    if smooth_node is None:
+        smooth_node = net.createNode("python", "road_turn_curve_smooth")
+    smooth_node.setInput(0, source_node, 0)
+    smooth_node.parm("python").set(smooth_code)
+    smooth_node.cook(force=True)
+    geo = smooth_node.geometry()
+    try:
+        status = geo.attribValue("road_turn_curve_smooth_status")
+        processed = geo.attribValue("road_turn_curve_smooth_processed_bends")
+        skipped = geo.attribValue("road_turn_curve_smooth_skipped_bends")
+        fallbacks = geo.attribValue("road_turn_curve_smooth_fallbacks")
+    except Exception:
+        status = "unknown"
+        processed = 0
+        skipped = 0
+        fallbacks = 0
+    print("  road_turn_curve_smooth: status={} processed={} skipped={} fallbacks={}".format(
+        status, int(processed), int(skipped), int(fallbacks)))
+    return smooth_node
+
+
+def build_vertex_cleanup(
+    hou,
+    net,
+    obj_path: str,
+    source_node,
+    enabled: bool,
+    target_spacing_m: float,
+    min_spacing_m: float,
+    anchor_angle_deg: float,
+    reuse_tolerance_m: float,
+):
+    """Even out road vertices after hard-turn smoothing and before junction smoothing."""
+    cleanup_code = houdini_sops.load(
+        "road_vertex_cleanup.py",
+        ENABLED=1 if enabled else 0,
+        TARGET_SPACING=target_spacing_m,
+        MIN_SPACING=min_spacing_m,
+        ANCHOR_ANGLE_DEG=anchor_angle_deg,
+        REUSE_TOLERANCE=reuse_tolerance_m,
+    )
+    cleanup_node = hou.node(obj_path + "/road_vertex_cleanup")
+    if cleanup_node is None:
+        cleanup_node = net.createNode("python", "road_vertex_cleanup")
+    cleanup_node.setInput(0, source_node, 0)
+    cleanup_node.parm("python").set(cleanup_code)
+    cleanup_node.cook(force=True)
+    geo = cleanup_node.geometry()
+    try:
+        status = geo.attribValue("road_vertex_cleanup_status")
+        removed = geo.attribValue("road_vertex_cleanup_removed_points")
+        close_before = geo.attribValue("road_vertex_cleanup_close_segments_before")
+        close_after = geo.attribValue("road_vertex_cleanup_close_segments_after")
+        fallbacks = geo.attribValue("road_vertex_cleanup_fallbacks")
+    except Exception:
+        status = "unknown"
+        removed = 0
+        close_before = 0
+        close_after = 0
+        fallbacks = 0
+    print("  road_vertex_cleanup: status={} removed={} close_segments {}->{} fallbacks={}".format(
+        status, int(removed), int(close_before), int(close_after), int(fallbacks)))
+    return cleanup_node
+
+
 def remove_legacy_road_nodes(hou, obj_path: str) -> None:
     """Remove retired road/debug nodes so the SOP network exposes one road chain."""
     for road_legacy_node_name in (
@@ -219,6 +314,19 @@ def build_source_chain(
     junction_curve_smooth_arc_spacing_m: float = 1.0,
     junction_curve_smooth_iterations: int = 1,
     junction_curve_smooth_max_junctions: int = 800,
+    turn_curve_smooth_enabled: bool = True,
+    turn_curve_smooth_distance_m: float = 5.0,
+    turn_curve_smooth_min_branch_distance_m: float = 2.0,
+    turn_curve_smooth_min_angle_deg: float = 25.0,
+    turn_curve_smooth_max_angle_deg: float = 155.0,
+    turn_curve_smooth_arc_spacing_m: float = 1.0,
+    turn_curve_smooth_iterations: int = 1,
+    turn_curve_smooth_max_bends: int = 2000,
+    vertex_cleanup_enabled: bool = True,
+    vertex_cleanup_spacing_m: float = 2.0,
+    vertex_cleanup_min_spacing_m: float = 0.75,
+    vertex_cleanup_anchor_angle_deg: float = 20.0,
+    vertex_cleanup_reuse_tolerance_m: float = 0.05,
 ) -> RoadSourceChain:
     """Build the stable raw-road source chain used by terrain and final road output."""
     remove_legacy_road_nodes(hou, obj_path)
@@ -243,11 +351,36 @@ def build_source_chain(
         centerline_resample_spacing_m,
         centerline_resample_preserve_bend_deg,
     )
-    junction_curve_smooth_node = build_junction_curve_smooth(
+    turn_curve_smooth_node = build_turn_curve_smooth(
         hou,
         net,
         obj_path,
         centerline_resample_node,
+        turn_curve_smooth_enabled,
+        turn_curve_smooth_distance_m,
+        turn_curve_smooth_min_branch_distance_m,
+        turn_curve_smooth_min_angle_deg,
+        turn_curve_smooth_max_angle_deg,
+        turn_curve_smooth_arc_spacing_m,
+        turn_curve_smooth_iterations,
+        turn_curve_smooth_max_bends,
+    )
+    vertex_cleanup_node = build_vertex_cleanup(
+        hou,
+        net,
+        obj_path,
+        turn_curve_smooth_node,
+        vertex_cleanup_enabled,
+        vertex_cleanup_spacing_m,
+        vertex_cleanup_min_spacing_m,
+        vertex_cleanup_anchor_angle_deg,
+        vertex_cleanup_reuse_tolerance_m,
+    )
+    junction_curve_smooth_node = build_junction_curve_smooth(
+        hou,
+        net,
+        obj_path,
+        vertex_cleanup_node,
         junction_curve_smooth_enabled,
         junction_curve_smooth_distance_m,
         junction_curve_smooth_min_branch_distance_m,
@@ -257,11 +390,13 @@ def build_source_chain(
         junction_curve_smooth_iterations,
         junction_curve_smooth_max_junctions,
     )
-    print("  road chain locked: road_api_raw_lines -> road_api_shared_topology -> road_centerline_resample -> road_junction_curve_smooth")
+    print("  road chain locked: road_api_raw_lines -> road_api_shared_topology -> road_centerline_resample -> road_turn_curve_smooth -> road_vertex_cleanup -> road_junction_curve_smooth")
     return RoadSourceChain(
         raw_node=raw_node,
         api_shared_topology_node=api_shared_topology_node,
         centerline_resample_node=centerline_resample_node,
+        turn_curve_smooth_node=turn_curve_smooth_node,
+        vertex_cleanup_node=vertex_cleanup_node,
         junction_curve_smooth_node=junction_curve_smooth_node,
         mesh_input=junction_curve_smooth_node,
     )

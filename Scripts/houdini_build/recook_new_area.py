@@ -68,6 +68,19 @@ _road_junction_curve_smooth_max_angle_deg = _ctx.road_junction_curve_smooth_max_
 _road_junction_curve_smooth_arc_spacing_m = _ctx.road_junction_curve_smooth_arc_spacing_m
 _road_junction_curve_smooth_iterations = _ctx.road_junction_curve_smooth_iterations
 _road_junction_curve_smooth_max_junctions = _ctx.road_junction_curve_smooth_max_junctions
+_road_turn_curve_smooth_enabled = _ctx.road_turn_curve_smooth_enabled
+_road_turn_curve_smooth_distance_m = _ctx.road_turn_curve_smooth_distance_m
+_road_turn_curve_smooth_min_branch_distance_m = _ctx.road_turn_curve_smooth_min_branch_distance_m
+_road_turn_curve_smooth_min_angle_deg = _ctx.road_turn_curve_smooth_min_angle_deg
+_road_turn_curve_smooth_max_angle_deg = _ctx.road_turn_curve_smooth_max_angle_deg
+_road_turn_curve_smooth_arc_spacing_m = _ctx.road_turn_curve_smooth_arc_spacing_m
+_road_turn_curve_smooth_iterations = _ctx.road_turn_curve_smooth_iterations
+_road_turn_curve_smooth_max_bends = _ctx.road_turn_curve_smooth_max_bends
+_road_vertex_cleanup_enabled = _ctx.road_vertex_cleanup_enabled
+_road_vertex_cleanup_spacing_m = _ctx.road_vertex_cleanup_spacing_m
+_road_vertex_cleanup_min_spacing_m = _ctx.road_vertex_cleanup_min_spacing_m
+_road_vertex_cleanup_anchor_angle_deg = _ctx.road_vertex_cleanup_anchor_angle_deg
+_road_vertex_cleanup_reuse_tolerance_m = _ctx.road_vertex_cleanup_reuse_tolerance_m
 _RECOOK_FINALIZED = False
 
 
@@ -217,6 +230,19 @@ road_source_chain = roads_domain.build_source_chain(
     _road_junction_curve_smooth_arc_spacing_m,
     _road_junction_curve_smooth_iterations,
     _road_junction_curve_smooth_max_junctions,
+    _road_turn_curve_smooth_enabled,
+    _road_turn_curve_smooth_distance_m,
+    _road_turn_curve_smooth_min_branch_distance_m,
+    _road_turn_curve_smooth_min_angle_deg,
+    _road_turn_curve_smooth_max_angle_deg,
+    _road_turn_curve_smooth_arc_spacing_m,
+    _road_turn_curve_smooth_iterations,
+    _road_turn_curve_smooth_max_bends,
+    _road_vertex_cleanup_enabled,
+    _road_vertex_cleanup_spacing_m,
+    _road_vertex_cleanup_min_spacing_m,
+    _road_vertex_cleanup_anchor_angle_deg,
+    _road_vertex_cleanup_reuse_tolerance_m,
 )
 _road_mesh_input = road_source_chain.mesh_input
 buildings_domain.patch_snap_and_height_sops(hou, OBJ_PATH)
@@ -274,6 +300,8 @@ CHECKS = [
     ('road_api_raw_lines', 100, None, 'raw map API road lines generated'),
     ('road_api_shared_topology', 100, None, 'raw API road shared topology generated'),
     ('road_centerline_resample', 100, None, 'road centerline spacing normalized'),
+    ('road_turn_curve_smooth', 100, None, 'road hard turns curve-smoothed'),
+    ('road_vertex_cleanup', 100, None, 'road vertices cleaned and evenly spaced'),
     ('road_junction_curve_smooth', 100, None, 'road junctions curve-smoothed'),
 ]
 for name, min_pts, max_y, desc in CHECKS:
