@@ -16,7 +16,7 @@ Houdini/Hip/VC_master_citygen_v001.hip
 最新运行区实验快照 hip：
 
 ```text
-Houdini/Hip/VC_z47n_e704000_n1429000_w1000_h1000_s1000_citygen_v001.hip
+Houdini/Hip/VC_z47n_e704000_n1431000_w1000_h1000_s1000_citygen_v001.hip
 ```
 
 当前主要输出节点：
@@ -34,23 +34,17 @@ Houdini/Hip/VC_z47n_e704000_n1429000_w1000_h1000_s1000_citygen_v001.hip
 ```text
 osm_import
     ↓
-extract_buildings / extract_roads
+extract_buildings / road_api_raw_lines
     ↓
-snap_bld_to_terrain / snap_roads_to_terrain1
+建筑链：snap_bld_to_terrain → bld_footprint_bevel → extrude_buildings → bld_with_foundation
     ↓
-bld_footprint_bevel / road_width_flat
+道路中线链：road_api_shared_topology → road_centerline_resample → road_turn_curve_smooth
     ↓
-extrude_buildings / road_strips
+road_vertex_cleanup → road_junction_curve_smooth → road_clipped → road_profile_apply
     ↓
-post_normals / snap_road_strips
+道路面链：road_capsule_surface_preview → road_surface_color
     ↓
-bld_clipped / road_clipped
-    ↓
-bld_foundation / road_extrude
-    ↓
-bld_with_foundation / terrain_color
-    ↓
-merge_all
+merge_all（bld_with_foundation + road_surface_color + terrain_color）
     ↓
 OUT_city
 ```
@@ -67,10 +61,12 @@ OUT_city
 
 ### 道路
 
-- `road_width_flat` 负责道路宽度和属性。
-- `road_strips` 将道路中心线生成面片，包含全顶点路口处理和凸包填充。
-- `snap_road_strips` 对道路条带所有顶点二次贴地，修复坡地侧边埋入地形。
-- `road_faces` / `road_clipped_faces` QA 检查异常大面片、开放面、长宽比、自交、尖角和裁剪后 n-gon 规整状态。
+- `road_api_raw_lines → road_api_shared_topology → road_centerline_resample → road_turn_curve_smooth → road_vertex_cleanup → road_junction_curve_smooth` 是当前稳定道路中线链。
+- `road_clipped → road_profile_apply` 给裁剪后的干净中线注入车道、路缘和人行道属性。
+- `road_capsule_surface_preview` 从中线生成固定宽度胶囊车道面；面片左右分开，中间有真实中心边，两端为半圆 cap。
+- `road_surface_color` 是当前道路面主输出，并接入 `merge_all / OUT_city`；`road_color` 仅保留为中线 debug，不进入最终总装。
+- `road_surface_union_preview` / `road_surface_quad_preview` 已从主流程移除，自动构建会清理旧节点。
+- `road_faces` QA 现在检查 `road_surface_color` 的闭合面片、自交、顶点数、长宽比和异常面积；`road_clipped_lines` 检查裁剪后的道路中线是否非空。
 
 ### 建筑
 

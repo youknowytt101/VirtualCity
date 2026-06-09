@@ -12,7 +12,7 @@ CONTRACT = DomainContract(
     key="roads",
     label="道路",
     depends_on=("terrain",),
-    final_nodes=("road_clipped", "road_color"),
+    final_nodes=("road_clipped", "road_color", "road_surface_color"),
 )
 
 
@@ -283,6 +283,8 @@ def remove_legacy_road_nodes(hou, obj_path: str) -> None:
         "road_topology_builder",
         "road_strips",
         "road_graph_filter",
+        "road_surface_quad_preview",
+        "road_surface_union_preview",
     ):
         road_legacy_node = hou.node(obj_path + "/" + road_legacy_node_name)
         if road_legacy_node is not None:
@@ -495,6 +497,47 @@ def apply_profiles(hou, net, obj_path: str, root_str: str, road_clip, enabled: b
     return road_profile_src
 
 
+def build_capsule_surface_preview(hou, net, obj_path: str, road_profile_src, enabled: bool = True):
+    """Create the capsule road surface used by the main road_surface_color output."""
+    old_preview = hou.node(obj_path + "/road_capsule_surface_preview")
+    if not enabled or road_profile_src is None:
+        if old_preview:
+            old_preview.destroy()
+            print("  road_capsule_surface_preview: 已关闭并移除胶囊道路面节点")
+        return None
+    try:
+        if old_preview:
+            old_preview.destroy()
+        preview_code = houdini_sops.load(
+            "road_capsule_surface_preview.py",
+            ENABLED=1,
+            DEFAULT_WIDTH=1.0,
+            USE_PROFILE_WIDTH=0,
+            CAP_SEGMENTS=12,
+            MIN_SEGMENT_LENGTH=0.10,
+            WIDTH_SCALE=1.0,
+        )
+        preview_node = net.createNode("python", "road_capsule_surface_preview")
+        preview_node.setInput(0, road_profile_src)
+        preview_node.parm("python").set(preview_code)
+        preview_node.cook(force=True)
+        preview_geo = preview_node.geometry()
+        try:
+            surfaces = preview_geo.attribValue("road_capsule_surface_preview_surface_prims")
+            guides = preview_geo.attribValue("road_capsule_surface_preview_centerline_guides")
+            fallbacks = preview_geo.attribValue("road_capsule_surface_preview_fallbacks")
+        except Exception:
+            surfaces = preview_geo.intrinsicValue("primitivecount")
+            guides = 0
+            fallbacks = 0
+        print("  road_capsule_surface_preview: surfaces={} guides={} fallbacks={}".format(
+            int(surfaces), int(guides), int(fallbacks)))
+        return preview_node
+    except Exception as exc:
+        print(f"  [WARN] road_capsule_surface_preview 生成失败: {exc}")
+        return None
+
+
 def apply_curb_variation(hou, net, obj_path: str, root_str: str, road_profile_src, enabled: bool):
     """Optionally write small curb variation attributes for road details."""
     road_curb_src = road_profile_src
@@ -523,7 +566,7 @@ def apply_curb_variation(hou, net, obj_path: str, root_str: str, road_profile_sr
 
 
 def color_roads(hou, net, obj_path: str, src_node, rgb):
-    """Create the public road_color output."""
+    """Create the centerline debug road_color output."""
     old = hou.node(obj_path + "/road_color")
     if old:
         old.destroy()
@@ -535,15 +578,30 @@ def color_roads(hou, net, obj_path: str, src_node, rgb):
     return road_color
 
 
+def color_road_surface(hou, net, obj_path: str, src_node, rgb):
+    """Create the public road_surface_color output from the capsule road surface."""
+    old = hou.node(obj_path + "/road_surface_color")
+    if old:
+        old.destroy()
+    if src_node is None:
+        return None
+    road_surface_color = net.createNode("attribwrangle", "road_surface_color")
+    road_surface_color.setInput(0, src_node)
+    road_surface_color.parm("class").set(2)  # Point
+    road_surface_color.parm("snippet").set("@Cd = set({:.4f}, {:.4f}, {:.4f});".format(*rgb))
+    road_surface_color.cook(force=True)
+    return road_surface_color
+
+
 def finalize_surface(hou, obj_path: str, road_colored):
-    """Keep the current road output as flat/raw line geometry and remove old extrude nodes."""
+    """Use the capsule road surface as final road geometry while keeping centerlines as debug."""
     for old_road_node in ("road_pre_extrude_dissolve", "road_pre_extrude_fuse", "road_extrude"):
         old = hou.node(obj_path + "/" + old_road_node)
         if old:
             old.destroy()
             print("  道路挤出节点移除: " + old_road_node)
     road_surface = road_colored
-    print("  road_surface: 使用平面道路面片（无挤出） pts={} prims={}".format(
+    print("  road_surface: 使用 capsule 道路面进入 OUT_city；中心线 road_color 保留为 debug pts={} prims={}".format(
         road_surface.geometry().intrinsicValue("pointcount"),
         road_surface.geometry().intrinsicValue("primitivecount")))
     return road_surface

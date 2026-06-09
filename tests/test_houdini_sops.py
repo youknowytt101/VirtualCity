@@ -44,6 +44,7 @@ class TestSopFilesExist(unittest.TestCase):
         "road_junction_arc_smoother.py",
         "road_topology_builder.py",
         "road_profile_apply.py",
+        "road_capsule_surface_preview.py",
     ]
 
     def test_all_present(self):
@@ -78,6 +79,26 @@ class TestPlaceholderSubstitution(unittest.TestCase):
         self.assertIn("/proj/VirtualCity", code)
         self.assertIn("road_profiles.json", code)
         self.assertNotIn("hou.hipFile.path", code)
+
+    def test_road_capsule_surface_preview_substitutes(self):
+        code = houdini_sops.load(
+            "road_capsule_surface_preview.py",
+            ENABLED=1,
+            DEFAULT_WIDTH=1.0,
+            USE_PROFILE_WIDTH=0,
+            CAP_SEGMENTS=12,
+            MIN_SEGMENT_LENGTH=0.10,
+            WIDTH_SCALE=1.0,
+        )
+        for token in (
+            "__ENABLED__",
+            "__DEFAULT_WIDTH__",
+            "__USE_PROFILE_WIDTH__",
+            "__CAP_SEGMENTS__",
+            "__MIN_SEGMENT_LENGTH__",
+            "__WIDTH_SCALE__",
+        ):
+            self.assertNotIn(token, code)
 
 
 class TestPythonSopValidity(unittest.TestCase):
@@ -144,6 +165,14 @@ class TestPythonSopValidity(unittest.TestCase):
             ),
             "road_topology_builder.py": {},
             "road_profile_apply.py": dict(ROOT="/proj/VirtualCity"),
+            "road_capsule_surface_preview.py": dict(
+                ENABLED=1,
+                DEFAULT_WIDTH=1.0,
+                USE_PROFILE_WIDTH=0,
+                CAP_SEGMENTS=12,
+                MIN_SEGMENT_LENGTH=0.10,
+                WIDTH_SCALE=1.0,
+            ),
         }
         for name, subs in cases.items():
             code = houdini_sops.load(name, **subs)
@@ -169,6 +198,38 @@ class TestSentinels(unittest.TestCase):
         self.assertIn("rtb_skipped_degenerate_junction_tris", text)
         self.assertIn("q_area < 0.05 or q_min_edge < 0.05", text)
         self.assertIn("t_angle is not None and t_angle < 2.0", text)
+
+    def test_road_capsule_surface_preview_keeps_centerline_debug_contract(self):
+        text = houdini_sops.load(
+            "road_capsule_surface_preview.py",
+            ENABLED=1,
+            DEFAULT_WIDTH=1.0,
+            USE_PROFILE_WIDTH=0,
+            CAP_SEGMENTS=12,
+            MIN_SEGMENT_LENGTH=0.10,
+            WIDTH_SCALE=1.0,
+        )
+        self.assertIn("main road surface output", text)
+        self.assertIn("road_surface_color", text)
+        self.assertIn("quad strips split by a real center edge", text)
+        self.assertIn("cap triangle fans", text)
+        self.assertIn("capsule_rings", text)
+        self.assertIn("USE_PROFILE_WIDTH", text)
+        self.assertIn("road_capsule_width", text)
+        self.assertIn("cap_points", text)
+        self.assertIn("left_quad", text)
+        self.assertIn("right_quad", text)
+        self.assertIn("quad_is_valid", text)
+        self.assertIn("polygon_area_xz", text)
+        self.assertIn("shared_point", text)
+        self.assertIn("road_capsule_piece", text)
+        self.assertIn("road_capsule_surface_preview_body_quads", text)
+        self.assertIn("road_capsule_surface_preview_center_split_quads", text)
+        self.assertIn("road_capsule_surface_preview_cap_triangles", text)
+        self.assertIn("road_capsule_surface_preview_skipped_self_intersecting_quads", text)
+        self.assertIn("road_capsule_surface_preview", text)
+        self.assertIn("road_capsule_role", text)
+        self.assertNotIn('setAttribValue(role_attr, "centerline")', text)
 
     def test_road_junction_arc_smoother_preserves_centerline_contract(self):
         text = houdini_sops.load(
@@ -377,7 +438,7 @@ class TestRecookRoadChain(unittest.TestCase):
     BUILDINGS_PATH = ROOT / "Scripts" / "houdini_build" / "domains" / "buildings.py"
     ROADS_PATH = ROOT / "Scripts" / "houdini_build" / "domains" / "roads.py"
 
-    def test_outputs_road_centerlines_without_polyextrude(self):
+    def test_outputs_road_surface_without_modifying_centerline_chain(self):
         text = self.PATH.read_text(encoding="utf-8")
         context = self.CONTEXT_PATH.read_text(encoding="utf-8")
         roads = self.ROADS_PATH.read_text(encoding="utf-8")
@@ -385,6 +446,9 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn("road_source_chain = roads_domain.build_source_chain", text)
         self.assertIn("_road_mesh_input = road_source_chain.mesh_input", text)
         self.assertIn("road_surface = road_colored", roads)
+        self.assertIn("road_capsule_surface = roads_domain.build_capsule_surface_preview", text)
+        self.assertIn("road_surface_colored = roads_domain.color_road_surface", text)
+        self.assertIn("road_surface = roads_domain.finalize_surface", text)
         self.assertIn("merge.setInput(1, road_surface)", text)
         self.assertIn('houdini_sops.load("road_api_raw_lines.py"', roads)
         self.assertIn('"road_shared_topology.py"', roads)
@@ -438,6 +502,8 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn('houdini_sops.load("road_profile_apply.py", ROOT=root_str)', roads)
         self.assertIn("road_prof.cook(force=True)", roads)
         self.assertIn('"road_profile_apply"', context)
+        self.assertIn('"road_capsule_surface_preview"', context)
+        self.assertIn('"road_surface_color"', context)
 
     def test_recook_only_preflights_houdini_ready_data(self):
         text = self.PATH.read_text(encoding="utf-8")
@@ -511,8 +577,11 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn("roads_domain.build_source_chain", text)
         self.assertIn("roads_domain.build_clipped_lines", text)
         self.assertIn("roads_domain.apply_profiles", text)
+        self.assertIn("roads_domain.build_capsule_surface_preview", text)
+        self.assertNotIn("roads_domain.build_surface_union_preview", text)
         self.assertIn("roads_domain.apply_curb_variation", text)
         self.assertIn("roads_domain.color_roads", text)
+        self.assertIn("roads_domain.color_road_surface", text)
         self.assertIn("roads_domain.finalize_surface", text)
         self.assertIn('houdini_sops.load("road_api_raw_lines.py")', roads)
         self.assertIn('"road_shared_topology.py"', roads)
@@ -521,6 +590,18 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn('"road_vertex_cleanup.py"', roads)
         self.assertIn('"road_junction_curve_smooth.py"', roads)
         self.assertIn('houdini_sops.load("road_profile_apply.py", ROOT=root_str)', roads)
+        self.assertIn('"road_capsule_surface_preview.py"', roads)
+        self.assertIn('net.createNode("python", "road_capsule_surface_preview")', roads)
+        self.assertIn("DEFAULT_WIDTH=1.0", roads)
+        self.assertNotIn('"road_surface_union_preview.py"', roads)
+        self.assertNotIn('net.createNode("python", "road_surface_union_preview")', roads)
+        self.assertNotIn("_write_surface_union_cache", roads)
+        self.assertNotIn("constrained_delaunay_triangles", roads)
+        self.assertIn('net.createNode("attribwrangle", "road_surface_color")', roads)
+        self.assertIn('"road_surface_quad_preview"', roads)
+        self.assertIn('"road_surface_union_preview"', roads)
+        self.assertNotIn('"road_surface_quad_preview.py"', roads)
+        self.assertNotIn('net.createNode("python", "road_surface_quad_preview")', roads)
         self.assertIn('houdini_sops.load("road_curb_variation.py", ROOT=root_str)', roads)
         self.assertNotIn('houdini_sops.load("road_fragment_cleanup.py")', roads)
         self.assertNotIn('net.createNode("attribwrangle", "snap_roads_to_terrain1")', roads)
@@ -536,7 +617,7 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn('net.createNode("attribwrangle", "snap_road_clipped")', roads)
         self.assertNotIn('net.createNode("python", "road_fragment_cleanup")', roads)
         self.assertIn('net.createNode("attribwrangle", "road_color")', roads)
-        self.assertIn('final_nodes=("road_clipped", "road_color")', roads)
+        self.assertIn('"road_surface_color"', roads)
 
     def test_network_layout_groups_domain_nodes_visually_only(self):
         text = self.PATH.read_text(encoding="utf-8")
@@ -568,8 +649,18 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertIn('"road_turn_curve_smooth"', layout)
         self.assertIn('"road_vertex_cleanup"', layout)
         self.assertIn('"road_junction_curve_smooth"', layout)
+        self.assertIn('"road_capsule_surface_preview"', layout)
+        self.assertIn("[道路面主输出] 从中心线生成两头半圆、左右分开的胶囊车道面；进入 road_surface_color。", layout)
+        self.assertNotIn('"road_surface_union_preview": (', layout)
+        self.assertIn('"road_surface_color"', layout)
+        self.assertIn("[道路面主输出] 给胶囊车道面写入颜色；作为 merge_all 的道路输入。", layout)
+        self.assertIn("SIDE_BRANCH_LAYOUT", layout)
+        self.assertIn('"road_capsule_surface_preview": (', layout)
+        self.assertIn('"road_profile_apply"', layout)
+        self.assertIn("_place_side_branches", layout)
         self.assertNotIn('"road_fragment_cleanup"', layout)
         self.assertIn('"road_color"', layout)
+        self.assertIn("[道路调试] 给干净道路中心线写入颜色；保留为 debug，不进入 OUT_city。", layout)
         self.assertIn('"merge_all"', layout)
         self.assertIn('"OUT_city"', layout)
         self.assertNotIn('"laneforge_lane_surfaces"', layout)
@@ -599,6 +690,9 @@ class TestModelQaRoadChain(unittest.TestCase):
         self.assertIn('"road_vertex_cleanup"', text)
         self.assertIn('"road_junction_curve_smooth"', text)
         self.assertIn('"road_color"', text)
+        self.assertIn('"road_capsule_surface_preview"', text)
+        self.assertIn('"road_surface_color"', text)
+        self.assertIn('"road_faces"', text)
         self.assertIn('"road_clipped_lines"', text)
         self.assertNotIn('"road_extrude"', text)
 
@@ -617,6 +711,8 @@ class TestExportAndImportChain(unittest.TestCase):
         self.assertIn("pipeline_status.export_gate", text)
         self.assertIn("select_sop_path", text)
         self.assertIn("[f'{_OBJ}/bld_with_foundation', f'{_OBJ}/bld_clipped', f'{_OBJ}/post_normals']", text)
+        self.assertIn("f'{_OBJ}/road_surface_color'", text)
+        self.assertIn("f'{_OBJ}/road_capsule_surface_preview'", text)
         removed_lane_surface_node = "lane" + "forge_lane_surfaces"
         self.assertNotIn(removed_lane_surface_node, text)
         self.assertIn("f'{_OBJ}/road_centerline_resample'", text)

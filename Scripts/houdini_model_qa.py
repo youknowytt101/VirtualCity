@@ -611,81 +611,6 @@ def _vc_model_qa_building_bundle(obj_path):
 
     return json.dumps(result)
 
-def _vc_model_qa_junction_quality(node_path, min_angle_deg=2.0, min_edge_m=0.01, sample_limit=5000):
-    node = hou.node(node_path)
-    if node is None:
-        return json.dumps({"missing": True, "node": node_path})
-    geo = node.geometry()
-
-    def prim_points(prim):
-        return [v.point().position() for v in prim.vertices()]
-
-    def min_angle_xz(pts):
-        if len(pts) < 3:
-            return None
-        angles = []
-        for i, cur in enumerate(pts):
-            prev = pts[(i - 1) % len(pts)]
-            nxt = pts[(i + 1) % len(pts)]
-            ax = prev.x() - cur.x(); az = prev.z() - cur.z()
-            bx = nxt.x() - cur.x();  bz = nxt.z() - cur.z()
-            al = math.sqrt(ax*ax + az*az); bl = math.sqrt(bx*bx + bz*bz)
-            if al <= 1e-9 or bl <= 1e-9:
-                continue
-            dot = max(-1.0, min(1.0, (ax*bx + az*bz) / (al*bl)))
-            angles.append(math.degrees(math.acos(dot)))
-        return min(angles) if angles else None
-
-    def min_edge_xz(pts):
-        if len(pts) < 2:
-            return 0.0
-        m = None
-        for i, p in enumerate(pts):
-            q = pts[(i + 1) % len(pts)]
-            dx = q.x() - p.x(); dz = q.z() - p.z()
-            l = math.sqrt(dx*dx + dz*dz)
-            m = l if m is None else min(m, l)
-        return 0.0 if m is None else m
-
-    is_junc_attr = geo.findPrimAttrib("is_junction")
-    prims = geo.prims()
-    checked = 0
-    junc_total = 0
-    small_angle = 0
-    sliver_edge = 0
-    min_ang_global = None
-    min_edge_global = None
-    for prim in prims:
-        if is_junc_attr is None or int(prim.attribValue(is_junc_attr) or 0) != 1:
-            continue
-        junc_total += 1
-        pts = prim_points(prim)
-        ang = min_angle_xz(pts)
-        edg = min_edge_xz(pts)
-        if ang is not None:
-            min_ang_global = ang if min_ang_global is None else min(min_ang_global, ang)
-        if edg is not None:
-            min_edge_global = edg if min_edge_global is None else min(min_edge_global, edg)
-        if ang is not None and ang < float(min_angle_deg):
-            small_angle += 1
-        if edg is not None and edg < float(min_edge_m):
-            sliver_edge += 1
-        checked += 1
-        if checked >= sample_limit:
-            break
-
-    return json.dumps({
-        "missing": False,
-        "node": node_path,
-        "junction_total": junc_total,
-        "checked": checked,
-        "min_angle_deg": min_ang_global,
-        "min_edge_m": min_edge_global,
-        "small_angle_count": small_angle,
-        "sliver_edge_count": sliver_edge,
-        "angle_threshold": float(min_angle_deg),
-        "edge_threshold": float(min_edge_m),
-    })
 '''
 
 
@@ -845,6 +770,8 @@ class QA:
             "road_junction_curve_smooth",
             "road_clipped",
             "road_color",
+            "road_capsule_surface_preview",
+            "road_surface_color",
             "merge_all",
             "OUT_city",
         ]
@@ -1203,37 +1130,23 @@ class QA:
         else:
             self.add(label, PASS, f"{node_name} terrain placement is within threshold", **stats)
 
-    def _add_road_face_check(self, label: str, node_name: str, missing_message: str) -> None:
+    def check_road_faces(self) -> None:
+        node_name = "road_surface_color"
         node_path = f"{self.obj_path}/{node_name}"
         detail = json.loads(self.conn.eval("_vc_model_qa_road_faces({})".format(json.dumps(node_path))))
         if detail.get("missing"):
-            self.add(label, FAIL, missing_message)
+            self.add("road_faces", FAIL, "road_surface_color is missing")
             return
-        self.metrics[label] = detail
-        hard_fail = (
-            detail["open_prims"]
-            or detail["large_area_fail_count"]
-            or detail["too_many_vertices_count"]
-            or detail.get("aspect_fail_count", 0)
-            or detail.get("small_angle_fail_count", 0)
-            or detail.get("self_intersection_count", 0)
-        )
-        soft_warn = (
-            detail["large_area_warn_count"]
-            or detail.get("aspect_warn_count", 0)
-            or detail.get("small_angle_warn_count", 0)
-        )
-        if hard_fail:
-            self.add(label, FAIL, f"{node_name} geometry has invalid faces", **detail)
-        elif soft_warn:
-            self.add(label, WARN, f"{node_name} geometry has unusual face shapes", **detail)
+        self.metrics["road_faces"] = detail
+        hard_fail = detail["open_prims"] or detail.get("self_intersection_count", 0)
+        if detail.get("prims", 0) <= 0:
+            self.add("road_faces", FAIL, "road_surface_color geometry is empty", **detail)
+        elif hard_fail:
+            self.add("road_faces", FAIL, "road_surface_color has invalid surface topology", **detail)
         else:
-            self.add(label, PASS, f"{node_name} faces look bounded", **detail)
+            self.add("road_faces", PASS, "road_surface_color is present and closed", **detail)
 
-    def check_road_faces(self) -> None:
-        self.add("road_faces", INFO, "road output is locked to raw map API lines; surface face QA skipped")
-
-    def check_road_clipped_faces(self) -> None:
+    def check_road_clipped_lines(self) -> None:
         geo = self.geo("road_clipped")
         if geo is None:
             self.add("road_clipped_lines", FAIL, "road_clipped is missing")
@@ -1308,16 +1221,20 @@ class QA:
             self.add("terrain_density", PASS, "terrain snap target is subdivided", **detail)
 
     def check_junction_quality(self) -> None:
-        self.add("junction_quality", INFO, "road output is locked to raw map API lines; junction patch QA skipped")
+        self.add(
+            "junction_quality",
+            INFO,
+            "junction patch QA skipped; road surface topology is covered by road_surface_color face QA",
+        )
     def run(self) -> None:
         self.check_required_nodes()
         self.check_terrain_density()
         self.check_building_bundle()
         self.terrain_delta_stats("bld_with_foundation", "dem_subdivide", "building_terrain_fit", -0.05)
         self.check_road_faces()
-        self.check_road_clipped_faces()
+        self.check_road_clipped_lines()
         self.check_road_profile_attrs()
-        self.terrain_delta_stats("road_clipped", "dem_subdivide", "road_terrain_fit", -0.05, miss_warn_ratio=0.35)
+        self.terrain_delta_stats("road_surface_color", "dem_subdivide", "road_terrain_fit", -0.05, miss_warn_ratio=0.35)
         self.check_junction_quality()
 
 

@@ -402,6 +402,13 @@ road_profile_src = roads_domain.apply_profiles(
     road_clip,
     _apply_road_profiles,
 )
+road_capsule_surface = roads_domain.build_capsule_surface_preview(
+    hou,
+    net,
+    OBJ_PATH,
+    road_profile_src,
+    True,
+)
 road_curb_src = roads_domain.apply_curb_variation(
     hou,
     net,
@@ -422,6 +429,7 @@ foundation_clip = buildings_domain.build_foundation(
 
 # ── 4c. 颜色节点（三类独立，来自 COLORS 配置）────────────────────────
 road_colored = roads_domain.color_roads(hou, net, OBJ_PATH, road_curb_src, COLORS['roads'])
+road_surface_colored = roads_domain.color_road_surface(hou, net, OBJ_PATH, road_capsule_surface, COLORS['roads'])
 terrain_colored = terrain_domain.color_terrain(hou, net, OBJ_PATH, snap_target, COLORS['terrain'])
 bld_final = buildings_domain.color_and_finalize_buildings(
     hou,
@@ -432,9 +440,9 @@ bld_final = buildings_domain.color_and_finalize_buildings(
     COLORS['buildings'],
 )
 
-# ── 4d. 道路面片输出（无挤出）────────────────────────────
-# 当前道路阶段先保持为平面面片，避免 PolyExtrude 在分段道路上生成细碎侧面。
-road_surface = roads_domain.finalize_surface(hou, OBJ_PATH, road_colored)
+# ── 4d. 道路双轨输出────────────────────────────
+# road_color 保留干净中心线 debug；最终 OUT_city 使用 capsule 道路面。
+road_surface = roads_domain.finalize_surface(hou, OBJ_PATH, road_surface_colored or road_colored)
 
 # ── 4e. promote_height / restore_height: method=First 防跨建筑高度污染 ─
 # fuse_bld 焊接邻近建筑角点后，Average 模式会让相邻建筑高度互相稀释。
@@ -470,7 +478,7 @@ for _ in range(2):
 
 # ── 5. 重连 merge_all + 保存 ────────────────────────
 merge = hou.node(OBJ_PATH + '/merge_all')
-if merge and bld_clip and road_clip:
+if merge and bld_clip and road_surface:
     merge.setInput(0, bld_final)
     merge.setInput(1, road_surface)
     merge.setInput(2, terrain_colored)

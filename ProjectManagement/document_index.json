@@ -56,8 +56,11 @@
     ],
     "work_on_roads": [
       "ProjectManagement/12_已知坑点与解决方案.md",
-      "Scripts/houdini_road_pipeline.py",
-      "Scripts/_road_strips_v2.py",
+      "Scripts/houdini_build/domains/roads.py",
+      "Scripts/houdini_sops/road_capsule_surface_preview.py",
+      "Scripts/houdini_sops/road_turn_curve_smooth.py",
+      "Scripts/houdini_sops/road_vertex_cleanup.py",
+      "Scripts/houdini_sops/road_junction_curve_smooth.py",
       "Scripts/houdini_build/recook_new_area.py",
       "Reports/model_qa/latest.json"
     ],
@@ -106,5 +109,5 @@
     ]
   },
   "version_roadmap": "ProjectManagement/11_版本路线图.md",
-  "last_updated": "2026-06-08"
+  "last_updated": "2026-06-10"
 }

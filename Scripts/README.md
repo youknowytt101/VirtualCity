@@ -59,7 +59,7 @@ export_and_import.py（审核后）
 |---|---|---|---|
 | 数据获取 / 下载 / 缓存 | `acquisition/set_area.py`, `area_picker.py`, `download_osm.py`, `download_dem.py`, `download_overture_buildings.py`, `_tile_cache.py` | `RawData/OSM/`, `RawData/DEM/`, `RawData/Overture/`, `RawData/_tiles/`, `RawData/_clip_cache/` | 缓存优先，缺失下载；`data-only` 只到这一层 |
 | 数据清洗 / 语义 / QA | `cleaning/refine_data.py`, `clean_raw_data.py`, `data_cleaning_cache.py`, `shared/vc_geo.py`, `shared/vc_schema.py`, `shared/vc_buildings.py` | `RawData/_cleaned/{area_id}/`, `RawData/_houdini_ready/{area_id}/`, `Config/qa/*.json` | QA 通过后才发布 Houdini-ready；失败保留上一版 |
-| Houdini 构建 / Model QA / 审核出口 | `houdini_build/recook_new_area.py`, `houdini_sops/`, `_osm_import_canonical.py`, `_road_strips_v2.py`, `houdini_model_qa.py`, `export_and_import.py` | `Houdini/Hip/*.hip`, `Reports/model_qa/*.json`, `Houdini/Export/*.fbx` | Houdini 只应消费 `_houdini_ready`；导出必须在人工审核后 |
+| Houdini 构建 / Model QA / 审核出口 | `houdini_build/recook_new_area.py`, `houdini_sops/`, `_osm_import_canonical.py`, `houdini_sops/road_capsule_surface_preview.py`, `houdini_model_qa.py`, `export_and_import.py` | `Houdini/Hip/*.hip`, `Reports/model_qa/*.json`, `Houdini/Export/*.fbx` | Houdini 只应消费 `_houdini_ready`；导出必须在人工审核后 |
 
 重要判断：
 
@@ -95,10 +95,40 @@ export_and_import.py（审核后）
 | `houdini_build/status.py` | 写入 `Config/houdini_build_status.json`，供 UI / export gate 读取 |
 | `houdini_build/domains/` | 资产域注册表：地形、建筑、道路、自然占位、总装 |
 | `_osm_import_canonical.py` | Houdini `osm_import` Python SOP 源码 |
-| `_road_strips_v2.py` | Houdini `road_strips` Python SOP 源码 |
+| `houdini_sops/road_capsule_surface_preview.py` | 当前主道路面 SOP：从干净中线生成胶囊车道面，并通过 `road_surface_color` 进入 `OUT_city` |
+| `_road_strips_v2.py` | 旧道路条带实验 SOP，保留供追溯，不再由当前主构建链创建 |
 | `houdini_model_qa.py` | Houdini 模型 QA quick/full |
 | `shared/vc_paths.py` | 项目路径统一入口，禁止硬编码盘符；根目录 `vc_paths.py` 仅兼容旧导入 |
 | `export_and_import.py` | Houdini 审核后导出并触发 UE5 导入 |
+
+---
+
+## 当前 Houdini 道路链
+
+道路中线和道路面分开维护：
+
+```text
+road_api_raw_lines
+    -> road_api_shared_topology
+    -> road_centerline_resample
+    -> road_turn_curve_smooth
+    -> road_vertex_cleanup
+    -> road_junction_curve_smooth
+    -> snap_road_strips / road_bbox_clip / snap_road_clipped
+    -> road_clipped
+    -> road_profile_apply
+```
+
+`road_color` 只给上面的干净中线写颜色，保留为调试输出；最终 `OUT_city` 的道路输入来自：
+
+```text
+road_profile_apply
+    -> road_capsule_surface_preview
+    -> road_surface_color
+    -> merge_all
+```
+
+`road_surface_union_preview` 和 `road_surface_quad_preview` 已退出主流程，只保留在 legacy cleanup 名单中，避免 Houdini 自动构建后遗留旧节点。
 
 ---
 
@@ -115,7 +145,9 @@ export_and_import.py（审核后）
 - foundation_normals
 - foundation_alignment
 - building_terrain_fit
-- road_faces
+- road_faces（检查 `road_surface_color` 胶囊道路面）
+- road_clipped_lines（检查裁剪后的干净道路中线）
+- road_profile_attrs
 - road_terrain_fit
 
 几何统计必须在 Houdini 进程内部完成，再返回 JSON。不要通过 RPYC 在本地逐点/逐面读取大几何。

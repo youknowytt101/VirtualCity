@@ -273,8 +273,8 @@
 - `Scripts/houdini_sops/road_fragment_cleanup.py`（已启用）
 
 #### 文档
-- `项目管理/SWEEP_SOP_BINDING_GUIDE.md`（Sweep 绑定指南）
-- `项目管理/ROAD_OPTIMIZATION_PROGRESS.md`（本文档）
+- `ProjectManagement/SWEEP_SOP_BINDING_GUIDE.md`（Sweep 绑定指南）
+- `ProjectManagement/ROAD_OPTIMIZATION_PROGRESS.md`（本文档）
 
 #### 配置
 - `Config/active_area.json`（已更新，包含所有优化参数）
@@ -282,7 +282,7 @@
 ### ⏳ 待完成项
 
 1. **Sweep SOP 属性绑定**（Milestone 3 细节）
-   - 参考：`项目管理/SWEEP_SOP_BINDING_GUIDE.md`
+   - 参考：`ProjectManagement/SWEEP_SOP_BINDING_GUIDE.md`
    - 工作量：手动配置（~15 分钟）
    - 优先级：中
 

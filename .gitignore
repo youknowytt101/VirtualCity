@@ -10,6 +10,7 @@ Scripts/logs/
 # ===== Houdini =====
 # 缓存和模拟数据（体积大，不提交）
 Houdini/PDG_Output/
+Houdini/Cache/
 *.sim
 *.simdata
 *.bgeo.sc

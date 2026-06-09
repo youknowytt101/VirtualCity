@@ -114,6 +114,8 @@ Houdini 构建 / Model QA / 审核出口
 
 完整构建的正式编排入口是 `Scripts/orchestration/run_pipeline.py`。`Scripts/set_area.py`、`Scripts/refine_data.py`、`Scripts/_recook_new_area.py` 保留旧命令兼容；新主线分别调用 `acquisition/set_area.py`、`cleaning/refine_data.py`、`houdini_build/recook_new_area.py`。Houdini 构建层只消费 `RawData/_houdini_ready/{area_id}/ready_manifest.json` 声明的当前 run 数据。
 
+当前 Houdini 道路输出采用双轨设计：`road_color` 保留干净道路中线作为调试链路，`road_capsule_surface_preview -> road_surface_color` 生成固定宽度胶囊车道面并接入 `merge_all / OUT_city`。旧的 `road_surface_union_preview` / `road_surface_quad_preview` 不再进入主流程，自动构建会清理这些遗留节点。
+
 配套图：
 
 - `ProjectManagement/VirtualCity_三大模块流程图.svg`

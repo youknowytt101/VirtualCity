@@ -8,6 +8,17 @@ BOX_PAD_X = 1.35
 BOX_PAD_Y = 0.55
 COLUMN_SPACING = 7.4
 ROW_SPACING = 1.35
+SIDE_BRANCH_OFFSET_X = 2.8
+SIDE_BRANCH_OFFSET_Y = -0.15
+
+
+SIDE_BRANCH_LAYOUT: dict[str, tuple[str, float, float]] = {
+    "road_capsule_surface_preview": (
+        "road_profile_apply",
+        SIDE_BRANCH_OFFSET_X,
+        SIDE_BRANCH_OFFSET_Y,
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -55,8 +66,10 @@ NODE_NOTES: dict[str, str] = {
     "snap_road_clipped": "[道路] 裁剪后再次贴地，避免边界处高度漂移。",
     "road_clipped": "[道路] 标记并输出区域内道路几何。",
     "road_profile_apply": "[道路] 根据 road_profiles.json 注入车道数、车道宽、人行道和路缘属性。",
+    "road_capsule_surface_preview": "[道路面主输出] 从中心线生成两头半圆、左右分开的胶囊车道面；进入 road_surface_color。",
     "road_curb_variation": "[道路] 注入路缘微小起伏属性，增加道路细节变化。",
-    "road_color": "[道路] 给最终道路输出写入基础显示颜色。",
+    "road_color": "[道路调试] 给干净道路中心线写入颜色；保留为 debug，不进入 OUT_city。",
+    "road_surface_color": "[道路面主输出] 给胶囊车道面写入颜色；作为 merge_all 的道路输入。",
     "merge_all": "[总装] 合并建筑、道路和地形为城市总输出。",
     "OUT_city": "[总装] 最终城市输出节点，供视口、导出和 QA 使用。",
     "road_junction_tangent_arcs": "[旧实验] 早期路口相切圆弧实验节点；不属于当前主道路链路。",
@@ -126,8 +139,10 @@ GROUPS: tuple[NetworkGroup, ...] = (
             "snap_road_clipped",
             "road_clipped",
             "road_profile_apply",
+            "road_capsule_surface_preview",
             "road_curb_variation",
             "road_color",
+            "road_surface_color",
         ),
     ),
     NetworkGroup(
@@ -215,11 +230,36 @@ def apply_node_notes(hou, obj_path: str) -> int:
 def _place_group(hou, nodes, group_index: int) -> None:
     x = group_index * COLUMN_SPACING
     y = 0.0
-    for row, node in enumerate(nodes):
+    row = 0
+    for node in nodes:
+        if node.name() in SIDE_BRANCH_LAYOUT:
+            continue
         try:
             node.setPosition(_vector2(hou, x, y - row * ROW_SPACING))
         except Exception:
             return
+        row += 1
+
+
+def _position_xy(position) -> tuple[float, float]:
+    try:
+        return float(position.x()), float(position.y())
+    except Exception:
+        return float(position[0]), float(position[1])
+
+
+def _place_side_branches(hou, obj_path: str) -> None:
+    """Keep surface branches visible without interrupting the centerline chain."""
+    for branch_name, (anchor_name, offset_x, offset_y) in SIDE_BRANCH_LAYOUT.items():
+        branch_node = hou.node(obj_path + "/" + branch_name)
+        anchor_node = hou.node(obj_path + "/" + anchor_name)
+        if branch_node is None or anchor_node is None:
+            continue
+        try:
+            anchor_x, anchor_y = _position_xy(anchor_node.position())
+            branch_node.setPosition(_vector2(hou, anchor_x + offset_x, anchor_y + offset_y))
+        except Exception:
+            continue
 
 
 def _expand_box_bounds(hou, box) -> None:
@@ -258,6 +298,7 @@ def apply_domain_network_layout(hou, net, obj_path: str) -> None:
                 pass
 
         _place_group(hou, nodes, group_index)
+        _place_side_branches(hou, obj_path)
 
         if not hasattr(net, "createNetworkBox"):
             continue

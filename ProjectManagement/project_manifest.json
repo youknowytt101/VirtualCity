@@ -4,28 +4,28 @@
   "current_stage": "houdini_quality_iteration",
   "primary_goal": "构建俯视角虚拟城市；当前重点是稳定数据获取、数据清洗、Houdini 自动构建与 Model QA 的快速实验链路",
   "current_priority": [
-    "人工审核最新 Houdini OUT_city 输出",
-    "继续优化道路贴地、交叉口和异常面片",
+    "人工审核当前 road_surface_color 胶囊道路面与 OUT_city 输出",
+    "确认 road_terrain_fit ray miss 是否只是地形边界/采样覆盖问题",
     "继续优化建筑裙边、建筑倒角和坡地贴地",
     "补强 Houdini Model QA 与 area_picker 完成态体验",
     "Houdini 输出确认后再触发 UE5 export_and_import.py"
   ],
   "active_area": {
-    "area_id": "z47n_e704000_n1429000_w1000_h1000_s1000",
-    "display_name": "Pattaya fixed UTM grid z47n_e704000_n1429000",
+    "area_id": "z47n_e704000_n1431000_w1000_h1000_s1000",
+    "display_name": "Pattaya fixed UTM grid z47n_e704000_n1431000",
     "status": "houdini_model_qa_warn_needs_human_review",
     "bbox_accuracy": "selected_from_area_picker",
     "bbox": {
-      "west": 100.8802921,
-      "south": 12.9195947,
-      "east": 100.8895736,
-      "north": 12.9286991
+      "west": 100.8804274,
+      "south": 12.9376703,
+      "east": 100.8897098,
+      "north": 12.9467748
     },
-    "osm_target": "RawData/OSM/z47n_e704000_n1429000_w1000_h1000_s1000_osm_v001.osm",
-    "dem_target": "RawData/DEM/z47n_e704000_n1429000_w1000_h1000_s1000_dem_v001.csv",
-    "buildings_target": "RawData/Overture/z47n_e704000_n1429000_w1000_h1000_s1000_buildings_overture_v001.geojson",
-    "houdini_hip": "Houdini/Hip/VC_z47n_e704000_n1429000_w1000_h1000_s1000_citygen_v001.hip",
-    "data_qa_report": "Config/qa/z47n_e704000_n1429000_w1000_h1000_s1000_qa_20260608_014750.json",
+    "osm_target": "RawData/OSM/z47n_e704000_n1431000_w1000_h1000_s1000_osm_v001.osm",
+    "dem_target": "RawData/DEM/z47n_e704000_n1431000_w1000_h1000_s1000_dem_v001.csv",
+    "buildings_target": "RawData/Overture/z47n_e704000_n1431000_w1000_h1000_s1000_buildings_overture_v001.geojson",
+    "houdini_hip": "Houdini/Hip/VC_z47n_e704000_n1431000_w1000_h1000_s1000_citygen_v001.hip",
+    "data_qa_report": "Config/qa/z47n_e704000_n1431000_w1000_h1000_s1000_qa_20260610_010414.json",
     "model_qa_report": "Reports/model_qa/latest.json"
   },
   "ai_entry_files": [
@@ -137,7 +137,8 @@
     "foundation_alignment",
     "building_terrain_fit",
     "road_faces",
-    "road_clipped_faces",
+    "road_clipped_lines",
+    "road_profile_attrs",
     "road_terrain_fit"
   ],
   "do_not_prioritize_now": [
@@ -177,5 +178,5 @@
   },
   "coordinate_authority": "Scripts/vc_geo.py",
   "semantic_contract": "Scripts/vc_schema.py",
-  "last_updated": "2026-06-08"
+  "last_updated": "2026-06-10"
 }
