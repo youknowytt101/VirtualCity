@@ -22,12 +22,13 @@ import vc_paths
 CACHE_SCHEMA_VERSION = 1
 CLIP_CACHE_DIR = vc_paths.DATA_ROOT / "_clip_cache"
 CLEAN_CACHE_INDEX = vc_paths.DATA_ROOT / "_clean_cache_index.json"
-CURRENT_ACQUISITION_PROFILE = {
-    "schema": 1,
-    "roads": "tile_cache_osm_else_overpass_v1",
-    "buildings": "tile_cache_overture_else_overture_api_v1",
-    "dem": "fabdem_else_tile_cache_else_nasadem_v1",
-}
+# Cache-fingerprint profile. Derived from the declarative source registry so
+# acquisition routing and the cache signature stay in lockstep. The serialized
+# bytes are frozen by tests; swapping a data source must not change them unless
+# a full cache invalidation is intended.
+from acquisition.sources import acquisition_profile as _acquisition_profile
+
+CURRENT_ACQUISITION_PROFILE = _acquisition_profile()
 
 OUTPUT_NAMES = {
     "buildings": "buildings.geojson",
