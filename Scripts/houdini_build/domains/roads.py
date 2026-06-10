@@ -329,8 +329,45 @@ def build_source_chain(
     vertex_cleanup_min_spacing_m: float = 0.75,
     vertex_cleanup_anchor_angle_deg: float = 20.0,
     vertex_cleanup_reuse_tolerance_m: float = 0.05,
+    *,
+    params=None,
 ) -> RoadSourceChain:
-    """Build the stable raw-road source chain used by terrain and final road output."""
+    """Build the stable raw-road source chain used by terrain and final road output.
+
+    Callers may pass a ``RoadBuildParams`` bundle via ``params`` instead of the
+    28 positional arguments. When ``params`` is given it wins for every field;
+    the positional arguments remain as a backward-compatible fallback so older
+    callers keep working unchanged.
+    """
+    if params is not None:
+        centerline_resample_enabled = params.centerline_resample_enabled
+        centerline_resample_spacing_m = params.centerline_resample_spacing_m
+        centerline_resample_preserve_bend_deg = params.centerline_resample_preserve_bend_deg
+        shared_topology_enabled = params.shared_topology_enabled
+        shared_topology_fuse_tolerance_m = params.shared_topology_fuse_tolerance_m
+        shared_topology_intersection_tolerance_m = params.shared_topology_intersection_tolerance_m
+        shared_topology_max_segments = params.shared_topology_max_segments
+        junction_curve_smooth_enabled = params.junction_curve_smooth_enabled
+        junction_curve_smooth_distance_m = params.junction_curve_smooth_distance_m
+        junction_curve_smooth_min_branch_distance_m = params.junction_curve_smooth_min_branch_distance_m
+        junction_curve_smooth_min_angle_deg = params.junction_curve_smooth_min_angle_deg
+        junction_curve_smooth_max_angle_deg = params.junction_curve_smooth_max_angle_deg
+        junction_curve_smooth_arc_spacing_m = params.junction_curve_smooth_arc_spacing_m
+        junction_curve_smooth_iterations = params.junction_curve_smooth_iterations
+        junction_curve_smooth_max_junctions = params.junction_curve_smooth_max_junctions
+        turn_curve_smooth_enabled = params.turn_curve_smooth_enabled
+        turn_curve_smooth_distance_m = params.turn_curve_smooth_distance_m
+        turn_curve_smooth_min_branch_distance_m = params.turn_curve_smooth_min_branch_distance_m
+        turn_curve_smooth_min_angle_deg = params.turn_curve_smooth_min_angle_deg
+        turn_curve_smooth_max_angle_deg = params.turn_curve_smooth_max_angle_deg
+        turn_curve_smooth_arc_spacing_m = params.turn_curve_smooth_arc_spacing_m
+        turn_curve_smooth_iterations = params.turn_curve_smooth_iterations
+        turn_curve_smooth_max_bends = params.turn_curve_smooth_max_bends
+        vertex_cleanup_enabled = params.vertex_cleanup_enabled
+        vertex_cleanup_spacing_m = params.vertex_cleanup_spacing_m
+        vertex_cleanup_min_spacing_m = params.vertex_cleanup_min_spacing_m
+        vertex_cleanup_anchor_angle_deg = params.vertex_cleanup_anchor_angle_deg
+        vertex_cleanup_reuse_tolerance_m = params.vertex_cleanup_reuse_tolerance_m
     remove_legacy_road_nodes(hou, obj_path)
     raw_node = build_raw_api_lines(hou, net, obj_path, osm)
     api_shared_topology_node = build_shared_topology(

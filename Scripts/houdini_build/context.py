@@ -43,6 +43,47 @@ def _road_source_mode(cfg: dict[str, Any]) -> str:
 
 
 @dataclass(frozen=True)
+class RoadBuildParams:
+    """Packed road-chain parameters for ``roads.build_source_chain``.
+
+    Field names mirror ``build_source_chain``'s keyword arguments (no ``road_``
+    prefix). Defaults MUST stay byte-identical to the corresponding
+    ``BuildContext`` fields — these values drive road geometry, so changing any
+    of them changes the model. This dataclass only changes *how* the same values
+    are passed (one named bundle instead of 28 positional args), removing the
+    silent position-mismatch hazard that pytest cannot catch.
+    """
+    centerline_resample_enabled: bool = True
+    centerline_resample_spacing_m: float = 2.0
+    centerline_resample_preserve_bend_deg: float = 8.0
+    shared_topology_enabled: bool = True
+    shared_topology_fuse_tolerance_m: float = 0.35
+    shared_topology_intersection_tolerance_m: float = 0.08
+    shared_topology_max_segments: int = 2500
+    junction_curve_smooth_enabled: bool = True
+    junction_curve_smooth_distance_m: float = 5.0
+    junction_curve_smooth_min_branch_distance_m: float = 2.0
+    junction_curve_smooth_min_angle_deg: float = 25.0
+    junction_curve_smooth_max_angle_deg: float = 155.0
+    junction_curve_smooth_arc_spacing_m: float = 1.0
+    junction_curve_smooth_iterations: int = 1
+    junction_curve_smooth_max_junctions: int = 800
+    turn_curve_smooth_enabled: bool = True
+    turn_curve_smooth_distance_m: float = 5.0
+    turn_curve_smooth_min_branch_distance_m: float = 2.0
+    turn_curve_smooth_min_angle_deg: float = 25.0
+    turn_curve_smooth_max_angle_deg: float = 155.0
+    turn_curve_smooth_arc_spacing_m: float = 1.0
+    turn_curve_smooth_iterations: int = 1
+    turn_curve_smooth_max_bends: int = 2000
+    vertex_cleanup_enabled: bool = True
+    vertex_cleanup_spacing_m: float = 2.0
+    vertex_cleanup_min_spacing_m: float = 0.75
+    vertex_cleanup_anchor_angle_deg: float = 20.0
+    vertex_cleanup_reuse_tolerance_m: float = 0.05
+
+
+@dataclass(frozen=True)
 class BuildContext:
     """Immutable config snapshot for one Houdini recook run."""
     cfg: dict[str, Any]
@@ -162,6 +203,45 @@ class BuildContext:
     @property
     def obj_path(self) -> str:
         return f"/obj/{self.obj_net}"
+
+    @property
+    def road_build_params(self) -> "RoadBuildParams":
+        """Bundle this context's road fields for roads.build_source_chain.
+
+        Pure field forwarding: each value is taken verbatim from the existing
+        BuildContext fields, so the packed params are byte-identical to passing
+        them positionally. Locked by tests/test_road_build_params.py.
+        """
+        return RoadBuildParams(
+            centerline_resample_enabled=self.road_centerline_resample_enabled,
+            centerline_resample_spacing_m=self.road_centerline_resample_spacing_m,
+            centerline_resample_preserve_bend_deg=self.road_centerline_resample_preserve_bend_deg,
+            shared_topology_enabled=self.road_shared_topology_enabled,
+            shared_topology_fuse_tolerance_m=self.road_shared_topology_fuse_tolerance_m,
+            shared_topology_intersection_tolerance_m=self.road_shared_topology_intersection_tolerance_m,
+            shared_topology_max_segments=self.road_shared_topology_max_segments,
+            junction_curve_smooth_enabled=self.road_junction_curve_smooth_enabled,
+            junction_curve_smooth_distance_m=self.road_junction_curve_smooth_distance_m,
+            junction_curve_smooth_min_branch_distance_m=self.road_junction_curve_smooth_min_branch_distance_m,
+            junction_curve_smooth_min_angle_deg=self.road_junction_curve_smooth_min_angle_deg,
+            junction_curve_smooth_max_angle_deg=self.road_junction_curve_smooth_max_angle_deg,
+            junction_curve_smooth_arc_spacing_m=self.road_junction_curve_smooth_arc_spacing_m,
+            junction_curve_smooth_iterations=self.road_junction_curve_smooth_iterations,
+            junction_curve_smooth_max_junctions=self.road_junction_curve_smooth_max_junctions,
+            turn_curve_smooth_enabled=self.road_turn_curve_smooth_enabled,
+            turn_curve_smooth_distance_m=self.road_turn_curve_smooth_distance_m,
+            turn_curve_smooth_min_branch_distance_m=self.road_turn_curve_smooth_min_branch_distance_m,
+            turn_curve_smooth_min_angle_deg=self.road_turn_curve_smooth_min_angle_deg,
+            turn_curve_smooth_max_angle_deg=self.road_turn_curve_smooth_max_angle_deg,
+            turn_curve_smooth_arc_spacing_m=self.road_turn_curve_smooth_arc_spacing_m,
+            turn_curve_smooth_iterations=self.road_turn_curve_smooth_iterations,
+            turn_curve_smooth_max_bends=self.road_turn_curve_smooth_max_bends,
+            vertex_cleanup_enabled=self.road_vertex_cleanup_enabled,
+            vertex_cleanup_spacing_m=self.road_vertex_cleanup_spacing_m,
+            vertex_cleanup_min_spacing_m=self.road_vertex_cleanup_min_spacing_m,
+            vertex_cleanup_anchor_angle_deg=self.road_vertex_cleanup_anchor_angle_deg,
+            vertex_cleanup_reuse_tolerance_m=self.road_vertex_cleanup_reuse_tolerance_m,
+        )
 
     @property
     def root_str(self) -> str:
