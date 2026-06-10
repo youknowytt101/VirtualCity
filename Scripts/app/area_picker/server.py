@@ -26,6 +26,7 @@ STATIC_ROOT = SCRIPTS / 'web_assets'
 
 import pipeline_status
 import vc_grid
+from acquisition import sources as acquisition_sources
 import app.area_picker.template as area_picker_template
 from app.area_picker.software_paths import (
     SOFTWARE_PATHS_FILE,
@@ -202,11 +203,68 @@ def _complete_downloaded_area_ids(root: Path | None = None) -> set[str]:
     return area_ids
 
 
-def _downloaded_area_status() -> dict:
-    area_ids = sorted(_complete_downloaded_area_ids())
+def _quick_jump_label(area_id: str) -> str:
+    parts = [part for part in re.split(r'[_\-\s]+', str(area_id or '').strip()) if part]
+    if not parts:
+        return '已下载区域'
+    return ' '.join(part.upper() if part.isupper() else part.capitalize() for part in parts)
+
+
+def _valid_bbox(value) -> list[float]:
+    if not isinstance(value, list) or len(value) != 4:
+        return []
+    try:
+        bbox = [float(v) for v in value]
+    except (TypeError, ValueError):
+        return []
+    if not (bbox[0] < bbox[2] and bbox[1] < bbox[3]):
+        return []
+    return bbox
+
+
+def _macro_tile_quick_jumps(root: Path | None = None) -> list[dict]:
+    base = root or ROOT
+    index_path = base / 'RawData' / '_tiles' / '_index.json'
+    if not index_path.exists():
+        return []
+    try:
+        index = json.loads(index_path.read_text(encoding='utf-8'))
+    except Exception:
+        return []
+    if not isinstance(index, dict):
+        return []
+
+    jumps: list[dict] = []
+    for area_id, entry in sorted(index.items()):
+        if not isinstance(entry, dict):
+            continue
+        bbox = _valid_bbox(entry.get('bbox'))
+        if not bbox:
+            continue
+        required = ('dem_tif', 'osm_xml', 'bld_geojson')
+        if not all(entry.get(key) and _resolve_project_path(entry.get(key), root=base).exists() for key in required):
+            continue
+        grid = vc_grid.tiles_for_bbox(bbox, max_tiles=10000)
+        tile_count = len(grid.get('tiles') or [])
+        if tile_count <= 0:
+            continue
+        jumps.append({
+            'id': str(area_id),
+            'label': _quick_jump_label(str(area_id)),
+            'tile_count': tile_count,
+            'bbox': bbox,
+            'jumpable': True,
+            'source': 'macro_tile',
+        })
+    return jumps
+
+
+def _downloaded_area_status(root: Path | None = None) -> dict:
+    area_ids = sorted(_complete_downloaded_area_ids(root))
     return {
         'count': len(area_ids),
         'area_ids': area_ids,
+        'quick_jumps': _macro_tile_quick_jumps(root),
     }
 
 
@@ -300,38 +358,49 @@ def _data_sources_status() -> dict:
 
     sources = cfg.get('sources') if isinstance(cfg.get('sources'), dict) else {}
     dem_source = str(cfg.get('dem_source') or 'unknown')
-    items = [
-        {
-            'key': 'roads',
-            'title': '道路',
-            'provider': 'OpenStreetMap',
-            'method': 'OSM highway ways · Overpass API',
-            'strategy': sources.get('roads') or 'tile_cache_osm_else_overpass_v1',
-            'strategy_label': '本地缓存优先，缺失时通过 Overpass API 获取 OSM highway ways',
-            'current': _source_mode(cfg, 'roads'),
+
+    # 静态字段（provider/method/strategy_label/默认 profile/title）来自单一真相源
+    # acquisition.sources 注册表，避免与缓存指纹、set_area 回退逻辑三处漂移。
+    # 运行时字段（实际命中策略、current 状态、file 状态、dem_source 覆盖）在此叠加。
+    specs = acquisition_sources.SOURCES
+
+    # 注册表用 'dem'，但前端契约与 _source_mode 第三组用 'terrain'：仅运行时侧用 terrain，
+    # cfg['sources'] 的回退 key 仍读注册表 key（dem）。
+    runtime = {
+        'roads': {
+            'group': 'roads',
+            'cfg_key': 'roads',
             'file': _file_status(cfg.get('osm_file')),
         },
-        {
-            'key': 'buildings',
-            'title': '建筑',
-            'provider': 'Overture Maps + Google Open Buildings',
-            'method': 'Overture 轮廓 · Google 高度补全',
-            'strategy': sources.get('buildings') or 'tile_cache_overture_else_overture_api_v1',
-            'strategy_label': '本地缓存优先，缺失时用 Overture 轮廓并用 Google 高度补全',
-            'current': _source_mode(cfg, 'buildings'),
+        'buildings': {
+            'group': 'buildings',
+            'cfg_key': 'buildings',
             'file': _file_status(cfg.get('buildings_file')),
         },
-        {
-            'key': 'terrain',
-            'title': '地形',
-            'provider': dem_source.upper() if dem_source != 'unknown' else 'DEM',
-            'method': 'FABDEM DTM 优先 · NASADEM 兜底',
-            'strategy': sources.get('dem') or 'fabdem_else_tile_cache_else_nasadem_v1',
-            'strategy_label': 'FABDEM DTM 优先，本地缓存命中直接恢复，失败时 NASADEM 兜底',
-            'current': _source_mode(cfg, 'terrain') + f' · source={dem_source}',
+        'dem': {
+            'group': 'terrain',
+            'cfg_key': 'dem',
             'file': _file_status(cfg.get('dem_csv')),
+            'provider_override': dem_source.upper() if dem_source != 'unknown' else 'DEM',
+            'current_suffix': f' · source={dem_source}',
         },
-    ]
+    }
+
+    items = []
+    for reg_key, spec in specs.items():
+        rt = runtime.get(reg_key, {'group': reg_key, 'cfg_key': reg_key, 'file': None})
+        group = rt['group']
+        current = _source_mode(cfg, group) + rt.get('current_suffix', '')
+        items.append({
+            'key': group,
+            'title': spec.title,
+            'provider': rt.get('provider_override', spec.provider),
+            'method': spec.method,
+            'strategy': sources.get(rt['cfg_key']) or spec.profile,
+            'strategy_label': spec.strategy_label,
+            'current': current,
+            'file': rt['file'],
+        })
     return {
         'available': True,
         'area_id': str(cfg.get('area_id') or ''),
@@ -340,11 +409,20 @@ def _data_sources_status() -> dict:
     }
 
 
-def _resolve_project_path(value: str | Path) -> Path:
-    path = Path(value)
+def _resolve_project_path(value: str | Path, *, root: Path | None = None) -> Path:
+    base = root or ROOT
+    raw = str(value).replace('\\', '/')
+    lowered = raw.lower()
+    marker = '/virtualcity/'
+    idx = lowered.find(marker)
+    if idx >= 0:
+        return base / raw[idx + len(marker):]
+    if lowered.endswith('/virtualcity'):
+        return base
+    path = Path(raw)
     if path.is_absolute():
         return path
-    return ROOT / path
+    return base / path
 
 
 def _load_active_area() -> dict:

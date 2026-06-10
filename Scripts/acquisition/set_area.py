@@ -46,11 +46,14 @@ if str(SCRIPTS_ROOT) not in sys.path:
 from shared.vc_paths import ROOT, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
 from shared.vc_geo import bbox_size_m
 import data_cleaning_cache as dcc
+from acquisition.sources import acquisition_profile
 from orchestration import pipeline_state
 
 HIP = str(HIP)
 
-ACQUISITION_PROFILE = dcc.CURRENT_ACQUISITION_PROFILE
+# 写入 active_area.json 的数据获取 profile 直接取自声明式源注册表（单一真相源），
+# 与 data_cleaning_cache 的缓存指纹同源；缓存指纹字节由测试锁死。
+ACQUISITION_PROFILE = acquisition_profile()
 DATA_ONLY = "--data-only" in sys.argv[1:]
 ACQUIRE_ONLY = "--acquire-only" in sys.argv[1:]
 if DATA_ONLY and ACQUIRE_ONLY:
