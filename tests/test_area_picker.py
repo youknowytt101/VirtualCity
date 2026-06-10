@@ -105,13 +105,13 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('id="download-btn" disabled onclick="downloadData()"', _PICKER_FRONTEND)
         self.assertIn('class="source-action-btn"', _PICKER_FRONTEND)
         self.assertIn("submitSelectedArea('/download-data'", _PICKER_FRONTEND)
-        self.assertIn("filter: grayscale(1) saturate(0) contrast(1.22) brightness(0.62);", _PICKER_FRONTEND)
+        self.assertIn("filter: grayscale(1) saturate(0) contrast(1.38) brightness(0.44);", _PICKER_FRONTEND)
         self.assertIn("var isCached = !!tile.cached;", _PICKER_FRONTEND)
-        self.assertIn("var cachedColor = '#eef7f4';", _PICKER_FRONTEND)
+        self.assertIn("var cachedColor = '#f8fffd';", _PICKER_FRONTEND)
         self.assertIn("var gridLineColor = '#000000';", _PICKER_FRONTEND)
         self.assertIn("color: gridLineColor,", _PICKER_FRONTEND)
-        self.assertIn("fillOpacity: isSelected ? (isCached ? 0.28 : 0.2) : (isCached ? 0.22 : 0),", _PICKER_FRONTEND)
-        self.assertIn("opacity: 1.0,", _PICKER_FRONTEND)
+        self.assertIn("fillOpacity: isSelected ? (isCached ? 0.58 : 0.54) : (isCached ? 0.32 : 0),", _PICKER_FRONTEND)
+        self.assertIn("opacity: 0.25,", _PICKER_FRONTEND)
         self.assertNotIn("opacity: isSelected ? 1.0 : 0.6", _PICKER_FRONTEND)
         self.assertNotIn("invert(1)", _PICKER_FRONTEND)
         self.assertNotIn("visualRoad", _PICKER_FRONTEND)
@@ -173,7 +173,7 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_action_panel_groups_workflow_modules(self):
         self.assertIn('id="action-panel"', _PICKER_FRONTEND)
-        self.assertIn("执行工作流", _PICKER_FRONTEND)
+        self.assertIn("工作流", _PICKER_FRONTEND)
         self.assertIn("数据处理", _PICKER_FRONTEND)
         self.assertIn("软件链接", _PICKER_FRONTEND)
         self.assertIn("执行状态", _PICKER_FRONTEND)
@@ -242,6 +242,36 @@ class TestDataSourcesStatus(unittest.TestCase):
 
         self.assertEqual(payload["count"], 2)
         self.assertEqual(payload["area_ids"], ["area_raw", "area_snapshot"])
+        self.assertEqual(payload["quick_jumps"], [])
+
+    def test_downloaded_area_status_builds_macro_tile_quick_jumps(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            tiles = root / "RawData" / "_tiles"
+            tiles.mkdir(parents=True)
+            (tiles / "pattaya_dem.tif").write_bytes(b"tif")
+            (tiles / "pattaya_osm.osm").write_text("<osm/>", encoding="utf-8")
+            (tiles / "pattaya_bld.geojson").write_text("{}", encoding="utf-8")
+            (tiles / "_index.json").write_text(json.dumps({
+                "pattaya": {
+                    "bbox": [100.84, 12.89, 100.92, 12.97],
+                    "dem_tif": "F:\\VirtualCity\\RawData\\_tiles\\pattaya_dem.tif",
+                    "osm_xml": "F:\\VirtualCity\\RawData\\_tiles\\pattaya_osm.osm",
+                    "bld_geojson": "F:\\VirtualCity\\RawData\\_tiles\\pattaya_bld.geojson",
+                }
+            }), encoding="utf-8")
+
+            with patch.object(area_picker, "ROOT", root):
+                payload = area_picker._downloaded_area_status()
+
+        self.assertEqual(payload["count"], 0)
+        self.assertEqual(len(payload["quick_jumps"]), 1)
+        jump = payload["quick_jumps"][0]
+        self.assertEqual(jump["id"], "pattaya")
+        self.assertEqual(jump["label"], "Pattaya")
+        self.assertEqual(jump["tile_count"], 100)
+        self.assertEqual(jump["bbox"], [100.84, 12.89, 100.92, 12.97])
+        self.assertTrue(jump["jumpable"])
 
     def test_data_sources_status_reads_active_area_files(self):
         with tempfile.TemporaryDirectory() as td:
