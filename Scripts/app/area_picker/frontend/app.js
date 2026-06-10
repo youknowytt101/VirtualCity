@@ -318,27 +318,17 @@ function updateExportButton(available, running) {
 
 function setRunStatus(state, title, pct, detail) {
   var panel = document.getElementById('run-status-panel');
-  var chip = document.getElementById('run-status-chip');
   var titleEl = document.getElementById('run-status-title');
   var pctEl = document.getElementById('run-status-pct');
   var bar = document.getElementById('run-status-bar');
   var detailEl = document.getElementById('run-status-detail');
-  if (!panel || !chip || !titleEl || !pctEl || !bar || !detailEl) return;
+  if (!panel || !titleEl || !pctEl || !bar || !detailEl) return;
   var n = Math.max(0, Math.min(100, Number(pct) || 0));
   panel.className = 'run-status-panel status-' + state;
-  chip.textContent = title;
   titleEl.textContent = title;
   pctEl.textContent = n + '%';
   bar.style.width = n + '%';
-  if (state === 'ok') {
-    bar.style.background = 'var(--accent)';
-  } else if (state === 'off') {
-    bar.style.background = 'var(--accent)';
-  } else if (state === 'warn') {
-    bar.style.background = 'var(--accent)';
-  } else {
-    bar.style.background = 'var(--accent)';
-  }
+  bar.style.background = 'var(--quick-jump-count)';
   detailEl.textContent = detail || '等待任务';
 }
 
@@ -543,6 +533,44 @@ function refreshDataSources() {
   });
 }
 
+function jumpToDownloadedArea(area) {
+  if (!area || !area.bbox || area.bbox.length !== 4) return;
+  map.fitBounds([[area.bbox[1], area.bbox[0]], [area.bbox[3], area.bbox[2]]], {
+    padding: [60, 60],
+    maxZoom: 14
+  });
+}
+
+function renderQuickJumps(downloadedAreas) {
+  var host = document.getElementById('map-quick-jumps');
+  if (!host) return;
+  host.innerHTML = '';
+  var jumps = (downloadedAreas && downloadedAreas.quick_jumps) || [];
+  jumps.filter(function(area) {
+    return area && area.jumpable && area.bbox && area.bbox.length === 4;
+  }).forEach(function(area) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'map-quick-jump';
+    btn.title = '跳转到 ' + (area.label || area.id || '已下载区域');
+
+    var title = document.createElement('span');
+    title.className = 'map-quick-jump-title';
+    title.textContent = area.label || area.id || '已下载区域';
+
+    var count = document.createElement('span');
+    count.className = 'map-quick-jump-count';
+    count.textContent = String(area.tile_count || 0);
+
+    btn.appendChild(title);
+    btn.appendChild(count);
+    btn.addEventListener('click', function() {
+      jumpToDownloadedArea(area);
+    });
+    host.appendChild(btn);
+  });
+}
+
 function refreshServiceState() {
   fetch('/health')
   .then(function(r) { return r.json(); })
@@ -552,6 +580,7 @@ function refreshServiceState() {
     updateExportButton(!!d.export_available, !!d.running);
     updateSelectionButtons(!!d.running);
     updateRunStatusFromHealth(d);
+    renderQuickJumps(d.downloaded_areas);
     refreshDataSources();
   })
   .catch(function() {
@@ -595,15 +624,15 @@ function startPageSession() {
 function tileStyle(tile) {
   var isSelected = !!selectedTileIds[tile.tile_id];
   var isCached = !!tile.cached;
-  var selectedColor = '#35d4c4';
-  var cachedColor = '#eef7f4';
+  var selectedColor = '#ffffff';
+  var cachedColor = '#f8fffd';
   var gridLineColor = '#000000';
   return {
     color: gridLineColor,
     weight: isSelected ? 2 : 1,
-    opacity: 1.0,
-    fillColor: isCached ? cachedColor : selectedColor,
-    fillOpacity: isSelected ? (isCached ? 0.28 : 0.2) : (isCached ? 0.22 : 0),
+    opacity: 0.25,
+    fillColor: isSelected ? selectedColor : (isCached ? cachedColor : selectedColor),
+    fillOpacity: isSelected ? (isCached ? 0.58 : 0.54) : (isCached ? 0.32 : 0),
     dashArray: null
   };
 }
@@ -1189,7 +1218,7 @@ function pollStatus() {
       document.getElementById('progress-bar').style.width = '100%';
       document.getElementById('progress-text').textContent = '100%';
       if (d.ok) {
-        document.getElementById('progress-bar').style.background = 'var(--accent)';
+        document.getElementById('progress-bar').style.background = 'var(--quick-jump-count)';
         var doneLabel = d.operation === 'download' ? '[OK] 数据下载完成' : '[OK] 生成完成';
         var doneLog = d.operation === 'download' ? '[OK] 数据下载完成！区域: ' : '[OK] 生成完成！区域: ';
         document.getElementById('step-label').textContent = doneLabel;
@@ -1210,7 +1239,7 @@ function pollStatus() {
           refreshServiceState();
         }
       } else {
-        document.getElementById('progress-bar').style.background = 'var(--accent)';
+        document.getElementById('progress-bar').style.background = 'var(--quick-jump-count)';
         var failDetail = failureStatusDetail(d.failure_summary, '[FAIL] 管线出错');
         document.getElementById('step-label').textContent = failDetail;
         setRunStatus('off', '失败', d.pct || 0, failDetail);
@@ -1239,7 +1268,7 @@ function submitSelectedArea(endpoint, actionLabel) {
   setFailureSummary(null);
   document.getElementById('progress-container').style.display = 'block';
   document.getElementById('progress-bar').style.width = '0%';
-  document.getElementById('progress-bar').style.background = 'var(--accent)';
+  document.getElementById('progress-bar').style.background = 'var(--quick-jump-count)';
   document.getElementById('progress-text').textContent = '0%';
   document.getElementById('step-label').textContent = '准备中...';
   setRunStatus('warn', '启动中', 0, actionLabel + ': ' + name);

@@ -5,7 +5,7 @@
 <title>VirtualCity — 固定网格框选器</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800;900&family=Silkscreen:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/leaflet/leaflet.css"/>
 <link rel="stylesheet" href="/static/leaflet-draw/leaflet.draw.css"/>
 <link rel="stylesheet" href="/area-picker/styles.css?v=__VERSION__"/>
@@ -46,6 +46,7 @@
           </svg>
         </button>
       </div>
+      <div id="map-quick-jumps" class="map-quick-jumps" aria-label="已下载区域快速跳转"></div>
     </div>
   </div>
   <aside id="control-panel" aria-label="区域操作面板">
@@ -99,14 +100,13 @@
   <aside id="action-panel" aria-label="执行操作面板">
     <div class="action-panel-head">
       <div>
-        <div class="section-kicker">执行工作流</div>
+        <div class="section-kicker">工作流</div>
         <div class="section-note">当前框选区域</div>
       </div>
     </div>
     <section class="action-module" aria-label="数据处理">
       <div class="action-module-head">
-        <div class="action-module-title">数据处理</div>
-        <div class="action-module-state">数据准备</div>
+        <div class="action-module-title">数据可视化预览</div>
       </div>
       <div class="action-grid">
         <button type="button" disabled class="action-btn placeholder-btn" title="建筑数据清洗入口待接入">
@@ -130,7 +130,6 @@
     <section class="action-module" aria-label="软件链接">
       <div class="action-module-head">
         <div class="action-module-title">软件链接</div>
-        <div class="action-module-state">本地会话</div>
       </div>
       <div class="houdini-status-stack" aria-label="Houdini 状态">
         <div class="software-path-editor">
@@ -165,7 +164,6 @@
     <section class="action-module" aria-label="执行状态">
       <div class="action-module-head">
         <div class="action-module-title">执行状态</div>
-        <div id="run-status-chip" class="action-module-state">待命</div>
       </div>
       <div id="run-status-panel" class="run-status-panel status-warn">
         <div class="run-status-head">
@@ -192,6 +190,20 @@
         </div>
       </div>
     </section>
+    <div id="console-dock">
+      <div id="log-tabs">
+        <button class="tab-btn active" onclick="switchTab('all')">完整控制台</button>
+        <button class="tab-btn" onclick="switchTab('clean')">离线精炼</button>
+        <button class="tab-btn" onclick="switchTab('houdini')">Houdini 算子</button>
+        <button class="tab-btn" onclick="switchTab('qa')">QA 质量审查</button>
+      </div>
+      <div id="log-panels-container">
+        <div id="log-panel-all" class="log-panel">等待选择网格...</div>
+        <div id="log-panel-clean" class="log-panel" style="display:none">等待数据下载或精炼...</div>
+        <div id="log-panel-houdini" class="log-panel" style="display:none">等待 Houdini RPYC 执行...</div>
+        <div id="log-panel-qa" class="log-panel" style="display:none">等待 Model QA 诊断报告...</div>
+      </div>
+    </div>
   </aside>
 </main>
 <div id="progress-container">
@@ -200,20 +212,6 @@
     <div id="progress-text">0%</div>
   </div>
   <div id="step-label">准备中...</div>
-</div>
-<div id="console-dock">
-  <div id="log-tabs">
-    <button class="tab-btn active" onclick="switchTab('all')">完整控制台</button>
-    <button class="tab-btn" onclick="switchTab('clean')">离线精炼</button>
-    <button class="tab-btn" onclick="switchTab('houdini')">Houdini 算子</button>
-    <button class="tab-btn" onclick="switchTab('qa')">QA 质量审查</button>
-  </div>
-  <div id="log-panels-container">
-    <div id="log-panel-all" class="log-panel">等待选择网格...</div>
-    <div id="log-panel-clean" class="log-panel" style="display:none">等待数据下载或精炼...</div>
-    <div id="log-panel-houdini" class="log-panel" style="display:none">等待 Houdini RPYC 执行...</div>
-    <div id="log-panel-qa" class="log-panel" style="display:none">等待 Model QA 诊断报告...</div>
-  </div>
 </div>
 
 <script src="/static/leaflet/leaflet.js"></script>
