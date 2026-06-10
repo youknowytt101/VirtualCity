@@ -152,6 +152,16 @@ if net is None and OBJ_NET == 'city_gen':
 
 print('[Houdini 2/7] 修复 SOP 和参数...', flush=True)
 
+# 构建期间挂起 OUT_city 的 display/render flag：display 节点常开时，每 force
+# 一个上游节点都会触发视口把整条 dirty 链拉去重绘一次。实测同一条强制刷新链
+# display 开=159.74s / 关=28.32s，~82% 墙钟耗在视口重绘而非建模。flag 在第 6 段
+# 结尾会被重新设回 True，几何输出不受影响。
+_out_city = hou.node(OBJ_PATH + '/OUT_city')
+if _out_city:
+    _out_city.setDisplayFlag(False)
+    _out_city.setRenderFlag(False)
+    print('  OUT_city display/render 已临时挂起（构建结束自动恢复）')
+
 
 def cooked_geometry(node_path, force=False, retries=3):
     """Fetch geometry after cook, retrying stale Houdini node proxies."""
@@ -215,34 +225,7 @@ road_source_chain = roads_domain.build_source_chain(
     net,
     OBJ_PATH,
     osm,
-    _road_centerline_resample_enabled,
-    _road_centerline_resample_spacing_m,
-    _road_centerline_resample_preserve_bend_deg,
-    _road_shared_topology_enabled,
-    _road_shared_topology_fuse_tolerance_m,
-    _road_shared_topology_intersection_tolerance_m,
-    _road_shared_topology_max_segments,
-    _road_junction_curve_smooth_enabled,
-    _road_junction_curve_smooth_distance_m,
-    _road_junction_curve_smooth_min_branch_distance_m,
-    _road_junction_curve_smooth_min_angle_deg,
-    _road_junction_curve_smooth_max_angle_deg,
-    _road_junction_curve_smooth_arc_spacing_m,
-    _road_junction_curve_smooth_iterations,
-    _road_junction_curve_smooth_max_junctions,
-    _road_turn_curve_smooth_enabled,
-    _road_turn_curve_smooth_distance_m,
-    _road_turn_curve_smooth_min_branch_distance_m,
-    _road_turn_curve_smooth_min_angle_deg,
-    _road_turn_curve_smooth_max_angle_deg,
-    _road_turn_curve_smooth_arc_spacing_m,
-    _road_turn_curve_smooth_iterations,
-    _road_turn_curve_smooth_max_bends,
-    _road_vertex_cleanup_enabled,
-    _road_vertex_cleanup_spacing_m,
-    _road_vertex_cleanup_min_spacing_m,
-    _road_vertex_cleanup_anchor_angle_deg,
-    _road_vertex_cleanup_reuse_tolerance_m,
+    params=_ctx.road_build_params,
 )
 _road_mesh_input = road_source_chain.mesh_input
 buildings_domain.patch_snap_and_height_sops(hou, OBJ_PATH)
