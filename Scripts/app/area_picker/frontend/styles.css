@@ -727,6 +727,9 @@ button, input { font: inherit; }
 .point-select-active .leaflet-tile {
   cursor: crosshair;
 }
+.leaflet-container {
+  background: #6b6b6b;
+}
 .leaflet-tile-pane .leaflet-tile {
   filter: grayscale(1) saturate(0) contrast(1.38) brightness(0.44);
 }

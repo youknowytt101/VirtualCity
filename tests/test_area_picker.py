@@ -287,7 +287,11 @@ class TestDataSourcesStatus(unittest.TestCase):
 
         self.assertEqual(payload["count"], 2)
         self.assertEqual(payload["area_ids"], ["area_raw", "area_snapshot"])
-        self.assertEqual(payload["quick_jumps"], [])
+        # 无 macro-tile 下载时，quick_jumps 仅含 9 个预置城市书签，tile 数均为 0。
+        self.assertEqual(len(payload["quick_jumps"]), len(area_picker.PRESET_CITY_JUMPS))
+        self.assertTrue(all(j["source"] == "preset_city" for j in payload["quick_jumps"]))
+        self.assertTrue(all(j["tile_count"] == 0 for j in payload["quick_jumps"]))
+        self.assertTrue(all(j["jumpable"] and len(j["bbox"]) == 4 for j in payload["quick_jumps"]))
 
     def test_downloaded_area_status_builds_macro_tile_quick_jumps(self):
         with tempfile.TemporaryDirectory() as td:
@@ -310,15 +314,44 @@ class TestDataSourcesStatus(unittest.TestCase):
                 payload = area_picker._downloaded_area_status()
 
         self.assertEqual(payload["count"], 0)
-        self.assertEqual(len(payload["quick_jumps"]), 1)
+        # pattaya 中心不属于任何预置城市，作为孤儿排在 9 个预置城市之前。
+        self.assertEqual(len(payload["quick_jumps"]), 1 + len(area_picker.PRESET_CITY_JUMPS))
         jump = payload["quick_jumps"][0]
         self.assertEqual(jump["id"], "pattaya")
         self.assertEqual(jump["label"], "Pattaya")
         self.assertEqual(jump["tile_count"], 100)
         self.assertEqual(jump["bbox"], [100.84, 12.89, 100.92, 12.97])
         self.assertTrue(jump["jumpable"])
+        self.assertEqual(jump["source"], "macro_tile")
 
-    def test_data_sources_status_reads_active_area_files(self):
+    def test_downloaded_area_inside_preset_city_folds_into_bookmark(self):
+        # 已下载区域中心落在 Tokyo bbox 内：不另列孤儿，tile 数折叠进 Tokyo 书签。
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            tiles = root / "RawData" / "_tiles"
+            tiles.mkdir(parents=True)
+            (tiles / "tk_dem.tif").write_bytes(b"tif")
+            (tiles / "tk_osm.osm").write_text("<osm/>", encoding="utf-8")
+            (tiles / "tk_bld.geojson").write_text("{}", encoding="utf-8")
+            (tiles / "_index.json").write_text(json.dumps({
+                "tokyo_shinjuku": {
+                    "bbox": [139.69, 35.68, 139.71, 35.70],
+                    "dem_tif": str(tiles / "tk_dem.tif"),
+                    "osm_xml": str(tiles / "tk_osm.osm"),
+                    "bld_geojson": str(tiles / "tk_bld.geojson"),
+                }
+            }), encoding="utf-8")
+
+            with patch.object(area_picker, "ROOT", root):
+                payload = area_picker._downloaded_area_status()
+
+        jumps = payload["quick_jumps"]
+        self.assertEqual(len(jumps), len(area_picker.PRESET_CITY_JUMPS))
+        self.assertTrue(all(j["source"] == "preset_city" for j in jumps))
+        tokyo = next(j for j in jumps if j["id"] == "tokyo")
+        self.assertGreater(tokyo["tile_count"], 0)
+
+
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             cfg_dir = root / "Config"

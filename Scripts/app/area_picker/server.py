@@ -249,6 +249,65 @@ def _valid_bbox(value) -> list[float]:
     return bbox
 
 
+PRESET_CITY_JUMPS = [
+    {'id': 'tokyo', 'label': 'Tokyo', 'bbox': [139.60, 35.55, 139.92, 35.82]},
+    {'id': 'new_york', 'label': 'New York', 'bbox': [-74.05, 40.68, -73.90, 40.82]},
+    {'id': 'london', 'label': 'London', 'bbox': [-0.25, 51.43, 0.02, 51.57]},
+    {'id': 'paris', 'label': 'Paris', 'bbox': [2.25, 48.81, 2.42, 48.90]},
+    {'id': 'shanghai', 'label': 'Shanghai', 'bbox': [121.40, 31.15, 121.58, 31.30]},
+    {'id': 'singapore', 'label': 'Singapore', 'bbox': [103.78, 1.26, 103.90, 1.36]},
+    {'id': 'bangkok', 'label': 'Bangkok', 'bbox': [100.46, 13.68, 100.62, 13.80]},
+    {'id': 'sydney', 'label': 'Sydney', 'bbox': [151.16, -33.90, 151.28, -33.83]},
+    {'id': 'los_angeles', 'label': 'Los Angeles', 'bbox': [-118.30, 34.00, -118.18, 34.10]},
+]
+
+
+def _bbox_center(bbox: list[float]) -> tuple[float, float]:
+    return ((bbox[0] + bbox[2]) / 2.0, (bbox[1] + bbox[3]) / 2.0)
+
+
+def _center_in_bbox(center: tuple[float, float], bbox: list[float]) -> bool:
+    lon, lat = center
+    return bbox[0] <= lon <= bbox[2] and bbox[1] <= lat <= bbox[3]
+
+
+def _preset_city_jumps(downloaded: list[dict]) -> list[dict]:
+    """预置世界主要城市书签。已下载区域中心落在城市 bbox 内的，复用其真实 tile 数。"""
+    jumps: list[dict] = []
+    for city in PRESET_CITY_JUMPS:
+        tile_count = 0
+        for area in downloaded:
+            area_bbox = area.get('bbox')
+            if isinstance(area_bbox, list) and len(area_bbox) == 4 and \
+                    _center_in_bbox(_bbox_center(area_bbox), city['bbox']):
+                tile_count += int(area.get('tile_count') or 0)
+        jumps.append({
+            'id': city['id'],
+            'label': city['label'],
+            'tile_count': tile_count,
+            'bbox': list(city['bbox']),
+            'jumpable': True,
+            'source': 'preset_city',
+        })
+    return jumps
+
+
+def _quick_jumps(root: Path | None = None) -> list[dict]:
+    """孤儿（已下载但不属于任何预置城市）排在最前，其后是 9 个预置城市书签。"""
+    downloaded = _macro_tile_quick_jumps(root)
+    preset = _preset_city_jumps(downloaded)
+    preset_boxes = [city['bbox'] for city in PRESET_CITY_JUMPS]
+    orphans = [
+        area for area in downloaded
+        if not any(
+            isinstance(area.get('bbox'), list) and len(area['bbox']) == 4 and
+            _center_in_bbox(_bbox_center(area['bbox']), box)
+            for box in preset_boxes
+        )
+    ]
+    return orphans + preset
+
+
 def _macro_tile_quick_jumps(root: Path | None = None) -> list[dict]:
     base = root or ROOT
     index_path = base / 'RawData' / '_tiles' / '_index.json'
@@ -291,7 +350,7 @@ def _downloaded_area_status(root: Path | None = None) -> dict:
     return {
         'count': len(area_ids),
         'area_ids': area_ids,
-        'quick_jumps': _macro_tile_quick_jumps(root),
+        'quick_jumps': _quick_jumps(root),
     }
 
 
