@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "Scripts"))
 import data_cleaning_cache as dcc
 import pipeline_state
 import refine_data
+from orchestration import build_history
 
 
 def _write_ready_file(path: Path, marker: str) -> None:
@@ -51,6 +52,63 @@ class TestPipelineState(unittest.TestCase):
     def test_run_id_rejects_path_traversal(self):
         with self.assertRaises(ValueError):
             pipeline_state.run_path("../outside")
+
+
+class TestBuildHistory(unittest.TestCase):
+    def _sample_run(self) -> dict:
+        return {
+            "schema": 1,
+            "run_id": "run_hist",
+            "area_id": "area_hist",
+            "bbox": [1, 2, 3, 4],
+            "source": "unit-test",
+            "status": "completed",
+            "phase": "completed",
+            "created": "2026-06-11T02:00:00",
+            "updated": "2026-06-11T02:03:20",
+            "events": [
+                {"time": "2026-06-11T02:00:00", "status": "running", "phase": "created", "message": "created"},
+                {"time": "2026-06-11T02:00:10", "status": "running", "phase": "refine_data", "message": "refine started"},
+                {"time": "2026-06-11T02:00:20", "status": "running", "phase": "houdini_recook", "message": "recook started"},
+                {"time": "2026-06-11T02:03:20", "status": "completed", "phase": "completed", "message": "done"},
+            ],
+        }
+
+    def test_render_includes_module_breakdown_and_durations(self):
+        md = build_history.render_markdown(self._sample_run())
+        self.assertIn("## 模块耗时分解", md)
+        self.assertIn("数据获取", md)
+        self.assertIn("数据清洗", md)
+        self.assertIn("Houdini 构建", md)
+        # 总耗时 3m20s，Houdini 段 3m00s 应占绝大多数。
+        self.assertIn("3m20s", md)
+        self.assertIn("3m00s", md)
+
+    def test_write_history_creates_per_run_file(self):
+        with tempfile.TemporaryDirectory() as td:
+            history = Path(td) / "build_history"
+            target = build_history.write_history(self._sample_run(), history_dir=history)
+            self.assertTrue(target.exists())
+            self.assertEqual(target.name, "run_hist.md")
+            self.assertIn("area_hist", target.read_text(encoding="utf-8"))
+
+    def test_complete_run_archives_history(self):
+        with tempfile.TemporaryDirectory() as td:
+            runs = Path(td) / "pipeline_runs"
+            history = Path(td) / "build_history"
+            with patch.object(pipeline_state, "RUNS_DIR", runs), \
+                    patch.object(pipeline_state, "LATEST_RUN", runs / "latest.json"), \
+                    patch.object(build_history, "HISTORY_DIR", history):
+                pipeline_state.create_run({"area_id": "area_hist"}, source="unit-test", run_id="run_hist")
+                pipeline_state.complete_run("run_hist")
+            self.assertTrue((history / "run_hist.md").exists())
+
+    def test_write_history_for_unknown_run_is_silent(self):
+        with tempfile.TemporaryDirectory() as td:
+            runs = Path(td) / "pipeline_runs"
+            with patch.object(pipeline_state, "RUNS_DIR", runs), \
+                    patch.object(pipeline_state, "LATEST_RUN", runs / "latest.json"):
+                self.assertIsNone(build_history.write_history_for_run("does_not_exist"))
 
 
 class TestReadyPublication(unittest.TestCase):

@@ -487,7 +487,13 @@ if not errors:
             qa_report = project_relative(_qa_latest)
             print('  [WARN] Model QA report unreadable: {}'.format(_exc))
     if _qa_result.returncode != 0:
-        errors.append('model QA failed (see {})'.format(qa_report or 'Reports/model_qa/latest.json'))
+        # Model QA 是非阻断体检，不是构建闸门：几何此刻已成功产出并汇聚到
+        # OUT_city，质量问题只如实记录到 qa_status，由导出闸门据此要求人工复核。
+        # 不再把 QA 结果塞进 errors，否则会让「几何产出」和「质量评分」共用
+        # 一根退出码，导致模型明明建好却被整条管线判失败。
+        qa_status = qa_status or 'fail'
+        print('  [WARN] Model QA 未通过（advisory，不阻断管线）: {}'.format(
+            qa_report or 'Reports/model_qa/latest.json'))
 
 # ── 结果汇报 ─────────────────────────────────────────
 print()

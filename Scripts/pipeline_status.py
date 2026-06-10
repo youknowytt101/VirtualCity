@@ -13,7 +13,7 @@ import manual_review
 import vc_paths
 
 
-MANUAL_REVIEW_QA = {"warn", "manual_review_required"}
+MANUAL_REVIEW_QA = {"warn", "manual_review_required", "fail"}
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -163,9 +163,9 @@ def export_gate(root: Path | None = None,
     qa_status = str(qa.get("status") or houdini.get("qa_status") or "").lower()
     if not qa.get("available"):
         reasons.append(str(qa.get("message") or "current Model QA report is missing"))
-    elif qa_status == "fail":
-        reasons.append("Model QA status is fail")
     elif qa_status in MANUAL_REVIEW_QA:
+        # QA 是非阻断体检：fail/warn 都不直接拦死导出，而是要求人工复核确认。
+        # 几何已成功产出，质量评分由人决定是否放行，而不是机器一刀切。
         requires_review = True
         warnings.append(f"Model QA status is {qa_status}")
 

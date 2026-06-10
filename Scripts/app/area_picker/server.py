@@ -51,6 +51,7 @@ _state = {'running': False, 'done': False, 'ok': False, 'returncode': None, 'nam
           'run_id': '',
           'houdini_done': False, 'houdini_status': '', 'houdini_message': '',
           'step': 0, 'total_steps': 6, 'step_label': '', 'log_lines': [], 'pct': 0,
+          'log_offset': 0, 'export_log_offset': 0,
           'export_running': False, 'export_done': False, 'export_ok': False,
           'export_returncode': None, 'export_log_lines': []}
 _state_lock = threading.Lock()
@@ -58,6 +59,32 @@ _selection_state = {'selection': None, 'updated_at': 0.0}
 _selection_lock = threading.Lock()
 _server_ref = [None]  # mutable ref so _run thread can call shutdown()
 _MAX_LOG_LINES = 80
+
+
+def _append_log(key, offset_key, line):
+    """Append a line to a rolling log window and keep a monotonic global offset.
+
+    log_offset 记录当前窗口首行在全局序列中的下标（即已被裁掉的行数）。
+    前端据此用全局序号消费，避免窗口滚动后 len() 不再增长导致的增量失效。
+    必须在持有 _state_lock 时调用。
+    """
+    lines = _state[key]
+    lines.append(line)
+    overflow = len(lines) - _MAX_LOG_LINES
+    if overflow > 0:
+        del lines[:overflow]
+        _state[offset_key] += overflow
+
+
+def _reset_log(key, offset_key, seed=None):
+    """Reset a log window and its global offset. Hold _state_lock when calling."""
+    _state[key] = list(seed) if seed else []
+    _state[offset_key] = 0
+# After run_pipeline.py exits, the stdout reader can stay blocked if a Houdini QA
+# grandchild still holds the inherited stdout write end. Once the process has
+# exited and the authoritative status file says completed, the reader is given
+# this long to drain before we stop waiting on the (possibly dead) pipe.
+_STDOUT_DRAIN_GRACE_S = 5.0
 _page_lock = threading.Lock()
 _page_state = {'seen': False, 'last_seen': 0.0, 'close_requested': False, 'closed_at': 0.0,
                'monitor_started': False, 'hold_until': 0.0}
@@ -695,14 +722,26 @@ def _open_browser(url: str) -> None:
         webbrowser.open(url)
 
 
-def _read_houdini_status(expected_area: str, expected_run_id: str = ''):
+def _load_houdini_status_raw() -> dict | None:
+    """读取 Houdini 构建状态文件原始 dict；缺失或损坏返回 None。
+
+    `_read_houdini_status` 与 `_houdini_status_belongs_to_run` 共用此处的文件读取，
+    避免两处各自打开同一文件、各自做 area/run 比对。
+    """
     status_file = ROOT / 'Config' / 'houdini_build_status.json'
     if not status_file.exists():
-        return False, '', 'status file missing'
+        return None
     try:
         data = json.loads(status_file.read_text(encoding='utf-8'))
-    except Exception as exc:
-        return False, '', f'status file unreadable: {exc}'
+    except Exception:
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _read_houdini_status(expected_area: str, expected_run_id: str = ''):
+    data = _load_houdini_status_raw()
+    if data is None:
+        return False, '', 'status file missing or unreadable'
     area_id = data.get('area_id', '')
     run_id = data.get('run_id', '')
     status = data.get('status', '')
@@ -712,6 +751,23 @@ def _read_houdini_status(expected_area: str, expected_run_id: str = ''):
     if expected_run_id and run_id != expected_run_id:
         return False, status, f'run mismatch: {run_id} != {expected_run_id}'
     return status == 'completed', status, message
+
+
+def _houdini_status_belongs_to_run(expected_area: str, expected_run_id: str = '') -> bool:
+    """状态文件是否确属本次 area/run。
+
+    watchdog 每 2 秒轮询一次状态文件，会在本次 recook 尚未写入新状态、文件还停留
+    在上一轮残留（不同 area/run）的窗口期读到陈旧的 completed/failed。只有身份匹配
+    才能把它当作本次的终态采信，否则会把上一轮的失败误判成本次失败。
+    """
+    data = _load_houdini_status_raw()
+    if data is None:
+        return False
+    if data.get('area_id', '') != expected_area:
+        return False
+    if expected_run_id and data.get('run_id', '') != expected_run_id:
+        return False
+    return True
 
 
 def _read_json_silent(path: Path) -> dict:
@@ -916,6 +972,23 @@ def _template_html():
     return area_picker_template.HTML
 
 
+def _frontend_asset_version() -> str:
+    """前端静态资源的内容指纹，用于 ?v= 缓存击穿。
+
+    APP_VERSION 是手写的 server 代码版本（也用于进程版本比对），不随前端文件变化，
+    所以不能拿它做缓存击穿——改了 app.js/styles.css 而忘记 +1 时，URL 不变、浏览器
+    吃旧缓存，热更新失效。这里改用前端文件的 mtime+size 派生指纹：文件一改版本串自动
+    变，URL 随之变，浏览器强制重取，无需任何手动维护。"""
+    parts: list[str] = []
+    for name in ("app.js", "styles.css", "index.html"):
+        try:
+            st = (FRONTEND_ROOT / name).stat()
+            parts.append(f"{int(st.st_mtime)}-{st.st_size}")
+        except OSError:
+            parts.append("0")
+    return "-".join(parts)
+
+
 class _Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass  # Suppress default access logs
@@ -997,6 +1070,7 @@ class _Handler(BaseHTTPRequestHandler):
                     'step_label': _state['step_label'],
                     'pct':        _state['pct'],
                     'log_lines':  list(_state['log_lines']),
+                    'log_offset': _state['log_offset'],
                     'houdini_done':    _state['houdini_done'],
                     'houdini_status':  _state['houdini_status'],
                     'houdini_message': _state['houdini_message'],
@@ -1013,6 +1087,7 @@ class _Handler(BaseHTTPRequestHandler):
                     'export_ok': _state['export_ok'],
                     'export_returncode': _state['export_returncode'],
                     'export_log_lines': list(_state['export_log_lines']),
+                    'export_log_offset': _state['export_log_offset'],
                 }
                 snapshot = dict(resp)
             resp['houdini_available'] = _probe_houdini()
@@ -1056,7 +1131,7 @@ class _Handler(BaseHTTPRequestHandler):
         html = (_template_html()
                 .replace('__LAT__', str(lat))
                 .replace('__LON__', str(lon))
-                .replace('__VERSION__', APP_VERSION)
+                .replace('__VERSION__', _frontend_asset_version())
                 .replace('__MAX_SELECTION_TILES__', str(vc_grid.MAX_SELECTION_TILES))
                 .replace('__SHUTDOWN_WITH_PAGE__', 'true' if SHUTDOWN_WITH_PAGE else 'false'))
         self.send_response(200)
@@ -1143,6 +1218,7 @@ class _Handler(BaseHTTPRequestHandler):
                            'operation': operation,
                            'run_id': '',
                            'step': 0, 'total_steps': 6, 'step_label': '启动中...', 'pct': 0,
+                           'log_offset': 0, 'export_log_offset': 0,
                            'log_lines': [],
                            'houdini_done': False, 'houdini_status': '', 'houdini_message': '',
                            'export_done': False, 'export_ok': False, 'export_returncode': None,
@@ -1167,24 +1243,34 @@ class _Handler(BaseHTTPRequestHandler):
                     bufsize=1,
                     env=env,
                 )
-                for raw_line in proc.stdout:
-                    line = raw_line.rstrip('\n\r')
-                    if not line:
-                        continue
-                    _safe_print(line)  # echo to terminal
-                    with _state_lock:
-                        _state['log_lines'].append(line)
-                        if len(_state['log_lines']) > _MAX_LOG_LINES:
-                            _state['log_lines'] = _state['log_lines'][-_MAX_LOG_LINES:]
-                        progress = _line_progress_update(line, int(_state.get('pct', 0)))
-                        if progress:
-                            _state.update(progress)
-                        run_match = _RUN_RE.match(line)
-                        if run_match:
-                            _state['run_id'] = run_match.group(1)
+
+                def _drain_stdout():
+                    for raw_line in proc.stdout:
+                        line = raw_line.rstrip('\n\r')
+                        if not line:
+                            continue
+                        _safe_print(line)  # echo to terminal
+                        with _state_lock:
+                            _append_log('log_lines', 'log_offset', line)
+                            progress = _line_progress_update(line, int(_state.get('pct', 0)))
+                            if progress:
+                                _state.update(progress)
+                            run_match = _RUN_RE.match(line)
+                            if run_match:
+                                _state['run_id'] = run_match.group(1)
+
+                # Read stdout on a side thread so completion never hinges on the
+                # pipe reaching EOF: a Houdini QA grandchild that inherits the
+                # stdout write end can keep the pipe open long after
+                # run_pipeline.py itself has exited and written the status file.
+                reader = threading.Thread(target=_drain_stdout, daemon=True)
+                reader.start()
 
                 proc.wait()
                 returncode = proc.returncode
+                # Give the reader a bounded window to flush buffered lines; if the
+                # pipe is wedged open by a grandchild, stop waiting on it.
+                reader.join(timeout=_STDOUT_DRAIN_GRACE_S)
                 if data_only:
                     houdini_done, houdini_status, houdini_message = False, 'skipped', 'data download only'
                     ok = returncode == 0
@@ -1204,7 +1290,7 @@ class _Handler(BaseHTTPRequestHandler):
 
             with _state_lock:
                 if ok and not houdini_done and not data_only:
-                    _state['log_lines'].append(f'[WARN] Houdini 状态文件未确认，但 run_pipeline.py 已成功退出: {houdini_message}')
+                    _append_log('log_lines', 'log_offset', f'[WARN] Houdini 状态文件未确认，但 run_pipeline.py 已成功退出: {houdini_message}')
                 _state.update({'running': False, 'done': True,
                                'ok': ok,
                                'returncode': returncode,
@@ -1229,7 +1315,46 @@ class _Handler(BaseHTTPRequestHandler):
                 else:
                     _safe_print('[area_picker] 状态服务保持运行，按 Ctrl+C 退出')
 
+        def _status_watchdog():
+            # Fallback completion path. The _run thread surfaces done only after
+            # its stdout reader and proc.wait() return; if that thread ever
+            # wedges, the authoritative status file still flips to
+            # completed/failed. Watch it for THIS run_id and surface done so the
+            # UI can leave the progress screen regardless of the reader's fate.
+            if data_only:
+                return
+            while True:
+                time.sleep(2.0)
+                with _state_lock:
+                    if _state.get('done') or not _state.get('running'):
+                        return
+                    run_id = _state.get('run_id', '')
+                # Require a known run_id so we never read a previous run's
+                # leftover completed/failed status for the same area.
+                if not run_id:
+                    continue
+                houdini_done, houdini_status, houdini_message = _read_houdini_status(name, run_id)
+                # 必须确认状态文件确属本次 run：否则会在新 recook 尚未写入、文件还停在
+                # 上一轮残留的窗口期，把上一轮的 completed/failed 误判成本次终态。
+                if houdini_status not in ('completed', 'failed'):
+                    continue
+                if not _houdini_status_belongs_to_run(name, run_id):
+                    continue
+                with _state_lock:
+                    if _state.get('done') or not _state.get('running'):
+                        return
+                    _state.update({'running': False, 'done': True,
+                                   'ok': houdini_done,
+                                   'pct': 100 if houdini_done else _state['pct'],
+                                   'step_label': '[OK] 完成' if houdini_done else '[FAIL] 失败',
+                                   'houdini_done': houdini_done,
+                                   'houdini_status': houdini_status,
+                                   'houdini_message': houdini_message})
+                _safe_print(f'[area_picker] 状态文件哨兵确认管线结束: {houdini_status}')
+                return
+
         threading.Thread(target=_run, daemon=True).start()
+        threading.Thread(target=_status_watchdog, daemon=True).start()
         if data_only:
             message = f'数据下载已启动: {name}'
         else:
@@ -1313,6 +1438,7 @@ class _Handler(BaseHTTPRequestHandler):
                 'export_done': False,
                 'export_ok': False,
                 'export_returncode': None,
+                'export_log_offset': 0,
                 'export_log_lines': ['[导出] Houdini FBX 导出开始（不触发 UE5 导入）'],
             })
 
@@ -1335,9 +1461,7 @@ class _Handler(BaseHTTPRequestHandler):
                         continue
                     _safe_print(line)
                     with _state_lock:
-                        _state['export_log_lines'].append(line)
-                        if len(_state['export_log_lines']) > _MAX_LOG_LINES:
-                            _state['export_log_lines'] = _state['export_log_lines'][-_MAX_LOG_LINES:]
+                        _append_log('export_log_lines', 'export_log_offset', line)
                 proc.wait()
                 returncode = proc.returncode
                 ok = returncode == 0
@@ -1345,7 +1469,7 @@ class _Handler(BaseHTTPRequestHandler):
                 returncode = proc.returncode if proc is not None else -1
                 ok = False
                 with _state_lock:
-                    _state['export_log_lines'].append(f'[FAIL] 导出线程异常: {exc}')
+                    _append_log('export_log_lines', 'export_log_offset', f'[FAIL] 导出线程异常: {exc}')
 
             with _state_lock:
                 _state.update({
@@ -1354,7 +1478,7 @@ class _Handler(BaseHTTPRequestHandler):
                     'export_ok': ok,
                     'export_returncode': returncode,
                 })
-                _state['export_log_lines'].append('[OK] FBX 导出完成' if ok else f'[FAIL] FBX 导出失败 exit={returncode}')
+                _append_log('export_log_lines', 'export_log_offset', '[OK] FBX 导出完成' if ok else f'[FAIL] FBX 导出失败 exit={returncode}')
             _safe_print('[area_picker] FBX 导出完成' if ok else f'[area_picker] FBX 导出失败 exit={returncode}')
 
         threading.Thread(target=_run_export, daemon=True).start()

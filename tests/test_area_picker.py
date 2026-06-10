@@ -38,6 +38,51 @@ class TestProgressParsing(unittest.TestCase):
         self.assertEqual(update["pct"], 99)
 
 
+class TestRollingLogOffset(unittest.TestCase):
+    """日志窗口滚动后，全局序号必须单调增长，前端据此消费不丢行。"""
+
+    def _isolated_state(self):
+        previous = dict(area_picker._state)
+        with area_picker._state_lock:
+            area_picker._reset_log("log_lines", "log_offset")
+        return previous
+
+    def test_offset_tracks_dropped_lines(self):
+        previous = self._isolated_state()
+        try:
+            total = area_picker._MAX_LOG_LINES + 25
+            with area_picker._state_lock:
+                for i in range(total):
+                    area_picker._append_log("log_lines", "log_offset", f"line-{i}")
+            self.assertEqual(len(area_picker._state["log_lines"]), area_picker._MAX_LOG_LINES)
+            self.assertEqual(area_picker._state["log_offset"], 25)
+            self.assertEqual(area_picker._state["log_lines"][0], "line-25")
+        finally:
+            with area_picker._state_lock:
+                area_picker._state.update(previous)
+
+    def test_frontend_consumption_loses_no_line_across_rollover(self):
+        previous = self._isolated_state()
+        try:
+            total = area_picker._MAX_LOG_LINES + 40
+            consumed = []
+            next_seq = 0
+            with area_picker._state_lock:
+                for i in range(total):
+                    area_picker._append_log("log_lines", "log_offset", f"line-{i}")
+                    base = area_picker._state["log_offset"]
+                    window = list(area_picker._state["log_lines"])
+                    global_end = base + len(window)
+                    if global_end > next_seq:
+                        start = max(next_seq, base) - base
+                        consumed.extend(window[start:])
+                        next_seq = global_end
+            self.assertEqual(consumed, [f"line-{i}" for i in range(total)])
+        finally:
+            with area_picker._state_lock:
+                area_picker._state.update(previous)
+
+
 class TestPickerHtml(unittest.TestCase):
     def test_picker_frontend_is_split_into_static_assets(self):
         self.assertTrue((FRONTEND_ROOT / "index.html").exists())
@@ -363,6 +408,36 @@ class TestRootLauncher(unittest.TestCase):
         self.assertNotIn("-StopUnknownPortOwners", source)
 
 
+class TestFrontendAssetVersion(unittest.TestCase):
+    def test_version_changes_when_asset_content_changes(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            for name in ("app.js", "styles.css", "index.html"):
+                (root / name).write_text("v1", encoding="utf-8")
+            with patch.object(area_picker, "FRONTEND_ROOT", root):
+                first = area_picker._frontend_asset_version()
+                # 改动 app.js 内容（size 变化），版本串必须随之变化。
+                (root / "app.js").write_text("v2-longer-content", encoding="utf-8")
+                second = area_picker._frontend_asset_version()
+        self.assertNotEqual(first, second)
+
+    def test_version_is_stable_without_changes(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            for name in ("app.js", "styles.css", "index.html"):
+                (root / name).write_text("same", encoding="utf-8")
+            with patch.object(area_picker, "FRONTEND_ROOT", root):
+                self.assertEqual(
+                    area_picker._frontend_asset_version(),
+                    area_picker._frontend_asset_version(),
+                )
+
+    def test_version_does_not_raise_on_missing_assets(self):
+        with tempfile.TemporaryDirectory() as td:
+            with patch.object(area_picker, "FRONTEND_ROOT", Path(td)):
+                self.assertIsInstance(area_picker._frontend_asset_version(), str)
+
+
 class TestHoudiniStatus(unittest.TestCase):
     def test_status_requires_matching_run_id(self):
         with tempfile.TemporaryDirectory() as td:
@@ -386,6 +461,34 @@ class TestHoudiniStatus(unittest.TestCase):
                 self.assertFalse(ok)
                 self.assertEqual(status, "completed")
                 self.assertIn("run mismatch", message)
+
+    def test_status_belongs_to_run_rejects_stale_other_run(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            cfg = root / "Config"
+            cfg.mkdir()
+            # 状态文件停留在上一轮的 area/run（陈旧残留），本次 run 不应采信。
+            (cfg / "houdini_build_status.json").write_text(json.dumps({
+                "area_id": "area_old",
+                "run_id": "run_old",
+                "status": "failed",
+                "message": "previous run failed",
+            }), encoding="utf-8")
+            with patch.object(area_picker, "ROOT", root):
+                self.assertFalse(
+                    area_picker._houdini_status_belongs_to_run("area_new", "run_new"))
+                self.assertFalse(
+                    area_picker._houdini_status_belongs_to_run("area_old", "run_new"))
+                self.assertTrue(
+                    area_picker._houdini_status_belongs_to_run("area_old", "run_old"))
+
+    def test_status_belongs_to_run_false_when_file_missing(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "Config").mkdir()
+            with patch.object(area_picker, "ROOT", root):
+                self.assertFalse(
+                    area_picker._houdini_status_belongs_to_run("area_new", "run_new"))
 
     def test_failure_summary_extracts_model_qa_report(self):
         with tempfile.TemporaryDirectory() as td:
@@ -637,7 +740,38 @@ class TestExportAvailability(unittest.TestCase):
         self.assertFalse(still_blocked["allowed"])
         self.assertTrue(allowed["allowed"])
 
-    def test_service_payload_skips_live_probe_while_pipeline_runs(self):
+    def test_export_gate_qa_fail_requires_review_not_hard_block(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            cfg = root / "Config"
+            qa = root / "Reports" / "model_qa"
+            cfg.mkdir()
+            qa.mkdir(parents=True)
+            active = {
+                "area_id": "area_test",
+                "run_id": "run_test",
+            }
+            (cfg / "active_area.json").write_text(json.dumps(active), encoding="utf-8")
+            (cfg / "houdini_build_status.json").write_text(json.dumps({
+                "area_id": "area_test",
+                "run_id": "run_test",
+                "status": "completed",
+                "qa_status": "fail",
+                "qa_report": "Reports/model_qa/area_test_quick.json",
+            }), encoding="utf-8")
+            (qa / "area_test_quick.json").write_text(json.dumps({
+                "area_id": "area_test",
+                "run_id": "run_test",
+                "status": "fail",
+            }), encoding="utf-8")
+
+            blocked = pipeline_status.export_gate(root, active, live_model_ready=True)
+            manual_review.write_review("area_test", "run_test", root=root)
+            allowed = pipeline_status.export_gate(root, active, live_model_ready=True)
+
+        self.assertFalse(blocked["allowed"])
+        self.assertTrue(blocked["requires_manual_review"])
+        self.assertTrue(allowed["allowed"])
         previous = dict(area_picker._state)
         try:
             with area_picker._state_lock:

@@ -1105,6 +1105,31 @@ function categorizeLine(line) {
   return null;
 }
 
+var LOG_MAX_LINES = 800;
+var _dirtyLogPanels = {};
+var _logFlushScheduled = false;
+
+function scheduleLogFlush() {
+  if (_logFlushScheduled) return;
+  _logFlushScheduled = true;
+  requestAnimationFrame(flushLogPanels);
+}
+
+function flushLogPanels() {
+  _logFlushScheduled = false;
+  var pending = _dirtyLogPanels;
+  _dirtyLogPanels = {};
+  for (var panelId in pending) {
+    if (!pending.hasOwnProperty(panelId)) continue;
+    var el = document.getElementById('log-panel-' + panelId);
+    if (!el) continue;
+    while (el.childElementCount > LOG_MAX_LINES && el.firstElementChild) {
+      el.removeChild(el.firstElementChild);
+    }
+    el.scrollTop = el.scrollHeight;
+  }
+}
+
 function writeToPanel(panelId, msg, cls) {
   var el = document.getElementById('log-panel-' + panelId);
   if (!el) return;
@@ -1117,7 +1142,8 @@ function writeToPanel(panelId, msg, cls) {
   if (cls) line.className = cls;
   line.textContent = msg + '\n';
   el.appendChild(line);
-  el.scrollTop = el.scrollHeight;
+  _dirtyLogPanels[panelId] = true;
+  scheduleLogFlush();
 }
 
 function log(msg, cls) {
@@ -1152,10 +1178,22 @@ function switchTab(panelId) {
 }
 
 var _pollTimer = null;
-var _lastLogLen = 0;
-var _lastExportLogLen = 0;
+var _lastLogSeq = 0;
+var _lastExportSeq = 0;
 var _lastFailureKey = '';
 var _houdiniOpenPollTimer = null;
+
+var _progressEls = null;
+function progressEls() {
+  if (!_progressEls) {
+    _progressEls = {
+      bar: document.getElementById('progress-bar'),
+      text: document.getElementById('progress-text'),
+      label: document.getElementById('step-label')
+    };
+  }
+  return _progressEls;
+}
 
 function pollHoudiniAfterOpen(remaining) {
   clearTimeout(_houdiniOpenPollTimer);
@@ -1171,35 +1209,46 @@ function pollStatus() {
   .then(r => r.json())
   .then(d => {
     var pct = d.pct || 0;
-    document.getElementById('progress-bar').style.width = pct + '%';
-    document.getElementById('progress-text').textContent = pct + '%';
-    document.getElementById('step-label').textContent = d.step_label || '运行中...';
+    var pe = progressEls();
+    pe.bar.style.width = pct + '%';
+    pe.text.textContent = pct + '%';
+    pe.label.textContent = d.step_label || '运行中...';
     updateRunStatusFromHealth(d);
     updateSoftwarePath(d.software_paths);
 
-    if (d.log_lines && d.log_lines.length > _lastLogLen) {
-      var newLines = d.log_lines.slice(_lastLogLen);
-      for (var i = 0; i < newLines.length; i++) {
-        var line = newLines[i];
-        var cls = 'dim';
-        if (line.indexOf('[OK]') >= 0) cls = 'ok';
-        else if (line.indexOf('[ERR]') >= 0 || line.indexOf('[FAIL]') >= 0) cls = 'err';
-        else if (line.match(/^\[\d+\/\d+\]/)) cls = 'step';
-        log(line, cls);
+    if (d.log_lines && d.log_lines.length) {
+      var logBase = d.log_offset || 0;
+      var globalEnd = logBase + d.log_lines.length;
+      if (globalEnd > _lastLogSeq) {
+        var startIdx = Math.max(_lastLogSeq, logBase) - logBase;
+        var newLines = d.log_lines.slice(startIdx);
+        for (var i = 0; i < newLines.length; i++) {
+          var line = newLines[i];
+          var cls = 'dim';
+          if (line.indexOf('[OK]') >= 0) cls = 'ok';
+          else if (line.indexOf('[ERR]') >= 0 || line.indexOf('[FAIL]') >= 0) cls = 'err';
+          else if (line.match(/^\[\d+\/\d+\]/)) cls = 'step';
+          log(line, cls);
+        }
+        _lastLogSeq = globalEnd;
       }
-      _lastLogLen = d.log_lines.length;
     }
 
-    if (d.export_log_lines && d.export_log_lines.length > _lastExportLogLen) {
-      var exportLines = d.export_log_lines.slice(_lastExportLogLen);
-      for (var j = 0; j < exportLines.length; j++) {
-        var exLine = exportLines[j];
-        var exCls = 'dim';
-        if (exLine.indexOf('[OK]') >= 0 || exLine.indexOf(' OK:') >= 0) exCls = 'ok';
-        else if (exLine.indexOf('[ERR]') >= 0 || exLine.indexOf('[FAIL]') >= 0 || exLine.indexOf('[WARN]') >= 0) exCls = 'err';
-        log(exLine, exCls);
+    if (d.export_log_lines && d.export_log_lines.length) {
+      var exportBase = d.export_log_offset || 0;
+      var exportEnd = exportBase + d.export_log_lines.length;
+      if (exportEnd > _lastExportSeq) {
+        var exStartIdx = Math.max(_lastExportSeq, exportBase) - exportBase;
+        var exportLines = d.export_log_lines.slice(exStartIdx);
+        for (var j = 0; j < exportLines.length; j++) {
+          var exLine = exportLines[j];
+          var exCls = 'dim';
+          if (exLine.indexOf('[OK]') >= 0 || exLine.indexOf(' OK:') >= 0) exCls = 'ok';
+          else if (exLine.indexOf('[ERR]') >= 0 || exLine.indexOf('[FAIL]') >= 0 || exLine.indexOf('[WARN]') >= 0) exCls = 'err';
+          log(exLine, exCls);
+        }
+        _lastExportSeq = exportEnd;
       }
-      _lastExportLogLen = d.export_log_lines.length;
     }
     updateExportButton(!!d.export_available, !!d.export_running || !!d.running);
     setHoudiniBadge(!!d.houdini_available, d.houdini_asset);
@@ -1215,13 +1264,14 @@ function pollStatus() {
     if (d.done && !d.export_running) {
       clearInterval(_pollTimer);
       _pollTimer = null;
-      document.getElementById('progress-bar').style.width = '100%';
-      document.getElementById('progress-text').textContent = '100%';
+      var peDone = progressEls();
+      peDone.bar.style.width = '100%';
+      peDone.text.textContent = '100%';
       if (d.ok) {
-        document.getElementById('progress-bar').style.background = 'var(--quick-jump-count)';
+        peDone.bar.style.background = 'var(--quick-jump-count)';
         var doneLabel = d.operation === 'download' ? '[OK] 数据下载完成' : '[OK] 生成完成';
         var doneLog = d.operation === 'download' ? '[OK] 数据下载完成！区域: ' : '[OK] 生成完成！区域: ';
-        document.getElementById('step-label').textContent = doneLabel;
+        peDone.label.textContent = doneLabel;
         setRunStatus('ok', '完成', 100, doneLabel);
         log(doneLog + d.name, 'ok');
         if (d.run_id) log('run_id: ' + d.run_id, 'dim');
@@ -1239,9 +1289,9 @@ function pollStatus() {
           refreshServiceState();
         }
       } else {
-        document.getElementById('progress-bar').style.background = 'var(--quick-jump-count)';
+        peDone.bar.style.background = 'var(--quick-jump-count)';
         var failDetail = failureStatusDetail(d.failure_summary, '[FAIL] 管线出错');
-        document.getElementById('step-label').textContent = failDetail;
+        peDone.label.textContent = failDetail;
         setRunStatus('off', '失败', d.pct || 0, failDetail);
         setFailureSummary(d.failure_summary);
         logFailureSummary(d.failure_summary, d.returncode);
@@ -1262,8 +1312,8 @@ function submitSelectedArea(endpoint, actionLabel) {
   document.getElementById('log-panel-clean').innerHTML = '等待数据下载或精炼...';
   document.getElementById('log-panel-houdini').innerHTML = '等待 Houdini RPYC 执行...';
   document.getElementById('log-panel-qa').innerHTML = '等待 Model QA 诊断报告...';
-  _lastLogLen = 0;
-  _lastExportLogLen = 0;
+  _lastLogSeq = 0;
+  _lastExportSeq = 0;
   _lastFailureKey = '';
   setFailureSummary(null);
   document.getElementById('progress-container').style.display = 'block';
@@ -1315,7 +1365,7 @@ function ensurePolling() {
 
 function exportFbx() {
   document.getElementById('export-btn').disabled = true;
-  _lastExportLogLen = 0;
+  _lastExportSeq = 0;
   setRunStatus('warn', '导出中', 0, 'Houdini 正在导出 FBX');
   log('[' + new Date().toLocaleTimeString() + '] 开始导出 FBX（不触发 UE5 导入）...', 'ok');
   fetch('/export', { method: 'POST' })

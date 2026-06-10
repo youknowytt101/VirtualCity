@@ -98,9 +98,32 @@ def update_run(run_id: str, *, status: str | None = None,
 
 
 def fail_run(run_id: str, *, phase: str, message: str) -> dict[str, Any]:
-    return update_run(run_id, status="failed", phase=phase, message=message)
+    payload = update_run(run_id, status="failed", phase=phase, message=message)
+    _archive_history(run_id)
+    return payload
 
 
 def complete_run(run_id: str, *, phase: str = "completed",
                  message: str = "pipeline completed") -> dict[str, Any]:
-    return update_run(run_id, status="completed", phase=phase, message=message)
+    payload = update_run(run_id, status="completed", phase=phase, message=message)
+    _archive_history(run_id)
+    return payload
+
+
+def _archive_history(run_id: str) -> None:
+    """Derive the human-readable build history archive for a finished run.
+
+    Observability only: never let an archiving error break the pipeline's
+    terminal bookkeeping.
+    """
+    try:
+        from orchestration import build_history
+    except ImportError:
+        try:
+            import build_history  # type: ignore
+        except ImportError:
+            return
+    try:
+        build_history.write_history_for_run(run_id)
+    except Exception:
+        pass
