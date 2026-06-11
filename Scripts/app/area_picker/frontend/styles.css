@@ -11,6 +11,8 @@
   --subtle: color-mix(in srgb, var(--text) 45%, var(--base));
   --teal: var(--accent);
   --quick-jump-count: #2ab7ff;
+  --scrollbar-thumb: color-mix(in srgb, var(--text) 20%, transparent);
+  --scrollbar-thumb-hover: color-mix(in srgb, var(--accent) 55%, transparent);
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -104,19 +106,24 @@ button, input { font: inherit; }
 .map-quick-jumps {
   position: absolute;
   left: 14px;
-  top: 56px;
+  bottom: 14px;
   z-index: 480;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 6px;
-  width: 101px;
+  gap: 7px;
+  width: 118px;
+  padding-right: 12px;
+  max-height: calc(100% - 70px);
+  overflow-y: auto;
+  overflow-x: hidden;
   pointer-events: auto;
 }
 .map-quick-jump {
+  position: relative;
   width: 100%;
   min-height: 31px;
-  padding: 7px 8px;
+  padding: 7px 8px 7px 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--base);
@@ -128,17 +135,42 @@ button, input { font: inherit; }
   align-items: center;
   gap: 6px;
   text-align: left;
+  will-change: transform;
   transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    background 160ms ease,
-    box-shadow 160ms ease;
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 200ms ease,
+    background-color 200ms ease;
+  animation: quick-jump-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .map-quick-jump:hover {
-  transform: translateX(3px);
-  border-color: var(--line);
-  background: color-mix(in srgb, var(--text) 8%, var(--base));
+  transform: translateX(8px);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  background-color: color-mix(in srgb, var(--text) 7%, var(--base));
   box-shadow: none;
+}
+.map-quick-jump:focus-visible {
+  outline: none;
+  transform: translateX(8px);
+  border-color: var(--accent);
+}
+.map-quick-jump:active {
+  transform: translateX(5px);
+  background-color: color-mix(in srgb, var(--text) 12%, var(--base));
+}
+@keyframes quick-jump-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-quick-jump {
+    animation: none;
+    transition: border-color 200ms ease, background-color 200ms ease;
+  }
+  .map-quick-jump:hover,
+  .map-quick-jump:focus-visible,
+  .map-quick-jump:active {
+    transform: none;
+  }
 }
 .map-quick-jump-title {
   display: block;
@@ -491,6 +523,67 @@ button, input { font: inherit; }
   gap: 8px;
   margin-top: 8px;
 }
+.download-progress {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 9px 10px;
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+}
+.download-progress[hidden] {
+  display: none;
+}
+.download-progress.status-ok {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--base));
+}
+.download-progress.status-off {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--base));
+}
+.download-progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.download-progress-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.download-progress-pct {
+  color: var(--accent);
+  font-family: Consolas, 'Cascadia Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+}
+.download-progress-track {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  background: var(--base);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.download-progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--quick-jump-count);
+  border-radius: 999px;
+  transition: width 0.3s ease, background 0.2s ease;
+}
+.download-progress-detail {
+  min-height: 16px;
+  color: var(--subtle);
+  font-size: 11px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
 .source-card {
   padding: 9px 10px;
   background: color-mix(in srgb, var(--text) 4%, var(--base));
@@ -738,43 +831,6 @@ button, input { font: inherit; }
   height: 32px;
   line-height: 32px;
 }
-#progress-container {
-  display: none;
-  padding: 10px 18px;
-  background: var(--base);
-  border-top: 1px solid var(--line);
-}
-#progress-bar-wrap {
-  background: var(--base);
-  border-radius: 6px;
-  height: 22px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  position: relative;
-}
-#progress-bar {
-  height: 100%;
-  background: var(--quick-jump-count);
-  border-radius: 6px;
-  transition: width 0.4s ease;
-  box-shadow: 0 0 10px color-mix(in srgb, var(--quick-jump-count) 36%, transparent);
-}
-#progress-text {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--text);
-  text-shadow: 0 1px 2px color-mix(in srgb, var(--base) 55%, transparent);
-}
-#step-label {
-  color: var(--accent);
-  font-size: 12px;
-  margin-top: 6px;
-}
 #console-dock {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -909,4 +965,30 @@ button, input { font: inherit; }
     max-width: 100%;
   }
   #console-dock { min-height: 240px; }
+}
+
+/* 自定义滚动条: 取代系统原生 UI, 统一到本应用的暗色青绿主题 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }

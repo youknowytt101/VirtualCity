@@ -95,6 +95,16 @@
           <div class="source-file">--</div>
         </div>
       </div>
+      <div id="download-progress" class="download-progress">
+        <div class="download-progress-head">
+          <span id="download-progress-title" class="download-progress-title">数据下载</span>
+          <span id="download-progress-pct" class="download-progress-pct">0%</span>
+        </div>
+        <div class="download-progress-track" aria-label="数据下载进度">
+          <div id="download-progress-bar" class="download-progress-bar"></div>
+        </div>
+        <div id="download-progress-detail" class="download-progress-detail">等待下载任务</div>
+      </div>
     </section>
   </aside>
   <aside id="action-panel" aria-label="执行操作面板">
@@ -206,13 +216,6 @@
     </div>
   </aside>
 </main>
-<div id="progress-container">
-  <div id="progress-bar-wrap">
-    <div id="progress-bar" style="width:0%"></div>
-    <div id="progress-text">0%</div>
-  </div>
-  <div id="step-label">准备中...</div>
-</div>
 
 <script src="/static/leaflet/leaflet.js"></script>
 <script src="/static/leaflet-draw/leaflet.draw.js"></script>

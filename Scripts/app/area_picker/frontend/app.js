@@ -544,30 +544,57 @@ function jumpToDownloadedArea(area) {
 function renderQuickJumps(downloadedAreas) {
   var host = document.getElementById('map-quick-jumps');
   if (!host) return;
-  host.innerHTML = '';
   var jumps = (downloadedAreas && downloadedAreas.quick_jumps) || [];
-  jumps.filter(function(area) {
+  var areas = jumps.filter(function(area) {
     return area && area.jumpable && area.bbox && area.bbox.length === 4;
-  }).forEach(function(area) {
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'map-quick-jump';
-    btn.title = '跳转到 ' + (area.label || area.id || '已下载区域');
+  });
 
-    var title = document.createElement('span');
-    title.className = 'map-quick-jump-title';
-    title.textContent = area.label || area.id || '已下载区域';
+  var existing = {};
+  Array.prototype.forEach.call(host.children, function(node) {
+    if (node.dataset && node.dataset.jumpKey) existing[node.dataset.jumpKey] = node;
+  });
 
-    var count = document.createElement('span');
-    count.className = 'map-quick-jump-count';
-    count.textContent = String(area.tile_count || 0);
+  var seen = {};
+  areas.forEach(function(area, index) {
+    var key = String(area.id || area.label || index);
+    seen[key] = true;
+    var label = area.label || area.id || '已下载区域';
+    var countText = String(area.tile_count || 0);
 
-    btn.appendChild(title);
-    btn.appendChild(count);
-    btn.addEventListener('click', function() {
-      jumpToDownloadedArea(area);
-    });
-    host.appendChild(btn);
+    var btn = existing[key];
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'map-quick-jump';
+      btn.dataset.jumpKey = key;
+
+      var title = document.createElement('span');
+      title.className = 'map-quick-jump-title';
+
+      var count = document.createElement('span');
+      count.className = 'map-quick-jump-count';
+
+      btn.appendChild(title);
+      btn.appendChild(count);
+      btn.addEventListener('click', function() {
+        jumpToDownloadedArea(btn._area);
+      });
+    }
+
+    btn._area = area;
+    btn.title = '跳转到 ' + label;
+    var titleEl = btn.querySelector('.map-quick-jump-title');
+    var countEl = btn.querySelector('.map-quick-jump-count');
+    if (titleEl && titleEl.textContent !== label) titleEl.textContent = label;
+    if (countEl && countEl.textContent !== countText) countEl.textContent = countText;
+
+    if (host.children[index] !== btn) {
+      host.insertBefore(btn, host.children[index] || null);
+    }
+  });
+
+  Array.prototype.slice.call(host.children).forEach(function(node) {
+    if (!node.dataset || !seen[node.dataset.jumpKey]) host.removeChild(node);
   });
 }
 
@@ -1183,16 +1210,43 @@ var _lastExportSeq = 0;
 var _lastFailureKey = '';
 var _houdiniOpenPollTimer = null;
 
-var _progressEls = null;
-function progressEls() {
-  if (!_progressEls) {
-    _progressEls = {
-      bar: document.getElementById('progress-bar'),
-      text: document.getElementById('progress-text'),
-      label: document.getElementById('step-label')
+var _downloadProgressEls = null;
+function downloadProgressEls() {
+  if (!_downloadProgressEls) {
+    _downloadProgressEls = {
+      panel: document.getElementById('download-progress'),
+      title: document.getElementById('download-progress-title'),
+      pct: document.getElementById('download-progress-pct'),
+      bar: document.getElementById('download-progress-bar'),
+      detail: document.getElementById('download-progress-detail')
     };
   }
-  return _progressEls;
+  return _downloadProgressEls;
+}
+
+function setDownloadProgress(state, title, pct, detail) {
+  var els = downloadProgressEls();
+  if (!els.panel) return;
+  els.panel.className = 'download-progress status-' + state;
+  var n = Math.max(0, Math.min(100, Number(pct) || 0));
+  if (els.title) els.title.textContent = title;
+  if (els.pct) els.pct.textContent = n + '%';
+  if (els.bar) els.bar.style.width = n + '%';
+  if (els.detail) els.detail.textContent = detail || '';
+}
+
+function resetDownloadProgress() {
+  var els = downloadProgressEls();
+  if (els.panel) els.panel.className = 'download-progress';
+  if (els.pct) els.pct.textContent = '0%';
+  if (els.bar) els.bar.style.width = '0%';
+  if (els.title) els.title.textContent = '数据下载';
+  if (els.detail) els.detail.textContent = '等待下载任务';
+}
+
+function reloadGridNow() {
+  clearTimeout(gridTimer);
+  loadGrid();
 }
 
 function pollHoudiniAfterOpen(remaining) {
@@ -1208,11 +1262,6 @@ function pollStatus() {
   fetch('/status')
   .then(r => r.json())
   .then(d => {
-    var pct = d.pct || 0;
-    var pe = progressEls();
-    pe.bar.style.width = pct + '%';
-    pe.text.textContent = pct + '%';
-    pe.label.textContent = d.step_label || '运行中...';
     updateRunStatusFromHealth(d);
     updateSoftwarePath(d.software_paths);
 
@@ -1254,6 +1303,10 @@ function pollStatus() {
     setHoudiniBadge(!!d.houdini_available, d.houdini_asset);
     updateSelectionButtons(!!d.running);
 
+    if (d.operation === 'download' && d.running) {
+      setDownloadProgress('warn', '数据下载中', d.pct || 0, d.step_label || '正在下载 OSM / DEM / 建筑...');
+    }
+
     if (d.export_done && !d.export_running) {
       clearInterval(_pollTimer);
       _pollTimer = null;
@@ -1264,17 +1317,17 @@ function pollStatus() {
     if (d.done && !d.export_running) {
       clearInterval(_pollTimer);
       _pollTimer = null;
-      var peDone = progressEls();
-      peDone.bar.style.width = '100%';
-      peDone.text.textContent = '100%';
       if (d.ok) {
-        peDone.bar.style.background = 'var(--quick-jump-count)';
         var doneLabel = d.operation === 'download' ? '[OK] 数据下载完成' : '[OK] 生成完成';
         var doneLog = d.operation === 'download' ? '[OK] 数据下载完成！区域: ' : '[OK] 生成完成！区域: ';
-        peDone.label.textContent = doneLabel;
         setRunStatus('ok', '完成', 100, doneLabel);
         log(doneLog + d.name, 'ok');
         if (d.run_id) log('run_id: ' + d.run_id, 'dim');
+        if (d.operation === 'download') {
+          setDownloadProgress('ok', '数据下载完成', 100, '已写入本地缓存，地图填充已刷新');
+          reloadGridNow();
+          setTimeout(resetDownloadProgress, 1500);
+        }
         if (d.auto_shutdown_on_success) {
           log('3 秒后自动关闭页面，5 秒后停止本地服务...', 'dim');
           setTimeout(function() {
@@ -1289,10 +1342,11 @@ function pollStatus() {
           refreshServiceState();
         }
       } else {
-        peDone.bar.style.background = 'var(--quick-jump-count)';
         var failDetail = failureStatusDetail(d.failure_summary, '[FAIL] 管线出错');
-        peDone.label.textContent = failDetail;
         setRunStatus('off', '失败', d.pct || 0, failDetail);
+        if (d.operation === 'download') {
+          setDownloadProgress('off', '数据下载失败', d.pct || 0, failDetail);
+        }
         setFailureSummary(d.failure_summary);
         logFailureSummary(d.failure_summary, d.returncode);
         updateSelectionButtons(false);
@@ -1305,6 +1359,7 @@ function pollStatus() {
 
 function submitSelectedArea(endpoint, actionLabel) {
   if (!selection) return;
+  var isDownload = endpoint === '/download-data';
   var name = selection.selection_id;
   var b = selection.bbox;
   updateSelectionButtons(true);
@@ -1316,11 +1371,11 @@ function submitSelectedArea(endpoint, actionLabel) {
   _lastExportSeq = 0;
   _lastFailureKey = '';
   setFailureSummary(null);
-  document.getElementById('progress-container').style.display = 'block';
-  document.getElementById('progress-bar').style.width = '0%';
-  document.getElementById('progress-bar').style.background = 'var(--quick-jump-count)';
-  document.getElementById('progress-text').textContent = '0%';
-  document.getElementById('step-label').textContent = '准备中...';
+  if (isDownload) {
+    setDownloadProgress('warn', '数据下载中', 0, '准备下载...');
+  } else {
+    resetDownloadProgress();
+  }
   setRunStatus('warn', '启动中', 0, actionLabel + ': ' + name);
   log('[' + new Date().toLocaleTimeString() + '] ' + actionLabel + ': ' + name, 'ok');
   log('bbox = [' + b[0]+', '+b[1]+', '+b[2]+', '+b[3]+']', 'dim');
@@ -1340,12 +1395,14 @@ function submitSelectedArea(endpoint, actionLabel) {
       _pollTimer = setInterval(pollStatus, 1000);
     } else {
       log('[错误] ' + d.message, 'err');
+      if (isDownload) setDownloadProgress('off', '数据下载失败', 0, d.message || '启动失败');
       updateSelectionButtons(false);
       refreshServiceState();
     }
   })
   .catch(e => {
     log('[网络错误] ' + e, 'err');
+    if (isDownload) setDownloadProgress('off', '数据下载失败', 0, '网络错误: ' + e);
     updateSelectionButtons(false);
     refreshServiceState();
   });
