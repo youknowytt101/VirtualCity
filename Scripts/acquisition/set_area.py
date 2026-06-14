@@ -46,6 +46,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
 from shared.vc_paths import ROOT, DATA_ROOT, SCRIPTS, HIP, project_relative, write_active_area
 from shared.vc_geo import bbox_size_m
 import data_cleaning_cache as dcc
+import area_manifest
 from acquisition.sources import acquisition_profile
 from orchestration import pipeline_state
 
@@ -369,6 +370,22 @@ if not clip_manifest:
         if not DATA_ONLY:
             write_active_area(cfg, relative=True)
         print(f"  [clip-cache] 已写入 {clip_manifest.get('key')}")
+
+# ── 已下载区域清单：一手把真实 tile_ids/bbox 落盘（单一真相源）──
+# tile_ids 优先取自上游选择（env），缺失时用 bbox 反推兜底以兼容旧入口。
+_manifest_tile_ids = list(TILE_IDS)
+if not _manifest_tile_ids:
+    try:
+        import vc_grid as _vc_grid
+        _grid = _vc_grid.tiles_for_bbox(bbox_req, max_tiles=100000)
+        _manifest_tile_ids = [t["tile_id"] for t in (_grid.get("tiles") or [])]
+    except Exception:
+        _manifest_tile_ids = []
+try:
+    area_manifest.write(area_name, tile_ids=_manifest_tile_ids, bbox=bbox_req)
+    print(f"  [area-manifest] 已记录 {area_name}: {len(_manifest_tile_ids)} tiles")
+except Exception as _ex:
+    print(f"  [WARN] area-manifest 写入失败: {_ex}")
 
 if DATA_ONLY:
     pipeline_state.complete_run(RUN_ID, phase="data_download_completed",

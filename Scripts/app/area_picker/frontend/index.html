@@ -6,8 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800;900&family=Silkscreen:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/leaflet/leaflet.css"/>
-<link rel="stylesheet" href="/static/leaflet-draw/leaflet.draw.css"/>
+<link rel="stylesheet" href="/static/maplibre/maplibre-gl.css"/>
 <link rel="stylesheet" href="/area-picker/styles.css?v=__VERSION__"/>
 
 </head>
@@ -30,11 +29,13 @@
           <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
             <rect width="18" height="18" x="3" y="3" rx="2"></rect>
           </svg>
+          <span class="map-tool-label">框选</span>
         </button>
         <button type="button" class="map-tool-button map-tool-point" title="点选网格" aria-label="点选网格">
           <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
             <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"></path>
           </svg>
+          <span class="map-tool-label">点选</span>
         </button>
         <button type="button" class="map-tool-button map-tool-clear" title="清空选择" aria-label="清空选择" disabled>
           <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
@@ -44,9 +45,27 @@
             <path d="M3 6h18"></path>
             <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
           </svg>
+          <span class="map-tool-label">清空</span>
         </button>
       </div>
-      <div id="map-quick-jumps" class="map-quick-jumps" aria-label="已下载区域快速跳转"></div>
+      <div id="basemap-control" class="map-tool-control basemap-control" aria-label="底图风格">
+        <button type="button" class="map-tool-button map-tool-basemap" title="选择底图风格" aria-label="选择底图风格" aria-haspopup="true">
+          <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path>
+            <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path>
+            <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path>
+          </svg>
+          <span class="map-tool-label basemap-label">矢量·标准</span>
+          <svg class="basemap-caret" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </button>
+        <div id="basemap-menu" class="basemap-menu" role="menu" aria-label="底图风格列表"></div>
+      </div>
+      <div id="region-nav" class="region-nav" aria-label="国家与城市导航">
+        <div id="region-countries" class="region-col region-countries" role="list" aria-label="国家"></div>
+        <div id="region-cities" class="region-col region-cities" role="list" aria-label="城市" hidden></div>
+      </div>
     </div>
   </div>
   <aside id="control-panel" aria-label="区域操作面板">
@@ -94,16 +113,6 @@
           <div class="source-detail">策略：FABDEM DTM 优先，本地缓存命中直接恢复，失败时 NASADEM 兜底</div>
           <div class="source-file">--</div>
         </div>
-      </div>
-      <div id="download-progress" class="download-progress">
-        <div class="download-progress-head">
-          <span id="download-progress-title" class="download-progress-title">数据下载</span>
-          <span id="download-progress-pct" class="download-progress-pct">0%</span>
-        </div>
-        <div class="download-progress-track" aria-label="数据下载进度">
-          <div id="download-progress-bar" class="download-progress-bar"></div>
-        </div>
-        <div id="download-progress-detail" class="download-progress-detail">等待下载任务</div>
       </div>
     </section>
   </aside>
@@ -180,6 +189,7 @@
           <div id="run-status-title" class="run-state">等待选择区域</div>
           <div id="run-status-pct" class="run-pct">0%</div>
         </div>
+        <div id="run-status-phase" class="run-status-phase" hidden></div>
         <div class="run-progress-track" aria-label="执行进度">
           <div id="run-status-bar" class="run-progress-bar"></div>
         </div>
@@ -217,8 +227,7 @@
   </aside>
 </main>
 
-<script src="/static/leaflet/leaflet.js"></script>
-<script src="/static/leaflet-draw/leaflet.draw.js"></script>
+<script src="/static/maplibre/maplibre-gl.js"></script>
 <script>
 window.VC_CONFIG = {
   lat: __LAT__,

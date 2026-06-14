@@ -23,6 +23,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from orchestration import pipeline_state
+from orchestration import state_machine as sm
 from shared import vc_paths
 
 
@@ -117,6 +118,13 @@ def main(argv: list[str] | None = None) -> int:
     area_id = cfg.get("area_id", "")
     print(f"\n[RUN] area_id={area_id} run_id={run_id}")
 
+    # 显式状态机只做时序守卫：每次推进做一次纯函数转移，非法时序（如 acquire
+    # 未完成就 cook、或终态后再推进）会在 transition 处抛错。phase 的落盘仍由
+    # 下面既有的 update_run/_run/complete_run 负责，落盘契约不变。
+    state = sm.QUEUED
+    state = sm.transition(state, sm.START)      # -> ACQUIRING
+    state = sm.transition(state, sm.ACQUIRED)   # -> REFINING（acquisition 已在上面跑完）
+
     refine_cmd = [python, str(SCRIPTS / "cleaning" / "refine_data.py")]
     if skip_probe:
         refine_cmd.append("--skip-probe")
@@ -124,19 +132,24 @@ def main(argv: list[str] | None = None) -> int:
         refine_cmd.append("--force")
 
     if _run(refine_cmd, phase="refine_data", run_id=run_id) != 0:
+        sm.transition(state, sm.FAIL)
         pipeline_state.fail_run(run_id, phase="refine_data",
                                 message="data refinement failed")
         print("[FAIL] 数据精炼未通过，中止流程")
         return 1
+    state = sm.transition(state, sm.REFINED)    # -> COOKING
     pipeline_state.update_run(run_id, phase="refine_data_completed",
                               message="data refinement completed")
 
     recook_cmd = [python, "-u", str(SCRIPTS / "houdini_build" / "recook_new_area.py")]
     if _run(recook_cmd, phase="houdini_recook", run_id=run_id) != 0:
+        sm.transition(state, sm.FAIL)
         pipeline_state.fail_run(run_id, phase="houdini_recook",
                                 message="Houdini recook failed")
         print("[FAIL] Houdini 重算失败，中止流程")
         return 1
+    state = sm.transition(state, sm.COOKED)     # -> QA
+    state = sm.transition(state, sm.QA_PASSED)  # -> DONE
 
     pipeline_state.complete_run(
         run_id,

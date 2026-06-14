@@ -15,6 +15,43 @@ import vc_paths
 
 MANUAL_REVIEW_QA = {"warn", "manual_review_required", "fail"}
 
+# phase 是真相源里的事实，把它翻译成人能看懂的中文标签属于读层职责，
+# 这里是唯一来源；server 的失败摘要也复用它，避免两处各维护一份。
+PHASE_LABELS = {
+    "created": "创建运行记录",
+    "download_area_prepared": "准备下载区域",
+    "active_area_written": "写入 active_area",
+    "acquire_osm": "获取道路数据",
+    "acquire_dem": "获取地形数据",
+    "acquire_buildings": "获取建筑数据",
+    "raw_data_acquired": "原始数据获取完成",
+    "data_download_completed": "数据下载完成",
+    "refine_data": "数据清洗",
+    "refine_data_completed": "数据清洗完成",
+    "houdini_preflight": "Houdini 输入预检",
+    "houdini_recook": "Houdini 重算",
+    "houdini_completed": "Houdini 完成",
+    "pipeline_completed": "管线完成",
+    "aborted": "流程中止",
+}
+
+# 数据获取/清洗阶段没有结构化的 step/total，按 phase 给固定锚点推进进度条；
+# Houdini 段则用真相源里的 progress.step/total 在 75~99 区间细分。
+_PHASE_PCT = {
+    "created": 2,
+    "download_area_prepared": 5,
+    "active_area_written": 6,
+    "acquire_osm": 20,
+    "acquire_dem": 38,
+    "acquire_buildings": 55,
+    "raw_data_acquired": 62,
+    "data_download_completed": 100,
+    "refine_data": 66,
+    "refine_data_completed": 74,
+    "houdini_completed": 100,
+    "pipeline_completed": 100,
+}
+
 
 def _read_json(path: Path) -> dict[str, Any]:
     try:
@@ -118,6 +155,43 @@ def load_model_qa(root: Path, area_id: str, run_id: str,
     return {"available": False, "same_identity": False, "message": "current model QA report missing"}
 
 
+def progress_view(run: dict[str, Any]) -> dict[str, Any]:
+    """把 run 文件里的 phase/progress/status 投影成 UI 进度，纯函数无副作用。
+
+    进度是真相源里的结构化事实，不再靠解析 stdout 日志推断：
+    - status 终态优先决定 pct（completed=100，failed 保留最后进度）。
+    - Houdini 段用 progress.step/total 在 75~99 区间细分。
+    - 其余阶段按 phase 锚点取固定 pct。
+    label 直接采用真相源写入的 progress.label；缺失时回退到 phase 中文标签。
+    """
+    phase = str(run.get("phase") or "")
+    status = str(run.get("status") or "")
+    progress = run.get("progress") if isinstance(run.get("progress"), dict) else {}
+    step = int(progress.get("step") or 0)
+    total = int(progress.get("total") or 0)
+    label = str(progress.get("label") or "")
+    phase_label = PHASE_LABELS.get(phase, phase or "管线执行")
+
+    if status == "completed":
+        pct = 100
+    elif phase in ("houdini_recook", "houdini_preflight"):
+        # 进入 Houdini 段即锚定 75 起点；拿到 step/total 后在 75~99 区间细分，
+        # 避免 recook 刚启动、progress 尚未写入（total=0）时 pct 掉回 0。
+        pct = 75 if total <= 0 else min(99, 75 + int(step / total * 23))
+    else:
+        pct = _PHASE_PCT.get(phase, 0)
+
+    return {
+        "phase": phase,
+        "phase_label": phase_label,
+        "status": status,
+        "step": step,
+        "total": total,
+        "label": label or phase_label,
+        "pct": pct,
+    }
+
+
 def current_status(root: Path | None = None,
                    active_cfg: dict[str, Any] | None = None) -> dict[str, Any]:
     base = root or vc_paths.ROOT
@@ -160,8 +234,12 @@ def export_gate(root: Path | None = None,
         reasons.append(f"Houdini status is {houdini.get('status') or 'unknown'}")
 
     qa = status["model_qa"]
-    qa_status = str(qa.get("status") or houdini.get("qa_status") or "").lower()
-    if not qa.get("available"):
+    # 优先采信 run 文件里的 qa（单一真相源），回退到独立 model_qa 报告与
+    # houdini_build_status 的 qa_status，保证旧产物在过渡期仍可被判读。
+    run_qa = status["run"].get("qa") if isinstance(status["run"].get("qa"), dict) else {}
+    qa_status = str(run_qa.get("status") or qa.get("status") or houdini.get("qa_status") or "").lower()
+    qa_available = bool(qa.get("available")) or bool(run_qa.get("status"))
+    if not qa_available:
         reasons.append(str(qa.get("message") or "current Model QA report is missing"))
     elif qa_status in MANUAL_REVIEW_QA:
         # QA 是非阻断体检：fail/warn 都不直接拦死导出，而是要求人工复核确认。

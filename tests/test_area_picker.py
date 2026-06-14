@@ -21,21 +21,27 @@ _PICKER_APP_JS = (FRONTEND_ROOT / "app.js").read_text(encoding="utf-8")
 _PICKER_FRONTEND = "\n".join([_PICKER_INDEX_HTML, _PICKER_STYLES, _PICKER_APP_JS])
 
 
-class TestProgressParsing(unittest.TestCase):
-    def test_final_main_step_leaves_room_for_houdini_stages(self):
-        update = area_picker._line_progress_update("[6/6] Houdini 重算...", 0)
-        self.assertEqual(update["pct"], 75)
-        self.assertEqual(update["step"], 6)
-        self.assertIn("Houdini", update["step_label"])
+class TestProgressView(unittest.TestCase):
+    """进度来自真相源投影，不再解析 stdout 日志。"""
 
-    def test_houdini_stage_advances_progress(self):
-        update = area_picker._line_progress_update("[Houdini 4/7] 全链路验证", 75)
-        self.assertGreater(update["pct"], 85)
-        self.assertEqual(update["step_label"], "[Houdini 4/7] 全链路验证")
+    def test_houdini_stage_maps_into_high_band(self):
+        run = {"phase": "houdini_recook", "status": "running",
+               "progress": {"step": 4, "total": 7, "label": "[Houdini 4/7] 全链路验证"}}
+        pv = pipeline_status.progress_view(run)
+        self.assertGreater(pv["pct"], 85)
+        self.assertLessEqual(pv["pct"], 99)
+        self.assertEqual(pv["label"], "[Houdini 4/7] 全链路验证")
 
-    def test_houdini_completion_reaches_nearly_done(self):
-        update = area_picker._line_progress_update("[OK] 全部通过，hip 已保存", 90)
-        self.assertEqual(update["pct"], 99)
+    def test_completed_run_reaches_full(self):
+        run = {"phase": "pipeline_completed", "status": "completed",
+               "progress": {"step": 7, "total": 7, "label": "done"}}
+        self.assertEqual(pipeline_status.progress_view(run)["pct"], 100)
+
+    def test_acquire_phase_uses_anchor_and_label(self):
+        run = {"phase": "acquire_dem", "status": "running", "progress": {}}
+        pv = pipeline_status.progress_view(run)
+        self.assertEqual(pv["pct"], 38)
+        self.assertEqual(pv["label"], "获取地形数据")
 
 
 class TestRollingLogOffset(unittest.TestCase):
@@ -142,6 +148,8 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('function openOrProbeHoudini()', _PICKER_FRONTEND)
         self.assertIn('function probeHoudini()', _PICKER_FRONTEND)
         self.assertNotIn('setInterval(refreshServiceState', _PICKER_FRONTEND)
+        self.assertIn("new EventSource('/events')", _PICKER_FRONTEND)
+        self.assertIn('function startStatusStream()', _PICKER_FRONTEND)
         self.assertIn('var shutdownWithPage = window.VC_CONFIG.shutdownWithPage;', _PICKER_FRONTEND)
         self.assertIn("navigator.sendBeacon('/session/closed'", _PICKER_FRONTEND)
         self.assertIn("fetch('/session'", _PICKER_FRONTEND)
@@ -149,7 +157,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('exportFbx', _PICKER_FRONTEND)
         self.assertIn('id="download-btn" disabled onclick="downloadData()"', _PICKER_FRONTEND)
         self.assertIn('class="source-action-btn"', _PICKER_FRONTEND)
-        self.assertIn("submitSelectedArea('/download-data'", _PICKER_FRONTEND)
+        self.assertIn("submitSelectedArea('download'", _PICKER_FRONTEND)
         self.assertIn("filter: grayscale(1) saturate(0) contrast(1.38) brightness(0.44);", _PICKER_FRONTEND)
         self.assertIn("var isCached = !!tile.cached;", _PICKER_FRONTEND)
         self.assertIn("var cachedColor = '#f8fffd';", _PICKER_FRONTEND)
@@ -319,10 +327,71 @@ class TestDataSourcesStatus(unittest.TestCase):
         jump = payload["quick_jumps"][0]
         self.assertEqual(jump["id"], "pattaya")
         self.assertEqual(jump["label"], "Pattaya")
+        # 无真实清单时，按 bbox 反推得到 10x10=100 个格子，聚合成一片。
         self.assertEqual(jump["tile_count"], 100)
-        self.assertEqual(jump["bbox"], [100.84, 12.89, 100.92, 12.97])
         self.assertTrue(jump["jumpable"])
-        self.assertEqual(jump["source"], "macro_tile")
+        self.assertEqual(jump["source"], "downloaded_area")
+
+    def test_macro_tile_prefers_manifest_tile_count_over_bbox_reverse_calc(self):
+        # 真实下载清单存在时，tile_count 取一手记录，不再用粗 bbox 反推（121 不再塌成 100）。
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            tiles = root / "RawData" / "_tiles"
+            tiles.mkdir(parents=True)
+            (tiles / "pattaya_dem.tif").write_bytes(b"tif")
+            (tiles / "pattaya_osm.osm").write_text("<osm/>", encoding="utf-8")
+            (tiles / "pattaya_bld.geojson").write_text("{}", encoding="utf-8")
+            (tiles / "_index.json").write_text(json.dumps({
+                "pattaya": {
+                    "bbox": [100.84, 12.89, 100.92, 12.97],
+                    "dem_tif": str(tiles / "pattaya_dem.tif"),
+                    "osm_xml": str(tiles / "pattaya_osm.osm"),
+                    "bld_geojson": str(tiles / "pattaya_bld.geojson"),
+                }
+            }), encoding="utf-8")
+            areas = root / "RawData" / "_areas"
+            areas.mkdir(parents=True)
+            (areas / "pattaya.json").write_text(json.dumps({
+                "area_id": "pattaya",
+                "tile_count": 121,
+                "tile_ids": [f"z47n_e{700000 + i * 1000}_n1429000_s1000" for i in range(121)],
+                "bbox": [100.84, 12.89, 100.92, 12.97],
+            }), encoding="utf-8")
+
+            with patch.object(area_picker, "ROOT", root):
+                payload = area_picker._downloaded_area_status()
+
+        jump = payload["quick_jumps"][0]
+        self.assertEqual(jump["id"], "pattaya")
+        self.assertEqual(jump["tile_count"], 121)
+        self.assertEqual(jump["source"], "downloaded_area")
+
+    def test_downloaded_area_manifest_without_index_entry_appears_as_jump(self):
+        # 真实下载（selection_id 命名）未进 _index.json 时，仍凭清单出现在跳转列表。
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            areas = root / "RawData" / "_areas"
+            areas.mkdir(parents=True)
+            sel_id = "z47n_e700000_n1429000_w11000_h11000_s1000"
+            (areas / f"{sel_id}.json").write_text(json.dumps({
+                "area_id": sel_id,
+                "tile_count": 121,
+                "tile_ids": [f"z47n_e{700000 + i * 1000}_n1429000_s1000" for i in range(121)],
+                "bbox": [100.84, 12.89, 100.92, 12.97],
+            }), encoding="utf-8")
+
+            with patch.object(area_picker, "ROOT", root):
+                payload = area_picker._downloaded_area_status()
+
+        orphans = [j for j in payload["quick_jumps"] if j["source"] == "downloaded_area"]
+        self.assertEqual(len(orphans), 1)
+        self.assertEqual(orphans[0]["id"], sel_id)
+        self.assertEqual(orphans[0]["tile_count"], 121)
+        # bbox 现在是真实格子的几何外包，而非清单里的粗 bbox。
+        self.assertEqual(len(orphans[0]["bbox"]), 4)
+        west, south, east, north = orphans[0]["bbox"]
+        self.assertLess(west, east)
+        self.assertLess(south, north)
 
     def test_downloaded_area_inside_preset_city_folds_into_bookmark(self):
         # 已下载区域中心落在 Tokyo bbox 内：不另列孤儿，tile 数折叠进 Tokyo 书签。
@@ -472,56 +541,68 @@ class TestFrontendAssetVersion(unittest.TestCase):
 
 
 class TestHoudiniStatus(unittest.TestCase):
-    def test_status_requires_matching_run_id(self):
+    def test_run_terminal_confirms_completed_for_matching_run(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            cfg = root / "Config"
-            cfg.mkdir()
-            (cfg / "houdini_build_status.json").write_text(json.dumps({
-                "area_id": "area_test",
+            run_dir = root / "Reports" / "pipeline_runs"
+            run_dir.mkdir(parents=True)
+            (run_dir / "run_new.json").write_text(json.dumps({
                 "run_id": "run_new",
+                "area_id": "area_test",
                 "status": "completed",
-                "message": "ok",
+                "phase": "pipeline_completed",
+                "events": [{"status": "completed", "phase": "pipeline_completed", "message": "done"}],
             }), encoding="utf-8")
-
             with patch.object(area_picker, "ROOT", root):
-                ok, status, message = area_picker._read_houdini_status("area_test", "run_new")
+                done, ok, status, message = area_picker._read_run_terminal("run_new")
+                self.assertTrue(done)
                 self.assertTrue(ok)
                 self.assertEqual(status, "completed")
-                self.assertEqual(message, "ok")
+                self.assertEqual(message, "done")
 
-                ok, status, message = area_picker._read_houdini_status("area_test", "run_old")
-                self.assertFalse(ok)
-                self.assertEqual(status, "completed")
-                self.assertIn("run mismatch", message)
-
-    def test_status_belongs_to_run_rejects_stale_other_run(self):
+    def test_run_terminal_reports_failed(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            cfg = root / "Config"
-            cfg.mkdir()
-            # 状态文件停留在上一轮的 area/run（陈旧残留），本次 run 不应采信。
-            (cfg / "houdini_build_status.json").write_text(json.dumps({
-                "area_id": "area_old",
-                "run_id": "run_old",
+            run_dir = root / "Reports" / "pipeline_runs"
+            run_dir.mkdir(parents=True)
+            (run_dir / "run_new.json").write_text(json.dumps({
+                "run_id": "run_new",
+                "area_id": "area_test",
                 "status": "failed",
-                "message": "previous run failed",
+                "phase": "houdini_recook",
+                "events": [{"status": "failed", "phase": "houdini_recook", "message": "QA failed"}],
             }), encoding="utf-8")
             with patch.object(area_picker, "ROOT", root):
-                self.assertFalse(
-                    area_picker._houdini_status_belongs_to_run("area_new", "run_new"))
-                self.assertFalse(
-                    area_picker._houdini_status_belongs_to_run("area_old", "run_new"))
-                self.assertTrue(
-                    area_picker._houdini_status_belongs_to_run("area_old", "run_old"))
+                done, ok, status, message = area_picker._read_run_terminal("run_new")
+                self.assertTrue(done)
+                self.assertFalse(ok)
+                self.assertEqual(status, "failed")
 
-    def test_status_belongs_to_run_false_when_file_missing(self):
+    def test_run_terminal_not_done_while_running(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            (root / "Config").mkdir()
+            run_dir = root / "Reports" / "pipeline_runs"
+            run_dir.mkdir(parents=True)
+            (run_dir / "run_new.json").write_text(json.dumps({
+                "run_id": "run_new",
+                "area_id": "area_test",
+                "status": "running",
+                "phase": "houdini_recook",
+                "events": [],
+            }), encoding="utf-8")
             with patch.object(area_picker, "ROOT", root):
-                self.assertFalse(
-                    area_picker._houdini_status_belongs_to_run("area_new", "run_new"))
+                done, ok, _status, _message = area_picker._read_run_terminal("run_new")
+                self.assertFalse(done)
+                self.assertFalse(ok)
+
+    def test_run_terminal_missing_record_is_not_done(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "Reports" / "pipeline_runs").mkdir(parents=True)
+            with patch.object(area_picker, "ROOT", root):
+                done, ok, _status, _message = area_picker._read_run_terminal("run_absent")
+                self.assertFalse(done)
+                self.assertFalse(ok)
 
     def test_failure_summary_extracts_model_qa_report(self):
         with tempfile.TemporaryDirectory() as td:

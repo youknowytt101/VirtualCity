@@ -37,6 +37,22 @@ def _write_build_status(area_id, status, hip_path=None, message='', qa_status=''
                         run_id=''):
     write_build_status(area_id, status, hip_path, message, qa_status, qa_report, run_id)
 
+
+def _progress(step, label):
+    """Push structured build progress into the run file (the source of truth).
+
+    The label here is the authoritative progress text; the adjacent print is
+    only for humans tailing the terminal. Changing a print never moves the bar.
+    """
+    if not _run_id:
+        return
+    try:
+        pipeline_state.update_progress(_run_id, step=step, total=7, label=label,
+                                       phase='houdini_recook')
+    except Exception:
+        pass
+
+
 _cfg = load_active_area()
 _ctx = BuildContext.from_config(_cfg)
 _area_id = _ctx.area_id
@@ -82,6 +98,7 @@ else:
     print('[Houdini preflight] _houdini_ready 已就绪，run_id 匹配')
 
 print('[Houdini 1/7] 数据就绪，连接 Houdini...', flush=True)
+_progress(1, '数据就绪，连接 Houdini')
 print('  构建域: ' + domain_summary())
 
 # ══════════════════════════════════════════
@@ -116,6 +133,7 @@ if net is None and OBJ_NET == 'city_gen':
         OBJ_PATH = f'/obj/{OBJ_NET}'
 
 print('[Houdini 2/7] 修复 SOP 和参数...', flush=True)
+_progress(2, '修复 SOP 和参数')
 
 # 构建期间挂起 OUT_city 的 display/render flag：display 节点常开时，每 force
 # 一个上游节点都会触发视口把整条 dirty 链拉去重绘一次。实测同一条强制刷新链
@@ -197,6 +215,7 @@ buildings_domain.patch_snap_and_height_sops(hou, OBJ_PATH)
 
 # ── 2. 强制 recook 数据源 ────────────────────────────
 print('\n[Houdini 3/7] recook 数据源')
+_progress(3, 'recook 数据源')
 if _dev_quick_roads:
     print('  [dev_quick_roads] 跳过数据源重算 (osm/dem)')
 else:
@@ -239,6 +258,7 @@ bld_footprint_bevel = buildings_domain.build_footprint_bevel(hou, net, OBJ_PATH)
 
 # ── 3. 验证全链路节点 ────────────────────────────────
 print('\n[Houdini 4/7] 全链路验证')
+_progress(4, '全链路验证')
 CHECKS = [
     ('extract_buildings',    50,   None,  'buildings extracted from OSM'),
     ('snap_bld_to_terrain',  50,   None,  'buildings snapped to terrain'),
@@ -280,6 +300,7 @@ for name, min_pts, max_y, desc in CHECKS:
 
 # ── 4. 重建裁剪节点 ──────────────────────────────────
 print('\n[Houdini 5/7] 完整资产边界过滤节点重建')
+_progress(5, '完整资产边界过滤节点重建')
 dem = snap_target
 dem.cook(force=False)
 bb  = dem.geometry().boundingBox()
@@ -432,6 +453,7 @@ if merge and bld_clip and road_surface:
     merge.setInput(2, terrain_colored)
 
 print('\n[Houdini 6/7] 刷新输出链并保存 HIP')
+_progress(6, '刷新输出链并保存 HIP')
 try:
     apply_domain_network_layout(hou, net, OBJ_PATH)
 except Exception as _layout_exc:
@@ -439,7 +461,7 @@ except Exception as _layout_exc:
 hou.hipFile.save()
 
 # ── 5b. Hip 按区域存档 ────────────────────────────────
-import shutil as _shutil, json as _json_arc
+import shutil as _shutil
 ARCHIVE_HIP = _ctx.archive_hip_path
 if ARCHIVE_HIP != HIP:
     _shutil.copy2(HIP, ARCHIVE_HIP)
@@ -471,6 +493,7 @@ qa_status = ''
 qa_report = ''
 if not errors:
     print('\n[Houdini 7/7] Model QA')
+    _progress(7, 'Model QA')
     _qa_cmd = [sys.executable, str(ROOT / 'Scripts' / 'houdini_model_qa.py'), '--mode', 'quick']
     _qa_result = subprocess.run(_qa_cmd, cwd=str(ROOT), capture_output=False)
     _qa_latest = ROOT / 'Reports' / 'model_qa' / '{}_latest.json'.format(_area_id)
@@ -513,6 +536,8 @@ else:
         _msg += '; model QA quick {}'.format(qa_status)
     _write_build_status(_area_id, 'completed', ARCHIVE_HIP, _msg, qa_status, qa_report, _run_id)
     if _run_id:
+        if qa_status:
+            pipeline_state.set_qa(_run_id, status=qa_status, report=qa_report)
         pipeline_state.update_run(_run_id, status='completed', phase='houdini_completed',
                                   message=_msg, fields={'hip_path': project_relative(ARCHIVE_HIP),
                                                         'qa_status': qa_status,

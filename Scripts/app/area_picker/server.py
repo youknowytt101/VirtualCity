@@ -26,6 +26,8 @@ STATIC_ROOT = SCRIPTS / 'web_assets'
 
 import pipeline_status
 import vc_grid
+import area_manifest
+import area_aggregate
 from acquisition import sources as acquisition_sources
 import app.area_picker.template as area_picker_template
 from app.area_picker.software_paths import (
@@ -80,11 +82,6 @@ def _reset_log(key, offset_key, seed=None):
     """Reset a log window and its global offset. Hold _state_lock when calling."""
     _state[key] = list(seed) if seed else []
     _state[offset_key] = 0
-# After run_pipeline.py exits, the stdout reader can stay blocked if a Houdini QA
-# grandchild still holds the inherited stdout write end. Once the process has
-# exited and the authoritative status file says completed, the reader is given
-# this long to drain before we stop waiting on the (possibly dead) pipe.
-_STDOUT_DRAIN_GRACE_S = 5.0
 _page_lock = threading.Lock()
 _page_state = {'seen': False, 'last_seen': 0.0, 'close_requested': False, 'closed_at': 0.0,
                'monitor_started': False, 'hold_until': 0.0}
@@ -99,31 +96,13 @@ def _safe_print(msg):
 PICKER_HOST = '127.0.0.1'
 PORT    = 8765
 
-_STEP_RE = re.compile(r'^\[(\d+)/(\d+)\]')
 _RUN_RE = re.compile(r'^\[RUN\] run_id=(\S+)$')
-_HOUDINI_RE = re.compile(r'^\[Houdini\s+(\d+)/(\d+)\]\s*(.*)')
 _REPORT_PATH_RE = re.compile(r'(Reports[/\\][^)\s]+\.json)', re.IGNORECASE)
 _RAW_AREA_PATTERNS = {
     'roads': ('OSM', re.compile(r'(.+)_osm_v001\.osm$')),
     'buildings': ('Overture', re.compile(r'(.+)_buildings_overture_v001\.geojson$')),
     'dem_csv': ('DEM', re.compile(r'(.+)_dem_v001\.csv$')),
     'dem_tif': ('DEM', re.compile(r'(.+)_dem_v001\.tif$')),
-}
-
-_PHASE_LABELS = {
-    'created': '创建运行记录',
-    'download_area_prepared': '准备下载区域',
-    'active_area_written': '写入 active_area',
-    'acquire_osm': '获取道路数据',
-    'acquire_dem': '获取地形数据',
-    'acquire_buildings': '获取建筑数据',
-    'refine_data': '数据清洗',
-    'refine_data_completed': '数据清洗完成',
-    'houdini_preflight': 'Houdini 输入预检',
-    'houdini_recook': 'Houdini 重算',
-    'houdini_completed': 'Houdini 完成',
-    'pipeline_completed': '管线完成',
-    'aborted': '流程中止',
 }
 
 _QA_METRIC_KEYS = (
@@ -157,40 +136,6 @@ _QA_METRIC_LABELS = {
     'sampled_points': 'samples',
     'sliver_edge_count': 'sliver edges',
 }
-
-
-def _line_progress_update(line: str, current_pct: int) -> dict:
-    """Map pipeline log lines to UI progress updates."""
-    m = _STEP_RE.match(line)
-    if m:
-        step_n, step_total = int(m.group(1)), int(m.group(2))
-        if step_n >= step_total:
-            pct = max(current_pct, 75)
-        else:
-            pct = max(current_pct, min(74, int(step_n / step_total * 75)))
-        return {
-            'step': step_n,
-            'total_steps': step_total,
-            'step_label': f'[{step_n}/{step_total}] {line.split("]", 1)[-1].strip()}',
-            'pct': pct,
-        }
-
-    h = _HOUDINI_RE.match(line)
-    if h:
-        stage_n, stage_total = int(h.group(1)), int(h.group(2))
-        pct = max(current_pct, min(99, 75 + int(stage_n / stage_total * 23)))
-        return {
-            'step_label': line,
-            'pct': pct,
-        }
-
-    if '[OK] 全部通过' in line or 'Houdini build completed' in line:
-        return {'step_label': 'Houdini 完成，等待状态确认...', 'pct': max(current_pct, 99)}
-
-    if '[OK]' in line and current_pct < 75:
-        return {'pct': min(74, current_pct + 3)}
-
-    return {}
 
 
 def _complete_downloaded_area_ids(root: Path | None = None) -> set[str]:
@@ -308,19 +253,27 @@ def _quick_jumps(root: Path | None = None) -> list[dict]:
     return orphans + preset
 
 
-def _macro_tile_quick_jumps(root: Path | None = None) -> list[dict]:
-    base = root or ROOT
-    index_path = base / 'RawData' / '_tiles' / '_index.json'
-    if not index_path.exists():
-        return []
-    try:
-        index = json.loads(index_path.read_text(encoding='utf-8'))
-    except Exception:
-        return []
-    if not isinstance(index, dict):
-        return []
+def _downloaded_tile_sources(root: Path | None = None) -> list[dict]:
+    """收集所有已下载来源的格子集合（带命名标志），供几何聚合使用。
 
-    jumps: list[dict] = []
+    两类来源：_index.json 的宏块预缓存（有名），以及真实下载清单 _areas/*.json
+    （匿名 selection）。同名区域优先用清单的真实 tile_ids，缺失才用 bbox 反推。
+    """
+    base = root or ROOT
+    manifests = area_manifest.load_all(base)
+    sources: list[dict] = []
+    seen: set[str] = set()
+
+    index_path = base / 'RawData' / '_tiles' / '_index.json'
+    index: dict = {}
+    if index_path.exists():
+        try:
+            loaded = json.loads(index_path.read_text(encoding='utf-8'))
+            if isinstance(loaded, dict):
+                index = loaded
+        except Exception:
+            index = {}
+
     for area_id, entry in sorted(index.items()):
         if not isinstance(entry, dict):
             continue
@@ -330,17 +283,50 @@ def _macro_tile_quick_jumps(root: Path | None = None) -> list[dict]:
         required = ('dem_tif', 'osm_xml', 'bld_geojson')
         if not all(entry.get(key) and _resolve_project_path(entry.get(key), root=base).exists() for key in required):
             continue
-        grid = vc_grid.tiles_for_bbox(bbox, max_tiles=10000)
-        tile_count = len(grid.get('tiles') or [])
-        if tile_count <= 0:
+        manifest = manifests.get(str(area_id))
+        if manifest and manifest.get('tile_ids'):
+            tile_ids = list(manifest['tile_ids'])
+        else:
+            grid = vc_grid.tiles_for_bbox(bbox, max_tiles=10000)
+            tile_ids = [t['tile_id'] for t in (grid.get('tiles') or [])]
+        if not tile_ids:
             continue
-        jumps.append({
+        seen.add(str(area_id))
+        sources.append({
             'id': str(area_id),
             'label': _quick_jump_label(str(area_id)),
-            'tile_count': tile_count,
-            'bbox': bbox,
+            'named': True,
+            'tile_ids': tile_ids,
+        })
+
+    for area_id, manifest in sorted(manifests.items()):
+        if str(area_id) in seen:
+            continue
+        tile_ids = list(manifest.get('tile_ids') or [])
+        if not tile_ids:
+            continue
+        sources.append({
+            'id': str(area_id),
+            'label': manifest.get('label') or _quick_jump_label(str(area_id)),
+            'named': bool(manifest.get('label')),
+            'tile_ids': tile_ids,
+        })
+    return sources
+
+
+def _macro_tile_quick_jumps(root: Path | None = None) -> list[dict]:
+    """已下载格子按网格 4-邻接聚合成片，每片统一计数/命名/包络。"""
+    sources = _downloaded_tile_sources(root)
+    areas = area_aggregate.aggregate(sources)
+    jumps: list[dict] = []
+    for area in areas:
+        jumps.append({
+            'id': area['id'],
+            'label': area['label'],
+            'tile_count': area['tile_count'],
+            'bbox': area['bbox'],
             'jumpable': True,
-            'source': 'macro_tile',
+            'source': 'downloaded_area',
         })
     return jumps
 
@@ -781,52 +767,29 @@ def _open_browser(url: str) -> None:
         webbrowser.open(url)
 
 
-def _load_houdini_status_raw() -> dict | None:
-    """读取 Houdini 构建状态文件原始 dict；缺失或损坏返回 None。
+def _read_run_terminal(expected_run_id: str = ''):
+    """从真相源 pipeline_runs/{run_id}.json 读本次 run 的终态。
 
-    `_read_houdini_status` 与 `_houdini_status_belongs_to_run` 共用此处的文件读取，
-    避免两处各自打开同一文件、各自做 area/run 比对。
+    run_pipeline.py 在三模块边界把 status 写成 completed/failed，这里只采信
+    身份匹配（run_id 相同）的记录，避免读到上一轮 run 的残留终态。
+    返回 (done, ok, status, message)：done 表示已到终态，ok 表示成功完成。
     """
-    status_file = ROOT / 'Config' / 'houdini_build_status.json'
-    if not status_file.exists():
-        return None
+    if not expected_run_id:
+        return False, False, '', 'run_id unknown'
     try:
-        data = json.loads(status_file.read_text(encoding='utf-8'))
+        payload = pipeline_status.load_run(ROOT, expected_run_id)
     except Exception:
-        return None
-    return data if isinstance(data, dict) else None
-
-
-def _read_houdini_status(expected_area: str, expected_run_id: str = ''):
-    data = _load_houdini_status_raw()
-    if data is None:
-        return False, '', 'status file missing or unreadable'
-    area_id = data.get('area_id', '')
-    run_id = data.get('run_id', '')
-    status = data.get('status', '')
-    message = data.get('message', '')
-    if area_id != expected_area:
-        return False, status, f'area mismatch: {area_id} != {expected_area}'
-    if expected_run_id and run_id != expected_run_id:
-        return False, status, f'run mismatch: {run_id} != {expected_run_id}'
-    return status == 'completed', status, message
-
-
-def _houdini_status_belongs_to_run(expected_area: str, expected_run_id: str = '') -> bool:
-    """状态文件是否确属本次 area/run。
-
-    watchdog 每 2 秒轮询一次状态文件，会在本次 recook 尚未写入新状态、文件还停留
-    在上一轮残留（不同 area/run）的窗口期读到陈旧的 completed/failed。只有身份匹配
-    才能把它当作本次的终态采信，否则会把上一轮的失败误判成本次失败。
-    """
-    data = _load_houdini_status_raw()
-    if data is None:
-        return False
-    if data.get('area_id', '') != expected_area:
-        return False
-    if expected_run_id and data.get('run_id', '') != expected_run_id:
-        return False
-    return True
+        payload = {}
+    if not payload or str(payload.get('run_id') or '') != expected_run_id:
+        return False, False, '', 'run record missing'
+    status = str(payload.get('status') or '').lower()
+    last = payload.get('events') or []
+    message = str(last[-1].get('message') if last else payload.get('phase') or '')
+    if status == 'completed':
+        return True, True, 'completed', message
+    if status == 'failed':
+        return True, False, 'failed', message
+    return False, False, status, message
 
 
 def _read_json_silent(path: Path) -> dict:
@@ -970,7 +933,10 @@ def _failure_summary(snapshot: dict | None = None) -> dict:
 
     phase = str(run_payload.get('phase') or failed_event.get('phase') or '')
     message = str(build_status.get('message') or failed_event.get('message') or snapshot.get('houdini_message') or '')
-    report = str(build_status.get('qa_report') or _report_path_from_message(message))
+    # report 优先采信真相源 run.qa（阶段1已把 QA 结论并入 run 文件），
+    # 再回退 houdini_build_status.json 的 qa_report，最后从日志消息里捞路径。
+    run_qa = run_payload.get('qa') if isinstance(run_payload.get('qa'), dict) else {}
+    report = str(run_qa.get('report') or build_status.get('qa_report') or _report_path_from_message(message))
     if not report:
         report = _report_path_from_message(str(failed_event.get('message') or ''))
     qa = _qa_report_summary(report)
@@ -980,9 +946,10 @@ def _failure_summary(snapshot: dict | None = None) -> dict:
 
     if not phase and (build_failed or qa):
         phase = 'houdini_recook'
-    phase_label = _PHASE_LABELS.get(phase, phase or '管线执行')
+    phase_label = pipeline_status.PHASE_LABELS.get(phase, phase or '管线执行')
     stage = phase_label
-    if report or str(build_status.get('qa_status') or '').lower() == 'fail':
+    run_qa_status = str(run_qa.get('status') or '').lower()
+    if report or run_qa_status == 'fail' or str(build_status.get('qa_status') or '').lower() == 'fail':
         stage = 'Houdini 7/7 Model QA'
     elif phase == 'houdini_recook':
         stage = 'Houdini 重算'
@@ -1048,6 +1015,88 @@ def _frontend_asset_version() -> str:
     return "-".join(parts)
 
 
+def _build_status_payload() -> dict:
+    """构建 /status 与 /events 共用的状态投影。
+
+    进度与终态只认真相源 pipeline_runs（内存 _state 仅作缓存）；server 重启丢失
+    内存态后，靠 active_area.json 的 run_id 从磁盘恢复进度与 done/ok。两个端点
+    共用同一份构建逻辑，避免轮询与 SSE 两套投影漂移。
+    """
+    with _state_lock:
+        elapsed = int(time.time() - _state['start']) if _state['running'] or _state['done'] else 0
+        resp = {
+            'running':    _state['running'],
+            'done':       _state['done'],
+            'ok':         _state['ok'],
+            'returncode': _state['returncode'],
+            'name':       _state['name'],
+            'operation':  _state.get('operation', ''),
+            'run_id':     _state['run_id'],
+            'elapsed':    elapsed,
+            'step':       _state['step'],
+            'total_steps': _state['total_steps'],
+            'step_label': _state['step_label'],
+            'phase':      '',
+            'phase_label': '',
+            'pct':        _state['pct'],
+            'log_lines':  list(_state['log_lines']),
+            'log_offset': _state['log_offset'],
+            'houdini_done':    _state['houdini_done'],
+            'houdini_status':  _state['houdini_status'],
+            'houdini_message': _state['houdini_message'],
+            'server_version':  APP_VERSION,
+            'pid':             os.getpid(),
+            'started_at':      STARTED_AT,
+            'auto_shutdown_on_success': AUTO_SHUTDOWN_ON_SUCCESS,
+            'no_browser':      NO_BROWSER,
+            'shutdown_with_page': SHUTDOWN_WITH_PAGE,
+            'houdini_available': False,
+            'export_available': False,
+            'export_running': _state['export_running'],
+            'export_done': _state['export_done'],
+            'export_ok': _state['export_ok'],
+            'export_returncode': _state['export_returncode'],
+            'export_log_lines': list(_state['export_log_lines']),
+            'export_log_offset': _state['export_log_offset'],
+        }
+        snapshot = dict(resp)
+    resp['houdini_available'] = _probe_houdini()
+    run_id = snapshot.get('run_id') or ''
+    if not run_id:
+        try:
+            run_id = str(pipeline_status.load_active(ROOT).get('run_id') or '')
+            if run_id:
+                resp['run_id'] = run_id
+        except Exception:
+            run_id = ''
+    if run_id:
+        try:
+            run_payload = pipeline_status.load_run(ROOT, run_id)
+            if run_payload:
+                pv = pipeline_status.progress_view(run_payload)
+                resp['step'] = pv['step']
+                resp['total_steps'] = pv['total'] or resp['total_steps']
+                resp['step_label'] = pv['label']
+                resp['phase'] = pv['phase']
+                resp['phase_label'] = pv['phase_label']
+                resp['pct'] = pv['pct']
+                if not resp.get('running') and not resp.get('done'):
+                    run_status = str(run_payload.get('status') or '').lower()
+                    if run_status in ('completed', 'failed'):
+                        resp['done'] = True
+                        resp['ok'] = run_status == 'completed'
+        except Exception:
+            pass
+    resp['houdini_asset'] = _houdini_asset_status(resp['houdini_available'])
+    resp['software_paths'] = _software_path_status()
+    if not resp.get('running') and not resp.get('export_running'):
+        resp['export_available'] = bool(resp['houdini_asset'].get('export_ready'))
+    resp['selection'] = _remembered_selection_status()
+    resp['downloaded_areas'] = _downloaded_area_status()
+    resp['failure_summary'] = _failure_summary(snapshot)
+    return resp
+
+
 class _Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass  # Suppress default access logs
@@ -1107,57 +1156,51 @@ class _Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 self._json({'ok': False, 'message': f'geocode failed: {exc}', 'results': []})
             return
+        if parsed.path == '/boundary':
+            params = urllib.parse.parse_qs(parsed.query)
+            osm_type = str(params.get('osm_type', ['R'])[0]).strip().upper() or 'R'
+            osm_id = str(params.get('osm_id', [''])[0]).strip()
+            if osm_type not in ('R', 'W', 'N') or not osm_id.isdigit():
+                self._json({'ok': False, 'message': 'invalid osm_type/osm_id', 'geojson': None})
+                return
+            try:
+                url = 'https://nominatim.openstreetmap.org/lookup?' + urllib.parse.urlencode({
+                    'osm_ids': osm_type + osm_id,
+                    'format': 'jsonv2',
+                    'polygon_geojson': '1',
+                })
+                req = urllib.request.Request(
+                    url,
+                    headers={
+                        'User-Agent': 'VirtualCity/0.1 area-picker geocoder',
+                        'Accept': 'application/json',
+                    },
+                )
+                with urllib.request.urlopen(req, timeout=8.0) as resp:
+                    data = json.loads(resp.read().decode('utf-8'))
+                item = data[0] if isinstance(data, list) and data and isinstance(data[0], dict) else None
+                geojson = item.get('geojson') if item else None
+                if not isinstance(geojson, dict) or geojson.get('type') not in ('Polygon', 'MultiPolygon'):
+                    self._json({'ok': False, 'message': 'no polygon boundary', 'geojson': None})
+                    return
+                self._json({
+                    'ok': True,
+                    'geojson': geojson,
+                    'boundingbox': item.get('boundingbox') if isinstance(item.get('boundingbox'), list) else [],
+                })
+            except Exception as exc:
+                self._json({'ok': False, 'message': f'boundary failed: {exc}', 'geojson': None})
+            return
         if parsed.path in ('/svg_live_viewer.html', '/reports/visualizations/svg_live_viewer.html'):
             self.send_response(302)
             self.send_header('Location', '/')
             self.end_headers()
             return
         if parsed.path == '/status':
-            with _state_lock:
-                elapsed = int(time.time() - _state['start']) if _state['running'] or _state['done'] else 0
-                resp = {
-                    'running':    _state['running'],
-                    'done':       _state['done'],
-                    'ok':         _state['ok'],
-                    'returncode': _state['returncode'],
-                    'name':       _state['name'],
-                    'operation':  _state.get('operation', ''),
-                    'run_id':     _state['run_id'],
-                    'elapsed':    elapsed,
-                    'step':       _state['step'],
-                    'total_steps': _state['total_steps'],
-                    'step_label': _state['step_label'],
-                    'pct':        _state['pct'],
-                    'log_lines':  list(_state['log_lines']),
-                    'log_offset': _state['log_offset'],
-                    'houdini_done':    _state['houdini_done'],
-                    'houdini_status':  _state['houdini_status'],
-                    'houdini_message': _state['houdini_message'],
-                    'server_version':  APP_VERSION,
-                    'pid':             os.getpid(),
-                    'started_at':      STARTED_AT,
-                    'auto_shutdown_on_success': AUTO_SHUTDOWN_ON_SUCCESS,
-                    'no_browser':      NO_BROWSER,
-                    'shutdown_with_page': SHUTDOWN_WITH_PAGE,
-                    'houdini_available': False,
-                    'export_available': False,
-                    'export_running': _state['export_running'],
-                    'export_done': _state['export_done'],
-                    'export_ok': _state['export_ok'],
-                    'export_returncode': _state['export_returncode'],
-                    'export_log_lines': list(_state['export_log_lines']),
-                    'export_log_offset': _state['export_log_offset'],
-                }
-                snapshot = dict(resp)
-            resp['houdini_available'] = _probe_houdini()
-            resp['houdini_asset'] = _houdini_asset_status(resp['houdini_available'])
-            resp['software_paths'] = _software_path_status()
-            if not resp.get('running') and not resp.get('export_running'):
-                resp['export_available'] = bool(resp['houdini_asset'].get('export_ready'))
-            resp['selection'] = _remembered_selection_status()
-            resp['downloaded_areas'] = _downloaded_area_status()
-            resp['failure_summary'] = _failure_summary(snapshot)
-            self._json(resp)
+            self._json(_build_status_payload())
+            return
+        if parsed.path == '/events':
+            self._sse_events()
             return
         if parsed.path.startswith('/static/'):
             self._static(parsed.path)
@@ -1235,11 +1278,10 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == '/export':
             self._post_export()
             return
-        if parsed.path not in ('/run', '/download-data'):
+        if parsed.path not in ('/run', '/download-data', '/jobs'):
             self.send_response(404)
             self.end_headers()
             return
-        data_only = parsed.path == '/download-data'
 
         length = int(self.headers.get('Content-Length', 0))
         try:
@@ -1247,6 +1289,14 @@ class _Handler(BaseHTTPRequestHandler):
         except json.JSONDecodeError:
             self._json({'ok': False, 'message': '请求 JSON 无法解析'})
             return
+
+        # 统一作业入口 /jobs 用 body.mode 区分生成/下载；旧的 /run、/download-data
+        # 仍按 path 决定，作为兼容入口保留。
+        if parsed.path == '/jobs':
+            mode = str(body.get('mode') or 'generate').lower()
+            data_only = mode == 'download'
+        else:
+            data_only = parsed.path == '/download-data'
 
         tile_ids = body.get('tile_ids')
         if tile_ids is None and body.get('tile_id'):
@@ -1295,6 +1345,8 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 env = os.environ.copy()
                 env['PYTHONIOENCODING'] = 'utf-8'
+                if data_only:
+                    env['VC_PIPELINE_TILE_IDS'] = ','.join(tile_ids or [])
                 proc = subprocess.Popen(
                     cmd, cwd=str(SCRIPTS),
                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -1311,33 +1363,30 @@ class _Handler(BaseHTTPRequestHandler):
                         _safe_print(line)  # echo to terminal
                         with _state_lock:
                             _append_log('log_lines', 'log_offset', line)
-                            progress = _line_progress_update(line, int(_state.get('pct', 0)))
-                            if progress:
-                                _state.update(progress)
                             run_match = _RUN_RE.match(line)
                             if run_match:
                                 _state['run_id'] = run_match.group(1)
 
-                # Read stdout on a side thread so completion never hinges on the
-                # pipe reaching EOF: a Houdini QA grandchild that inherits the
-                # stdout write end can keep the pipe open long after
-                # run_pipeline.py itself has exited and written the status file.
+                # Read stdout on a side thread purely for echo + rolling log;
+                # completion is decided by the durable run file, not by the pipe
+                # reaching EOF or by parsing log lines.
                 reader = threading.Thread(target=_drain_stdout, daemon=True)
                 reader.start()
 
                 proc.wait()
                 returncode = proc.returncode
-                # Give the reader a bounded window to flush buffered lines; if the
-                # pipe is wedged open by a grandchild, stop waiting on it.
-                reader.join(timeout=_STDOUT_DRAIN_GRACE_S)
+                reader.join(timeout=2.0)
                 if data_only:
                     houdini_done, houdini_status, houdini_message = False, 'skipped', 'data download only'
                     ok = returncode == 0
                 else:
                     with _state_lock:
                         run_id = _state.get('run_id', '')
-                    houdini_done, houdini_status, houdini_message = _read_houdini_status(name, run_id)
-                    ok = returncode == 0 and houdini_done
+                    done, run_ok, run_status, run_message = _read_run_terminal(run_id)
+                    houdini_done = run_ok
+                    houdini_status = run_status or ('completed' if run_ok else 'unknown')
+                    houdini_message = run_message
+                    ok = returncode == 0 and run_ok
             except Exception as exc:
                 returncode = proc.returncode if proc is not None else -1
                 houdini_done, houdini_status, houdini_message = False, 'exception', str(exc)
@@ -1349,7 +1398,7 @@ class _Handler(BaseHTTPRequestHandler):
 
             with _state_lock:
                 if ok and not houdini_done and not data_only:
-                    _append_log('log_lines', 'log_offset', f'[WARN] Houdini 状态文件未确认，但 run_pipeline.py 已成功退出: {houdini_message}')
+                    _append_log('log_lines', 'log_offset', f'[WARN] 真相源未确认完成，但 run_pipeline.py 已成功退出: {houdini_message}')
                 _state.update({'running': False, 'done': True,
                                'ok': ok,
                                'returncode': returncode,
@@ -1358,14 +1407,14 @@ class _Handler(BaseHTTPRequestHandler):
                                'houdini_done': houdini_done,
                                'houdini_status': houdini_status,
                                'houdini_message': houdini_message})
-            status = 'OK' if ok else f'FAIL(exit={returncode}, houdini={houdini_status})'
+            status = 'OK' if ok else f'FAIL(exit={returncode}, run={houdini_status})'
             _safe_print(f'[area_picker] 管线结束: {status}')
             if data_only:
                 _safe_print('[area_picker] 数据下载完成，Houdini 重算已跳过')
             elif houdini_done:
-                _safe_print('[area_picker] Houdini 构建完成已确认')
+                _safe_print('[area_picker] 真相源已确认管线完成')
             else:
-                _safe_print(f'[area_picker] Houdini 构建完成未确认: {houdini_message}')
+                _safe_print(f'[area_picker] 管线完成未确认: {houdini_message}')
             if ok:
                 if AUTO_SHUTDOWN_ON_SUCCESS:
                     _safe_print('[area_picker] 5 秒后自动退出服务器...')
@@ -1377,9 +1426,9 @@ class _Handler(BaseHTTPRequestHandler):
         def _status_watchdog():
             # Fallback completion path. The _run thread surfaces done only after
             # its stdout reader and proc.wait() return; if that thread ever
-            # wedges, the authoritative status file still flips to
-            # completed/failed. Watch it for THIS run_id and surface done so the
-            # UI can leave the progress screen regardless of the reader's fate.
+            # wedges, the durable run file still flips to completed/failed.
+            # Watch THIS run_id in the single source of truth and surface done so
+            # the UI can leave the progress screen regardless of the reader's fate.
             if data_only:
                 return
             while True:
@@ -1389,27 +1438,23 @@ class _Handler(BaseHTTPRequestHandler):
                         return
                     run_id = _state.get('run_id', '')
                 # Require a known run_id so we never read a previous run's
-                # leftover completed/failed status for the same area.
+                # leftover completed/failed record.
                 if not run_id:
                     continue
-                houdini_done, houdini_status, houdini_message = _read_houdini_status(name, run_id)
-                # 必须确认状态文件确属本次 run：否则会在新 recook 尚未写入、文件还停在
-                # 上一轮残留的窗口期，把上一轮的 completed/failed 误判成本次终态。
-                if houdini_status not in ('completed', 'failed'):
-                    continue
-                if not _houdini_status_belongs_to_run(name, run_id):
+                done, run_ok, run_status, run_message = _read_run_terminal(run_id)
+                if not done:
                     continue
                 with _state_lock:
                     if _state.get('done') or not _state.get('running'):
                         return
                     _state.update({'running': False, 'done': True,
-                                   'ok': houdini_done,
-                                   'pct': 100 if houdini_done else _state['pct'],
-                                   'step_label': '[OK] 完成' if houdini_done else '[FAIL] 失败',
-                                   'houdini_done': houdini_done,
-                                   'houdini_status': houdini_status,
-                                   'houdini_message': houdini_message})
-                _safe_print(f'[area_picker] 状态文件哨兵确认管线结束: {houdini_status}')
+                                   'ok': run_ok,
+                                   'pct': 100 if run_ok else _state['pct'],
+                                   'step_label': '[OK] 完成' if run_ok else '[FAIL] 失败',
+                                   'houdini_done': run_ok,
+                                   'houdini_status': run_status,
+                                   'houdini_message': run_message})
+                _safe_print(f'[area_picker] 真相源哨兵确认管线结束: {run_status}')
                 return
 
         threading.Thread(target=_run, daemon=True).start()
@@ -1556,14 +1601,93 @@ class _Handler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
             return
-        body = target.read_bytes()
         ctype = mimetypes.guess_type(target.name)[0] or 'application/octet-stream'
-        self.send_response(200)
+        self._serve_file_with_range(target, ctype, cache_control='public, max-age=86400')
+
+    def _serve_file_with_range(self, target: Path, ctype: str, *, cache_control: str):
+        # pmtiles 等大文件依赖 HTTP Range 只取所需字节区间，避免整文件下载/全量入内存。
+        file_size = target.stat().st_size
+        range_header = self.headers.get('Range')
+        byte_range = self._parse_range_header(range_header, file_size)
+
+        if byte_range is None:
+            if range_header:
+                # 语法可解析但区间非法（越界等）-> 416 并回报当前总长。
+                self.send_response(416)
+                self.send_header('Content-Range', f'bytes */{file_size}')
+                self.send_header('Accept-Ranges', 'bytes')
+                self.end_headers()
+                return
+            self.send_response(200)
+            self.send_header('Content-Type', ctype)
+            self.send_header('Content-Length', str(file_size))
+            self.send_header('Accept-Ranges', 'bytes')
+            self.send_header('Cache-Control', cache_control)
+            self.end_headers()
+            self._stream_file_range(target, 0, file_size)
+            return
+
+        start, end = byte_range
+        length = end - start + 1
+        self.send_response(206)
         self.send_header('Content-Type', ctype)
-        self.send_header('Content-Length', str(len(body)))
-        self.send_header('Cache-Control', 'public, max-age=86400')
+        self.send_header('Content-Length', str(length))
+        self.send_header('Content-Range', f'bytes {start}-{end}/{file_size}')
+        self.send_header('Accept-Ranges', 'bytes')
+        self.send_header('Cache-Control', cache_control)
         self.end_headers()
-        self.wfile.write(body)
+        self._stream_file_range(target, start, length)
+
+    @staticmethod
+    def _parse_range_header(range_header: str | None, file_size: int):
+        # 仅支持单区间 'bytes=start-end' / 'bytes=start-' / 'bytes=-suffix'。
+        # 返回闭区间 (start, end)，非法或越界返回 None。
+        if not range_header or file_size <= 0:
+            return None
+        if not range_header.startswith('bytes='):
+            return None
+        spec = range_header[len('bytes='):].strip()
+        if ',' in spec:
+            spec = spec.split(',', 1)[0].strip()
+        if '-' not in spec:
+            return None
+        start_str, end_str = spec.split('-', 1)
+        start_str, end_str = start_str.strip(), end_str.strip()
+        try:
+            if start_str == '':
+                if end_str == '':
+                    return None
+                suffix = int(end_str)
+                if suffix <= 0:
+                    return None
+                start = max(0, file_size - suffix)
+                end = file_size - 1
+            else:
+                start = int(start_str)
+                end = int(end_str) if end_str else file_size - 1
+        except ValueError:
+            return None
+        if start < 0 or start >= file_size or end < start:
+            return None
+        end = min(end, file_size - 1)
+        return start, end
+
+    def _stream_file_range(self, target: Path, start: int, length: int):
+        if self.command == 'HEAD':
+            return
+        chunk_size = 64 * 1024
+        remaining = length
+        try:
+            with target.open('rb') as fh:
+                fh.seek(start)
+                while remaining > 0:
+                    chunk = fh.read(min(chunk_size, remaining))
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    remaining -= len(chunk)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
 
     def _frontend_static(self, request_path: str):
         rel = urllib.parse.unquote(request_path[len('/area-picker/'):]).replace('\\', '/').lstrip('/')
@@ -1596,6 +1720,40 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def _sse_events(self):
+        """Server-Sent Events 流：周期推送与 /status 同构的状态投影。
+
+        真相源归一后，状态已是磁盘上的事实，这里只是把同一份 _build_status_payload
+        定时推给前端。客户端断开（写异常）即结束循环；轮询端点 /status 仍保留作为
+        不支持 EventSource 时的降级路径。
+        """
+        try:
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/event-stream; charset=utf-8')
+            self.send_header('Cache-Control', 'no-cache, no-store')
+            self.send_header('Connection', 'keep-alive')
+            self.send_header('X-Accel-Buffering', 'no')
+            self.end_headers()
+        except Exception:
+            return
+        idle_after_done = 0
+        while True:
+            try:
+                payload = _build_status_payload()
+                frame = 'data: ' + json.dumps(payload, ensure_ascii=False) + '\n\n'
+                self.wfile.write(frame.encode('utf-8'))
+                self.wfile.flush()
+            except Exception:
+                return  # client disconnected or write failed
+            # 终态后再多推几帧确保前端收到收尾，然后结束这条长连接。
+            if payload.get('done') and not payload.get('running') and not payload.get('export_running'):
+                idle_after_done += 1
+                if idle_after_done >= 3:
+                    return
+            else:
+                idle_after_done = 0
+            time.sleep(1.0)
 
 
 def main():

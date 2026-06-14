@@ -1,8 +1,6 @@
 var selection = null;
 var selectedTileIds = {};
 var lastGridData = null;
-var gridLayer = null;
-var drawnItems = null;
 var gridRequestId = 0;
 var gridTimer = null;
 var maxSelectionTiles = window.VC_CONFIG.maxSelectionTiles;
@@ -11,26 +9,290 @@ var pageSessionTimer = null;
 var selectionStorageKey = 'vc.areaPicker.selection.v1';
 var pendingRestoreTileIds = null;
 var pendingRestoreLogged = false;
-var rectangleDrawTool = null;
 var pointSelectActive = false;
 var selectionToolButtons = {};
-var gridRenderer = null;
+var mapReady = false;
+var rectToolArmed = false;
+var rectDragging = false;
+var rectStart = null;
 
-var map = L.map('map', { zoomControl: false }).setView([window.VC_CONFIG.lat, window.VC_CONFIG.lon], 14);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors', maxZoom: 19
-}).addTo(map);
-gridRenderer = L.canvas({ padding: 0.35 });
-gridLayer = L.layerGroup().addTo(map);
-drawnItems = new L.FeatureGroup();
-map.addLayer(drawnItems);
+var VECTOR_STYLE_URL = '/area-picker/basemap-style.json?v=' + window.VC_CONFIG.version;
+var OSM_RASTER_STYLE = {
+  version: 8,
+  sources: {
+    osm: {
+      type: 'raster',
+      tiles: [
+        'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      ],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }
+  },
+  layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
+};
+var BASEMAP_STYLES = [
+  { id: 'liberty', label: '矢量·标准', style: VECTOR_STYLE_URL },
+  { id: 'positron', label: '矢量·浅灰', style: 'https://tiles.openfreemap.org/styles/positron', extrusionColor: 'hsl(40,7%,80%)' },
+  { id: 'dark', label: '矢量·深色', style: 'https://tiles.openfreemap.org/styles/dark', extrusionColor: 'hsl(220,6%,18%)' },
+  { id: 'osm', label: '栅格·OSM', style: OSM_RASTER_STYLE }
+];
+var currentBasemap = BASEMAP_STYLES[0].id;
 
-rectangleDrawTool = new L.Draw.Rectangle(map, {
-  shapeOptions: { color: 'var(--accent)', weight: 2, fillOpacity: 0.02 }
+function getBasemapStyle(id) {
+  for (var i = 0; i < BASEMAP_STYLES.length; i++) {
+    if (BASEMAP_STYLES[i].id === id) return BASEMAP_STYLES[i];
+  }
+  return BASEMAP_STYLES[0];
+}
+
+var map = new maplibregl.Map({
+  container: 'map',
+  style: VECTOR_STYLE_URL,
+  center: [window.VC_CONFIG.lon, window.VC_CONFIG.lat],
+  zoom: 13,
+  attributionControl: false,
+  dragRotate: false,
+  pitchWithRotate: false
+});
+map.touchZoomRotate.disableRotation();
+
+function emptyFeatureCollection() {
+  return { type: 'FeatureCollection', features: [] };
+}
+
+function addExtrusionForCurrentStyle() {
+  var def = getBasemapStyle(currentBasemap);
+  if (!def.extrusionColor) return;
+  if (!map.getSource('openmaptiles')) return;
+  if (map.getLayer('building-3d-extra')) return;
+  map.addLayer({
+    id: 'building-3d-extra',
+    type: 'fill-extrusion',
+    source: 'openmaptiles',
+    'source-layer': 'building',
+    minzoom: 14,
+    paint: {
+      'fill-extrusion-base': ['get', 'render_min_height'],
+      'fill-extrusion-color': def.extrusionColor,
+      'fill-extrusion-height': ['get', 'render_height'],
+      'fill-extrusion-opacity': 0.85
+    }
+  });
+}
+
+function setupMapLayers() {
+  addExtrusionForCurrentStyle();
+  map.addSource('grid', { type: 'geojson', data: emptyFeatureCollection() });
+  map.addLayer({
+    id: 'grid-fill',
+    type: 'fill',
+    source: 'grid',
+    paint: {
+      'fill-color': ['case', ['get', 'selected'], '#ffffff', ['get', 'cached'], '#f8fffd', '#ffffff'],
+      'fill-opacity': ['case', ['get', 'selected'], ['case', ['get', 'cached'], 0.58, 0.54], ['get', 'cached'], 0.32, 0]
+    }
+  });
+  map.addLayer({
+    id: 'grid-line',
+    type: 'line',
+    source: 'grid',
+    paint: {
+      'line-color': '#000000',
+      'line-opacity': 0.25,
+      'line-width': ['case', ['get', 'selected'], 2, 1]
+    }
+  });
+  map.addSource('draw', { type: 'geojson', data: emptyFeatureCollection() });
+  map.addLayer({
+    id: 'draw-rect',
+    type: 'line',
+    source: 'draw',
+    paint: { 'line-color': '#1f8a70', 'line-width': 2, 'line-dasharray': [2, 2] }
+  });
+  map.addSource('highlight', { type: 'geojson', data: emptyFeatureCollection() });
+  map.addLayer({
+    id: 'region-outline-glow',
+    type: 'line',
+    source: 'highlight',
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': '#3b82f6',
+      'line-blur': 6,
+      'line-opacity': 0.5,
+      'line-width': ['interpolate', ['linear'], ['zoom'], 3, 6, 8, 11, 14, 18]
+    }
+  });
+  map.addLayer({
+    id: 'region-outline',
+    type: 'line',
+    source: 'highlight',
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': '#3b82f6',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 3, 2, 8, 4, 14, 6]
+    }
+  });
+}
+
+function setDrawData(fc) {
+  var src = map.getSource('draw');
+  if (src) src.setData(fc || emptyFeatureCollection());
+}
+
+function buildGridFeatureCollection() {
+  var tiles = (lastGridData && lastGridData.tiles) ? lastGridData.tiles : [];
+  return {
+    type: 'FeatureCollection',
+    features: tiles.map(function(tile) {
+      var b = tileDisplayBbox(tile);
+      return {
+        type: 'Feature',
+        properties: {
+          tile_id: tile.tile_id,
+          selected: !!selectedTileIds[tile.tile_id],
+          cached: !!tile.cached
+        },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]], [b[0], b[1]]]]
+        }
+      };
+    })
+  };
+}
+
+function setGridData() {
+  var src = map.getSource('grid');
+  if (src) src.setData(buildGridFeatureCollection());
+}
+
+function rectFeatureCollection(a, b) {
+  var w = Math.min(a.lng, b.lng), e = Math.max(a.lng, b.lng);
+  var s = Math.min(a.lat, b.lat), n = Math.max(a.lat, b.lat);
+  return {
+    type: 'FeatureCollection',
+    features: [{
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'LineString', coordinates: [[w, s], [e, s], [e, n], [w, n], [w, s]] }
+    }]
+  };
+}
+
+function makeBounds(a, b) {
+  var w = Math.min(a.lng, b.lng), e = Math.max(a.lng, b.lng);
+  var s = Math.min(a.lat, b.lat), n = Math.max(a.lat, b.lat);
+  return {
+    getWest: function() { return w; },
+    getEast: function() { return e; },
+    getSouth: function() { return s; },
+    getNorth: function() { return n; }
+  };
+}
+
+function armRectangleTool() {
+  rectToolArmed = true;
+  rectDragging = false;
+  rectStart = null;
+  if (map.dragPan) map.dragPan.disable();
+  map.getCanvas().style.cursor = 'crosshair';
+}
+
+function disarmRectangleTool() {
+  rectToolArmed = false;
+  rectDragging = false;
+  rectStart = null;
+  if (map.dragPan) map.dragPan.enable();
+  map.getCanvas().style.cursor = '';
+  setDrawData(emptyFeatureCollection());
+  updateMapToolButtons();
+}
+
+function bindRectangleDrag() {
+  map.on('mousedown', function(e) {
+    if (!rectToolArmed) return;
+    rectDragging = true;
+    rectStart = e.lngLat;
+    setDrawData(rectFeatureCollection(rectStart, e.lngLat));
+  });
+  map.on('mousemove', function(e) {
+    if (!rectDragging || !rectStart) return;
+    setDrawData(rectFeatureCollection(rectStart, e.lngLat));
+  });
+  map.on('mouseup', function(e) {
+    if (!rectDragging || !rectStart) return;
+    var start = rectStart;
+    var end = e.lngLat;
+    rectDragging = false;
+    rectStart = null;
+    disarmRectangleTool();
+    if (start.lng === end.lng && start.lat === end.lat) return;
+    selectTilesByBounds(makeBounds(start, end));
+  });
+}
+
+map.on('load', function() {
+  setupMapLayers();
+  mapReady = true;
+  bindRectangleDrag();
+  restoreRememberedSelection();
+  scheduleGridLoad();
 });
 
+function setBasemapStyle(id) {
+  if (!mapReady) return;
+  if (id === currentBasemap) {
+    closeBasemapMenu();
+    return;
+  }
+  var target = getBasemapStyle(id);
+  map.once('styledata', function() {
+    setupMapLayers();
+    setGridData();
+    syncDrawnSelectionLayer();
+  });
+  map.setStyle(target.style);
+  currentBasemap = target.id;
+  updateBasemapMenu();
+  closeBasemapMenu();
+  log('底图风格已切换到「' + target.label + '」。', 'info');
+}
+
+function openBasemapMenu() {
+  var control = document.getElementById('basemap-control');
+  if (control) control.classList.add('open');
+}
+
+function closeBasemapMenu() {
+  var control = document.getElementById('basemap-control');
+  if (control) control.classList.remove('open');
+}
+
+function toggleBasemapMenu() {
+  var control = document.getElementById('basemap-control');
+  if (!control) return;
+  if (control.classList.contains('open')) closeBasemapMenu();
+  else openBasemapMenu();
+}
+
+function updateBasemapMenu() {
+  var current = getBasemapStyle(currentBasemap);
+  var label = document.querySelector('.map-tool-basemap .basemap-label');
+  if (label) label.textContent = current.label;
+  var menu = document.getElementById('basemap-menu');
+  if (menu) {
+    Array.prototype.forEach.call(menu.children, function(node) {
+      node.classList.toggle('active', node.dataset.styleId === currentBasemap);
+    });
+  }
+}
+
 function rectangleToolActive() {
-  return !!(rectangleDrawTool && rectangleDrawTool.enabled && rectangleDrawTool.enabled());
+  return rectToolArmed;
 }
 
 function updateMapToolButtons() {
@@ -47,21 +309,25 @@ function updateMapToolButtons() {
 
 function setPointSelectActive(active) {
   pointSelectActive = !!active;
-  if (pointSelectActive && rectangleToolActive()) rectangleDrawTool.disable();
-  var method = pointSelectActive ? 'addClass' : 'removeClass';
-  L.DomUtil[method](map.getContainer(), 'point-select-active');
+  if (pointSelectActive && rectangleToolActive()) disarmRectangleTool();
+  var container = map.getContainer();
+  if (pointSelectActive) {
+    container.classList.add('point-select-active');
+  } else {
+    container.classList.remove('point-select-active');
+  }
   updateMapToolButtons();
 }
 
 function activateRectangleTool() {
   setPointSelectActive(false);
-  if (rectangleDrawTool && !rectangleToolActive()) rectangleDrawTool.enable();
+  if (!rectangleToolActive()) armRectangleTool();
   updateMapToolButtons();
 }
 
 function clearSelectionFromMapTool() {
   setPointSelectActive(false);
-  if (rectangleToolActive()) rectangleDrawTool.disable();
+  if (rectangleToolActive()) disarmRectangleTool();
   clearSelection();
 }
 
@@ -69,7 +335,8 @@ function bindSelectionTools() {
   selectionToolButtons = {
     rectangle: document.querySelector('.map-tool-rectangle'),
     point: document.querySelector('.map-tool-point'),
-    clear: document.querySelector('.map-tool-clear')
+    clear: document.querySelector('.map-tool-clear'),
+    basemap: document.querySelector('.map-tool-basemap')
   };
   if (selectionToolButtons.rectangle) {
     selectionToolButtons.rectangle.addEventListener('click', activateRectangleTool);
@@ -82,7 +349,37 @@ function bindSelectionTools() {
   if (selectionToolButtons.clear) {
     selectionToolButtons.clear.addEventListener('click', clearSelectionFromMapTool);
   }
+  if (selectionToolButtons.basemap) {
+    selectionToolButtons.basemap.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleBasemapMenu();
+    });
+  }
+  buildBasemapMenu();
+  document.addEventListener('click', function(e) {
+    var control = document.getElementById('basemap-control');
+    if (control && !control.contains(e.target)) closeBasemapMenu();
+  });
   updateMapToolButtons();
+  updateBasemapMenu();
+}
+
+function buildBasemapMenu() {
+  var menu = document.getElementById('basemap-menu');
+  if (!menu) return;
+  menu.textContent = '';
+  BASEMAP_STYLES.forEach(function(item) {
+    var opt = document.createElement('button');
+    opt.type = 'button';
+    opt.className = 'basemap-option';
+    opt.dataset.styleId = item.id;
+    opt.textContent = item.label;
+    opt.addEventListener('click', function(e) {
+      e.stopPropagation();
+      setBasemapStyle(item.id);
+    });
+    menu.appendChild(opt);
+  });
 }
 bindSelectionTools();
 
@@ -111,12 +408,12 @@ function focusSearchResult(item) {
     var west = parseFloat(item.boundingbox[2]);
     var east = parseFloat(item.boundingbox[3]);
     if (isFinite(south) && isFinite(north) && isFinite(west) && isFinite(east) && south < north && west < east) {
-      map.fitBounds([[south, west], [north, east]], { padding: [40, 40], maxZoom: 15 });
+      map.fitBounds([[west, south], [east, north]], { padding: 40, maxZoom: 15 });
     } else {
-      map.setView([lat, lon], 13);
+      map.jumpTo({ center: [lon, lat], zoom: 13 });
     }
   } else {
-    map.setView([lat, lon], 13);
+    map.jumpTo({ center: [lon, lat], zoom: 13 });
   }
   setText('location-search-status', '已定位：' + shortSearchTitle(item) + '。现在可以点选或框选网格。');
   scheduleGridLoad();
@@ -161,25 +458,9 @@ function bindLocationSearch() {
 
 bindLocationSearch();
 
-map.on(L.Draw.Event.CREATED, function(e) {
-  drawnItems.clearLayers();
-  e.layer.setStyle({ opacity: 0, fillOpacity: 0 });
-  drawnItems.addLayer(e.layer);
-  selectTilesByBounds(e.layer.getBounds());
-});
-
-map.on(L.Draw.Event.DRAWSTART, function() {
-  setPointSelectActive(false);
-  updateMapToolButtons();
-});
-
-map.on(L.Draw.Event.DRAWSTOP, function() {
-  updateMapToolButtons();
-});
-
 map.on('click', function(e) {
   if (!pointSelectActive) return;
-  selectTileByLatLng(e.latlng);
+  selectTileByLatLng(e.lngLat);
 });
 document.getElementById('houdini-path-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
@@ -332,6 +613,20 @@ function setRunStatus(state, title, pct, detail) {
   detailEl.textContent = detail || '等待任务';
 }
 
+// 阶段标签来自真相源的 phase_label（获取道路/清洗/Houdini 重算/Model QA…），
+// 与 step_label 的细粒度进度文字互补：这一行回答"在哪一大步"，detail 回答"这步在做什么"。
+function setRunPhase(phaseLabel) {
+  var el = document.getElementById('run-status-phase');
+  if (!el) return;
+  if (phaseLabel) {
+    el.textContent = phaseLabel;
+    el.hidden = false;
+  } else {
+    el.textContent = '';
+    el.hidden = true;
+  }
+}
+
 function failureMetricsLine(summary) {
   if (!summary) return '';
   if (summary.metrics_line) return summary.metrics_line;
@@ -396,28 +691,36 @@ function logFailureSummary(summary, returncode) {
 function updateRunStatusFromHealth(d) {
   if (!d) {
     setRunStatus('warn', '待命', 0, '等待选择区域');
+    setRunPhase('');
     setFailureSummary(null);
     return;
   }
   if (d.running) {
-    setRunStatus('warn', '运行中', d.pct || 0, d.step_label || '任务执行中');
+    var isDownloadRun = d.operation === 'download';
+    setRunStatus('warn', isDownloadRun ? '数据下载中' : '运行中', d.pct || 0, d.step_label || (isDownloadRun ? '正在下载 OSM / DEM / 建筑...' : '任务执行中'));
+    setRunPhase(d.phase_label || '');
     setFailureSummary(null);
   } else if (d.export_running) {
     setRunStatus('warn', '导出中', 0, 'Houdini 正在导出 FBX');
+    setRunPhase('导出 FBX');
     setFailureSummary(null);
   } else if (d.done) {
     if (d.ok) {
       setRunStatus('ok', '完成', 100, d.step_label || d.name || '任务结束');
+      setRunPhase('');
       setFailureSummary(null);
     } else {
       setRunStatus('off', '失败', d.pct || 0, failureStatusDetail(d.failure_summary, d.step_label || d.name || '任务失败'));
+      setRunPhase(d.phase_label || '');
       setFailureSummary(d.failure_summary);
     }
   } else if (d.failure_summary && d.failure_summary.available) {
     setRunStatus('off', '上次失败', d.pct || 0, failureStatusDetail(d.failure_summary, '上次管线失败'));
+    setRunPhase('');
     setFailureSummary(d.failure_summary);
   } else {
     setRunStatus('warn', '待命', 0, selection ? '已选择区域，等待执行' : '等待选择区域');
+    setRunPhase('');
     setFailureSummary(null);
   }
 }
@@ -533,69 +836,118 @@ function refreshDataSources() {
   });
 }
 
-function jumpToDownloadedArea(area) {
-  if (!area || !area.bbox || area.bbox.length !== 4) return;
-  map.fitBounds([[area.bbox[1], area.bbox[0]], [area.bbox[3], area.bbox[2]]], {
-    padding: [60, 60],
-    maxZoom: 14
+function flyToBbox(bbox, maxZoom) {
+  if (!bbox || bbox.length !== 4) return;
+  map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], {
+    padding: 60,
+    maxZoom: maxZoom || 14
   });
 }
 
-function renderQuickJumps(downloadedAreas) {
-  var host = document.getElementById('map-quick-jumps');
+var boundaryCache = {};
+
+function setHighlightData(fc) {
+  var src = map.getSource('highlight');
+  if (src) src.setData(fc || emptyFeatureCollection());
+}
+
+function loadBoundary(osmId) {
+  if (!osmId) {
+    setHighlightData(null);
+    return;
+  }
+  var cached = boundaryCache[osmId];
+  if (cached) {
+    setHighlightData(cached);
+    return;
+  }
+  fetch('/boundary?osm_type=R&osm_id=' + encodeURIComponent(osmId))
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (!d || !d.ok || !d.geojson) {
+      setHighlightData(null);
+      return;
+    }
+    var fc = { type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: d.geojson }] };
+    boundaryCache[osmId] = fc;
+    setHighlightData(fc);
+  })
+  .catch(function() {
+    setHighlightData(null);
+  });
+}
+
+var regionData = null;
+var activeCountryId = null;
+
+function loadRegionNav() {
+  fetch('/area-picker/regions.json?v=' + window.VC_CONFIG.version)
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    regionData = d && d.countries ? d.countries : [];
+    renderCountries();
+  })
+  .catch(function() {
+    regionData = [];
+  });
+}
+
+function renderCountries() {
+  var host = document.getElementById('region-countries');
   if (!host) return;
-  var jumps = (downloadedAreas && downloadedAreas.quick_jumps) || [];
-  var areas = jumps.filter(function(area) {
-    return area && area.jumpable && area.bbox && area.bbox.length === 4;
+  host.textContent = '';
+  regionData.forEach(function(country) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'region-item';
+    btn.setAttribute('role', 'listitem');
+    btn.textContent = country.name;
+    btn.title = '定位到 ' + country.name;
+    btn.addEventListener('click', function() {
+      selectCountry(country, btn);
+    });
+    host.appendChild(btn);
   });
+}
 
-  var existing = {};
-  Array.prototype.forEach.call(host.children, function(node) {
-    if (node.dataset && node.dataset.jumpKey) existing[node.dataset.jumpKey] = node;
-  });
+function selectCountry(country, btn) {
+  activeCountryId = country.id;
+  var host = document.getElementById('region-countries');
+  if (host) {
+    Array.prototype.forEach.call(host.children, function(node) {
+      node.classList.toggle('active', node === btn);
+    });
+  }
+  flyToBbox(country.bbox, 7);
+  loadBoundary(country.osmId);
+  renderCities(country.cities || []);
+}
 
-  var seen = {};
-  areas.forEach(function(area, index) {
-    var key = String(area.id || area.label || index);
-    seen[key] = true;
-    var label = area.label || area.id || '已下载区域';
-    var countText = String(area.tile_count || 0);
-
-    var btn = existing[key];
-    if (!btn) {
-      btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'map-quick-jump';
-      btn.dataset.jumpKey = key;
-
-      var title = document.createElement('span');
-      title.className = 'map-quick-jump-title';
-
-      var count = document.createElement('span');
-      count.className = 'map-quick-jump-count';
-
-      btn.appendChild(title);
-      btn.appendChild(count);
-      btn.addEventListener('click', function() {
-        jumpToDownloadedArea(btn._area);
+function renderCities(cities) {
+  var host = document.getElementById('region-cities');
+  if (!host) return;
+  host.textContent = '';
+  if (!cities.length) {
+    host.hidden = true;
+    return;
+  }
+  cities.forEach(function(city) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'region-item';
+    btn.setAttribute('role', 'listitem');
+    btn.textContent = city.name;
+    btn.title = '定位到 ' + city.name;
+    btn.addEventListener('click', function() {
+      Array.prototype.forEach.call(host.children, function(node) {
+        node.classList.toggle('active', node === btn);
       });
-    }
-
-    btn._area = area;
-    btn.title = '跳转到 ' + label;
-    var titleEl = btn.querySelector('.map-quick-jump-title');
-    var countEl = btn.querySelector('.map-quick-jump-count');
-    if (titleEl && titleEl.textContent !== label) titleEl.textContent = label;
-    if (countEl && countEl.textContent !== countText) countEl.textContent = countText;
-
-    if (host.children[index] !== btn) {
-      host.insertBefore(btn, host.children[index] || null);
-    }
+      flyToBbox(city.bbox, 12);
+      loadBoundary(city.osmId);
+    });
+    host.appendChild(btn);
   });
-
-  Array.prototype.slice.call(host.children).forEach(function(node) {
-    if (!node.dataset || !seen[node.dataset.jumpKey]) host.removeChild(node);
-  });
+  host.hidden = false;
 }
 
 function refreshServiceState() {
@@ -607,7 +959,6 @@ function refreshServiceState() {
     updateExportButton(!!d.export_available, !!d.running);
     updateSelectionButtons(!!d.running);
     updateRunStatusFromHealth(d);
-    renderQuickJumps(d.downloaded_areas);
     refreshDataSources();
   })
   .catch(function() {
@@ -646,27 +997,6 @@ function startPageSession() {
   touchPageSession();
   pageSessionTimer = setInterval(touchPageSession, 2000);
   window.addEventListener('pagehide', notifyPageClosed);
-}
-
-function tileStyle(tile) {
-  var isSelected = !!selectedTileIds[tile.tile_id];
-  var isCached = !!tile.cached;
-  var selectedColor = '#ffffff';
-  var cachedColor = '#f8fffd';
-  var gridLineColor = '#000000';
-  return {
-    color: gridLineColor,
-    weight: isSelected ? 2 : 1,
-    opacity: 0.25,
-    fillColor: isSelected ? selectedColor : (isCached ? cachedColor : selectedColor),
-    fillOpacity: isSelected ? (isCached ? 0.58 : 0.54) : (isCached ? 0.32 : 0),
-    dashArray: null
-  };
-}
-
-function tileLatLngBounds(tile) {
-  var b = tileDisplayBbox(tile);
-  return [[b[1], b[0]], [b[3], b[2]]];
 }
 
 function tileDisplayBbox(tile) {
@@ -811,8 +1141,8 @@ function restoreRememberedSelection() {
 function restoreSelectionFromPayload(payload) {
   if (!payload || !payload.tile_ids || !payload.tile_ids.length) return false;
   if (payload.bbox && payload.bbox.length === 4) {
-    map.fitBounds([[payload.bbox[1], payload.bbox[0]], [payload.bbox[3], payload.bbox[2]]], {
-      padding: [60, 60],
+    map.fitBounds([[payload.bbox[0], payload.bbox[1]], [payload.bbox[2], payload.bbox[3]]], {
+      padding: 60,
       maxZoom: 16
     });
   }
@@ -874,19 +1204,11 @@ function updateTileDisplay() {
 }
 
 function syncDrawnSelectionLayer() {
-  if (!drawnItems || !selection || !selection.bbox) return;
-  drawnItems.clearLayers();
-  var b = selection.bbox;
-  L.rectangle([[b[1], b[0]], [b[3], b[2]]], {
-    opacity: 0,
-    fillOpacity: 0
-  }).addTo(drawnItems);
+  setDrawData(emptyFeatureCollection());
 }
 
 function refreshTileStyles() {
-  gridLayer.eachLayer(function(layer) {
-    if (layer.vcTile) layer.setStyle(tileStyle(layer.vcTile));
-  });
+  setGridData();
 }
 
 function bboxIntersects(bounds, bbox) {
@@ -999,7 +1321,7 @@ function selectTileByLatLng(latlng) {
 function clearSelection() {
   selection = null;
   selectedTileIds = {};
-  drawnItems.clearLayers();
+  setDrawData(emptyFeatureCollection());
   clearPersistedSelection();
   updateTileDisplay();
   refreshTileStyles();
@@ -1007,29 +1329,28 @@ function clearSelection() {
 }
 
 function renderGrid(data) {
-  gridLayer.clearLayers();
-  if (!data) return;
+  if (!data) {
+    lastGridData = null;
+    setGridData();
+    return;
+  }
   lastGridData = data;
   if (data.truncated) {
+    setGridData();
     return;
   }
   assignDisplayGridBounds(data.tiles);
-  data.tiles.forEach(function(tile) {
-    var options = tileStyle(tile);
-    options.interactive = false;
-    options.renderer = gridRenderer;
-    var poly = L.rectangle(tileLatLngBounds(tile), options);
-    poly.vcTile = tile;
-    poly.addTo(gridLayer);
-  });
+  setGridData();
   restorePendingSelection();
-  refreshTileStyles();
 }
 
 function loadGrid() {
-  map.invalidateSize();
-  var size = map.getSize();
-  if (!size || size.x <= 0 || size.y <= 0) {
+  if (!mapReady) {
+    scheduleGridLoad();
+    return;
+  }
+  var canvas = map.getCanvas();
+  if (!canvas || canvas.width <= 0 || canvas.height <= 0) {
     scheduleGridLoad();
     return;
   }
@@ -1059,13 +1380,12 @@ function scheduleGridLoad() {
   gridTimer = setTimeout(loadGrid, 40);
 }
 
-map.on('moveend zoomend', scheduleGridLoad);
+map.on('moveend', scheduleGridLoad);
+map.on('zoomend', scheduleGridLoad);
 window.addEventListener('resize', function() {
-  map.invalidateSize();
+  map.resize();
   scheduleGridLoad();
 });
-restoreRememberedSelection();
-scheduleGridLoad();
 
 function categorizeLine(line) {
   var l = line.toLowerCase();
@@ -1205,44 +1525,11 @@ function switchTab(panelId) {
 }
 
 var _pollTimer = null;
+var _evtSource = null;
 var _lastLogSeq = 0;
 var _lastExportSeq = 0;
 var _lastFailureKey = '';
 var _houdiniOpenPollTimer = null;
-
-var _downloadProgressEls = null;
-function downloadProgressEls() {
-  if (!_downloadProgressEls) {
-    _downloadProgressEls = {
-      panel: document.getElementById('download-progress'),
-      title: document.getElementById('download-progress-title'),
-      pct: document.getElementById('download-progress-pct'),
-      bar: document.getElementById('download-progress-bar'),
-      detail: document.getElementById('download-progress-detail')
-    };
-  }
-  return _downloadProgressEls;
-}
-
-function setDownloadProgress(state, title, pct, detail) {
-  var els = downloadProgressEls();
-  if (!els.panel) return;
-  els.panel.className = 'download-progress status-' + state;
-  var n = Math.max(0, Math.min(100, Number(pct) || 0));
-  if (els.title) els.title.textContent = title;
-  if (els.pct) els.pct.textContent = n + '%';
-  if (els.bar) els.bar.style.width = n + '%';
-  if (els.detail) els.detail.textContent = detail || '';
-}
-
-function resetDownloadProgress() {
-  var els = downloadProgressEls();
-  if (els.panel) els.panel.className = 'download-progress';
-  if (els.pct) els.pct.textContent = '0%';
-  if (els.bar) els.bar.style.width = '0%';
-  if (els.title) els.title.textContent = '数据下载';
-  if (els.detail) els.detail.textContent = '等待下载任务';
-}
 
 function reloadGridNow() {
   clearTimeout(gridTimer);
@@ -1261,7 +1548,12 @@ function pollHoudiniAfterOpen(remaining) {
 function pollStatus() {
   fetch('/status')
   .then(r => r.json())
-  .then(d => {
+  .then(applyStatus)
+  .catch(function() { /* server may be restarting */ });
+}
+
+function applyStatus(d) {
+  (function() {
     updateRunStatusFromHealth(d);
     updateSoftwarePath(d.software_paths);
 
@@ -1303,20 +1595,14 @@ function pollStatus() {
     setHoudiniBadge(!!d.houdini_available, d.houdini_asset);
     updateSelectionButtons(!!d.running);
 
-    if (d.operation === 'download' && d.running) {
-      setDownloadProgress('warn', '数据下载中', d.pct || 0, d.step_label || '正在下载 OSM / DEM / 建筑...');
-    }
-
     if (d.export_done && !d.export_running) {
-      clearInterval(_pollTimer);
-      _pollTimer = null;
+      stopStatusStream();
       refreshServiceState();
       return;
     }
 
     if (d.done && !d.export_running) {
-      clearInterval(_pollTimer);
-      _pollTimer = null;
+      stopStatusStream();
       if (d.ok) {
         var doneLabel = d.operation === 'download' ? '[OK] 数据下载完成' : '[OK] 生成完成';
         var doneLog = d.operation === 'download' ? '[OK] 数据下载完成！区域: ' : '[OK] 生成完成！区域: ';
@@ -1324,9 +1610,7 @@ function pollStatus() {
         log(doneLog + d.name, 'ok');
         if (d.run_id) log('run_id: ' + d.run_id, 'dim');
         if (d.operation === 'download') {
-          setDownloadProgress('ok', '数据下载完成', 100, '已写入本地缓存，地图填充已刷新');
           reloadGridNow();
-          setTimeout(resetDownloadProgress, 1500);
         }
         if (d.auto_shutdown_on_success) {
           log('3 秒后自动关闭页面，5 秒后停止本地服务...', 'dim');
@@ -1344,22 +1628,17 @@ function pollStatus() {
       } else {
         var failDetail = failureStatusDetail(d.failure_summary, '[FAIL] 管线出错');
         setRunStatus('off', '失败', d.pct || 0, failDetail);
-        if (d.operation === 'download') {
-          setDownloadProgress('off', '数据下载失败', d.pct || 0, failDetail);
-        }
         setFailureSummary(d.failure_summary);
         logFailureSummary(d.failure_summary, d.returncode);
         updateSelectionButtons(false);
         refreshServiceState();
       }
     }
-  })
-  .catch(function() { /* server may be restarting */ });
+  })();
 }
 
-function submitSelectedArea(endpoint, actionLabel) {
+function submitSelectedArea(mode, actionLabel) {
   if (!selection) return;
-  var isDownload = endpoint === '/download-data';
   var name = selection.selection_id;
   var b = selection.bbox;
   updateSelectionButtons(true);
@@ -1371,53 +1650,76 @@ function submitSelectedArea(endpoint, actionLabel) {
   _lastExportSeq = 0;
   _lastFailureKey = '';
   setFailureSummary(null);
-  if (isDownload) {
-    setDownloadProgress('warn', '数据下载中', 0, '准备下载...');
-  } else {
-    resetDownloadProgress();
-  }
   setRunStatus('warn', '启动中', 0, actionLabel + ': ' + name);
   log('[' + new Date().toLocaleTimeString() + '] ' + actionLabel + ': ' + name, 'ok');
   log('bbox = [' + b[0]+', '+b[1]+', '+b[2]+', '+b[3]+']', 'dim');
   updateExportButton(false, true);
 
-  fetch(endpoint, {
+  fetch('/jobs', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      tile_ids: selection.tiles.map(function(tile) { return tile.tile_id; })
+      tile_ids: selection.tiles.map(function(tile) { return tile.tile_id; }),
+      mode: mode
     })
   })
   .then(r => r.json())
   .then(d => {
     if (d.ok) {
       log(d.message || '任务已启动...', 'dim');
-      _pollTimer = setInterval(pollStatus, 1000);
+      startStatusStream();
     } else {
       log('[错误] ' + d.message, 'err');
-      if (isDownload) setDownloadProgress('off', '数据下载失败', 0, d.message || '启动失败');
       updateSelectionButtons(false);
       refreshServiceState();
     }
   })
   .catch(e => {
     log('[网络错误] ' + e, 'err');
-    if (isDownload) setDownloadProgress('off', '数据下载失败', 0, '网络错误: ' + e);
     updateSelectionButtons(false);
     refreshServiceState();
   });
 }
 
 function runPipeline() {
-  submitSelectedArea('/run', '提交 Houdini 生成');
+  submitSelectedArea('generate', '提交 Houdini 生成');
 }
 
 function downloadData() {
-  submitSelectedArea('/download-data', '提交数据下载');
+  submitSelectedArea('download', '提交数据下载');
+}
+
+function stopStatusStream() {
+  if (_evtSource) { try { _evtSource.close(); } catch (e) {} _evtSource = null; }
+  if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+}
+
+// 真相源归一后，优先用 SSE 实时取状态；EventSource 不可用或连接出错时
+// 降级回每秒轮询 /status，保证旧浏览器与异常场景仍可用。
+function startStatusStream() {
+  stopStatusStream();
+  if (typeof window.EventSource === 'undefined') {
+    _pollTimer = setInterval(pollStatus, 1000);
+    return;
+  }
+  try {
+    _evtSource = new EventSource('/events');
+  } catch (e) {
+    _pollTimer = setInterval(pollStatus, 1000);
+    return;
+  }
+  _evtSource.onmessage = function(ev) {
+    try { applyStatus(JSON.parse(ev.data)); } catch (e) {}
+  };
+  _evtSource.onerror = function() {
+    // SSE 断开（含正常收尾后服务端关闭）：关掉它并退回轮询兜底。
+    if (_evtSource) { try { _evtSource.close(); } catch (e) {} _evtSource = null; }
+    if (!_pollTimer) _pollTimer = setInterval(pollStatus, 1000);
+  };
 }
 
 function ensurePolling() {
-  if (!_pollTimer) _pollTimer = setInterval(pollStatus, 1000);
+  if (!_evtSource && !_pollTimer) startStatusStream();
 }
 
 function exportFbx() {
@@ -1443,4 +1745,5 @@ function exportFbx() {
 
 refreshServiceState();
 refreshDataSources();
+loadRegionNav();
 startPageSession();

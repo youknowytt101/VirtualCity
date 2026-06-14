@@ -11,7 +11,7 @@ from typing import Any
 from shared import vc_paths
 
 
-RUN_SCHEMA_VERSION = 1
+RUN_SCHEMA_VERSION = 2
 RUNS_DIR = vc_paths.ROOT / "Reports" / "pipeline_runs"
 LATEST_RUN = RUNS_DIR / "latest.json"
 _SAFE_RUN_ID = re.compile(r"^[A-Za-z0-9_.-]+$")
@@ -64,6 +64,8 @@ def create_run(area_cfg: dict[str, Any], *, source: str,
         "source": source,
         "status": "running",
         "phase": "created",
+        "progress": {"step": 0, "total": 0, "label": ""},
+        "qa": {},
         "created": created,
         "updated": created,
         "events": [
@@ -93,6 +95,42 @@ def update_run(run_id: str, *, status: str | None = None,
             "phase": payload.get("phase", ""),
             "message": message,
         })
+    _write_run(payload)
+    return payload
+
+
+def update_progress(run_id: str, *, step: int, total: int,
+                    label: str = "", phase: str | None = None) -> dict[str, Any]:
+    """Record structured build progress in the single source of truth.
+
+    Progress lives in the run file as data, not as a log line for an upstream
+    reader to parse. Callers pass explicit step/total/label instead of relying
+    on the wording of a print statement.
+    """
+    payload = load_run(run_id)
+    payload["progress"] = {"step": int(step), "total": int(total), "label": label}
+    if phase:
+        payload["phase"] = phase
+    payload["updated"] = now()
+    _write_run(payload)
+    return payload
+
+
+def set_qa(run_id: str, *, status: str, report: str = "",
+           passed: bool | None = None) -> dict[str, Any]:
+    """Fold the Model QA outcome into the run as raw facts.
+
+    Only the raw QA result is stored here. Derived judgements such as
+    requires_review or failed-check extraction are left to the read layer
+    (pipeline_status), keeping this source of truth free of policy.
+    """
+    payload = load_run(run_id)
+    payload["qa"] = {
+        "status": status,
+        "report": report,
+        "passed": bool(passed) if passed is not None else (str(status).lower() == "pass"),
+    }
+    payload["updated"] = now()
     _write_run(payload)
     return payload
 

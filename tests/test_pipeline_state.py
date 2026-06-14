@@ -14,6 +14,7 @@ import data_cleaning_cache as dcc
 import pipeline_state
 import refine_data
 from orchestration import build_history
+from orchestration import state_machine as sm
 
 
 def _write_ready_file(path: Path, marker: str) -> None:
@@ -206,6 +207,90 @@ class TestReadyPublication(unittest.TestCase):
                 "RawData/_houdini_ready/area_test/buildings.geojson",
             )
             self.assertNotIn(".staging", ready["outputs"]["buildings.geojson"]["path"])
+class TestProgressInSourceOfTruth(unittest.TestCase):
+    """阶段1：进度作为结构化数据写入真相源，不再依赖日志正则。"""
+
+    def test_update_progress_persists_step_total_label(self):
+        with tempfile.TemporaryDirectory() as td:
+            runs = Path(td) / "pipeline_runs"
+            with patch.object(pipeline_state, "RUNS_DIR", runs), \
+                    patch.object(pipeline_state, "LATEST_RUN", runs / "latest.json"):
+                pipeline_state.create_run({"area_id": "area_p"}, source="unit-test", run_id="run_p")
+                pipeline_state.update_progress("run_p", step=3, total=7, label="Houdini 3/7")
+                run = pipeline_state.load_run("run_p")
+                self.assertEqual(run["progress"], {"step": 3, "total": 7, "label": "Houdini 3/7"})
+
+    def test_update_progress_can_advance_phase(self):
+        with tempfile.TemporaryDirectory() as td:
+            runs = Path(td) / "pipeline_runs"
+            with patch.object(pipeline_state, "RUNS_DIR", runs), \
+                    patch.object(pipeline_state, "LATEST_RUN", runs / "latest.json"):
+                pipeline_state.create_run({"area_id": "area_p"}, source="unit-test", run_id="run_p")
+                pipeline_state.update_progress("run_p", step=1, total=7,
+                                               label="start", phase="houdini_recook")
+                run = pipeline_state.load_run("run_p")
+                self.assertEqual(run["phase"], "houdini_recook")
+                self.assertEqual(run["progress"]["step"], 1)
+
+
+class TestQaInSourceOfTruth(unittest.TestCase):
+    """阶段1：QA 原始结论并入真相源，派生判断留给读层。"""
+
+    def test_set_qa_records_raw_result(self):
+        with tempfile.TemporaryDirectory() as td:
+            runs = Path(td) / "pipeline_runs"
+            with patch.object(pipeline_state, "RUNS_DIR", runs), \
+                    patch.object(pipeline_state, "LATEST_RUN", runs / "latest.json"):
+                pipeline_state.create_run({"area_id": "area_q"}, source="unit-test", run_id="run_q")
+                pipeline_state.set_qa("run_q", status="pass", report="all checks ok")
+                run = pipeline_state.load_run("run_q")
+                self.assertEqual(run["qa"]["status"], "pass")
+                self.assertEqual(run["qa"]["report"], "all checks ok")
+                self.assertTrue(run["qa"]["passed"])
+
+    def test_set_qa_non_pass_is_not_passed(self):
+        with tempfile.TemporaryDirectory() as td:
+            runs = Path(td) / "pipeline_runs"
+            with patch.object(pipeline_state, "RUNS_DIR", runs), \
+                    patch.object(pipeline_state, "LATEST_RUN", runs / "latest.json"):
+                pipeline_state.create_run({"area_id": "area_q"}, source="unit-test", run_id="run_q")
+                pipeline_state.set_qa("run_q", status="fail", report="2 checks failed")
+                run = pipeline_state.load_run("run_q")
+                self.assertEqual(run["qa"]["status"], "fail")
+                self.assertFalse(run["qa"]["passed"])
+
+
+class TestStateMachine(unittest.TestCase):
+    """阶段5：显式状态机的时序守卫，纯函数无副作用。"""
+
+    def test_happy_path_runs_to_done(self):
+        final = sm.run([sm.START, sm.ACQUIRED, sm.REFINED, sm.COOKED, sm.QA_PASSED])
+        self.assertEqual(final, sm.DONE)
+
+    def test_acquire_failure_never_enters_cook(self):
+        # acquire 阶段失败应直接进入 FAILED，且不能再被推进到 cooking。
+        state = sm.transition(sm.QUEUED, sm.START)   # ACQUIRING
+        state = sm.transition(state, sm.FAIL)         # FAILED
+        self.assertEqual(state, sm.FAILED)
+        with self.assertRaises(sm.IllegalTransition):
+            sm.transition(state, sm.COOKED)
+
+    def test_out_of_order_event_is_rejected(self):
+        # 跳过 acquire 直接 cook 属非法时序，必须抛错而不是悄悄前进。
+        state = sm.transition(sm.QUEUED, sm.START)   # ACQUIRING
+        with self.assertRaises(sm.IllegalTransition):
+            sm.transition(state, sm.COOKED)
+
+    def test_terminal_state_rejects_further_events(self):
+        with self.assertRaises(sm.IllegalTransition):
+            sm.transition(sm.DONE, sm.START)
+
+    def test_fail_from_any_stage_reaches_failed(self):
+        for stage_events in ([sm.START], [sm.START, sm.ACQUIRED],
+                             [sm.START, sm.ACQUIRED, sm.REFINED]):
+            state = sm.run(stage_events)
+            self.assertFalse(sm.is_terminal(state))
+            self.assertEqual(sm.transition(state, sm.FAIL), sm.FAILED)
 
 
 if __name__ == "__main__":
