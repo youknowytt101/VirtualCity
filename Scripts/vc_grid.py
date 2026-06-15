@@ -11,7 +11,7 @@ import data_cleaning_cache as dcc
 
 
 TILE_SIZE_M = 1000
-MAX_VIEW_TILES = 400
+MAX_VIEW_TILES = 10000
 MAX_SELECTION_TILES = 256
 _TILE_ID_RE = re.compile(r"^z(?P<zone>\d+)(?P<hemi>[ns])_e(?P<easting>-?\d+)_n(?P<northing>-?\d+)_s(?P<size>\d+)$")
 
@@ -89,16 +89,38 @@ def _envelope(corners: Sequence[Sequence[float]]) -> list[float]:
     ]
 
 
-def cache_coverage(bbox: Sequence[float]) -> dict[str, Any]:
-    """Return whether all raw inputs for bbox can be restored locally."""
-    macro = _tile_cache.find_covering_tile(bbox)
+def build_coverage_context() -> dict[str, Any]:
+    """一次性读取缓存索引快照，供批量瓦片复用。"""
+    return {
+        "macro": _tile_cache.load_macro_snapshot(),
+        "clip": dcc.load_clip_snapshot(),
+    }
+
+
+def cache_coverage(bbox: Sequence[float], *, context: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Return whether all raw inputs for bbox can be restored locally.
+
+    单 bbox 调用走原始入口（保持契约可 mock）；批量场景显式传入
+    build_coverage_context() 的快照，避免每格重复读盘。
+    """
+    if context is None:
+        macro = _tile_cache.find_covering_tile(bbox)
+    else:
+        macro = _tile_cache.find_covering_tile_in(context["macro"], bbox)
     if macro:
         return {"cached": True, "source": "macro_tile"}
 
-    clip = dcc.find_covering_clip_cache(
-        bbox,
-        source_signature=dcc.CURRENT_ACQUISITION_PROFILE,
-    )
+    if context is None:
+        clip = dcc.find_covering_clip_cache(
+            bbox,
+            source_signature=dcc.CURRENT_ACQUISITION_PROFILE,
+        )
+    else:
+        clip = dcc.find_covering_clip_cache_in(
+            context["clip"],
+            bbox,
+            source_signature=dcc.CURRENT_ACQUISITION_PROFILE,
+        )
     if clip:
         return {
             "cached": True,
@@ -110,7 +132,8 @@ def cache_coverage(bbox: Sequence[float]) -> dict[str, Any]:
 
 
 def make_tile(zone: int, easting: int, northing: int, *,
-              size_m: int = TILE_SIZE_M, northern: bool = True) -> dict[str, Any]:
+              size_m: int = TILE_SIZE_M, northern: bool = True,
+              context: dict[str, Any] | None = None) -> dict[str, Any]:
     corners = _tile_corners(zone, easting, northing, size_m=size_m, northern=northern)
     bbox = _envelope(corners)
     center_lat, center_lon = _utm_lite.utm_to_wgs84(
@@ -119,7 +142,7 @@ def make_tile(zone: int, easting: int, northing: int, *,
         zone,
         northern=northern,
     )
-    coverage = cache_coverage(bbox)
+    coverage = cache_coverage(bbox, context=context)
     return {
         "tile_id": tile_id(zone, easting, northing, size_m=size_m, northern=northern),
         "zone": int(zone),
@@ -175,8 +198,9 @@ def selection_from_tile_ids(tile_ids: Sequence[str], *,
         zone,
         northern=northern,
     )
+    context = build_coverage_context()
     tiles = [
-        make_tile(zone, easting, northing, size_m=size_m, northern=northern)
+        make_tile(zone, easting, northing, size_m=size_m, northern=northern, context=context)
         for northing in expected_northings
         for easting in expected_eastings
     ]
@@ -236,8 +260,9 @@ def tiles_for_bbox(bbox: Sequence[float], *, size_m: int = TILE_SIZE_M,
             "zone": zone,
         }
 
+    context = build_coverage_context()
     tiles = [
-        make_tile(zone, easting, northing, size_m=size_m, northern=northern)
+        make_tile(zone, easting, northing, size_m=size_m, northern=northern, context=context)
         for northing in range(min_n, max_n + size_m, size_m)
         for easting in range(min_e, max_e + size_m, size_m)
     ]

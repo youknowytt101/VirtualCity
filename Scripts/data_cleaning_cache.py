@@ -348,11 +348,19 @@ def find_covering_clip_cache(bbox: list[float] | tuple[float, ...] | None,
                              *,
                              source_signature: dict[str, Any] | None = None) -> dict[str, Any] | None:
     """Return the smallest valid clip cache that fully contains bbox."""
-    target = normalize_bbox(bbox)
-    if not target or not CLIP_CACHE_DIR.exists():
-        return None
-    expected = normalize_source_signature(source_signature) if source_signature else None
-    candidates = []
+    return find_covering_clip_cache_in(
+        load_clip_snapshot(), bbox, source_signature=source_signature
+    )
+
+
+def load_clip_snapshot() -> list[dict[str, Any]]:
+    """读一次 clip 缓存目录并校验产物存在，返回可复用的内存快照。
+
+    供一次性判定大量瓦片复用：避免每格都 glob 目录并逐个 json.load。
+    """
+    snapshot: list[dict[str, Any]] = []
+    if not CLIP_CACHE_DIR.exists():
+        return snapshot
     for manifest_path in CLIP_CACHE_DIR.glob("*/_manifest.json"):
         try:
             with open(manifest_path, encoding="utf-8") as f:
@@ -360,15 +368,38 @@ def find_covering_clip_cache(bbox: list[float] | tuple[float, ...] | None,
         except (OSError, json.JSONDecodeError):
             continue
         source_bbox = normalize_bbox(manifest.get("bbox"))
-        if not source_bbox or not _bbox_contains(source_bbox, target):
-            continue
-        if expected is not None and manifest.get("source_signature", {"profile": "default_v1"}) != expected:
+        if not source_bbox:
             continue
         paths = clip_cache_paths(manifest.get("key", ""))
         if not all(paths[group].exists() for group in OUTPUT_NAMES):
             continue
         area = (source_bbox[2] - source_bbox[0]) * (source_bbox[3] - source_bbox[1])
-        candidates.append((area, manifest))
+        snapshot.append({
+            "manifest": manifest,
+            "source_bbox": source_bbox,
+            "area": area,
+        })
+    return snapshot
+
+
+def find_covering_clip_cache_in(snapshot: list[dict[str, Any]],
+                                bbox: list[float] | tuple[float, ...] | None,
+                                *,
+                                source_signature: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    """纯内存判定：从快照里找完整覆盖 bbox 的最小 clip 缓存。"""
+    target = normalize_bbox(bbox)
+    if not target:
+        return None
+    expected = normalize_source_signature(source_signature) if source_signature else None
+    candidates = []
+    for item in snapshot:
+        source_bbox = item["source_bbox"]
+        if not _bbox_contains(source_bbox, target):
+            continue
+        manifest = item["manifest"]
+        if expected is not None and manifest.get("source_signature", {"profile": "default_v1"}) != expected:
+            continue
+        candidates.append((item["area"], manifest))
     if not candidates:
         return None
     candidates.sort(key=lambda item: item[0])

@@ -39,14 +39,32 @@ def save_index(idx):
 
 def find_covering_tile(bbox):
     """返回完整覆盖 bbox 的 tile entry，找不到返回 None。"""
+    return find_covering_tile_in(load_macro_snapshot(), bbox)
+
+
+def load_macro_snapshot():
+    """读一次索引并校验文件存在，返回可复用的内存快照。
+
+    适用于一次性判定大量瓦片：避免每格都重读 _index.json 并反复 stat 磁盘。
+    """
+    keys = ["dem_tif", "osm_xml", "bld_geojson"]
+    snapshot = []
+    for entry in load_index().values():
+        bbox = entry.get("bbox")
+        if not bbox or len(bbox) != 4:
+            continue
+        if all(resolve_project_path(entry.get(k, "")).exists() for k in keys):
+            snapshot.append(entry)
+    return snapshot
+
+
+def find_covering_tile_in(snapshot, bbox):
+    """纯内存判定：从快照里找完整覆盖 bbox 的 entry。"""
     w, s, e, n = bbox
-    for name, entry in load_index().items():
+    for entry in snapshot:
         tw, ts, te, tn = entry["bbox"]
         if tw <= w and ts <= s and te >= e and tn >= n:
-            # 验证文件存在
-            keys = ["dem_tif", "osm_xml", "bld_geojson"]
-            if all(resolve_project_path(entry.get(k, "")).exists() for k in keys):
-                return entry
+            return entry
     return None
 
 

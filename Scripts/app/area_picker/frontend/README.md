@@ -8,7 +8,8 @@ This folder contains the homepage UI for the VirtualCity area picker.
 
 Keep the automation pipeline boundary stable while iterating on visuals:
 
-- Do not rename the API endpoints used by `app.js`: `/tiles`, `/run`, `/download-data`, `/status`, `/health`, `/data-sources`, `/selection`, `/selection/clear`, `/software-paths`, `/open-houdini`, and `/export`.
+- `app.js` submits jobs through the unified `/jobs` endpoint (`body.mode` is `generate` or `download`); do not rename it. The legacy `/run` and `/download-data` routes still exist in `server.py` for backward compatibility but are no longer called by the frontend.
+- Other endpoints `app.js` relies on: `/tiles`, `/boundary`, `/geocode`, `/status`, `/events` (SSE, with `/status` polling as fallback), `/health`, `/data-sources`, `/selection`, `/selection/clear`, `/software-paths`, `/open-houdini`, `/export`, `/session`, and `/session/closed`. Static config is served at `/area-picker/regions.json` and `/area-picker/basemap-style.json`.
 - Do not change the meaning of submitted `tile_ids`; Houdini and data acquisition rely on them.
 - Visual changes should generally start in `styles.css`.
 - Interaction and motion changes should generally stay in `app.js`.

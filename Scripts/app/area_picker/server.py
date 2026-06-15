@@ -23,6 +23,8 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 ROOT = SCRIPTS.parent
 STATIC_ROOT = SCRIPTS / 'web_assets'
+BOUNDARY_CACHE_DIR = SCRIPTS / 'app' / 'area_picker' / '.cache' / 'boundary'
+BOUNDARY_PREBUILT_DIR = SCRIPTS / 'app' / 'area_picker' / 'frontend' / 'boundaries'
 
 import pipeline_status
 import vc_grid
@@ -42,6 +44,62 @@ FRONTEND_ROOT = area_picker_template.FRONTEND_ROOT
 APP_VERSION = "10-06-26_v2.23"
 STARTED_AT = time.strftime("%Y-%m-%d %H:%M:%S")
 AUTO_SHUTDOWN_ON_SUCCESS = os.environ.get("VC_AREA_PICKER_AUTO_SHUTDOWN") == "1"
+
+
+def _fetch_boundary(osm_type: str, osm_id: str) -> dict:
+    key = f'{osm_type}{osm_id}'
+    prebuilt_file = BOUNDARY_PREBUILT_DIR / f'{key}.json'
+    if prebuilt_file.exists():
+        try:
+            prebuilt = json.loads(prebuilt_file.read_text(encoding='utf-8'))
+            if isinstance(prebuilt, dict) and prebuilt.get('ok'):
+                return prebuilt
+        except Exception:
+            pass
+    cache_file = BOUNDARY_CACHE_DIR / f'{key}.json'
+    if cache_file.exists():
+        try:
+            cached = json.loads(cache_file.read_text(encoding='utf-8'))
+            if isinstance(cached, dict) and cached.get('ok'):
+                return cached
+        except Exception:
+            pass
+    url = 'https://nominatim.openstreetmap.org/lookup?' + urllib.parse.urlencode({
+        'osm_ids': key,
+        'format': 'jsonv2',
+        'polygon_geojson': '1',
+    })
+    req = urllib.request.Request(
+        url,
+        headers={
+            'User-Agent': 'VirtualCity/0.1 area-picker geocoder',
+            'Accept': 'application/json',
+        },
+    )
+    last_exc = None
+    for attempt in range(2):
+        try:
+            with urllib.request.urlopen(req, timeout=8.0) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+            item = data[0] if isinstance(data, list) and data and isinstance(data[0], dict) else None
+            geojson = item.get('geojson') if item else None
+            if not isinstance(geojson, dict) or geojson.get('type') not in ('Polygon', 'MultiPolygon'):
+                return {'ok': False, 'message': 'no polygon boundary', 'geojson': None}
+            result = {
+                'ok': True,
+                'geojson': geojson,
+                'boundingbox': item.get('boundingbox') if isinstance(item.get('boundingbox'), list) else [],
+            }
+            try:
+                BOUNDARY_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+                cache_file.write_text(json.dumps(result), encoding='utf-8')
+            except Exception:
+                pass
+            return result
+        except Exception as exc:
+            last_exc = exc
+            time.sleep(0.6)
+    return {'ok': False, 'message': f'boundary failed: {last_exc}', 'geojson': None}
 NO_BROWSER = os.environ.get("VC_AREA_PICKER_NO_BROWSER") == "1"
 SHUTDOWN_WITH_PAGE = os.environ.get("VC_AREA_PICKER_SHUTDOWN_WITH_PAGE") == "1"
 PAGE_SESSION_GRACE_SECONDS = 30.0
@@ -1163,33 +1221,7 @@ class _Handler(BaseHTTPRequestHandler):
             if osm_type not in ('R', 'W', 'N') or not osm_id.isdigit():
                 self._json({'ok': False, 'message': 'invalid osm_type/osm_id', 'geojson': None})
                 return
-            try:
-                url = 'https://nominatim.openstreetmap.org/lookup?' + urllib.parse.urlencode({
-                    'osm_ids': osm_type + osm_id,
-                    'format': 'jsonv2',
-                    'polygon_geojson': '1',
-                })
-                req = urllib.request.Request(
-                    url,
-                    headers={
-                        'User-Agent': 'VirtualCity/0.1 area-picker geocoder',
-                        'Accept': 'application/json',
-                    },
-                )
-                with urllib.request.urlopen(req, timeout=8.0) as resp:
-                    data = json.loads(resp.read().decode('utf-8'))
-                item = data[0] if isinstance(data, list) and data and isinstance(data[0], dict) else None
-                geojson = item.get('geojson') if item else None
-                if not isinstance(geojson, dict) or geojson.get('type') not in ('Polygon', 'MultiPolygon'):
-                    self._json({'ok': False, 'message': 'no polygon boundary', 'geojson': None})
-                    return
-                self._json({
-                    'ok': True,
-                    'geojson': geojson,
-                    'boundingbox': item.get('boundingbox') if isinstance(item.get('boundingbox'), list) else [],
-                })
-            except Exception as exc:
-                self._json({'ok': False, 'message': f'boundary failed: {exc}', 'geojson': None})
+            self._json(_fetch_boundary(osm_type, osm_id))
             return
         if parsed.path in ('/svg_live_viewer.html', '/reports/visualizations/svg_live_viewer.html'):
             self.send_response(302)
@@ -1234,6 +1266,7 @@ class _Handler(BaseHTTPRequestHandler):
                 .replace('__LAT__', str(lat))
                 .replace('__LON__', str(lon))
                 .replace('__VERSION__', _frontend_asset_version())
+                .replace('__APP_VERSION__', APP_VERSION)
                 .replace('__MAX_SELECTION_TILES__', str(vc_grid.MAX_SELECTION_TILES))
                 .replace('__SHUTDOWN_WITH_PAGE__', 'true' if SHUTDOWN_WITH_PAGE else 'false'))
         self.send_response(200)
