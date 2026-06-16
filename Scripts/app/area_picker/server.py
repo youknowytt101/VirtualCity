@@ -68,6 +68,7 @@ def _fetch_boundary(osm_type: str, osm_id: str) -> dict:
         'osm_ids': key,
         'format': 'jsonv2',
         'polygon_geojson': '1',
+        'polygon_threshold': '0',
     })
     req = urllib.request.Request(
         url,
@@ -412,6 +413,17 @@ def _service_payload() -> dict:
         step_label = snapshot.get('step_label', '')
     houdini_available = _probe_houdini()
     houdini_asset = _houdini_asset_status(houdini_available)
+    # 口径分离：当前态只反映 running 中的值。历史结果迁到 last_run。
+    last_run = {
+        'available': bool(done),
+        'ok': bool(ok) if done else False,
+        'run_id': run_id if done else '',
+        'name': name if done else '',
+        'operation': operation if done else '',
+        'returncode': snapshot.get('returncode') if done else None,
+        'step_label': step_label if done else '',
+        'pct': pct if done else 0,
+    }
     return {
         'app': 'VirtualCity area_picker',
         'server_version': APP_VERSION,
@@ -420,13 +432,14 @@ def _service_payload() -> dict:
         'root': str(ROOT),
         'running': running,
         'export_running': export_running,
-        'done': done,
-        'ok': ok,
-        'name': name,
-        'operation': operation,
-        'run_id': run_id,
-        'pct': pct,
-        'step_label': step_label,
+        'done': False if not running else done,
+        'ok': False if not running else ok,
+        'name': name if running else '',
+        'operation': operation if running else '',
+        'run_id': run_id if running else '',
+        'pct': pct if running else 0,
+        'step_label': step_label if running else '',
+        'last_run': last_run,
         'auto_shutdown_on_success': AUTO_SHUTDOWN_ON_SUCCESS,
         'no_browser': NO_BROWSER,
         'shutdown_with_page': SHUTDOWN_WITH_PAGE,
@@ -1152,6 +1165,24 @@ def _build_status_payload() -> dict:
     resp['selection'] = _remembered_selection_status()
     resp['downloaded_areas'] = _downloaded_area_status()
     resp['failure_summary'] = _failure_summary(snapshot)
+    # 口径分离：顶层 running/done/ok 只反映"当前回合"。运行结束（包含成功）的
+    # 历史结果迁到 last_run，避免页面刷新后前端把"上次完成"误显示为"当前完成"。
+    # failure_summary 仍由 snapshot 计算（保留 _state 原貌），因此"上次失败"
+    # 摘要展示不受影响。
+    last_run = {
+        'available': bool(resp.get('done')),
+        'ok': bool(resp.get('ok')) if resp.get('done') else False,
+        'run_id': resp.get('run_id') if resp.get('done') else '',
+        'name': resp.get('name') if resp.get('done') else '',
+        'operation': resp.get('operation') if resp.get('done') else '',
+        'returncode': resp.get('returncode') if resp.get('done') else None,
+        'step_label': resp.get('step_label') if resp.get('done') else '',
+        'pct': resp.get('pct', 0) if resp.get('done') else 0,
+    }
+    resp['last_run'] = last_run
+    if not resp.get('running'):
+        resp['done'] = False
+        resp['ok'] = False
     return resp
 
 

@@ -35,11 +35,27 @@ var OSM_RASTER_STYLE = {
   },
   layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
 };
+var SATELLITE_GLOBE_STYLE = {
+  version: 8,
+  projection: { type: 'globe' },
+  sources: {
+    satellite: {
+      type: 'raster',
+      tiles: [
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      ],
+      tileSize: 256,
+      maxzoom: 19,
+      attribution: 'Imagery © Esri, Maxar, Earthstar Geographics'
+    }
+  },
+  layers: [
+    { id: 'satellite', type: 'raster', source: 'satellite' }
+  ]
+};
 var BASEMAP_STYLES = [
-  { id: 'liberty', label: '矢量·标准', style: VECTOR_STYLE_URL, buildingRGB: [214, 211, 205] },
-  { id: 'positron', label: '矢量·浅灰', style: 'https://tiles.openfreemap.org/styles/positron', extrusionColor: 'hsl(40,7%,80%)', buildingRGB: [223, 220, 214] },
-  { id: 'dark', label: '矢量·深色', style: 'https://tiles.openfreemap.org/styles/dark', extrusionColor: 'hsl(220,6%,18%)', buildingRGB: [56, 59, 66] },
-  { id: 'osm', label: '栅格·OSM', style: OSM_RASTER_STYLE }
+  { id: 'positron', label: '默认', style: 'https://tiles.openfreemap.org/styles/positron', extrusionColor: 'hsl(40,7%,80%)', buildingRGB: [223, 220, 214] },
+  { id: 'satellite', label: '卫星', style: SATELLITE_GLOBE_STYLE }
 ];
 var currentBasemap = 'positron';
 
@@ -53,13 +69,122 @@ function getBasemapStyle(id) {
 var map = new maplibregl.Map({
   container: 'map',
   style: getBasemapStyle(currentBasemap).style,
-  center: [window.VC_CONFIG.lon, window.VC_CONFIG.lat],
-  zoom: 13,
+  center: [window.VC_CONFIG.lon, 20],
+  zoom: 2.5,
+  maxPitch: 65,
   attributionControl: false,
   dragRotate: false,
-  pitchWithRotate: false
+  pitchWithRotate: false,
+  dragPan: {
+    linearity: 0.25,
+    easing: function(t) { return 1 - Math.pow(1 - t, 3); },
+    maxSpeed: 2000,
+    deceleration: 2200
+  }
 });
 map.touchZoomRotate.disableRotation();
+if (map.scrollZoom) map.scrollZoom.disable();
+setupSmoothWheelZoom();
+setupMiddleButtonRotate();
+
+// 3D 视角下按住鼠标中键拖拽旋转相机：水平改 bearing，垂直改 pitch。
+function setupMiddleButtonRotate() {
+  var canvas = map.getCanvas();
+  var ROTATE_SPEED = 0.35;   // 每像素水平 → 度（bearing）
+  var PITCH_SPEED = 0.25;    // 每像素垂直 → 度（pitch）
+  var dragging = false;
+  var lastX = 0;
+  var lastY = 0;
+
+  canvas.addEventListener('mousedown', function(e) {
+    if (e.button !== 1) return;          // 只接管中键
+    if (map.getPitch() <= 0.5) return;   // 仅 3D 视角生效
+    e.preventDefault();                  // 阻止浏览器中键自动滚动
+    dragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    if (_cityOrbit) _cityOrbit.stop();   // 接管期间停掉自动环绕
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    var dx = e.clientX - lastX;
+    var dy = e.clientY - lastY;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    map.setBearing(map.getBearing() + dx * ROTATE_SPEED);
+    var nextPitch = map.getPitch() - dy * PITCH_SPEED;
+    nextPitch = Math.max(0, Math.min(map.getMaxPitch(), nextPitch));
+    map.setPitch(nextPitch);
+  });
+
+  window.addEventListener('mouseup', function(e) {
+    if (e.button !== 1) return;
+    if (!dragging) return;
+    dragging = false;
+    syncViewToggle();
+  });
+}
+
+function setupSmoothWheelZoom() {
+  var canvas = map.getCanvas();
+  var zoomVelocity = 0;
+  var anchorPoint = null;
+  var running = false;
+
+  var FRICTION = 0.86;
+  var IMPULSE = 0.0011;
+  var MAX_VELOCITY = 0.22;
+  var MIN_VELOCITY = 0.0009;
+
+  function applyZoomAround(z) {
+    var clamped = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), z));
+    if (!anchorPoint) {
+      map.setZoom(clamped);
+      return;
+    }
+    var beforeLngLat = map.unproject(anchorPoint);
+    map.setZoom(clamped);
+    var afterPoint = map.project(beforeLngLat);
+    var dx = afterPoint.x - anchorPoint.x;
+    var dy = afterPoint.y - anchorPoint.y;
+    if (dx || dy) {
+      var center = map.project(map.getCenter());
+      map.setCenter(map.unproject(new maplibregl.Point(center.x + dx, center.y + dy)));
+    }
+  }
+
+  function frame() {
+    if (Math.abs(zoomVelocity) < MIN_VELOCITY) {
+      zoomVelocity = 0;
+      running = false;
+      return;
+    }
+    var current = map.getZoom();
+    var next = current + zoomVelocity;
+    var min = map.getMinZoom();
+    var max = map.getMaxZoom();
+    if (next <= min || next >= max) zoomVelocity = 0;
+    applyZoomAround(next);
+    zoomVelocity *= FRICTION;
+    requestAnimationFrame(frame);
+  }
+
+  canvas.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var delta = e.deltaY;
+    if (e.deltaMode === 1) delta *= 20;
+    else if (e.deltaMode === 2) delta *= 400;
+    var rect = canvas.getBoundingClientRect();
+    anchorPoint = new maplibregl.Point(e.clientX - rect.left, e.clientY - rect.top);
+    zoomVelocity += -delta * IMPULSE;
+    zoomVelocity = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, zoomVelocity));
+    if (!running) {
+      running = true;
+      requestAnimationFrame(frame);
+    }
+  }, { passive: false });
+}
 
 function emptyFeatureCollection() {
   return { type: 'FeatureCollection', features: [] };
@@ -233,6 +358,7 @@ function setupDeckOverlay() {
   buildLightingEffect();
   deckOverlay = new deck.MapboxOverlay({
     interleaved: false,
+    useDevicePixels: Math.min((window.devicePixelRatio || 1) * 1.5, 3),
     effects: [lightingEffect],
     layers: deckLayers()
   });
@@ -397,18 +523,190 @@ function bindRectangleDrag() {
   });
 }
 
+function forceEnglishLabels() {  // 底图（OpenMapTiles schema）的地名 symbol 图层默认用本地化 name 字段，
+  // 导致中/俄/日等本地文字混入。统一把含 text-field 的图层改成英文名，
+  // 无 name:en 时回退到拉丁转写 name:latin，再回退到原始 name。
+  var style;
+  try { style = map.getStyle(); } catch (e) { return; }
+  if (!style || !style.layers) return;
+  var englishField = [
+    'coalesce',
+    ['get', 'name:en'],
+    ['get', 'name:latin'],
+    ['get', 'name']
+  ];
+  style.layers.forEach(function(lyr) {
+    if (lyr.type !== 'symbol') return;
+    if (!lyr.layout || lyr.layout['text-field'] === undefined) return;
+    if (!map.getLayer(lyr.id)) return;
+    try { map.setLayoutProperty(lyr.id, 'text-field', englishField); } catch (e) {}
+  });
+}
+
+var WATER_DARK = '#838383';
+
+// 统一压暗所有底图的江河湖海。底图基于 OpenMapTiles schema，水体来自
+// source-layer 为 water/waterway 的图层；同时兼容靠 id 命名水体的样式。
+// 不同底图水色各异，这里直接覆盖为固定暗色，保证跨底图视觉一致。
+function darkenWaterLayers() {
+  var style;
+  try { style = map.getStyle(); } catch (e) { return; }
+  if (!style || !style.layers) return;
+  var idHint = /water|ocean|river|lake|sea|marine/i;
+  style.layers.forEach(function(lyr) {
+    if (!map.getLayer(lyr.id)) return;
+    var srcLayer = lyr['source-layer'];
+    var isWater = srcLayer === 'water' || srcLayer === 'waterway' ||
+                  (idHint.test(lyr.id) && !/waterway-?label|water-?name|building/i.test(lyr.id));
+    if (!isWater) return;
+    try {
+      if (lyr.type === 'fill') {
+        map.setPaintProperty(lyr.id, 'fill-color', WATER_DARK);
+      } else if (lyr.type === 'line') {
+        map.setPaintProperty(lyr.id, 'line-color', WATER_DARK);
+      } else if (lyr.type === 'fill-extrusion') {
+        map.setPaintProperty(lyr.id, 'fill-extrusion-color', WATER_DARK);
+      }
+    } catch (e) {}
+  });
+}
+
+function applyGlobeProjection() {
+  if (map.setProjection) map.setProjection({ type: 'globe' });
+  // 去掉球面暗面与边缘光晕：sky/fog 全部设为 UI 底色，atmosphere-blend 归零。
+  if (map.setSky) {
+    map.setSky({
+      'sky-color': '#1f1e1d',
+      'horizon-color': '#1f1e1d',
+      'fog-color': '#1f1e1d',
+      'sky-horizon-blend': 0.0,
+      'horizon-fog-blend': 0.0,
+      'fog-ground-blend': 0.0,
+      'atmosphere-blend': 0.0
+    });
+  }
+}
+
 map.on('load', function() {
   setupMapLayers();
   mapReady = true;
+  applyGlobeProjection();
+  forceEnglishLabels();
+  darkenWaterLayers();
   bindRectangleDrag();
   restoreRememberedSelection();
   scheduleGridLoad();
+  setupGlobeSpin();
+  setupCityOrbit();
+  setupViewToggle();
+  requestAnimationFrame(function() {
+    var el = document.getElementById('map');
+    if (el) el.classList.add('map-ready');
+  });
 });
+
+// 全局自转控制器：飞行/聚焦等程序化相机动作需要在期间挂起自转，
+// 否则每帧 setCenter 会覆盖 fitBounds 动画，导致聚焦失效。
+var _spinControl = null;
+
+function setupGlobeSpin() {
+  var SPIN_DEGREES_PER_SEC = 1;     // 目标自转速度（稍慢）
+  var RESUME_DELAY = 500;           // 用户停止操作 0.5 秒后恢复
+  var STOP_ABOVE_ZOOM = 4.5;        // 拉近后不再自转
+  var RAMP_MS = 1400;               // 启动加速曲线时长
+
+  var spinning = false;
+  var suspended = false;            // 程序化相机动作（飞行）期间挂起
+  var resumeTimer = null;
+  var lastTime = 0;
+  var rampStart = 0;
+  var rafId = null;
+
+  function easeRamp(t) {
+    // smoothstep，从 0 平滑加速到 1，避免自转启动时的速度突变
+    t = Math.max(0, Math.min(1, t));
+    return t * t * (3 - 2 * t);
+  }
+
+  function startSpin() {
+    if (suspended) return;
+    if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
+    if (spinning) return;
+    spinning = true;
+    lastTime = 0;
+    rampStart = 0;
+    if (!rafId) rafId = requestAnimationFrame(spinFrame);
+  }
+
+  function stopSpin() {
+    spinning = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  // 用户交互：立即停转，停手 RESUME_DELAY 后重新平滑启动
+  function onUserInteract() {
+    stopSpin();
+    if (resumeTimer) clearTimeout(resumeTimer);
+    if (suspended) return;
+    resumeTimer = setTimeout(startSpin, RESUME_DELAY);
+  }
+
+  function spinFrame(now) {
+    if (!spinning) { rafId = null; return; }
+    // 程序化相机动画（fitBounds/flyTo 聚焦飞行）进行中：让路，绝不用 setCenter
+    // 打断飞行。飞行结束 isEasing 变 false 后，从头平滑加速恢复自转。
+    var flying = map.isEasing && map.isEasing();
+    if (flying || map.getPitch() > 0.5 || map.getZoom() > STOP_ABOVE_ZOOM) {
+      lastTime = 0;
+      rampStart = 0;
+      rafId = requestAnimationFrame(spinFrame);
+      return;
+    }
+    if (!rampStart) rampStart = now;
+    if (lastTime) {
+      var dt = (now - lastTime) / 1000;
+      var speed = SPIN_DEGREES_PER_SEC * easeRamp((now - rampStart) / RAMP_MS);
+      var center = map.getCenter();
+      center.lng = ((center.lng + speed * dt + 180) % 360) - 180;
+      map.setCenter(center);
+    }
+    lastTime = now;
+    rafId = requestAnimationFrame(spinFrame);
+  }
+
+  var canvas = map.getCanvas();
+  ['mousedown', 'touchstart', 'wheel', 'dragstart', 'zoomstart'].forEach(function(evt) {
+    canvas.addEventListener(evt, onUserInteract, { passive: true });
+  });
+
+  // 视角压平回顶视即视为 3D 巡游结束：解除挂起，让自转判定重新生效。
+  // 飞入/抬头都停在 65°（> 0.5），不会误触发；只有真正回到平视才解锁。
+  map.on('pitchend', function() {
+    if (suspended && map.getPitch() <= 0.5) {
+      suspended = false;
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(startSpin, RESUME_DELAY);
+    }
+  });
+  _spinControl = {
+    suspend: function() {
+      suspended = true;
+      stopSpin();
+      if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
+    },
+    release: function() {
+      suspended = false;
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(startSpin, RESUME_DELAY);
+    }
+  };
+
+  startSpin();
+}
 
 function setBasemapStyle(id) {
   if (!mapReady) return;
   if (id === currentBasemap) {
-    closeBasemapMenu();
     return;
   }
   var target = getBasemapStyle(id);
@@ -418,12 +716,14 @@ function setBasemapStyle(id) {
     syncDrawnSelectionLayer();
     restoreBoundaryAfterStyle();
     hideNativeBuildingExtrusion();
+    applyGlobeProjection();
+    forceEnglishLabels();
+    darkenWaterLayers();
     scheduleDeckRefresh();
   });
   map.setStyle(target.style);
   currentBasemap = target.id;
   updateBasemapMenu();
-  closeBasemapMenu();
   log('底图风格已切换到「' + target.label + '」。', 'info');
 }
 
@@ -452,33 +752,21 @@ function concealThenReveal(el, swap) {
   el.addEventListener('animationend', done);
 }
 
-function openBasemapMenu() {
-  var control = document.getElementById('basemap-control');
-  if (control) control.classList.add('open');
-  replayReveal(document.getElementById('basemap-menu'));
-}
-
-function closeBasemapMenu() {
-  var control = document.getElementById('basemap-control');
-  if (control) control.classList.remove('open');
-}
-
-function toggleBasemapMenu() {
-  var control = document.getElementById('basemap-control');
-  if (!control) return;
-  if (control.classList.contains('open')) closeBasemapMenu();
-  else openBasemapMenu();
-}
-
 function updateBasemapMenu() {
-  var current = getBasemapStyle(currentBasemap);
-  var label = document.querySelector('.map-tool-basemap .basemap-label');
-  if (label) label.textContent = current.label;
-  var menu = document.getElementById('basemap-menu');
-  if (menu) {
-    Array.prototype.forEach.call(menu.children, function(node) {
-      node.classList.toggle('active', node.dataset.styleId === currentBasemap);
-    });
+  var seg = document.getElementById('basemap-segment');
+  if (!seg) return;
+  var options = seg.querySelectorAll('.segmented-option');
+  var thumb = seg.querySelector('.segmented-thumb');
+  var activeNode = null;
+  Array.prototype.forEach.call(options, function(node) {
+    var on = node.dataset.styleId === currentBasemap;
+    node.classList.toggle('active', on);
+    node.setAttribute('aria-checked', on ? 'true' : 'false');
+    if (on) activeNode = node;
+  });
+  if (thumb && activeNode) {
+    thumb.style.width = activeNode.offsetWidth + 'px';
+    thumb.style.transform = 'translateX(' + activeNode.offsetLeft + 'px)';
   }
 }
 
@@ -508,6 +796,10 @@ function setGridVisible(visible) {
   ['grid-fill', 'grid-line'].forEach(function(layerId) {
     if (map.getLayer(layerId)) map.setLayoutProperty(layerId, 'visibility', value);
   });
+  var toolbar = document.getElementById('selection-tools');
+  if (toolbar) toolbar.classList.toggle('drawer-open', gridVisible);
+  var drawer = toolbar && toolbar.querySelector('.map-tool-drawer');
+  if (drawer) drawer.setAttribute('aria-hidden', gridVisible ? 'false' : 'true');
   updateMapToolButtons();
 }
 
@@ -544,8 +836,7 @@ function bindSelectionTools() {
     grid: document.querySelector('.map-tool-grid'),
     rectangle: document.querySelector('.map-tool-rectangle'),
     point: document.querySelector('.map-tool-point'),
-    clear: document.querySelector('.map-tool-clear'),
-    basemap: document.querySelector('.map-tool-basemap')
+    clear: document.querySelector('.map-tool-clear')
   };
   if (selectionToolButtons.grid) {
     selectionToolButtons.grid.addEventListener('click', toggleGridVisible);
@@ -561,36 +852,30 @@ function bindSelectionTools() {
   if (selectionToolButtons.clear) {
     selectionToolButtons.clear.addEventListener('click', clearSelectionFromMapTool);
   }
-  if (selectionToolButtons.basemap) {
-    selectionToolButtons.basemap.addEventListener('click', function(e) {
-      e.stopPropagation();
-      toggleBasemapMenu();
-    });
-  }
   buildBasemapMenu();
-  document.addEventListener('click', function(e) {
-    var control = document.getElementById('basemap-control');
-    if (control && !control.contains(e.target)) closeBasemapMenu();
-  });
   updateMapToolButtons();
   updateBasemapMenu();
 }
 
 function buildBasemapMenu() {
-  var menu = document.getElementById('basemap-menu');
-  if (!menu) return;
-  menu.textContent = '';
+  var seg = document.getElementById('basemap-segment');
+  if (!seg) return;
+  seg.textContent = '';
+  var thumb = document.createElement('span');
+  thumb.className = 'segmented-thumb';
+  seg.appendChild(thumb);
   BASEMAP_STYLES.forEach(function(item) {
     var opt = document.createElement('button');
     opt.type = 'button';
-    opt.className = 'basemap-option flat-item';
+    opt.className = 'segmented-option';
+    opt.setAttribute('role', 'radio');
     opt.dataset.styleId = item.id;
     opt.textContent = item.label;
     opt.addEventListener('click', function(e) {
       e.stopPropagation();
       setBasemapStyle(item.id);
     });
-    menu.appendChild(opt);
+    seg.appendChild(opt);
   });
 }
 bindSelectionTools();
@@ -812,7 +1097,19 @@ function setRunStatus(state, title, pct, detail) {
   panel.className = 'run-status-panel status-' + state;
   titleEl.textContent = title;
   pctEl.textContent = n + '%';
-  bar.style.transform = 'scaleX(' + (n / 100) + ')';
+  // 进度只对"前进"播放缓动；回退/归零（任务结束、失败、重置）瞬时完成，
+  // 避免进度条演出一段 0.3s 的"倒流"动画。
+  var prev = Number(bar.dataset.pct) || 0;
+  if (n < prev) {
+    var saved = bar.style.transition;
+    bar.style.transition = 'none';
+    bar.style.transform = 'scaleX(' + (n / 100) + ')';
+    void bar.offsetWidth;
+    bar.style.transition = saved;
+  } else {
+    bar.style.transform = 'scaleX(' + (n / 100) + ')';
+  }
+  bar.dataset.pct = n;
   detailEl.textContent = detail || '等待任务';
 }
 
@@ -877,7 +1174,11 @@ function computeStageStatuses(d) {
     else statuses = ['done', 'done', 'done', 'done'];
     return statuses;
   }
-  if (map) {
+  // 闸门：只有任务真正在运行时，phase 才驱动阶段勾选。
+  // 否则（待命/空闲、或 health 残留了已完成 phase）一律视为待命，返回全 todo，
+  // 避免出现"待命 0% 却四个阶段全勾"的状态错位。
+  var active = d.running || d.export_running;
+  if (active && map) {
     for (var j = 0; j < 4; j++) {
       if (j < map.idx) statuses[j] = 'done';
       else if (j === map.idx) statuses[j] = map.done ? 'done' : 'active';
@@ -912,9 +1213,18 @@ function renderStageChecklist(d) {
   if (!list) return;
   var statuses = computeStageStatuses(d);
   var rows = list.children;
+  // 首屏：禁用一帧动画，让初始状态（可能已是完成态）无回弹地直接落位，
+  // 之后的状态变化才播放勾选弹入/置灰动画，避免刷新时四个勾一起抖动。
+  var primed = list.dataset.primed === '1';
+  if (!primed) list.classList.add('no-anim');
   for (var i = 0; i < rows.length && i < statuses.length; i++) {
     rows[i].className = 'run-stage is-' + statuses[i];
     rows[i].setAttribute('aria-checked', statuses[i] === 'done' ? 'true' : 'false');
+  }
+  if (!primed) {
+    void list.offsetWidth;
+    list.classList.remove('no-anim');
+    list.dataset.primed = '1';
   }
 }
 
@@ -980,7 +1290,14 @@ function logFailureSummary(summary, returncode) {
 }
 
 function updateRunStatusFromHealth(d) {
-  renderStageChecklist(d);
+  // 阶段勾选：
+  // - 任务正在运行/导出 → 显示真实阶段
+  // - 等待窗口内（已提交未翻转 running）→ 待命，避免闪到全勾
+  // - 其他（包括 last_run.available，刷新后看到的"上次结果"）→ 待命
+  // 后端现在已经把 done/ok 限定为"当前回合"，刷新后顶层 done 始终为 false，
+  // 历史结果在 last_run 字段里，不再需要会话级守卫。
+  var active = d && (d.running || d.export_running);
+  renderStageChecklist((active && !_awaitingRun) ? d : null);
   if (!d) {
     setRunStatus('warn', '待命', 0, '等待选择区域');
     setRunPhase('');
@@ -988,6 +1305,7 @@ function updateRunStatusFromHealth(d) {
     return;
   }
   if (d.running) {
+    _awaitingRun = false;
     var isDownloadRun = d.operation === 'download';
     setRunStatus('warn', isDownloadRun ? '数据下载中' : '运行中', d.pct || 0, d.step_label || (isDownloadRun ? '正在下载 OSM / DEM / 建筑...' : '任务执行中'));
     setRunPhase(d.phase_label || '');
@@ -996,7 +1314,15 @@ function updateRunStatusFromHealth(d) {
     setRunStatus('warn', '导出中', 0, 'Houdini 正在导出 FBX');
     setRunPhase('导出 FBX');
     setFailureSummary(null);
+  } else if (_awaitingRun) {
+    // 已提交、等待后端翻转为 running。忽略此刻 health 里残留的完成/失败态，
+    // 维持"启动中 0%"，避免进度条闪到 100% 再缩回。
+    setRunStatus('warn', '启动中', 0, '任务已提交，正在启动...');
+    setRunPhase('');
+    setFailureSummary(null);
   } else if (d.done) {
+    // 后端只在"当前回合刚结束"时把 done=true 暴露出来；刷新后顶层 done=false，
+    // 历史结果走 last_run / failure_summary，所以这里就是真正的"本次完成/失败"。
     if (d.ok) {
       setRunStatus('ok', '完成', 100, d.step_label || d.name || '任务结束');
       setRunPhase('');
@@ -1120,12 +1446,185 @@ function refreshDataSources() {
   });
 }
 
+function bboxCenter(bbox) {
+  if (!bbox || bbox.length !== 4) return null;
+  return [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
+}
+
 function flyToBbox(bbox, maxZoom) {
   if (!bbox || bbox.length !== 4) return;
+  if (_spinControl) _spinControl.suspend();
+  if (_cityOrbit) _cityOrbit.stop();
+  map.once('moveend', function() {
+    if (_spinControl) _spinControl.release();
+    syncViewToggle();
+  });
   map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], {
     padding: 60,
-    maxZoom: maxZoom || 14
+    maxZoom: maxZoom || 14,
+    pitch: 0,
+    bearing: 0,
+    linear: false,
+    curve: 1.42,
+    speed: 0.8,
+    easing: function(t) { return 1 - Math.pow(1 - t, 3); }
   });
+}
+
+// 城市级 3D 巡游：聚焦 → 抬头偏头 → 绕中心匀速环绕。
+// 与全球自转互斥；与 _spinControl 同构（rAF + smoothstep 加速 + isEasing 守卫）。
+var _cityOrbit = null;
+
+function setupCityOrbit() {
+  var ORBIT_DEGREES_PER_SEC = 6;   // 环绕目标速度
+  var RAMP_MS = 1200;              // 启动加速曲线时长
+
+  var active = false;
+  var lastTime = 0;
+  var rampStart = 0;
+  var rafId = null;
+
+  function easeRamp(t) {
+    t = Math.max(0, Math.min(1, t));
+    return t * t * (3 - 2 * t);
+  }
+
+  function orbitFrame(now) {
+    if (!active) { rafId = null; return; }
+    // 第二段 easeTo（抬头偏头）进行中：让路，绝不用 setBearing 打断它。
+    if (map.isEasing && map.isEasing()) {
+      lastTime = 0;
+      rampStart = 0;
+      rafId = requestAnimationFrame(orbitFrame);
+      return;
+    }
+    if (!rampStart) rampStart = now;
+    if (lastTime) {
+      var dt = (now - lastTime) / 1000;
+      var speed = ORBIT_DEGREES_PER_SEC * easeRamp((now - rampStart) / RAMP_MS);
+      map.setBearing(map.getBearing() + speed * dt);
+    }
+    lastTime = now;
+    rafId = requestAnimationFrame(orbitFrame);
+  }
+
+  function start() {
+    if (active) return;
+    active = true;
+    lastTime = 0;
+    rampStart = 0;
+    if (!rafId) rafId = requestAnimationFrame(orbitFrame);
+  }
+
+  function stop() {
+    active = false;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  // 用户交互打断环绕，但不复位 pitch/zoom（与 Google Earth 一致）。
+  var canvas = map.getCanvas();
+  ['mousedown', 'touchstart', 'wheel', 'dragstart', 'zoomstart'].forEach(function(evt) {
+    canvas.addEventListener(evt, function() { if (active) stop(); }, { passive: true });
+  });
+
+  _cityOrbit = {
+    start: start,
+    stop: stop,
+    isActive: function() { return active; }
+  };
+}
+
+var CITY_PITCH = 65;
+
+// 进入城市 3D 巡游：阶段1 平视聚焦 → 阶段2 抬头偏头 → 阶段3 环绕。
+function flyTo3DCity(lng, lat, zoom) {
+  if (typeof lng !== 'number' || typeof lat !== 'number') return;
+  var targetZoom = zoom || 16;
+  if (_spinControl) _spinControl.suspend();
+  if (_cityOrbit) _cityOrbit.stop();
+
+  var startBearing = map.getBearing();
+
+  map.once('moveend', function() {
+    if (_cityOrbit) _cityOrbit.start();
+  });
+
+  map.flyTo({
+    center: [lng, lat],
+    zoom: targetZoom + 0.4,
+    pitch: CITY_PITCH,
+    bearing: startBearing - 25,
+    speed: 2.4,
+    curve: 1.2,
+    essential: true
+  });
+}
+
+// 退出 3D，回到顶视 2D，并恢复全球自转判定。
+function exit3DTo2D() {
+  if (_cityOrbit) _cityOrbit.stop();
+  map.easeTo({
+    pitch: 0,
+    bearing: 0,
+    duration: 800,
+    easing: function(t) { return t * t * (3 - 2 * t); }
+  });
+  map.once('moveend', function() {
+    if (_spinControl) _spinControl.release();
+    syncViewToggle();
+  });
+}
+
+// 右下角 3D 按钮专用：中心不动，仅慢速抬头偏头（与建筑按钮的快速飞入分开）。
+function enter3DInPlace() {
+  if (_spinControl) _spinControl.suspend();
+  if (_cityOrbit) _cityOrbit.stop();
+  var startBearing = map.getBearing();
+  map.easeTo({
+    pitch: CITY_PITCH,
+    bearing: startBearing - 25,
+    duration: 800,
+    easing: function(t) { return t * t * (3 - 2 * t); }
+  });
+  map.once('moveend', function() {
+    if (_cityOrbit) _cityOrbit.start();
+    syncViewToggle();
+  });
+}
+
+// 右下角常驻 2D/3D 切换：3D 进入/重启巡游，2D 复位顶视。
+function setupViewToggle() {
+  var to2d = document.querySelector('#view-toggle .view-toggle-2d');
+  var to3d = document.querySelector('#view-toggle .view-toggle-3d');
+  if (!to2d || !to3d) return;
+
+  to3d.addEventListener('click', function() {
+    if (map.getPitch() > 0.5) {
+      if (_spinControl) _spinControl.suspend();
+      if (_cityOrbit) _cityOrbit.start();
+      syncViewToggle();
+    } else {
+      enter3DInPlace();
+    }
+  });
+
+  to2d.addEventListener('click', function() {
+    exit3DTo2D();
+  });
+
+  map.on('pitchend', syncViewToggle);
+  syncViewToggle();
+}
+
+function syncViewToggle() {
+  var to2d = document.querySelector('#view-toggle .view-toggle-2d');
+  var to3d = document.querySelector('#view-toggle .view-toggle-3d');
+  if (!to2d || !to3d) return;
+  var is3d = map.getPitch() > 0.5;
+  to3d.classList.toggle('active', is3d);
+  to3d.setAttribute('aria-pressed', is3d ? 'true' : 'false');
+  to2d.classList.toggle('active', !is3d);
+  to2d.setAttribute('aria-pressed', !is3d ? 'true' : 'false');
 }
 
 var boundaryCache = {};
@@ -1253,20 +1752,44 @@ function renderCities(cities) {
     return;
   }
   cities.forEach(function(city) {
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'region-item flat-item';
-    btn.setAttribute('role', 'listitem');
-    btn.textContent = city.name;
-    btn.title = '定位到 ' + city.name;
-    btn.addEventListener('click', function() {
+    var row = document.createElement('div');
+    row.className = 'region-city-row';
+    row.setAttribute('role', 'listitem');
+
+    var nameBtn = document.createElement('button');
+    nameBtn.type = 'button';
+    nameBtn.className = 'region-name-btn';
+    nameBtn.textContent = city.name;
+    nameBtn.title = '定位到 ' + city.name;
+    nameBtn.addEventListener('click', function() {
       Array.prototype.forEach.call(host.children, function(node) {
-        node.classList.toggle('active', node === btn);
+        node.classList.toggle('active', node === row);
       });
       loadBoundary(city.osmId);
       flyToBbox(city.bbox, 12);
     });
-    host.appendChild(btn);
+
+    var buildBtn = document.createElement('button');
+    buildBtn.type = 'button';
+    buildBtn.className = 'region-build-btn';
+    buildBtn.title = city.name + ' 3D 巡游';
+    buildBtn.setAttribute('aria-label', city.name + ' 3D 巡游');
+    buildBtn.innerHTML = '<svg class="region-build-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path><path d="M9 9h.01"></path><path d="M9 13h.01"></path><path d="M9 17h.01"></path></svg>';
+    buildBtn.addEventListener('click', function() {
+      Array.prototype.forEach.call(host.children, function(node) {
+        node.classList.toggle('active', node === row);
+      });
+      var target = (city.landmark && city.landmark.length === 2)
+        ? city.landmark
+        : bboxCenter(city.bbox);
+      if (!target) return;
+      loadBoundary(city.osmId);
+      flyTo3DCity(target[0], target[1], city.landmark_zoom || 16);
+    });
+
+    row.appendChild(nameBtn);
+    row.appendChild(buildBtn);
+    host.appendChild(row);
   });
   host.hidden = false;
   replayReveal(host);
@@ -1454,12 +1977,6 @@ function restoreRememberedSelection() {
 
 function restoreSelectionFromPayload(payload) {
   if (!payload || !payload.tile_ids || !payload.tile_ids.length) return false;
-  if (payload.bbox && payload.bbox.length === 4) {
-    map.fitBounds([[payload.bbox[0], payload.bbox[1]], [payload.bbox[2], payload.bbox[3]]], {
-      padding: 60,
-      maxZoom: 16
-    });
-  }
   pendingRestoreTileIds = payload.tile_ids.slice();
   pendingRestoreLogged = false;
   if (lastGridData && lastGridData.tiles && lastGridData.tiles.length) {
@@ -1696,7 +2213,12 @@ function scheduleGridLoad() {
 
 map.on('moveend', scheduleGridLoad);
 map.on('zoomend', scheduleGridLoad);
-map.on('moveend', function() { scheduleDeckRefresh(true); });
+map.on('moveend', function() {
+  // 环绕只逐帧转朝向、中心/缩放不变，本就无需靠 moveend 刷建筑；
+  // 放行它只会每帧重置刷新防抖，把瓦片到达后的刷新永久饿死。
+  if (_cityOrbit && _cityOrbit.isActive()) return;
+  scheduleDeckRefresh(true);
+});
 map.on('zoomend', function() { scheduleDeckRefresh(true); });
 map.on('sourcedata', function(e) {
   if (e.sourceId === 'openmaptiles' && e.isSourceLoaded) scheduleDeckRefresh();
@@ -1757,6 +2279,9 @@ var _lastLogSeq = 0;
 var _lastExportSeq = 0;
 var _lastFailureKey = '';
 var _houdiniOpenPollTimer = null;
+// 点击"启动/下载"后到后端状态真正翻转为 running 之间的等待窗口标志。
+// 期间 SSE/health 可能短暂仍是空闲态，若不挡住会让进度条/阶段勾选闪烁。
+var _awaitingRun = false;
 
 function reloadGridNow() {
   clearTimeout(gridTimer);
@@ -1795,7 +2320,9 @@ function applyStatus(d) {
           var cls = 'dim';
           if (line.indexOf('[OK]') >= 0) cls = 'ok';
           else if (line.indexOf('[ERR]') >= 0 || line.indexOf('[FAIL]') >= 0) cls = 'err';
-          else if (line.match(/^\[\d+\/\d+\]/)) cls = 'step';
+          else if (line.indexOf('[WARN]') >= 0) cls = 'warn';
+          else if (line.match(/^\[[^\]]*\d+\/\d+\]/) || line.indexOf('====') >= 0) cls = 'step';
+          else if (line.indexOf('[RUN]') >= 0 || line.indexOf('[INFO]') >= 0) cls = 'info';
           log(line, cls);
         }
         _lastLogSeq = globalEnd;
@@ -1812,7 +2339,8 @@ function applyStatus(d) {
           var exLine = exportLines[j];
           var exCls = 'dim';
           if (exLine.indexOf('[OK]') >= 0 || exLine.indexOf(' OK:') >= 0) exCls = 'ok';
-          else if (exLine.indexOf('[ERR]') >= 0 || exLine.indexOf('[FAIL]') >= 0 || exLine.indexOf('[WARN]') >= 0) exCls = 'err';
+          else if (exLine.indexOf('[ERR]') >= 0 || exLine.indexOf('[FAIL]') >= 0) exCls = 'err';
+          else if (exLine.indexOf('[WARN]') >= 0) exCls = 'warn';
           log(exLine, exCls);
         }
         _lastExportSeq = exportEnd;
@@ -1874,6 +2402,7 @@ function submitSelectedArea(mode, actionLabel) {
   _lastLogSeq = 0;
   _lastExportSeq = 0;
   _lastFailureKey = '';
+  _awaitingRun = true;
   setFailureSummary(null);
   setRunStatus('warn', '启动中', 0, actionLabel + ': ' + name);
   log('[' + new Date().toLocaleTimeString() + '] ' + actionLabel + ': ' + name, 'ok');
@@ -1893,13 +2422,18 @@ function submitSelectedArea(mode, actionLabel) {
     if (d.ok) {
       log(d.message || '任务已启动...', 'dim');
       startStatusStream();
+      // 兜底：8 秒内若仍未等到 running（任务秒级完成或后端未报 running），
+      // 解除等待标志，让真实的完成/失败态正常显示，避免卡在"启动中"。
+      setTimeout(function() { _awaitingRun = false; }, 8000);
     } else {
+      _awaitingRun = false;
       log('[错误] ' + d.message, 'err');
       updateSelectionButtons(false);
       refreshServiceState();
     }
   })
   .catch(e => {
+    _awaitingRun = false;
     log('[网络错误] ' + e, 'err');
     updateSelectionButtons(false);
     refreshServiceState();
