@@ -4,7 +4,8 @@ This folder contains the homepage UI for the VirtualCity area picker.
 
 - `index.html`: page structure and `window.VC_CONFIG` bootstrap values injected by the Python server.
 - `styles.css`: visual design, layout, responsive rules, and animation polish.
-- `app.js`: browser interaction logic, Leaflet map setup, tile selection, and API calls.
+- `app.js`: browser interaction logic, map setup, tile selection, and API calls.
+- `orbit-preview.js`: independent WebGL orbit preview module mounted by `app.js`.
 
 Keep the automation pipeline boundary stable while iterating on visuals:
 

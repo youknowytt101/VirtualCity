@@ -116,6 +116,19 @@ button, input { font: inherit; }
 #map.map-ready {
   opacity: 1;
 }
+.space-preview-canvas,
+.space-label-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 430;
+  pointer-events: none;
+}
+.space-preview-canvas {
+  mix-blend-mode: screen;
+}
+.space-label-canvas {
+  mix-blend-mode: normal;
+}
 .maplibregl-canvas {
   background: var(--base);
 }

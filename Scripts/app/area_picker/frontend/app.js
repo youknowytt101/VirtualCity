@@ -84,108 +84,575 @@ var map = new maplibregl.Map({
 });
 map.touchZoomRotate.disableRotation();
 if (map.scrollZoom) map.scrollZoom.disable();
-setupSmoothWheelZoom();
-setupMiddleButtonRotate();
+var cameraController = createCameraController(map);
+cameraController.bindInput();
 
-// 3D 视角下按住鼠标中键拖拽旋转相机：水平改 bearing，垂直改 pitch。
-function setupMiddleButtonRotate() {
-  var canvas = map.getCanvas();
-  var ROTATE_SPEED = 0.35;   // 每像素水平 → 度（bearing）
-  var PITCH_SPEED = 0.25;    // 每像素垂直 → 度（pitch）
-  var dragging = false;
-  var lastX = 0;
-  var lastY = 0;
+function createCameraController(mapInstance) {
+  var MODES = {
+    IDLE_2D: '2d-idle',
+    AUTO_SPIN: '2d-auto-spin',
+    WHEEL_ZOOM: 'wheel-zoom',
+    MANUAL_3D: '3d-manual',
+    CITY_FLYING: '3d-city-flying',
+    CITY_ORBIT: '3d-city-orbit',
+    PROGRAMMATIC_FIT: 'programmatic-fit'
+  };
 
-  canvas.addEventListener('mousedown', function(e) {
-    if (e.button !== 1) return;          // 只接管中键
-    if (map.getPitch() <= 0.5) return;   // 仅 3D 视角生效
-    e.preventDefault();                  // 阻止浏览器中键自动滚动
-    dragging = true;
-    lastX = e.clientX;
-    lastY = e.clientY;
-    if (_cityOrbit) _cityOrbit.stop();   // 接管期间停掉自动环绕
-  });
+  var CITY_PITCH = 65;
+  var AUTO_SPIN_MAX_ZOOM = 4.5;
+  var AUTO_SPIN_DEGREES_PER_SEC = 1;
+  var CITY_ORBIT_DEGREES_PER_SEC = 6;
+  var SPIN_RAMP_MS = 1400;
+  var ORBIT_RAMP_MS = 1200;
+  var WHEEL_HOLD_MS = 500;
+  var WHEEL_BOUNDARY_HOLD_MS = 12000;
+  var MANUAL_HOLD_MS = 500;
+  var PROGRAMMATIC_HOLD_MS = 1500;
+  var ZOOM_EDGE_EPS = 0.02;
+  var ZOOM_NOOP_EPS = 0.0001;
+  var MAX_FRAME_DT = 0.05;
+  var ANCHOR_ROUNDTRIP_TOLERANCE_PX = 8;
+  var MAX_ANCHOR_CORRECTION_PX = 160;
+  var GLOBE_EDGE_TOLERANCE_PX = 24;
 
-  window.addEventListener('mousemove', function(e) {
-    if (!dragging) return;
-    var dx = e.clientX - lastX;
-    var dy = e.clientY - lastY;
-    lastX = e.clientX;
-    lastY = e.clientY;
-    map.setBearing(map.getBearing() + dx * ROTATE_SPEED);
-    var nextPitch = map.getPitch() - dy * PITCH_SPEED;
-    nextPitch = Math.max(0, Math.min(map.getMaxPitch(), nextPitch));
-    map.setPitch(nextPitch);
-  });
+  var WHEEL_FRICTION = 0.86;
+  var WHEEL_IMPULSE = 0.0011;
+  var WHEEL_MAX_VELOCITY = 0.22;
+  var WHEEL_MIN_VELOCITY = 0.0009;
 
-  window.addEventListener('mouseup', function(e) {
-    if (e.button !== 1) return;
-    if (!dragging) return;
-    dragging = false;
-    syncViewToggle();
-  });
-}
+  var ROTATE_SPEED = 0.35;
+  var PITCH_SPEED = 0.25;
 
-function setupSmoothWheelZoom() {
-  var canvas = map.getCanvas();
+  var mode = MODES.IDLE_2D;
+  var rafId = null;
+  var resumeTimer = null;
+  var userHoldUntil = 0;
+  var lastFrameTime = 0;
+  var spinRampStart = 0;
+  var orbitRampStart = 0;
   var zoomVelocity = 0;
   var anchorPoint = null;
-  var running = false;
+  var wheelAnchorMode = null;
+  var moveToken = 0;
+  var inputBound = false;
+  var viewToggleBound = false;
+  var middleDragging = false;
+  var lastMouseX = 0;
+  var lastMouseY = 0;
 
-  var FRICTION = 0.86;
-  var IMPULSE = 0.0011;
-  var MAX_VELOCITY = 0.22;
-  var MIN_VELOCITY = 0.0009;
+  function easeRamp(t) {
+    t = Math.max(0, Math.min(1, t));
+    return t * t * (3 - 2 * t);
+  }
 
-  function applyZoomAround(z) {
-    var clamped = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), z));
-    if (!anchorPoint) {
-      map.setZoom(clamped);
-      return;
-    }
-    var beforeLngLat = map.unproject(anchorPoint);
-    map.setZoom(clamped);
-    var afterPoint = map.project(beforeLngLat);
-    var dx = afterPoint.x - anchorPoint.x;
-    var dy = afterPoint.y - anchorPoint.y;
-    if (dx || dy) {
-      var center = map.project(map.getCenter());
-      map.setCenter(map.unproject(new maplibregl.Point(center.x + dx, center.y + dy)));
+  function isFlatView() {
+    return mapInstance.getPitch() <= 0.5;
+  }
+
+  function isEasing() {
+    return !!(mapInstance.isEasing && mapInstance.isEasing());
+  }
+
+  function setMode(next) {
+    if (mode === next) return;
+    mode = next;
+    lastFrameTime = 0;
+    if (next !== MODES.AUTO_SPIN) spinRampStart = 0;
+    if (next !== MODES.CITY_ORBIT) orbitRampStart = 0;
+  }
+
+  function requestFrame() {
+    if (!rafId) rafId = requestAnimationFrame(frame);
+  }
+
+  function clearResumeTimer() {
+    if (resumeTimer) {
+      clearTimeout(resumeTimer);
+      resumeTimer = null;
     }
   }
 
-  function frame() {
-    if (Math.abs(zoomVelocity) < MIN_VELOCITY) {
-      zoomVelocity = 0;
-      running = false;
-      return;
-    }
-    var current = map.getZoom();
-    var next = current + zoomVelocity;
-    var min = map.getMinZoom();
-    var max = map.getMaxZoom();
-    if (next <= min || next >= max) zoomVelocity = 0;
-    applyZoomAround(next);
-    zoomVelocity *= FRICTION;
-    requestAnimationFrame(frame);
+  function stopMapEase() {
+    if (isEasing() && mapInstance.stop) mapInstance.stop();
   }
 
-  canvas.addEventListener('wheel', function(e) {
-    e.preventDefault();
+  function resetWheelZoom() {
+    zoomVelocity = 0;
+    anchorPoint = null;
+    wheelAnchorMode = null;
+  }
+
+  function finishWheelZoom() {
+    resetWheelZoom();
+    setMode(isFlatView() ? MODES.IDLE_2D : MODES.MANUAL_3D);
+    scheduleAutoResume();
+  }
+
+  function interruptForWheel() {
+    moveToken++;
+    if (mode === MODES.AUTO_SPIN) setMode(MODES.IDLE_2D);
+    if (mode === MODES.CITY_ORBIT || mode === MODES.CITY_FLYING || mode === MODES.PROGRAMMATIC_FIT) {
+      setMode(isFlatView() ? MODES.IDLE_2D : MODES.MANUAL_3D);
+    }
+  }
+
+  function stopAutoBehaviorsForManual() {
+    moveToken++;
+    if (mode === MODES.CITY_ORBIT) setMode(MODES.MANUAL_3D);
+    if (mode === MODES.AUTO_SPIN) setMode(MODES.IDLE_2D);
+    if (mode === MODES.WHEEL_ZOOM) finishWheelZoom();
+  }
+
+  function holdAutoSpin(ms) {
+    userHoldUntil = Math.max(userHoldUntil, performance.now() + ms);
+    if (mode === MODES.AUTO_SPIN) setMode(MODES.IDLE_2D);
+    clearResumeTimer();
+    scheduleAutoResume();
+  }
+
+  function canAutoSpin(now) {
+    return mode === MODES.IDLE_2D &&
+      isFlatView() &&
+      mapInstance.getZoom() <= AUTO_SPIN_MAX_ZOOM &&
+      !isEasing() &&
+      now >= userHoldUntil;
+  }
+
+  function scheduleAutoResume() {
+    clearResumeTimer();
+    if (mode !== MODES.IDLE_2D) return;
+    if (!isFlatView() || mapInstance.getZoom() > AUTO_SPIN_MAX_ZOOM || isEasing()) return;
+
+    var now = performance.now();
+    var delay = Math.max(0, userHoldUntil - now);
+    resumeTimer = setTimeout(maybeStartAutoSpin, delay);
+  }
+
+  function maybeStartAutoSpin() {
+    clearResumeTimer();
+    if (!canAutoSpin(performance.now())) {
+      scheduleAutoResume();
+      return;
+    }
+    setMode(MODES.AUTO_SPIN);
+    lastFrameTime = 0;
+    spinRampStart = 0;
+    requestFrame();
+  }
+
+  function stepAutoSpin(now) {
+    if (!isFlatView() || mapInstance.getZoom() > AUTO_SPIN_MAX_ZOOM) {
+      setMode(MODES.IDLE_2D);
+      scheduleAutoResume();
+      return false;
+    }
+    if (isEasing()) {
+      lastFrameTime = 0;
+      spinRampStart = 0;
+      return true;
+    }
+    if (!spinRampStart) spinRampStart = now;
+    if (lastFrameTime) {
+      var dt = Math.min((now - lastFrameTime) / 1000, MAX_FRAME_DT);
+      var speed = AUTO_SPIN_DEGREES_PER_SEC * easeRamp((now - spinRampStart) / SPIN_RAMP_MS);
+      var center = mapInstance.getCenter();
+      center.lng = ((center.lng + speed * dt + 180) % 360) - 180;
+      mapInstance.setCenter(center);
+    }
+    lastFrameTime = now;
+    return true;
+  }
+
+  function normalizeWheelDelta(e) {
     var delta = e.deltaY;
     if (e.deltaMode === 1) delta *= 20;
     else if (e.deltaMode === 2) delta *= 400;
-    var rect = canvas.getBoundingClientRect();
-    anchorPoint = new maplibregl.Point(e.clientX - rect.left, e.clientY - rect.top);
-    zoomVelocity += -delta * IMPULSE;
-    zoomVelocity = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, zoomVelocity));
-    if (!running) {
-      running = true;
-      requestAnimationFrame(frame);
-    }
-  }, { passive: false });
-}
+    return delta;
+  }
 
+  function isWheelAtZoomBoundary(delta) {
+    var current = mapInstance.getZoom();
+    var zoomingOut = delta > 0;
+    var zoomingIn = delta < 0;
+    return (zoomingOut && current <= mapInstance.getMinZoom() + ZOOM_EDGE_EPS) ||
+      (zoomingIn && current >= mapInstance.getMaxZoom() - ZOOM_EDGE_EPS);
+  }
+
+  function pointIsFinite(point) {
+    return point && Number.isFinite(point.x) && Number.isFinite(point.y);
+  }
+
+  function distanceBetweenPoints(a, b) {
+    var dx = a.x - b.x;
+    var dy = a.y - b.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function wrapLng(lng) {
+    return ((lng + 540) % 360) - 180;
+  }
+
+  function projectedPoint(lngLat) {
+    try {
+      var point = mapInstance.project(lngLat);
+      return pointIsFinite(point) ? point : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function visibleGlobeRadiusPx(centerPoint) {
+    var center = mapInstance.getCenter();
+    var candidates = [
+      projectedPoint([wrapLng(center.lng + 90), center.lat]),
+      projectedPoint([wrapLng(center.lng - 90), center.lat])
+    ];
+    var distances = [];
+    candidates.forEach(function(candidate) {
+      if (!candidate) return;
+      var distance = distanceBetweenPoints(candidate, centerPoint);
+      if (Number.isFinite(distance) && distance > 0) distances.push(distance);
+    });
+    if (!distances.length) return Infinity;
+    distances.sort(function(a, b) { return a - b; });
+    return distances[0];
+  }
+
+  function pointInsideVisibleGlobe(point) {
+    if (!pointIsFinite(point)) return false;
+    var centerPoint = projectedPoint(mapInstance.getCenter());
+    if (!centerPoint) return true;
+    var radius = visibleGlobeRadiusPx(centerPoint);
+    if (!Number.isFinite(radius)) return true;
+    var canvas = mapInstance.getCanvas();
+    var canvasDiagonal = Math.sqrt(canvas.clientWidth * canvas.clientWidth + canvas.clientHeight * canvas.clientHeight);
+    if (radius > canvasDiagonal * 1.4) return true;
+    return distanceBetweenPoints(point, centerPoint) <= radius + GLOBE_EDGE_TOLERANCE_PX;
+  }
+
+  function resolveWheelAnchor(point) {
+    if (!wheelAnchorMode) {
+      wheelAnchorMode = pointInsideVisibleGlobe(point) ? 'cursor' : 'center';
+    }
+    if (wheelAnchorMode === 'cursor') {
+      anchorPoint = point;
+    } else {
+      anchorPoint = null;
+    }
+  }
+  function anchorPointOnGlobe(point) {
+    if (!pointInsideVisibleGlobe(point)) return false;
+    var lngLat = mapInstance.unproject(point);
+    if (!lngLat || !Number.isFinite(lngLat.lng) || !Number.isFinite(lngLat.lat)) return false;
+    var roundTrip = mapInstance.project(lngLat);
+    return pointIsFinite(roundTrip) && distanceBetweenPoints(roundTrip, point) <= ANCHOR_ROUNDTRIP_TOLERANCE_PX;
+  }
+
+  function applyZoomAround(z) {
+    var clamped = Math.max(mapInstance.getMinZoom(), Math.min(mapInstance.getMaxZoom(), z));
+    if (Math.abs(clamped - mapInstance.getZoom()) < ZOOM_NOOP_EPS) return;
+    if (!anchorPoint || !anchorPointOnGlobe(anchorPoint)) {
+      mapInstance.setZoom(clamped);
+      return;
+    }
+
+    var beforeLngLat = mapInstance.unproject(anchorPoint);
+    mapInstance.setZoom(clamped);
+
+    var afterPoint = mapInstance.project(beforeLngLat);
+    if (!pointIsFinite(afterPoint)) return;
+
+    var dx = afterPoint.x - anchorPoint.x;
+    var dy = afterPoint.y - anchorPoint.y;
+    var correction = Math.sqrt(dx * dx + dy * dy);
+    if (!Number.isFinite(correction) || correction > MAX_ANCHOR_CORRECTION_PX) return;
+
+    if (dx || dy) {
+      var center = mapInstance.project(mapInstance.getCenter());
+      var nextCenter = new maplibregl.Point(center.x + dx, center.y + dy);
+      mapInstance.setCenter(mapInstance.unproject(nextCenter));
+    }
+  }
+
+  function stepWheelZoom() {
+    if (Math.abs(zoomVelocity) < WHEEL_MIN_VELOCITY) {
+      finishWheelZoom();
+      return false;
+    }
+    var current = mapInstance.getZoom();
+    var next = current + zoomVelocity;
+    var min = mapInstance.getMinZoom();
+    var max = mapInstance.getMaxZoom();
+    if (next <= min || next >= max) {
+      applyZoomAround(next <= min ? min : max);
+      finishWheelZoom();
+      return false;
+    }
+    applyZoomAround(next);
+    zoomVelocity *= WHEEL_FRICTION;
+    return true;
+  }
+
+  function onWheel(e) {
+    e.preventDefault();
+    var delta = normalizeWheelDelta(e);
+    if (!delta) return;
+
+    holdAutoSpin(WHEEL_HOLD_MS);
+    interruptForWheel();
+    stopMapEase();
+
+    if (isWheelAtZoomBoundary(delta)) {
+      resetWheelZoom();
+      setMode(isFlatView() ? MODES.IDLE_2D : MODES.MANUAL_3D);
+      holdAutoSpin(WHEEL_BOUNDARY_HOLD_MS);
+      return;
+    }
+
+    var rect = mapInstance.getCanvas().getBoundingClientRect();
+    var wheelPoint = new maplibregl.Point(e.clientX - rect.left, e.clientY - rect.top);
+    resolveWheelAnchor(wheelPoint);
+    zoomVelocity += -delta * WHEEL_IMPULSE;
+    zoomVelocity = Math.max(-WHEEL_MAX_VELOCITY, Math.min(WHEEL_MAX_VELOCITY, zoomVelocity));
+    setMode(MODES.WHEEL_ZOOM);
+    requestFrame();
+  }
+
+  function stepCityOrbit(now) {
+    if (isEasing()) {
+      lastFrameTime = 0;
+      orbitRampStart = 0;
+      return true;
+    }
+    if (!orbitRampStart) orbitRampStart = now;
+    if (lastFrameTime) {
+      var dt = Math.min((now - lastFrameTime) / 1000, MAX_FRAME_DT);
+      var speed = CITY_ORBIT_DEGREES_PER_SEC * easeRamp((now - orbitRampStart) / ORBIT_RAMP_MS);
+      mapInstance.setBearing(mapInstance.getBearing() + speed * dt);
+    }
+    lastFrameTime = now;
+    return true;
+  }
+
+  function startCityOrbit() {
+    setMode(MODES.CITY_ORBIT);
+    lastFrameTime = 0;
+    orbitRampStart = 0;
+    requestFrame();
+  }
+
+  function frame(now) {
+    rafId = null;
+    var keepRunning = false;
+    if (mode === MODES.AUTO_SPIN) keepRunning = stepAutoSpin(now);
+    else if (mode === MODES.WHEEL_ZOOM) keepRunning = stepWheelZoom(now);
+    else if (mode === MODES.CITY_ORBIT) keepRunning = stepCityOrbit(now);
+    if (keepRunning) requestFrame();
+  }
+
+  function onManualInputStart() {
+    holdAutoSpin(MANUAL_HOLD_MS);
+    stopMapEase();
+    stopAutoBehaviorsForManual();
+  }
+
+  function onMapZoomStart() {
+    if (mode === MODES.WHEEL_ZOOM || mode === MODES.CITY_FLYING || mode === MODES.PROGRAMMATIC_FIT) return;
+    onManualInputStart();
+  }
+
+  function onMouseDown(e) {
+    onManualInputStart();
+    if (e.button !== 1 || isFlatView()) return;
+    e.preventDefault();
+    stopMapEase();
+    resetWheelZoom();
+    setMode(MODES.MANUAL_3D);
+    middleDragging = true;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+  }
+
+  function onMouseMove(e) {
+    if (!middleDragging) return;
+    var dx = e.clientX - lastMouseX;
+    var dy = e.clientY - lastMouseY;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+    mapInstance.setBearing(mapInstance.getBearing() + dx * ROTATE_SPEED);
+    var nextPitch = mapInstance.getPitch() - dy * PITCH_SPEED;
+    nextPitch = Math.max(0, Math.min(mapInstance.getMaxPitch(), nextPitch));
+    mapInstance.setPitch(nextPitch);
+  }
+
+  function onMouseUp(e) {
+    if (e.button !== 1 || !middleDragging) return;
+    middleDragging = false;
+    setMode(isFlatView() ? MODES.IDLE_2D : MODES.MANUAL_3D);
+    syncViewToggle();
+    scheduleAutoResume();
+  }
+
+  function bindInput() {
+    if (inputBound) return;
+    inputBound = true;
+    var canvas = mapInstance.getCanvas();
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+    canvas.addEventListener('mousedown', onMouseDown);
+    canvas.addEventListener('touchstart', onManualInputStart, { passive: true });
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    mapInstance.on('dragstart', onManualInputStart);
+    mapInstance.on('zoomstart', onMapZoomStart);
+    mapInstance.on('pitchend', function() {
+      syncViewToggle();
+      if (isFlatView() && mode === MODES.MANUAL_3D) {
+        setMode(MODES.IDLE_2D);
+        scheduleAutoResume();
+      }
+    });
+    mapInstance.on('moveend', scheduleAutoResume);
+    mapInstance.on('zoomend', scheduleAutoResume);
+  }
+
+  function start() {
+    setMode(isFlatView() ? MODES.IDLE_2D : MODES.MANUAL_3D);
+    scheduleAutoResume();
+  }
+
+  function fitBounds2D(bbox, maxZoom) {
+    if (!bbox || bbox.length !== 4) return;
+    moveToken++;
+    var token = moveToken;
+    holdAutoSpin(PROGRAMMATIC_HOLD_MS);
+    resetWheelZoom();
+    setMode(MODES.PROGRAMMATIC_FIT);
+    mapInstance.once('moveend', function() {
+      if (token !== moveToken) return;
+      setMode(MODES.IDLE_2D);
+      syncViewToggle();
+      holdAutoSpin(PROGRAMMATIC_HOLD_MS);
+    });
+    mapInstance.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], {
+      padding: 60,
+      maxZoom: maxZoom || 14,
+      pitch: 0,
+      bearing: 0,
+      linear: false,
+      curve: 1.42,
+      speed: 0.8,
+      easing: function(t) { return 1 - Math.pow(1 - t, 3); }
+    });
+  }
+
+  function flyToCity(lng, lat, zoom) {
+    if (typeof lng !== 'number' || typeof lat !== 'number') return;
+    moveToken++;
+    var token = moveToken;
+    var targetZoom = zoom || 16;
+    holdAutoSpin(PROGRAMMATIC_HOLD_MS);
+    resetWheelZoom();
+    setMode(MODES.CITY_FLYING);
+    var startBearing = mapInstance.getBearing();
+    mapInstance.once('moveend', function() {
+      if (token !== moveToken) return;
+      startCityOrbit();
+      syncViewToggle();
+    });
+    mapInstance.flyTo({
+      center: [lng, lat],
+      zoom: targetZoom + 0.4,
+      pitch: CITY_PITCH,
+      bearing: startBearing - 25,
+      speed: 2.4,
+      curve: 1.2,
+      essential: true
+    });
+  }
+
+  function enter3DInPlace() {
+    moveToken++;
+    var token = moveToken;
+    holdAutoSpin(PROGRAMMATIC_HOLD_MS);
+    resetWheelZoom();
+    setMode(MODES.CITY_FLYING);
+    var startBearing = mapInstance.getBearing();
+    mapInstance.easeTo({
+      pitch: CITY_PITCH,
+      bearing: startBearing - 25,
+      duration: 800,
+      easing: function(t) { return t * t * (3 - 2 * t); }
+    });
+    mapInstance.once('moveend', function() {
+      if (token !== moveToken) return;
+      startCityOrbit();
+      syncViewToggle();
+    });
+  }
+
+  function exitTo2D() {
+    moveToken++;
+    var token = moveToken;
+    holdAutoSpin(PROGRAMMATIC_HOLD_MS);
+    resetWheelZoom();
+    setMode(MODES.PROGRAMMATIC_FIT);
+    mapInstance.easeTo({
+      pitch: 0,
+      bearing: 0,
+      duration: 800,
+      easing: function(t) { return t * t * (3 - 2 * t); }
+    });
+    mapInstance.once('moveend', function() {
+      if (token !== moveToken) return;
+      setMode(MODES.IDLE_2D);
+      syncViewToggle();
+      holdAutoSpin(PROGRAMMATIC_HOLD_MS);
+    });
+  }
+
+  function setupViewToggle() {
+    if (viewToggleBound) return;
+    var to2d = document.querySelector('#view-toggle .view-toggle-2d');
+    var to3d = document.querySelector('#view-toggle .view-toggle-3d');
+    if (!to2d || !to3d) return;
+    viewToggleBound = true;
+
+    to3d.addEventListener('click', function() {
+      if (!isFlatView()) {
+        startCityOrbit();
+        syncViewToggle();
+      } else {
+        enter3DInPlace();
+      }
+    });
+
+    to2d.addEventListener('click', exitTo2D);
+    syncViewToggle();
+  }
+
+  function syncViewToggle() {
+    var to2d = document.querySelector('#view-toggle .view-toggle-2d');
+    var to3d = document.querySelector('#view-toggle .view-toggle-3d');
+    if (!to2d || !to3d) return;
+    var is3d = !isFlatView();
+    to3d.classList.toggle('active', is3d);
+    to3d.setAttribute('aria-pressed', is3d ? 'true' : 'false');
+    to2d.classList.toggle('active', !is3d);
+    to2d.setAttribute('aria-pressed', !is3d ? 'true' : 'false');
+  }
+
+  return {
+    bindInput: bindInput,
+    start: start,
+    setupViewToggle: setupViewToggle,
+    syncViewToggle: syncViewToggle,
+    fitBounds2D: fitBounds2D,
+    flyToCity: flyToCity,
+    enter3DInPlace: enter3DInPlace,
+    exitTo2D: exitTo2D,
+    isCityOrbitActive: function() { return mode === MODES.CITY_ORBIT; }
+  };
+}
 function emptyFeatureCollection() {
   return { type: 'FeatureCollection', features: [] };
 }
@@ -523,10 +990,7 @@ function bindRectangleDrag() {
   });
 }
 
-function forceEnglishLabels() {  // 底图（OpenMapTiles schema）的地名 symbol 图层默认用本地化 name 字段，
-  // 导致中/俄/日等本地文字混入。统一把含 text-field 的图层改成英文名，
-  // 无 name:en 时回退到拉丁转写 name:latin，再回退到原始 name。
-  var style;
+function forceEnglishLabels() {
   try { style = map.getStyle(); } catch (e) { return; }
   if (!style || !style.layers) return;
   var englishField = [
@@ -545,9 +1009,6 @@ function forceEnglishLabels() {  // 底图（OpenMapTiles schema）的地名 sym
 
 var WATER_DARK = '#838383';
 
-// 统一压暗所有底图的江河湖海。底图基于 OpenMapTiles schema，水体来自
-// source-layer 为 water/waterway 的图层；同时兼容靠 id 命名水体的样式。
-// 不同底图水色各异，这里直接覆盖为固定暗色，保证跨底图视觉一致。
 function darkenWaterLayers() {
   var style;
   try { style = map.getStyle(); } catch (e) { return; }
@@ -573,7 +1034,6 @@ function darkenWaterLayers() {
 
 function applyGlobeProjection() {
   if (map.setProjection) map.setProjection({ type: 'globe' });
-  // 去掉球面暗面与边缘光晕：sky/fog 全部设为 UI 底色，atmosphere-blend 归零。
   if (map.setSky) {
     map.setSky({
       'sky-color': '#1f1e1d',
@@ -587,6 +1047,19 @@ function applyGlobeProjection() {
   }
 }
 
+function setupSpacePreview() {
+  if (!window.VirtualCityOrbitPreview || typeof window.VirtualCityOrbitPreview.mount !== 'function') {
+    console.warn('Orbit preview module unavailable.');
+    return;
+  }
+  window.VirtualCityOrbitPreview.mount(map, {
+    feedUrl: '/orbit-tle?groups=stations,visual',
+    planetFeedUrl: '/planet-ephemeris',
+    satellite: window.satellite,
+    maxBodies: 28
+  });
+}
+setupSpacePreview();
 map.on('load', function() {
   setupMapLayers();
   mapReady = true;
@@ -596,113 +1069,14 @@ map.on('load', function() {
   bindRectangleDrag();
   restoreRememberedSelection();
   scheduleGridLoad();
-  setupGlobeSpin();
-  setupCityOrbit();
-  setupViewToggle();
+  cameraController.start();
+  cameraController.setupViewToggle();
+  setupSpacePreview();
   requestAnimationFrame(function() {
     var el = document.getElementById('map');
     if (el) el.classList.add('map-ready');
   });
 });
-
-// 全局自转控制器：飞行/聚焦等程序化相机动作需要在期间挂起自转，
-// 否则每帧 setCenter 会覆盖 fitBounds 动画，导致聚焦失效。
-var _spinControl = null;
-
-function setupGlobeSpin() {
-  var SPIN_DEGREES_PER_SEC = 1;     // 目标自转速度（稍慢）
-  var RESUME_DELAY = 500;           // 用户停止操作 0.5 秒后恢复
-  var STOP_ABOVE_ZOOM = 4.5;        // 拉近后不再自转
-  var RAMP_MS = 1400;               // 启动加速曲线时长
-
-  var spinning = false;
-  var suspended = false;            // 程序化相机动作（飞行）期间挂起
-  var resumeTimer = null;
-  var lastTime = 0;
-  var rampStart = 0;
-  var rafId = null;
-
-  function easeRamp(t) {
-    // smoothstep，从 0 平滑加速到 1，避免自转启动时的速度突变
-    t = Math.max(0, Math.min(1, t));
-    return t * t * (3 - 2 * t);
-  }
-
-  function startSpin() {
-    if (suspended) return;
-    if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
-    if (spinning) return;
-    spinning = true;
-    lastTime = 0;
-    rampStart = 0;
-    if (!rafId) rafId = requestAnimationFrame(spinFrame);
-  }
-
-  function stopSpin() {
-    spinning = false;
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  }
-
-  // 用户交互：立即停转，停手 RESUME_DELAY 后重新平滑启动
-  function onUserInteract() {
-    stopSpin();
-    if (resumeTimer) clearTimeout(resumeTimer);
-    if (suspended) return;
-    resumeTimer = setTimeout(startSpin, RESUME_DELAY);
-  }
-
-  function spinFrame(now) {
-    if (!spinning) { rafId = null; return; }
-    // 程序化相机动画（fitBounds/flyTo 聚焦飞行）进行中：让路，绝不用 setCenter
-    // 打断飞行。飞行结束 isEasing 变 false 后，从头平滑加速恢复自转。
-    var flying = map.isEasing && map.isEasing();
-    if (flying || map.getPitch() > 0.5 || map.getZoom() > STOP_ABOVE_ZOOM) {
-      lastTime = 0;
-      rampStart = 0;
-      rafId = requestAnimationFrame(spinFrame);
-      return;
-    }
-    if (!rampStart) rampStart = now;
-    if (lastTime) {
-      var dt = (now - lastTime) / 1000;
-      var speed = SPIN_DEGREES_PER_SEC * easeRamp((now - rampStart) / RAMP_MS);
-      var center = map.getCenter();
-      center.lng = ((center.lng + speed * dt + 180) % 360) - 180;
-      map.setCenter(center);
-    }
-    lastTime = now;
-    rafId = requestAnimationFrame(spinFrame);
-  }
-
-  var canvas = map.getCanvas();
-  ['mousedown', 'touchstart', 'wheel', 'dragstart', 'zoomstart'].forEach(function(evt) {
-    canvas.addEventListener(evt, onUserInteract, { passive: true });
-  });
-
-  // 视角压平回顶视即视为 3D 巡游结束：解除挂起，让自转判定重新生效。
-  // 飞入/抬头都停在 65°（> 0.5），不会误触发；只有真正回到平视才解锁。
-  map.on('pitchend', function() {
-    if (suspended && map.getPitch() <= 0.5) {
-      suspended = false;
-      if (resumeTimer) clearTimeout(resumeTimer);
-      resumeTimer = setTimeout(startSpin, RESUME_DELAY);
-    }
-  });
-  _spinControl = {
-    suspend: function() {
-      suspended = true;
-      stopSpin();
-      if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
-    },
-    release: function() {
-      suspended = false;
-      if (resumeTimer) clearTimeout(resumeTimer);
-      resumeTimer = setTimeout(startSpin, RESUME_DELAY);
-    }
-  };
-
-  startSpin();
-}
 
 function setBasemapStyle(id) {
   if (!mapReady) return;
@@ -1097,8 +1471,7 @@ function setRunStatus(state, title, pct, detail) {
   panel.className = 'run-status-panel status-' + state;
   titleEl.textContent = title;
   pctEl.textContent = n + '%';
-  // 进度只对"前进"播放缓动；回退/归零（任务结束、失败、重置）瞬时完成，
-  // 避免进度条演出一段 0.3s 的"倒流"动画。
+  // Only animate forward progress; resets and failures snap back immediately.
   var prev = Number(bar.dataset.pct) || 0;
   if (n < prev) {
     var saved = bar.style.transition;
@@ -1113,8 +1486,6 @@ function setRunStatus(state, title, pct, detail) {
   detailEl.textContent = detail || '等待任务';
 }
 
-// 阶段标签来自真相源的 phase_label（获取道路/清洗/Houdini 重算/Model QA…），
-// 与 step_label 的细粒度进度文字互补：这一行回答"在哪一大步"，detail 回答"这步在做什么"。
 function setRunPhase(phaseLabel) {
   var el = document.getElementById('run-status-phase');
   if (!el) return;
@@ -1127,8 +1498,6 @@ function setRunPhase(phaseLabel) {
   }
 }
 
-// 阶段清单：把后端 phase（真相源 PHASE_LABELS 的 key）投影成 4 个大阶段的
-// todo/active/done/fail 四态。phase 是事实，stage 是它的粗粒度归并，纯函数派生。
 var STAGE_DEFS = [
   { id: 'download', label: '数据下载' },
   { id: 'refine',   label: '离线精炼' },
@@ -1174,9 +1543,6 @@ function computeStageStatuses(d) {
     else statuses = ['done', 'done', 'done', 'done'];
     return statuses;
   }
-  // 闸门：只有任务真正在运行时，phase 才驱动阶段勾选。
-  // 否则（待命/空闲、或 health 残留了已完成 phase）一律视为待命，返回全 todo，
-  // 避免出现"待命 0% 却四个阶段全勾"的状态错位。
   var active = d.running || d.export_running;
   if (active && map) {
     for (var j = 0; j < 4; j++) {
@@ -1207,14 +1573,11 @@ function ensureStageDom() {
   return list;
 }
 
-// 复用已建 DOM、只切 className，让 todo→done 的勾选弹入与置灰由 CSS transition 接管。
 function renderStageChecklist(d) {
   var list = ensureStageDom();
   if (!list) return;
   var statuses = computeStageStatuses(d);
   var rows = list.children;
-  // 首屏：禁用一帧动画，让初始状态（可能已是完成态）无回弹地直接落位，
-  // 之后的状态变化才播放勾选弹入/置灰动画，避免刷新时四个勾一起抖动。
   var primed = list.dataset.primed === '1';
   if (!primed) list.classList.add('no-anim');
   for (var i = 0; i < rows.length && i < statuses.length; i++) {
@@ -1291,11 +1654,8 @@ function logFailureSummary(summary, returncode) {
 
 function updateRunStatusFromHealth(d) {
   // 阶段勾选：
-  // - 任务正在运行/导出 → 显示真实阶段
-  // - 等待窗口内（已提交未翻转 running）→ 待命，避免闪到全勾
-  // - 其他（包括 last_run.available，刷新后看到的"上次结果"）→ 待命
-  // 后端现在已经把 done/ok 限定为"当前回合"，刷新后顶层 done 始终为 false，
-  // 历史结果在 last_run 字段里，不再需要会话级守卫。
+  // - 任务正在运行/导出 -> 显示真实阶段
+  // - 等待窗口内（已提交未翻转 running）-> 待命，避免闪到全绿
   var active = d && (d.running || d.export_running);
   renderStageChecklist((active && !_awaitingRun) ? d : null);
   if (!d) {
@@ -1315,14 +1675,11 @@ function updateRunStatusFromHealth(d) {
     setRunPhase('导出 FBX');
     setFailureSummary(null);
   } else if (_awaitingRun) {
-    // 已提交、等待后端翻转为 running。忽略此刻 health 里残留的完成/失败态，
-    // 维持"启动中 0%"，避免进度条闪到 100% 再缩回。
+    // 已提交、等待后端翻转为 running。忽略此时 health 里残留的完成/失败态。
     setRunStatus('warn', '启动中', 0, '任务已提交，正在启动...');
     setRunPhase('');
     setFailureSummary(null);
   } else if (d.done) {
-    // 后端只在"当前回合刚结束"时把 done=true 暴露出来；刷新后顶层 done=false，
-    // 历史结果走 last_run / failure_summary，所以这里就是真正的"本次完成/失败"。
     if (d.ok) {
       setRunStatus('ok', '完成', 100, d.step_label || d.name || '任务结束');
       setRunPhase('');
@@ -1452,181 +1809,28 @@ function bboxCenter(bbox) {
 }
 
 function flyToBbox(bbox, maxZoom) {
-  if (!bbox || bbox.length !== 4) return;
-  if (_spinControl) _spinControl.suspend();
-  if (_cityOrbit) _cityOrbit.stop();
-  map.once('moveend', function() {
-    if (_spinControl) _spinControl.release();
-    syncViewToggle();
-  });
-  map.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], {
-    padding: 60,
-    maxZoom: maxZoom || 14,
-    pitch: 0,
-    bearing: 0,
-    linear: false,
-    curve: 1.42,
-    speed: 0.8,
-    easing: function(t) { return 1 - Math.pow(1 - t, 3); }
-  });
+  cameraController.fitBounds2D(bbox, maxZoom);
 }
 
-// 城市级 3D 巡游：聚焦 → 抬头偏头 → 绕中心匀速环绕。
-// 与全球自转互斥；与 _spinControl 同构（rAF + smoothstep 加速 + isEasing 守卫）。
-var _cityOrbit = null;
-
-function setupCityOrbit() {
-  var ORBIT_DEGREES_PER_SEC = 6;   // 环绕目标速度
-  var RAMP_MS = 1200;              // 启动加速曲线时长
-
-  var active = false;
-  var lastTime = 0;
-  var rampStart = 0;
-  var rafId = null;
-
-  function easeRamp(t) {
-    t = Math.max(0, Math.min(1, t));
-    return t * t * (3 - 2 * t);
-  }
-
-  function orbitFrame(now) {
-    if (!active) { rafId = null; return; }
-    // 第二段 easeTo（抬头偏头）进行中：让路，绝不用 setBearing 打断它。
-    if (map.isEasing && map.isEasing()) {
-      lastTime = 0;
-      rampStart = 0;
-      rafId = requestAnimationFrame(orbitFrame);
-      return;
-    }
-    if (!rampStart) rampStart = now;
-    if (lastTime) {
-      var dt = (now - lastTime) / 1000;
-      var speed = ORBIT_DEGREES_PER_SEC * easeRamp((now - rampStart) / RAMP_MS);
-      map.setBearing(map.getBearing() + speed * dt);
-    }
-    lastTime = now;
-    rafId = requestAnimationFrame(orbitFrame);
-  }
-
-  function start() {
-    if (active) return;
-    active = true;
-    lastTime = 0;
-    rampStart = 0;
-    if (!rafId) rafId = requestAnimationFrame(orbitFrame);
-  }
-
-  function stop() {
-    active = false;
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  }
-
-  // 用户交互打断环绕，但不复位 pitch/zoom（与 Google Earth 一致）。
-  var canvas = map.getCanvas();
-  ['mousedown', 'touchstart', 'wheel', 'dragstart', 'zoomstart'].forEach(function(evt) {
-    canvas.addEventListener(evt, function() { if (active) stop(); }, { passive: true });
-  });
-
-  _cityOrbit = {
-    start: start,
-    stop: stop,
-    isActive: function() { return active; }
-  };
-}
-
-var CITY_PITCH = 65;
-
-// 进入城市 3D 巡游：阶段1 平视聚焦 → 阶段2 抬头偏头 → 阶段3 环绕。
 function flyTo3DCity(lng, lat, zoom) {
-  if (typeof lng !== 'number' || typeof lat !== 'number') return;
-  var targetZoom = zoom || 16;
-  if (_spinControl) _spinControl.suspend();
-  if (_cityOrbit) _cityOrbit.stop();
-
-  var startBearing = map.getBearing();
-
-  map.once('moveend', function() {
-    if (_cityOrbit) _cityOrbit.start();
-  });
-
-  map.flyTo({
-    center: [lng, lat],
-    zoom: targetZoom + 0.4,
-    pitch: CITY_PITCH,
-    bearing: startBearing - 25,
-    speed: 2.4,
-    curve: 1.2,
-    essential: true
-  });
+  cameraController.flyToCity(lng, lat, zoom);
 }
 
-// 退出 3D，回到顶视 2D，并恢复全球自转判定。
 function exit3DTo2D() {
-  if (_cityOrbit) _cityOrbit.stop();
-  map.easeTo({
-    pitch: 0,
-    bearing: 0,
-    duration: 800,
-    easing: function(t) { return t * t * (3 - 2 * t); }
-  });
-  map.once('moveend', function() {
-    if (_spinControl) _spinControl.release();
-    syncViewToggle();
-  });
+  cameraController.exitTo2D();
 }
 
-// 右下角 3D 按钮专用：中心不动，仅慢速抬头偏头（与建筑按钮的快速飞入分开）。
 function enter3DInPlace() {
-  if (_spinControl) _spinControl.suspend();
-  if (_cityOrbit) _cityOrbit.stop();
-  var startBearing = map.getBearing();
-  map.easeTo({
-    pitch: CITY_PITCH,
-    bearing: startBearing - 25,
-    duration: 800,
-    easing: function(t) { return t * t * (3 - 2 * t); }
-  });
-  map.once('moveend', function() {
-    if (_cityOrbit) _cityOrbit.start();
-    syncViewToggle();
-  });
+  cameraController.enter3DInPlace();
 }
 
-// 右下角常驻 2D/3D 切换：3D 进入/重启巡游，2D 复位顶视。
 function setupViewToggle() {
-  var to2d = document.querySelector('#view-toggle .view-toggle-2d');
-  var to3d = document.querySelector('#view-toggle .view-toggle-3d');
-  if (!to2d || !to3d) return;
-
-  to3d.addEventListener('click', function() {
-    if (map.getPitch() > 0.5) {
-      if (_spinControl) _spinControl.suspend();
-      if (_cityOrbit) _cityOrbit.start();
-      syncViewToggle();
-    } else {
-      enter3DInPlace();
-    }
-  });
-
-  to2d.addEventListener('click', function() {
-    exit3DTo2D();
-  });
-
-  map.on('pitchend', syncViewToggle);
-  syncViewToggle();
+  cameraController.setupViewToggle();
 }
 
 function syncViewToggle() {
-  var to2d = document.querySelector('#view-toggle .view-toggle-2d');
-  var to3d = document.querySelector('#view-toggle .view-toggle-3d');
-  if (!to2d || !to3d) return;
-  var is3d = map.getPitch() > 0.5;
-  to3d.classList.toggle('active', is3d);
-  to3d.setAttribute('aria-pressed', is3d ? 'true' : 'false');
-  to2d.classList.toggle('active', !is3d);
-  to2d.setAttribute('aria-pressed', !is3d ? 'true' : 'false');
+  cameraController.syncViewToggle();
 }
-
 var boundaryCache = {};
 var lastBoundaryFC = null;
 var requestedBoundaryKey = null;
@@ -2214,9 +2418,8 @@ function scheduleGridLoad() {
 map.on('moveend', scheduleGridLoad);
 map.on('zoomend', scheduleGridLoad);
 map.on('moveend', function() {
-  // 环绕只逐帧转朝向、中心/缩放不变，本就无需靠 moveend 刷建筑；
-  // 放行它只会每帧重置刷新防抖，把瓦片到达后的刷新永久饿死。
-  if (_cityOrbit && _cityOrbit.isActive()) return;
+  // City orbit only rotates bearing; avoid starving debounced building refresh.
+  if (cameraController && cameraController.isCityOrbitActive()) return;
   scheduleDeckRefresh(true);
 });
 map.on('zoomend', function() { scheduleDeckRefresh(true); });
@@ -2279,8 +2482,6 @@ var _lastLogSeq = 0;
 var _lastExportSeq = 0;
 var _lastFailureKey = '';
 var _houdiniOpenPollTimer = null;
-// 点击"启动/下载"后到后端状态真正翻转为 running 之间的等待窗口标志。
-// 期间 SSE/health 可能短暂仍是空闲态，若不挡住会让进度条/阶段勾选闪烁。
 var _awaitingRun = false;
 
 function reloadGridNow() {
@@ -2422,8 +2623,7 @@ function submitSelectedArea(mode, actionLabel) {
     if (d.ok) {
       log(d.message || '任务已启动...', 'dim');
       startStatusStream();
-      // 兜底：8 秒内若仍未等到 running（任务秒级完成或后端未报 running），
-      // 解除等待标志，让真实的完成/失败态正常显示，避免卡在"启动中"。
+      // 兜底：8 秒内若仍未等到 running，解除等待标志。
       setTimeout(function() { _awaitingRun = false; }, 8000);
     } else {
       _awaitingRun = false;
@@ -2453,8 +2653,6 @@ function stopStatusStream() {
   if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
 }
 
-// 真相源归一后，优先用 SSE 实时取状态；EventSource 不可用或连接出错时
-// 降级回每秒轮询 /status，保证旧浏览器与异常场景仍可用。
 function startStatusStream() {
   stopStatusStream();
   if (typeof window.EventSource === 'undefined') {
@@ -2471,7 +2669,6 @@ function startStatusStream() {
     try { applyStatus(JSON.parse(ev.data)); } catch (e) {}
   };
   _evtSource.onerror = function() {
-    // SSE 断开（含正常收尾后服务端关闭）：关掉它并退回轮询兜底。
     if (_evtSource) { try { _evtSource.close(); } catch (e) {} _evtSource = null; }
     if (!_pollTimer) _pollTimer = setInterval(pollStatus, 1000);
   };

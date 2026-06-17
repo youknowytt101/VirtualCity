@@ -79,12 +79,9 @@ function Start-AreaPickerHost {
 
 try {
     Write-LauncherLog "Launching VirtualCity console."
-    if (-not (Test-AreaPickerReady)) {
-        Start-AreaPickerHost
-    }
-    else {
-        Write-LauncherLog "Existing area_picker service is already ready."
-    }
+    # Always enter the Python host once: it decides whether the current server
+    # version can be reused or an older process must be replaced.
+    Start-AreaPickerHost
 
     if (-not (Wait-AreaPickerReady)) {
         throw "VirtualCity console did not become ready within $StartupTimeoutSec seconds."

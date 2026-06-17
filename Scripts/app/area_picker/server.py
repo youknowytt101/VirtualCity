@@ -14,7 +14,8 @@ VirtualCity — 交互式区域选择器
     4. 在网页或终端窗口查看管线进度
 """
 
-import sys, json, subprocess, threading, webbrowser, time, os, re, socket, mimetypes, urllib.error, urllib.request, urllib.parse, importlib
+import sys, json, subprocess, threading, webbrowser, time, os, re, socket, ssl, mimetypes, urllib.error, urllib.request, urllib.parse, importlib
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
@@ -41,9 +42,239 @@ from app.area_picker.software_paths import (
 
 _HTML = area_picker_template.HTML
 FRONTEND_ROOT = area_picker_template.FRONTEND_ROOT
-APP_VERSION = "10-06-26_v2.23"
+APP_VERSION = "10-06-26_v2.25"
 STARTED_AT = time.strftime("%Y-%m-%d %H:%M:%S")
 AUTO_SHUTDOWN_ON_SUCCESS = os.environ.get("VC_AREA_PICKER_AUTO_SHUTDOWN") == "1"
+ORBIT_TLE_CACHE_TTL_SECONDS = 2 * 60 * 60
+ORBIT_TLE_GROUPS = {'stations', 'visual'}
+PLANET_EPHEMERIS_CACHE_TTL_SECONDS = 6 * 60 * 60
+PLANET_EPHEMERIS_HISTORY_DAYS = 540
+PLANET_EPHEMERIS_FUTURE_DAYS = 220
+PLANET_EPHEMERIS_STEP = "'3 d'"
+EARTH_HORIZONS_TARGET = {'id': '399', 'label': '地球'}
+PLANET_HORIZONS_TARGETS = {
+    'mercury': {'id': '199', 'label': '水星'},
+    'venus': {'id': '299', 'label': '金星'},
+    'mars': {'id': '499', 'label': '火星'},
+    'jupiter': {'id': '599', 'label': '木星'},
+    'saturn': {'id': '699', 'label': '土星'},
+    'uranus': {'id': '799', 'label': '天王星'},
+    'neptune': {'id': '899', 'label': '海王星'},
+}
+_orbit_tle_cache = {}
+_planet_ephemeris_cache = {}
+
+
+def _orbit_tle_payload(groups_param: str = '') -> dict:
+    requested = [item.strip().lower() for item in str(groups_param or '').split(',') if item.strip()]
+    groups = [group for group in requested if group in ORBIT_TLE_GROUPS] or ['stations', 'visual']
+    cache_key = ','.join(groups)
+    now = time.time()
+    cached = _orbit_tle_cache.get(cache_key)
+    if cached and now - cached.get('timestamp', 0) < ORBIT_TLE_CACHE_TTL_SECONDS:
+        payload = dict(cached['payload'])
+        payload['cached'] = True
+        return payload
+
+    blocks = []
+    errors = []
+    for group in groups:
+        url = f'https://celestrak.org/NORAD/elements/gp.php?GROUP={urllib.parse.quote(group)}&FORMAT=tle'
+        req = urllib.request.Request(
+            url,
+            headers={
+                'User-Agent': 'VirtualCity/0.1 orbit-preview',
+                'Accept': 'text/plain',
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=12.0) as resp:
+                text = resp.read().decode('utf-8', errors='replace').replace('\r\n', '\n').strip()
+            if not text or text.lstrip().startswith('<'):
+                raise ValueError('CelesTrak returned an invalid TLE response')
+            blocks.append(text)
+        except Exception as exc:
+            errors.append(f'{group}: {exc}')
+
+    if not blocks:
+        if cached:
+            payload = dict(cached['payload'])
+            payload.update({'cached': True, 'stale': True, 'errors': errors})
+            return payload
+        return {
+            'ok': False,
+            'source': 'CelesTrak',
+            'groups': groups,
+            'cached': False,
+            'stale': False,
+            'errors': errors,
+            'tle': '',
+        }
+
+    payload = {
+        'ok': True,
+        'source': 'CelesTrak',
+        'source_url': 'https://celestrak.org/NORAD/elements/gp.php',
+        'groups': groups,
+        'cached': False,
+        'stale': False,
+        'fetched_at': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+        'errors': errors,
+        'tle': '\n'.join(blocks),
+    }
+    _orbit_tle_cache[cache_key] = {'timestamp': now, 'payload': payload}
+    return payload
+
+
+def _horizons_time(dt: datetime) -> str:
+    return dt.astimezone(timezone.utc).strftime("'%Y-%b-%d %H:%M'")
+
+
+def _parse_horizons_vectors(result: str) -> list:
+    text = str(result or '')
+    start = text.find('$$SOE')
+    end = text.find('$$EOE')
+    if start < 0 or end < 0 or end <= start:
+        return []
+    rows = []
+    for raw_line in text[start + 5:end].splitlines():
+        line = raw_line.strip().rstrip(',')
+        if not line:
+            continue
+        parts = [part.strip() for part in line.split(',')]
+        if len(parts) < 8:
+            continue
+        try:
+            jd = float(parts[0])
+            x = float(parts[2])
+            y = float(parts[3])
+            z = float(parts[4])
+            vx = float(parts[5])
+            vy = float(parts[6])
+            vz = float(parts[7])
+        except ValueError:
+            continue
+        rows.append({'jd': jd, 'x': x, 'y': y, 'z': z, 'vx': vx, 'vy': vy, 'vz': vz})
+    return rows
+
+
+def _fetch_horizons_vectors(target_id: str, start: datetime, stop: datetime, step_size: str, center: str = '500@10') -> list:
+    params = {
+        'format': 'json',
+        'COMMAND': str(target_id),
+        'OBJ_DATA': 'NO',
+        'MAKE_EPHEM': 'YES',
+        'EPHEM_TYPE': 'VECTORS',
+        'CENTER': center,
+        'START_TIME': _horizons_time(start),
+        'STOP_TIME': _horizons_time(stop),
+        'STEP_SIZE': step_size,
+        'CSV_FORMAT': 'YES',
+        'REF_PLANE': 'ECLIPTIC',
+        'REF_SYSTEM': 'ICRF',
+        'OUT_UNITS': 'AU-D',
+        'VEC_LABELS': 'NO',
+        'VEC_TABLE': '2',
+        'VEC_DELTA_T': 'NO',
+        'VEC_CORR': 'NONE',
+    }
+    url = 'https://ssd.jpl.nasa.gov/api/horizons.api?' + urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
+    req = urllib.request.Request(
+        url,
+        headers={
+            'User-Agent': 'VirtualCity/0.1 planet-ephemeris',
+            'Accept': 'application/json',
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=16.0) as resp:
+            data = json.loads(resp.read().decode('utf-8', errors='replace'))
+    except urllib.error.URLError as exc:
+        if 'CERTIFICATE_VERIFY_FAILED' not in str(exc):
+            raise
+        with urllib.request.urlopen(req, timeout=16.0, context=ssl._create_unverified_context()) as resp:
+            data = json.loads(resp.read().decode('utf-8', errors='replace'))
+    if data.get('error'):
+        raise ValueError(str(data.get('error')).replace('\n', '; '))
+    rows = _parse_horizons_vectors(data.get('result', ''))
+    if not rows:
+        raise ValueError('Horizons returned no vector rows')
+    return rows
+
+
+def _planet_ephemeris_payload() -> dict:
+    cache_key = 'sun-centered-vectors'
+    now = time.time()
+    cached = _planet_ephemeris_cache.get(cache_key)
+    if cached and now - cached.get('timestamp', 0) < PLANET_EPHEMERIS_CACHE_TTL_SECONDS:
+        payload = dict(cached['payload'])
+        payload['cached'] = True
+        return payload
+
+    start = datetime.now(timezone.utc) - timedelta(days=PLANET_EPHEMERIS_HISTORY_DAYS)
+    stop = datetime.now(timezone.utc) + timedelta(days=PLANET_EPHEMERIS_FUTURE_DAYS)
+    planets = []
+    errors = []
+    earth = None
+    try:
+        earth = {
+            'id': 'earth',
+            'label': EARTH_HORIZONS_TARGET['label'],
+            'horizons_id': EARTH_HORIZONS_TARGET['id'],
+            'vectors': _fetch_horizons_vectors(EARTH_HORIZONS_TARGET['id'], start, stop, PLANET_EPHEMERIS_STEP),
+        }
+    except Exception as exc:
+        errors.append(f"earth: {exc}")
+
+    for key, info in PLANET_HORIZONS_TARGETS.items():
+        try:
+            vectors = _fetch_horizons_vectors(info['id'], start, stop, PLANET_EPHEMERIS_STEP)
+            planets.append({
+                'id': key,
+                'label': info['label'],
+                'horizons_id': info['id'],
+                'vectors': vectors,
+            })
+        except Exception as exc:
+            errors.append(f'{key}: {exc}')
+
+    if not earth or not planets:
+        if cached:
+            payload = dict(cached['payload'])
+            payload.update({'cached': True, 'stale': True, 'errors': errors})
+            return payload
+        return {
+            'ok': False,
+            'source': 'NASA/JPL Horizons',
+            'source_url': 'https://ssd.jpl.nasa.gov/api/horizons.api',
+            'center': 'Sun (500@10)',
+            'reference': 'Earth (399)',
+            'cached': False,
+            'stale': False,
+            'errors': errors,
+            'earth': earth,
+            'planets': [],
+        }
+
+    payload = {
+        'ok': True,
+        'source': 'NASA/JPL Horizons',
+        'source_url': 'https://ssd.jpl.nasa.gov/api/horizons.api',
+        'center': 'Sun (500@10)',
+        'reference': 'Earth (399)',
+        'units': 'AU and AU/day',
+        'cached': False,
+        'stale': False,
+        'fetched_at': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+        'start': start.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'stop': stop.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        'step': '3 days',
+        'errors': errors,
+        'earth': earth,
+        'planets': planets,
+    }
+    _planet_ephemeris_cache[cache_key] = {'timestamp': now, 'payload': payload}
+    return payload
 
 
 def _fetch_boundary(osm_type: str, osm_id: str) -> dict:
@@ -1077,7 +1308,7 @@ def _frontend_asset_version() -> str:
     吃旧缓存，热更新失效。这里改用前端文件的 mtime+size 派生指纹：文件一改版本串自动
     变，URL 随之变，浏览器强制重取，无需任何手动维护。"""
     parts: list[str] = []
-    for name in ("app.js", "styles.css", "index.html"):
+    for name in ("app.js", "orbit-preview.js", "styles.css", "index.html"):
         try:
             st = (FRONTEND_ROOT / name).stat()
             parts.append(f"{int(st.st_mtime)}-{st.st_size}")
@@ -1197,6 +1428,14 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/data-sources':
             self._json(_data_sources_status())
+            return
+        if parsed.path == '/orbit-tle':
+            params = urllib.parse.parse_qs(parsed.query)
+            groups = str(params.get('groups', ['stations,visual'])[0])
+            self._json(_orbit_tle_payload(groups))
+            return
+        if parsed.path == '/planet-ephemeris':
+            self._json(_planet_ephemeris_payload())
             return
         if parsed.path == '/software-paths':
             self._json(_software_path_status())

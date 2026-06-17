@@ -18,7 +18,8 @@ FRONTEND_ROOT = Path(area_picker.FRONTEND_ROOT)
 _PICKER_INDEX_HTML = area_picker._HTML
 _PICKER_STYLES = (FRONTEND_ROOT / "styles.css").read_text(encoding="utf-8")
 _PICKER_APP_JS = (FRONTEND_ROOT / "app.js").read_text(encoding="utf-8")
-_PICKER_FRONTEND = "\n".join([_PICKER_INDEX_HTML, _PICKER_STYLES, _PICKER_APP_JS])
+_PICKER_ORBIT_JS = (FRONTEND_ROOT / "orbit-preview.js").read_text(encoding="utf-8")
+_PICKER_FRONTEND = "\n".join([_PICKER_INDEX_HTML, _PICKER_STYLES, _PICKER_APP_JS, _PICKER_ORBIT_JS])
 
 
 class TestProgressView(unittest.TestCase):
@@ -94,7 +95,9 @@ class TestPickerHtml(unittest.TestCase):
         self.assertTrue((FRONTEND_ROOT / "index.html").exists())
         self.assertTrue((FRONTEND_ROOT / "styles.css").exists())
         self.assertTrue((FRONTEND_ROOT / "app.js").exists())
+        self.assertTrue((FRONTEND_ROOT / "orbit-preview.js").exists())
         self.assertIn('/area-picker/styles.css?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertIn('/area-picker/orbit-preview.js?v=__VERSION__', _PICKER_INDEX_HTML)
         self.assertIn('/area-picker/app.js?v=__VERSION__', _PICKER_INDEX_HTML)
         self.assertIn("window.VC_CONFIG", _PICKER_INDEX_HTML)
         self.assertNotIn("<style>", _PICKER_INDEX_HTML)
@@ -140,6 +143,10 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('/static/maplibre/maplibre-gl.css', _PICKER_FRONTEND)
         self.assertIn('/static/maplibre/maplibre-gl.js', _PICKER_FRONTEND)
         self.assertIn('/static/deckgl/deck.gl.min.js', _PICKER_FRONTEND)
+        self.assertIn('/static/satellitejs/satellite.min.js', _PICKER_FRONTEND)
+        self.assertIn('window.VirtualCityOrbitPreview', _PICKER_FRONTEND)
+        self.assertIn("planetFeedUrl: '/planet-ephemeris'", _PICKER_FRONTEND)
+        self.assertIn('NASA/JPL Horizons', _PICKER_FRONTEND)
         self.assertNotIn('/static/leaflet/leaflet.js', _PICKER_FRONTEND)
         self.assertNotIn('/static/leaflet-draw/leaflet.draw.js', _PICKER_FRONTEND)
         self.assertNotIn('unpkg.com/leaflet', _PICKER_FRONTEND)
@@ -512,19 +519,22 @@ class TestFrontendAssetVersion(unittest.TestCase):
     def test_version_changes_when_asset_content_changes(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            for name in ("app.js", "styles.css", "index.html"):
+            for name in ("app.js", "orbit-preview.js", "styles.css", "index.html"):
                 (root / name).write_text("v1", encoding="utf-8")
             with patch.object(area_picker, "FRONTEND_ROOT", root):
                 first = area_picker._frontend_asset_version()
                 # 改动 app.js 内容（size 变化），版本串必须随之变化。
                 (root / "app.js").write_text("v2-longer-content", encoding="utf-8")
                 second = area_picker._frontend_asset_version()
+                (root / "orbit-preview.js").write_text("v3-longer-orbit-content", encoding="utf-8")
+                third = area_picker._frontend_asset_version()
         self.assertNotEqual(first, second)
+        self.assertNotEqual(second, third)
 
     def test_version_is_stable_without_changes(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            for name in ("app.js", "styles.css", "index.html"):
+            for name in ("app.js", "orbit-preview.js", "styles.css", "index.html"):
                 (root / name).write_text("same", encoding="utf-8")
             with patch.object(area_picker, "FRONTEND_ROOT", root):
                 self.assertEqual(
@@ -536,6 +546,66 @@ class TestFrontendAssetVersion(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             with patch.object(area_picker, "FRONTEND_ROOT", Path(td)):
                 self.assertIsInstance(area_picker._frontend_asset_version(), str)
+
+
+class TestOrbitDataFeeds(unittest.TestCase):
+    def test_horizons_vector_parser_reads_csv_rows(self):
+        result = """
+header
+$$SOE
+2461207.500000000, A.D. 2026-Jun-16 00:00:00.0000,  1.0E+00,  2.0E+00, -3.0E-02,  4.0E-03,  5.0E-03, -6.0E-04,
+$$EOE
+"""
+        rows = area_picker._parse_horizons_vectors(result)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["jd"], 2461207.5)
+        self.assertEqual(rows[0]["x"], 1.0)
+        self.assertEqual(rows[0]["y"], 2.0)
+        self.assertEqual(rows[0]["z"], -0.03)
+        self.assertEqual(rows[0]["vx"], 0.004)
+
+    def test_planet_ephemeris_route_exists_in_handler(self):
+        source = Path(area_picker.__file__).read_text(encoding="utf-8")
+        self.assertIn("if parsed.path == '/planet-ephemeris':", source)
+        self.assertIn("_planet_ephemeris_payload()", source)
+        self.assertIn("'CENTER': center", source)
+        self.assertIn("'center': 'Sun (500@10)'", source)
+        self.assertIn("'earth': earth", source)
+        self.assertIn("PLANET_EPHEMERIS_FUTURE_DAYS = 220", source)
+
+    def test_orbit_preview_uses_heliocentric_planet_frame(self):
+        orbit_preview = (
+            Path(area_picker.__file__).parent
+            / "frontend"
+            / "orbit-preview.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn("earthEphemeris", orbit_preview)
+        self.assertIn("solarScenePoint", orbit_preview)
+        self.assertIn("projectSolarPoint", orbit_preview)
+        self.assertIn("drawSolarOrbitLines", orbit_preview)
+        self.assertIn("drawSunGlyph", orbit_preview)
+        self.assertIn("heliocentric orbits", orbit_preview)
+        self.assertIn("sampleApproximateOrbitSceneAt", orbit_preview)
+        self.assertIn("osculatingOrbitPoints", orbit_preview)
+        self.assertIn("SOLAR_GM_AU3_PER_DAY2", orbit_preview)
+        self.assertIn("vx: Number(row.vx)", orbit_preview)
+        self.assertIn("var currentAnomaly = Math.atan2", orbit_preview)
+        self.assertIn("? r", orbit_preview)
+        self.assertIn("segmentOutsideViewport", orbit_preview)
+        self.assertIn("SOLAR_AU_TO_EARTH_RADIUS = 5.35", orbit_preview)
+        self.assertIn("return SOLAR_AU_TO_EARTH_RADIUS", orbit_preview)
+        self.assertIn("var sx = vector[0] - earthNow[0]", orbit_preview)
+        self.assertNotIn("function compressSolarDistance", orbit_preview)
+        self.assertNotIn("var radius = 1.42 + compressed * 2.55 * scale", orbit_preview)
+        self.assertIn("var p = projectSolarPoint(geom, world)", orbit_preview)
+        self.assertIn("var p = projectSolarPoint(geom, reference.sunPoint)", orbit_preview)
+        self.assertIn("labelCtx.lineWidth = 1.1", orbit_preview)
+        self.assertIn("var lineAlpha = alpha * SOLAR_ORBIT_COLOR[3]", orbit_preview)
+        self.assertIn("setupSpacePreview();\nmap.on('load'", _PICKER_APP_JS.replace("\r\n", "\n"))
+        self.assertNotIn("PLANET_ORBIT_COLOR", orbit_preview)
+        self.assertNotIn("PLANET_TAIL_REBUILD_MS", orbit_preview)
+        self.assertNotIn("function buildPlanetTail", orbit_preview)
+        self.assertNotIn("function drawPlanetTail", orbit_preview)
 
 
 class TestHoudiniStatus(unittest.TestCase):
