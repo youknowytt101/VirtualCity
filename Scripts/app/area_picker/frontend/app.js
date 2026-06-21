@@ -1056,7 +1056,8 @@ function setupSpacePreview() {
     feedUrl: '/orbit-tle?groups=stations,visual',
     planetFeedUrl: '/planet-ephemeris',
     satellite: window.satellite,
-    maxBodies: 28
+    maxBodies: 30,
+    timeScale: 80
   });
 }
 setupSpacePreview();

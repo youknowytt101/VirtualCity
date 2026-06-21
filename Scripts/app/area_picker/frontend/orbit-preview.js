@@ -5,6 +5,12 @@
   var ORBIT_TAIL_REBUILD_MS = 1600;
   var SOLAR_ORBIT_REBUILD_MS = 90000;
   var TWO_PI = Math.PI * 2;
+  var DEFAULT_TIME_SCALE = 80;
+  var SATELLITE_TRAJECTORY_MIN_STEP_MS = 12000;
+  var SATELLITE_TRAJECTORY_MAX_STEP_MS = 120000;
+  var SATELLITE_TRAJECTORY_MIN_FUTURE_MINUTES = 12;
+  var SATELLITE_TRAJECTORY_MAX_FUTURE_MINUTES = 80;
+  var SATELLITE_TRAJECTORY_FUTURE_FRACTION = 0.45;
   var J2000_MS = Date.UTC(2000, 0, 1, 12);
   var ORBIT_LINE_COLOR = [1, 1, 1, 0.96];
   var SOLAR_ORBIT_COLOR = [1, 1, 1, 0.30];
@@ -28,7 +34,12 @@
     var satelliteApi = options.satellite || window.satellite;
     var feedUrl = options.feedUrl || '/orbit-tle?groups=stations,visual';
     var planetFeedUrl = options.planetFeedUrl || '/planet-ephemeris';
-    var maxBodies = Math.max(1, Math.floor(options.maxBodies || 28));
+    var maxBodies = Math.max(1, Math.floor(options.maxBodies || 30));
+    var requestedTimeScale = Number(options.timeScale || DEFAULT_TIME_SCALE);
+    var timeScale = Number.isFinite(requestedTimeScale) && requestedTimeScale > 0 ? requestedTimeScale : DEFAULT_TIME_SCALE;
+    var simulationRealStartMs = Date.now();
+    var simulationStartMs = simulationRealStartMs;
+    var orbitTailRebuildMs = Math.max(100, ORBIT_TAIL_REBUILD_MS / timeScale);
     if (!map || typeof map.getContainer !== 'function') return null;
 
     var host = map.getContainer();
@@ -109,6 +120,11 @@
     function smoothstep(edge0, edge1, value) {
       var t = clamp((value - edge0) / (edge1 - edge0), 0, 1);
       return t * t * (3 - 2 * t);
+    }
+
+    function simulationDate(realNowMs) {
+      var nowMs = Number.isFinite(realNowMs) ? realNowMs : Date.now();
+      return new Date(simulationStartMs + (nowMs - simulationRealStartMs) * timeScale);
     }
 
     function compileShader(type, source) {
@@ -357,11 +373,162 @@
       return vectorFromLngLat(lng, lat, earthRadii);
     }
 
-    function sampleSatelliteWorld(body, date) {
+    function directSampleSatelliteWorld(body, date) {
       if (!body || !body.satrec || !satelliteApi) return null;
       var state = satelliteApi.propagate(body.satrec, date);
       if (!state || !state.position) return null;
       return eciPositionToWorld(state.position, satelliteApi.gstime(date));
+    }
+
+    function directSampleSatelliteFrame(body, date) {
+      var position = directSampleSatelliteWorld(body, date);
+      if (!position) return null;
+      var probeMs = 1000;
+      var before = directSampleSatelliteWorld(body, new Date(date.getTime() - probeMs));
+      var after = directSampleSatelliteWorld(body, new Date(date.getTime() + probeMs));
+      var spanSeconds = 0;
+      var velocity = [0, 0, 0];
+      if (before && after) {
+        spanSeconds = probeMs * 2 / 1000;
+        velocity = [
+          (after[0] - before[0]) / spanSeconds,
+          (after[1] - before[1]) / spanSeconds,
+          (after[2] - before[2]) / spanSeconds
+        ];
+      } else if (after) {
+        spanSeconds = probeMs / 1000;
+        velocity = [
+          (after[0] - position[0]) / spanSeconds,
+          (after[1] - position[1]) / spanSeconds,
+          (after[2] - position[2]) / spanSeconds
+        ];
+      }
+      return { position: position, velocity: velocity };
+    }
+
+    function deriveTrajectoryVelocities(frames) {
+      if (!frames || frames.length < 2) return;
+      for (var i = 0; i < frames.length; i++) {
+        var previous = frames[Math.max(0, i - 1)];
+        var next = frames[Math.min(frames.length - 1, i + 1)];
+        var spanSeconds = Math.max(0.001, (next.time - previous.time) / 1000);
+        frames[i].velocity = [
+          (next.position[0] - previous.position[0]) / spanSeconds,
+          (next.position[1] - previous.position[1]) / spanSeconds,
+          (next.position[2] - previous.position[2]) / spanSeconds
+        ];
+      }
+    }
+
+    function hermiteTrajectoryFrame(a, b, timeMs) {
+      var spanSeconds = Math.max(0.001, (b.time - a.time) / 1000);
+      var f = clamp((timeMs - a.time) / (b.time - a.time || 1), 0, 1);
+      var f2 = f * f;
+      var f3 = f2 * f;
+      var h00 = 2 * f3 - 3 * f2 + 1;
+      var h10 = f3 - 2 * f2 + f;
+      var h01 = -2 * f3 + 3 * f2;
+      var h11 = f3 - f2;
+      var dh00 = 6 * f2 - 6 * f;
+      var dh10 = 3 * f2 - 4 * f + 1;
+      var dh01 = -6 * f2 + 6 * f;
+      var dh11 = 3 * f2 - 2 * f;
+      var av = a.velocity || [0, 0, 0];
+      var bv = b.velocity || [0, 0, 0];
+      var position = [];
+      var velocity = [];
+      for (var i = 0; i < 3; i++) {
+        var m0 = av[i] * spanSeconds;
+        var m1 = bv[i] * spanSeconds;
+        position[i] = h00 * a.position[i] + h10 * m0 + h01 * b.position[i] + h11 * m1;
+        velocity[i] = (dh00 * a.position[i] + dh10 * m0 + dh01 * b.position[i] + dh11 * m1) / spanSeconds;
+      }
+      return { position: position, velocity: velocity };
+    }
+
+    function interpolateTrajectoryAt(body, timeMs) {
+      var frames = body && body.trajectoryFrames;
+      if (!frames || frames.length < 2) return null;
+      if (timeMs <= frames[0].time) {
+        return {
+          position: frames[0].position.slice(),
+          velocity: (frames[0].velocity || [0, 0, 0]).slice()
+        };
+      }
+      var last = frames[frames.length - 1];
+      if (timeMs >= last.time) {
+        return {
+          position: last.position.slice(),
+          velocity: (last.velocity || [0, 0, 0]).slice()
+        };
+      }
+      var lo = 0;
+      var hi = frames.length - 2;
+      while (lo < hi) {
+        var mid = Math.ceil((lo + hi) / 2);
+        if (timeMs < frames[mid].time) hi = mid - 1;
+        else lo = mid;
+      }
+      return hermiteTrajectoryFrame(frames[lo], frames[lo + 1], timeMs);
+    }
+
+    function buildTrajectoryCache(body, centerDate) {
+      if (!body || !body.satrec || !centerDate) return false;
+      var periodMinutes = body.periodMinutes || 96;
+      var tailMinutes = periodMinutes * (body.tailFraction || 0.72);
+      var futureMinutes = clamp(
+        periodMinutes * SATELLITE_TRAJECTORY_FUTURE_FRACTION,
+        SATELLITE_TRAJECTORY_MIN_FUTURE_MINUTES,
+        SATELLITE_TRAJECTORY_MAX_FUTURE_MINUTES
+      );
+      var sampleCount = Math.max(12, body.samples || 190);
+      var stepMs = clamp(
+        tailMinutes * 60000 / sampleCount,
+        SATELLITE_TRAJECTORY_MIN_STEP_MS,
+        SATELLITE_TRAJECTORY_MAX_STEP_MS
+      );
+      var centerMs = centerDate.getTime();
+      var startMs = centerMs - tailMinutes * 60000;
+      var endMs = centerMs + futureMinutes * 60000;
+      var frames = [];
+      for (var t = startMs; t <= endMs + stepMs * 0.5; t += stepMs) {
+        var position = directSampleSatelliteWorld(body, new Date(t));
+        if (!position) continue;
+        frames.push({ time: t, position: position });
+      }
+      if (frames.length < 2) return false;
+      deriveTrajectoryVelocities(frames);
+      body.trajectoryFrames = frames;
+      body.trajectoryStartMs = frames[0].time;
+      body.trajectoryEndMs = frames[frames.length - 1].time;
+      body.trajectoryStepMs = stepMs;
+      body.trajectoryTailMinutes = tailMinutes;
+      body.trajectoryBuiltRealAt = Date.now();
+      return true;
+    }
+
+    function ensureTrajectoryCache(body, date) {
+      if (!body || !date) return false;
+      var timeMs = date.getTime();
+      var frames = body.trajectoryFrames;
+      if (!frames || frames.length < 2) return buildTrajectoryCache(body, date);
+      var edge = Math.max(body.trajectoryStepMs || SATELLITE_TRAJECTORY_MIN_STEP_MS, 1) * 3;
+      if (timeMs < body.trajectoryStartMs + edge || timeMs > body.trajectoryEndMs - edge) {
+        return buildTrajectoryCache(body, date);
+      }
+      return true;
+    }
+
+    function sampleSatelliteFrame(body, date) {
+      if (!ensureTrajectoryCache(body, date)) {
+        return directSampleSatelliteFrame(body, date);
+      }
+      return interpolateTrajectoryAt(body, date.getTime());
+    }
+
+    function sampleSatelliteWorld(body, date) {
+      var frame = sampleSatelliteFrame(body, date);
+      return frame ? frame.position : null;
     }
 
     function createPlanetBodies() {
@@ -593,20 +760,21 @@
 
     function buildOrbitTail(body, startDate) {
       if (!body || !body.satrec) return false;
-      var periodMinutes = body.periodMinutes || 96;
-      var samples = body.samples || 190;
-      var tailMinutes = periodMinutes * (body.tailFraction || 0.72);
+      if (!ensureTrajectoryCache(body, startDate)) return false;
+      var tailMinutes = body.trajectoryTailMinutes || (body.periodMinutes || 96) * (body.tailFraction || 0.72);
+      var startMs = startDate.getTime();
+      var samples = Math.max(12, body.samples || 190);
+      var stepMs = tailMinutes * 60000 / samples;
       var data = [];
       for (var i = 0; i <= samples; i++) {
-        var offsetMinutes = -tailMinutes * (i / samples);
-        var date = new Date(startDate.getTime() + offsetMinutes * 60000);
-        var p = sampleSatelliteWorld(body, date);
-        if (!p) continue;
-        data.push(p[0], p[1], p[2]);
+        var frame = interpolateTrajectoryAt(body, startMs - i * stepMs);
+        if (!frame || !frame.position) continue;
+        data.push(frame.position[0], frame.position[1], frame.position[2]);
       }
       if (data.length < 6) return false;
       body.trailPoints = data;
       body.trailBuiltAt = startDate.getTime();
+      body.trailBuiltRealAt = Date.now();
       return true;
     }
 
@@ -651,6 +819,11 @@
         }
       }
       return triples;
+    }
+
+    function tleCatalogKey(item) {
+      var catalog = item && item.line1 ? item.line1.slice(2, 7).trim() : '';
+      return catalog || (item.name + '|' + item.line1 + '|' + item.line2);
     }
 
     function satelliteColor(index, name) {
@@ -700,13 +873,17 @@
       var triples = parseTleTriples(text);
       var preferred = [];
       var others = [];
+      var seenCatalog = {};
       triples.forEach(function(item) {
+        var key = tleCatalogKey(item);
+        if (seenCatalog[key]) return;
+        seenCatalog[key] = true;
         if (/ISS \(ZARYA\)|CSS \(TIANHE\)|CSS \(WENTIAN\)|CSS \(MENGTIAN\)|HST|HUBBLE/i.test(item.name)) preferred.push(item);
         else others.push(item);
       });
       var selected = preferred.concat(others).slice(0, maxBodies);
       var nextBodies = [];
-      var now = new Date();
+      var now = simulationDate();
       selected.forEach(function(item, index) {
         var body = tleToBody(item, index);
         if (!body) return;
@@ -798,6 +975,7 @@
         };
         return;
       }
+      applyTleData(fallbackTle.join('\n'), { source: 'fallback TLE', cached: true });
       fetch(feedUrl, { cache: 'no-store' })
         .then(function(resp) {
           if (!resp.ok) throw new Error('orbit feed HTTP ' + resp.status);
@@ -810,9 +988,11 @@
           }
         })
         .catch(function(err) {
-          console.warn('Orbit feed unavailable, using fallback TLE.', err);
-        applyTleData(fallbackTle.join('\n'), { source: 'fallback TLE', cached: true });
-      });
+          console.warn('Orbit feed unavailable, keeping fallback TLE.', err);
+          if (!spaceBodies.length) {
+            applyTleData(fallbackTle.join('\n'), { source: 'fallback TLE', cached: true });
+          }
+        });
     }
 
     loadOrbitData();
@@ -1042,19 +1222,24 @@
       return maxX < -padding || minX > width + padding || maxY < -padding || minY > height + padding;
     }
 
-    function drawOrbitTail(body, geom, alpha, nowDate) {
-      if (!body.trailPoints || !body.trailBuiltAt || Math.abs(nowDate.getTime() - body.trailBuiltAt) > ORBIT_TAIL_REBUILD_MS) {
+    function drawOrbitTail(body, geom, alpha, nowDate, realNowMs) {
+      var nowMs = Number.isFinite(realNowMs) ? realNowMs : Date.now();
+      var realAge = Math.abs(nowMs - (body.trailBuiltRealAt || 0));
+      var simulationAge = Math.abs(nowDate.getTime() - (body.trailBuiltAt || 0));
+      var maxSimulationAge = Math.max(1800, (body.trajectoryStepMs || SATELLITE_TRAJECTORY_MIN_STEP_MS) * 0.45);
+      if (!body.trailPoints || !body.trailBuiltAt || realAge > orbitTailRebuildMs || simulationAge > maxSimulationAge) {
         buildOrbitTail(body, nowDate);
       }
       if (!body.trailPoints || body.trailPoints.length < 6) return;
       var points = body.trailPoints;
+      var currentWorld = sampleSatelliteWorld(body, nowDate);
       var segmentCount = Math.max(1, points.length / 3 - 1);
       labelCtx.save();
       labelCtx.globalCompositeOperation = 'lighter';
       for (var i = segmentCount; i > 0; i--) {
         var idx = i * 3;
         var p0 = [points[idx], points[idx + 1], points[idx + 2]];
-        var p1 = [points[idx - 3], points[idx - 2], points[idx - 1]];
+        var p1 = currentWorld && i === 1 ? currentWorld : [points[idx - 3], points[idx - 2], points[idx - 1]];
         var a = projectWorldPoint(geom, p0);
         var b = projectWorldPoint(geom, p1);
         var aVisible = !isOccludedByEarth(geom, a);
@@ -1164,23 +1349,28 @@
     }
 
     function drawSpacecraftGlyph(body, geom, date, alpha) {
-      var world = sampleSatelliteWorld(body, date);
-      if (!world) return null;
+      var frame = sampleSatelliteFrame(body, date);
+      if (!frame || !frame.position) return null;
+      var world = frame.position;
       var p = projectWorldPoint(geom, world);
       if (isOccludedByEarth(geom, p)) return null;
-      var next = sampleSatelliteWorld(body, new Date(date.getTime() + 45000));
+      var velocity = frame.velocity || [0, 0, 0];
+      var hasVelocity = Math.hypot(velocity[0], velocity[1], velocity[2]) > 1e-7;
+      var next = hasVelocity
+        ? [world[0] + velocity[0] * 45, world[1] + velocity[1] * 45, world[2] + velocity[2] * 45]
+        : sampleSatelliteWorld(body, new Date(date.getTime() + 45000));
       var nextProjected = next ? projectWorldPoint(geom, next) : null;
       var angle = nextProjected ? Math.atan2(nextProjected.y - p.y, nextProjected.x - p.x) : 0;
       var depth = smoothstep(-0.10, 0.82, p.z);
       var glyphAlpha = alpha * (0.38 + 0.62 * depth);
-      var size = clamp(body.size * 1.06 * p.perspective, 4.2, body.showLabel ? 7.4 : 5.8);
+      var size = clamp(body.size * 0.64 * p.perspective, 2.5, body.showLabel ? 4.6 : 3.8);
 
       labelCtx.save();
       labelCtx.translate(p.x, p.y);
       labelCtx.rotate(angle + Math.PI / 6);
       labelCtx.globalAlpha = glyphAlpha;
       labelCtx.strokeStyle = 'rgba(210, 214, 218, 0.86)';
-      labelCtx.lineWidth = body.showLabel ? 1.15 : 0.9;
+      labelCtx.lineWidth = body.showLabel ? 0.9 : 0.72;
       labelCtx.shadowColor = '#000000';
       labelCtx.shadowBlur = 4;
       labelCtx.beginPath();
@@ -1201,17 +1391,17 @@
       if (!projected || !body.showLabel) return;
       var labelAlpha = alpha * clamp(0.30 + projected.alpha * 0.72, 0, 1);
       if (labelAlpha < 0.05) return;
-      var labelX = projected.x + 10;
-      var labelY = projected.y - 8;
+      var labelX = projected.x + 8;
+      var labelY = projected.y - 6;
       labelCtx.save();
       labelCtx.globalAlpha = labelAlpha;
-      labelCtx.font = '600 11px Noto Sans SC, sans-serif';
+      labelCtx.font = '600 9px Noto Sans SC, sans-serif';
       labelCtx.textBaseline = 'middle';
       labelCtx.strokeStyle = 'rgba(188, 210, 238, 0.42)';
       labelCtx.lineWidth = 1;
       labelCtx.beginPath();
-      labelCtx.moveTo(projected.x + 4, projected.y - 3);
-      labelCtx.lineTo(labelX - 3, labelY);
+      labelCtx.moveTo(projected.x + 3, projected.y - 2);
+      labelCtx.lineTo(labelX - 2, labelY);
       labelCtx.stroke();
       labelCtx.fillStyle = 'rgba(226, 236, 250, 0.90)';
       labelCtx.shadowColor = '#000000';
@@ -1270,7 +1460,8 @@
       var pitch = map.getPitch();
       var geom = globeScreenGeometry();
       var alpha = previewVisibility(geom, zoom, pitch);
-      var nowDate = new Date();
+      var realNowMs = Date.now();
+      var nowDate = simulationDate(realNowMs);
 
       gl.viewport(0, 0, glCanvas.width, glCanvas.height);
       gl.clearColor(0, 0, 0, 0);
@@ -1297,7 +1488,7 @@
         drawLimbShading(geom, alpha, nowDate);
         drawAtmosphere(geom, alpha);
         spaceBodies.forEach(function(body) {
-          drawOrbitTail(body, geom, alpha, nowDate);
+          drawOrbitTail(body, geom, alpha, nowDate, realNowMs);
         });
         var planetLabels = [];
         planetBodies.forEach(function(body) {
