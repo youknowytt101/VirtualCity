@@ -836,7 +836,63 @@ def centerline_polylines_from_input():
     return lines
 
 
-def _run_arc(arc_out, bundle_geo, centre_geo, real_node):
+def _corner_position_from_geo(geo):
+    if geo is None:
+        return None
+    corner_attr = geo.findPrimAttrib("corner_position")
+    if corner_attr is None:
+        return None
+    prims = list(geo.prims())
+    if not prims:
+        return None
+    return hou.Vector3(prims[0].attribValue(corner_attr))
+
+
+def _positive_prim_values(geo, name):
+    if geo is None:
+        return []
+    attrib = geo.findPrimAttrib(name)
+    if attrib is None:
+        return []
+    return [
+        float(prim.attribValue(attrib))
+        for prim in geo.prims()
+        if float(prim.attribValue(attrib)) > EPS
+    ]
+
+
+def _positive_point_values(geo, name):
+    if geo is None:
+        return []
+    attrib = geo.findPointAttrib(name)
+    if attrib is None:
+        return []
+    return [
+        float(point.attribValue(attrib))
+        for point in geo.points()
+        if float(point.attribValue(attrib)) > EPS
+    ]
+
+
+def _arc_distance_from_pscale(*geometries):
+    checks = (
+        ("prim", "corner_pscale"),
+        ("point", "pscale"),
+        ("prim", "corner_keep_distance"),
+    )
+    for kind, name in checks:
+        values = []
+        for geo in geometries:
+            if kind == "prim":
+                values.extend(_positive_prim_values(geo, name))
+            else:
+                values.extend(_positive_point_values(geo, name))
+        if values:
+            return max(values), name
+    raise hou.NodeError("No positive pscale value found to drive the tangent arc distance.")
+
+
+def _run_arc(arc_out, bundle_geo, centre_geo, real_node, source_geo=None):
     global _arc_node, _arc_geo, _arc_legacy_ctrl, _arc_centre_geo
     _arc_node = real_node
     _arc_geo = arc_out
@@ -845,7 +901,9 @@ def _run_arc(arc_out, bundle_geo, centre_geo, real_node):
 
     geo = arc_out
     cook_start = time.perf_counter()
-    requested_distance = float(ctrl_value("curve_distance", 5.0))
+    requested_distance, requested_distance_source = _arc_distance_from_pscale(
+        centre_geo, bundle_geo, source_geo
+    )
     curve_prims = select_arc_curve_prims(geo)
     if len(curve_prims) < 2:
         raise hou.NodeError("Expected at least two curve primitives in the input geometry.")
@@ -976,7 +1034,17 @@ def _run_arc(arc_out, bundle_geo, centre_geo, real_node):
         curve1_entries, curve1_inter_idx, curve1_tan_idx, curve1_tan_fraction, center, start_vec, plane_normal, arc_angle, intersection_arc_fraction
     )
     centerline_lines = centerline_polylines_from_input()
-    centerline_intersection_info = find_centerline_intersection(centerline_lines, intersection_point)
+    forced_centerline_intersection = (
+        _corner_position_from_geo(_arc_centre_geo)
+        or _corner_position_from_geo(source_geo)
+    )
+    if forced_centerline_intersection is not None:
+        centerline_intersection_info = {
+            "point": forced_centerline_intersection,
+            "source": "corner_position",
+        }
+    else:
+        centerline_intersection_info = find_centerline_intersection(centerline_lines, intersection_point)
     centerline_intersection = centerline_intersection_info["point"]
     curve0_centerline_info = select_centerline_for_curve(centerline_lines, cd0_tan["rest"], centerline_intersection)
     curve1_centerline_info = select_centerline_for_curve(centerline_lines, cd1_tan["rest"], centerline_intersection)
@@ -1085,21 +1153,26 @@ def _run_arc(arc_out, bundle_geo, centre_geo, real_node):
     _, curve1_points = add_modified_curve(curve1_entries, curve1_positions, curve1_weights, curve1_inter_idx, curve1_tan_idx, 1)
     _, centerline_points = add_centerline_curve()
     # --- Road surface: every real centerline vertex preserved, projected to the arc edge. ---
-    # Map source number -> displayed arc-edge position (straight runs stay
-    # parallel via N*pscale offset; rounded runs already sit on the arc).
-    arc_pos_by_number = {}
-    arc_numbers = set()
+    # Map displayed arc-edge positions back to real centerline vertices. Source
+    # numbers are mirrored on extract V curves, so use each offset point's rest
+    # position as the disambiguating key instead of treating number as unique.
+    arc_edge_records = []
     for i, pt in enumerate(curve0_points):
         num = int(curve0_entries[i].get("number", -1))
-        arc_pos_by_number[num] = pt.position()
-        if curve0_weights[i] > 0.0:
-            arc_numbers.add(num)
+        arc_edge_records.append({
+            "number": num,
+            "rest": hou.Vector3(curve0_entries[i].get("rest", pt.position())),
+            "position": pt.position(),
+            "weight": curve0_weights[i],
+        })
     for i, pt in enumerate(curve1_points):
         num = int(curve1_entries[i].get("number", -1))
-        if num not in arc_pos_by_number:
-            arc_pos_by_number[num] = pt.position()
-        if curve1_weights[i] > 0.0:
-            arc_numbers.add(num)
+        arc_edge_records.append({
+            "number": num,
+            "rest": hou.Vector3(curve1_entries[i].get("rest", pt.position())),
+            "position": pt.position(),
+            "weight": curve1_weights[i],
+        })
     if len(centerline_lines) >= 2:
         real_center_seq = build_real_centerline_sequence(
             centerline_lines[0], centerline_lines[1], centerline_intersection
@@ -1112,14 +1185,40 @@ def _run_arc(arc_out, bundle_geo, centre_geo, real_node):
     def project_edge_to_arc(pos):
         frac = fraction_for_point_on_arc(pos, center, start_vec, plane_normal, arc_angle)
         return arc_point_at_fraction(center, start_vec, plane_normal, arc_angle, frac), frac
+    def matching_arc_edge_record(position, number):
+        if not arc_edge_records:
+            return None
+        same_number = [
+            record for record in arc_edge_records
+            if int(record["number"]) == int(number)
+        ]
+        candidates = same_number or arc_edge_records
+        best = min(
+            candidates,
+            key=lambda record: record["rest"].distanceTo(position),
+        )
+        tolerance = 0.25 if same_number else 1.0
+        if best["rest"].distanceTo(position) > tolerance:
+            return None
+        return best
     # Edge row per centerline vertex. Straight runs reuse the parallel arc-edge
     # vertex (same source number). Each rounded run (vertices the offset edge had
     # trimmed away) is filled by an arc-length parameterised sweep between its two
     # flanking straight anchors, so the rounded edge points stay monotonic and
     # evenly spread on the arc instead of fanning out and overlapping.
     seq_positions = [position for position, _ in real_center_seq]
-    edge_positions = [arc_pos_by_number.get(int(number)) for _, number in real_center_seq]
-    arc_edge_indices = {i for i, pos in enumerate(edge_positions) if pos is None}
+    edge_records = [
+        matching_arc_edge_record(position, number)
+        for position, number in real_center_seq
+    ]
+    edge_positions = [
+        record["position"] if record is not None else None
+        for record in edge_records
+    ]
+    arc_edge_indices = {
+        i for i, record in enumerate(edge_records)
+        if record is None or record["weight"] > 0.0
+    }
     n_seq = len(real_center_seq)
     k = 0
     while k < n_seq:
@@ -1153,14 +1252,13 @@ def _run_arc(arc_out, bundle_geo, centre_geo, real_node):
             edge_positions[i] = arc_point_at_fraction(
                 center, start_vec, plane_normal, arc_angle, frac
             )
-    # Even-distribution pass for is_arc edge points. The marked points (number
-    # in arc_numbers, or collapsed rounded run via arc_edge_indices) form one
+    # Even-distribution pass for is_arc edge points. The marked points form one
     # contiguous run whose two ends are the tangent interface points. Spread the
     # whole run's arc fractions uniformly by angle so the degenerate spans that
     # bunched up at a single spot get pulled out into an even fan on the circle.
     marked_arc_idx = [
         i for i in range(n_seq)
-        if int(real_center_seq[i][1]) in arc_numbers or i in arc_edge_indices
+        if i in arc_edge_indices
     ]
     if len(marked_arc_idx) >= 2:
         frac_start = project_edge_to_arc(edge_positions[marked_arc_idx[0]])[1]
@@ -1180,7 +1278,7 @@ def _run_arc(arc_out, bundle_geo, centre_geo, real_node):
         edge_pt = create_point(
             edge_positions[idx], "road_surface_edge", 2, 0.0, None, 0.0, int(number)
         )
-        on_arc = int(number) in arc_numbers or idx in arc_edge_indices
+        on_arc = idx in arc_edge_indices
         edge_pt.setAttribValue(is_arc_attrib, 1 if on_arc else 0)
         edge_points.append(edge_pt)
     road_surface_count = 0
@@ -1222,6 +1320,7 @@ def _run_arc(arc_out, bundle_geo, centre_geo, real_node):
     set_global("arc_tangent1", p1)
     set_global("arc_equal_distance", float(distance))
     set_global("arc_requested_distance", float(requested_distance))
+    set_global("arc_requested_distance_source", requested_distance_source)
     set_global("arc_max_distance", float(max_distance))
     set_global("arc_snapped_distance0", float(snapped_distance0))
     set_global("arc_snapped_distance1", float(snapped_distance1))
@@ -1333,6 +1432,526 @@ def _prim_crosses_curve(prim, centre_segments):
 def _dist2d(a, b):
     return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
 
+
+def _source_projection_info(source, position):
+    pscale_attr = source.findPointAttrib("pscale")
+    px = float(position[0])
+    pz = float(position[2])
+    best = None
+    for prim in source.prims():
+        points = prim.points()
+        for index in range(1, len(points)):
+            a_pos = points[index - 1].position()
+            b_pos = points[index].position()
+            ax, az = float(a_pos[0]), float(a_pos[2])
+            bx, bz = float(b_pos[0]), float(b_pos[2])
+            vx, vz = bx - ax, bz - az
+            segment_len2 = vx * vx + vz * vz
+            if segment_len2 <= EPS:
+                continue
+            amount = clamp(((px - ax) * vx + (pz - az) * vz) / segment_len2, 0.0, 1.0)
+            qx = ax + vx * amount
+            qz = az + vz * amount
+            dx = px - qx
+            dz = pz - qz
+            distance = (dx * dx + dz * dz) ** 0.5
+            if pscale_attr is not None:
+                ps0 = float(points[index - 1].attribValue(pscale_attr))
+                ps1 = float(points[index].attribValue(pscale_attr))
+                pscale = ps0 * (1.0 - amount) + ps1 * amount
+            else:
+                pscale = 0.0
+            side = vx * dz - vz * dx
+            info = {
+                "distance": distance,
+                "pscale": pscale,
+                "side": side,
+            }
+            if best is None or distance < best["distance"]:
+                best = info
+    return best
+
+
+def _offset_distance_stats(prim, source):
+    ratios = []
+    signs = []
+    for point in prim.points():
+        info = _source_projection_info(source, point.position())
+        if info is None or info["pscale"] <= EPS:
+            continue
+        ratios.append(info["distance"] / info["pscale"])
+        if info["side"] > 1.0e-6:
+            signs.append(1)
+        elif info["side"] < -1.0e-6:
+            signs.append(-1)
+    if not ratios:
+        return None
+    sign_counts = {sign: signs.count(sign) for sign in (-1, 1)}
+    side_consistency = 1.0
+    dominant_side = 0
+    if signs:
+        dominant_side = max(sign_counts, key=sign_counts.get)
+        side_consistency = float(sign_counts[dominant_side]) / float(len(signs))
+    start, end = _prim_ends_xz(prim)
+    return {
+        "min_ratio": min(ratios),
+        "max_ratio": max(ratios),
+        "avg_ratio": sum(ratios) / float(len(ratios)),
+        "side_consistency": side_consistency,
+        "dominant_side": dominant_side,
+        "closed": _dist2d(start, end) <= 1.0e-5,
+    }
+
+
+def _valid_offset_prim(prim, source, centre_segments):
+    if _prim_crosses_curve(prim, centre_segments):
+        return False
+    stats = _offset_distance_stats(prim, source)
+    if stats is None:
+        return True
+    if stats["closed"]:
+        return False
+    if stats["side_consistency"] < 0.8:
+        return False
+    if stats["min_ratio"] < 0.45 or stats["max_ratio"] > 1.55:
+        return False
+    return 0.75 <= stats["avg_ratio"] <= 1.25
+
+
+def _point_record(point):
+    geo = point.geometry()
+    number_attr = geo.findPointAttrib("number")
+    rest_attr = geo.findPointAttrib("rest")
+    position = hou.Vector3(point.position())
+    return {
+        "position": position,
+        "number": int(point.attribValue(number_attr)) if number_attr is not None else point.number(),
+        "rest": hou.Vector3(point.attribValue(rest_attr)) if rest_attr is not None else position,
+    }
+
+
+def _prim_records(prim):
+    return [_point_record(vertex.point()) for vertex in prim.vertices()]
+
+
+def _record_distance(a, b):
+    return a["position"].distanceTo(b["position"])
+
+
+def _chain_record_fragments(fragments, tolerance=0.25):
+    remaining = [list(fragment) for fragment in fragments if len(fragment) >= 2]
+    if not remaining:
+        return []
+    chain = max(remaining, key=len)
+    remaining.remove(chain)
+    while remaining:
+        best = None
+        for fragment in remaining:
+            tests = (
+                (_record_distance(chain[-1], fragment[0]), "append", False, fragment),
+                (_record_distance(chain[-1], fragment[-1]), "append", True, fragment),
+                (_record_distance(chain[0], fragment[-1]), "prepend", False, fragment),
+                (_record_distance(chain[0], fragment[0]), "prepend", True, fragment),
+            )
+            candidate = min(tests, key=lambda item: item[0])
+            if best is None or candidate[0] < best[0]:
+                best = candidate
+        if best is None or best[0] > tolerance:
+            break
+        _, mode, reverse_fragment, fragment = best
+        ordered = list(reversed(fragment)) if reverse_fragment else list(fragment)
+        if mode == "append":
+            chain.extend(ordered[1:])
+        else:
+            chain = ordered[:-1] + chain
+        remaining.remove(fragment)
+    return chain
+
+
+def _create_record_polyline(geo, records, role, corner_id):
+    if len(records) < 2:
+        return None
+    number_attr = geo.findPointAttrib("number")
+    if number_attr is None:
+        number_attr = geo.addAttrib(hou.attribType.Point, "number", -1)
+    rest_attr = geo.findPointAttrib("rest")
+    if rest_attr is None:
+        rest_attr = geo.addAttrib(hou.attribType.Point, "rest", (0.0, 0.0, 0.0))
+    poly = geo.createPolygon()
+    poly.setIsClosed(False)
+    for record in records:
+        point = geo.createPoint()
+        point.setPosition(record["position"])
+        point.setAttribValue(number_attr, int(record["number"]))
+        point.setAttribValue(rest_attr, tuple(record["rest"]))
+        poly.addVertex(point)
+    poly.setAttribValue("line_role", role)
+    poly.setAttribValue("corner_id", int(corner_id))
+    return poly
+
+
+def _source_corner_id(source):
+    corner_attr = source.findPrimAttrib("corner_id")
+    prims = list(source.prims())
+    if corner_attr is not None and prims:
+        return int(prims[0].attribValue(corner_attr))
+    return 0
+
+
+def _extract_corner_info(source):
+    prims = list(source.prims())
+    if not prims:
+        return None
+    prim = prims[0]
+    required = ("branch_angle0", "branch_angle1", "corner_position")
+    attrs = {name: source.findPrimAttrib(name) for name in required}
+    if any(attrib is None for attrib in attrs.values()):
+        return None
+    angle0 = float(prim.attribValue(attrs["branch_angle0"]))
+    angle1 = float(prim.attribValue(attrs["branch_angle1"]))
+    delta = (angle1 - angle0) % TAU
+    return {
+        "angle0": angle0,
+        "angle1": angle1,
+        "delta": delta,
+        "corner_position": hou.Vector3(prim.attribValue(attrs["corner_position"])),
+    }
+
+
+def _offset_intersection_count(source, verbs):
+    outer = _offset_copy(source, 1.0)
+    inner = _offset_copy(source, -1.0)
+    merged = hou.Geometry()
+    verbs["merge"].execute(merged, [outer, inner])
+    _flatten_y(merged)
+    analysis_verb = verbs["intersectionanalysis"]
+    analysis_verb.setParms(
+        {
+            "useinputnumattrib": 1,
+            "useprimnumattrib": 1,
+            "useprimuvwattrib": 1,
+            "useptnumattrib": 1,
+        }
+    )
+    analysis = hou.Geometry()
+    analysis_verb.execute(analysis, [merged])
+    return len(analysis.points()) + len(analysis.prims())
+
+
+def _angle_in_ccw_sector(angle, start, delta):
+    rel = (angle - start) % TAU
+    return rel <= delta + 1.0e-5
+
+
+def _sector_score_for_prim(prim, corner_info):
+    if corner_info is None:
+        return 0.0
+    return _sector_score_for_positions(
+        [point.position() for point in prim.points()],
+        corner_info,
+    )
+
+
+def _sector_score_for_positions(positions, corner_info):
+    if corner_info is None or not positions:
+        return 0.0
+    corner = corner_info["corner_position"]
+    start = corner_info["angle0"]
+    delta = corner_info["delta"]
+    inside = 0
+    for position in positions:
+        angle = math.atan2(
+            float(position.z() - corner.z()),
+            float(position.x() - corner.x()),
+        )
+        if _angle_in_ccw_sector(angle, start, delta):
+            inside += 1
+    return float(inside) / float(len(positions))
+
+
+def _sector_score_for_records(records, corner_info):
+    return _sector_score_for_positions(
+        [record["position"] for record in records],
+        corner_info,
+    )
+
+
+def _source_branch_lookup(source, corner_position):
+    number_attr = source.findPointAttrib("number")
+    points = list(source.points())
+    if not points:
+        return {}, [], 0
+    corner_index = min(
+        range(len(points)),
+        key=lambda index: points[index].position().distanceTo(corner_position),
+    )
+    by_number = {}
+    source_records = []
+    for index, point in enumerate(points):
+        if index < corner_index:
+            branch = 0
+        elif index > corner_index:
+            branch = 1
+        else:
+            branch = -1
+        number = int(point.attribValue(number_attr)) if number_attr is not None else point.number()
+        by_number.setdefault(number, branch)
+        source_records.append({"position": point.position(), "branch": branch})
+
+    source_segments = []
+    for index in range(1, len(points)):
+        if index <= corner_index:
+            branch = 0
+        elif index - 1 >= corner_index:
+            branch = 1
+        else:
+            branch = -1
+        source_segments.append({
+            "a": points[index - 1].position(),
+            "b": points[index].position(),
+            "branch": branch,
+        })
+    return by_number, source_segments, corner_index
+
+
+def _record_branch(record, by_number, source_segments):
+    if not source_segments:
+        branch = by_number.get(int(record["number"]))
+        return branch if branch in (0, 1) else -1
+
+    position = record["position"]
+    px = float(position[0])
+    pz = float(position[2])
+    best = None
+    for segment in source_segments:
+        a = segment["a"]
+        b = segment["b"]
+        ax, az = float(a[0]), float(a[2])
+        bx, bz = float(b[0]), float(b[2])
+        vx, vz = bx - ax, bz - az
+        length2 = vx * vx + vz * vz
+        if length2 <= EPS:
+            continue
+        amount = clamp(((px - ax) * vx + (pz - az) * vz) / length2, 0.0, 1.0)
+        qx = ax + vx * amount
+        qz = az + vz * amount
+        distance = ((px - qx) ** 2 + (pz - qz) ** 2) ** 0.5
+        if best is None or distance < best[0]:
+            best = (distance, segment["branch"])
+    if best is None:
+        return -1
+    return best[1] if best[1] in (0, 1) else -1
+
+
+def _split_sector_offset_records(records, source, corner_info):
+    if len(records) < 3 or corner_info is None:
+        return None
+    by_number, source_records, _ = _source_branch_lookup(
+        source, corner_info["corner_position"]
+    )
+    labels = [_record_branch(record, by_number, source_records) for record in records]
+    transitions = [
+        index for index in range(len(labels) - 1)
+        if labels[index] in (0, 1)
+        and labels[index + 1] in (0, 1)
+        and labels[index] != labels[index + 1]
+    ]
+    if not transitions:
+        return None
+    split_index = max(
+        transitions,
+        key=lambda index: _record_distance(records[index], records[index + 1]),
+    )
+    left = list(records[: split_index + 1])
+    right = list(records[split_index + 1 :])
+    if not left or not right:
+        return None
+    left_label = next((label for label in labels[: split_index + 1] if label in (0, 1)), -1)
+    right_label = next((label for label in labels[split_index + 1 :] if label in (0, 1)), -1)
+    corner_pos = (left[-1]["position"] + right[0]["position"]) * 0.5
+    corner_record = {
+        "position": corner_pos,
+        "number": -1,
+        "rest": corner_pos,
+    }
+    if left_label == 0 and right_label == 1:
+        return left + [corner_record], [corner_record] + right
+    if left_label == 1 and right_label == 0:
+        return list(reversed(right)) + [corner_record], [corner_record] + list(reversed(left))
+    return None
+
+
+def _surface_from_center_edge_records(center_records, edge_records, corner_id):
+    count = min(len(center_records), len(edge_records))
+    if count < 2:
+        return None
+
+    surface = hou.Geometry()
+    corner_attrib = surface.addAttrib(hou.attribType.Prim, "corner_id", -1)
+    source_attrib = surface.addAttrib(hou.attribType.Prim, "source_surface_prim", -1)
+    is_arc_attrib = surface.addAttrib(hou.attribType.Point, "is_arc", 0)
+
+    center_points = []
+    edge_points = []
+    for index in range(count):
+        center_point = surface.createPoint()
+        center_point.setPosition(center_records[index]["position"])
+        center_point.setAttribValue(is_arc_attrib, 0)
+        center_points.append(center_point)
+
+        edge_point = surface.createPoint()
+        edge_point.setPosition(edge_records[index]["position"])
+        edge_point.setAttribValue(is_arc_attrib, 0)
+        edge_points.append(edge_point)
+
+    surface_count = 0
+    for index in range(count - 1):
+        face_points = [
+            edge_points[index],
+            edge_points[index + 1],
+            center_points[index + 1],
+            center_points[index],
+        ]
+        if not polygon_span_ok(face_points):
+            continue
+        poly = surface.createPolygon()
+        poly.setIsClosed(True)
+        for point in face_points:
+            poly.addVertex(point)
+        poly.setAttribValue(corner_attrib, int(corner_id))
+        poly.setAttribValue(source_attrib, int(index))
+        surface_count += 1
+
+    if surface_count == 0:
+        return None
+    return surface
+
+
+def _direct_extrapolated_surface(source):
+    if source.findPrimAttrib("corner_position") is None or len(source.prims()) != 1:
+        return None
+    corner_info = _extract_corner_info(source)
+    if corner_info is None or corner_info["delta"] <= math.pi:
+        return None
+
+    verbs = hou.sopNodeTypeCategory().nodeVerbs()
+    if _offset_intersection_count(source, verbs) > 0:
+        return None
+
+    candidates = []
+    for sign in (1.0, -1.0):
+        edge_geo = _offset_copy(source, sign)
+        _flatten_y(edge_geo)
+        prims = list(edge_geo.prims())
+        if not prims:
+            continue
+        records = _prim_records(prims[0])
+        if len(records) < 2:
+            continue
+        length = sum(
+            _record_distance(records[index - 1], records[index])
+            for index in range(1, len(records))
+        )
+        candidates.append((
+            _sector_score_for_records(records, corner_info),
+            length,
+            records,
+        ))
+
+    if not candidates:
+        return None
+    score, _, edge_records = max(candidates, key=lambda item: (item[0], item[1]))
+    if score <= 0.5:
+        return None
+
+    return _surface_from_center_edge_records(
+        _prim_records(source.prims()[0]),
+        edge_records,
+        _source_corner_id(source),
+    )
+
+
+def _run_extract_pair_stitch(source, verbs):
+    if source.findPrimAttrib("corner_position") is None or len(source.prims()) != 1:
+        return None
+
+    corner_info = _extract_corner_info(source)
+    centre_segments = _centre_segments_xz(source)
+    outer = _offset_copy(source, 1.0)
+    inner = _offset_copy(source, -1.0)
+    merged = hou.Geometry()
+    verbs["merge"].execute(merged, [outer, inner])
+    _flatten_y(merged)
+    analysis_verb = verbs["intersectionanalysis"]
+    analysis_verb.setParms(
+        {
+            "useinputnumattrib": 1,
+            "useprimnumattrib": 1,
+            "useprimuvwattrib": 1,
+            "useptnumattrib": 1,
+        }
+    )
+    analysis = hou.Geometry()
+    analysis_verb.execute(analysis, [merged])
+    stitched = hou.Geometry()
+    verbs["intersectionstitch"].execute(stitched, [merged, None, analysis])
+
+    by_side = {-1: [], 1: []}
+    for prim in stitched.prims():
+        if not _valid_offset_prim(prim, source, centre_segments):
+            continue
+        stats = _offset_distance_stats(prim, source)
+        if stats is None or stats["dominant_side"] == 0:
+            continue
+        by_side[stats["dominant_side"]].append(_prim_records(prim))
+
+    if corner_info is not None and corner_info["delta"] <= math.pi:
+        scored = []
+        for fragments in by_side.values():
+            records = _chain_record_fragments(fragments)
+            if len(records) < 3:
+                continue
+            length = sum(
+                _record_distance(records[index - 1], records[index])
+                for index in range(1, len(records))
+            )
+            scored.append((
+                _sector_score_for_records(records, corner_info),
+                length,
+                records,
+            ))
+        scored = [item for item in scored if item[0] > 0.5]
+        if scored:
+            _, _, selected = max(scored, key=lambda item: (item[0], item[1]))
+            split_records = _split_sector_offset_records(
+                selected,
+                source,
+                corner_info,
+            )
+            if split_records is not None:
+                out = hou.Geometry()
+                _ensure_role_attribs(out)
+                corner_id = _source_corner_id(source)
+                for records in split_records:
+                    _create_record_polyline(out, records, "offset", corner_id)
+                _create_record_polyline(
+                    out, _prim_records(source.prims()[0]), "center", corner_id
+                )
+                return out
+
+    if not by_side[-1] or not by_side[1]:
+        return None
+
+    out = hou.Geometry()
+    _ensure_role_attribs(out)
+    corner_id = _source_corner_id(source)
+    for side in (-1, 1):
+        records = _chain_record_fragments(by_side[side])
+        _create_record_polyline(out, records, "offset", corner_id)
+    _create_record_polyline(out, _prim_records(source.prims()[0]), "center", corner_id)
+    return out
+
+
 def _prim_ends_xz(prim):
     points = prim.points()
     a = points[0].position()
@@ -1431,8 +2050,12 @@ def _ensure_role_attribs(geo):
 
 
 def _run_stitch(source):
-    centre_segments = _centre_segments_xz(source)
     verbs = hou.sopNodeTypeCategory().nodeVerbs()
+    extract_stitched = _run_extract_pair_stitch(source, verbs)
+    if extract_stitched is not None:
+        return extract_stitched
+
+    centre_segments = _centre_segments_xz(source)
     outer = _offset_copy(source, 1.0)
     inner = _offset_copy(source, -1.0)
     merged = hou.Geometry()
@@ -1453,7 +2076,7 @@ def _run_stitch(source):
     verbs["intersectionstitch"].execute(stitched, [merged, None, analysis])
     doomed = [
         prim for prim in stitched.prims()
-        if _prim_crosses_curve(prim, centre_segments)
+        if not _valid_offset_prim(prim, source, centre_segments)
     ]
     if doomed:
         stitched.deletePrims(doomed)
@@ -1495,6 +2118,21 @@ def _upward_vertices(vertices):
     return vertices if _polygon_normal_y(vertices) <= 0.0 else list(reversed(vertices))
 
 
+def _dedupe_ordered_vertices(vertices, tolerance=1.0e-6):
+    clean = []
+    for vertex in vertices:
+        position = vertex.point().position()
+        if clean and position.distanceTo(clean[-1].point().position()) <= tolerance:
+            continue
+        clean.append(vertex)
+    if len(clean) > 2:
+        first = clean[0].point().position()
+        last = clean[-1].point().position()
+        if first.distanceTo(last) <= tolerance:
+            clean.pop()
+    return clean
+
+
 def _surface_from_arc_output(arc_geo, corner_id):
     """Copy only the solver's closed road-surface faces into a clean geometry."""
     surface = hou.Geometry()
@@ -1526,12 +2164,12 @@ def _surface_from_arc_output(arc_geo, corner_id):
         return point
 
     for source_prim in road_group.prims():
-        vertices = list(source_prim.vertices())
+        vertices = _dedupe_ordered_vertices(_upward_vertices(list(source_prim.vertices())))
         if len(vertices) < 3:
             continue
         poly = surface.createPolygon()
         poly.setIsClosed(True)
-        for vertex in _upward_vertices(vertices):
+        for vertex in vertices:
             poly.addVertex(clone_point(vertex.point()))
         poly.setAttribValue(corner_attrib, int(corner_id))
         poly.setAttribValue(source_attrib, int(source_prim.number()))
@@ -1573,13 +2211,55 @@ def _copy_prims(source, keep):
     return geo
 
 
+def _is_extrapolated_stitch_input(source):
+    role_attrib = source.findPrimAttrib("line_role")
+    corner_attrib = source.findPrimAttrib("corner_id")
+    if role_attrib is None or corner_attrib is None:
+        return False
+    roles = {prim.attribValue(role_attrib) for prim in source.prims()}
+    return "offset" in roles and "center" in roles
+
+
+def _is_final_surface_input(source):
+    if source.findPrimAttrib("line_role") is not None:
+        return False
+    return (
+        source.findPrimAttrib("source_surface_prim") is not None
+        and source.findPrimAttrib("corner_id") is not None
+        and source.findPointAttrib("is_arc") is not None
+    )
+
+
+def _input_geometry_or_none(node, index):
+    inputs = node.inputs()
+    if index >= len(inputs) or inputs[index] is None:
+        return None
+    return node.inputGeometry(index)
+
+
 # -- Coordinator entry --
 def build():
     node = hou.pwd()
     out_geo = node.geometry()
     source = node.inputGeometry(0)
+    raw_source = _input_geometry_or_none(node, 1) or source
 
-    stitched = _run_stitch(source)
+    if _is_final_surface_input(source):
+        out_geo.clear()
+        out_geo.merge(source)
+        return
+
+    if _is_extrapolated_stitch_input(source):
+        stitched = hou.Geometry()
+        stitched.merge(source)
+    else:
+        direct_surface = _direct_extrapolated_surface(source)
+        if direct_surface is not None:
+            out_geo.clear()
+            out_geo.merge(direct_surface)
+            return
+
+        stitched = _run_stitch(source)
 
     out_geo.clear()
 
@@ -1599,9 +2279,9 @@ def build():
 
         arc_out = hou.Geometry()
         arc_out.merge(bundle)
-        _run_arc(arc_out, bundle, centre, node)
+        _run_arc(arc_out, bundle, centre, node, raw_source)
 
         out_geo.merge(_surface_from_arc_output(arc_out, corner_id))
 
-build()
-
+if globals().get("ROAD_CORNER_INTEGRATED_AUTOBUILD", True):
+    build()

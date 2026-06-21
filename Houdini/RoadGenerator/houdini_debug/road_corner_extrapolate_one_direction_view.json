@@ -1,0 +1,20 @@
+{
+  "schema": "houdini-debug-internal-screenshot",
+  "version": 1,
+  "target_node": "/obj/geo1/road_corner_extrapolate",
+  "frame": 59.0,
+  "output_path": "D:\\MyProject\\Houdini\\RoadGenerator\\Houdini\\RoadGenerator\\houdini_debug\\road_corner_extrapolate_one_direction_view.png",
+  "resolution": [
+    1600,
+    900
+  ],
+  "ok": true,
+  "capture_method": "SceneViewer.flipbook",
+  "warnings": [],
+  "errors": [
+    "GeometryViewport.saveViewToImage is not available."
+  ],
+  "scene_viewer": "panetab1",
+  "file_size": 64849,
+  "elapsed_seconds": 0.2077
+}

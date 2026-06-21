@@ -1,0 +1,398 @@
+{
+  "schema": "houdini-debug-problem-geometry-log",
+  "version": 1,
+  "target_node": "/obj/geo1/road_corner_integrated",
+  "frame": 59.0,
+  "generated_at_epoch": 1782046910.85462,
+  "elapsed_seconds": 0.0727,
+  "counts": {
+    "points": 54,
+    "vertices": 104,
+    "primitives": 26,
+    "point_attribs": 2,
+    "vertex_attribs": 0,
+    "primitive_attribs": 2,
+    "detail_attribs": 1
+  },
+  "node_messages": {
+    "errors": [],
+    "warnings": [
+      "Distance pins the two interface points. This distance is not an exact two-tangent circle for the current curves; see arc_tangent_dot0/1."
+    ],
+    "messages": []
+  },
+  "position_summary": {
+    "bad_position_count": 0,
+    "bad_position_samples": [],
+    "bbox": {
+      "min": [
+        -4.438879489898682,
+        0.0,
+        -4.764759063720703
+      ],
+      "max": [
+        10.966937065124512,
+        4.782343967235647e-05,
+        15.453173637390137
+      ]
+    }
+  },
+  "primitive_summary": {
+    "primitive_type_counts": {
+      "Polygon": 26
+    },
+    "degenerate_primitive_count": 0,
+    "degenerate_primitive_samples": [],
+    "zero_length_edge_count": 0,
+    "zero_length_edge_samples": [],
+    "nonmanifold_edge_count": 0,
+    "nonmanifold_edge_samples": [],
+    "boundary_edge_count": 54,
+    "boundary_edge_samples": [
+      {
+        "edge": [
+          0,
+          1
+        ]
+      },
+      {
+        "edge": [
+          2,
+          3
+        ]
+      },
+      {
+        "edge": [
+          0,
+          3
+        ]
+      },
+      {
+        "edge": [
+          1,
+          4
+        ]
+      },
+      {
+        "edge": [
+          2,
+          5
+        ]
+      },
+      {
+        "edge": [
+          4,
+          6
+        ]
+      },
+      {
+        "edge": [
+          5,
+          7
+        ]
+      },
+      {
+        "edge": [
+          6,
+          8
+        ]
+      },
+      {
+        "edge": [
+          7,
+          9
+        ]
+      },
+      {
+        "edge": [
+          8,
+          10
+        ]
+      },
+      {
+        "edge": [
+          9,
+          11
+        ]
+      },
+      {
+        "edge": [
+          10,
+          12
+        ]
+      },
+      {
+        "edge": [
+          11,
+          13
+        ]
+      },
+      {
+        "edge": [
+          12,
+          14
+        ]
+      },
+      {
+        "edge": [
+          13,
+          15
+        ]
+      },
+      {
+        "edge": [
+          14,
+          16
+        ]
+      },
+      {
+        "edge": [
+          15,
+          17
+        ]
+      },
+      {
+        "edge": [
+          16,
+          18
+        ]
+      },
+      {
+        "edge": [
+          17,
+          19
+        ]
+      },
+      {
+        "edge": [
+          18,
+          20
+        ]
+      },
+      {
+        "edge": [
+          19,
+          21
+        ]
+      },
+      {
+        "edge": [
+          20,
+          22
+        ]
+      },
+      {
+        "edge": [
+          21,
+          23
+        ]
+      },
+      {
+        "edge": [
+          22,
+          24
+        ]
+      },
+      {
+        "edge": [
+          23,
+          25
+        ]
+      },
+      {
+        "edge": [
+          24,
+          26
+        ]
+      },
+      {
+        "edge": [
+          25,
+          27
+        ]
+      },
+      {
+        "edge": [
+          27,
+          28
+        ]
+      },
+      {
+        "edge": [
+          26,
+          29
+        ]
+      },
+      {
+        "edge": [
+          29,
+          30
+        ]
+      },
+      {
+        "edge": [
+          28,
+          31
+        ]
+      },
+      {
+        "edge": [
+          30,
+          32
+        ]
+      },
+      {
+        "edge": [
+          31,
+          33
+        ]
+      },
+      {
+        "edge": [
+          32,
+          34
+        ]
+      },
+      {
+        "edge": [
+          33,
+          35
+        ]
+      },
+      {
+        "edge": [
+          34,
+          36
+        ]
+      },
+      {
+        "edge": [
+          35,
+          37
+        ]
+      },
+      {
+        "edge": [
+          36,
+          38
+        ]
+      },
+      {
+        "edge": [
+          37,
+          39
+        ]
+      },
+      {
+        "edge": [
+          38,
+          40
+        ]
+      },
+      {
+        "edge": [
+          39,
+          41
+        ]
+      },
+      {
+        "edge": [
+          40,
+          42
+        ]
+      },
+      {
+        "edge": [
+          41,
+          43
+        ]
+      },
+      {
+        "edge": [
+          42,
+          44
+        ]
+      },
+      {
+        "edge": [
+          43,
+          45
+        ]
+      },
+      {
+        "edge": [
+          44,
+          46
+        ]
+      },
+      {
+        "edge": [
+          45,
+          47
+        ]
+      },
+      {
+        "edge": [
+          46,
+          48
+        ]
+      },
+      {
+        "edge": [
+          47,
+          49
+        ]
+      },
+      {
+        "edge": [
+          48,
+          50
+        ]
+      },
+      {
+        "edge": [
+          49,
+          51
+        ]
+      },
+      {
+        "edge": [
+          50,
+          52
+        ]
+      },
+      {
+        "edge": [
+          52,
+          53
+        ]
+      },
+      {
+        "edge": [
+          51,
+          53
+        ]
+      }
+    ]
+  },
+  "duplicate_point_summary": {
+    "checked": true,
+    "duplicate_cluster_count": 0,
+    "duplicate_point_count": 0,
+    "samples": []
+  },
+  "attribute_summary": {
+    "bad_float_attribute_count": 0,
+    "samples": []
+  },
+  "parameters": {
+    "max_samples": 120,
+    "position_abs_limit": 1000000000.0,
+    "tiny_edge_eps": 1e-06,
+    "tiny_area_eps": 1e-10,
+    "check_duplicate_points": true,
+    "duplicate_point_eps": 0.0,
+    "duplicate_point_scan_limit": 250000
+  },
+  "severity": "ok"
+}
