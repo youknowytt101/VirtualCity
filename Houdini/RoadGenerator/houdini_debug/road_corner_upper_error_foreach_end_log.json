@@ -1,0 +1,552 @@
+{
+  "schema": "houdini-debug-problem-geometry-log",
+  "version": 1,
+  "target_node": "/obj/geo1/foreach_end1",
+  "frame": 59.0,
+  "generated_at_epoch": 1782061548.8128953,
+  "elapsed_seconds": 0.2174,
+  "counts": {
+    "points": 86,
+    "vertices": 168,
+    "primitives": 42,
+    "point_attribs": 2,
+    "vertex_attribs": 0,
+    "primitive_attribs": 2,
+    "detail_attribs": 1
+  },
+  "node_messages": {
+    "errors": [],
+    "warnings": [],
+    "messages": []
+  },
+  "position_summary": {
+    "bad_position_count": 0,
+    "bad_position_samples": [],
+    "bbox": {
+      "min": [
+        -16.157299041748047,
+        0.0,
+        -3.9237236976623535
+      ],
+      "max": [
+        5.330254554748535,
+        4.782343967235647e-05,
+        15.13532543182373
+      ]
+    }
+  },
+  "primitive_summary": {
+    "primitive_type_counts": {
+      "Polygon": 42
+    },
+    "degenerate_primitive_count": 0,
+    "degenerate_primitive_samples": [],
+    "zero_length_edge_count": 0,
+    "zero_length_edge_samples": [],
+    "nonmanifold_edge_count": 0,
+    "nonmanifold_edge_samples": [],
+    "boundary_edge_count": 86,
+    "boundary_edge_samples": [
+      {
+        "edge": [
+          0,
+          1
+        ]
+      },
+      {
+        "edge": [
+          2,
+          3
+        ]
+      },
+      {
+        "edge": [
+          0,
+          3
+        ]
+      },
+      {
+        "edge": [
+          1,
+          4
+        ]
+      },
+      {
+        "edge": [
+          2,
+          5
+        ]
+      },
+      {
+        "edge": [
+          4,
+          6
+        ]
+      },
+      {
+        "edge": [
+          5,
+          7
+        ]
+      },
+      {
+        "edge": [
+          6,
+          8
+        ]
+      },
+      {
+        "edge": [
+          7,
+          9
+        ]
+      },
+      {
+        "edge": [
+          8,
+          10
+        ]
+      },
+      {
+        "edge": [
+          9,
+          11
+        ]
+      },
+      {
+        "edge": [
+          10,
+          12
+        ]
+      },
+      {
+        "edge": [
+          11,
+          13
+        ]
+      },
+      {
+        "edge": [
+          12,
+          14
+        ]
+      },
+      {
+        "edge": [
+          13,
+          15
+        ]
+      },
+      {
+        "edge": [
+          14,
+          16
+        ]
+      },
+      {
+        "edge": [
+          15,
+          17
+        ]
+      },
+      {
+        "edge": [
+          16,
+          18
+        ]
+      },
+      {
+        "edge": [
+          17,
+          19
+        ]
+      },
+      {
+        "edge": [
+          18,
+          20
+        ]
+      },
+      {
+        "edge": [
+          19,
+          21
+        ]
+      },
+      {
+        "edge": [
+          20,
+          22
+        ]
+      },
+      {
+        "edge": [
+          21,
+          23
+        ]
+      },
+      {
+        "edge": [
+          22,
+          24
+        ]
+      },
+      {
+        "edge": [
+          23,
+          25
+        ]
+      },
+      {
+        "edge": [
+          24,
+          26
+        ]
+      },
+      {
+        "edge": [
+          25,
+          27
+        ]
+      },
+      {
+        "edge": [
+          26,
+          28
+        ]
+      },
+      {
+        "edge": [
+          27,
+          29
+        ]
+      },
+      {
+        "edge": [
+          28,
+          30
+        ]
+      },
+      {
+        "edge": [
+          29,
+          31
+        ]
+      },
+      {
+        "edge": [
+          30,
+          32
+        ]
+      },
+      {
+        "edge": [
+          31,
+          33
+        ]
+      },
+      {
+        "edge": [
+          32,
+          34
+        ]
+      },
+      {
+        "edge": [
+          33,
+          35
+        ]
+      },
+      {
+        "edge": [
+          34,
+          36
+        ]
+      },
+      {
+        "edge": [
+          35,
+          37
+        ]
+      },
+      {
+        "edge": [
+          36,
+          38
+        ]
+      },
+      {
+        "edge": [
+          37,
+          39
+        ]
+      },
+      {
+        "edge": [
+          38,
+          40
+        ]
+      },
+      {
+        "edge": [
+          39,
+          41
+        ]
+      },
+      {
+        "edge": [
+          40,
+          42
+        ]
+      },
+      {
+        "edge": [
+          41,
+          43
+        ]
+      },
+      {
+        "edge": [
+          42,
+          44
+        ]
+      },
+      {
+        "edge": [
+          43,
+          45
+        ]
+      },
+      {
+        "edge": [
+          44,
+          46
+        ]
+      },
+      {
+        "edge": [
+          45,
+          47
+        ]
+      },
+      {
+        "edge": [
+          46,
+          48
+        ]
+      },
+      {
+        "edge": [
+          47,
+          49
+        ]
+      },
+      {
+        "edge": [
+          48,
+          50
+        ]
+      },
+      {
+        "edge": [
+          49,
+          51
+        ]
+      },
+      {
+        "edge": [
+          50,
+          52
+        ]
+      },
+      {
+        "edge": [
+          51,
+          53
+        ]
+      },
+      {
+        "edge": [
+          52,
+          54
+        ]
+      },
+      {
+        "edge": [
+          53,
+          55
+        ]
+      },
+      {
+        "edge": [
+          54,
+          56
+        ]
+      },
+      {
+        "edge": [
+          55,
+          57
+        ]
+      },
+      {
+        "edge": [
+          56,
+          58
+        ]
+      },
+      {
+        "edge": [
+          57,
+          59
+        ]
+      },
+      {
+        "edge": [
+          58,
+          60
+        ]
+      },
+      {
+        "edge": [
+          59,
+          61
+        ]
+      },
+      {
+        "edge": [
+          60,
+          62
+        ]
+      },
+      {
+        "edge": [
+          61,
+          63
+        ]
+      },
+      {
+        "edge": [
+          62,
+          64
+        ]
+      },
+      {
+        "edge": [
+          63,
+          65
+        ]
+      },
+      {
+        "edge": [
+          64,
+          66
+        ]
+      },
+      {
+        "edge": [
+          65,
+          67
+        ]
+      },
+      {
+        "edge": [
+          66,
+          68
+        ]
+      },
+      {
+        "edge": [
+          67,
+          69
+        ]
+      },
+      {
+        "edge": [
+          68,
+          70
+        ]
+      },
+      {
+        "edge": [
+          69,
+          71
+        ]
+      },
+      {
+        "edge": [
+          70,
+          72
+        ]
+      },
+      {
+        "edge": [
+          71,
+          73
+        ]
+      },
+      {
+        "edge": [
+          72,
+          74
+        ]
+      },
+      {
+        "edge": [
+          73,
+          75
+        ]
+      },
+      {
+        "edge": [
+          74,
+          76
+        ]
+      },
+      {
+        "edge": [
+          75,
+          77
+        ]
+      },
+      {
+        "edge": [
+          76,
+          78
+        ]
+      },
+      {
+        "edge": [
+          77,
+          79
+        ]
+      },
+      {
+        "edge": [
+          78,
+          80
+        ]
+      }
+    ]
+  },
+  "duplicate_point_summary": {
+    "checked": true,
+    "duplicate_cluster_count": 0,
+    "duplicate_point_count": 0,
+    "samples": []
+  },
+  "attribute_summary": {
+    "bad_float_attribute_count": 0,
+    "samples": []
+  },
+  "parameters": {
+    "max_samples": 80,
+    "position_abs_limit": 1000000000.0,
+    "tiny_edge_eps": 1e-06,
+    "tiny_area_eps": 1e-10,
+    "check_duplicate_points": true,
+    "duplicate_point_eps": 0.0,
+    "duplicate_point_scan_limit": 250000
+  },
+  "severity": "ok"
+}
