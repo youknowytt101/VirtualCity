@@ -16,6 +16,14 @@ var mapReady = false;
 var rectToolArmed = false;
 var rectDragging = false;
 var rectStart = null;
+var activeWorkspaceId = 'news';
+var WORKSPACE_KINDS = {
+  news: 'earth',
+  'city-preview': 'earth',
+  neighborhood: 'earth',
+  game: 'game',
+  houdini: 'houdini'
+};
 
 var VECTOR_STYLE_URL = '/area-picker/basemap-style.json?v=' + window.VC_CONFIG.version;
 var OSM_RASTER_STYLE = {
@@ -1035,10 +1043,12 @@ function darkenWaterLayers() {
 function applyGlobeProjection() {
   if (map.setProjection) map.setProjection({ type: 'globe' });
   if (map.setSky) {
+    // 大气改用自定义 3D 半透明球壳层（atmosphere-shell custom layer）实现，
+    // 原生 setSky 大气在本项目里观感像"地球高光"，这里关掉。
     map.setSky({
-      'sky-color': '#1f1e1d',
-      'horizon-color': '#1f1e1d',
-      'fog-color': '#1f1e1d',
+      'sky-color': '#05070d',
+      'horizon-color': '#05070d',
+      'fog-color': '#05070d',
       'sky-horizon-blend': 0.0,
       'horizon-fog-blend': 0.0,
       'fog-ground-blend': 0.0,
@@ -1047,19 +1057,6 @@ function applyGlobeProjection() {
   }
 }
 
-function setupSpacePreview() {
-  if (!window.VirtualCityOrbitPreview || typeof window.VirtualCityOrbitPreview.mount !== 'function') {
-    console.warn('Orbit preview module unavailable.');
-    return;
-  }
-  window.VirtualCityOrbitPreview.mount(map, {
-    feedUrl: '/orbit-tle?groups=stations,visual',
-    satellite: window.satellite,
-    maxBodies: 30,
-    timeScale: 80
-  });
-}
-setupSpacePreview();
 map.on('load', function() {
   setupMapLayers();
   mapReady = true;
@@ -1071,7 +1068,6 @@ map.on('load', function() {
   scheduleGridLoad();
   cameraController.start();
   cameraController.setupViewToggle();
-  setupSpacePreview();
   requestAnimationFrame(function() {
     var el = document.getElementById('map');
     if (el) el.classList.add('map-ready');
@@ -1831,6 +1827,54 @@ function setupViewToggle() {
 function syncViewToggle() {
   cameraController.syncViewToggle();
 }
+
+function updateWorkspaceButtons(workspaceId) {
+  var buttons = document.querySelectorAll('[data-workspace-target]');
+  Array.prototype.forEach.call(buttons, function(button) {
+    var active = button.dataset.workspaceTarget === workspaceId;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+
+function setWorkspace(id) {
+  var nextWorkspace = WORKSPACE_KINDS[id] ? id : 'houdini';
+  var workspaceKind = WORKSPACE_KINDS[nextWorkspace];
+  activeWorkspaceId = nextWorkspace;
+  var workspace = document.getElementById('workspace');
+  var mapShell = document.getElementById('map-shell');
+  var actionPanel = document.getElementById('action-panel');
+  var gameWorkbench = document.getElementById('game-workbench');
+  var isHoudini = workspaceKind === 'houdini';
+  var showsMap = workspaceKind !== 'game';
+  if (workspace) workspace.dataset.workspaceKind = workspaceKind;
+  if (mapShell) mapShell.hidden = !showsMap;
+  if (actionPanel) actionPanel.hidden = !isHoudini;
+  if (gameWorkbench) gameWorkbench.hidden = workspaceKind !== 'game';
+  if (!isHoudini) {
+    setGridVisible(false);
+    setPointSelectActive(false);
+    if (rectangleToolActive()) disarmRectangleTool();
+  }
+  updateWorkspaceButtons(nextWorkspace);
+  if (showsMap) {
+    requestAnimationFrame(function() {
+      if (map && map.resize) map.resize();
+      if (isHoudini) scheduleGridLoad();
+      if (typeof scheduleDeckRefresh === 'function') scheduleDeckRefresh(true);
+    });
+  }
+}
+
+function bindWorkspaceSwitching() {
+  var buttons = document.querySelectorAll('[data-workspace-target]');
+  Array.prototype.forEach.call(buttons, function(button) {
+    button.addEventListener('click', function() {
+      setWorkspace(button.dataset.workspaceTarget);
+    });
+  });
+}
+
 var boundaryCache = {};
 var lastBoundaryFC = null;
 var requestedBoundaryKey = null;
@@ -2411,6 +2455,7 @@ function loadGrid() {
 }
 
 function scheduleGridLoad() {
+  if (activeWorkspaceId !== 'houdini') return;
   clearTimeout(gridTimer);
   gridTimer = setTimeout(loadGrid, 40);
 }
@@ -2427,8 +2472,10 @@ map.on('sourcedata', function(e) {
   if (e.sourceId === 'openmaptiles' && e.isSourceLoaded) scheduleDeckRefresh();
 });
 window.addEventListener('resize', function() {
+  if (WORKSPACE_KINDS[activeWorkspaceId] === 'game') return;
   map.resize();
-  scheduleGridLoad();
+  if (activeWorkspaceId === 'houdini') scheduleGridLoad();
+  if (typeof scheduleDeckRefresh === 'function') scheduleDeckRefresh(true);
 });
 
 var LOG_MAX_LINES = 800;
@@ -2702,4 +2749,6 @@ function exportFbx() {
 refreshServiceState();
 refreshDataSources();
 loadRegionNav();
+bindWorkspaceSwitching();
+setWorkspace(activeWorkspaceId);
 startPageSession();

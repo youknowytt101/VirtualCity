@@ -18,8 +18,7 @@ FRONTEND_ROOT = Path(area_picker.FRONTEND_ROOT)
 _PICKER_INDEX_HTML = area_picker._HTML
 _PICKER_STYLES = (FRONTEND_ROOT / "styles.css").read_text(encoding="utf-8")
 _PICKER_APP_JS = (FRONTEND_ROOT / "app.js").read_text(encoding="utf-8")
-_PICKER_ORBIT_JS = (FRONTEND_ROOT / "orbit-preview.js").read_text(encoding="utf-8")
-_PICKER_FRONTEND = "\n".join([_PICKER_INDEX_HTML, _PICKER_STYLES, _PICKER_APP_JS, _PICKER_ORBIT_JS])
+_PICKER_FRONTEND = "\n".join([_PICKER_INDEX_HTML, _PICKER_STYLES, _PICKER_APP_JS])
 
 
 class TestProgressView(unittest.TestCase):
@@ -95,9 +94,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertTrue((FRONTEND_ROOT / "index.html").exists())
         self.assertTrue((FRONTEND_ROOT / "styles.css").exists())
         self.assertTrue((FRONTEND_ROOT / "app.js").exists())
-        self.assertTrue((FRONTEND_ROOT / "orbit-preview.js").exists())
         self.assertIn('/area-picker/styles.css?v=__VERSION__', _PICKER_INDEX_HTML)
-        self.assertIn('/area-picker/orbit-preview.js?v=__VERSION__', _PICKER_INDEX_HTML)
         self.assertIn('/area-picker/app.js?v=__VERSION__', _PICKER_INDEX_HTML)
         self.assertIn("window.VC_CONFIG", _PICKER_INDEX_HTML)
         self.assertNotIn("<style>", _PICKER_INDEX_HTML)
@@ -143,12 +140,6 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('/static/maplibre/maplibre-gl.css', _PICKER_FRONTEND)
         self.assertIn('/static/maplibre/maplibre-gl.js', _PICKER_FRONTEND)
         self.assertIn('/static/deckgl/deck.gl.min.js', _PICKER_FRONTEND)
-        self.assertIn('/static/satellitejs/satellite.min.js', _PICKER_FRONTEND)
-        self.assertIn('window.VirtualCityOrbitPreview', _PICKER_FRONTEND)
-        self.assertNotIn("planetFeedUrl: '/planet-ephemeris'", _PICKER_APP_JS)
-        self.assertIn("var showPlanets = options.showPlanets === true;", _PICKER_ORBIT_JS)
-        self.assertIn("if (showPlanets) loadPlanetData();", _PICKER_ORBIT_JS)
-        self.assertIn("timeScale: 80", _PICKER_FRONTEND)
         self.assertNotIn('/static/leaflet/leaflet.js', _PICKER_FRONTEND)
         self.assertNotIn('/static/leaflet-draw/leaflet.draw.js', _PICKER_FRONTEND)
         self.assertNotIn('unpkg.com/leaflet', _PICKER_FRONTEND)
@@ -266,6 +257,43 @@ class TestPickerHtml(unittest.TestCase):
         self.assertNotIn("right: 18px;", _PICKER_FRONTEND)
         self.assertNotIn("top: 18px;", _PICKER_FRONTEND)
         self.assertNotIn("max-height: calc(100% - 36px);", _PICKER_FRONTEND)
+
+    def test_workspace_switcher_has_mode_hooks(self):
+        self.assertIn('data-workspace-target="city-preview"', _PICKER_FRONTEND)
+        self.assertIn('data-workspace-target="news"', _PICKER_FRONTEND)
+        self.assertIn('data-workspace-target="neighborhood"', _PICKER_FRONTEND)
+        self.assertIn('data-workspace-target="game"', _PICKER_FRONTEND)
+        self.assertIn('data-workspace-target="houdini"', _PICKER_FRONTEND)
+        self.assertIn('id="game-workbench"', _PICKER_FRONTEND)
+        self.assertIn('data-workspace-kind', _PICKER_FRONTEND)
+        self.assertIn('#workspace[data-workspace-kind="earth"] #map-shell', _PICKER_FRONTEND)
+        self.assertIn('grid-column: 2 / 4;', _PICKER_FRONTEND)
+        self.assertIn('#action-panel[hidden]', _PICKER_FRONTEND)
+        self.assertIn('var WORKSPACE_KINDS = {', _PICKER_FRONTEND)
+        self.assertIn('function setWorkspace(id)', _PICKER_FRONTEND)
+        self.assertIn('function bindWorkspaceSwitching()', _PICKER_FRONTEND)
+        self.assertIn("map.resize();", _PICKER_FRONTEND)
+
+    def test_map_controls_are_repositioned(self):
+        self.assertIn('#map #selection-tools {', _PICKER_FRONTEND)
+        self.assertIn('#map #basemap-control {', _PICKER_FRONTEND)
+        self.assertIn('right: 14px;', _PICKER_FRONTEND)
+        self.assertIn('top: 14px;', _PICKER_FRONTEND)
+
+    def test_grid_tools_are_houdini_only(self):
+        self.assertIn('#workspace:not([data-workspace-kind="houdini"]) #selection-tools', _PICKER_FRONTEND)
+        self.assertIn("if (activeWorkspaceId !== 'houdini') return;", _PICKER_APP_JS)
+        self.assertIn('setGridVisible(false);', _PICKER_APP_JS)
+        self.assertIn('setPointSelectActive(false);', _PICKER_APP_JS)
+
+    def test_workspace_menu_order_and_default_page(self):
+        menu_labels = ["实时新闻", "城市预览", "我的街区", "我的游戏", "Houdini", "DCCbridge"]
+        positions = [_PICKER_INDEX_HTML.index(label) for label in menu_labels]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn('id="workspace" data-workspace-kind="earth"', _PICKER_INDEX_HTML)
+        self.assertIn('data-workspace-target="news" aria-pressed="true"', _PICKER_INDEX_HTML)
+        self.assertIn('id="action-panel" aria-label="执行操作面板" hidden', _PICKER_INDEX_HTML)
+        self.assertIn('var activeWorkspaceId = \'news\';', _PICKER_APP_JS)
 
     def test_houdini_status_lives_in_action_panel(self):
         self.assertIn('id="houdini-badge"', _PICKER_FRONTEND)
@@ -493,8 +521,8 @@ class TestSelectionMemory(unittest.TestCase):
 
 
 class TestRootLauncher(unittest.TestCase):
-    def test_root_launcher_starts_picker_with_page_lifecycle_shutdown(self):
-        launcher = ROOT / "启动VirtualCity操作台.cmd"
+    def test_root_launcher_starts_native_desktop_window(self):
+        launcher = ROOT / "启动WorldBuilder.cmd"
         self.assertTrue(launcher.exists())
         source = launcher.read_text(encoding="utf-8")
         self.assertIn("launch_virtualcity_console.ps1", source)
@@ -502,15 +530,21 @@ class TestRootLauncher(unittest.TestCase):
         launch_script = ROOT / "Scripts" / "launch_virtualcity_console.ps1"
         self.assertTrue(launch_script.exists())
         launch_source = launch_script.read_text(encoding="utf-8")
-        self.assertIn("VC_AREA_PICKER_SHUTDOWN_WITH_PAGE=1", launch_source)
-        self.assertIn("VC_AREA_PICKER_NO_BROWSER=1", launch_source)
-        self.assertIn("http://127.0.0.1:$Port/", launch_source)
+        # 桌面外壳模型：启动器跑 desktop.py（pywebview 原生窗口 + 同进程内嵌服务），
+        # 不再开浏览器，也不再依赖网页心跳自杀（SHUTDOWN_WITH_PAGE）。
+        self.assertIn("desktop.py", launch_source)
+        self.assertNotIn("VC_AREA_PICKER_SHUTDOWN_WITH_PAGE", launch_source)
+        self.assertNotIn("url.dll,FileProtocolHandler", launch_source)
         self.assertIn("Test-AreaPickerReady", launch_source)
-        self.assertIn("Open-ConsoleUrl", launch_source)
-        self.assertIn("url.dll,FileProtocolHandler", launch_source)
+
+        desktop = ROOT / "Scripts" / "desktop.py"
+        self.assertTrue(desktop.exists())
+        desktop_source = desktop.read_text(encoding="utf-8")
+        self.assertIn("import webview", desktop_source)
+        self.assertIn("VC_AREA_PICKER_NO_BROWSER", desktop_source)
 
     def test_root_reset_shortcut_uses_reset_script(self):
-        shortcut = ROOT / "重置VirtualCity网页服务.cmd"
+        shortcut = ROOT / "重置WorldBuilder服务.cmd"
         self.assertTrue(shortcut.exists())
         source = shortcut.read_text(encoding="utf-8")
         self.assertIn("reset_virtualcity_servers.ps1", source)
@@ -521,14 +555,16 @@ class TestFrontendAssetVersion(unittest.TestCase):
     def test_version_changes_when_asset_content_changes(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            for name in ("app.js", "orbit-preview.js", "styles.css", "index.html"):
+            static_root = root / "_static"
+            static_root.mkdir(parents=True)
+            for name in ("app.js", "styles.css", "index.html"):
                 (root / name).write_text("v1", encoding="utf-8")
-            with patch.object(area_picker, "FRONTEND_ROOT", root):
+            with patch.object(area_picker, "FRONTEND_ROOT", root), patch.object(area_picker, "STATIC_ROOT", static_root):
                 first = area_picker._frontend_asset_version()
                 # 改动 app.js 内容（size 变化），版本串必须随之变化。
                 (root / "app.js").write_text("v2-longer-content", encoding="utf-8")
                 second = area_picker._frontend_asset_version()
-                (root / "orbit-preview.js").write_text("v3-longer-orbit-content", encoding="utf-8")
+                (root / "styles.css").write_text("v3-longer-styles-content", encoding="utf-8")
                 third = area_picker._frontend_asset_version()
         self.assertNotEqual(first, second)
         self.assertNotEqual(second, third)
@@ -536,9 +572,11 @@ class TestFrontendAssetVersion(unittest.TestCase):
     def test_version_is_stable_without_changes(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            for name in ("app.js", "orbit-preview.js", "styles.css", "index.html"):
+            static_root = root / "_static"
+            static_root.mkdir(parents=True)
+            for name in ("app.js", "styles.css", "index.html"):
                 (root / name).write_text("same", encoding="utf-8")
-            with patch.object(area_picker, "FRONTEND_ROOT", root):
+            with patch.object(area_picker, "FRONTEND_ROOT", root), patch.object(area_picker, "STATIC_ROOT", static_root):
                 self.assertEqual(
                     area_picker._frontend_asset_version(),
                     area_picker._frontend_asset_version(),
@@ -546,88 +584,8 @@ class TestFrontendAssetVersion(unittest.TestCase):
 
     def test_version_does_not_raise_on_missing_assets(self):
         with tempfile.TemporaryDirectory() as td:
-            with patch.object(area_picker, "FRONTEND_ROOT", Path(td)):
+            with patch.object(area_picker, "FRONTEND_ROOT", Path(td)), patch.object(area_picker, "STATIC_ROOT", Path(td) / "_static"):
                 self.assertIsInstance(area_picker._frontend_asset_version(), str)
-
-
-class TestOrbitDataFeeds(unittest.TestCase):
-    def test_horizons_vector_parser_reads_csv_rows(self):
-        result = """
-header
-$$SOE
-2461207.500000000, A.D. 2026-Jun-16 00:00:00.0000,  1.0E+00,  2.0E+00, -3.0E-02,  4.0E-03,  5.0E-03, -6.0E-04,
-$$EOE
-"""
-        rows = area_picker._parse_horizons_vectors(result)
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0]["jd"], 2461207.5)
-        self.assertEqual(rows[0]["x"], 1.0)
-        self.assertEqual(rows[0]["y"], 2.0)
-        self.assertEqual(rows[0]["z"], -0.03)
-        self.assertEqual(rows[0]["vx"], 0.004)
-
-    def test_planet_ephemeris_route_exists_in_handler(self):
-        source = Path(area_picker.__file__).read_text(encoding="utf-8")
-        self.assertIn("if parsed.path == '/planet-ephemeris':", source)
-        self.assertIn("_planet_ephemeris_payload()", source)
-        self.assertIn("'CENTER': center", source)
-        self.assertIn("'center': 'Sun (500@10)'", source)
-        self.assertIn("'earth': earth", source)
-        self.assertIn("PLANET_EPHEMERIS_FUTURE_DAYS = 220", source)
-
-    def test_orbit_preview_keeps_planets_disabled_by_default(self):
-        orbit_preview = (
-            Path(area_picker.__file__).parent
-            / "frontend"
-            / "orbit-preview.js"
-        ).read_text(encoding="utf-8")
-        self.assertIn("var showPlanets = options.showPlanets === true;", orbit_preview)
-        self.assertIn("var planetBodies = showPlanets ? createPlanetBodies() : [];", orbit_preview)
-        self.assertIn("if (showPlanets) loadPlanetData();", orbit_preview)
-        self.assertIn("if (showPlanets) {", orbit_preview)
-        self.assertIn("earthEphemeris", orbit_preview)
-        self.assertIn("solarScenePoint", orbit_preview)
-        self.assertIn("projectSolarPoint", orbit_preview)
-        self.assertIn("drawSolarOrbitLines", orbit_preview)
-        self.assertIn("drawSunGlyph", orbit_preview)
-        self.assertIn("heliocentric orbits", orbit_preview)
-        self.assertIn("sampleApproximateOrbitSceneAt", orbit_preview)
-        self.assertIn("osculatingOrbitPoints", orbit_preview)
-        self.assertIn("SOLAR_GM_AU3_PER_DAY2", orbit_preview)
-        self.assertIn("vx: Number(row.vx)", orbit_preview)
-        self.assertIn("var currentAnomaly = Math.atan2", orbit_preview)
-        self.assertIn("? r", orbit_preview)
-        self.assertIn("segmentOutsideViewport", orbit_preview)
-        self.assertIn("SOLAR_AU_TO_EARTH_RADIUS = 5.35", orbit_preview)
-        self.assertIn("return SOLAR_AU_TO_EARTH_RADIUS", orbit_preview)
-        self.assertIn("var sx = vector[0] - earthNow[0]", orbit_preview)
-        self.assertIn("DEFAULT_TIME_SCALE = 80", orbit_preview)
-        self.assertIn("function simulationDate", orbit_preview)
-        self.assertIn("function buildTrajectoryCache", orbit_preview)
-        self.assertIn("function deriveTrajectoryVelocities", orbit_preview)
-        self.assertIn("function hermiteTrajectoryFrame", orbit_preview)
-        self.assertIn("function interpolateTrajectoryAt", orbit_preview)
-        self.assertIn("directSampleSatelliteWorld", orbit_preview)
-        self.assertIn("trajectoryFrames", orbit_preview)
-        self.assertIn("velocity", orbit_preview)
-        self.assertIn("trailBuiltRealAt", orbit_preview)
-        self.assertIn("function tleCatalogKey", orbit_preview)
-        self.assertIn("seenCatalog[key]", orbit_preview)
-        self.assertLess(
-            orbit_preview.index("applyTleData(fallbackTle.join('\\n'), { source: 'fallback TLE', cached: true });"),
-            orbit_preview.index("fetch(feedUrl, { cache: 'no-store' })"),
-        )
-        self.assertNotIn("function compressSolarDistance", orbit_preview)
-        self.assertNotIn("var radius = 1.42 + compressed * 2.55 * scale", orbit_preview)
-        self.assertIn("var p = projectSolarPoint(geom, world)", orbit_preview)
-        self.assertIn("var p = projectSolarPoint(geom, reference.sunPoint)", orbit_preview)
-        self.assertIn("labelCtx.lineWidth = 1.1", orbit_preview)
-        self.assertIn("var lineAlpha = alpha * SOLAR_ORBIT_COLOR[3]", orbit_preview)
-        self.assertIn("setupSpacePreview();\nmap.on('load'", _PICKER_APP_JS.replace("\r\n", "\n"))
-        self.assertNotIn("PLANET_ORBIT_COLOR", orbit_preview)
-        self.assertNotIn("PLANET_TAIL_REBUILD_MS", orbit_preview)
-        self.assertNotIn("function buildPlanetTail", orbit_preview)
-        self.assertNotIn("function drawPlanetTail", orbit_preview)
 
 
 class TestHoudiniStatus(unittest.TestCase):

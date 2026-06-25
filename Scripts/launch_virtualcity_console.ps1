@@ -1,7 +1,6 @@
 param(
     [int]$Port = 8765,
-    [int]$StartupTimeoutSec = 25,
-    [switch]$NoOpen
+    [int]$StartupTimeoutSec = 25
 )
 
 $ErrorActionPreference = "Stop"
@@ -43,37 +42,14 @@ function Wait-AreaPickerReady {
     return $false
 }
 
-function Open-ConsoleUrl {
-    if ($NoOpen) {
-        return
-    }
-
-    try {
-        Start-Process -FilePath $Url
-        Write-LauncherLog "Opened browser with Start-Process: $Url"
-        return
-    }
-    catch {
-        Write-LauncherLog "Start-Process URL failed: $($_.Exception.Message)"
-    }
-
-    try {
-        $rundll = Join-Path $env:SystemRoot "System32\rundll32.exe"
-        Start-Process -FilePath $rundll -ArgumentList @("url.dll,FileProtocolHandler", $Url)
-        Write-LauncherLog "Opened browser with FileProtocolHandler: $Url"
-        return
-    }
-    catch {
-        Write-LauncherLog "FileProtocolHandler failed: $($_.Exception.Message)"
-        throw "VirtualCity console is ready, but Windows could not open the browser automatically. Open $Url manually."
-    }
-}
-
 function Start-AreaPickerHost {
     $uv = (Get-Command "uv.exe" -ErrorAction Stop).Source
     $cacheDir = Join-Path $Scripts ".uv-cache"
-    $command = 'set "VC_AREA_PICKER_SHUTDOWN_WITH_PAGE=1" && set "VC_AREA_PICKER_NO_BROWSER=1" && cd /d "{0}" && "{1}" --cache-dir "{2}" run python -u area_picker.py' -f $Scripts, $uv, $cacheDir
-    $proc = Start-Process -FilePath $env:ComSpec -ArgumentList @("/d", "/c", $command) -WorkingDirectory $Scripts -WindowStyle Minimized -PassThru
+    # desktop.py 用 pywebview 开原生窗口、同进程内嵌服务，关窗口即整体退出；
+    # 不再需要 SHUTDOWN_WITH_PAGE 心跳，也不再开浏览器（窗口由 desktop.py 自己弹出）。
+    # 直接以隐藏窗口启动 uv（不经 cmd /c），控制台不再露面；uv run 仍确保 .venv 同步。
+    $uvArgs = @("--cache-dir", $cacheDir, "run", "python", "-u", "desktop.py")
+    $proc = Start-Process -FilePath $uv -ArgumentList $uvArgs -WorkingDirectory $Scripts -WindowStyle Hidden -PassThru
     Write-LauncherLog "Started area_picker host pid=$($proc.Id)."
 }
 
@@ -87,8 +63,7 @@ try {
         throw "VirtualCity console did not become ready within $StartupTimeoutSec seconds."
     }
 
-    Write-LauncherLog "VirtualCity console ready: $Url"
-    Open-ConsoleUrl
+    Write-LauncherLog "VirtualCity console ready: $Url (native window opened by desktop.py)"
     exit 0
 }
 catch {

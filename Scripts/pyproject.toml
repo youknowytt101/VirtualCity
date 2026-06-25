@@ -8,6 +8,7 @@ dependencies = [
     "numpy>=1.26.0",
     "overturemaps>=1.0.0",
     "pillow>=10.0.0",
+    "pywebview>=5.0",
     "rasterio>=1.3.8",
     "rpyc==4.1.0",
     "shapely>=2.0.0",

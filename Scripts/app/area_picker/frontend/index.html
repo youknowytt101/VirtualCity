@@ -20,7 +20,7 @@
   </div>
   <div class="toolbar-cluster"></div>
 </div>
-<main id="workspace">
+<main id="workspace" data-workspace-kind="earth">
   <div id="map-shell">
     <div id="map">
       <div id="selection-tools" class="map-tool-control flat-panel flat-panel--row" aria-label="区域选择工具">
@@ -85,78 +85,61 @@
       </div>
     </section>
     <!-- /地点搜索组件 -->
-    <!-- 数据源组件：数据源概览 + 下载入口 + 道路/建筑/地形来源卡片 -->
-    <section class="panel-section data-source-section" id="data-source-section" aria-label="数据源">
-      <div class="section-row">
-        <div>
-          <div class="section-kicker">数据源</div>
-          <div id="source-status" class="section-note">选取区域预先下载地图数据加快Houdini自动管线构建速度</div>
-        </div>
-        <button id="download-btn" disabled onclick="downloadData()" class="source-action-btn">
-          <span class="btn-main">下载地图数据</span>
-        </button>
-      </div>
-      <div id="source-list" class="source-list">
-        <div class="source-card">
-          <div class="source-head">
-            <span class="source-title">道路</span>
+    <section class="panel-section tool-placeholder-section" id="tool-placeholder-section" aria-label="工具入口占位">
+      <div class="tool-placeholder-list flat-panel flat-panel--col">
+        <button type="button" class="tool-placeholder-btn flat-item active" data-workspace-target="news" aria-pressed="true" title="切换到实时新闻">实时新闻</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="city-preview" aria-pressed="false" title="切换到城市预览">城市预览</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="neighborhood" aria-pressed="false" title="切换到我的街区">我的街区</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到游戏工作台">我的游戏</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini</button>
+        <details class="dcc-bridge-panel flat-item">
+          <summary class="tool-placeholder-btn dcc-bridge-summary">DCCbridge</summary>
+          <div class="dcc-bridge-options" aria-label="DCCbridge 选项">
+            <div class="dcc-option-row">
+              <span class="dcc-toggle" aria-hidden="true"></span>
+              <span class="dcc-name">Blender <span class="dcc-version">(v1.0.1)</span></span>
+              <button type="button" class="dcc-install-btn" disabled>安装</button>
+            </div>
+            <div class="dcc-option-row">
+              <span class="dcc-toggle" aria-hidden="true"></span>
+              <span class="dcc-name">3ds Max <span class="dcc-version">(v1.0.0)</span></span>
+              <button type="button" class="dcc-install-btn" disabled>安装</button>
+            </div>
+            <div class="dcc-option-row">
+              <span class="dcc-toggle" aria-hidden="true"></span>
+              <span class="dcc-name">Unity <span class="dcc-version">(v1.0.0)</span></span>
+              <button type="button" class="dcc-install-btn" disabled>安装</button>
+            </div>
+            <div class="dcc-option-row">
+              <span class="dcc-toggle" aria-hidden="true"></span>
+              <span class="dcc-name">Unreal <span class="dcc-version">(v1.0.4)</span></span>
+              <button type="button" class="dcc-install-btn" disabled>安装</button>
+            </div>
+            <div class="dcc-option-row">
+              <span class="dcc-toggle" aria-hidden="true"></span>
+              <span class="dcc-name">Maya <span class="dcc-version">(v1.0.0)</span></span>
+              <button type="button" class="dcc-install-btn" disabled>安装</button>
+            </div>
+            <div class="dcc-option-row">
+              <span class="dcc-toggle" aria-hidden="true"></span>
+              <span class="dcc-name">Cocos <span class="dcc-version">(v1.0.0)</span></span>
+              <button type="button" class="dcc-install-btn" disabled>安装</button>
+            </div>
+            <div class="dcc-option-row">
+              <span class="dcc-toggle" aria-hidden="true"></span>
+              <span class="dcc-name">Godot <span class="dcc-version">(v1.0.0)</span></span>
+              <button type="button" class="dcc-install-btn" disabled>安装</button>
+            </div>
+            <div class="dcc-option-row">
+              <span class="dcc-toggle" aria-hidden="true"></span>
+              <span class="dcc-name">ZBrush <span class="dcc-version">(v1.0.0)</span></span>
+              <button type="button" class="dcc-install-btn" disabled>安装</button>
+            </div>
           </div>
-          <div class="source-provider">数据源：OpenStreetMap</div>
-          <div class="source-detail">策略：本地缓存优先，缺失时通过 Overpass API 获取 OSM highway ways</div>
-        </div>
-        <div class="source-card">
-          <div class="source-head">
-            <span class="source-title">建筑</span>
-          </div>
-          <div class="source-provider">数据源：Overture Maps + Google Open Buildings</div>
-          <div class="source-detail">策略：本地缓存优先，缺失时用 Overture 轮廓并用 Google 高度补全</div>
-        </div>
-        <div class="source-card">
-          <div class="source-head">
-            <span class="source-title">地形</span>
-          </div>
-          <div class="source-provider">数据源：FABDEM / NASADEM</div>
-          <div class="source-detail">策略：FABDEM DTM 优先，本地缓存命中直接恢复，失败时 NASADEM 兜底</div>
-        </div>
-      </div>
-    </section>
-    <!-- /数据源组件 -->
-    <!-- 运行监控组件：执行状态进度 + 多标签控制台日志，作为一套整体 -->
-    <section class="panel-section run-monitor" id="run-monitor" aria-label="运行监控">
-      <div id="run-status-panel" class="run-status-panel status-warn">
-        <div class="run-status-head">
-          <div id="run-status-title" class="run-state">等待选择区域</div>
-          <div id="run-status-pct" class="run-pct">0%</div>
-        </div>
-        <div class="run-progress-track" aria-label="执行进度">
-          <div id="run-status-bar" class="run-progress-bar"></div>
-        </div>
-        <div id="run-status-phase" class="run-status-phase" hidden></div>
-        <div id="run-stage-list" class="run-stage-list" role="list" aria-label="管线阶段进度"></div>
-        <div id="run-status-detail" class="run-status-detail">尚未启动任务</div>
-        <div id="failure-summary" class="failure-summary" hidden>
-          <div class="failure-row reason">
-            <span class="failure-key">原因</span>
-            <span id="failure-reason" class="failure-value">--</span>
-          </div>
-          <div class="failure-row report">
-            <span class="failure-key">报告</span>
-            <span id="failure-report" class="failure-value">--</span>
-          </div>
-          <div class="failure-row metrics">
-            <span class="failure-key">指标</span>
-            <span id="failure-metrics" class="failure-value">--</span>
-          </div>
-        </div>
-        <!-- 控制台：执行日志完整视图，归属运行监控组件，置于执行状态卡片底部 -->
-        <div id="console-dock">
-          <div id="log-panels-container">
-            <div id="log-panel-all" class="log-panel">等待选择网格...</div>
-          </div>
-        </div>
+        </details>
       </div>
     </section>
-    <!-- /运行监控组件 -->
+    <!-- 运行监控组件已移至右侧 action-panel 底部 -->
     <!-- 底部占位组件：账户/入口占位，待接入 -->
     <section class="panel-section panel-footer" id="panel-footer" aria-label="账户占位">
       <div class="account-card">
@@ -183,13 +166,62 @@
       </div>
     </section>
   </aside>
-  <aside id="action-panel" aria-label="执行操作面板">
+  <section id="game-workbench" class="workspace-page" data-workspace-panel="game" aria-label="游戏工作台" hidden>
+    <div class="workbench-shell">
+      <div class="workbench-head">
+        <div>
+          <div class="section-kicker">CompositionPipeline</div>
+          <div class="section-note">游戏工作台挂载点</div>
+        </div>
+      </div>
+      <div id="composition-workbench-host" class="workbench-host" aria-label="CompositionPipeline 工作台"></div>
+    </div>
+  </section>
+  <aside id="action-panel" aria-label="执行操作面板" hidden>
     <div class="action-panel-head">
       <div>
         <div class="section-kicker">工作流</div>
         <div class="section-note">当前框选区域</div>
       </div>
     </div>
+    <section class="action-module" aria-label="数据源">
+      <!-- 数据源组件：数据源概览 + 下载入口 + 道路/建筑/地形来源卡片 -->
+      <section class="data-source-section" id="data-source-section" aria-label="数据源">
+        <div class="section-row">
+          <div>
+            <div class="section-kicker">数据源</div>
+            <div id="source-status" class="section-note">选取区域预先下载地图数据加快Houdini自动管线构建速度</div>
+          </div>
+          <button id="download-btn" disabled onclick="downloadData()" class="source-action-btn">
+            <span class="btn-main">下载地图数据</span>
+          </button>
+        </div>
+        <div id="source-list" class="source-list">
+          <div class="source-card">
+            <div class="source-head">
+              <span class="source-title">道路</span>
+            </div>
+            <div class="source-provider">数据源：OpenStreetMap</div>
+            <div class="source-detail">策略：本地缓存优先，缺失时通过 Overpass API 获取 OSM highway ways</div>
+          </div>
+          <div class="source-card">
+            <div class="source-head">
+              <span class="source-title">建筑</span>
+            </div>
+            <div class="source-provider">数据源：Overture Maps + Google Open Buildings</div>
+            <div class="source-detail">策略：本地缓存优先，缺失时用 Overture 轮廓并用 Google 高度补全</div>
+          </div>
+          <div class="source-card">
+            <div class="source-head">
+              <span class="source-title">地形</span>
+            </div>
+            <div class="source-provider">数据源：FABDEM / NASADEM</div>
+            <div class="source-detail">策略：FABDEM DTM 优先，本地缓存命中直接恢复，失败时 NASADEM 兜底</div>
+          </div>
+        </div>
+      </section>
+      <!-- /数据源组件 -->
+    </section>
     <section class="action-module" aria-label="数据处理">
       <div class="action-module-head">
         <div class="action-module-title">数据可视化预览</div>
@@ -247,13 +279,47 @@
         </button>
       </div>
     </section>
+    <!-- 运行监控组件：执行状态进度 + 多标签控制台日志，作为一套整体 -->
+    <section class="action-module run-monitor" id="run-monitor" aria-label="运行监控">
+      <div id="run-status-panel" class="run-status-panel status-warn">
+        <div class="run-status-head">
+          <div id="run-status-title" class="run-state">等待选择区域</div>
+          <div id="run-status-pct" class="run-pct">0%</div>
+        </div>
+        <div class="run-progress-track" aria-label="执行进度">
+          <div id="run-status-bar" class="run-progress-bar"></div>
+        </div>
+        <div id="run-status-phase" class="run-status-phase" hidden></div>
+        <div id="run-stage-list" class="run-stage-list" role="list" aria-label="管线阶段进度"></div>
+        <div id="run-status-detail" class="run-status-detail">尚未启动任务</div>
+        <div id="failure-summary" class="failure-summary" hidden>
+          <div class="failure-row reason">
+            <span class="failure-key">原因</span>
+            <span id="failure-reason" class="failure-value">--</span>
+          </div>
+          <div class="failure-row report">
+            <span class="failure-key">报告</span>
+            <span id="failure-report" class="failure-value">--</span>
+          </div>
+          <div class="failure-row metrics">
+            <span class="failure-key">指标</span>
+            <span id="failure-metrics" class="failure-value">--</span>
+          </div>
+        </div>
+        <!-- 控制台：执行日志完整视图，归属运行监控组件，置于执行状态卡片底部 -->
+        <div id="console-dock">
+          <div id="log-panels-container">
+            <div id="log-panel-all" class="log-panel">等待选择网格...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /运行监控组件 -->
   </aside>
 </main>
 
 <script src="/static/maplibre/maplibre-gl.js"></script>
 <script src="/static/deckgl/deck.gl.min.js"></script>
-<script src="/static/satellitejs/satellite.min.js"></script>
-<script src="/area-picker/orbit-preview.js?v=__VERSION__"></script>
 <script>
 window.VC_CONFIG = {
   lat: __LAT__,

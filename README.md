@@ -1,6 +1,6 @@
-# VirtualCity
+# WorldBuilder
 
-VirtualCity is a local pipeline for building a top-down virtual city from real
+WorldBuilder is a local pipeline for building a top-down virtual city from real
 map data. The current product surface is the local area picker / control room,
 but the core project is the reproducible asset pipeline:
 

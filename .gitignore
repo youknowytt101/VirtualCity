@@ -110,6 +110,9 @@ Scripts/.uv-cache/
 
 # ===== 编辑器 =====
 .vscode/
+.cursor/
+.claude/
+_codex_state.md
 *.swp
 *.swo
 *~
@@ -121,3 +124,5 @@ Scripts/.uv-cache/
 # Houdini/Hip/*.hip - Hip 工程文件
 # 项目管理/ - 所有项目文档
 # Config/ - 所有配置文件
+
+Scripts/icons/_preview.png

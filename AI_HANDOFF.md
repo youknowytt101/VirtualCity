@@ -1,4 +1,4 @@
-# VirtualCity AI / Human Handoff
+# WorldBuilder AI / Human Handoff
 
 Last updated: 2026-06-24
 

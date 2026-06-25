@@ -105,6 +105,43 @@ button, input { font: inherit; }
   min-height: 0;
   overflow: hidden;
 }
+#map-shell[hidden],
+#action-panel[hidden] {
+  display: none;
+}
+#workspace[data-workspace-kind="earth"] #map-shell {
+  grid-column: 2 / 4;
+  grid-row: 1;
+}
+.workspace-page {
+  grid-column: 2 / 4;
+  grid-row: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  background: var(--base);
+}
+.workspace-page[hidden] {
+  display: none;
+}
+.workbench-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+.workbench-head {
+  flex: 0 0 auto;
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.workbench-host {
+  flex: 1 1 auto;
+  min-height: 0;
+  background: color-mix(in srgb, var(--text) 3%, var(--base));
+}
 #map {
   width: 100%;
   height: 100%;
@@ -115,19 +152,6 @@ button, input { font: inherit; }
 }
 #map.map-ready {
   opacity: 1;
-}
-.space-preview-canvas,
-.space-label-canvas {
-  position: absolute;
-  inset: 0;
-  z-index: 430;
-  pointer-events: none;
-}
-.space-preview-canvas {
-  mix-blend-mode: screen;
-}
-.space-label-canvas {
-  mix-blend-mode: normal;
 }
 .maplibregl-canvas {
   background: var(--base);
@@ -141,7 +165,15 @@ button, input { font: inherit; }
 #map #basemap-control {
   left: 14px;
   right: auto;
-  top: calc(14px + 38px + 10px);
+  top: 14px;
+}
+#map #selection-tools {
+  left: auto;
+  right: 14px;
+  top: 14px;
+}
+#workspace:not([data-workspace-kind="houdini"]) #selection-tools {
+  display: none;
 }
 .basemap-segment {
   padding: 3px;
@@ -561,7 +593,7 @@ button, input { font: inherit; }
 
 /* ============================================================
    运行监控组件 (#run-monitor)：执行状态进度 + 多标签控制台日志
-   归属左栏 control-panel，整体作为一套组件维护
+   归属右栏 action-panel，整体作为一套组件维护
    ============================================================ */
 #run-monitor.run-monitor {
   display: flex;
@@ -575,6 +607,7 @@ button, input { font: inherit; }
 }
 .panel-footer {
   flex: 0 0 auto;
+  margin-top: auto;
 }
 .account-card {
   display: flex;
@@ -994,6 +1027,76 @@ button, input { font: inherit; }
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5L5 19' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5L5 19' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
 }
+.tool-placeholder-section {
+  flex: 0 0 auto;
+}
+.tool-placeholder-btn {
+  min-height: 38px;
+  padding: 0 11px;
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+}
+.dcc-bridge-panel {
+  padding: 0;
+}
+.dcc-bridge-summary {
+  display: flex;
+  align-items: center;
+  list-style: none;
+}
+.dcc-bridge-summary::-webkit-details-marker {
+  display: none;
+}
+.dcc-bridge-options {
+  display: grid;
+  gap: 2px;
+  padding: 6px 10px 10px;
+}
+.dcc-option-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 34px;
+  gap: 8px;
+  color: var(--text);
+  font-size: 12px;
+}
+.dcc-toggle {
+  width: 30px;
+  height: 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 7%, var(--base));
+  border: 1px solid var(--line-soft);
+}
+.dcc-toggle::before {
+  content: "";
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: 1px;
+  border-radius: 50%;
+  background: var(--subtle);
+}
+.dcc-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dcc-version {
+  color: var(--subtle);
+}
+.dcc-install-btn {
+  padding: 0;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
 .search-status {
   min-height: 16px;
   color: var(--subtle);
@@ -1319,6 +1422,10 @@ button, input { font: inherit; }
     position: relative;
     order: 3;
     height: 520px;
+    min-height: 520px;
+  }
+  .workspace-page {
+    order: 3;
     min-height: 520px;
   }
   #map {
