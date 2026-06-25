@@ -1054,7 +1054,6 @@ function setupSpacePreview() {
   }
   window.VirtualCityOrbitPreview.mount(map, {
     feedUrl: '/orbit-tle?groups=stations,visual',
-    planetFeedUrl: '/planet-ephemeris',
     satellite: window.satellite,
     maxBodies: 30,
     timeScale: 80

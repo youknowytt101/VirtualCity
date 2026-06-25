@@ -16,8 +16,11 @@ Houdini/Hip/VC_master_citygen_v001.hip
 最新运行区实验快照 hip：
 
 ```text
-Houdini/Hip/VC_z47n_e704000_n1431000_w1000_h1000_s1000_citygen_v001.hip
+Houdini/Hip/VC_z47n_e702000_n1428000_w1000_h1000_s1000_citygen_v001.hip
 ```
+
+最新 Model QA quick 为 `fail`：`building_terrain_fit` 与 `road_terrain_fit`
+仍需检查，当前输出不能直接晋级为基准。
 
 当前主要输出节点：
 

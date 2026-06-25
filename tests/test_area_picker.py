@@ -145,9 +145,10 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('/static/deckgl/deck.gl.min.js', _PICKER_FRONTEND)
         self.assertIn('/static/satellitejs/satellite.min.js', _PICKER_FRONTEND)
         self.assertIn('window.VirtualCityOrbitPreview', _PICKER_FRONTEND)
-        self.assertIn("planetFeedUrl: '/planet-ephemeris'", _PICKER_FRONTEND)
+        self.assertNotIn("planetFeedUrl: '/planet-ephemeris'", _PICKER_APP_JS)
+        self.assertIn("var showPlanets = options.showPlanets === true;", _PICKER_ORBIT_JS)
+        self.assertIn("if (showPlanets) loadPlanetData();", _PICKER_ORBIT_JS)
         self.assertIn("timeScale: 80", _PICKER_FRONTEND)
-        self.assertIn('NASA/JPL Horizons', _PICKER_FRONTEND)
         self.assertNotIn('/static/leaflet/leaflet.js', _PICKER_FRONTEND)
         self.assertNotIn('/static/leaflet-draw/leaflet.draw.js', _PICKER_FRONTEND)
         self.assertNotIn('unpkg.com/leaflet', _PICKER_FRONTEND)
@@ -574,12 +575,16 @@ $$EOE
         self.assertIn("'earth': earth", source)
         self.assertIn("PLANET_EPHEMERIS_FUTURE_DAYS = 220", source)
 
-    def test_orbit_preview_uses_heliocentric_planet_frame(self):
+    def test_orbit_preview_keeps_planets_disabled_by_default(self):
         orbit_preview = (
             Path(area_picker.__file__).parent
             / "frontend"
             / "orbit-preview.js"
         ).read_text(encoding="utf-8")
+        self.assertIn("var showPlanets = options.showPlanets === true;", orbit_preview)
+        self.assertIn("var planetBodies = showPlanets ? createPlanetBodies() : [];", orbit_preview)
+        self.assertIn("if (showPlanets) loadPlanetData();", orbit_preview)
+        self.assertIn("if (showPlanets) {", orbit_preview)
         self.assertIn("earthEphemeris", orbit_preview)
         self.assertIn("solarScenePoint", orbit_preview)
         self.assertIn("projectSolarPoint", orbit_preview)

@@ -33,7 +33,8 @@
     options = options || {};
     var satelliteApi = options.satellite || window.satellite;
     var feedUrl = options.feedUrl || '/orbit-tle?groups=stations,visual';
-    var planetFeedUrl = options.planetFeedUrl || '/planet-ephemeris';
+    var showPlanets = options.showPlanets === true;
+    var planetFeedUrl = showPlanets ? (options.planetFeedUrl || '/planet-ephemeris') : '';
     var maxBodies = Math.max(1, Math.floor(options.maxBodies || 30));
     var requestedTimeScale = Number(options.timeScale || DEFAULT_TIME_SCALE);
     var timeScale = Number.isFinite(requestedTimeScale) && requestedTimeScale > 0 ? requestedTimeScale : DEFAULT_TIME_SCALE;
@@ -73,7 +74,7 @@
     var sphereBuffer = gl.createBuffer();
     var pointBuffer = gl.createBuffer();
     var spaceBodies = [];
-    var planetBodies = createPlanetBodies();
+    var planetBodies = showPlanets ? createPlanetBodies() : [];
     var earthEphemeris = null;
     var solarReference = {
       builtAt: 0,
@@ -89,11 +90,11 @@
       source: 'CelesTrak',
       message: 'loading live TLE data'
     };
-    var planetStatus = {
+    var planetStatus = showPlanets ? {
       loading: true,
       source: 'NASA/JPL Horizons',
       message: 'loading planet ephemeris'
-    };
+    } : null;
     var stars = createStarfield(360);
 
     var fallbackTle = [
@@ -1018,7 +1019,7 @@
         });
     }
 
-    loadPlanetData();
+    if (showPlanets) loadPlanetData();
 
     function resize() {
       var rect = host.getBoundingClientRect();
@@ -1438,7 +1439,7 @@
     function drawOrbitStatus(alpha) {
       var parts = [];
       if (orbitStatus && orbitStatus.message) parts.push(orbitStatus.source + ' - ' + orbitStatus.message);
-      if (planetStatus && planetStatus.message) parts.push(planetStatus.source + ' - ' + planetStatus.message);
+      if (showPlanets && planetStatus && planetStatus.message) parts.push(planetStatus.source + ' - ' + planetStatus.message);
       if (!parts.length) return;
       var text = parts.join(' | ');
       labelCtx.save();
@@ -1470,8 +1471,6 @@
       labelCtx.clearRect(0, 0, width, height);
 
       if (alpha > 0.015) {
-        var planetScale = solarSystemScale(nowDate);
-        var solarFrame = getSolarReference(nowDate, planetScale);
         drawStarfield(geom, alpha);
 
         gl.enable(gl.DEPTH_TEST);
@@ -1483,25 +1482,29 @@
           drawOrbitPoint(body, geom, nowDate, alpha * 0.72);
         });
 
-        drawSolarOrbitLines(solarFrame, geom, alpha * 0.78);
-        var sunProjected = drawSunGlyph(solarFrame, geom, alpha);
         drawLimbShading(geom, alpha, nowDate);
         drawAtmosphere(geom, alpha);
         spaceBodies.forEach(function(body) {
           drawOrbitTail(body, geom, alpha, nowDate, realNowMs);
         });
-        var planetLabels = [];
-        planetBodies.forEach(function(body) {
-          planetLabels.push({ body: body, projected: drawPlanetGlyph(body, geom, nowDate, alpha * 0.88, planetScale) });
-        });
+        if (showPlanets) {
+          var planetScale = solarSystemScale(nowDate);
+          var solarFrame = getSolarReference(nowDate, planetScale);
+          drawSolarOrbitLines(solarFrame, geom, alpha * 0.78);
+          var sunProjected = drawSunGlyph(solarFrame, geom, alpha);
+          var planetLabels = [];
+          planetBodies.forEach(function(body) {
+            planetLabels.push({ body: body, projected: drawPlanetGlyph(body, geom, nowDate, alpha * 0.88, planetScale) });
+          });
+          planetLabels.forEach(function(item) {
+            drawPlanetLabel(item.body, item.projected, alpha);
+          });
+          drawPlanetLabel({ label: '太阳', showLabel: true }, sunProjected, alpha);
+        }
         spaceBodies.forEach(function(body) {
           var projected = drawSpacecraftGlyph(body, geom, nowDate, alpha);
           drawLabel(body, projected, alpha);
         });
-        planetLabels.forEach(function(item) {
-          drawPlanetLabel(item.body, item.projected, alpha);
-        });
-        drawPlanetLabel({ label: '太阳', showLabel: true }, sunProjected, alpha);
         drawOrbitStatus(alpha);
       }
 

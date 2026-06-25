@@ -1,171 +1,101 @@
-# VirtualCity 工程根目录
+# VirtualCity
 
-> **Git 仓库**：`https://github.com/youknowytt101/VirtualCity.git`  
-> 新机器首次使用：`git clone https://github.com/youknowytt101/VirtualCity.git`
-
-> AI / 新成员接手项目时，先阅读根目录：`AI_HANDOFF.md`。
-> 然后阅读：`ProjectManagement/00_AI接手指南.md`。
-> 当前状态和下一步见：`ProjectManagement/02_当前状态与下一步.md`。
->
-> 当前主线自动化流程见：`Scripts/README.md` 和 `ProjectManagement/04_稳定流程规范.md`。
-> 三大模块架构边界见：`ProjectManagement/14_三大模块架构边界.md`。
-
-## 目录结构
-
-```
-VirtualCity/
-├── README.md                  ← 本文件
-├── AI_HANDOFF.md              ← AI / 人类接手第一入口
-├── VirtualCity完整执行计划.md   ← 当前完整执行计划
-├── 执行方案.md                  ← 早期可执行方案
-│
-├── ProjectManagement/         ← AI 接手、状态、迭代日志、稳定流程
-│   ├── 00_AI接手指南.md
-│   ├── 01_资料地图.md
-│   ├── 02_当前状态与下一步.md
-│   ├── 03_迭代日志.md
-│   ├── 04_稳定流程规范.md
-│   ├── 05_自动迭代协议.md
-│   ├── 06_任务记录模板.md
-│   ├── 07_MVP_QA检查清单.md
-│   ├── 08_任务看板.md
-│   ├── 09_决策记录.md
-│   ├── 10_AI启动自检清单.md
-│   ├── 11_版本路线图.md
-│   ├── project_manifest.json
-│   ├── document_index.json
-│   └── 区域记录/
-│
-├── Config/                       ← 机器可读配置模板
-│   ├── area_config.template.json
-│   ├── pipeline_config.template.json
-│   └── qa_checklist.template.json
-│
-├── 调研文档/                   ← 行业调研文档
-│   ├── README.md
-│   └── 地图API-Houdini-UE流程/
-│       ├── 01_地图数据获取与API对比.md
-│       ├── 02_Houdini处理流程.md
-│       ├── 03_UE5整合方案.md
-│       ├── 04_完整流程速查表.md
-│       ├── 05_虚拟城市主流技术方案.md
-│       ├── 06_路线一详细拆解_Houdini+UE5城市管线.md
-│       └── 07_补充优化建议_2026版.md
-│
-├── RawData/                   ← OSM / DEM / Overture 原始与缓存数据
-│   ├── OSM/                   ← 区域道路与兜底建筑 .osm
-│   ├── DEM/                   ← FABDEM / NASADEM CSV 与 GeoTIFF
-│   ├── Overture/              ← Overture 建筑轮廓 GeoJSON
-│   ├── _clip_cache/           ← 区域裁切缓存
-│   └── _houdini_ready/        ← Houdini 输入中间结果（不提交）
-│
-├── Houdini/                   ← Houdini 工程、区域 hip、导出资产
-│   ├── Hip/
-│   ├── HDA/
-│   └── Export/
-│
-├── Scripts/                 ← 数据获取、清洗、Houdini recook、QA 自动化
-│   ├── orchestration/
-│   ├── acquisition/
-│   ├── cleaning/
-│   ├── houdini_build/
-│   ├── houdini_sops/
-│   ├── shared/
-│   ├── ue5/
-│   └── _archive/
-│
-└── UE5/                       ← Unreal Engine 5 工程
-    └── （UE5 项目文件夹）
-```
-
-## 核心流程
-
-```
-area_picker.py (Leaflet 网页框选 / 用户级入口)
-    ↓
-orchestration/run_pipeline.py (完整管线编排)
-    ↓
-acquisition/set_area.py --acquire-only (区域状态 + 数据获取)
-    ↓
-cleaning/refine_data.py (数据清洗 + 数据 QA)
-    ↓
-houdini_build/recook_new_area.py (Houdini 自动构建)
-    ↓
-houdini_model_qa.py (模型 QA)
-    ↓
-人工审核 Houdini OUT_city
-    ↓
-export_and_import.py (审核后再进入 UE5)
-```
-
-## 三大模块架构
-
-当前官方架构口径是三大模块：
+VirtualCity is a local pipeline for building a top-down virtual city from real
+map data. The current product surface is the local area picker / control room,
+but the core project is the reproducible asset pipeline:
 
 ```text
-数据获取 / 下载 / 缓存
-    ↓
-数据清洗 / 语义 / QA
-    ↓
-Houdini 构建 / Model QA / 审核出口
+area picker -> data acquisition/cache -> data cleaning/QA -> Houdini build -> Model QA -> human review -> UE5 export
 ```
 
-这三大块是当前业务流程和验收口径；核心执行入口已开始物理分层到 `Scripts/acquisition/`、`Scripts/cleaning/`、`Scripts/houdini_build/`，`Scripts/` 根目录保留旧命令 wrapper 兼容历史调用。详细边界、评分和目标目录形态见 `ProjectManagement/14_三大模块架构边界.md`。
+## Current Truth
 
-完整构建的正式编排入口是 `Scripts/orchestration/run_pipeline.py`。`Scripts/set_area.py`、`Scripts/refine_data.py`、`Scripts/_recook_new_area.py` 保留旧命令兼容；新主线分别调用 `acquisition/set_area.py`、`cleaning/refine_data.py`、`houdini_build/recook_new_area.py`。Houdini 构建层只消费 `RawData/_houdini_ready/{area_id}/ready_manifest.json` 声明的当前 run 数据。
+Last updated: 2026-06-24
 
-当前 Houdini 道路输出采用双轨设计：`road_color` 保留干净道路中线作为调试链路，`road_capsule_surface_preview -> road_surface_color` 生成固定宽度胶囊车道面并接入 `merge_all / OUT_city`。旧的 `road_surface_union_preview` / `road_surface_quad_preview` 不再进入主流程，自动构建会清理这些遗留节点。
+- Current phase: Houdini asset-quality iteration.
+- Current active area: `z47n_e702000_n1428000_w1000_h1000_s1000`.
+- Latest Houdini build: completed.
+- Latest Model QA: failed, `11 pass / 0 warn / 2 fail`.
+- Failing checks: `building_terrain_fit`, `road_terrain_fit`.
+- UE5 export/import is still an audited exit, not the default pipeline end.
 
-配套图：
+Do not treat the current browser UI, orbit preview, or old demo output as the
+design target. The design target is a stable, repeatable city-generation
+pipeline with clear QA gates.
 
-- `ProjectManagement/VirtualCity_三大模块流程图.svg`
-- `ProjectManagement/VirtualCity_自动化管线完整流程图.svg`
+## Read First
 
-## AI 快速入口
+Use these documents as the active source of truth:
 
-- AI 接手指南：`ProjectManagement/00_AI接手指南.md`
-- 当前状态与下一步：`ProjectManagement/02_当前状态与下一步.md`
-- 资料地图：`ProjectManagement/01_资料地图.md`
-- 迭代日志：`ProjectManagement/03_迭代日志.md`
-- 稳定流程规范：`ProjectManagement/04_稳定流程规范.md`
-- 自动迭代协议：`ProjectManagement/05_自动迭代协议.md`
-- 任务记录模板：`ProjectManagement/06_任务记录模板.md`
-- MVP QA 检查清单：`ProjectManagement/07_MVP_QA检查清单.md`
-- 任务看板：`ProjectManagement/08_任务看板.md`
-- 决策记录：`ProjectManagement/09_决策记录.md`
-- AI 启动自检清单：`ProjectManagement/10_AI启动自检清单.md`
-- 版本路线图：`ProjectManagement/11_版本路线图.md`
-- 三大模块架构边界：`ProjectManagement/14_三大模块架构边界.md`
-- 仓库产物治理：`ProjectManagement/15_仓库产物治理.md`
-- 机器可读项目清单：`ProjectManagement/project_manifest.json`
-- 机器可读文档索引：`ProjectManagement/document_index.json`
-- 配置模板目录：`Config/README.md`
+| Need | File |
+|---|---|
+| Current handoff | `AI_HANDOFF.md` |
+| AI/new-member startup | `ProjectManagement/00_AI接手指南.md` |
+| Document map | `ProjectManagement/01_资料地图.md` |
+| Current status | `ProjectManagement/02_当前状态与下一步.md` |
+| Task board | `ProjectManagement/08_任务看板.md` |
+| Stable workflow | `ProjectManagement/04_稳定流程规范.md` |
+| Architecture boundary | `ProjectManagement/14_三大模块架构边界.md` |
+| Known Houdini pitfalls | `ProjectManagement/12_已知坑点与解决方案.md` |
 
-## 计划与调研快速入口
+Older plans and research are retained for traceability, but they are not the
+current operating instructions unless one of the files above points to them.
 
-- 完整执行计划：`VirtualCity完整执行计划.md`
-- 早期可执行方案：`执行方案.md`
-- 自动化预留规划：`Scripts/README.md`
-- 自动化必要性判断：`Scripts/插件清单.md`
-- 完整流程速查：`调研文档/地图API-Houdini-UE流程/04_完整流程速查表.md`
-- 管线详细拆解：`调研文档/地图API-Houdini-UE流程/06_路线一详细拆解_Houdini+UE5城市管线.md`
-- 2026 版补充优化：`调研文档/地图API-Houdini-UE流程/07_补充优化建议_2026版.md`
+## Main Command
 
-## 当前项目阶段
+Start the user-facing control room:
 
-当前阶段：**Houdini 资产质量快速迭代**。
-
-最终目标是俯视角虚拟城市构建。当前重点不是最终整合输出，而是稳定并优化：
-
-```text
-数据获取 → 数据清洗 → Houdini 自动构建 → Model QA → 人工视口审核
-```
-
-最新稳定主入口：
-
-```bash
+```powershell
 cd Scripts
 uv run python area_picker.py
 ```
 
-“重新测试 / 从头测试 / 全流程测试”必须从 `area_picker.py` 网页入口开始，并以 Houdini build status + Model QA 通过作为结束条件。当前 UE5 导出导入仍放在 Houdini 视口审核之后手动触发。
+When someone says "重新测试", "从头测试", "全流程测试", or "测试自动化管线",
+the test must start from `Scripts/area_picker.py` and must end with both:
+
+- `Config/houdini_build_status.json` for the same `area_id` / `run_id`
+- `Reports/model_qa/latest.json` for the same `area_id` / `run_id`
+
+`qa_status=fail` means the pipeline ran, but the output is not promotable.
+
+## Architecture
+
+The active architecture is three modules:
+
+```text
+数据获取 / 下载 / 缓存
+    -> 数据清洗 / 语义 / QA
+    -> Houdini 构建 / Model QA / 审核出口
+```
+
+Primary implementation boundaries:
+
+| Module | Main files | Outputs |
+|---|---|---|
+| Acquisition | `Scripts/acquisition/`, `Scripts/app/area_picker/` | `RawData/OSM/`, `RawData/DEM/`, `RawData/Overture/`, `RawData/_tiles/`, `RawData/_clip_cache/` |
+| Cleaning | `Scripts/cleaning/`, `Scripts/shared/`, `Scripts/data_cleaning_cache.py` | `RawData/_cleaned/`, `RawData/_houdini_ready/`, `Config/qa/` |
+| Houdini build | `Scripts/houdini_build/`, `Scripts/houdini_sops/`, `Scripts/houdini_model_qa.py` | `Houdini/Hip/`, `Reports/model_qa/`, `Houdini/Export/` |
+
+Compatibility wrappers remain in `Scripts/` root. New work should use the
+physical module locations above.
+
+## Repository Map
+
+```text
+Config/              machine-readable area, pipeline, QA, and runtime status
+RawData/             source data, cache, cleaned data, Houdini-ready data
+Scripts/             acquisition, cleaning, Houdini build, QA, UE5 helpers
+Houdini/             master/area HIP files, HDA placeholder, exports
+UE5/                 Unreal project and launch helper
+ProjectManagement/   active handoff docs, board, decisions, logs, research index
+Reports/             pipeline run reports, Model QA, build history
+调研文档/             research archive, not day-to-day operating state
+```
+
+## What Not To Prioritize Now
+
+- Full City Sample recreation.
+- Mass AI / complex traffic.
+- Whole-city or nationwide datasets.
+- New plugin framework.
+- UE5 polish before Houdini output passes QA and human review.

@@ -113,6 +113,7 @@ Scripts/.uv-cache/
 *.swp
 *.swo
 *~
+.worktrees/
 
 # ===== 不排除以下内容（明确保留）=====
 # .windsurf/workflows/ - 工作流文件
