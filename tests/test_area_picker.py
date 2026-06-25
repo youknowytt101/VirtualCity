@@ -274,6 +274,74 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('function bindWorkspaceSwitching()', _PICKER_FRONTEND)
         self.assertIn("map.resize();", _PICKER_FRONTEND)
 
+    def test_game_workspace_mounts_three_scene(self):
+        game_js_path = FRONTEND_ROOT / "game_workbench.js"
+        self.assertTrue(game_js_path.exists())
+        game_js = game_js_path.read_text(encoding="utf-8")
+        self.assertIn('/static/three/three.min.js', _PICKER_INDEX_HTML)
+        self.assertIn('/area-picker/game_workbench.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertIn('id="game-scene-host"', _PICKER_INDEX_HTML)
+        self.assertIn('game-asset-button', _PICKER_INDEX_HTML)
+        self.assertIn('data-game-asset="character"', _PICKER_INDEX_HTML)
+        self.assertIn('id="game-run-button"', _PICKER_INDEX_HTML)
+        self.assertIn('initGameWorkbench', game_js)
+        self.assertIn('createToonGrayMaterial', game_js)
+        self.assertIn('createPlayModeController', game_js)
+        self.assertIn('placeCharacterAt', game_js)
+        self.assertIn('handleGameShortcut', game_js)
+        self.assertIn('window.VC_GAME_WORKBENCH', game_js)
+        self.assertIn('window.VC_GAME_WORKBENCH.init()', _PICKER_APP_JS)
+        self.assertIn('window.VC_GAME_WORKBENCH.setActive(', _PICKER_APP_JS)
+
+    def test_game_workspace_has_composition_viewport_controls(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn('id="game-speed-control"', _PICKER_INDEX_HTML)
+        self.assertIn('id="game-speed-input"', _PICKER_INDEX_HTML)
+        self.assertIn('class="game-tool-button game-asset-button"', _PICKER_INDEX_HTML)
+        self.assertIn('class="game-tool-button game-run-button"', _PICKER_INDEX_HTML)
+        self.assertIn('id="game-run-label"', _PICKER_INDEX_HTML)
+        self.assertIn('.game-toolbar-shell', _PICKER_STYLES)
+        self.assertIn('.game-speed-control', _PICKER_STYLES)
+        self.assertIn('.game-run-label', _PICKER_STYLES)
+        self.assertIn('-webkit-appearance: none;', _PICKER_STYLES)
+        self.assertIn('appearance: textfield;', _PICKER_STYLES)
+        self.assertIn('handleAltViewportDrag', game_js)
+        self.assertIn('setMoveSpeed', game_js)
+        self.assertIn('runLabel.textContent', game_js)
+        self.assertNotIn('runButton.textContent', game_js)
+        self.assertIn('event.altKey', game_js)
+        self.assertIn("beginViewportDrag('orbit'", game_js)
+        self.assertIn("beginViewportDrag('track'", game_js)
+        self.assertIn("beginViewportDrag('dolly'", game_js)
+
+    def test_game_renderer_matches_composition_lighting_baseline(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn('THREE.ColorManagement.legacyMode = false;', game_js)
+        self.assertIn('renderer.shadowMap.type = THREE.BasicShadowMap;', game_js)
+        self.assertIn('opacity: 0.4', game_js)
+        self.assertIn('sun.shadow.mapSize.set(4096, 4096);', game_js)
+        self.assertIn('sun.shadow.normalBias = 0.03;', game_js)
+
+    def test_game_workspace_uses_transform_controls(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn('type="importmap"', _PICKER_INDEX_HTML)
+        self.assertIn('/static/three/three.module.js', _PICKER_INDEX_HTML)
+        self.assertIn('/static/three/TransformControls.js', game_js)
+        self.assertIn('transformControls.attach(selectedCharacter)', game_js)
+        self.assertIn('transformControls.addEventListener("dragging-changed"', game_js)
+
+    def test_game_viewport_orbits_selected_character_first(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        pivot_body = game_js[
+            game_js.index("function getViewportPivot(event)"):
+            game_js.index("function beginViewportDrag")
+        ]
+        self.assertLess(
+            pivot_body.index("if (selectedCharacter)"),
+            pivot_body.index("screenToGround(event.clientX, event.clientY)")
+        )
+        self.assertIn("camera.position.clone().addScaledVector(forward, 10)", pivot_body)
+
     def test_map_controls_are_repositioned(self):
         self.assertIn('#map #selection-tools {', _PICKER_FRONTEND)
         self.assertIn('#map #basemap-control {', _PICKER_FRONTEND)

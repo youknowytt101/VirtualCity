@@ -167,14 +167,33 @@
     </section>
   </aside>
   <section id="game-workbench" class="workspace-page" data-workspace-panel="game" aria-label="游戏工作台" hidden>
-    <div class="workbench-shell">
-      <div class="workbench-head">
-        <div>
-          <div class="section-kicker">CompositionPipeline</div>
-          <div class="section-note">游戏工作台挂载点</div>
+    <div id="composition-workbench-host" class="game-workbench-host workbench-host" aria-label="我的游戏 Three.js 场景">
+      <div id="game-scene-host" class="game-scene-host" tabindex="0" aria-label="3D 游戏网格场景"></div>
+      <div id="game-toolbar" class="game-toolbar" aria-label="游戏工具">
+        <div class="game-toolbar-shell" role="toolbar" aria-label="游戏资产和运行">
+          <button type="button" id="game-character-button" class="game-tool-button game-asset-button" data-game-asset="character" title="拖入角色" aria-label="拖入角色">
+            <svg class="game-tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+              <circle cx="12" cy="5" r="2.2"></circle>
+              <path d="M12 8v6"></path>
+              <path d="M8.5 10.5h7"></path>
+              <path d="M10 14l-1.7 5"></path>
+              <path d="M14 14l1.7 5"></path>
+            </svg>
+          </button>
+          <button type="button" id="game-run-button" class="game-tool-button game-run-button" aria-pressed="false" title="运行或停止" aria-label="运行或停止">
+            <svg class="game-tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+            <span id="game-run-label" class="game-run-label">运行</span>
+          </button>
         </div>
+        <label id="game-speed-control" class="game-speed-control" for="game-speed-input">
+          <span class="game-speed-label">Speed</span>
+          <input id="game-speed-input" class="game-speed-input" type="number" min="1" max="80" step="1" value="7">
+        </label>
       </div>
-      <div id="composition-workbench-host" class="workbench-host" aria-label="CompositionPipeline 工作台"></div>
+      <div id="game-status" class="game-status">拖入角色后点击运行</div>
+      <div id="game-drag-preview" class="game-drag-preview" hidden>角色</div>
     </div>
   </section>
   <aside id="action-panel" aria-label="执行操作面板" hidden>
@@ -320,6 +339,14 @@
 
 <script src="/static/maplibre/maplibre-gl.js"></script>
 <script src="/static/deckgl/deck.gl.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "/static/three/three.module.js"
+  }
+}
+</script>
+<script src="/static/three/three.min.js"></script>
 <script>
 window.VC_CONFIG = {
   lat: __LAT__,
@@ -329,6 +356,7 @@ window.VC_CONFIG = {
   shutdownWithPage: __SHUTDOWN_WITH_PAGE__
 };
 </script>
+<script src="/area-picker/game_workbench.js?v=__VERSION__"></script>
 <script src="/area-picker/app.js?v=__VERSION__"></script>
 </body>
 </html>

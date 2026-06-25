@@ -1851,6 +1851,12 @@ function setWorkspace(id) {
   if (mapShell) mapShell.hidden = !showsMap;
   if (actionPanel) actionPanel.hidden = !isHoudini;
   if (gameWorkbench) gameWorkbench.hidden = workspaceKind !== 'game';
+  if (window.VC_GAME_WORKBENCH) {
+    if (workspaceKind === 'game') {
+      window.VC_GAME_WORKBENCH.init();
+    }
+    window.VC_GAME_WORKBENCH.setActive(workspaceKind === 'game');
+  }
   if (!isHoudini) {
     setGridVisible(false);
     setPointSelectActive(false);
