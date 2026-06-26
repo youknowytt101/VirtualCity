@@ -76,6 +76,38 @@ button, input { font: inherit; }
   gap: 10px;
   min-width: 0;
 }
+.toolbar-icon-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.toolbar-icon-button:hover,
+.toolbar-icon-button:focus-visible {
+  background: color-mix(in srgb, var(--text) 9%, var(--base));
+  outline: none;
+}
+.toolbar-icon-button[hidden] {
+  display: none;
+}
+.action-panel-toggle .panel-icon {
+  grid-area: 1 / 1;
+}
+.action-panel-toggle .panel-icon-expand {
+  display: none;
+}
+.action-panel-toggle.is-collapsed .panel-icon-collapse {
+  display: none;
+}
+.action-panel-toggle.is-collapsed .panel-icon-expand {
+  display: block;
+}
 .version-chip, .status-line {
   max-width: 300px;
   overflow: hidden;
@@ -88,6 +120,23 @@ button, input { font: inherit; }
   padding: 6px 10px;
   font-size: 12px;
 }
+.version-chip {
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+}
+.version-chip:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--line);
+}
+.version-chip:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 68%, transparent);
+  outline-offset: 2px;
+}
+.version-chip.is-refreshing {
+  cursor: wait;
+  opacity: 0.78;
+}
 .status-line { color: var(--muted); }
 #workspace {
   position: relative;
@@ -98,6 +147,9 @@ button, input { font: inherit; }
   grid-template-areas: "controls map actions";
   gap: 0;
   background: var(--base);
+}
+#workspace[data-action-panel-collapsed="true"] {
+  grid-template-columns: 300px minmax(0, 1fr) 0;
 }
 #map-shell {
   grid-area: map;

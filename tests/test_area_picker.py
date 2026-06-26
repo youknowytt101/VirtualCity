@@ -133,8 +133,36 @@ class TestPickerHtml(unittest.TestCase):
         self.assertNotIn("cached-only", _PICKER_FRONTEND)
         self.assertNotIn("只显示已有缓存", _PICKER_FRONTEND)
 
+    def test_houdini_action_panel_toggle_lives_in_top_toolbar(self):
+        toolbar_start = _PICKER_INDEX_HTML.index('<div id="toolbar">')
+        workspace_start = _PICKER_INDEX_HTML.index('<main id="workspace"')
+        toolbar_html = _PICKER_INDEX_HTML[toolbar_start:workspace_start]
+        action_panel_start = _PICKER_INDEX_HTML.index('<aside id="action-panel"')
+        action_panel_html = _PICKER_INDEX_HTML[action_panel_start:]
+
+        self.assertIn('class="toolbar-cluster"', toolbar_html)
+        self.assertIn('id="action-panel-toggle"', toolbar_html)
+        self.assertNotIn('id="action-panel-toggle"', action_panel_html)
+        self.assertIn('data-action-panel-collapsed="false"', _PICKER_FRONTEND)
+        self.assertIn('#workspace[data-action-panel-collapsed="true"]', _PICKER_STYLES)
+        self.assertIn('function setActionPanelCollapsed(collapsed)', _PICKER_APP_JS)
+        self.assertIn('function bindActionPanelToggle()', _PICKER_APP_JS)
+
     def test_picker_version_uses_public_date_semver_format(self):
         self.assertRegex(area_picker.APP_VERSION, r"^\d{2}-\d{2}-\d{2}_v\d+\.\d+$")
+
+    def test_version_chip_refreshes_frontend_without_reopening_page(self):
+        self.assertIn('id="frontend-refresh-button"', _PICKER_INDEX_HTML)
+        self.assertIn('class="version-chip"', _PICKER_INDEX_HTML)
+        self.assertIn('aria-label="刷新前端并保留当前工作区"', _PICKER_INDEX_HTML)
+        self.assertIn("frontendRefreshWorkspaceKey = 'vc.areaPicker.refreshWorkspace.v1'", _PICKER_APP_JS)
+        self.assertIn("function bindFrontendRefresh()", _PICKER_APP_JS)
+        self.assertIn("sessionStorage.setItem(frontendRefreshWorkspaceKey, activeWorkspaceId)", _PICKER_APP_JS)
+        self.assertIn("url.searchParams.set('refresh', String(Date.now()))", _PICKER_APP_JS)
+        self.assertIn("window.location.replace(url.toString())", _PICKER_APP_JS)
+        self.assertIn("function initialWorkspaceId()", _PICKER_APP_JS)
+        self.assertIn("bindFrontendRefresh();", _PICKER_APP_JS)
+        self.assertIn("setWorkspace(initialWorkspaceId());", _PICKER_APP_JS)
 
     def test_picker_uses_local_web_assets_and_online_basemap(self):
         self.assertIn('/static/maplibre/maplibre-gl.css', _PICKER_FRONTEND)
@@ -292,6 +320,25 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('window.VC_GAME_WORKBENCH', game_js)
         self.assertIn('window.VC_GAME_WORKBENCH.init()', _PICKER_APP_JS)
         self.assertIn('window.VC_GAME_WORKBENCH.setActive(', _PICKER_APP_JS)
+
+    def test_game_workbench_static_version_changes_with_script(self):
+        game_js_path = FRONTEND_ROOT / "game_workbench.js"
+        stat = game_js_path.stat()
+        fingerprint = f"{int(stat.st_mtime)}-{stat.st_size}"
+        self.assertIn(fingerprint, area_picker._frontend_asset_version())
+
+    def test_game_character_uses_stylized_readable_avatar(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn('createCharacterMaterial', game_js)
+        self.assertIn("name: 'player-visor'", game_js)
+        self.assertIn("name: 'player-backpack'", game_js)
+        self.assertIn("name: 'player-left-arm'", game_js)
+        self.assertIn("name: 'player-right-arm'", game_js)
+        self.assertIn("name: 'player-left-leg'", game_js)
+        self.assertIn("name: 'player-right-leg'", game_js)
+        self.assertIn('character.userData.motionParts', game_js)
+        self.assertIn('updateCharacterMotion(player, moveDirection, deltaTime)', game_js)
+        self.assertIn('resetCharacterMotion(player)', game_js)
 
     def test_game_workspace_has_composition_viewport_controls(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")

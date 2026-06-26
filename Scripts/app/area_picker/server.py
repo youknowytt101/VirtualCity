@@ -1083,6 +1083,7 @@ def _frontend_asset_version() -> str:
     parts: list[str] = []
     assets = [
         (FRONTEND_ROOT, "app.js"),
+        (FRONTEND_ROOT, "game_workbench.js"),
         (FRONTEND_ROOT, "styles.css"),
         (FRONTEND_ROOT, "index.html"),
     ]

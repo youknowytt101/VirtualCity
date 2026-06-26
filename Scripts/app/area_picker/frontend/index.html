@@ -16,11 +16,24 @@
     <div class="brand-copy">
       <h1>WorldBuilder</h1>
     </div>
-    <span class="version-chip">__APP_VERSION__</span>
+    <button type="button" id="frontend-refresh-button" class="version-chip" title="刷新前端并保留当前工作区" aria-label="刷新前端并保留当前工作区">__APP_VERSION__</button>
   </div>
-  <div class="toolbar-cluster"></div>
+  <div class="toolbar-cluster">
+    <button type="button" id="action-panel-toggle" class="toolbar-icon-button action-panel-toggle" title="收起右栏" aria-label="收起右栏" aria-pressed="false" hidden>
+      <svg class="tool-icon panel-icon panel-icon-collapse" aria-hidden="true" viewBox="0 0 24 24">
+        <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+        <path d="M15 3v18"></path>
+        <path d="m9 9 3 3-3 3"></path>
+      </svg>
+      <svg class="tool-icon panel-icon panel-icon-expand" aria-hidden="true" viewBox="0 0 24 24">
+        <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+        <path d="M15 3v18"></path>
+        <path d="m10 9-3 3 3 3"></path>
+      </svg>
+    </button>
+  </div>
 </div>
-<main id="workspace" data-workspace-kind="earth">
+<main id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="false">
   <div id="map-shell">
     <div id="map">
       <div id="selection-tools" class="map-tool-control flat-panel flat-panel--row" aria-label="区域选择工具">

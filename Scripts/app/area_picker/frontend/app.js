@@ -7,6 +7,7 @@ var maxSelectionTiles = window.VC_CONFIG.maxSelectionTiles;
 var shutdownWithPage = window.VC_CONFIG.shutdownWithPage;
 var pageSessionTimer = null;
 var selectionStorageKey = 'vc.areaPicker.selection.v1';
+var frontendRefreshWorkspaceKey = 'vc.areaPicker.refreshWorkspace.v1';
 var pendingRestoreTileIds = null;
 var pendingRestoreLogged = false;
 var pointSelectActive = false;
@@ -17,6 +18,7 @@ var rectToolArmed = false;
 var rectDragging = false;
 var rectStart = null;
 var activeWorkspaceId = 'news';
+var actionPanelCollapsed = false;
 var WORKSPACE_KINDS = {
   news: 'earth',
   'city-preview': 'earth',
@@ -1837,19 +1839,78 @@ function updateWorkspaceButtons(workspaceId) {
   });
 }
 
+function syncActionPanelToggle() {
+  var workspace = document.getElementById('workspace');
+  var actionPanel = document.getElementById('action-panel');
+  var toggle = document.getElementById('action-panel-toggle');
+  var isHoudini = WORKSPACE_KINDS[activeWorkspaceId] === 'houdini';
+  var collapsed = !!actionPanelCollapsed;
+  if (workspace) workspace.dataset.actionPanelCollapsed = collapsed ? 'true' : 'false';
+  if (actionPanel) actionPanel.hidden = !isHoudini || collapsed;
+  if (!toggle) return;
+  toggle.hidden = !isHoudini;
+  toggle.classList.toggle('is-collapsed', collapsed);
+  toggle.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+  toggle.setAttribute('aria-label', collapsed ? '展开右栏' : '收起右栏');
+  toggle.title = collapsed ? '展开右栏' : '收起右栏';
+}
+
+function setActionPanelCollapsed(collapsed) {
+  actionPanelCollapsed = !!collapsed;
+  syncActionPanelToggle();
+  requestAnimationFrame(function() {
+    if (map && map.resize) map.resize();
+    if (activeWorkspaceId === 'houdini') scheduleGridLoad();
+    if (typeof scheduleDeckRefresh === 'function') scheduleDeckRefresh(true);
+  });
+}
+
+function bindActionPanelToggle() {
+  var toggle = document.getElementById('action-panel-toggle');
+  if (!toggle) return;
+  toggle.addEventListener('click', function() {
+    setActionPanelCollapsed(!actionPanelCollapsed);
+  });
+  syncActionPanelToggle();
+}
+
+function initialWorkspaceId() {
+  if (!window.sessionStorage) return activeWorkspaceId;
+  try {
+    var storedWorkspace = window.sessionStorage.getItem(frontendRefreshWorkspaceKey);
+    window.sessionStorage.removeItem(frontendRefreshWorkspaceKey);
+    if (storedWorkspace && WORKSPACE_KINDS[storedWorkspace]) return storedWorkspace;
+  } catch (e) {}
+  return activeWorkspaceId;
+}
+
+function bindFrontendRefresh() {
+  var button = document.getElementById('frontend-refresh-button');
+  if (!button) return;
+  button.addEventListener('click', function() {
+    try {
+      sessionStorage.setItem(frontendRefreshWorkspaceKey, activeWorkspaceId);
+    } catch (e) {}
+    button.classList.add('is-refreshing');
+    button.disabled = true;
+    var url = new URL(window.location.href);
+    url.searchParams.set('refresh', String(Date.now()));
+    window.location.replace(url.toString());
+  });
+}
+
 function setWorkspace(id) {
   var nextWorkspace = WORKSPACE_KINDS[id] ? id : 'houdini';
   var workspaceKind = WORKSPACE_KINDS[nextWorkspace];
   activeWorkspaceId = nextWorkspace;
   var workspace = document.getElementById('workspace');
   var mapShell = document.getElementById('map-shell');
-  var actionPanel = document.getElementById('action-panel');
   var gameWorkbench = document.getElementById('game-workbench');
   var isHoudini = workspaceKind === 'houdini';
   var showsMap = workspaceKind !== 'game';
   if (workspace) workspace.dataset.workspaceKind = workspaceKind;
   if (mapShell) mapShell.hidden = !showsMap;
-  if (actionPanel) actionPanel.hidden = !isHoudini;
+  syncActionPanelToggle();
   if (gameWorkbench) gameWorkbench.hidden = workspaceKind !== 'game';
   if (window.VC_GAME_WORKBENCH) {
     if (workspaceKind === 'game') {
@@ -2756,5 +2817,7 @@ refreshServiceState();
 refreshDataSources();
 loadRegionNav();
 bindWorkspaceSwitching();
-setWorkspace(activeWorkspaceId);
+bindActionPanelToggle();
+bindFrontendRefresh();
+setWorkspace(initialWorkspaceId());
 startPageSession();
