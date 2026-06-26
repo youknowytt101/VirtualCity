@@ -7,6 +7,7 @@
   var runLabel = null;
   var speedInput = null;
   var statusText = null;
+  var gameWorkbench = null;
   var renderer = null;
   var scene = null;
   var camera = null;
@@ -15,7 +16,6 @@
   var mouse = null;
   var groundPlane = null;
   var hitPoint = null;
-  var selectionBox = null;
   var playMode = null;
   var cameraControls = null;
   var rafId = null;
@@ -26,6 +26,8 @@
   var selectedCharacter = null;
   var transformControls = null;
   var transformControlsLoading = null;
+  var transformMode = 'translate';
+  var transformModeButtons = [];
   var undoStack = [];
   var sharedToonGradientMap = null;
 
@@ -94,10 +96,30 @@
 
   function createOutlineMesh(geometry, thickness) {
     var THREE = safeThree();
-    var outline = new THREE.Mesh(geometry, createOutlineMaterial(thickness));
+    var material = createOutlineMaterial(thickness);
+    var outline = new THREE.Mesh(geometry, material);
     outline.userData.pickable = false;
     outline.userData.outline = true;
+    outline.userData.outlineBaseColor = material.uniforms.outlineColor.value.clone();
+    outline.userData.outlineBaseThickness = material.uniforms.outlineThickness.value;
     return outline;
+  }
+
+  function setOutlineSelected(outline, selected) {
+    var uniforms = outline.material && outline.material.uniforms;
+    if (!uniforms || !uniforms.outlineColor || !uniforms.outlineThickness) return;
+    uniforms.outlineColor.value.set(selected ? 0xffc400 : outline.userData.outlineBaseColor);
+    uniforms.outlineThickness.value = selected ? 0.026 : outline.userData.outlineBaseThickness;
+  }
+
+  function syncSelectionHighlight() {
+    var playing = playMode && playMode.isPlaying();
+    characters.forEach(function(character) {
+      var selected = character === selectedCharacter && !playing;
+      character.traverse(function(child) {
+        if (child.userData && child.userData.outline) setOutlineSelected(child, selected);
+      });
+    });
   }
 
   function createCharacterPart(options) {
@@ -456,7 +478,6 @@
       targetYaw = yaw;
       targetPitch = pitch;
       canvas.focus();
-      requestPointerLock();
       updateCamera();
       options.onChange(true);
       return true;
@@ -674,7 +695,7 @@
       }
 
       if (state.mode === 'dolly') {
-        state.distance = Math.max(0.35, state.distance + dy * state.distance * 0.01);
+        state.distance = Math.max(0.35, state.distance - dy * state.distance * 0.01);
         orbitOffset.copy(camera.position).sub(state.target).normalize().multiplyScalar(state.distance);
         camera.position.copy(state.target).add(orbitOffset);
         camera.lookAt(state.target);
@@ -702,7 +723,13 @@
         beginViewportDrag('look', event, null);
         return true;
       }
+      if (event.button === 1) {
+        event.preventDefault();
+        beginViewportDrag('track', event, getViewportPivot(event));
+        return true;
+      }
       if (event.button === 0 && !dragState) {
+        if (isTransformControlActive()) return true;
         pickCharacter(event);
         return true;
       }
@@ -770,6 +797,7 @@
       handlePointerDown: handlePointerDown,
       handlePointerMove: handlePointerMove,
       handlePointerUp: handlePointerUp,
+      isLooking: function() { return rightDown; },
       pressKey: function(code) { keys[code] = true; },
       releaseKey: function(event) { delete keys[event.code.toLowerCase()]; },
       setMoveSpeed: setMoveSpeed,
@@ -798,34 +826,79 @@
     scene.add(character);
     selectCharacter(character);
     undoStack.push({ type: 'create', character: character });
-    setStatus('角色已放置，按 R 或点击运行');
+    setStatus('角色已放置，按 Space 或点击运行');
     return character;
+  }
+
+  function updateTransformModeButtons() {
+    transformModeButtons.forEach(function(button) {
+      var activeMode = button.dataset.transformMode === transformMode;
+      button.classList.toggle('is-active', activeMode);
+      button.setAttribute('aria-pressed', activeMode ? 'true' : 'false');
+    });
+  }
+
+  function setTransformMode(mode) {
+    if (mode !== 'translate' && mode !== 'rotate' && mode !== 'scale') return;
+    transformMode = mode;
+    if (transformControls) transformControls.setMode(transformMode);
+    updateTransformModeButtons();
+    render();
+  }
+
+  function bindTransformModeButtons() {
+    transformModeButtons = Array.prototype.slice.call(document.querySelectorAll('[data-transform-mode]'));
+    transformModeButtons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        setTransformMode(button.dataset.transformMode);
+      });
+    });
+    updateTransformModeButtons();
+  }
+
+  function isTransformControlActive() {
+    return Boolean(
+      transformControls &&
+      transformControls.visible &&
+      transformControls.enabled &&
+      (transformControls.dragging || transformControls.axis)
+    );
   }
 
   function selectCharacter(character) {
     selectedCharacter = character || null;
-    if (selectionBox) {
-      selectionBox.object = selectedCharacter || new (safeThree()).Object3D();
-      selectionBox.visible = Boolean(selectedCharacter);
-    }
     if (transformControls) {
       if (selectedCharacter) transformControls.attach(selectedCharacter);
       else transformControls.detach();
     } else if (selectedCharacter) {
       ensureTransformControls();
     }
+    syncEditOverlays();
+  }
+
+  function syncEditOverlays() {
+    var editing = Boolean(selectedCharacter) && !(playMode && playMode.isPlaying());
+    if (transformControls) {
+      transformControls.visible = editing;
+      transformControls.enabled = editing;
+      transformControls.setMode(transformMode);
+    }
+    syncSelectionHighlight();
   }
 
   function ensureTransformControls() {
     if (transformControls || transformControlsLoading || !scene || !camera || !renderer) return;
     transformControlsLoading = import('/static/three/TransformControls.js').then(function(module) {
       transformControls = new module.TransformControls(camera, renderer.domElement);
+      transformControls.setMode(transformMode);
+      transformControls.setSize(1);
       transformControls.addEventListener("dragging-changed", function(event) {
         if (event.value && cameraControls) cameraControls.clearState();
       });
       transformControls.addEventListener('change', render);
       scene.add(transformControls);
       if (selectedCharacter) transformControls.attach(selectedCharacter);
+      syncEditOverlays();
     }).catch(function() {
       setStatus('TransformControls 未加载');
     });
@@ -915,11 +988,13 @@
 
   function syncRunState() {
     var playing = playMode && playMode.isPlaying();
+    if (gameWorkbench) gameWorkbench.classList.toggle('is-playing', playing);
     if (runButton) {
       runButton.classList.toggle('is-active', playing);
       runButton.setAttribute('aria-pressed', playing ? 'true' : 'false');
       if (runLabel) runLabel.textContent = playing ? '停止' : '运行';
     }
+    syncEditOverlays();
     setStatus(playing ? 'WASD 移动，鼠标控制方向，Esc 停止' : '拖入角色后点击运行');
   }
 
@@ -971,7 +1046,26 @@
     if (playMode.handleKeyDown(event)) return;
 
     var code = event.code.toLowerCase();
-    if (code === 'keyr' || code === 'space') {
+    if (cameraControls.isLooking()) {
+      cameraControls.pressKey(code);
+      return;
+    }
+    if (code === 'keyw') {
+      event.preventDefault();
+      setTransformMode('translate');
+      return;
+    }
+    if (code === 'keye') {
+      event.preventDefault();
+      setTransformMode('rotate');
+      return;
+    }
+    if (code === 'keyr') {
+      event.preventDefault();
+      setTransformMode('scale');
+      return;
+    }
+    if (code === 'space') {
       event.preventDefault();
       toggleRun();
       return;
@@ -1005,7 +1099,6 @@
 
   function render() {
     if (!renderer) return;
-    if (selectionBox && selectedCharacter) selectionBox.update();
     renderer.render(scene, camera);
   }
 
@@ -1079,6 +1172,7 @@
     runLabel = document.getElementById('game-run-label');
     speedInput = document.getElementById('game-speed-input');
     statusText = document.getElementById('game-status');
+    gameWorkbench = document.getElementById('game-workbench');
     if (!sceneHost) return;
 
     if (THREE.ColorManagement && 'legacyMode' in THREE.ColorManagement) {
@@ -1124,10 +1218,6 @@
     mouse = new THREE.Vector2();
     groundPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     hitPoint = new THREE.Vector3();
-    selectionBox = new THREE.BoxHelper(new THREE.Object3D(), 0xffc400);
-    selectionBox.visible = false;
-    selectionBox.material.depthTest = false;
-    scene.add(selectionBox);
     clock = new THREE.Clock();
     playMode = createPlayModeController({
       camera: camera,
@@ -1137,6 +1227,7 @@
     cameraControls = createGameCameraController();
     if (speedInput) cameraControls.setMoveSpeed(speedInput.value);
     cameraControls.syncRotationFromCamera();
+    bindTransformModeButtons();
     bindInput();
     initialized = true;
     resize();

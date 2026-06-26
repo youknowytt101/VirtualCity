@@ -88,6 +88,13 @@ button, input { font: inherit; }
   border-radius: 8px;
   cursor: pointer;
 }
+.action-panel-toggle {
+  border-color: transparent;
+  color: #ffffff;
+}
+.action-panel-toggle.is-collapsed {
+  color: var(--subtle);
+}
 .toolbar-icon-button:hover,
 .toolbar-icon-button:focus-visible {
   background: color-mix(in srgb, var(--text) 9%, var(--base));
@@ -151,6 +158,20 @@ button, input { font: inherit; }
 #workspace[data-action-panel-collapsed="true"] {
   grid-template-columns: 300px minmax(0, 1fr) 0;
 }
+#workspace[data-workspace-kind="game"] {
+  grid-template-columns: 300px minmax(0, 1fr) 0;
+}
+#workspace[data-workspace-kind="game"] #action-panel:not([hidden]) {
+  grid-area: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 326px;
+  min-width: 326px;
+  max-width: 326px;
+  height: 100%;
+}
 #map-shell {
   grid-area: map;
   position: relative;
@@ -213,20 +234,20 @@ button, input { font: inherit; }
 }
 .game-toolbar {
   position: absolute;
-  left: 14px;
-  top: 14px;
+  left: 10px;
+  top: 10px;
   z-index: 20;
   display: flex;
   align-items: flex-start;
-  gap: 7px;
+  gap: 5px;
 }
 .game-toolbar-shell,
 .game-speed-control {
   display: flex;
   align-items: center;
-  height: 44px;
+  height: 34px;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
+  border-radius: 6px;
   background: rgba(37, 37, 37, 0.92);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
   backdrop-filter: blur(18px);
@@ -235,8 +256,8 @@ button, input { font: inherit; }
   overflow: hidden;
 }
 .game-tool-button {
-  width: 44px;
-  height: 42px;
+  width: 34px;
+  height: 32px;
   border: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   background: transparent;
@@ -258,21 +279,28 @@ button, input { font: inherit; }
 }
 .game-run-button {
   width: auto;
-  min-width: 58px;
+  min-width: 48px;
   grid-auto-flow: column;
   grid-template-columns: auto auto;
-  column-gap: 7px;
-  padding: 0 12px;
+  column-gap: 5px;
+  padding: 0 9px;
 }
 .game-run-label {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0;
   line-height: 1;
 }
+.game-transform-mode .game-tool-button {
+  width: 32px;
+}
+.game-transform-button.is-active {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
 .game-tool-icon {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
@@ -280,24 +308,24 @@ button, input { font: inherit; }
   stroke-width: 1.8;
 }
 .game-speed-control {
-  gap: 8px;
-  padding: 5px 7px 5px 10px;
+  gap: 6px;
+  padding: 4px 6px 4px 8px;
   color: #ffffff;
 }
 .game-speed-label {
-  font-size: 12px;
+  font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0;
 }
 .game-speed-input {
-  width: 44px;
-  height: 32px;
+  width: 36px;
+  height: 24px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 6px;
+  border-radius: 5px;
   background: rgba(18, 18, 18, 0.72);
   color: #ffffff;
-  padding: 0 7px;
-  font-size: 14px;
+  padding: 0 5px;
+  font-size: 12px;
   font-weight: 700;
   outline: none;
   appearance: textfield;
@@ -312,16 +340,16 @@ button, input { font: inherit; }
 }
 .game-status {
   position: absolute;
-  left: 14px;
-  bottom: 14px;
+  left: 10px;
+  bottom: 10px;
   z-index: 20;
-  max-width: min(360px, calc(100% - 28px));
+  max-width: min(320px, calc(100% - 20px));
   border: 1px solid rgba(31, 30, 29, 0.12);
-  border-radius: 8px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.82);
   color: #2a2a2a;
-  padding: 8px 10px;
-  font-size: 12px;
+  padding: 6px 8px;
+  font-size: 11px;
   font-weight: 600;
   box-shadow: 0 8px 22px rgba(31, 30, 29, 0.1);
 }
@@ -340,6 +368,10 @@ button, input { font: inherit; }
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26);
 }
 .game-drag-preview[hidden] {
+  display: none;
+}
+#game-workbench.is-playing .game-toolbar,
+#game-workbench.is-playing .game-status {
   display: none;
 }
 #map {

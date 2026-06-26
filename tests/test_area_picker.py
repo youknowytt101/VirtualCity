@@ -310,6 +310,15 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("function syncActionPanelContent(workspaceId)", _PICKER_APP_JS)
         self.assertIn("querySelectorAll('[data-action-panel-content]')", _PICKER_APP_JS)
 
+    def test_game_action_panel_overlays_without_resizing_viewport(self):
+        self.assertIn('#workspace[data-workspace-kind="game"] {', _PICKER_STYLES)
+        self.assertIn("grid-template-columns: 300px minmax(0, 1fr) 0;", _PICKER_STYLES)
+        self.assertIn('#workspace[data-workspace-kind="game"] #action-panel:not([hidden])', _PICKER_STYLES)
+        self.assertIn("grid-area: auto;", _PICKER_STYLES)
+        self.assertIn("position: absolute;", _PICKER_STYLES)
+        self.assertIn("min-width: 326px;", _PICKER_STYLES)
+        self.assertIn("max-width: 326px;", _PICKER_STYLES)
+
     def test_account_footer_uses_codex_style_menu(self):
         self.assertIn('<details class="account-menu">', _PICKER_INDEX_HTML)
         self.assertIn('class="account-trigger"', _PICKER_INDEX_HTML)
@@ -342,6 +351,19 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('window.VC_GAME_WORKBENCH', game_js)
         self.assertIn('window.VC_GAME_WORKBENCH.init()', _PICKER_APP_JS)
         self.assertIn('window.VC_GAME_WORKBENCH.setActive(', _PICKER_APP_JS)
+
+    def test_game_play_mode_hides_editor_overlays_and_start_ui(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        enter_start = game_js.index("function enter(character)")
+        enter_end = game_js.index("function exit()", enter_start)
+        enter_body = game_js[enter_start:enter_end]
+
+        self.assertNotIn("BoxHelper", game_js)
+        self.assertIn("function syncSelectionHighlight()", game_js)
+        self.assertIn("syncEditOverlays();", game_js)
+        self.assertNotIn("requestPointerLock();", enter_body)
+        self.assertIn("#game-workbench.is-playing .game-toolbar", _PICKER_STYLES)
+        self.assertIn("#game-workbench.is-playing .game-status", _PICKER_STYLES)
 
     def test_game_workbench_static_version_changes_with_script(self):
         game_js_path = FRONTEND_ROOT / "game_workbench.js"
@@ -382,6 +404,50 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("beginViewportDrag('orbit'", game_js)
         self.assertIn("beginViewportDrag('track'", game_js)
         self.assertIn("beginViewportDrag('dolly'", game_js)
+
+    def test_game_transform_controls_have_explicit_modes(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn('data-transform-mode="translate"', _PICKER_INDEX_HTML)
+        self.assertIn('data-transform-mode="rotate"', _PICKER_INDEX_HTML)
+        self.assertIn('data-transform-mode="scale"', _PICKER_INDEX_HTML)
+        self.assertIn("function setTransformMode(mode)", game_js)
+        self.assertIn("transformControls.setMode(transformMode);", game_js)
+        self.assertIn("transformControls.setSize(1);", game_js)
+        self.assertIn("function bindTransformModeButtons()", game_js)
+
+    def test_game_transform_controls_own_pointer_interaction(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        controls_start = game_js.index("function createGameCameraController()")
+        down_start = game_js.index("function handlePointerDown(event)", controls_start)
+        down_end = game_js.index("function handlePointerMove(event)", down_start)
+        down_body = game_js[down_start:down_end]
+
+        self.assertIn("function isTransformControlActive()", game_js)
+        self.assertIn("transformControls.dragging || transformControls.axis", game_js)
+        self.assertIn("if (isTransformControlActive()) return true;", down_body)
+        self.assertLess(
+            down_body.index("if (isTransformControlActive()) return true;"),
+            down_body.index("pickCharacter(event);"),
+        )
+
+    def test_game_middle_mouse_tracks_viewport_without_alt(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        controls_start = game_js.index("function createGameCameraController()")
+        down_start = game_js.index("function handlePointerDown(event)", controls_start)
+        down_end = game_js.index("function handlePointerMove(event)", down_start)
+        down_body = game_js[down_start:down_end]
+
+        self.assertIn("if (event.button === 1) {", down_body)
+        self.assertIn("beginViewportDrag('track', event, getViewportPivot(event));", down_body)
+
+    def test_game_editor_shortcuts_match_unreal_viewport(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn("setTransformMode('translate');", game_js)
+        self.assertIn("setTransformMode('rotate');", game_js)
+        self.assertIn("setTransformMode('scale');", game_js)
+        self.assertNotIn("code === 'keyr' || code === 'space'", game_js)
+        self.assertIn("code === 'space'", game_js)
+        self.assertIn("state.distance - dy * state.distance * 0.01", game_js)
 
     def test_game_renderer_matches_composition_lighting_baseline(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
@@ -424,7 +490,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('setPointSelectActive(false);', _PICKER_APP_JS)
 
     def test_workspace_menu_order_and_default_page(self):
-        menu_labels = ["实时新闻", "城市预览", "我的街区", "我的游戏", "Houdini", "DCCbridge"]
+        menu_labels = ["上帝之眼", "城市预览", "我的街区", "我的游戏", "Houdini", "DCCbridge"]
         positions = [_PICKER_INDEX_HTML.index(label) for label in menu_labels]
         self.assertEqual(positions, sorted(positions))
         self.assertIn('id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="true"', _PICKER_INDEX_HTML)
