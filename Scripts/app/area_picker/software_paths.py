@@ -9,6 +9,14 @@ from pathlib import Path
 SCRIPTS = Path(__file__).resolve().parents[2]
 ROOT = SCRIPTS.parent
 SOFTWARE_PATHS_FILE = ROOT / "Config" / "software_paths.json"
+SOFTWARE_IDS = ("houdini", "blender", "unity", "unreal", "godot")
+
+
+def software_path_key(software_id: str) -> str:
+    software_id = str(software_id or "").strip().lower()
+    if software_id not in SOFTWARE_IDS:
+        return ""
+    return f"{software_id}_exe"
 
 
 def read_software_paths() -> dict:
@@ -33,10 +41,10 @@ def write_software_paths(data: dict) -> None:
 
 def software_path_status() -> dict:
     data = read_software_paths()
-    houdini_exe = str(data.get("houdini_exe") or "").strip()
-    exists = bool(houdini_exe) and Path(houdini_exe).exists()
-    return {
-        "houdini_exe": houdini_exe,
-        "houdini_exe_exists": exists,
-        "config_path": str(SOFTWARE_PATHS_FILE),
-    }
+    status = {"config_path": str(SOFTWARE_PATHS_FILE)}
+    for software_id in SOFTWARE_IDS:
+        key = software_path_key(software_id)
+        value = str(data.get(key) or "").strip()
+        status[key] = value
+        status[f"{key}_exists"] = bool(value) and Path(value).exists()
+    return status

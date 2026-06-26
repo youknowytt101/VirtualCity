@@ -151,15 +151,29 @@ class TestPickerHtml(unittest.TestCase):
     def test_picker_version_uses_public_date_semver_format(self):
         self.assertRegex(area_picker.APP_VERSION, r"^\d{2}-\d{2}-\d{2}_v\d+\.\d+$")
 
-    def test_version_chip_refreshes_frontend_without_reopening_page(self):
+    def test_version_text_and_test_buttons_are_split(self):
+        self.assertIn('id="app-version-label" class="version-text">__APP_VERSION__</span>', _PICKER_INDEX_HTML)
+        self.assertIn('id="backend-restart-button"', _PICKER_INDEX_HTML)
         self.assertIn('id="frontend-refresh-button"', _PICKER_INDEX_HTML)
-        self.assertIn('class="version-chip"', _PICKER_INDEX_HTML)
-        self.assertIn('aria-label="刷新前端并保留当前工作区"', _PICKER_INDEX_HTML)
+        self.assertIn('class="test-chip"', _PICKER_INDEX_HTML)
+        self.assertIn('aria-label="测试期间重启后端服务"', _PICKER_INDEX_HTML)
+        self.assertIn('aria-label="测试期间刷新前端资源"', _PICKER_INDEX_HTML)
+        self.assertNotIn('id="frontend-refresh-button" class="version-chip"', _PICKER_INDEX_HTML)
         self.assertIn("frontendRefreshWorkspaceKey = 'vc.areaPicker.refreshWorkspace.v1'", _PICKER_APP_JS)
         self.assertIn("function bindFrontendRefresh()", _PICKER_APP_JS)
-        self.assertIn("sessionStorage.setItem(frontendRefreshWorkspaceKey, activeWorkspaceId)", _PICKER_APP_JS)
+        self.assertIn("var restartButton = document.getElementById('backend-restart-button');", _PICKER_APP_JS)
+        self.assertIn("var refreshButton = document.getElementById('frontend-refresh-button');", _PICKER_APP_JS)
+        self.assertIn("function rememberWorkspace()", _PICKER_APP_JS)
+        self.assertIn("clearDccPathCache();", _PICKER_APP_JS)
+        self.assertIn("fetch('/restart'", _PICKER_APP_JS)
+        self.assertIn("reloadWithCacheBust();", _PICKER_APP_JS)
         self.assertIn("url.searchParams.set('refresh', String(Date.now()))", _PICKER_APP_JS)
         self.assertIn("window.location.replace(url.toString())", _PICKER_APP_JS)
+        self.assertTrue(hasattr(area_picker, "_schedule_desktop_restart"))
+        server_source = Path(area_picker.__file__).read_text(encoding="utf-8")
+        self.assertIn("parsed.path == '/restart'", server_source)
+        self.assertIn("VC_AREA_PICKER_FORCE_RESTART", server_source)
+        self.assertIn("def _clear_dcc_path_cache", server_source)
         self.assertIn("function initialWorkspaceId()", _PICKER_APP_JS)
         self.assertIn("bindFrontendRefresh();", _PICKER_APP_JS)
         self.assertIn("setWorkspace(initialWorkspaceId());", _PICKER_APP_JS)
@@ -510,7 +524,7 @@ class TestPickerHtml(unittest.TestCase):
             'data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL',
             'data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市',
             'data-workspace-target="neighborhood" aria-pressed="false" title="切换到街区">街区',
-            'data-workspace-target="game" aria-pressed="false" title="切换到构建">构建',
+            'data-workspace-target="game" aria-pressed="false" title="切换到虚拟资产构建">虚拟资产构建',
             'data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini',
             "DCCbridge",
         ]
@@ -521,6 +535,76 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('id="action-panel" aria-label="执行操作面板" hidden', _PICKER_INDEX_HTML)
         self.assertIn('var activeWorkspaceId = \'news\';', _PICKER_APP_JS)
         self.assertIn('var actionPanelCollapsed = true;', _PICKER_APP_JS)
+
+    def test_dccbridge_controls_are_clickable(self):
+        self.assertIn('class="dcc-toggle" aria-pressed="false" aria-label="打开 Houdini"', _PICKER_INDEX_HTML)
+        self.assertIn('class="dcc-install-btn" aria-pressed="false">安装</button>', _PICKER_INDEX_HTML)
+        self.assertNotIn('class="dcc-install-btn" disabled', _PICKER_INDEX_HTML)
+        self.assertIn("function bindDccBridgeControls", _PICKER_APP_JS)
+        self.assertIn("install.textContent = installed ? '已安装' : '安装';", _PICKER_APP_JS)
+        self.assertIn(".dcc-bridge-panel.flat-item:hover", _PICKER_FRONTEND)
+        self.assertIn(".dcc-bridge-summary.active", _PICKER_FRONTEND)
+        self.assertIn("updateWorkspaceButtons('');", _PICKER_APP_JS)
+        self.assertIn("summary.classList.add('active');", _PICKER_APP_JS)
+        self.assertIn("min-width: 36px;", _PICKER_FRONTEND)
+        self.assertIn(".dcc-option-row.is-enabled .dcc-name", _PICKER_FRONTEND)
+        self.assertIn("function openDccSoftware", _PICKER_APP_JS)
+        self.assertIn("fetch('/open-software'", _PICKER_APP_JS)
+        self.assertIn("function saveDccSoftwarePath", _PICKER_APP_JS)
+        self.assertIn("function updateDccSoftwarePaths", _PICKER_APP_JS)
+        for label in ("Houdini", "Blender", "Unity", "Unreal", "Godot"):
+            self.assertIn(label, _PICKER_INDEX_HTML)
+        for removed in ("3ds Max", "Maya", "Cocos", "ZBrush"):
+            self.assertNotIn(removed, _PICKER_INDEX_HTML)
+        self.assertIn('data-dcc-id="houdini"', _PICKER_INDEX_HTML)
+        self.assertIn('class="dcc-path-btn" aria-expanded="false" title="设置 Houdini 本地路径"', _PICKER_INDEX_HTML)
+        self.assertIn('class="dcc-path-icon"', _PICKER_INDEX_HTML)
+        self.assertIn('/area-picker/icons/lucide-folder.svg', _PICKER_STYLES)
+        self.assertIn('/area-picker/icons/bootstrap-folder-fill.svg', _PICKER_STYLES)
+        self.assertIn("clip-path: inset(0 100% 0 0);", _PICKER_STYLES)
+        self.assertIn(".dcc-option-row.has-path .dcc-path-icon::after", _PICKER_STYLES)
+        self.assertTrue((FRONTEND_ROOT / "icons" / "lucide-folder.svg").exists())
+        self.assertTrue((FRONTEND_ROOT / "icons" / "bootstrap-folder-fill.svg").exists())
+        self.assertTrue((FRONTEND_ROOT / "icons" / "LUCIDE_LICENSE.txt").exists())
+        self.assertTrue((FRONTEND_ROOT / "icons" / "BOOTSTRAP_ICONS_LICENSE.txt").exists())
+        self.assertIn('class="dcc-path-input" type="text"', _PICKER_INDEX_HTML)
+        self.assertIn("dccPathCachePrefix = 'virtualcity.dcc.path.'", _PICKER_APP_JS)
+        self.assertIn("function dccPathStorageKey", _PICKER_APP_JS)
+        self.assertIn("function clearDccPathCache", _PICKER_APP_JS)
+        self.assertIn("localStorage.setItem(dccPathStorageKey(row), value);", _PICKER_APP_JS)
+        self.assertIn("localStorage.removeItem(key);", _PICKER_APP_JS)
+        self.assertIn("paths[key] || getCachedDccPath(row)", _PICKER_APP_JS)
+        self.assertIn("function saveAndCloseDccPathEditor", _PICKER_APP_JS)
+        self.assertIn("event.key !== 'Enter'", _PICKER_APP_JS)
+        self.assertIn("document.addEventListener('pointerdown'", _PICKER_APP_JS)
+        self.assertIn("row.classList.toggle('has-path', !!value);", _PICKER_APP_JS)
+        self.assertIn("panel.addEventListener('input'", _PICKER_APP_JS)
+        self.assertIn("row.classList.toggle('has-path', !!input.value.trim());", _PICKER_APP_JS)
+        self.assertIn("if (d.ok) row.classList.toggle('has-path', !!input.value.trim());", _PICKER_APP_JS)
+        server_source = Path(area_picker.__file__).read_text(encoding="utf-8")
+        self.assertIn("def _post_open_software", server_source)
+        self.assertIn("parsed.path == '/open-software'", server_source)
+
+    def test_dccbridge_software_directory_resolves_to_exe(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            blender = root / "blender.exe"
+            blender.write_text("", encoding="utf-8")
+            self.assertEqual(area_picker._resolve_software_launch_path("blender", str(root)), blender)
+
+    def test_restart_clears_dcc_path_cache(self):
+        data = {
+            "houdini_exe": "C:/Houdini/houdini.exe",
+            "blender_exe": "C:/Blender/blender.exe",
+            "unity_exe": "C:/Unity/Unity.exe",
+            "unreal_exe": "C:/Unreal/UnrealEditor.exe",
+            "godot_exe": "C:/Godot/Godot.exe",
+            "unrelated": "keep",
+        }
+        with patch.object(area_picker, "_read_software_paths", return_value=dict(data)), \
+                patch.object(area_picker, "_write_software_paths") as write_paths:
+            area_picker._clear_dcc_path_cache()
+        write_paths.assert_called_once_with({"unrelated": "keep"})
 
     def test_houdini_status_lives_in_action_panel(self):
         self.assertIn('id="houdini-badge"', _PICKER_FRONTEND)

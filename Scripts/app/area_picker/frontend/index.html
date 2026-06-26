@@ -16,7 +16,9 @@
     <div class="brand-copy">
       <h1>WorldBuilder</h1>
     </div>
-    <button type="button" id="frontend-refresh-button" class="version-chip" title="刷新前端并保留当前工作区" aria-label="刷新前端并保留当前工作区">__APP_VERSION__</button>
+    <span id="app-version-label" class="version-text">__APP_VERSION__</span>
+    <button type="button" id="backend-restart-button" class="test-chip" title="测试期间重启后端服务" aria-label="测试期间重启后端服务">重启</button>
+    <button type="button" id="frontend-refresh-button" class="test-chip" title="测试期间刷新前端资源" aria-label="测试期间刷新前端资源">刷新</button>
   </div>
   <div class="toolbar-cluster">
     <button type="button" id="action-panel-toggle" class="toolbar-icon-button action-panel-toggle" title="收起右栏" aria-label="收起右栏" aria-pressed="false" hidden>
@@ -101,50 +103,55 @@
         <button type="button" class="tool-placeholder-btn flat-item active" data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="neighborhood" aria-pressed="false" title="切换到街区">街区</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到构建">构建</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到虚拟资产构建">虚拟资产构建</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini</button>
         <details class="dcc-bridge-panel flat-item">
           <summary class="tool-placeholder-btn dcc-bridge-summary">DCCbridge</summary>
           <div class="dcc-bridge-options" aria-label="DCCbridge 选项">
-            <div class="dcc-option-row">
-              <span class="dcc-toggle" aria-hidden="true"></span>
+            <div class="dcc-option-row" data-dcc-id="houdini">
+              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Houdini"></button>
+              <span class="dcc-name">Houdini <span class="dcc-version">(v1.0.0)</span></span>
+              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Houdini 本地路径" aria-label="设置 Houdini 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+              <div class="dcc-path-editor" hidden>
+                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Houdini 本地路径">
+              </div>
+            </div>
+            <div class="dcc-option-row" data-dcc-id="blender">
+              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Blender"></button>
               <span class="dcc-name">Blender <span class="dcc-version">(v1.0.1)</span></span>
-              <button type="button" class="dcc-install-btn" disabled>安装</button>
+              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Blender 本地路径" aria-label="设置 Blender 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+              <div class="dcc-path-editor" hidden>
+                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Blender 本地路径">
+              </div>
             </div>
-            <div class="dcc-option-row">
-              <span class="dcc-toggle" aria-hidden="true"></span>
-              <span class="dcc-name">3ds Max <span class="dcc-version">(v1.0.0)</span></span>
-              <button type="button" class="dcc-install-btn" disabled>安装</button>
-            </div>
-            <div class="dcc-option-row">
-              <span class="dcc-toggle" aria-hidden="true"></span>
+            <div class="dcc-option-row" data-dcc-id="unity">
+              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Unity"></button>
               <span class="dcc-name">Unity <span class="dcc-version">(v1.0.0)</span></span>
-              <button type="button" class="dcc-install-btn" disabled>安装</button>
+              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Unity 本地路径" aria-label="设置 Unity 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+              <div class="dcc-path-editor" hidden>
+                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Unity 本地路径">
+              </div>
             </div>
-            <div class="dcc-option-row">
-              <span class="dcc-toggle" aria-hidden="true"></span>
+            <div class="dcc-option-row" data-dcc-id="unreal">
+              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Unreal"></button>
               <span class="dcc-name">Unreal <span class="dcc-version">(v1.0.4)</span></span>
-              <button type="button" class="dcc-install-btn" disabled>安装</button>
+              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Unreal 本地路径" aria-label="设置 Unreal 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+              <div class="dcc-path-editor" hidden>
+                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Unreal 本地路径">
+              </div>
             </div>
-            <div class="dcc-option-row">
-              <span class="dcc-toggle" aria-hidden="true"></span>
-              <span class="dcc-name">Maya <span class="dcc-version">(v1.0.0)</span></span>
-              <button type="button" class="dcc-install-btn" disabled>安装</button>
-            </div>
-            <div class="dcc-option-row">
-              <span class="dcc-toggle" aria-hidden="true"></span>
-              <span class="dcc-name">Cocos <span class="dcc-version">(v1.0.0)</span></span>
-              <button type="button" class="dcc-install-btn" disabled>安装</button>
-            </div>
-            <div class="dcc-option-row">
-              <span class="dcc-toggle" aria-hidden="true"></span>
+            <div class="dcc-option-row" data-dcc-id="godot">
+              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Godot"></button>
               <span class="dcc-name">Godot <span class="dcc-version">(v1.0.0)</span></span>
-              <button type="button" class="dcc-install-btn" disabled>安装</button>
-            </div>
-            <div class="dcc-option-row">
-              <span class="dcc-toggle" aria-hidden="true"></span>
-              <span class="dcc-name">ZBrush <span class="dcc-version">(v1.0.0)</span></span>
-              <button type="button" class="dcc-install-btn" disabled>安装</button>
+              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Godot 本地路径" aria-label="设置 Godot 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+              <div class="dcc-path-editor" hidden>
+                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Godot 本地路径">
+              </div>
             </div>
           </div>
         </details>

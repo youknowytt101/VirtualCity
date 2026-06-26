@@ -8,6 +8,7 @@ var shutdownWithPage = window.VC_CONFIG.shutdownWithPage;
 var pageSessionTimer = null;
 var selectionStorageKey = 'vc.areaPicker.selection.v1';
 var frontendRefreshWorkspaceKey = 'vc.areaPicker.refreshWorkspace.v1';
+var dccPathCachePrefix = 'virtualcity.dcc.path.';
 var pendingRestoreTileIds = null;
 var pendingRestoreLogged = false;
 var pointSelectActive = false;
@@ -120,7 +121,7 @@ function createCameraController(mapInstance) {
     PROGRAMMATIC_FIT: 'programmatic-fit'
   };
 
-  var CITY_PITCH = 65;
+  var CITY_PITCH = 55;
   var AUTO_SPIN_MAX_ZOOM = 4.5;
   var AUTO_SPIN_DEGREES_PER_SEC = 1;
   var CITY_ORBIT_DEGREES_PER_SEC = 6;
@@ -562,7 +563,7 @@ function createCameraController(mapInstance) {
       bearing: 0,
       linear: false,
       curve: 1.42,
-      speed: 0.8,
+      speed: 2.4,
       easing: function(t) { return 1 - Math.pow(1 - t, 3); }
     });
   }
@@ -571,7 +572,7 @@ function createCameraController(mapInstance) {
     if (typeof lng !== 'number' || typeof lat !== 'number') return;
     moveToken++;
     var token = moveToken;
-    var targetZoom = zoom || 16;
+    var targetZoom = zoom || 15;
     holdAutoSpin(PROGRAMMATIC_HOLD_MS);
     resetWheelZoom();
     setMode(MODES.CITY_FLYING);
@@ -583,7 +584,7 @@ function createCameraController(mapInstance) {
     });
     mapInstance.flyTo({
       center: [lng, lat],
-      zoom: targetZoom + 0.4,
+      zoom: targetZoom,
       pitch: CITY_PITCH,
       bearing: startBearing - 25,
       speed: 2.4,
@@ -1385,7 +1386,10 @@ function saveSoftwarePath(refreshAfter) {
   })
   .then(function(r) { return r.json(); })
   .then(function(d) {
-    if (d.software_paths) updateSoftwarePath(d.software_paths);
+    if (d.software_paths) {
+      updateSoftwarePath(d.software_paths);
+      updateDccSoftwarePaths(d.software_paths);
+    }
     if (!d.ok && note) {
       note.textContent = d.message || '保存失败';
       note.style.color = 'var(--accent)';
@@ -1444,7 +1448,10 @@ function openOrProbeHoudini() {
   })
   .then(function(r) { return r.json(); })
   .then(function(d) {
-    if (d.software_paths) updateSoftwarePath(d.software_paths);
+    if (d.software_paths) {
+      updateSoftwarePath(d.software_paths);
+      updateDccSoftwarePaths(d.software_paths);
+    }
     if (!d.ok) {
       var note = document.getElementById('houdini-path-note');
       if (note) {
@@ -1849,6 +1856,8 @@ function updateWorkspaceButtons(workspaceId) {
     button.classList.toggle('active', active);
     button.setAttribute('aria-pressed', active ? 'true' : 'false');
   });
+  var dccSummary = document.querySelector('.dcc-bridge-summary');
+  if (dccSummary) dccSummary.classList.remove('active');
 }
 
 function syncActionPanelContent(workspaceId) {
@@ -1987,18 +1996,45 @@ function initialWorkspaceId() {
 }
 
 function bindFrontendRefresh() {
-  var button = document.getElementById('frontend-refresh-button');
-  if (!button) return;
-  button.addEventListener('click', function() {
-    try {
-      sessionStorage.setItem(frontendRefreshWorkspaceKey, activeWorkspaceId);
-    } catch (e) {}
-    button.classList.add('is-refreshing');
-    button.disabled = true;
+  var refreshButton = document.getElementById('frontend-refresh-button');
+  var restartButton = document.getElementById('backend-restart-button');
+  if (!refreshButton && !restartButton) return;
+  function reloadWithCacheBust() {
     var url = new URL(window.location.href);
     url.searchParams.set('refresh', String(Date.now()));
     window.location.replace(url.toString());
-  });
+  }
+  function rememberWorkspace() {
+    try {
+      sessionStorage.setItem(frontendRefreshWorkspaceKey, activeWorkspaceId);
+    } catch (e) {}
+  }
+  if (refreshButton) {
+    refreshButton.addEventListener('click', function() {
+      rememberWorkspace();
+      reloadWithCacheBust();
+    });
+  }
+  if (restartButton) {
+    restartButton.addEventListener('click', function() {
+      rememberWorkspace();
+      clearDccPathCache();
+      restartButton.classList.add('is-refreshing');
+      restartButton.disabled = true;
+      fetch('/restart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}'
+      })
+      .catch(function() {})
+      .finally(function() {
+        setTimeout(function() {
+          restartButton.classList.remove('is-refreshing');
+          restartButton.disabled = false;
+        }, 2500);
+      });
+    });
+  }
 }
 
 function setWorkspace(id) {
@@ -2202,7 +2238,7 @@ function renderCities(cities) {
         : bboxCenter(city.bbox);
       if (!target) return;
       loadBoundary(city.osmId);
-      flyTo3DCity(target[0], target[1], city.landmark_zoom || 16);
+      flyTo3DCity(target[0], target[1], city.landmark_zoom || 15);
     });
 
     row.appendChild(nameBtn);
@@ -2219,6 +2255,7 @@ function refreshServiceState() {
   .then(function(d) {
     setHoudiniBadge(!!d.houdini_available, d.houdini_asset);
     updateSoftwarePath(d.software_paths);
+    updateDccSoftwarePaths(d.software_paths);
     updateExportButton(!!d.export_available, !!d.running);
     updateSelectionButtons(!!d.running);
     updateRunStatusFromHealth(d);
@@ -2766,6 +2803,7 @@ function applyStatus(d) {
     }
     updateExportButton(!!d.export_available, !!d.export_running || !!d.running);
     setHoudiniBadge(!!d.houdini_available, d.houdini_asset);
+    updateDccSoftwarePaths(d.software_paths);
     updateSelectionButtons(!!d.running);
 
     if (d.export_done && !d.export_running) {
@@ -2865,6 +2903,224 @@ function downloadData() {
   submitSelectedArea('download', '提交数据下载');
 }
 
+function dccSoftwareId(row) {
+  return row ? (row.getAttribute('data-dcc-id') || '').trim() : '';
+}
+
+function dccSoftwarePathKey(row) {
+  var softwareId = dccSoftwareId(row);
+  return softwareId ? softwareId + '_exe' : '';
+}
+
+function dccPathStorageKey(row) {
+  return dccPathCachePrefix + dccSoftwareId(row);
+}
+
+function getCachedDccPath(row) {
+  try {
+    return localStorage.getItem(dccPathStorageKey(row)) || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function setCachedDccPath(row, value) {
+  try {
+    if (value) localStorage.setItem(dccPathStorageKey(row), value);
+    else localStorage.removeItem(dccPathStorageKey(row));
+  } catch (e) {}
+}
+
+function clearDccPathCache() {
+  try {
+    var keys = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key && key.indexOf(dccPathCachePrefix) === 0) keys.push(key);
+    }
+    keys.forEach(function(key) {
+      localStorage.removeItem(key);
+    });
+  } catch (e) {}
+  document.querySelectorAll('.dcc-option-row').forEach(function(row) {
+    var input = row.querySelector('.dcc-path-input');
+    if (input) input.value = '';
+    row.classList.remove('has-path');
+    closeDccPathEditor(row);
+  });
+}
+
+function updateDccSoftwarePaths(paths) {
+  if (!paths) return;
+  document.querySelectorAll('.dcc-option-row').forEach(function(row) {
+    var input = row.querySelector('.dcc-path-input');
+    var key = dccSoftwarePathKey(row);
+    if (!input || !key) return;
+    var value = paths[key] || getCachedDccPath(row);
+    if (document.activeElement !== input) input.value = value;
+    row.classList.toggle('has-path', !!value);
+  });
+}
+
+function saveDccSoftwarePath(row) {
+  var input = row ? row.querySelector('.dcc-path-input') : null;
+  var softwareId = dccSoftwareId(row);
+  if (!input || !softwareId) return Promise.resolve({ ok: false });
+  var value = input.value.trim();
+  setCachedDccPath(row, value);
+  row.classList.toggle('has-path', !!value);
+  return fetch('/software-paths', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ software_id: softwareId, path: value })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.software_paths) {
+      updateSoftwarePath(d.software_paths);
+      updateDccSoftwarePaths(d.software_paths);
+    }
+    if (d.ok) row.classList.toggle('has-path', !!input.value.trim());
+    return d;
+  });
+}
+
+function closeDccPathEditor(row) {
+  var pathBtn = row ? row.querySelector('.dcc-path-btn') : null;
+  var editor = row ? row.querySelector('.dcc-path-editor') : null;
+  if (pathBtn) {
+    pathBtn.classList.remove('is-open');
+    pathBtn.setAttribute('aria-expanded', 'false');
+  }
+  if (editor) editor.hidden = true;
+}
+
+function saveAndCloseDccPathEditor(row) {
+  if (!row) return;
+  saveDccSoftwarePath(row).then(function(d) {
+    if (!d || d.ok) closeDccPathEditor(row);
+  });
+}
+
+function openDccSoftware(row, toggle) {
+  var input = row ? row.querySelector('.dcc-path-input') : null;
+  var softwareId = dccSoftwareId(row);
+  if (!row || !toggle || !softwareId) return;
+  toggle.disabled = true;
+  fetch('/open-software', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ software_id: softwareId, path: input ? input.value : '' })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.software_paths) {
+      updateSoftwarePath(d.software_paths);
+      updateDccSoftwarePaths(d.software_paths);
+    }
+    var ok = !!d.ok;
+    toggle.classList.toggle('is-on', ok);
+    toggle.setAttribute('aria-pressed', ok ? 'true' : 'false');
+    row.classList.toggle('is-enabled', ok);
+    if (!ok && input) {
+      var pathBtn = row.querySelector('.dcc-path-btn');
+      var editor = row.querySelector('.dcc-path-editor');
+      input.title = d.message || '软件启动失败';
+      if (pathBtn) {
+        pathBtn.classList.add('is-open');
+        pathBtn.setAttribute('aria-expanded', 'true');
+      }
+      if (editor) editor.hidden = false;
+      input.focus();
+    }
+  })
+  .catch(function(e) {
+    toggle.classList.remove('is-on');
+    toggle.setAttribute('aria-pressed', 'false');
+    row.classList.remove('is-enabled');
+    if (input) input.title = '软件启动失败: ' + e;
+  })
+  .finally(function() {
+    toggle.disabled = false;
+  });
+}
+
+function bindDccBridgeControls() {
+  var panel = document.querySelector('.dcc-bridge-options');
+  if (!panel) return;
+  var bridge = panel.closest('.dcc-bridge-panel');
+  var summary = bridge ? bridge.querySelector('.dcc-bridge-summary') : null;
+  if (bridge && summary) {
+    bridge.addEventListener('toggle', function() {
+      if (bridge.open) {
+        updateWorkspaceButtons('');
+        summary.classList.add('active');
+      } else {
+        updateWorkspaceButtons(activeWorkspaceId);
+      }
+    });
+  }
+  document.addEventListener('pointerdown', function(event) {
+    var keepRow = event.target.closest('.dcc-option-row');
+    panel.querySelectorAll('.dcc-option-row').forEach(function(row) {
+      if (row !== keepRow && row.querySelector('.dcc-path-editor:not([hidden])')) {
+        saveAndCloseDccPathEditor(row);
+      }
+    });
+  });
+  panel.addEventListener('click', function(event) {
+    var toggle = event.target.closest('.dcc-toggle');
+    if (toggle && panel.contains(toggle)) {
+      var row = toggle.closest('.dcc-option-row');
+      openDccSoftware(row, toggle);
+      return;
+    }
+
+    var pathBtn = event.target.closest('.dcc-path-btn');
+    if (pathBtn && panel.contains(pathBtn)) {
+      var pathRow = pathBtn.closest('.dcc-option-row');
+      var editor = pathRow ? pathRow.querySelector('.dcc-path-editor') : null;
+      var open = pathBtn.getAttribute('aria-expanded') !== 'true';
+      pathBtn.classList.toggle('is-open', open);
+      pathBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (editor) {
+        editor.hidden = !open;
+        var pathInput = editor.querySelector('.dcc-path-input');
+        if (open && pathInput) pathInput.focus();
+      }
+      return;
+    }
+
+    var install = event.target.closest('.dcc-install-btn');
+    if (!install || !panel.contains(install)) return;
+    var installed = install.getAttribute('aria-pressed') !== 'true';
+    var installRow = install.closest('.dcc-option-row');
+    if (installRow) installRow.classList.toggle('is-installed', installed);
+    install.classList.toggle('is-installed', installed);
+    install.setAttribute('aria-pressed', installed ? 'true' : 'false');
+    install.textContent = installed ? '已安装' : '安装';
+  });
+  panel.addEventListener('change', function(event) {
+    var input = event.target.closest('.dcc-path-input');
+    if (!input || !panel.contains(input)) return;
+    var row = input.closest('.dcc-option-row');
+    if (!row) return;
+    saveDccSoftwarePath(row);
+  });
+  panel.addEventListener('input', function(event) {
+    var input = event.target.closest('.dcc-path-input');
+    if (!input || !panel.contains(input)) return;
+    var row = input.closest('.dcc-option-row');
+    if (row) row.classList.toggle('has-path', !!input.value.trim());
+  });
+  panel.addEventListener('keydown', function(event) {
+    var input = event.target.closest('.dcc-path-input');
+    if (!input || !panel.contains(input) || event.key !== 'Enter') return;
+    event.preventDefault();
+    saveAndCloseDccPathEditor(input.closest('.dcc-option-row'));
+  });
+}
+
 function stopStatusStream() {
   if (_evtSource) { try { _evtSource.close(); } catch (e) {} _evtSource = null; }
   if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
@@ -2922,6 +3178,7 @@ loadRegionNav();
 bindWorkspaceSwitching();
 bindActionPanelToggle();
 bindHoudiniSideResize();
+bindDccBridgeControls();
 bindAccountMenu();
 bindFrontendRefresh();
 setWorkspace(initialWorkspaceId());

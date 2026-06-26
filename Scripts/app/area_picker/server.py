@@ -35,7 +35,9 @@ from acquisition import sources as acquisition_sources
 import app.area_picker.template as area_picker_template
 from app.area_picker.software_paths import (
     SOFTWARE_PATHS_FILE,
+    SOFTWARE_IDS as _SOFTWARE_IDS,
     read_software_paths as _read_software_paths,
+    software_path_key as _software_path_key,
     software_path_status as _software_path_status,
     write_software_paths as _write_software_paths,
 )
@@ -104,6 +106,7 @@ def _fetch_boundary(osm_type: str, osm_id: str) -> dict:
     return {'ok': False, 'message': f'boundary failed: {last_exc}', 'geojson': None}
 NO_BROWSER = os.environ.get("VC_AREA_PICKER_NO_BROWSER") == "1"
 SHUTDOWN_WITH_PAGE = os.environ.get("VC_AREA_PICKER_SHUTDOWN_WITH_PAGE") == "1"
+FORCE_RESTART = os.environ.get("VC_AREA_PICKER_FORCE_RESTART") == "1"
 # 浏览器会把后台标签页的 setInterval 心跳节流到最慢每分钟一次，宽限期必须
 # 高于该节流上限，否则切到别的窗口几十秒后就会被误判为"网页已关闭"而自杀。
 # 真正关页面仍由 /session/closed 信标走 PAGE_CLOSE_GRACE_SECONDS 快速停服。
@@ -707,6 +710,39 @@ def _schedule_page_close_shutdown() -> None:
     threading.Thread(target=_delayed_shutdown, daemon=True).start()
 
 
+def _schedule_desktop_restart() -> None:
+    def _restart() -> None:
+        time.sleep(0.35)
+        try:
+            env = os.environ.copy()
+            env['VC_AREA_PICKER_FORCE_RESTART'] = '1'
+            subprocess.Popen([sys.executable, '-u', str(SCRIPTS / 'desktop.py')], cwd=str(SCRIPTS), close_fds=True, env=env)
+        except Exception as exc:
+            _safe_print(f'[area_picker] 重启桌面外壳失败: {exc}')
+        server = _server_ref[0]
+        if server is not None:
+            try:
+                server.shutdown()
+            except Exception:
+                pass
+        time.sleep(0.25)
+        os._exit(0)
+
+    threading.Thread(target=_restart, daemon=True).start()
+
+
+def _clear_dcc_path_cache() -> None:
+    data = _read_software_paths()
+    changed = False
+    for software_id in _SOFTWARE_IDS:
+        key = _software_path_key(software_id)
+        if key in data:
+            data.pop(key, None)
+            changed = True
+    if changed:
+        _write_software_paths(data)
+
+
 def _probe_houdini(timeout: float = 0.35) -> bool:
     """Return whether the local Houdini RPYC port accepts connections."""
     try:
@@ -725,11 +761,57 @@ def _open_houdini_from_config() -> dict:
         return {'ok': False, 'message': '请先输入 Houdini 软件路径', 'software_paths': status}
     if not status.get('houdini_exe_exists'):
         return {'ok': False, 'message': 'Houdini 软件路径不存在', 'software_paths': status}
+    launch_path = _resolve_software_launch_path('houdini', houdini_exe)
+    if not launch_path:
+        return {'ok': False, 'message': 'Houdini 目录中没有找到 houdini.exe', 'software_paths': status}
     try:
-        subprocess.Popen([houdini_exe], cwd=str(Path(houdini_exe).parent), close_fds=True)
+        subprocess.Popen([str(launch_path)], cwd=str(launch_path.parent), close_fds=True)
     except Exception as exc:
         return {'ok': False, 'message': f'Houdini 启动失败: {exc}', 'software_paths': status}
     return {'ok': True, 'message': 'Houdini 已启动，等待连接', 'started': True, 'software_paths': status}
+
+
+def _resolve_software_launch_path(software_id: str, value: str) -> Path | None:
+    path = Path(str(value or '').strip())
+    if not path.exists():
+        return None
+    if path.is_file():
+        return path
+    candidates = {
+        'houdini': ('bin/houdini.exe', 'houdini.exe'),
+        'blender': ('blender.exe',),
+        'unity': ('Editor/Unity.exe', 'Unity.exe'),
+        'unreal': ('Engine/Binaries/Win64/UnrealEditor.exe', 'UnrealEditor.exe'),
+        'godot': ('Godot.exe', 'godot.exe'),
+    }.get(str(software_id or '').strip().lower(), ())
+    for rel in candidates:
+        candidate = path / rel
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _open_software_from_config(software_id: str) -> dict:
+    software_id = str(software_id or '').strip().lower()
+    if software_id == 'houdini':
+        return _open_houdini_from_config()
+    key = _software_path_key(software_id)
+    status = _software_path_status()
+    if not key:
+        return {'ok': False, 'message': '未知软件', 'software_paths': status}
+    software_exe = status.get(key) or ''
+    if not software_exe:
+        return {'ok': False, 'message': '请先设置软件路径', 'software_paths': status}
+    if not status.get(f'{key}_exists'):
+        return {'ok': False, 'message': '软件路径不存在', 'software_paths': status}
+    launch_path = _resolve_software_launch_path(software_id, software_exe)
+    if not launch_path:
+        return {'ok': False, 'message': '目录中没有找到可执行文件', 'software_paths': status}
+    try:
+        subprocess.Popen([str(launch_path)], cwd=str(launch_path.parent), close_fds=True)
+    except Exception as exc:
+        return {'ok': False, 'message': f'软件启动失败: {exc}', 'software_paths': status}
+    return {'ok': True, 'message': '软件已启动', 'started': True, 'software_paths': status}
 
 
 def _export_available() -> bool:
@@ -1325,6 +1407,15 @@ class _Handler(BaseHTTPRequestHandler):
             self._json({'ok': True, 'message': 'shutting down'})
             threading.Thread(target=lambda: _server_ref[0].shutdown()).start()
             return
+        if parsed.path == '/restart':
+            _safe_print('[area_picker] 收到前端重启请求，正在重启桌面服务...')
+            try:
+                _clear_dcc_path_cache()
+            except Exception as exc:
+                _safe_print(f'[area_picker] 清理 DCC 路径缓存失败: {exc}')
+            self._json({'ok': True, 'message': 'restarting'})
+            _schedule_desktop_restart()
+            return
         if parsed.path == '/session':
             _mark_page_seen()
             _start_page_monitor()
@@ -1348,6 +1439,9 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/open-houdini':
             self._post_open_houdini()
+            return
+        if parsed.path == '/open-software':
+            self._post_open_software()
             return
         if parsed.path == '/export':
             self._post_export()
@@ -1566,9 +1660,24 @@ class _Handler(BaseHTTPRequestHandler):
         except json.JSONDecodeError:
             self._json({'ok': False, 'message': '请求 JSON 无法解析'})
             return
-        houdini_exe = str(body.get('houdini_exe') or '').strip().strip('"')
+        updates = {}
+        software_id = str(body.get('software_id') or '').strip().lower()
+        if software_id:
+            key = _software_path_key(software_id)
+            if not key:
+                self._json({'ok': False, 'message': '未知软件'})
+                return
+            updates[key] = str(body.get('path') or '').strip().strip('"')
+        else:
+            for item in _SOFTWARE_IDS:
+                key = _software_path_key(item)
+                if key in body:
+                    updates[key] = str(body.get(key) or '').strip().strip('"')
+        if not updates:
+            self._json({'ok': False, 'message': '没有可保存的软件路径'})
+            return
         data = _read_software_paths()
-        data['houdini_exe'] = houdini_exe
+        data.update(updates)
         try:
             _write_software_paths(data)
         except Exception as exc:
@@ -1576,9 +1685,10 @@ class _Handler(BaseHTTPRequestHandler):
             return
         status = _software_path_status()
         message = '软件路径已保存'
-        if houdini_exe and not status.get('houdini_exe_exists'):
+        if any(status.get(key) and not status.get(f'{key}_exists') for key in updates):
             message = '软件路径已保存，但文件不存在'
         self._json({'ok': True, 'message': message, 'software_paths': status})
+
     def _post_open_houdini(self):
         if not _probe_houdini():
             length = int(self.headers.get('Content-Length', 0))
@@ -1597,6 +1707,30 @@ class _Handler(BaseHTTPRequestHandler):
                     self._json({'ok': False, 'message': f'软件路径保存失败: {exc}'})
                     return
         self._json(_open_houdini_from_config())
+
+    def _post_open_software(self):
+        length = int(self.headers.get('Content-Length', 0))
+        try:
+            body = json.loads(self.rfile.read(length) or b'{}')
+        except json.JSONDecodeError:
+            self._json({'ok': False, 'message': '请求 JSON 无法解析'})
+            return
+        software_id = str(body.get('software_id') or '').strip().lower()
+        key = _software_path_key(software_id)
+        if not key:
+            self._json({'ok': False, 'message': '未知软件'})
+            return
+        path = str(body.get('path') or '').strip().strip('"')
+        if path:
+            data = _read_software_paths()
+            data[key] = path
+            try:
+                _write_software_paths(data)
+            except Exception as exc:
+                self._json({'ok': False, 'message': f'软件路径保存失败: {exc}'})
+                return
+        self._json(_open_software_from_config(software_id))
+
     def _post_export(self):
         if not _export_available():
             self._json({'ok': False, 'message': '当前区域还没有通过 Houdini Model QA，不能导出 FBX。'})
@@ -1836,7 +1970,7 @@ def main():
     existing = _probe_existing_server()
     if existing:
         version = existing.get('server_version', '')
-        if version == APP_VERSION:
+        if not FORCE_RESTART and version == APP_VERSION:
             existing_shutdown = bool(existing.get('shutdown_with_page', False))
             if existing_shutdown == SHUTDOWN_WITH_PAGE:
                 print(f"[area_picker] 已有当前版本服务在运行: {url}")

@@ -115,7 +115,7 @@ button, input { font: inherit; }
 .action-panel-toggle.is-collapsed .panel-icon-expand {
   display: block;
 }
-.version-chip, .status-line {
+.version-text, .test-chip, .status-line {
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -127,20 +127,33 @@ button, input { font: inherit; }
   padding: 6px 10px;
   font-size: 12px;
 }
-.version-chip {
+.test-chip {
+  align-self: flex-end;
+  margin-bottom: 5px;
+  padding: 4px 8px;
+  font-size: 11px;
   cursor: pointer;
   font-family: inherit;
   line-height: 1;
 }
-.version-chip:hover:not(:disabled) {
+.version-text {
+  align-self: flex-end;
+  margin-bottom: 5px;
+  padding: 0;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  line-height: 1;
+}
+.test-chip:hover:not(:disabled) {
   color: var(--text);
   border-color: var(--line);
 }
-.version-chip:focus-visible {
+.test-chip:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent) 68%, transparent);
   outline-offset: 2px;
 }
-.version-chip.is-refreshing {
+.test-chip.is-refreshing {
   cursor: wait;
   opacity: 0.78;
 }
@@ -1542,11 +1555,30 @@ body.is-resizing-game-side {
 }
 .dcc-bridge-panel {
   padding: 0;
+  cursor: default;
+  transition: none;
+}
+.dcc-bridge-panel.flat-item:hover,
+.dcc-bridge-panel.flat-item:active {
+  background-color: transparent;
 }
 .dcc-bridge-summary {
   display: flex;
   align-items: center;
   list-style: none;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.dcc-bridge-summary:hover,
+.dcc-bridge-summary:focus-visible {
+  background-color: color-mix(in srgb, #ffffff 10%, transparent);
+}
+.dcc-bridge-summary:active {
+  background-color: var(--glass-bg-hover);
+}
+.dcc-bridge-summary.active {
+  background-color: var(--glass-accent-soft);
+  color: color-mix(in srgb, var(--glass-accent) 70%, var(--text));
 }
 .dcc-bridge-summary::-webkit-details-marker {
   display: none;
@@ -1558,7 +1590,7 @@ body.is-resizing-game-side {
 }
 .dcc-option-row {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) auto;
+  grid-template-columns: 34px minmax(0, 1fr) auto 22px;
   align-items: center;
   min-height: 34px;
   gap: 8px;
@@ -1566,11 +1598,14 @@ body.is-resizing-game-side {
   font-size: 12px;
 }
 .dcc-toggle {
+  padding: 0;
   width: 30px;
   height: 16px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--text) 7%, var(--base));
   border: 1px solid var(--line-soft);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 .dcc-toggle::before {
   content: "";
@@ -1580,25 +1615,130 @@ body.is-resizing-game-side {
   margin: 1px;
   border-radius: 50%;
   background: var(--subtle);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.dcc-toggle.is-on {
+  background: color-mix(in srgb, var(--accent) 55%, var(--base));
+}
+.dcc-toggle.is-on::before {
+  background: var(--text);
+  transform: translateX(14px);
+}
+.dcc-toggle:disabled {
+  cursor: default;
+  opacity: 0.65;
 }
 .dcc-name {
+  color: var(--subtle);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 0.15s ease;
 }
 .dcc-version {
   color: var(--subtle);
 }
-.dcc-install-btn {
-  padding: 0;
+.dcc-option-row.is-enabled .dcc-name {
   color: var(--text);
+}
+.dcc-install-btn {
+  min-width: 36px;
+  padding: 0;
+  color: var(--subtle);
   background: transparent;
   border: 0;
   font-size: 12px;
   font-weight: 650;
-  cursor: not-allowed;
+  text-align: right;
+  cursor: pointer;
   opacity: 0.75;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+.dcc-option-row.is-enabled .dcc-install-btn {
+  color: var(--text);
+}
+.dcc-option-row.is-installed .dcc-install-btn {
+  color: var(--text);
+}
+.dcc-install-btn:hover,
+.dcc-install-btn.is-installed {
+  opacity: 1;
+}
+.dcc-path-btn {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  color: var(--subtle);
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: color 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+}
+.dcc-path-icon {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  display: block;
+}
+.dcc-path-icon::before,
+.dcc-path-icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+}
+.dcc-path-icon::before {
+  -webkit-mask: url("/area-picker/icons/lucide-folder.svg") center / contain no-repeat;
+  mask: url("/area-picker/icons/lucide-folder.svg") center / contain no-repeat;
+}
+.dcc-path-icon::after {
+  background: #fff;
+  clip-path: inset(0 100% 0 0);
+  -webkit-mask: url("/area-picker/icons/bootstrap-folder-fill.svg") center / contain no-repeat;
+  mask: url("/area-picker/icons/bootstrap-folder-fill.svg") center / contain no-repeat;
+  transition: clip-path 220ms ease;
+}
+.dcc-option-row.has-path .dcc-path-icon::after {
+  clip-path: inset(0 0 0 0);
+}
+.dcc-path-btn:hover,
+.dcc-path-btn.is-open {
+  color: var(--text);
+  background: color-mix(in srgb, #ffffff 8%, transparent);
+  opacity: 1;
+}
+.dcc-option-row.has-path .dcc-path-btn {
+  color: #fff;
+  opacity: 1;
+}
+.dcc-path-editor {
+  grid-column: 1 / -1;
+  padding: 0 0 5px 42px;
+}
+.dcc-path-editor[hidden] {
+  display: none;
+}
+.dcc-path-input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  min-height: 30px;
+  padding: 6px 8px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 4%, var(--base));
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  font-size: 11.5px;
+  line-height: 1.35;
+  outline: none;
+}
+.dcc-path-input:focus {
+  border-color: var(--accent);
 }
 .search-status {
   min-height: 16px;
@@ -1966,7 +2106,7 @@ body.is-resizing-game-side {
   .source-action-btn {
     width: 100%;
   }
-  .version-chip, .status-line {
+  .version-text, .test-chip, .status-line {
     max-width: 100%;
   }
   #console-dock { height: 150px; }
