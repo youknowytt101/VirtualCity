@@ -33,7 +33,7 @@
     </button>
   </div>
 </div>
-<main id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="false">
+<main id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="true">
   <div id="map-shell">
     <div id="map">
       <div id="selection-tools" class="map-tool-control flat-panel flat-panel--row" aria-label="区域选择工具">
@@ -155,28 +155,32 @@
     <!-- 运行监控组件已移至右侧 action-panel 底部 -->
     <!-- 底部占位组件：账户/入口占位，待接入 -->
     <section class="panel-section panel-footer" id="panel-footer" aria-label="账户占位">
-      <div class="account-card">
-        <div class="account-avatar" aria-hidden="true">Y</div>
-        <div class="account-meta">
-          <div class="account-name">未登录</div>
-          <div class="account-plan">Free plan</div>
-        </div>
-        <div class="account-actions">
-          <button type="button" class="account-btn flat-item" disabled title="占位入口" aria-label="占位入口">
-            <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <path d="M7 10l5 5 5-5"></path>
-              <path d="M12 15V3"></path>
+      <details class="account-menu">
+        <summary class="account-trigger" aria-label="打开账户菜单">
+          <span class="account-avatar" aria-hidden="true">S</span>
+          <span class="account-meta">
+            <span class="account-name">Settings</span>
+            <span class="account-plan">Account</span>
+          </span>
+          <span class="account-update">Update</span>
+        </summary>
+        <div class="account-popover" role="menu" aria-label="账户菜单">
+          <div class="account-menu-status">
+            <svg class="account-menu-icon" aria-hidden="true" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M8 12h8"></path>
             </svg>
+            <span>未登录</span>
+          </div>
+          <button type="button" class="account-menu-item" role="menuitem">
+            <span>Settings</span>
+            <span class="account-menu-shortcut">Ctrl+,</span>
           </button>
-          <button type="button" class="account-btn flat-item" disabled title="占位入口" aria-label="占位入口">
-            <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
-              <path d="m7 15 5 5 5-5"></path>
-              <path d="m7 9 5-5 5 5"></path>
-            </svg>
+          <button type="button" class="account-menu-item" role="menuitem">
+            <span>Log out</span>
           </button>
         </div>
-      </div>
+      </details>
     </section>
   </aside>
   <section id="game-workbench" class="workspace-page" data-workspace-panel="game" aria-label="游戏工作台" hidden>
@@ -210,6 +214,11 @@
     </div>
   </section>
   <aside id="action-panel" aria-label="执行操作面板" hidden>
+    <div class="action-panel-content action-panel-empty" data-action-panel-content="news" aria-label="实时新闻右栏"></div>
+    <div class="action-panel-content action-panel-empty" data-action-panel-content="city-preview" aria-label="城市预览右栏" hidden></div>
+    <div class="action-panel-content action-panel-empty" data-action-panel-content="neighborhood" aria-label="我的街区右栏" hidden></div>
+    <div class="action-panel-content action-panel-empty" data-action-panel-content="game" aria-label="我的游戏右栏" hidden></div>
+    <div class="action-panel-content" data-action-panel-content="houdini" aria-label="Houdini 右栏" hidden>
     <div class="action-panel-head">
       <div>
         <div class="section-kicker">工作流</div>
@@ -347,6 +356,7 @@
       </div>
     </section>
     <!-- /运行监控组件 -->
+    </div>
   </aside>
 </main>
 

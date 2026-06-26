@@ -162,11 +162,11 @@ button, input { font: inherit; }
   display: none;
 }
 #workspace[data-workspace-kind="earth"] #map-shell {
-  grid-column: 2 / 4;
+  grid-column: 2 / 3;
   grid-row: 1;
 }
 .workspace-page {
-  grid-column: 2 / 4;
+  grid-column: 2 / 3;
   grid-row: 1;
   min-width: 0;
   min-height: 0;
@@ -677,6 +677,19 @@ button, input { font: inherit; }
   box-shadow: none;
   backdrop-filter: none;
 }
+.action-panel-content {
+  min-height: 0;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
+}
+.action-panel-content[hidden] {
+  display: none;
+}
+.action-panel-empty {
+  min-height: 0;
+}
 .action-panel-head {
   display: flex;
   align-items: flex-start;
@@ -807,34 +820,59 @@ button, input { font: inherit; }
 }
 .panel-footer {
   flex: 0 0 auto;
-  margin-top: auto;
+  margin: auto -14px -14px;
+  padding: 0;
+  border-top: 1px solid var(--line);
 }
-.account-card {
+.account-menu {
+  position: relative;
+  width: 100%;
+}
+.account-menu > summary {
+  list-style: none;
+}
+.account-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.account-trigger {
+  width: 100%;
+  min-height: 56px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 11px;
-  background: var(--raise);
-  border: 1px solid var(--line-soft);
-  border-radius: 10px;
+  gap: 9px;
+  padding: 8px 14px 8px 22px;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+  cursor: pointer;
+}
+.account-trigger:hover,
+.account-trigger:focus-visible {
+  background: color-mix(in srgb, #ffffff 7%, transparent);
+  outline: none;
 }
 .account-avatar {
   flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--text);
-  background: var(--base);
-  border: 1px solid var(--line-soft);
+  color: color-mix(in srgb, #f0a07b 82%, #ffffff 18%);
+  background: color-mix(in srgb, #f0a07b 18%, transparent);
+  border: 0;
 }
 .account-meta {
   flex: 1 1 auto;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 .account-name {
   font-size: 13px;
@@ -851,28 +889,86 @@ button, input { font: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.account-actions {
+.account-update {
   flex: 0 0 auto;
-  display: flex;
-  gap: 6px;
+  margin-left: 4px;
+  padding: 3px 8px 4px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  background: color-mix(in srgb, #f0a07b 85%, #ffffff 15%);
 }
-.account-btn {
+.account-popover {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: calc(100% + 8px);
+  z-index: 800;
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 92%, #ffffff 8%);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.34);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(5px);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.account-menu[open] .account-popover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.account-menu:not([open]) .account-popover {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(5px);
+}
+.account-menu-status,
+.account-menu-item {
+  min-height: 30px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border-radius: 8px;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 7px;
+}
+.account-menu-status {
   color: var(--muted);
+  border-bottom: 1px solid var(--line-soft);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
-.account-btn .tool-icon {
-  width: 16px;
-  height: 16px;
+.account-menu-item {
+  width: 100%;
+  justify-content: space-between;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
 }
-.account-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
+.account-menu-item:hover,
+.account-menu-item:focus-visible {
+  background: color-mix(in srgb, #ffffff 7%, transparent);
+  outline: none;
+}
+.account-menu-icon {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.account-menu-shortcut {
+  color: var(--subtle);
+  font-size: 11px;
 }
 .run-status-panel {
   display: flex;

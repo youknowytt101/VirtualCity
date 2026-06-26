@@ -143,7 +143,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('class="toolbar-cluster"', toolbar_html)
         self.assertIn('id="action-panel-toggle"', toolbar_html)
         self.assertNotIn('id="action-panel-toggle"', action_panel_html)
-        self.assertIn('data-action-panel-collapsed="false"', _PICKER_FRONTEND)
+        self.assertIn('data-action-panel-collapsed="true"', _PICKER_FRONTEND)
         self.assertIn('#workspace[data-action-panel-collapsed="true"]', _PICKER_STYLES)
         self.assertIn('function setActionPanelCollapsed(collapsed)', _PICKER_APP_JS)
         self.assertIn('function bindActionPanelToggle()', _PICKER_APP_JS)
@@ -295,12 +295,34 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('id="game-workbench"', _PICKER_FRONTEND)
         self.assertIn('data-workspace-kind', _PICKER_FRONTEND)
         self.assertIn('#workspace[data-workspace-kind="earth"] #map-shell', _PICKER_FRONTEND)
-        self.assertIn('grid-column: 2 / 4;', _PICKER_FRONTEND)
+        self.assertIn('grid-column: 2 / 3;', _PICKER_FRONTEND)
         self.assertIn('#action-panel[hidden]', _PICKER_FRONTEND)
         self.assertIn('var WORKSPACE_KINDS = {', _PICKER_FRONTEND)
         self.assertIn('function setWorkspace(id)', _PICKER_FRONTEND)
         self.assertIn('function bindWorkspaceSwitching()', _PICKER_FRONTEND)
         self.assertIn("map.resize();", _PICKER_FRONTEND)
+
+    def test_workspace_action_panel_has_blank_panels_for_unimplemented_modules(self):
+        self.assertIn('data-action-panel-content="houdini"', _PICKER_INDEX_HTML)
+        for workspace in ("news", "city-preview", "neighborhood", "game"):
+            self.assertIn(f'data-action-panel-content="{workspace}"', _PICKER_INDEX_HTML)
+        self.assertIn("action-panel-empty", _PICKER_STYLES)
+        self.assertIn("function syncActionPanelContent(workspaceId)", _PICKER_APP_JS)
+        self.assertIn("querySelectorAll('[data-action-panel-content]')", _PICKER_APP_JS)
+
+    def test_account_footer_uses_codex_style_menu(self):
+        self.assertIn('<details class="account-menu">', _PICKER_INDEX_HTML)
+        self.assertIn('class="account-trigger"', _PICKER_INDEX_HTML)
+        self.assertIn('class="account-popover"', _PICKER_INDEX_HTML)
+        self.assertIn('role="menu"', _PICKER_INDEX_HTML)
+        self.assertIn('<span class="account-name">Settings</span>', _PICKER_INDEX_HTML)
+        self.assertIn('<span class="account-plan">Account</span>', _PICKER_INDEX_HTML)
+        self.assertIn("border-top: 1px solid var(--line);", _PICKER_STYLES)
+        self.assertIn(".account-menu[open] .account-popover", _PICKER_STYLES)
+        self.assertNotIn(".account-menu:hover .account-popover", _PICKER_STYLES)
+        self.assertIn("function bindAccountMenu()", _PICKER_APP_JS)
+        self.assertIn("if (!menu.contains(event.target)) menu.open = false;", _PICKER_APP_JS)
+        self.assertNotIn("account-card", _PICKER_FRONTEND)
 
     def test_game_workspace_mounts_three_scene(self):
         game_js_path = FRONTEND_ROOT / "game_workbench.js"
@@ -405,10 +427,11 @@ class TestPickerHtml(unittest.TestCase):
         menu_labels = ["实时新闻", "城市预览", "我的街区", "我的游戏", "Houdini", "DCCbridge"]
         positions = [_PICKER_INDEX_HTML.index(label) for label in menu_labels]
         self.assertEqual(positions, sorted(positions))
-        self.assertIn('id="workspace" data-workspace-kind="earth"', _PICKER_INDEX_HTML)
+        self.assertIn('id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="true"', _PICKER_INDEX_HTML)
         self.assertIn('data-workspace-target="news" aria-pressed="true"', _PICKER_INDEX_HTML)
         self.assertIn('id="action-panel" aria-label="执行操作面板" hidden', _PICKER_INDEX_HTML)
         self.assertIn('var activeWorkspaceId = \'news\';', _PICKER_APP_JS)
+        self.assertIn('var actionPanelCollapsed = true;', _PICKER_APP_JS)
 
     def test_houdini_status_lives_in_action_panel(self):
         self.assertIn('id="houdini-badge"', _PICKER_FRONTEND)

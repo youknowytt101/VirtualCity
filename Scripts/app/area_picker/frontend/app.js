@@ -18,7 +18,7 @@ var rectToolArmed = false;
 var rectDragging = false;
 var rectStart = null;
 var activeWorkspaceId = 'news';
-var actionPanelCollapsed = false;
+var actionPanelCollapsed = true;
 var WORKSPACE_KINDS = {
   news: 'earth',
   'city-preview': 'earth',
@@ -1839,16 +1839,22 @@ function updateWorkspaceButtons(workspaceId) {
   });
 }
 
+function syncActionPanelContent(workspaceId) {
+  var panels = document.querySelectorAll('[data-action-panel-content]');
+  Array.prototype.forEach.call(panels, function(panel) {
+    panel.hidden = panel.dataset.actionPanelContent !== workspaceId;
+  });
+}
+
 function syncActionPanelToggle() {
   var workspace = document.getElementById('workspace');
   var actionPanel = document.getElementById('action-panel');
   var toggle = document.getElementById('action-panel-toggle');
-  var isHoudini = WORKSPACE_KINDS[activeWorkspaceId] === 'houdini';
   var collapsed = !!actionPanelCollapsed;
   if (workspace) workspace.dataset.actionPanelCollapsed = collapsed ? 'true' : 'false';
-  if (actionPanel) actionPanel.hidden = !isHoudini || collapsed;
+  if (actionPanel) actionPanel.hidden = collapsed;
   if (!toggle) return;
-  toggle.hidden = !isHoudini;
+  toggle.hidden = false;
   toggle.classList.toggle('is-collapsed', collapsed);
   toggle.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
   toggle.setAttribute('aria-label', collapsed ? '展开右栏' : '收起右栏');
@@ -1872,6 +1878,17 @@ function bindActionPanelToggle() {
     setActionPanelCollapsed(!actionPanelCollapsed);
   });
   syncActionPanelToggle();
+}
+
+function bindAccountMenu() {
+  var menu = document.querySelector('.account-menu');
+  if (!menu) return;
+  document.addEventListener('click', function(event) {
+    if (!menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') menu.open = false;
+  });
 }
 
 function initialWorkspaceId() {
@@ -1910,6 +1927,7 @@ function setWorkspace(id) {
   var showsMap = workspaceKind !== 'game';
   if (workspace) workspace.dataset.workspaceKind = workspaceKind;
   if (mapShell) mapShell.hidden = !showsMap;
+  syncActionPanelContent(nextWorkspace);
   syncActionPanelToggle();
   if (gameWorkbench) gameWorkbench.hidden = workspaceKind !== 'game';
   if (window.VC_GAME_WORKBENCH) {
@@ -2818,6 +2836,7 @@ refreshDataSources();
 loadRegionNav();
 bindWorkspaceSwitching();
 bindActionPanelToggle();
+bindAccountMenu();
 bindFrontendRefresh();
 setWorkspace(initialWorkspaceId());
 startPageSession();
