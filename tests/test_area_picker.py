@@ -252,10 +252,11 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_action_panel_groups_workflow_modules(self):
         self.assertIn('id="action-panel"', _PICKER_FRONTEND)
-        self.assertIn("工作流", _PICKER_FRONTEND)
-        self.assertIn("数据处理", _PICKER_FRONTEND)
-        self.assertIn("软件链接", _PICKER_FRONTEND)
-        self.assertIn("执行状态", _PICKER_FRONTEND)
+        self.assertIn("待命/运行监控", _PICKER_FRONTEND)
+        self.assertIn("数据源", _PICKER_FRONTEND)
+        self.assertIn("预览", _PICKER_FRONTEND)
+        self.assertIn("构建", _PICKER_FRONTEND)
+        self.assertIn("运行监控", _PICKER_FRONTEND)
         self.assertIn("建筑", _PICKER_FRONTEND)
         self.assertIn("地形", _PICKER_FRONTEND)
         self.assertIn("自然", _PICKER_FRONTEND)
@@ -302,11 +303,11 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('function bindWorkspaceSwitching()', _PICKER_FRONTEND)
         self.assertIn("map.resize();", _PICKER_FRONTEND)
 
-    def test_workspace_action_panel_has_blank_panels_for_unimplemented_modules(self):
+    def test_workspace_action_panel_has_tabbed_panels_for_unimplemented_modules(self):
         self.assertIn('data-action-panel-content="houdini"', _PICKER_INDEX_HTML)
         for workspace in ("news", "city-preview", "neighborhood", "game"):
             self.assertIn(f'data-action-panel-content="{workspace}"', _PICKER_INDEX_HTML)
-        self.assertIn("action-panel-empty", _PICKER_STYLES)
+        self.assertIn(".action-tabs", _PICKER_STYLES)
         self.assertIn("function syncActionPanelContent(workspaceId)", _PICKER_APP_JS)
         self.assertIn("querySelectorAll('[data-action-panel-content]')", _PICKER_APP_JS)
 
@@ -505,7 +506,14 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('setPointSelectActive(false);', _PICKER_APP_JS)
 
     def test_workspace_menu_order_and_default_page(self):
-        menu_labels = ["上帝之眼", "城市预览", "我的街区", "我的游戏", "Houdini", "DCCbridge"]
+        menu_labels = [
+            'data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL',
+            'data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市',
+            'data-workspace-target="neighborhood" aria-pressed="false" title="切换到街区">街区',
+            'data-workspace-target="game" aria-pressed="false" title="切换到构建">构建',
+            'data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini',
+            "DCCbridge",
+        ]
         positions = [_PICKER_INDEX_HTML.index(label) for label in menu_labels]
         self.assertEqual(positions, sorted(positions))
         self.assertIn('id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="true"', _PICKER_INDEX_HTML)

@@ -219,8 +219,18 @@ button, input { font: inherit; }
   position: relative;
   width: 100%;
   height: 100%;
-  background: #ffffff;
+  background: #8f8f8f;
   overflow: hidden;
+}
+.game-workbench-host::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 46px rgba(0, 0, 0, 0.34),
+    inset 0 0 128px rgba(0, 0, 0, 0.16);
 }
 .game-scene-host {
   position: absolute;
@@ -699,7 +709,7 @@ button, input { font: inherit; }
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 13px;
+  padding: 13px 6px 4px;
   overflow-y: auto;
   color: var(--text);
   background: var(--surface);
@@ -719,8 +729,156 @@ button, input { font: inherit; }
 .action-panel-content[hidden] {
   display: none;
 }
-.action-panel-empty {
+.game-side-panel {
+  display: grid;
+  grid-template-rows: minmax(96px, var(--game-outline-height, 33.333%)) 6px minmax(160px, 1fr);
+  gap: 0;
+}
+.houdini-side-panel {
+  display: grid;
+  grid-template-rows: minmax(200px, 1fr) 6px minmax(150px, var(--houdini-outline-height, 33.333%));
+  gap: 0;
+}
+.action-outline-panel {
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--raise);
+}
+.action-outline-title {
+  min-height: 26px;
+  display: grid;
+  place-items: center;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--line-soft);
+  color: color-mix(in srgb, var(--accent) 74%, var(--text));
+  font-size: 11.5px;
+  font-weight: 760;
+  line-height: 1.2;
+}
+.action-outline-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden auto;
+  scrollbar-gutter: stable;
+  background: color-mix(in srgb, var(--text) 2%, var(--base));
+}
+.houdini-side-panel .action-outline-body {
+  display: flex;
+  overflow: hidden;
+  scrollbar-gutter: auto;
+}
+.houdini-side-panel #run-monitor.run-monitor {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.houdini-side-panel #run-status-panel {
+  flex: 1 1 auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.game-side-resizer {
+  position: relative;
+  min-height: 6px;
+  cursor: row-resize;
+  touch-action: none;
+}
+.game-side-resizer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 1px;
+  height: 3px;
+  background: var(--line-soft);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.game-side-resizer:hover::before,
+.game-side-resizer:focus-visible::before,
+body.is-resizing-game-side .game-side-resizer::before {
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent) 58%, var(--line-soft));
+}
+.game-side-resizer:focus-visible {
+  outline: none;
+}
+body.is-resizing-game-side {
+  cursor: row-resize;
+  user-select: none;
+}
+.action-tabs {
+  --action-tab-count: 3;
+  --action-tab-active-bg: color-mix(in srgb, var(--accent) 12%, transparent);
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--action-tab-count), minmax(0, 1fr));
+  grid-template-rows: auto minmax(0, 1fr);
+  column-gap: 2px;
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--raise);
+}
+.action-tab-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  clip-path: inset(50%);
+}
+.action-tab-label {
+  min-width: 0;
+  min-height: 26px;
+  display: grid;
+  place-items: center;
+  padding: 0 8px;
+  color: var(--subtle);
+  font-size: 11.5px;
+  font-weight: 760;
+  line-height: 1.2;
+  cursor: pointer;
+  user-select: none;
+}
+.action-tab-input:checked + .action-tab-label {
+  background: var(--action-tab-active-bg);
+  color: color-mix(in srgb, var(--accent) 74%, var(--text));
+}
+.action-tab-input:focus-visible + .action-tab-label {
+  outline: 2px solid color-mix(in srgb, var(--accent) 58%, transparent);
+  outline-offset: -2px;
+}
+#houdini-side-tab-3 + .action-tab-label {
+  order: 1;
+}
+#houdini-side-tab-2 + .action-tab-label {
+  order: 2;
+}
+#houdini-side-tab-1 + .action-tab-label {
+  order: 3;
+}
+.action-tab-panel {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: none;
+  min-height: 0;
+  overflow: hidden auto;
+  scrollbar-gutter: stable;
+  padding: 8px;
+  box-sizing: border-box;
+  background: var(--action-tab-active-bg);
+}
+.action-tab-input:checked + .action-tab-label + .action-tab-panel {
+  display: block;
 }
 .action-panel-head {
   display: flex;
@@ -814,22 +972,22 @@ button, input { font: inherit; }
   overflow-wrap: anywhere;
 }
 /* ============================================================
-   数据源组件 (#data-source-section)：外层边框将概览/下载入口/来源卡片框为一组
+   数据源组件 (#data-source-section)
    ============================================================ */
 #data-source-section.data-source-section {
   display: grid;
   grid-template-rows: auto repeat(3, 1fr);
   row-gap: 0;
-  padding: 11px;
-  background: var(--raise);
-  border: 1px solid var(--line-soft);
-  border-radius: 10px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 }
 #data-source-section .section-row {
   align-items: center;
   gap: 12px;
-  padding: 6px 11px;
-  margin: 0 -11px;
+  padding: 6px 0 10px;
+  margin: 0;
   border-bottom: 1px solid var(--line-soft);
 }
 #data-source-section .section-row > div:first-child {
@@ -1018,6 +1176,23 @@ button, input { font: inherit; }
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+.run-status-sticky {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 8px;
+  background: color-mix(in srgb, var(--text) 2%, var(--base));
+}
+.run-status-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-right: -11px;
+  padding-right: 11px;
+  overflow: hidden auto;
+  scrollbar-gutter: stable;
 }
 .run-status-phase {
   margin-top: 6px;
@@ -1438,8 +1613,8 @@ button, input { font: inherit; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 10px 11px;
-  margin: 0 -11px;
+  padding: 10px 0;
+  margin: 0;
   border-bottom: 1px solid var(--line-soft);
 }
 .source-card:last-child {

@@ -30,6 +30,7 @@
   var transformModeButtons = [];
   var undoStack = [];
   var sharedToonGradientMap = null;
+  var sideResizeState = null;
 
   function setStatus(message) {
     if (statusText) statusText.textContent = message;
@@ -586,7 +587,7 @@
     var up = new THREE.Vector3(0, 0, 1);
     var yaw = 0;
     var pitch = 0;
-    var moveSpeed = 7;
+    var moveSpeed = 35;
 
     function setMoveSpeed(value) {
       var numericSpeed = Number(value);
@@ -1128,10 +1129,85 @@
     render();
   }
 
+  function setGameOutlineHeight(height) {
+    var panel = document.querySelector('[data-action-panel-content="game"]');
+    var resizer = document.getElementById('game-side-resizer');
+    if (!panel || !resizer) return;
+    var rect = panel.getBoundingClientRect();
+    if (rect.height <= 0) return;
+    var resizerHeight = resizer.getBoundingClientRect().height || 6;
+    var minHeight = 96;
+    var maxHeight = Math.max(minHeight, rect.height - resizerHeight - 160);
+    var nextHeight = Math.max(minHeight, Math.min(maxHeight, height));
+    panel.style.setProperty('--game-outline-height', Math.round(nextHeight) + 'px');
+    resizer.setAttribute('aria-valuemin', String(minHeight));
+    resizer.setAttribute('aria-valuemax', String(Math.round(maxHeight)));
+    resizer.setAttribute('aria-valuenow', String(Math.round(nextHeight)));
+  }
+
+  function setGameOutlineHeightFromPointer(event) {
+    var panel = document.querySelector('[data-action-panel-content="game"]');
+    var resizer = document.getElementById('game-side-resizer');
+    if (!panel || !resizer) return;
+    var rect = panel.getBoundingClientRect();
+    var resizerHeight = resizer.getBoundingClientRect().height || 6;
+    setGameOutlineHeight(event.clientY - rect.top - resizerHeight / 2);
+  }
+
+  function finishSidePanelResize(event) {
+    if (!sideResizeState) return;
+    var resizer = document.getElementById('game-side-resizer');
+    if (resizer && resizer.releasePointerCapture && event && event.pointerId === sideResizeState.pointerId) {
+      try { resizer.releasePointerCapture(event.pointerId); } catch (e) {}
+    }
+    sideResizeState = null;
+    document.body.classList.remove('is-resizing-game-side');
+  }
+
+  function bindSidePanelResize() {
+    var resizer = document.getElementById('game-side-resizer');
+    var outline = document.getElementById('game-scene-outline');
+    if (!resizer || !outline) return;
+    resizer.addEventListener('pointerdown', function(event) {
+      if (event.button !== 0) return;
+      event.preventDefault();
+      sideResizeState = { pointerId: event.pointerId };
+      document.body.classList.add('is-resizing-game-side');
+      if (resizer.setPointerCapture) resizer.setPointerCapture(event.pointerId);
+      setGameOutlineHeightFromPointer(event);
+    });
+    window.addEventListener('pointermove', function(event) {
+      if (!sideResizeState) return;
+      event.preventDefault();
+      setGameOutlineHeightFromPointer(event);
+    });
+    window.addEventListener('pointerup', finishSidePanelResize);
+    window.addEventListener('pointercancel', finishSidePanelResize);
+    resizer.addEventListener('keydown', function(event) {
+      var step = 20;
+      var current = outline.getBoundingClientRect().height;
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setGameOutlineHeight(current - step);
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setGameOutlineHeight(current + step);
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        setGameOutlineHeight(0);
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        setGameOutlineHeight(Number.MAX_SAFE_INTEGER);
+      }
+    });
+    setGameOutlineHeight(outline.getBoundingClientRect().height);
+  }
+
   function bindInput() {
     var toolbar = document.getElementById('game-toolbar');
     if (toolbar) toolbar.addEventListener('pointerdown', beginAssetDrag);
     window.addEventListener('pointermove', function(event) {
+      if (sideResizeState) return;
       if (playMode.handlePointerMove(event)) return;
       if (moveAssetDrag(event)) return;
       cameraControls.handlePointerMove(event);
@@ -1191,7 +1267,7 @@
     }
     THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffffff);
+    scene.background = new THREE.Color(0x8f8f8f);
     camera = new THREE.PerspectiveCamera(50, 1, 0.1, 2000);
     camera.up.set(0, 0, 1);
     camera.position.set(10, -16, 8);
@@ -1239,6 +1315,7 @@
     if (speedInput) cameraControls.setMoveSpeed(speedInput.value);
     cameraControls.syncRotationFromCamera();
     bindTransformModeButtons();
+    bindSidePanelResize();
     bindInput();
     initialized = true;
     resize();

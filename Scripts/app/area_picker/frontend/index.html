@@ -98,10 +98,10 @@
     <!-- /地点搜索组件 -->
     <section class="panel-section tool-placeholder-section" id="tool-placeholder-section" aria-label="工具入口占位">
       <div class="tool-placeholder-list flat-panel flat-panel--col">
-        <button type="button" class="tool-placeholder-btn flat-item active" data-workspace-target="news" aria-pressed="true" title="切换到上帝之眼">上帝之眼</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="city-preview" aria-pressed="false" title="切换到城市预览">城市预览</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="neighborhood" aria-pressed="false" title="切换到我的街区">我的街区</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到游戏工作台">我的游戏</button>
+        <button type="button" class="tool-placeholder-btn flat-item active" data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="neighborhood" aria-pressed="false" title="切换到街区">街区</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到构建">构建</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini</button>
         <details class="dcc-bridge-panel flat-item">
           <summary class="tool-placeholder-btn dcc-bridge-summary">DCCbridge</summary>
@@ -229,7 +229,7 @@
         </div>
         <label id="game-speed-control" class="game-speed-control" for="game-speed-input">
           <span class="game-speed-label">Speed</span>
-          <input id="game-speed-input" class="game-speed-input" type="number" min="1" max="80" step="1" value="7">
+          <input id="game-speed-input" class="game-speed-input" type="number" min="1" max="80" step="1" value="35">
         </label>
       </div>
       <div id="game-status" class="game-status">拖入角色后点击运行</div>
@@ -237,148 +237,217 @@
     </div>
   </section>
   <aside id="action-panel" aria-label="执行操作面板" hidden>
-    <div class="action-panel-content action-panel-empty" data-action-panel-content="news" aria-label="上帝之眼右栏"></div>
-    <div class="action-panel-content action-panel-empty" data-action-panel-content="city-preview" aria-label="城市预览右栏" hidden></div>
-    <div class="action-panel-content action-panel-empty" data-action-panel-content="neighborhood" aria-label="我的街区右栏" hidden></div>
-    <div class="action-panel-content action-panel-empty" data-action-panel-content="game" aria-label="我的游戏右栏" hidden></div>
-    <div class="action-panel-content" data-action-panel-content="houdini" aria-label="Houdini 右栏" hidden>
-    <div class="action-panel-head">
-      <div>
-        <div class="section-kicker">工作流</div>
-        <div class="section-note">当前框选区域</div>
-      </div>
+    <div class="action-panel-content" data-action-panel-content="news" aria-label="上帝之眼右栏">
+      <section class="action-tabs" aria-label="上帝之眼右栏标签页">
+        <input id="news-side-tab-1" class="action-tab-input" type="radio" name="news-side-tabs" checked>
+        <label class="action-tab-label" for="news-side-tab-1">标签一</label>
+        <div class="action-tab-panel" aria-label="标签一"></div>
+
+        <input id="news-side-tab-2" class="action-tab-input" type="radio" name="news-side-tabs">
+        <label class="action-tab-label" for="news-side-tab-2">标签二</label>
+        <div class="action-tab-panel" aria-label="标签二"></div>
+
+        <input id="news-side-tab-3" class="action-tab-input" type="radio" name="news-side-tabs">
+        <label class="action-tab-label" for="news-side-tab-3">标签三</label>
+        <div class="action-tab-panel" aria-label="标签三"></div>
+      </section>
     </div>
-    <section class="action-module" aria-label="数据源">
-      <!-- 数据源组件：数据源概览 + 下载入口 + 道路/建筑/地形来源卡片 -->
-      <section class="data-source-section" id="data-source-section" aria-label="数据源">
-        <div class="section-row">
-          <div>
-            <div class="section-kicker">数据源</div>
-            <div id="source-status" class="section-note">选取区域预先下载地图数据加快Houdini自动管线构建速度</div>
-          </div>
-          <button id="download-btn" disabled onclick="downloadData()" class="source-action-btn">
-            <span class="btn-main">下载地图数据</span>
-          </button>
+    <div class="action-panel-content" data-action-panel-content="city-preview" aria-label="城市预览右栏" hidden>
+      <section class="action-tabs" aria-label="城市预览右栏标签页">
+        <input id="city-preview-side-tab-1" class="action-tab-input" type="radio" name="city-preview-side-tabs" checked>
+        <label class="action-tab-label" for="city-preview-side-tab-1">标签一</label>
+        <div class="action-tab-panel" aria-label="标签一"></div>
+
+        <input id="city-preview-side-tab-2" class="action-tab-input" type="radio" name="city-preview-side-tabs">
+        <label class="action-tab-label" for="city-preview-side-tab-2">标签二</label>
+        <div class="action-tab-panel" aria-label="标签二"></div>
+
+        <input id="city-preview-side-tab-3" class="action-tab-input" type="radio" name="city-preview-side-tabs">
+        <label class="action-tab-label" for="city-preview-side-tab-3">标签三</label>
+        <div class="action-tab-panel" aria-label="标签三"></div>
+      </section>
+    </div>
+    <div class="action-panel-content" data-action-panel-content="neighborhood" aria-label="我的街区右栏" hidden>
+      <section class="action-tabs" aria-label="我的街区右栏标签页">
+        <input id="neighborhood-side-tab-1" class="action-tab-input" type="radio" name="neighborhood-side-tabs" checked>
+        <label class="action-tab-label" for="neighborhood-side-tab-1">标签一</label>
+        <div class="action-tab-panel" aria-label="标签一"></div>
+
+        <input id="neighborhood-side-tab-2" class="action-tab-input" type="radio" name="neighborhood-side-tabs">
+        <label class="action-tab-label" for="neighborhood-side-tab-2">标签二</label>
+        <div class="action-tab-panel" aria-label="标签二"></div>
+
+        <input id="neighborhood-side-tab-3" class="action-tab-input" type="radio" name="neighborhood-side-tabs">
+        <label class="action-tab-label" for="neighborhood-side-tab-3">标签三</label>
+        <div class="action-tab-panel" aria-label="标签三"></div>
+      </section>
+    </div>
+    <div class="action-panel-content game-side-panel" data-action-panel-content="game" aria-label="我的游戏右栏" hidden>
+      <section id="game-scene-outline" class="action-outline-panel" aria-label="场景大纲">
+        <div class="action-outline-title">场景大纲</div>
+        <div class="action-outline-body"></div>
+      </section>
+      <div id="game-side-resizer" class="game-side-resizer" role="separator" aria-label="调整场景大纲高度" aria-orientation="horizontal" aria-controls="game-scene-outline game-side-tabs" tabindex="0"></div>
+      <section id="game-side-tabs" class="action-tabs" aria-label="我的游戏右栏标签页">
+        <input id="game-side-tab-1" class="action-tab-input" type="radio" name="game-side-tabs" checked>
+        <label class="action-tab-label" for="game-side-tab-1">创建</label>
+        <div class="action-tab-panel" aria-label="创建"></div>
+
+        <input id="game-side-tab-2" class="action-tab-input" type="radio" name="game-side-tabs">
+        <label class="action-tab-label" for="game-side-tab-2">测试</label>
+        <div class="action-tab-panel" aria-label="测试"></div>
+
+        <input id="game-side-tab-3" class="action-tab-input" type="radio" name="game-side-tabs">
+        <label class="action-tab-label" for="game-side-tab-3">发布</label>
+        <div class="action-tab-panel" aria-label="发布"></div>
+      </section>
+    </div>
+    <div class="action-panel-content houdini-side-panel" data-action-panel-content="houdini" aria-label="Houdini 右栏" hidden>
+      <section id="houdini-side-tabs" class="action-tabs" aria-label="Houdini 右栏标签页">
+        <input id="houdini-side-tab-1" class="action-tab-input" type="radio" name="houdini-side-tabs">
+        <label class="action-tab-label" for="houdini-side-tab-1">数据源</label>
+        <div class="action-tab-panel" aria-label="数据源">
+          <section class="action-module" aria-label="数据源">
+            <section class="data-source-section" id="data-source-section" aria-label="数据源">
+              <div class="section-row">
+                <div>
+                  <div id="source-status" class="section-note">选取区域预先下载地图数据加快Houdini自动管线构建速度</div>
+                </div>
+                <button id="download-btn" disabled onclick="downloadData()" class="source-action-btn">
+                  <span class="btn-main">下载地图数据</span>
+                </button>
+              </div>
+              <div id="source-list" class="source-list">
+                <div class="source-card">
+                  <div class="source-head">
+                    <span class="source-title">道路</span>
+                  </div>
+                  <div class="source-provider">数据源：OpenStreetMap</div>
+                  <div class="source-detail">策略：本地缓存优先，缺失时通过 Overpass API 获取 OSM highway ways</div>
+                </div>
+                <div class="source-card">
+                  <div class="source-head">
+                    <span class="source-title">建筑</span>
+                  </div>
+                  <div class="source-provider">数据源：Overture Maps + Google Open Buildings</div>
+                  <div class="source-detail">策略：本地缓存优先，缺失时用 Overture 轮廓并用 Google 高度补全</div>
+                </div>
+                <div class="source-card">
+                  <div class="source-head">
+                    <span class="source-title">地形</span>
+                  </div>
+                  <div class="source-provider">数据源：FABDEM / NASADEM</div>
+                  <div class="source-detail">策略：FABDEM DTM 优先，本地缓存命中直接恢复，失败时 NASADEM 兜底</div>
+                </div>
+              </div>
+            </section>
+          </section>
         </div>
-        <div id="source-list" class="source-list">
-          <div class="source-card">
-            <div class="source-head">
-              <span class="source-title">道路</span>
+
+        <input id="houdini-side-tab-2" class="action-tab-input" type="radio" name="houdini-side-tabs">
+        <label class="action-tab-label" for="houdini-side-tab-2">预览</label>
+        <div class="action-tab-panel" aria-label="数据可视化预览">
+          <section class="action-module" aria-label="数据可视化预览">
+            <div class="action-grid">
+              <button type="button" disabled class="action-btn placeholder-btn" title="建筑数据清洗入口待接入">
+                <span class="btn-main">建筑</span>
+                <span class="btn-sub">待接入</span>
+              </button>
+              <button type="button" disabled class="action-btn placeholder-btn" title="地形数据清洗入口待接入">
+                <span class="btn-main">地形</span>
+                <span class="btn-sub">待接入</span>
+              </button>
+              <button type="button" disabled class="action-btn placeholder-btn" title="自然数据处理入口待接入">
+                <span class="btn-main">自然</span>
+                <span class="btn-sub">待接入</span>
+              </button>
+              <button type="button" disabled class="action-btn placeholder-btn" title="道路数据处理入口待接入">
+                <span class="btn-main">道路</span>
+                <span class="btn-sub">待接入</span>
+              </button>
             </div>
-            <div class="source-provider">数据源：OpenStreetMap</div>
-            <div class="source-detail">策略：本地缓存优先，缺失时通过 Overpass API 获取 OSM highway ways</div>
-          </div>
-          <div class="source-card">
-            <div class="source-head">
-              <span class="source-title">建筑</span>
+          </section>
+        </div>
+
+        <input id="houdini-side-tab-3" class="action-tab-input" type="radio" name="houdini-side-tabs" checked>
+        <label class="action-tab-label" for="houdini-side-tab-3">构建</label>
+        <div class="action-tab-panel" aria-label="构建">
+          <section class="action-module" aria-label="构建">
+            <div class="houdini-status-stack" aria-label="Houdini 状态">
+              <div class="software-path-editor">
+                <input id="houdini-path-input" type="text" spellcheck="false" placeholder="输入 Houdini 软件路径，例如 D:\houdini21\bin\houdini.exe">
+              </div>
+              <div id="houdini-path-note" class="software-path-note">未设置软件路径</div>
+              <button id="houdini-badge" type="button" class="badge badge-warn" onclick="openOrProbeHoudini()" title="未连接时启动路径里的 Houdini；已连接时刷新状态">打开 Houdini</button>
+              <div id="houdini-connection-row" class="status-row status-warn">
+                <span class="status-label">软件连接</span>
+                <span id="houdini-connection-value" class="status-value">待检查</span>
+              </div>
+              <div id="houdini-asset-row" class="status-row status-warn">
+                <span class="status-label">模型资产</span>
+                <span id="houdini-asset-value" class="status-value">等待生成</span>
+              </div>
+              <div id="houdini-export-row" class="status-row status-warn">
+                <span class="status-label">导出就绪</span>
+                <span id="houdini-export-value" class="status-value">等待资产</span>
+              </div>
             </div>
-            <div class="source-provider">数据源：Overture Maps + Google Open Buildings</div>
-            <div class="source-detail">策略：本地缓存优先，缺失时用 Overture 轮廓并用 Google 高度补全</div>
-          </div>
-          <div class="source-card">
-            <div class="source-head">
-              <span class="source-title">地形</span>
+            <div class="action-grid">
+              <button id="run-btn" disabled onclick="runPipeline()" class="action-btn">
+                <span class="btn-main">Houdini 生成</span>
+                <span class="btn-sub">完整构建 + QA</span>
+              </button>
+              <button id="export-btn" disabled onclick="exportFbx()" class="action-btn">
+                <span class="btn-main">导出 FBX</span>
+                <span class="btn-sub">审核后资产</span>
+              </button>
             </div>
-            <div class="source-provider">数据源：FABDEM / NASADEM</div>
-            <div class="source-detail">策略：FABDEM DTM 优先，本地缓存命中直接恢复，失败时 NASADEM 兜底</div>
-          </div>
+          </section>
         </div>
       </section>
-      <!-- /数据源组件 -->
-    </section>
-    <section class="action-module" aria-label="数据处理">
-      <div class="action-module-head">
-        <div class="action-module-title">数据可视化预览</div>
-      </div>
-      <div class="action-grid">
-        <button type="button" disabled class="action-btn placeholder-btn" title="建筑数据清洗入口待接入">
-          <span class="btn-main">建筑</span>
-          <span class="btn-sub">待接入</span>
-        </button>
-        <button type="button" disabled class="action-btn placeholder-btn" title="地形数据清洗入口待接入">
-          <span class="btn-main">地形</span>
-          <span class="btn-sub">待接入</span>
-        </button>
-        <button type="button" disabled class="action-btn placeholder-btn" title="自然数据处理入口待接入">
-          <span class="btn-main">自然</span>
-          <span class="btn-sub">待接入</span>
-        </button>
-        <button type="button" disabled class="action-btn placeholder-btn" title="道路数据处理入口待接入">
-          <span class="btn-main">道路</span>
-          <span class="btn-sub">待接入</span>
-        </button>
-      </div>
-    </section>
-    <section class="action-module" aria-label="软件链接">
-      <div class="action-module-head">
-        <div class="action-module-title">软件链接</div>
-      </div>
-      <div class="houdini-status-stack" aria-label="Houdini 状态">
-        <div class="software-path-editor">
-          <input id="houdini-path-input" type="text" spellcheck="false" placeholder="输入 Houdini 软件路径，例如 D:\houdini21\bin\houdini.exe">
+      <div id="houdini-side-resizer" class="game-side-resizer" role="separator" aria-label="调整待命/运行监控高度" aria-orientation="horizontal" aria-controls="houdini-side-tabs houdini-run-outline" tabindex="0"></div>
+      <section id="houdini-run-outline" class="action-outline-panel" aria-label="待命/运行监控">
+        <div class="action-outline-title">待命/运行监控</div>
+        <div class="action-outline-body">
+          <section class="action-module run-monitor" id="run-monitor" aria-label="运行监控">
+            <div id="run-status-panel" class="run-status-panel status-warn">
+              <div class="run-status-sticky">
+                <div class="run-status-head">
+                  <div id="run-status-title" class="run-state">等待选择区域</div>
+                  <div id="run-status-pct" class="run-pct">0%</div>
+                </div>
+                <div class="run-progress-track" aria-label="执行进度">
+                  <div id="run-status-bar" class="run-progress-bar"></div>
+                </div>
+              </div>
+              <div class="run-status-scroll">
+                <div id="run-status-phase" class="run-status-phase" hidden></div>
+                <div id="run-stage-list" class="run-stage-list" role="list" aria-label="管线阶段进度"></div>
+                <div id="run-status-detail" class="run-status-detail">尚未启动任务</div>
+                <div id="failure-summary" class="failure-summary" hidden>
+                  <div class="failure-row reason">
+                    <span class="failure-key">原因</span>
+                    <span id="failure-reason" class="failure-value">--</span>
+                  </div>
+                  <div class="failure-row report">
+                    <span class="failure-key">报告</span>
+                    <span id="failure-report" class="failure-value">--</span>
+                  </div>
+                  <div class="failure-row metrics">
+                    <span class="failure-key">指标</span>
+                    <span id="failure-metrics" class="failure-value">--</span>
+                  </div>
+                </div>
+                <div id="console-dock">
+                  <div id="log-panels-container">
+                    <div id="log-panel-all" class="log-panel">等待选择网格...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-        <div id="houdini-path-note" class="software-path-note">未设置软件路径</div>
-        <button id="houdini-badge" type="button" class="badge badge-warn" onclick="openOrProbeHoudini()" title="未连接时启动路径里的 Houdini；已连接时刷新状态">打开 Houdini</button>
-        <div id="houdini-connection-row" class="status-row status-warn">
-          <span class="status-label">软件连接</span>
-          <span id="houdini-connection-value" class="status-value">待检查</span>
-        </div>
-        <div id="houdini-asset-row" class="status-row status-warn">
-          <span class="status-label">模型资产</span>
-          <span id="houdini-asset-value" class="status-value">等待生成</span>
-        </div>
-        <div id="houdini-export-row" class="status-row status-warn">
-          <span class="status-label">导出就绪</span>
-          <span id="houdini-export-value" class="status-value">等待资产</span>
-        </div>
-      </div>
-      <div class="action-grid">
-        <button id="run-btn" disabled onclick="runPipeline()" class="action-btn">
-          <span class="btn-main">Houdini 生成</span>
-          <span class="btn-sub">完整构建 + QA</span>
-        </button>
-        <button id="export-btn" disabled onclick="exportFbx()" class="action-btn">
-          <span class="btn-main">导出 FBX</span>
-          <span class="btn-sub">审核后资产</span>
-        </button>
-      </div>
-    </section>
-    <!-- 运行监控组件：执行状态进度 + 多标签控制台日志，作为一套整体 -->
-    <section class="action-module run-monitor" id="run-monitor" aria-label="运行监控">
-      <div id="run-status-panel" class="run-status-panel status-warn">
-        <div class="run-status-head">
-          <div id="run-status-title" class="run-state">等待选择区域</div>
-          <div id="run-status-pct" class="run-pct">0%</div>
-        </div>
-        <div class="run-progress-track" aria-label="执行进度">
-          <div id="run-status-bar" class="run-progress-bar"></div>
-        </div>
-        <div id="run-status-phase" class="run-status-phase" hidden></div>
-        <div id="run-stage-list" class="run-stage-list" role="list" aria-label="管线阶段进度"></div>
-        <div id="run-status-detail" class="run-status-detail">尚未启动任务</div>
-        <div id="failure-summary" class="failure-summary" hidden>
-          <div class="failure-row reason">
-            <span class="failure-key">原因</span>
-            <span id="failure-reason" class="failure-value">--</span>
-          </div>
-          <div class="failure-row report">
-            <span class="failure-key">报告</span>
-            <span id="failure-report" class="failure-value">--</span>
-          </div>
-          <div class="failure-row metrics">
-            <span class="failure-key">指标</span>
-            <span id="failure-metrics" class="failure-value">--</span>
-          </div>
-        </div>
-        <!-- 控制台：执行日志完整视图，归属运行监控组件，置于执行状态卡片底部 -->
-        <div id="console-dock">
-          <div id="log-panels-container">
-            <div id="log-panel-all" class="log-panel">等待选择网格...</div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- /运行监控组件 -->
+      </section>
     </div>
   </aside>
 </main>

@@ -19,6 +19,7 @@ var rectDragging = false;
 var rectStart = null;
 var activeWorkspaceId = 'news';
 var actionPanelCollapsed = true;
+var houdiniSideResizeState = null;
 var WORKSPACE_KINDS = {
   news: 'earth',
   'city-preview': 'earth',
@@ -48,6 +49,7 @@ var OSM_RASTER_STYLE = {
 var SATELLITE_GLOBE_STYLE = {
   version: 8,
   projection: { type: 'globe' },
+  terrain: { source: 'terrain-dem', exaggeration: 20 },
   sources: {
     satellite: {
       type: 'raster',
@@ -57,6 +59,16 @@ var SATELLITE_GLOBE_STYLE = {
       tileSize: 256,
       maxzoom: 19,
       attribution: 'Imagery © Esri, Maxar, Earthstar Geographics'
+    },
+    'terrain-dem': {
+      type: 'raster-dem',
+      tiles: [
+        'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'
+      ],
+      tileSize: 256,
+      maxzoom: 15,
+      encoding: 'terrarium',
+      attribution: 'Elevation © Mapzen'
     }
   },
   layers: [
@@ -1880,6 +1892,79 @@ function bindActionPanelToggle() {
   syncActionPanelToggle();
 }
 
+function setHoudiniOutlineHeight(height) {
+  var panel = document.querySelector('[data-action-panel-content="houdini"]');
+  var resizer = document.getElementById('houdini-side-resizer');
+  if (!panel || !resizer) return;
+  var rect = panel.getBoundingClientRect();
+  if (rect.height <= 0) return;
+  var resizerHeight = resizer.getBoundingClientRect().height || 6;
+  var minHeight = 150;
+  var maxHeight = Math.max(minHeight, rect.height - resizerHeight - 200);
+  var nextHeight = Math.max(minHeight, Math.min(maxHeight, height));
+  panel.style.setProperty('--houdini-outline-height', Math.round(nextHeight) + 'px');
+  resizer.setAttribute('aria-valuemin', String(minHeight));
+  resizer.setAttribute('aria-valuemax', String(Math.round(maxHeight)));
+  resizer.setAttribute('aria-valuenow', String(Math.round(nextHeight)));
+}
+
+function setHoudiniOutlineHeightFromPointer(event) {
+  var panel = document.querySelector('[data-action-panel-content="houdini"]');
+  var resizer = document.getElementById('houdini-side-resizer');
+  if (!panel || !resizer) return;
+  var rect = panel.getBoundingClientRect();
+  var resizerHeight = resizer.getBoundingClientRect().height || 6;
+  setHoudiniOutlineHeight(rect.bottom - event.clientY - resizerHeight / 2);
+}
+
+function finishHoudiniSideResize(event) {
+  if (!houdiniSideResizeState) return;
+  var resizer = document.getElementById('houdini-side-resizer');
+  if (resizer && resizer.releasePointerCapture && event && event.pointerId === houdiniSideResizeState.pointerId) {
+    try { resizer.releasePointerCapture(event.pointerId); } catch (e) {}
+  }
+  houdiniSideResizeState = null;
+  document.body.classList.remove('is-resizing-game-side');
+}
+
+function bindHoudiniSideResize() {
+  var resizer = document.getElementById('houdini-side-resizer');
+  var outline = document.getElementById('houdini-run-outline');
+  if (!resizer || !outline) return;
+  resizer.addEventListener('pointerdown', function(event) {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    houdiniSideResizeState = { pointerId: event.pointerId };
+    document.body.classList.add('is-resizing-game-side');
+    if (resizer.setPointerCapture) resizer.setPointerCapture(event.pointerId);
+    setHoudiniOutlineHeightFromPointer(event);
+  });
+  window.addEventListener('pointermove', function(event) {
+    if (!houdiniSideResizeState) return;
+    event.preventDefault();
+    setHoudiniOutlineHeightFromPointer(event);
+  });
+  window.addEventListener('pointerup', finishHoudiniSideResize);
+  window.addEventListener('pointercancel', finishHoudiniSideResize);
+  resizer.addEventListener('keydown', function(event) {
+    var step = 20;
+    var current = outline.getBoundingClientRect().height;
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setHoudiniOutlineHeight(current + step);
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setHoudiniOutlineHeight(current - step);
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      setHoudiniOutlineHeight(0);
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      setHoudiniOutlineHeight(Number.MAX_SAFE_INTEGER);
+    }
+  });
+}
+
 function bindAccountMenu() {
   var menu = document.querySelector('.account-menu');
   if (!menu) return;
@@ -2836,6 +2921,7 @@ refreshDataSources();
 loadRegionNav();
 bindWorkspaceSwitching();
 bindActionPanelToggle();
+bindHoudiniSideResize();
 bindAccountMenu();
 bindFrontendRefresh();
 setWorkspace(initialWorkspaceId());
