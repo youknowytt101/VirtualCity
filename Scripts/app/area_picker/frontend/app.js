@@ -19,7 +19,9 @@ var rectToolArmed = false;
 var rectDragging = false;
 var rectStart = null;
 var activeWorkspaceId = 'news';
-var actionPanelCollapsed = true;
+var cityPreviewActive = false;
+var lastCityView = null;
+var actionPanelCollapsed = false;
 var houdiniSideResizeState = null;
 var WORKSPACE_KINDS = {
   news: 'earth',
@@ -593,6 +595,29 @@ function createCameraController(mapInstance) {
     });
   }
 
+  function flyToWorld() {
+    moveToken++;
+    var token = moveToken;
+    holdAutoSpin(PROGRAMMATIC_HOLD_MS);
+    resetWheelZoom();
+    setMode(MODES.PROGRAMMATIC_FIT);
+    mapInstance.once('moveend', function() {
+      if (token !== moveToken) return;
+      setMode(MODES.IDLE_2D);
+      syncViewToggle();
+      holdAutoSpin(PROGRAMMATIC_HOLD_MS);
+    });
+    mapInstance.flyTo({
+      center: [window.VC_CONFIG.lon, 20],
+      zoom: 2.5,
+      pitch: 0,
+      bearing: 0,
+      speed: 2.4,
+      curve: 1.2,
+      essential: true
+    });
+  }
+
   function enter3DInPlace() {
     moveToken++;
     var token = moveToken;
@@ -671,6 +696,7 @@ function createCameraController(mapInstance) {
     syncViewToggle: syncViewToggle,
     fitBounds2D: fitBounds2D,
     flyToCity: flyToCity,
+    flyToWorld: flyToWorld,
     enter3DInPlace: enter3DInPlace,
     exitTo2D: exitTo2D,
     isCityOrbitActive: function() { return mode === MODES.CITY_ORBIT; }
@@ -1419,6 +1445,7 @@ function setHoudiniBadge(available, asset) {
     el.title = '启动输入路径里的 Houdini';
   }
   updateHoudiniStatusPanel(available, asset || null);
+  if (available) setDccSoftwareSwitch('houdini', true);
 }
 
 function setHoudiniChecking(text) {
@@ -1461,6 +1488,7 @@ function openOrProbeHoudini() {
       refreshServiceState();
       return;
     }
+    setDccSoftwareSwitch('houdini', true);
     pollHoudiniAfterOpen(8);
   })
   .catch(function(e) {
@@ -1825,6 +1853,44 @@ function bboxCenter(bbox) {
   return [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
 }
 
+function findRegionById(items, id) {
+  items = items || [];
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].id === id) return items[i];
+  }
+  return null;
+}
+
+function setActiveChildByIndex(host, index) {
+  if (!host) return;
+  Array.prototype.forEach.call(host.children, function(node, i) {
+    node.classList.toggle('active', i === index);
+  });
+}
+
+function showDefaultCityPreview() {
+  var country = findRegionById(regionData, 'sg');
+  if (!country) return false;
+  var cities = country.cities || [];
+  var city = findRegionById(country.cities || [], 'central');
+  if (!city) return false;
+  activeCountryId = country.id;
+  setActiveChildByIndex(document.getElementById('region-countries'), regionData.indexOf(country));
+  renderCities(cities);
+  setActiveChildByIndex(document.getElementById('region-cities'), cities.indexOf(city));
+  loadBoundary(city.osmId);
+  var target = (city.landmark && city.landmark.length === 2) ? city.landmark : bboxCenter(city.bbox);
+  if (!target) return false;
+  cityPreviewActive = true;
+  flyTo3DCity(target[0], target[1], city.landmark_zoom || 15);
+  return true;
+}
+
+function showGlobalOverview() {
+  cityPreviewActive = false;
+  cameraController.flyToWorld();
+}
+
 function flyToBbox(bbox, maxZoom) {
   cameraController.fitBounds2D(bbox, maxZoom);
 }
@@ -1839,6 +1905,20 @@ function exit3DTo2D() {
 
 function enter3DInPlace() {
   cameraController.enter3DInPlace();
+}
+
+function syncHoudiniCameraToCity() {
+  var view = lastCityView;
+  if (!view && regionData) {
+    var country = findRegionById(regionData, 'sg');
+    var city = country ? findRegionById(country.cities || [], 'central') : null;
+    if (city && city.bbox) view = { bbox: city.bbox, maxZoom: 12 };
+  }
+  if (!view) return false;
+  cityPreviewActive = false;
+  map.once('moveend', scheduleGridLoad);
+  flyToBbox(view.bbox, view.maxZoom);
+  return true;
 }
 
 function setupViewToggle() {
@@ -2066,8 +2146,18 @@ function setWorkspace(id) {
   if (showsMap) {
     requestAnimationFrame(function() {
       if (map && map.resize) map.resize();
-      if (isHoudini) scheduleGridLoad();
+      if (isHoudini) {
+        setGridVisible(true);
+        syncHoudiniCameraToCity();
+        scheduleGridLoad();
+      }
       if (typeof scheduleDeckRefresh === 'function') scheduleDeckRefresh(true);
+      if (nextWorkspace === 'city-preview') showDefaultCityPreview();
+      if (nextWorkspace === 'news') showGlobalOverview();
+      else if (cityPreviewActive && nextWorkspace !== 'city-preview' && nextWorkspace !== 'houdini' && showsMap) {
+        cityPreviewActive = false;
+        exit3DTo2D();
+      }
     });
   }
 }
@@ -2157,6 +2247,8 @@ function loadRegionNav() {
   .then(function(d) {
     regionData = d && d.countries ? d.countries : [];
     renderCountries();
+    if (activeWorkspaceId === 'city-preview') showDefaultCityPreview();
+    else if (activeWorkspaceId === 'houdini') syncHoudiniCameraToCity();
   })
   .catch(function() {
     regionData = [];
@@ -2220,7 +2312,8 @@ function renderCities(cities) {
         node.classList.toggle('active', node === row);
       });
       loadBoundary(city.osmId);
-      flyToBbox(city.bbox, 12);
+      lastCityView = { bbox: city.bbox, maxZoom: 12 };
+      flyToBbox(lastCityView.bbox, lastCityView.maxZoom);
     });
 
     var buildBtn = document.createElement('button');
@@ -2238,6 +2331,7 @@ function renderCities(cities) {
         : bboxCenter(city.bbox);
       if (!target) return;
       loadBoundary(city.osmId);
+      cityPreviewActive = true;
       flyTo3DCity(target[0], target[1], city.landmark_zoom || 15);
     });
 
@@ -2962,6 +3056,15 @@ function updateDccSoftwarePaths(paths) {
   });
 }
 
+function setDccSoftwareSwitch(softwareId, enabled) {
+  var row = document.querySelector('.dcc-option-row[data-dcc-id="' + softwareId + '"]');
+  var toggle = row ? row.querySelector('.dcc-toggle') : null;
+  if (!row || !toggle) return;
+  toggle.classList.toggle('is-on', enabled);
+  toggle.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+  row.classList.toggle('is-enabled', enabled);
+}
+
 function saveDccSoftwarePath(row) {
   var input = row ? row.querySelector('.dcc-path-input') : null;
   var softwareId = dccSoftwareId(row);
@@ -3019,9 +3122,7 @@ function openDccSoftware(row, toggle) {
       updateDccSoftwarePaths(d.software_paths);
     }
     var ok = !!d.ok;
-    toggle.classList.toggle('is-on', ok);
-    toggle.setAttribute('aria-pressed', ok ? 'true' : 'false');
-    row.classList.toggle('is-enabled', ok);
+    setDccSoftwareSwitch(softwareId, ok);
     if (!ok && input) {
       var pathBtn = row.querySelector('.dcc-path-btn');
       var editor = row.querySelector('.dcc-path-editor');
@@ -3045,6 +3146,33 @@ function openDccSoftware(row, toggle) {
   });
 }
 
+function closeDccSoftware(row, toggle) {
+  var softwareId = dccSoftwareId(row);
+  if (!row || !toggle || !softwareId) return;
+  toggle.disabled = true;
+  fetch('/close-software', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ software_id: softwareId })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    if (d.software_paths) {
+      updateSoftwarePath(d.software_paths);
+      updateDccSoftwarePaths(d.software_paths);
+    }
+    setDccSoftwareSwitch(softwareId, !d.ok);
+    if (!d.ok) toggle.title = d.message || '软件关闭失败';
+  })
+  .catch(function(e) {
+    setDccSoftwareSwitch(softwareId, true);
+    toggle.title = '软件关闭失败: ' + e;
+  })
+  .finally(function() {
+    toggle.disabled = false;
+  });
+}
+
 function bindDccBridgeControls() {
   var panel = document.querySelector('.dcc-bridge-options');
   if (!panel) return;
@@ -3061,6 +3189,7 @@ function bindDccBridgeControls() {
     });
   }
   document.addEventListener('pointerdown', function(event) {
+    if (bridge && bridge.open && !bridge.contains(event.target)) bridge.open = false;
     var keepRow = event.target.closest('.dcc-option-row');
     panel.querySelectorAll('.dcc-option-row').forEach(function(row) {
       if (row !== keepRow && row.querySelector('.dcc-path-editor:not([hidden])')) {
@@ -3072,7 +3201,8 @@ function bindDccBridgeControls() {
     var toggle = event.target.closest('.dcc-toggle');
     if (toggle && panel.contains(toggle)) {
       var row = toggle.closest('.dcc-option-row');
-      openDccSoftware(row, toggle);
+      if (toggle.classList.contains('is-on')) closeDccSoftware(row, toggle);
+      else openDccSoftware(row, toggle);
       return;
     }
 

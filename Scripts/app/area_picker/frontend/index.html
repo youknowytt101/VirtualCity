@@ -33,7 +33,7 @@
     </button>
   </div>
 </div>
-<main id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="true">
+<main id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="false">
   <div id="map-shell">
     <div id="map">
       <div id="selection-tools" class="map-tool-control flat-panel flat-panel--row" aria-label="区域选择工具">
@@ -102,7 +102,6 @@
       <div class="tool-placeholder-list flat-panel flat-panel--col">
         <button type="button" class="tool-placeholder-btn flat-item active" data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="neighborhood" aria-pressed="false" title="切换到街区">街区</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到虚拟资产构建">虚拟资产构建</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini</button>
         <details class="dcc-bridge-panel flat-item">
@@ -243,7 +242,7 @@
       <div id="game-drag-preview" class="game-drag-preview" hidden>角色</div>
     </div>
   </section>
-  <aside id="action-panel" aria-label="执行操作面板" hidden>
+  <aside id="action-panel" aria-label="执行操作面板">
     <div class="action-panel-content" data-action-panel-content="news" aria-label="上帝之眼右栏">
       <section class="action-tabs" aria-label="上帝之眼右栏标签页">
         <input id="news-side-tab-1" class="action-tab-input" type="radio" name="news-side-tabs" checked>

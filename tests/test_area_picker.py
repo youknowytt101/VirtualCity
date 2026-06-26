@@ -143,7 +143,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('class="toolbar-cluster"', toolbar_html)
         self.assertIn('id="action-panel-toggle"', toolbar_html)
         self.assertNotIn('id="action-panel-toggle"', action_panel_html)
-        self.assertIn('data-action-panel-collapsed="true"', _PICKER_FRONTEND)
+        self.assertIn('data-action-panel-collapsed="false"', _PICKER_FRONTEND)
         self.assertIn('#workspace[data-action-panel-collapsed="true"]', _PICKER_STYLES)
         self.assertIn('function setActionPanelCollapsed(collapsed)', _PICKER_APP_JS)
         self.assertIn('function bindActionPanelToggle()', _PICKER_APP_JS)
@@ -304,7 +304,7 @@ class TestPickerHtml(unittest.TestCase):
     def test_workspace_switcher_has_mode_hooks(self):
         self.assertIn('data-workspace-target="city-preview"', _PICKER_FRONTEND)
         self.assertIn('data-workspace-target="news"', _PICKER_FRONTEND)
-        self.assertIn('data-workspace-target="neighborhood"', _PICKER_FRONTEND)
+        self.assertNotIn('data-workspace-target="neighborhood"', _PICKER_FRONTEND)
         self.assertIn('data-workspace-target="game"', _PICKER_FRONTEND)
         self.assertIn('data-workspace-target="houdini"', _PICKER_FRONTEND)
         self.assertIn('id="game-workbench"', _PICKER_FRONTEND)
@@ -324,6 +324,35 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn(".action-tabs", _PICKER_STYLES)
         self.assertIn("function syncActionPanelContent(workspaceId)", _PICKER_APP_JS)
         self.assertIn("querySelectorAll('[data-action-panel-content]')", _PICKER_APP_JS)
+
+    def test_city_workspace_defaults_to_singapore_central_3d_preview(self):
+        self.assertIn("function showDefaultCityPreview()", _PICKER_APP_JS)
+        self.assertIn("findRegionById(regionData, 'sg')", _PICKER_APP_JS)
+        self.assertIn("findRegionById(country.cities || [], 'central')", _PICKER_APP_JS)
+        self.assertIn("loadBoundary(city.osmId);", _PICKER_APP_JS)
+        self.assertIn("var lastCityView = null;", _PICKER_APP_JS)
+        self.assertIn("lastCityView = { bbox: city.bbox, maxZoom: 12 };", _PICKER_APP_JS)
+        self.assertIn("flyToBbox(lastCityView.bbox, lastCityView.maxZoom);", _PICKER_APP_JS)
+        self.assertIn("function syncHoudiniCameraToCity()", _PICKER_APP_JS)
+        self.assertIn("if (city && city.bbox) view = { bbox: city.bbox, maxZoom: 12 };", _PICKER_APP_JS)
+        self.assertIn("flyToBbox(view.bbox, view.maxZoom);", _PICKER_APP_JS)
+        self.assertIn("flyTo3DCity(target[0], target[1], city.landmark_zoom || 15);", _PICKER_APP_JS)
+        self.assertIn("syncHoudiniCameraToCity();", _PICKER_APP_JS)
+        self.assertIn("if (nextWorkspace === 'city-preview') showDefaultCityPreview();", _PICKER_APP_JS)
+        self.assertIn("else if (cityPreviewActive && nextWorkspace !== 'city-preview' && nextWorkspace !== 'houdini' && showsMap) {", _PICKER_APP_JS)
+        self.assertIn("cityPreviewActive = false;", _PICKER_APP_JS)
+        self.assertIn("if (activeWorkspaceId === 'city-preview') showDefaultCityPreview();", _PICKER_APP_JS)
+        self.assertIn("else if (activeWorkspaceId === 'houdini') syncHoudiniCameraToCity();", _PICKER_APP_JS)
+
+    def test_eol_workspace_defaults_to_global_overview(self):
+        self.assertIn("function flyToWorld()", _PICKER_APP_JS)
+        self.assertIn("center: [window.VC_CONFIG.lon, 20]", _PICKER_APP_JS)
+        self.assertIn("zoom: 2.5", _PICKER_APP_JS)
+        self.assertIn("pitch: 0", _PICKER_APP_JS)
+        self.assertIn("flyToWorld: flyToWorld", _PICKER_APP_JS)
+        self.assertIn("function showGlobalOverview()", _PICKER_APP_JS)
+        self.assertIn("cameraController.flyToWorld();", _PICKER_APP_JS)
+        self.assertIn("if (nextWorkspace === 'news') showGlobalOverview();", _PICKER_APP_JS)
 
     def test_game_action_panel_overlays_without_resizing_viewport(self):
         self.assertIn('#workspace[data-workspace-kind="game"] {', _PICKER_STYLES)
@@ -516,6 +545,7 @@ class TestPickerHtml(unittest.TestCase):
     def test_grid_tools_are_houdini_only(self):
         self.assertIn('#workspace:not([data-workspace-kind="houdini"]) #selection-tools', _PICKER_FRONTEND)
         self.assertIn("if (activeWorkspaceId !== 'houdini') return;", _PICKER_APP_JS)
+        self.assertIn('setGridVisible(true);', _PICKER_APP_JS)
         self.assertIn('setGridVisible(false);', _PICKER_APP_JS)
         self.assertIn('setPointSelectActive(false);', _PICKER_APP_JS)
 
@@ -523,18 +553,18 @@ class TestPickerHtml(unittest.TestCase):
         menu_labels = [
             'data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL',
             'data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市',
-            'data-workspace-target="neighborhood" aria-pressed="false" title="切换到街区">街区',
             'data-workspace-target="game" aria-pressed="false" title="切换到虚拟资产构建">虚拟资产构建',
             'data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini',
             "DCCbridge",
         ]
         positions = [_PICKER_INDEX_HTML.index(label) for label in menu_labels]
         self.assertEqual(positions, sorted(positions))
-        self.assertIn('id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="true"', _PICKER_INDEX_HTML)
+        self.assertIn('id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="false"', _PICKER_INDEX_HTML)
         self.assertIn('data-workspace-target="news" aria-pressed="true"', _PICKER_INDEX_HTML)
-        self.assertIn('id="action-panel" aria-label="执行操作面板" hidden', _PICKER_INDEX_HTML)
+        self.assertIn('id="action-panel" aria-label="执行操作面板"', _PICKER_INDEX_HTML)
+        self.assertNotIn('id="action-panel" aria-label="执行操作面板" hidden', _PICKER_INDEX_HTML)
         self.assertIn('var activeWorkspaceId = \'news\';', _PICKER_APP_JS)
-        self.assertIn('var actionPanelCollapsed = true;', _PICKER_APP_JS)
+        self.assertIn('var actionPanelCollapsed = false;', _PICKER_APP_JS)
 
     def test_dccbridge_controls_are_clickable(self):
         self.assertIn('class="dcc-toggle" aria-pressed="false" aria-label="打开 Houdini"', _PICKER_INDEX_HTML)
@@ -546,10 +576,17 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn(".dcc-bridge-summary.active", _PICKER_FRONTEND)
         self.assertIn("updateWorkspaceButtons('');", _PICKER_APP_JS)
         self.assertIn("summary.classList.add('active');", _PICKER_APP_JS)
+        self.assertIn("bridge.open && !bridge.contains(event.target)", _PICKER_APP_JS)
         self.assertIn("min-width: 36px;", _PICKER_FRONTEND)
         self.assertIn(".dcc-option-row.is-enabled .dcc-name", _PICKER_FRONTEND)
         self.assertIn("function openDccSoftware", _PICKER_APP_JS)
         self.assertIn("fetch('/open-software'", _PICKER_APP_JS)
+        self.assertIn("function closeDccSoftware", _PICKER_APP_JS)
+        self.assertIn("fetch('/close-software'", _PICKER_APP_JS)
+        self.assertIn("if (toggle.classList.contains('is-on')) closeDccSoftware(row, toggle);", _PICKER_APP_JS)
+        self.assertIn("function setDccSoftwareSwitch", _PICKER_APP_JS)
+        self.assertIn("if (available) setDccSoftwareSwitch('houdini', true);", _PICKER_APP_JS)
+        self.assertIn("setDccSoftwareSwitch(softwareId, ok);", _PICKER_APP_JS)
         self.assertIn("function saveDccSoftwarePath", _PICKER_APP_JS)
         self.assertIn("function updateDccSoftwarePaths", _PICKER_APP_JS)
         for label in ("Houdini", "Blender", "Unity", "Unreal", "Godot"):
@@ -584,6 +621,8 @@ class TestPickerHtml(unittest.TestCase):
         server_source = Path(area_picker.__file__).read_text(encoding="utf-8")
         self.assertIn("def _post_open_software", server_source)
         self.assertIn("parsed.path == '/open-software'", server_source)
+        self.assertIn("def _post_close_software", server_source)
+        self.assertIn("parsed.path == '/close-software'", server_source)
 
     def test_dccbridge_software_directory_resolves_to_exe(self):
         with tempfile.TemporaryDirectory() as td:
@@ -591,6 +630,17 @@ class TestPickerHtml(unittest.TestCase):
             blender = root / "blender.exe"
             blender.write_text("", encoding="utf-8")
             self.assertEqual(area_picker._resolve_software_launch_path("blender", str(root)), blender)
+
+    def test_dccbridge_close_software_uses_process_name(self):
+        fake_run = SimpleNamespace(returncode=0, stdout="", stderr="")
+        with patch.object(area_picker.os, "name", "nt"), \
+                patch.object(area_picker, "_software_path_status", return_value={"blender_exe": "C:/missing/blender.exe"}), \
+                patch.object(area_picker.subprocess, "run", return_value=fake_run) as run:
+            payload = area_picker._close_software_from_config("blender")
+        self.assertTrue(payload["ok"])
+        cmd = run.call_args.args[0]
+        self.assertEqual(cmd[:3], ["powershell", "-NoProfile", "-Command"])
+        self.assertIn("Get-Process -Name 'blender'", cmd[3])
 
     def test_restart_clears_dcc_path_cache(self):
         data = {

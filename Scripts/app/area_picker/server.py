@@ -791,6 +791,15 @@ def _resolve_software_launch_path(software_id: str, value: str) -> Path | None:
     return None
 
 
+_SOFTWARE_PROCESS_NAMES = {
+    'houdini': 'houdini.exe',
+    'blender': 'blender.exe',
+    'unity': 'Unity.exe',
+    'unreal': 'UnrealEditor.exe',
+    'godot': 'Godot.exe',
+}
+
+
 def _open_software_from_config(software_id: str) -> dict:
     software_id = str(software_id or '').strip().lower()
     if software_id == 'houdini':
@@ -812,6 +821,32 @@ def _open_software_from_config(software_id: str) -> dict:
     except Exception as exc:
         return {'ok': False, 'message': f'软件启动失败: {exc}', 'software_paths': status}
     return {'ok': True, 'message': '软件已启动', 'started': True, 'software_paths': status}
+
+
+def _close_software_from_config(software_id: str) -> dict:
+    software_id = str(software_id or '').strip().lower()
+    key = _software_path_key(software_id)
+    status = _software_path_status()
+    if not key:
+        return {'ok': False, 'message': '未知软件', 'software_paths': status}
+    launch_path = _resolve_software_launch_path(software_id, status.get(key) or '')
+    image_name = launch_path.name if launch_path else _SOFTWARE_PROCESS_NAMES.get(software_id, '')
+    if not image_name:
+        return {'ok': False, 'message': '未知软件进程', 'software_paths': status}
+    if os.name != 'nt':
+        return {'ok': False, 'message': '当前系统不支持强制关闭软件', 'software_paths': status}
+    try:
+        proc = subprocess.run(
+            ['powershell', '-NoProfile', '-Command',
+             f"Get-Process -Name '{Path(image_name).stem}' -ErrorAction SilentlyContinue | Stop-Process -Force"],
+            cwd=str(SCRIPTS), capture_output=True, text=True, encoding='utf-8', errors='replace'
+        )
+    except Exception as exc:
+        return {'ok': False, 'message': f'软件关闭失败: {exc}', 'software_paths': status}
+    if proc.returncode != 0:
+        msg = (proc.stderr or proc.stdout or '软件关闭失败').strip()
+        return {'ok': False, 'message': msg, 'software_paths': status}
+    return {'ok': True, 'message': '软件已关闭', 'software_paths': status}
 
 
 def _export_available() -> bool:
@@ -1443,6 +1478,9 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == '/open-software':
             self._post_open_software()
             return
+        if parsed.path == '/close-software':
+            self._post_close_software()
+            return
         if parsed.path == '/export':
             self._post_export()
             return
@@ -1730,6 +1768,15 @@ class _Handler(BaseHTTPRequestHandler):
                 self._json({'ok': False, 'message': f'软件路径保存失败: {exc}'})
                 return
         self._json(_open_software_from_config(software_id))
+
+    def _post_close_software(self):
+        length = int(self.headers.get('Content-Length', 0))
+        try:
+            body = json.loads(self.rfile.read(length) or b'{}')
+        except json.JSONDecodeError:
+            self._json({'ok': False, 'message': '请求 JSON 无法解析'})
+            return
+        self._json(_close_software_from_config(body.get('software_id')))
 
     def _post_export(self):
         if not _export_available():
