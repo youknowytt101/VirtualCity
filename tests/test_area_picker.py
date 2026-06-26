@@ -440,6 +440,21 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("if (event.button === 1) {", down_body)
         self.assertIn("beginViewportDrag('track', event, getViewportPivot(event));", down_body)
 
+    def test_game_right_mouse_wheel_adjusts_flight_speed(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        wheel_start = game_js.index("sceneHost.addEventListener('wheel'")
+        wheel_end = game_js.index("}, { passive: false });", wheel_start)
+        wheel_body = game_js[wheel_start:wheel_end]
+
+        self.assertIn("function adjustMoveSpeed(event)", game_js)
+        self.assertIn("return setMoveSpeed(moveSpeed + (event.deltaY < 0 ? 1 : -1));", game_js)
+        self.assertIn("if (cameraControls.isLooking()) {", wheel_body)
+        self.assertIn("cameraControls.adjustMoveSpeed(event);", wheel_body)
+        self.assertLess(
+            wheel_body.index("cameraControls.adjustMoveSpeed(event);"),
+            wheel_body.index("cameraControls.zoomView(event);"),
+        )
+
     def test_game_editor_shortcuts_match_unreal_viewport(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         self.assertIn("setTransformMode('translate');", game_js)

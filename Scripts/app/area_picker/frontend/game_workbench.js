@@ -596,6 +596,11 @@
       return moveSpeed;
     }
 
+    function adjustMoveSpeed(event) {
+      event.preventDefault();
+      return setMoveSpeed(moveSpeed + (event.deltaY < 0 ? 1 : -1));
+    }
+
     function syncRotationFromCamera() {
       camera.getWorldDirection(forward);
       yaw = Math.atan2(forward.y, forward.x);
@@ -801,6 +806,7 @@
       pressKey: function(code) { keys[code] = true; },
       releaseKey: function(event) { delete keys[event.code.toLowerCase()]; },
       setMoveSpeed: setMoveSpeed,
+      adjustMoveSpeed: adjustMoveSpeed,
       syncRotationFromCamera: syncRotationFromCamera,
       update: update,
       zoomView: function(event) {
@@ -1147,7 +1153,12 @@
       cameraControls.handlePointerDown(event);
     });
     sceneHost.addEventListener('wheel', function(event) {
-      if (!playMode.isPlaying()) cameraControls.zoomView(event);
+      if (playMode.isPlaying()) return;
+      if (cameraControls.isLooking()) {
+        cameraControls.adjustMoveSpeed(event);
+        return;
+      }
+      cameraControls.zoomView(event);
     }, { passive: false });
     sceneHost.addEventListener('contextmenu', function(event) {
       event.preventDefault();

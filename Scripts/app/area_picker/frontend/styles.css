@@ -299,13 +299,13 @@ button, input { font: inherit; }
   color: #ffffff;
 }
 .game-tool-icon {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.8;
+  stroke-width: 2;
 }
 .game-speed-control {
   gap: 6px;
