@@ -95,6 +95,7 @@
         <form id="location-search-form" class="location-search-row">
           <input id="location-search-input" type="search" autocomplete="off" placeholder="例如 Thailand、Tokyo、New York、Pattaya">
         </form>
+        <div id="location-search-status" class="search-status" aria-live="polite"></div>
       </div>
     </section>
     <!-- /地点搜索组件 -->
@@ -102,7 +103,7 @@
       <div class="tool-placeholder-list flat-panel flat-panel--col">
         <button type="button" class="tool-placeholder-btn flat-item active" data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到编辑器">编辑器</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到虚拟资产构建">虚拟资产构建</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini</button>
         <details class="dcc-bridge-panel flat-item">
           <summary class="tool-placeholder-btn dcc-bridge-summary">DCCbridge</summary>
@@ -478,6 +479,10 @@ window.VC_CONFIG = {
 };
 </script>
 <script src="/area-picker/game_workbench.js?v=__VERSION__"></script>
+<script src="/area-picker/workspace.js?v=__VERSION__"></script>
+<script src="/area-picker/selection_search.js?v=__VERSION__"></script>
+<script src="/area-picker/pipeline_status.js?v=__VERSION__"></script>
+<script src="/area-picker/dcc_bridge.js?v=__VERSION__"></script>
 <script src="/area-picker/app.js?v=__VERSION__"></script>
 </body>
 </html>

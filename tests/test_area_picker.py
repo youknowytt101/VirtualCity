@@ -17,7 +17,17 @@ import pipeline_status
 FRONTEND_ROOT = Path(area_picker.FRONTEND_ROOT)
 _PICKER_INDEX_HTML = area_picker._HTML
 _PICKER_STYLES = (FRONTEND_ROOT / "styles.css").read_text(encoding="utf-8")
-_PICKER_APP_JS = (FRONTEND_ROOT / "app.js").read_text(encoding="utf-8")
+_PICKER_SCRIPT_NAMES = (
+    "workspace.js",
+    "selection_search.js",
+    "pipeline_status.js",
+    "dcc_bridge.js",
+    "app.js",
+)
+_PICKER_APP_JS = "\n".join(
+    (FRONTEND_ROOT / name).read_text(encoding="utf-8")
+    for name in _PICKER_SCRIPT_NAMES
+)
 _PICKER_FRONTEND = "\n".join([_PICKER_INDEX_HTML, _PICKER_STYLES, _PICKER_APP_JS])
 
 
@@ -94,8 +104,10 @@ class TestPickerHtml(unittest.TestCase):
         self.assertTrue((FRONTEND_ROOT / "index.html").exists())
         self.assertTrue((FRONTEND_ROOT / "styles.css").exists())
         self.assertTrue((FRONTEND_ROOT / "app.js").exists())
+        for name in _PICKER_SCRIPT_NAMES:
+            self.assertTrue((FRONTEND_ROOT / name).exists())
+            self.assertIn(f"/area-picker/{name}?v=__VERSION__", _PICKER_INDEX_HTML)
         self.assertIn('/area-picker/styles.css?v=__VERSION__', _PICKER_INDEX_HTML)
-        self.assertIn('/area-picker/app.js?v=__VERSION__', _PICKER_INDEX_HTML)
         self.assertIn("window.VC_CONFIG", _PICKER_INDEX_HTML)
         self.assertNotIn("<style>", _PICKER_INDEX_HTML)
         self.assertIn("def _frontend_static", Path(area_picker.__file__).read_text(encoding="utf-8"))
