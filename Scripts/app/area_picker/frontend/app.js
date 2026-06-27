@@ -32,6 +32,9 @@ var WORKSPACE_KINDS = {
 };
 
 var VECTOR_STYLE_URL = '/area-picker/basemap-style.json?v=' + window.VC_CONFIG.version;
+var WORLD_GEOJSON_URL = '/area-picker/world_countries.json?v=' + window.VC_CONFIG.version;
+var WORLD_OCEAN_COLOR = '#838383';
+var WORLD_LAND_COLOR = '#f8f4f0';
 var OSM_RASTER_STYLE = {
   version: 8,
   sources: {
@@ -883,7 +886,86 @@ function setupDeckOverlay() {
   scheduleDeckRefresh();
 }
 
+var worldGeojsonPromise = null;
+var worldLayersRemoved = false;
+
+function loadWorldGeojson() {
+  if (!worldGeojsonPromise) {
+    worldGeojsonPromise = fetch(WORLD_GEOJSON_URL)
+      .then(function(r) { return r.json(); })
+      .catch(function() { return null; });
+  }
+  return worldGeojsonPromise;
+}
+
+// 本地世界国界层：默认底图首帧即出「灰海 + 白陆 + 轮廓 + 国名」，
+// 不必等 openfreemap 矢量瓦片。轮廓线无需字体，瞬间渲染；国名要等 glyphs
+// （很小，远快于矢量瓦片）。等 openmaptiles 瓦片就绪后由 removeWorldBaseLayers
+// 淡出移除，避免与瓦片自带的边界/标注重影。仅默认底图启用，卫星底图跳过。
+function addWorldBaseLayers() {
+  if (currentBasemap !== 'positron') return;
+  worldLayersRemoved = false;
+  loadWorldGeojson().then(function(data) {
+    if (!data || worldLayersRemoved || currentBasemap !== 'positron') return;
+    if (map.getSource('world')) return;
+    map.addSource('world-bg', { type: 'geojson', data: {
+      type: 'Feature', properties: {},
+      geometry: { type: 'Polygon', coordinates: [[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]] }
+    } });
+    map.addSource('world', { type: 'geojson', data: data });
+    map.addLayer({
+      id: 'world-ocean', type: 'fill', source: 'world-bg', maxzoom: 6,
+      paint: { 'fill-color': WORLD_OCEAN_COLOR, 'fill-opacity': 1, 'fill-opacity-transition': { duration: 400 } }
+    });
+    map.addLayer({
+      id: 'world-land', type: 'fill', source: 'world', maxzoom: 6,
+      paint: { 'fill-color': WORLD_LAND_COLOR, 'fill-opacity': 1, 'fill-opacity-transition': { duration: 400 } }
+    });
+    map.addLayer({
+      id: 'world-line', type: 'line', source: 'world', maxzoom: 6,
+      paint: {
+        'line-color': '#b9b4ad',
+        'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.4, 5, 1.2],
+        'line-opacity': 1, 'line-opacity-transition': { duration: 400 }
+      }
+    });
+    map.addLayer({
+      id: 'world-label', type: 'symbol', source: 'world', maxzoom: 6,
+      layout: {
+        'text-field': ['coalesce', ['get', 'name'], ''],
+        'text-font': ['Noto Sans Regular'],
+        'text-size': ['interpolate', ['linear'], ['zoom'], 1, 10, 5, 15],
+        'text-max-width': 7, 'text-padding': 4
+      },
+      paint: {
+        'text-color': '#3c3c3c', 'text-halo-color': WORLD_LAND_COLOR, 'text-halo-width': 1.2,
+        'text-opacity': 1, 'text-opacity-transition': { duration: 400 }
+      }
+    });
+  });
+}
+
+function removeWorldBaseLayers() {
+  if (worldLayersRemoved) return;
+  worldLayersRemoved = true;
+  if (!map.getSource('world')) return;
+  [['world-ocean', 'fill-opacity'], ['world-land', 'fill-opacity'],
+   ['world-line', 'line-opacity'], ['world-label', 'text-opacity']].forEach(function(pair) {
+    if (!map.getLayer(pair[0])) return;
+    try { map.setPaintProperty(pair[0], pair[1], 0); } catch (e) {}
+  });
+  setTimeout(function() {
+    ['world-ocean', 'world-land', 'world-line', 'world-label'].forEach(function(id) {
+      if (map.getLayer(id)) { try { map.removeLayer(id); } catch (e) {} }
+    });
+    ['world', 'world-bg'].forEach(function(id) {
+      if (map.getSource(id)) { try { map.removeSource(id); } catch (e) {} }
+    });
+  }, 450);
+}
+
 function setupMapLayers() {
+  addWorldBaseLayers();
   setupDeckOverlay();
   map.addSource('grid', { type: 'geojson', data: emptyFeatureCollection() });
   map.addLayer({
@@ -892,7 +974,7 @@ function setupMapLayers() {
     source: 'grid',
     layout: { visibility: 'none' },
     paint: {
-      'fill-color': ['case', ['get', 'selected'], '#ffffff', ['get', 'cached'], '#f8fffd', '#ffffff'],
+      'fill-color': ['case', ['get', 'selected'], '#ffffff', ['get', 'cached'], '#3b82f6', '#ffffff'],
       'fill-opacity': ['case', ['get', 'selected'], ['case', ['get', 'cached'], 0.58, 0.54], ['get', 'cached'], 0.32, 0]
     }
   });
@@ -1392,7 +1474,10 @@ map.on('moveend', function() {
 });
 map.on('zoomend', function() { scheduleDeckRefresh(true); });
 map.on('sourcedata', function(e) {
-  if (e.sourceId === 'openmaptiles' && e.isSourceLoaded) scheduleDeckRefresh();
+  if (e.sourceId === 'openmaptiles' && e.isSourceLoaded) {
+    removeWorldBaseLayers();
+    scheduleDeckRefresh();
+  }
 });
 window.addEventListener('resize', function() {
   if (WORKSPACE_KINDS[activeWorkspaceId] === 'game') return;
