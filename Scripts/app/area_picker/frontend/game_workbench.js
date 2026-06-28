@@ -1,3 +1,6 @@
+// Domain: game-workbench
+// Owns: Three.js editor scene, asset drag/drop, transform controls, and whitebox import into the game workspace.
+// AI handoff: For editor viewport, asset sync, or scene outline issues, start here before checking vc_glb.js.
 (function() {
   'use strict';
 

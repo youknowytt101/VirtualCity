@@ -1,4 +1,7 @@
-﻿var selection = null;
+﻿// Domain: map-bootstrap
+// Owns: MapLibre bootstrap, global map state, region navigation, city preview, and page session lifecycle.
+// AI handoff: For base map, city camera, region boundary, or page session issues, start here after checking focused modules.
+var selection = null;
 var selectedTileIds = {};
 var lastGridData = null;
 var gridRequestId = 0;

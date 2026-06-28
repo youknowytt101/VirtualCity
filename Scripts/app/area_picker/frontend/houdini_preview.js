@@ -1,3 +1,6 @@
+// Domain: houdini-preview
+// Owns: Small Three.js whitebox preview driven by the houdini_asset.whitebox status contract.
+// AI handoff: For blank preview or stale GLB issues, trace VC_HOUDINI_PREVIEW.update from pipeline_status.js.
 // Small Three.js preview in the Houdini build panel.
 // The preview is driven by the explicit houdini_asset.whitebox contract from
 // /health, /status, and /events. It never probes Houdini and never triggers an

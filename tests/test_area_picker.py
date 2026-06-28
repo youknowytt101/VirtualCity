@@ -1,5 +1,6 @@
 """Offline tests for area_picker state and progress helpers."""
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -116,6 +117,107 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("window.VC_CONFIG", _PICKER_INDEX_HTML)
         self.assertNotIn("<style>", _PICKER_INDEX_HTML)
         self.assertIn("def _frontend_static", Path(area_picker.__file__).read_text(encoding="utf-8"))
+
+    def test_ai_frontend_handoff_maps_user_symptoms_to_code(self):
+        handoff_path = FRONTEND_ROOT / "AI_FRONTEND_HANDOFF.md"
+        self.assertTrue(handoff_path.exists())
+        handoff = handoff_path.read_text(encoding="utf-8")
+        expected_markers = (
+            "AI_FRONTEND_HANDOFF.md",
+            "API_CONTRACT.md",
+            "白盒预览不显示",
+            "houdini_preview.js",
+            "VC_HOUDINI_PREVIEW.update",
+            "/whitebox.glb",
+            "test_houdini_panel_preview_uses_explicit_whitebox_contract",
+            "Houdini 按钮不可用",
+            "pipeline_status.js",
+            "applySharedStatus",
+            "/health",
+            "地图框选异常",
+            "selection_search.js",
+            "setSelection",
+            "/tiles",
+            "DCC 路径保存失败",
+            "dcc_bridge.js",
+            "saveSoftwarePath",
+            "/software-paths",
+            "本地资产目录保存失败",
+            "asset_dir.js",
+            "applyStatus",
+            "renderTree",
+            "/asset-dir",
+            "地点搜索异常",
+            "bindLocationSearch",
+            "/geocode",
+            "区域导航不显示",
+            "loadRegionNav",
+            "/area-picker/regions.json",
+            "底图或世界轮廓不显示",
+            "WORLD_GEOJSON_URL",
+            "/area-picker/world_countries.json",
+        )
+        for marker in expected_markers:
+            self.assertIn(marker, handoff)
+        readme = (FRONTEND_ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("AI_FRONTEND_HANDOFF.md", readme)
+        self.assertIn("API_CONTRACT.md", readme)
+
+    def test_ai_frontend_handoff_guard_tests_exist(self):
+        handoff = (FRONTEND_ROOT / "AI_FRONTEND_HANDOFF.md").read_text(encoding="utf-8")
+        source = Path(__file__).read_text(encoding="utf-8")
+        guard_tests = sorted(set(re.findall(r"`(test_[A-Za-z0-9_]+)`", handoff)))
+        self.assertTrue(guard_tests)
+        for test_name in guard_tests:
+            with self.subTest(test_name=test_name):
+                self.assertIn(f"def {test_name}", source)
+
+    def test_api_contract_documents_frontend_routes_and_backend_handlers(self):
+        contract_path = FRONTEND_ROOT / "API_CONTRACT.md"
+        self.assertTrue(contract_path.exists())
+        contract = contract_path.read_text(encoding="utf-8")
+        expected_markers = (
+            "/health",
+            "refreshServiceState",
+            "_service_payload",
+            "/status",
+            "pollStatus",
+            "_build_status_payload",
+            "/events",
+            "startStatusStream",
+            "_sse_events",
+            "/jobs",
+            "submitSelectedArea",
+            "do_POST",
+            "/whitebox.glb",
+            "VC_HOUDINI_PREVIEW.update",
+            "_serve_whitebox_glb",
+            "/selection",
+            "restoreRememberedSelection",
+            "_post_selection",
+            "/software-paths",
+            "saveSoftwarePath",
+            "_post_software_paths",
+            "/area-picker/regions.json",
+            "loadRegionNav",
+            "/area-picker/basemap-style.json",
+            "VECTOR_STYLE_URL",
+            "/area-picker/world_countries.json",
+            "WORLD_GEOJSON_URL",
+            "_frontend_static",
+            "/static/",
+            "_static",
+        )
+        for marker in expected_markers:
+            self.assertIn(marker, contract)
+
+    def test_frontend_scripts_have_ai_handoff_headers(self):
+        for name in _PICKER_SCRIPT_NAMES:
+            with self.subTest(script=name):
+                header = "\n".join((FRONTEND_ROOT / name).read_text(encoding="utf-8").splitlines()[:6])
+                self.assertIn("// Domain:", header)
+                self.assertIn("// Owns:", header)
+                self.assertIn("// AI handoff:", header)
 
     def test_houdini_status_updates_use_shared_frontend_projection(self):
         self.assertIn("function applySharedStatus(d)", _PICKER_FRONTEND)
@@ -506,6 +608,21 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('window.VC_GAME_WORKBENCH', game_js)
         self.assertIn('window.VC_GAME_WORKBENCH.init()', _PICKER_APP_JS)
         self.assertIn('window.VC_GAME_WORKBENCH.setActive(', _PICKER_APP_JS)
+
+    def test_game_workspace_has_asset_dir_controls(self):
+        asset_js = (FRONTEND_ROOT / "asset_dir.js").read_text(encoding="utf-8")
+        self.assertIn('id="asset-dir-form"', _PICKER_INDEX_HTML)
+        self.assertIn('id="asset-dir-input"', _PICKER_INDEX_HTML)
+        self.assertIn('id="asset-dir-tree"', _PICKER_INDEX_HTML)
+        self.assertIn('/area-picker/asset_dir.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertIn("fetch('/asset-dir')", asset_js)
+        self.assertIn("fetch('/asset-dir',", asset_js)
+        self.assertIn("function applyStatus(d)", asset_js)
+        self.assertIn("function renderTree(subdirs, ready)", asset_js)
+        self.assertIn("form.addEventListener('submit'", asset_js)
+        server_source = Path(area_picker.__file__).read_text(encoding="utf-8")
+        self.assertIn("parsed.path == '/asset-dir'", server_source)
+        self.assertIn("def _post_asset_dir", server_source)
 
     def test_game_play_mode_hides_editor_overlays_and_start_ui(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")

@@ -1,3 +1,6 @@
+// Domain: shared-glb-loading
+// Owns: GLB loader reuse for the editor scene and Houdini preview.
+// AI handoff: If a whitebox or game GLB URL loads incorrectly, check this after the caller's URL contract.
 // Shared GLB loader for the editor scene and the Houdini preview.
 // Returns the loaded scene rotated from glTF Y-up to this app's Z-up.
 (function() {

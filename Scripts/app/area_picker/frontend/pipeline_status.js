@@ -1,5 +1,8 @@
 ﻿// Pipeline status, logs, task submission, and export controls.
 
+// Domain: pipeline-status
+// Owns: Run/export buttons, status stream, logs, progress UI, failure summary, and data-source rendering.
+// AI handoff: For Houdini run state or stuck progress, start with applySharedStatus, applyStatus, and submitSelectedArea.
 function updateExportButton(available, running) {
   var btn = document.getElementById('export-btn');
   btn.disabled = !available || !!running;

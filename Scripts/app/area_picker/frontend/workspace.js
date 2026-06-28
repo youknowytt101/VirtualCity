@@ -1,5 +1,8 @@
 ﻿// Workspace switching and shell layout controls.
 
+// Domain: workspace-shell
+// Owns: Workspace switching, action panel visibility, shell resizing, refresh/restart controls, and account menu behavior.
+// AI handoff: For right panel, workspace tab, or refresh-state issues, start with setWorkspace and syncActionPanelContent.
 function updateWorkspaceButtons(workspaceId) {
   var buttons = document.querySelectorAll('[data-workspace-target]');
   Array.prototype.forEach.call(buttons, function(button) {

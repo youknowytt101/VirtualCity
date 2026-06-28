@@ -1,5 +1,8 @@
 ﻿// Map selection, grid loading, and location search controls.
 
+// Domain: map-selection
+// Owns: Grid loading, fixed-tile selection, persisted selection restore, basemap menu, and location search.
+// AI handoff: For map selection or tile restore issues, start with setSelection, loadGrid, and restoreRememberedSelection.
 function setDrawData(fc) {
   var src = map.getSource('draw');
   if (src) src.setData(fc || emptyFeatureCollection());

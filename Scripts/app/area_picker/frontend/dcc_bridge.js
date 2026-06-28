@@ -1,5 +1,8 @@
 ﻿// DCC software path and bridge controls.
 
+// Domain: dcc-bridge
+// Owns: DCC software paths, Houdini launch/probe state, and DCCbridge open/close controls.
+// AI handoff: For Houdini badge or software path issues, start with saveSoftwarePath, setHoudiniBadge, and updateDccSoftwarePaths.
 function setStatusRow(rowId, valueId, state, text, title) {
   var row = document.getElementById(rowId);
   var value = document.getElementById(valueId);

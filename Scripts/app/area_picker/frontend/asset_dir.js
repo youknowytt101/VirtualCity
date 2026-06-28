@@ -1,3 +1,6 @@
+// Domain: asset-library
+// Owns: Local asset directory persistence and asset tree status in the game workspace.
+// AI handoff: For asset directory save or tree refresh issues, check /asset-dir in API_CONTRACT.md.
 (function() {
   'use strict';
 
