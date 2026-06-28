@@ -36,9 +36,11 @@ import app.area_picker.template as area_picker_template
 from app.area_picker.software_paths import (
     SOFTWARE_PATHS_FILE,
     SOFTWARE_IDS as _SOFTWARE_IDS,
+    asset_dir_status as _asset_dir_status,
     read_software_paths as _read_software_paths,
     software_path_key as _software_path_key,
     software_path_status as _software_path_status,
+    write_asset_dir as _write_asset_dir,
     write_software_paths as _write_software_paths,
 )
 
@@ -406,6 +408,36 @@ def _downloaded_area_status(root: Path | None = None) -> dict:
     }
 
 
+def _last_run_payload(source: dict) -> dict:
+    done = bool(source.get('done'))
+    return {
+        'available': done,
+        'ok': bool(source.get('ok')) if done else False,
+        'run_id': source.get('run_id') if done else '',
+        'name': source.get('name') if done else '',
+        'operation': source.get('operation') if done else '',
+        'returncode': source.get('returncode') if done else None,
+        'step_label': source.get('step_label') if done else '',
+        'pct': source.get('pct', 0) if done else 0,
+    }
+
+
+def _attach_service_status_fields(resp: dict, snapshot: dict) -> dict:
+    houdini_available = _probe_houdini()
+    houdini_asset = _houdini_asset_status(houdini_available)
+    resp['houdini_available'] = houdini_available
+    resp['houdini_asset'] = houdini_asset
+    resp['software_paths'] = _software_path_status()
+    resp['export_available'] = (
+        False if resp.get('running') or resp.get('export_running')
+        else bool(houdini_asset.get('export_ready'))
+    )
+    resp['selection'] = _remembered_selection_status()
+    resp['downloaded_areas'] = _downloaded_area_status()
+    resp['failure_summary'] = _failure_summary(snapshot)
+    return resp
+
+
 def _service_payload() -> dict:
     with _state_lock:
         snapshot = dict(_state)
@@ -418,20 +450,7 @@ def _service_payload() -> dict:
         ok = snapshot.get('ok', False)
         pct = snapshot.get('pct', 0)
         step_label = snapshot.get('step_label', '')
-    houdini_available = _probe_houdini()
-    houdini_asset = _houdini_asset_status(houdini_available)
-    # 口径分离：当前态只反映 running 中的值。历史结果迁到 last_run。
-    last_run = {
-        'available': bool(done),
-        'ok': bool(ok) if done else False,
-        'run_id': run_id if done else '',
-        'name': name if done else '',
-        'operation': operation if done else '',
-        'returncode': snapshot.get('returncode') if done else None,
-        'step_label': step_label if done else '',
-        'pct': pct if done else 0,
-    }
-    return {
+    resp = {
         'app': 'VirtualCity area_picker',
         'server_version': APP_VERSION,
         'pid': os.getpid(),
@@ -446,18 +465,13 @@ def _service_payload() -> dict:
         'run_id': run_id if running else '',
         'pct': pct if running else 0,
         'step_label': step_label if running else '',
-        'last_run': last_run,
+        # 口径分离：当前态只反映 running 中的值。历史结果迁到 last_run。
+        'last_run': _last_run_payload(snapshot),
         'auto_shutdown_on_success': AUTO_SHUTDOWN_ON_SUCCESS,
         'no_browser': NO_BROWSER,
         'shutdown_with_page': SHUTDOWN_WITH_PAGE,
-        'houdini_available': houdini_available,
-        'houdini_asset': houdini_asset,
-        'software_paths': _software_path_status(),
-        'export_available': False if running or export_running else bool(houdini_asset.get('export_ready')),
-        'selection': _remembered_selection_status(),
-        'downloaded_areas': _downloaded_area_status(),
-        'failure_summary': _failure_summary(snapshot),
     }
+    return _attach_service_status_fields(resp, snapshot)
 
 
 def _file_status(value: str | Path | None) -> dict:
@@ -860,6 +874,72 @@ def _export_available() -> bool:
     return bool(gate.get('allowed'))
 
 
+def _default_whitebox_path() -> Path:
+    return ROOT / 'Houdini' / 'Export' / 'whitebox_v001.glb'
+
+
+def _whitebox_path_from_status(houdini_status: dict | None = None) -> Path:
+    value = str((houdini_status or {}).get('whitebox_path') or '').strip()
+    return _resolve_project_path(value) if value else _default_whitebox_path()
+
+
+def _size_label(size: int, exists: bool = True) -> str:
+    if not exists:
+        return '--'
+    if size >= 1024 * 1024:
+        return f'{size / (1024 * 1024):.1f} MB'
+    if size >= 1024:
+        return f'{size / 1024:.0f} KB'
+    return f'{size} B'
+
+
+def _whitebox_artifact_status(area_id: str = '', run_id: str = '',
+                              houdini_status: dict | None = None) -> dict:
+    """Describe the preview whitebox file as an explicit UI artifact contract."""
+    status = houdini_status or {}
+    target = _whitebox_path_from_status(status)
+    artifact_area_id = str(status.get('area_id') or area_id or '')
+    artifact_run_id = str(status.get('run_id') or run_id or '')
+    path_label = _project_path_label(target)
+    base = {
+        'available': False,
+        'path': path_label,
+        'url': '',
+        'area_id': artifact_area_id,
+        'run_id': artifact_run_id,
+        'size': 0,
+        'size_label': '--',
+        'mtime': 0,
+        'mtime_ms': 0,
+        'cache_key': '',
+        'message': 'whitebox GLB missing',
+    }
+    try:
+        if not target.is_file():
+            return base
+        stat = target.stat()
+    except OSError as exc:
+        base['message'] = f'whitebox GLB unreadable: {exc}'
+        return base
+
+    cache_key = f'{artifact_run_id or "run"}-{stat.st_mtime_ns}-{stat.st_size}'
+    query = urllib.parse.urlencode({
+        'run_id': artifact_run_id,
+        'v': cache_key,
+    })
+    base.update({
+        'available': True,
+        'url': '/whitebox.glb?' + query,
+        'size': stat.st_size,
+        'size_label': _size_label(stat.st_size, True),
+        'mtime': int(stat.st_mtime),
+        'mtime_ms': int(stat.st_mtime * 1000),
+        'cache_key': cache_key,
+        'message': '',
+    })
+    return base
+
+
 def _houdini_asset_status(houdini_available: bool | None = None) -> dict:
     """Summarize whether the current Houdini scene has QA-passed exportable geometry."""
     try:
@@ -869,10 +949,12 @@ def _houdini_asset_status(houdini_available: bool | None = None) -> dict:
             'qa_ok': False,
             'model_ready': False,
             'export_ready': False,
+            'preview_ready': False,
             'status': '',
             'message': f'active_area.json 不可读: {exc}',
             'area_id': '',
             'run_id': '',
+            'whitebox': _whitebox_artifact_status(),
         }
     area_id = str(cfg.get('area_id') or '')
     run_id = str(cfg.get('run_id') or '')
@@ -884,10 +966,12 @@ def _houdini_asset_status(houdini_available: bool | None = None) -> dict:
     qa_ok = bool(h_status.get('available') and str(h_status.get('status') or '').lower() == 'completed')
     status = str(h_status.get('status') or '')
     message = str(h_status.get('message') or gate.get('primary_reason') or '')
+    whitebox = _whitebox_artifact_status(area_id, run_id, h_status)
     return {
         'qa_ok': qa_ok,
         'model_ready': model_ready,
         'export_ready': bool(gate.get('allowed')),
+        'preview_ready': bool(whitebox.get('available') and status.lower() == 'completed'),
         'status': status,
         'message': message,
         'export_block_reason': str(gate.get('primary_reason') or ''),
@@ -895,6 +979,7 @@ def _houdini_asset_status(houdini_available: bool | None = None) -> dict:
         'manual_review_approved': bool(gate.get('manual_review_approved')),
         'area_id': area_id,
         'run_id': run_id,
+        'whitebox': whitebox,
     }
 
 
@@ -1205,6 +1290,9 @@ def _frontend_asset_version() -> str:
         (FRONTEND_ROOT, "pipeline_status.js"),
         (FRONTEND_ROOT, "dcc_bridge.js"),
         (FRONTEND_ROOT, "game_workbench.js"),
+        (FRONTEND_ROOT, "vc_glb.js"),
+        (FRONTEND_ROOT, "houdini_preview.js"),
+        (FRONTEND_ROOT, "asset_dir.js"),
         (FRONTEND_ROOT, "styles.css"),
         (FRONTEND_ROOT, "index.html"),
     ]
@@ -1262,7 +1350,6 @@ def _build_status_payload() -> dict:
             'export_log_offset': _state['export_log_offset'],
         }
         snapshot = dict(resp)
-    resp['houdini_available'] = _probe_houdini()
     run_id = snapshot.get('run_id') or ''
     if not run_id:
         try:
@@ -1289,28 +1376,12 @@ def _build_status_payload() -> dict:
                         resp['ok'] = run_status == 'completed'
         except Exception:
             pass
-    resp['houdini_asset'] = _houdini_asset_status(resp['houdini_available'])
-    resp['software_paths'] = _software_path_status()
-    if not resp.get('running') and not resp.get('export_running'):
-        resp['export_available'] = bool(resp['houdini_asset'].get('export_ready'))
-    resp['selection'] = _remembered_selection_status()
-    resp['downloaded_areas'] = _downloaded_area_status()
-    resp['failure_summary'] = _failure_summary(snapshot)
+    _attach_service_status_fields(resp, snapshot)
     # 口径分离：顶层 running/done/ok 只反映"当前回合"。运行结束（包含成功）的
     # 历史结果迁到 last_run，避免页面刷新后前端把"上次完成"误显示为"当前完成"。
     # failure_summary 仍由 snapshot 计算（保留 _state 原貌），因此"上次失败"
     # 摘要展示不受影响。
-    last_run = {
-        'available': bool(resp.get('done')),
-        'ok': bool(resp.get('ok')) if resp.get('done') else False,
-        'run_id': resp.get('run_id') if resp.get('done') else '',
-        'name': resp.get('name') if resp.get('done') else '',
-        'operation': resp.get('operation') if resp.get('done') else '',
-        'returncode': resp.get('returncode') if resp.get('done') else None,
-        'step_label': resp.get('step_label') if resp.get('done') else '',
-        'pct': resp.get('pct', 0) if resp.get('done') else 0,
-    }
-    resp['last_run'] = last_run
+    resp['last_run'] = _last_run_payload(resp)
     if not resp.get('running'):
         resp['done'] = False
         resp['ok'] = False
@@ -1331,6 +1402,9 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/software-paths':
             self._json(_software_path_status())
+            return
+        if parsed.path == '/asset-dir':
+            self._json(_asset_dir_status())
             return
         if parsed.path == '/selection':
             self._json(_remembered_selection_status())
@@ -1401,6 +1475,9 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path.startswith('/area-picker/'):
             self._frontend_static(parsed.path)
+            return
+        if parsed.path == '/whitebox.glb':
+            self._serve_whitebox_glb()
             return
         if parsed.path == '/tiles':
             try:
@@ -1475,6 +1552,9 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/software-paths':
             self._post_software_paths()
+            return
+        if parsed.path == '/asset-dir':
+            self._post_asset_dir()
             return
         if parsed.path == '/open-houdini':
             self._post_open_houdini()
@@ -1731,6 +1811,23 @@ class _Handler(BaseHTTPRequestHandler):
             message = '软件路径已保存，但文件不存在'
         self._json({'ok': True, 'message': message, 'software_paths': status})
 
+    def _post_asset_dir(self):
+        length = int(self.headers.get('Content-Length', 0))
+        try:
+            body = json.loads(self.rfile.read(length) or b'{}')
+        except json.JSONDecodeError:
+            self._json({'ok': False, 'message': '请求 JSON 无法解析'})
+            return
+        try:
+            status = _write_asset_dir(body.get('path'))
+        except Exception as exc:
+            self._json({'ok': False, 'message': f'资产目录保存失败: {exc}'})
+            return
+        message = '资产目录已保存'
+        if status['asset_dir'] and not status['asset_dir_exists']:
+            message = '资产目录已保存，但目录不存在'
+        self._json({'ok': True, 'message': message, 'asset_dir': status})
+
     def _post_open_houdini(self):
         if not _probe_houdini():
             length = int(self.headers.get('Content-Length', 0))
@@ -1846,6 +1943,24 @@ class _Handler(BaseHTTPRequestHandler):
 
         threading.Thread(target=_run_export, daemon=True).start()
         self._json({'ok': True, 'message': 'FBX 导出已启动'})
+
+    def _serve_whitebox_glb(self):
+        try:
+            cfg = _load_active_area()
+            h_status = pipeline_status.load_houdini_status(
+                ROOT,
+                str(cfg.get('area_id') or ''),
+                str(cfg.get('run_id') or ''),
+            )
+        except Exception:
+            h_status = {}
+        target = _whitebox_path_from_status(h_status)
+        if not target.is_file():
+            self.send_response(404)
+            self.end_headers()
+            return
+        # no-cache: the file may be overwritten by the next generation run.
+        self._serve_file_with_range(target, 'model/gltf-binary', cache_control='no-store')
 
     def _static(self, request_path: str):
         rel = urllib.parse.unquote(request_path[len('/static/'):]).replace('\\', '/').lstrip('/')

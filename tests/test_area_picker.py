@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "Scripts"))
 
 import area_picker
+import houdini_build.status as houdini_status_writer
 import manual_review
 import pipeline_status
 
@@ -18,6 +19,10 @@ FRONTEND_ROOT = Path(area_picker.FRONTEND_ROOT)
 _PICKER_INDEX_HTML = area_picker._HTML
 _PICKER_STYLES = (FRONTEND_ROOT / "styles.css").read_text(encoding="utf-8")
 _PICKER_SCRIPT_NAMES = (
+    "vc_glb.js",
+    "game_workbench.js",
+    "houdini_preview.js",
+    "asset_dir.js",
     "workspace.js",
     "selection_search.js",
     "pipeline_status.js",
@@ -111,6 +116,43 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("window.VC_CONFIG", _PICKER_INDEX_HTML)
         self.assertNotIn("<style>", _PICKER_INDEX_HTML)
         self.assertIn("def _frontend_static", Path(area_picker.__file__).read_text(encoding="utf-8"))
+
+    def test_houdini_status_updates_use_shared_frontend_projection(self):
+        self.assertIn("function applySharedStatus(d)", _PICKER_FRONTEND)
+        self.assertGreaterEqual(_PICKER_FRONTEND.count("applySharedStatus(d);"), 2)
+
+    def test_houdini_preview_honors_preview_ready_gate(self):
+        self.assertIn("var previewReady = !!asset.preview_ready;", _PICKER_FRONTEND)
+        self.assertIn("if (!previewReady || !whitebox.available)", _PICKER_FRONTEND)
+
+    def test_houdini_preview_uses_terrain_mesh_for_turntable_pivot(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("function findLayerObject(root, layerKey)", preview_js)
+        self.assertIn("function computeTerrainPreviewPivot(model)", preview_js)
+        self.assertIn("var terrainObject = findLayerObject(model, 'terrain');", preview_js)
+        self.assertIn("var buildingsObject = findLayerObject(model, 'buildings');", preview_js)
+        self.assertIn("var frameObject = buildingsObject || terrainObject || model;", preview_js)
+        self.assertIn("model.position.set(-pivot.center.x, -pivot.center.y, -pivot.groundZ);", preview_js)
+        self.assertNotIn("model.position.sub(center);", preview_js)
+
+    def test_houdini_preview_uses_fixed_white_shadow_light(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("renderer.shadowMap.enabled = true;", preview_js)
+        self.assertIn("renderer.shadowMap.type = THREE.BasicShadowMap;", preview_js)
+        self.assertIn("new THREE.AmbientLight(0xffffff", preview_js)
+        self.assertIn("var sun = new THREE.DirectionalLight(0xffffff", preview_js)
+        self.assertIn("sun.position.set(6, -8, 10);", preview_js)
+        self.assertIn("sun.castShadow = true;", preview_js)
+        self.assertIn("sun.shadow.mapSize.set(2048, 2048);", preview_js)
+        self.assertIn("scene.add(sun, sun.target);", preview_js)
+        self.assertIn("object.castShadow = true;", preview_js)
+        self.assertIn("object.receiveShadow = true;", preview_js)
+        self.assertNotIn("HemisphereLight", preview_js)
+
+    def test_status_payloads_share_common_service_projection(self):
+        source = Path(area_picker.__file__).read_text(encoding="utf-8")
+        self.assertIn("def _attach_service_status_fields", source)
+        self.assertGreaterEqual(source.count("_attach_service_status_fields("), 3)
 
     def test_picker_uses_draw_rectangle_for_fixed_grid_blocks(self):
         self.assertIn("固定网格框选器", _PICKER_FRONTEND)
@@ -427,6 +469,16 @@ class TestPickerHtml(unittest.TestCase):
         fingerprint = f"{int(stat.st_mtime)}-{stat.st_size}"
         self.assertIn(fingerprint, area_picker._frontend_asset_version())
 
+    def test_houdini_panel_preview_uses_explicit_whitebox_contract(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        pipeline_js = (FRONTEND_ROOT / "pipeline_status.js").read_text(encoding="utf-8")
+
+        self.assertIn("function frameRadius(", preview_js)
+        self.assertIn("asset.whitebox", preview_js)
+        self.assertIn("whitebox.url", preview_js)
+        self.assertIn("window.VC_HOUDINI_PREVIEW.update(d);", pipeline_js)
+        self.assertNotIn("model_ready && !d.running", preview_js)
+
     def test_game_character_uses_stylized_readable_avatar(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         self.assertIn('createCharacterMaterial', game_js)
@@ -565,7 +617,7 @@ class TestPickerHtml(unittest.TestCase):
         menu_labels = [
             'data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL',
             'data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市',
-            'data-workspace-target="game" aria-pressed="false" title="切换到虚拟资产构建">虚拟资产构建',
+            'data-workspace-target="game" aria-pressed="false" title="切换到编辑器">编辑器',
             'data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini',
             "DCCbridge",
         ]
@@ -930,7 +982,19 @@ class TestFrontendAssetVersion(unittest.TestCase):
             root = Path(td)
             static_root = root / "_static"
             static_root.mkdir(parents=True)
-            for name in ("app.js", "styles.css", "index.html"):
+            for name in (
+                "app.js",
+                "workspace.js",
+                "selection_search.js",
+                "pipeline_status.js",
+                "dcc_bridge.js",
+                "game_workbench.js",
+                "vc_glb.js",
+                "houdini_preview.js",
+                "asset_dir.js",
+                "styles.css",
+                "index.html",
+            ):
                 (root / name).write_text("v1", encoding="utf-8")
             with patch.object(area_picker, "FRONTEND_ROOT", root), patch.object(area_picker, "STATIC_ROOT", static_root):
                 first = area_picker._frontend_asset_version()
@@ -939,15 +1003,30 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 second = area_picker._frontend_asset_version()
                 (root / "styles.css").write_text("v3-longer-styles-content", encoding="utf-8")
                 third = area_picker._frontend_asset_version()
+                (root / "houdini_preview.js").write_text("v4-preview-content", encoding="utf-8")
+                fourth = area_picker._frontend_asset_version()
         self.assertNotEqual(first, second)
         self.assertNotEqual(second, third)
+        self.assertNotEqual(third, fourth)
 
     def test_version_is_stable_without_changes(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             static_root = root / "_static"
             static_root.mkdir(parents=True)
-            for name in ("app.js", "styles.css", "index.html"):
+            for name in (
+                "app.js",
+                "workspace.js",
+                "selection_search.js",
+                "pipeline_status.js",
+                "dcc_bridge.js",
+                "game_workbench.js",
+                "vc_glb.js",
+                "houdini_preview.js",
+                "asset_dir.js",
+                "styles.css",
+                "index.html",
+            ):
                 (root / name).write_text("same", encoding="utf-8")
             with patch.object(area_picker, "FRONTEND_ROOT", root), patch.object(area_picker, "STATIC_ROOT", static_root):
                 self.assertEqual(
@@ -962,6 +1041,27 @@ class TestFrontendAssetVersion(unittest.TestCase):
 
 
 class TestHoudiniStatus(unittest.TestCase):
+    def test_build_status_records_whitebox_artifact_path(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            whitebox = root / "Houdini" / "Export" / "whitebox_v001.glb"
+            whitebox.parent.mkdir(parents=True)
+            whitebox.write_bytes(b"glb-data")
+            with patch.object(houdini_status_writer, "ROOT", root):
+                houdini_status_writer.write_build_status(
+                    "area_test",
+                    "completed",
+                    root / "Houdini" / "Hip" / "area.hip",
+                    "done",
+                    "pass",
+                    "Reports/model_qa/area_test.json",
+                    "run_test",
+                    whitebox_path=whitebox,
+                )
+
+            payload = json.loads((root / "Config" / "houdini_build_status.json").read_text(encoding="utf-8"))
+        self.assertEqual(payload["whitebox_path"], "Houdini/Export/whitebox_v001.glb")
+
     def test_run_terminal_confirms_completed_for_matching_run(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -1162,7 +1262,11 @@ class TestExportAvailability(unittest.TestCase):
                 "status": "completed",
                 "qa_status": "pass",
                 "qa_report": "Reports/model_qa/area_test_quick.json",
+                "whitebox_path": "Houdini/Export/whitebox_v001.glb",
             }), encoding="utf-8")
+            whitebox = root / "Houdini" / "Export" / "whitebox_v001.glb"
+            whitebox.parent.mkdir(parents=True)
+            whitebox.write_bytes(b"glb-data")
             (qa / "area_test_quick.json").write_text(json.dumps({
                 "area_id": "area_test",
                 "run_id": "run_test",
@@ -1174,6 +1278,41 @@ class TestExportAvailability(unittest.TestCase):
         self.assertTrue(payload["qa_ok"])
         self.assertTrue(payload["model_ready"])
         self.assertTrue(payload["export_ready"])
+        self.assertTrue(payload["whitebox"]["available"])
+        self.assertEqual(payload["whitebox"]["run_id"], "run_test")
+        self.assertEqual(payload["whitebox"]["path"], "Houdini/Export/whitebox_v001.glb")
+        self.assertIn("/whitebox.glb?", payload["whitebox"]["url"])
+
+    def test_houdini_asset_status_reports_missing_whitebox_without_blocking_export(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            cfg = root / "Config"
+            qa = root / "Reports" / "model_qa"
+            cfg.mkdir()
+            qa.mkdir(parents=True)
+            (cfg / "active_area.json").write_text(json.dumps({
+                "area_id": "area_test",
+                "run_id": "run_test",
+            }), encoding="utf-8")
+            (cfg / "houdini_build_status.json").write_text(json.dumps({
+                "area_id": "area_test",
+                "run_id": "run_test",
+                "status": "completed",
+                "qa_status": "pass",
+                "qa_report": "Reports/model_qa/area_test_quick.json",
+                "whitebox_path": "Houdini/Export/missing.glb",
+            }), encoding="utf-8")
+            (qa / "area_test_quick.json").write_text(json.dumps({
+                "area_id": "area_test",
+                "run_id": "run_test",
+                "status": "pass",
+            }), encoding="utf-8")
+            with patch.object(area_picker, "ROOT", root), \
+                    patch.object(area_picker, "_houdini_model_available", return_value=True):
+                payload = area_picker._houdini_asset_status(True)
+        self.assertTrue(payload["export_ready"])
+        self.assertFalse(payload["whitebox"]["available"])
+        self.assertEqual(payload["whitebox"]["run_id"], "run_test")
 
     def test_export_requires_both_completed_qa_and_live_model(self):
         with tempfile.TemporaryDirectory() as td:

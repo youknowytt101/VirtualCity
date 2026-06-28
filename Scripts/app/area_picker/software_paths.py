@@ -39,6 +39,18 @@ def write_software_paths(data: dict) -> None:
     tmp.replace(SOFTWARE_PATHS_FILE)
 
 
+def asset_dir_status() -> dict:
+    value = str(read_software_paths().get("asset_dir") or "").strip()
+    return {"asset_dir": value, "asset_dir_exists": bool(value) and Path(value).is_dir()}
+
+
+def write_asset_dir(value: str) -> dict:
+    data = read_software_paths()
+    data["asset_dir"] = str(value or "").strip().strip('"')
+    write_software_paths(data)
+    return asset_dir_status()
+
+
 def software_path_status() -> dict:
     data = read_software_paths()
     status = {"config_path": str(SOFTWARE_PATHS_FILE)}

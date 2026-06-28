@@ -28,6 +28,7 @@
   var transformControlsLoading = null;
   var transformMode = 'translate';
   var transformModeButtons = [];
+  var loadedModel = null;
   var undoStack = [];
   var sharedToonGradientMap = null;
   var sideResizeState = null;
@@ -911,6 +912,44 @@
     });
   }
 
+  function loadGLB(url) {
+    initGameWorkbench();
+    if (!scene) { setStatus('场景未就绪'); return; }
+    if (!window.VC_GLB) { setStatus('加载器未就绪'); return; }
+    setStatus('导入白盒中…');
+    window.VC_GLB.load(url).then(function(root) {
+      if (loadedModel) scene.remove(loadedModel);
+      loadedModel = root;
+      scene.add(root);
+      render();
+      setStatus('白盒已导入');
+    }).catch(function(error) {
+      setStatus('白盒导入失败');
+      if (window.console) console.error('GLB load failed:', error);
+    });
+  }
+
+  // Load the latest pipeline-produced whitebox into the editor (no export — the
+  // generation pipeline writes the GLB; cache-bust to dodge stale caches).
+  function syncFromHoudini() {
+    var whitebox = window.VC_HOUDINI_PREVIEW && window.VC_HOUDINI_PREVIEW.getWhitebox
+      ? window.VC_HOUDINI_PREVIEW.getWhitebox()
+      : null;
+    loadGLB((whitebox && whitebox.url) || ('/whitebox.glb?t=' + Date.now()));
+  }
+
+  function bindSyncButtons() {
+    var importBtn = document.getElementById('import-houdini-whitebox-btn');  // 编辑器 资产 tab
+    if (importBtn) importBtn.addEventListener('click', syncFromHoudini);
+
+    var syncBtn = document.getElementById('sync-to-editor-btn');  // Houdini 构建面板
+    if (syncBtn) syncBtn.addEventListener('click', function() {
+      var navBtn = document.querySelector('[data-workspace-target="game"]');
+      if (navBtn) navBtn.click();  // 先切到编辑器工作区
+      syncFromHoudini();
+    });
+  }
+
   function pickCharacter(event) {
     var rect = sceneHost.getBoundingClientRect();
     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -1343,6 +1382,14 @@
   window.VC_GAME_WORKBENCH = {
     init: initGameWorkbench,
     resize: resize,
-    setActive: setActive
+    setActive: setActive,
+    loadGLB: loadGLB,
+    syncFromHoudini: syncFromHoudini
   };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindSyncButtons);
+  } else {
+    bindSyncButtons();
+  }
 })();

@@ -103,7 +103,7 @@
       <div class="tool-placeholder-list flat-panel flat-panel--col">
         <button type="button" class="tool-placeholder-btn flat-item active" data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到虚拟资产构建">虚拟资产构建</button>
+        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到编辑器">编辑器</button>
         <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini</button>
         <details class="dcc-bridge-panel flat-item">
           <summary class="tool-placeholder-btn dcc-bridge-summary">DCCbridge</summary>
@@ -295,17 +295,48 @@
         <div class="action-outline-body"></div>
       </section>
       <div id="game-side-resizer" class="game-side-resizer" role="separator" aria-label="调整场景大纲高度" aria-orientation="horizontal" aria-controls="game-scene-outline game-side-tabs" tabindex="0"></div>
-      <section id="game-side-tabs" class="action-tabs" aria-label="我的游戏右栏标签页">
+      <section id="game-side-tabs" class="action-tabs" aria-label="我的游戏右栏标签页" style="--action-tab-count: 4;">
         <input id="game-side-tab-1" class="action-tab-input" type="radio" name="game-side-tabs" checked>
-        <label class="action-tab-label" for="game-side-tab-1">创建</label>
-        <div class="action-tab-panel" aria-label="创建"></div>
+        <label class="action-tab-label" for="game-side-tab-1">资产</label>
+        <div class="action-tab-panel" aria-label="资产">
+          <form id="asset-dir-form" class="asset-dir">
+            <label class="asset-dir-label" for="asset-dir-input">本地资产目录</label>
+            <input id="asset-dir-input" class="asset-dir-input" type="text" placeholder="例如 D:\Assets" autocomplete="off" spellcheck="false">
+            <div class="asset-dir-row">
+              <button type="submit" class="asset-dir-save">保存</button>
+              <span id="asset-dir-status" class="asset-dir-msg" aria-live="polite"></span>
+            </div>
+          </form>
+          <ul id="asset-dir-tree" class="asset-dir-tree" aria-label="资产目录结构"></ul>
+          <div class="asset-actions">
+            <button id="import-houdini-whitebox-btn" type="button" class="action-btn">
+              <span class="btn-main">导入 Houdini 白盒</span>
+            </button>
+            <button id="asset-cat-character" type="button" class="action-btn">
+              <span class="btn-main">人物角色</span>
+            </button>
+            <button id="asset-cat-scene-whitebox" type="button" class="action-btn">
+              <span class="btn-main">场景白盒</span>
+            </button>
+            <button id="asset-cat-scene-component" type="button" class="action-btn">
+              <span class="btn-main">场景组件</span>
+            </button>
+            <button id="asset-cat-logic" type="button" class="action-btn">
+              <span class="btn-main">功能逻辑</span>
+            </button>
+          </div>
+        </div>
 
         <input id="game-side-tab-2" class="action-tab-input" type="radio" name="game-side-tabs">
-        <label class="action-tab-label" for="game-side-tab-2">测试</label>
-        <div class="action-tab-panel" aria-label="测试"></div>
+        <label class="action-tab-label" for="game-side-tab-2">创建</label>
+        <div class="action-tab-panel" aria-label="创建"></div>
 
         <input id="game-side-tab-3" class="action-tab-input" type="radio" name="game-side-tabs">
-        <label class="action-tab-label" for="game-side-tab-3">发布</label>
+        <label class="action-tab-label" for="game-side-tab-3">测试</label>
+        <div class="action-tab-panel" aria-label="测试"></div>
+
+        <input id="game-side-tab-4" class="action-tab-input" type="radio" name="game-side-tabs">
+        <label class="action-tab-label" for="game-side-tab-4">发布</label>
         <div class="action-tab-panel" aria-label="发布"></div>
       </section>
     </div>
@@ -409,6 +440,10 @@
                 <span class="btn-sub">审核后资产</span>
               </button>
             </div>
+            <button id="sync-to-editor-btn" type="button" class="action-btn">
+              <span class="btn-main">同步至资产库</span>
+            </button>
+            <div id="houdini-preview-host" class="houdini-preview" aria-label="白盒预览"></div>
           </section>
         </div>
       </section>
@@ -478,7 +513,10 @@ window.VC_CONFIG = {
   shutdownWithPage: __SHUTDOWN_WITH_PAGE__
 };
 </script>
+<script src="/area-picker/vc_glb.js?v=__VERSION__"></script>
 <script src="/area-picker/game_workbench.js?v=__VERSION__"></script>
+<script src="/area-picker/houdini_preview.js?v=__VERSION__"></script>
+<script src="/area-picker/asset_dir.js?v=__VERSION__"></script>
 <script src="/area-picker/workspace.js?v=__VERSION__"></script>
 <script src="/area-picker/selection_search.js?v=__VERSION__"></script>
 <script src="/area-picker/pipeline_status.js?v=__VERSION__"></script>

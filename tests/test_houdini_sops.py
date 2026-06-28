@@ -514,6 +514,13 @@ class TestRecookRoadChain(unittest.TestCase):
         self.assertNotIn("_refine_result", text)
         self.assertNotIn("str(ROOT / 'Scripts' / 'refine_data.py')", text)
 
+    def test_recook_model_qa_reuses_current_rpyc_connection(self):
+        text = self.PATH.read_text(encoding="utf-8")
+        self.assertIn("from houdini_build.model_qa_runner import run_model_qa", text)
+        self.assertIn("run_model_qa(conn, hou, OBJ_PATH, 'quick', _cfg)", text)
+        self.assertNotIn("_qa_cmd = [sys.executable", text)
+        self.assertNotIn("subprocess.run(_qa_cmd", text)
+
     def test_houdini_build_domain_registry_documents_asset_boundaries(self):
         keys = [domain.key for domain in BUILD_ORDER]
         self.assertEqual(keys, ["terrain", "buildings", "roads", "nature", "assembly"])
@@ -724,6 +731,34 @@ class TestExportAndImportChain(unittest.TestCase):
         self.assertNotIn("f'{_OBJ}/road_strips'", text)
         self.assertIn("[f'{_OBJ}/terrain_color', f'{_OBJ}/dem_subdivide', f'{_OBJ}/dem_terrain']", text)
         self.assertIn("prims = geo.intrinsicValue('primitivecount')", text)
+
+    def test_whitebox_glb_export_preserves_terrain_buildings_roads_layers(self):
+        text = Path("Scripts/houdini_build/glb_export.py").read_text(encoding="utf-8")
+        self.assertIn('"terrain": ("terrain_color", "dem_subdivide", "dem_terrain")', text)
+        self.assertIn('"buildings": ("bld_with_foundation", "bld_clipped", "post_normals")', text)
+        self.assertIn('"roads": ("road_surface_color", "road_capsule_surface_preview", "road_clipped")', text)
+        self.assertIn('createNode("geo", "VC_whitebox_{}".format(layer_key))', text)
+        self.assertIn('hou.node("/obj/VC_whitebox")', text)
+        self.assertNotIn('obj.createNode("subnet", "VC_whitebox")', text)
+        self.assertIn('def _set_export_root(rop, layers):', text)
+        self.assertIn('_set_if_present(rop, "usesoppath", 0)', text)
+        self.assertIn('_set_if_present(rop, "objpath", "/obj")', text)
+        self.assertIn('_set_if_present(rop, "objects", "VC_whitebox_*")', text)
+        self.assertIn('_set_if_present(rop, "forceobjects", "")', text)
+        self.assertIn('_set_if_present(rop, "exportmaterials", 0)', text)
+        self.assertIn('_set_if_present(rop, "exportnames", 1)', text)
+        self.assertIn('_set_if_present(rop, "exportmeshnames", 1)', text)
+        self.assertIn('_set_flag_if_present(layer, "setDisplayFlag", True)', text)
+        self.assertNotIn('layer.setRenderFlag(True)', text)
+        self.assertIn('rop.render()', text)
+
+    def test_whitebox_glb_export_cleans_temporary_houdini_nodes(self):
+        text = Path("Scripts/houdini_build/glb_export.py").read_text(encoding="utf-8")
+        self.assertIn('def _destroy_whitebox_layers(layers):', text)
+        self.assertIn('    try:\n', text)
+        self.assertIn('        rop.render()', text)
+        self.assertIn('finally:\n        if rop is not None:', text)
+        self.assertIn('_destroy_whitebox_layers(layers)', text)
 
 
 if __name__ == "__main__":

@@ -18,6 +18,9 @@ DEFAULT_HEIGHT   = 0.0   # Overture 和 Google 均未知时的属层备用默认
 FLOOR_HEIGHT     = 3.5   # num_floors → height 换算系数
 HEIGHT_THRESHOLD = 0.80  # Overture 覆盖率低于此就执行 Google 高度 join
 JOIN_MAX_DIST    = 50.0   # 空间 join 最大匹配距离（米）
+OVERTURE_CONNECT_TIMEOUT = 10
+OVERTURE_REQUEST_TIMEOUT = 60
+OVERTURE_FETCH_ATTEMPTS  = 2
 
 
 def _fetch_overture(bbox):
@@ -27,47 +30,63 @@ def _fetch_overture(bbox):
     from shapely.geometry import mapping
 
     west, south, east, north = bbox
-    features = []
-    reader = overturemaps.record_batch_reader('building', bbox=(west, south, east, north))
-    for batch in reader:
-        d = batch.to_pydict()
-        n = len(d.get('geometry', []))
-        for i in range(n):
-            wkb = d['geometry'][i]
-            if wkb is None:
-                continue
-            try:
-                geom = from_wkb(bytes(wkb))
-                geom_dict = mapping(geom)
-            except Exception:
-                continue
+    for attempt in range(1, OVERTURE_FETCH_ATTEMPTS + 1):
+        features = []
+        try:
+            reader = overturemaps.record_batch_reader(
+                'building',
+                bbox=(west, south, east, north),
+                stac=True,
+                connect_timeout=OVERTURE_CONNECT_TIMEOUT,
+                request_timeout=OVERTURE_REQUEST_TIMEOUT,
+            )
+            if reader is None:
+                raise RuntimeError('overturemaps returned no reader')
+            for batch in reader:
+                d = batch.to_pydict()
+                n = len(d.get('geometry', []))
+                for i in range(n):
+                    wkb = d['geometry'][i]
+                    if wkb is None:
+                        continue
+                    try:
+                        geom = from_wkb(bytes(wkb))
+                        geom_dict = mapping(geom)
+                    except Exception:
+                        continue
 
-            h = d.get('height', [None] * n)[i]
-            floors = d.get('num_floors', [None] * n)[i]
-            if h is not None and h > 0:
-                height, real = float(h), True
-            elif floors is not None and floors > 0:
-                height, real = float(floors) * FLOOR_HEIGHT, True
-            else:
-                height, real = DEFAULT_HEIGHT, False
+                    h = d.get('height', [None] * n)[i]
+                    floors = d.get('num_floors', [None] * n)[i]
+                    if h is not None and h > 0:
+                        height, real = float(h), True
+                    elif floors is not None and floors > 0:
+                        height, real = float(floors) * FLOOR_HEIGHT, True
+                    else:
+                        height, real = DEFAULT_HEIGHT, False
 
-            # Overture schema: 顶层是 'subtype'（residential/commercial/...），
-            # 'class' 是更细分类（apartments/office/...）。两者皆可缺。
-            # 优先 subtype，其次 class，最后 'building' 兜底。
-            subtype_arr = d.get('subtype', [None] * n)
-            class_arr   = d.get('class',   [None] * n)
-            sub_v = subtype_arr[i] if i < len(subtype_arr) else None
-            cls_v = class_arr[i]   if i < len(class_arr)   else None
-            bld_class = sub_v or cls_v or 'building'
+                    # Overture schema: 顶层是 'subtype'（residential/commercial/...），
+                    # 'class' 是更细分类（apartments/office/...）。两者皆可缺。
+                    # 优先 subtype，其次 class，最后 'building' 兜底。
+                    subtype_arr = d.get('subtype', [None] * n)
+                    class_arr   = d.get('class',   [None] * n)
+                    sub_v = subtype_arr[i] if i < len(subtype_arr) else None
+                    cls_v = class_arr[i]   if i < len(class_arr)   else None
+                    bld_class = sub_v or cls_v or 'building'
 
-            features.append({
-                'geom':    geom,
-                'geom_dict': geom_dict,
-                'height':  height,
-                'real':    real,
-                'class':   bld_class,
-            })
-    return features
+                    features.append({
+                        'geom':    geom,
+                        'geom_dict': geom_dict,
+                        'height':  height,
+                        'real':    real,
+                        'class':   bld_class,
+                    })
+            return features
+        except Exception as exc:
+            if attempt >= OVERTURE_FETCH_ATTEMPTS:
+                raise
+            print(f'  ⚠ Overture 建筑读取失败，重试 {attempt}/{OVERTURE_FETCH_ATTEMPTS}: {exc}')
+
+    raise RuntimeError('Overture 建筑读取失败')
 
 
 def _fetch_google_heights(bbox, scripts_dir):

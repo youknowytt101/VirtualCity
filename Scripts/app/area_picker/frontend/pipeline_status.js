@@ -245,58 +245,6 @@ function updateRunStatusFromHealth(d) {
   }
 }
 
-function updateHoudiniStatusPanel(available, asset) {
-  setStatusRow(
-    'houdini-connection-row',
-    'houdini-connection-value',
-    available ? 'ok' : 'off',
-    available ? '在线' : '离线',
-    available ? 'Houdini RPYC 已连接' : '需要先打开 Houdini 并启用 RPYC 18811'
-  );
-  var qaOk = !!(asset && asset.qa_ok);
-  var modelReady = !!(asset && asset.model_ready);
-  var exportReady = !!(asset && asset.export_ready);
-  var message = asset && asset.message ? asset.message : '';
-  var assetText = '等待生成';
-  var assetState = 'warn';
-  if (!available) {
-    assetText = '等待 Houdini';
-    assetState = 'off';
-  } else if (qaOk && modelReady) {
-    assetText = 'QA 通过 / 现场可用';
-    assetState = 'ok';
-  } else if (qaOk && !modelReady) {
-    assetText = 'QA 通过 / 现场缺失';
-    assetState = 'warn';
-  } else if (message.indexOf('run mismatch') >= 0) {
-    assetText = 'QA 记录不匹配';
-    assetState = 'warn';
-  } else if (message.indexOf('area mismatch') >= 0) {
-    assetText = '区域不匹配';
-    assetState = 'warn';
-  } else if (asset && asset.status === 'completed') {
-    assetText = 'QA 已完成 / 待确认';
-    assetState = 'warn';
-  } else if (asset && asset.status) {
-    assetText = 'QA ' + asset.status;
-    assetState = 'warn';
-  }
-  setStatusRow(
-    'houdini-asset-row',
-    'houdini-asset-value',
-    assetState,
-    assetText,
-    message || 'Houdini 生成完成并通过 QA 后，模型资产会进入可导出状态'
-  );
-  setStatusRow(
-    'houdini-export-row',
-    'houdini-export-value',
-    exportReady ? 'ok' : 'warn',
-    exportReady ? '可导出' : '等待资产',
-    exportReady ? '当前 Houdini 模型可导出 FBX' : '需要 Houdini 在线、Model QA 通过，并且 OUT_city 现场几何可用'
-  );
-}
-
 function updateSelectionButtons(running) {
   var disabled = !selection || !!running;
   document.getElementById('run-btn').disabled = disabled;
@@ -352,12 +300,7 @@ function refreshServiceState() {
   fetch('/health')
   .then(function(r) { return r.json(); })
   .then(function(d) {
-    setHoudiniBadge(!!d.houdini_available, d.houdini_asset);
-    updateSoftwarePath(d.software_paths);
-    updateDccSoftwarePaths(d.software_paths);
-    updateExportButton(!!d.export_available, !!d.running);
-    updateSelectionButtons(!!d.running);
-    updateRunStatusFromHealth(d);
+    applySharedStatus(d);
     refreshDataSources();
   })
   .catch(function() {
@@ -440,10 +383,19 @@ function pollStatus() {
   .catch(function() { /* server may be restarting */ });
 }
 
+function applySharedStatus(d) {
+  updateRunStatusFromHealth(d);
+  updateSoftwarePath(d.software_paths);
+  updateDccSoftwarePaths(d.software_paths);
+  updateExportButton(!!d.export_available, !!d.export_running || !!d.running);
+  setHoudiniBadge(!!d.houdini_available, d.houdini_asset);
+  updateSelectionButtons(!!d.running);
+  if (window.VC_HOUDINI_PREVIEW) window.VC_HOUDINI_PREVIEW.update(d);
+}
+
 function applyStatus(d) {
   (function() {
-    updateRunStatusFromHealth(d);
-    updateSoftwarePath(d.software_paths);
+    applySharedStatus(d);
 
     if (d.log_lines && d.log_lines.length) {
       var logBase = d.log_offset || 0;
@@ -482,11 +434,6 @@ function applyStatus(d) {
         _lastExportSeq = exportEnd;
       }
     }
-    updateExportButton(!!d.export_available, !!d.export_running || !!d.running);
-    setHoudiniBadge(!!d.houdini_available, d.houdini_asset);
-    updateDccSoftwarePaths(d.software_paths);
-    updateSelectionButtons(!!d.running);
-
     if (d.export_done && !d.export_running) {
       stopStatusStream();
       refreshServiceState();

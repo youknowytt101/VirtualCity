@@ -8,7 +8,7 @@ Houdini 换区重算脚本
   4. 重建裁剪节点（基于新 DEM 边界）
   5. 重连 merge_all + 保存 hip
 """
-import sys, rpyc, subprocess, json, time, atexit
+import sys, rpyc, time, atexit
 from pathlib import Path
 
 SCRIPTS_ROOT = Path(__file__).resolve().parents[1]
@@ -17,16 +17,18 @@ if str(SCRIPTS_ROOT) not in sys.path:
 
 import houdini_road_pipeline as road_pipe
 import houdini_sops
+from houdini_build import glb_export
 from houdini_build.context import BuildContext
 from houdini_build.domains import domain_summary
 from houdini_build.domains import buildings as buildings_domain
 from houdini_build.domains import roads as roads_domain
 from houdini_build.domains import terrain as terrain_domain
+from houdini_build.model_qa_runner import run_model_qa
 from houdini_build.network_layout import apply_domain_network_layout
 from houdini_build.preflight import check_houdini_ready, houdini_ready_failure_message
 from houdini_build.status import write_build_status
 from orchestration import pipeline_state
-from shared.vc_paths import ROOT, HIP as MASTER_HIP, load_active_area, project_relative
+from shared.vc_paths import HIP as MASTER_HIP, load_active_area, project_relative
 
 PASS = '[OK]'
 FAIL = '[FAIL]'
@@ -34,8 +36,9 @@ errors = []
 
 
 def _write_build_status(area_id, status, hip_path=None, message='', qa_status='', qa_report='',
-                        run_id=''):
-    write_build_status(area_id, status, hip_path, message, qa_status, qa_report, run_id)
+                        run_id='', whitebox_path=None):
+    write_build_status(area_id, status, hip_path, message, qa_status, qa_report, run_id,
+                       whitebox_path=whitebox_path)
 
 
 def _progress(step, label):
@@ -479,37 +482,21 @@ if _out:
     _out.setRenderFlag(True)
 print('  [OK] 视口链已强制刷新')
 
-# Release the recook RPYC connection before the standalone QA subprocess opens
-# its own connection. Houdini's lightweight RPYC server can drop one stream when
-# two long-lived clients inspect geometry at the same time.
-try:
-    conn.close()
-except Exception:
-    pass
-conn = None
-
 # -- 6b. Quick model QA (fast regression gate) ---------------------------
 qa_status = ''
 qa_report = ''
 if not errors:
     print('\n[Houdini 7/7] Model QA')
     _progress(7, 'Model QA')
-    _qa_cmd = [sys.executable, str(ROOT / 'Scripts' / 'houdini_model_qa.py'), '--mode', 'quick']
-    _qa_result = subprocess.run(_qa_cmd, cwd=str(ROOT), capture_output=False)
-    _qa_latest = ROOT / 'Reports' / 'model_qa' / '{}_latest.json'.format(_area_id)
-    if not _qa_latest.exists():
-        _qa_latest = ROOT / 'Reports' / 'model_qa' / 'latest.json'
-    if _qa_latest.exists():
-        try:
-            with open(_qa_latest, encoding='utf-8') as _f:
-                _qa_payload = json.load(_f)
-                qa_status = _qa_payload.get('status', '')
-                qa_report = _qa_payload.get('report_path', project_relative(_qa_latest))
-        except Exception as _exc:
-            qa_status = 'unreadable'
-            qa_report = project_relative(_qa_latest)
-            print('  [WARN] Model QA report unreadable: {}'.format(_exc))
-    if _qa_result.returncode != 0:
+    try:
+        _qa_result = run_model_qa(conn, hou, OBJ_PATH, 'quick', _cfg)
+        qa_status = _qa_result.get('status', '')
+        qa_report = _qa_result.get('report_path', '')
+    except Exception as _exc:
+        _qa_result = {'returncode': 1}
+        qa_status = 'error'
+        print('  [WARN] Model QA 执行异常（advisory，不阻断管线）: {}'.format(_exc))
+    if _qa_result.get('returncode', 0) != 0:
         # Model QA 是非阻断体检，不是构建闸门：几何此刻已成功产出并汇聚到
         # OUT_city，质量问题只如实记录到 qa_status，由导出闸门据此要求人工复核。
         # 不再把 QA 结果塞进 errors，否则会让「几何产出」和「质量评分」共用
@@ -531,10 +518,18 @@ if errors:
     sys.exit(1)
 else:
     _RECOOK_FINALIZED = True
+    # Export the whitebox GLB in-process before reporting completion, so the
+    # "completed" signal implies the web preview's GLB is already on disk.
+    _whitebox_path = None
+    try:
+        _whitebox_path = glb_export.export_whitebox(hou, OBJ_PATH)
+    except Exception as _glb_exc:
+        print('  [GLB] 白盒导出失败（advisory，不阻断管线）: {}'.format(_glb_exc))
     _msg = 'Houdini build completed'
     if qa_status:
         _msg += '; model QA quick {}'.format(qa_status)
-    _write_build_status(_area_id, 'completed', ARCHIVE_HIP, _msg, qa_status, qa_report, _run_id)
+    _write_build_status(_area_id, 'completed', ARCHIVE_HIP, _msg, qa_status, qa_report, _run_id,
+                        _whitebox_path)
     if _run_id:
         if qa_status:
             pipeline_state.set_qa(_run_id, status=qa_status, report=qa_report)

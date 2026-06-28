@@ -59,6 +59,72 @@ function saveSoftwarePath(refreshAfter) {
     return { ok: false, message: String(e) };
   });
 }
+
+function updateHoudiniStatusPanel(available, asset) {
+  setStatusRow(
+    'houdini-connection-row',
+    'houdini-connection-value',
+    available ? 'ok' : 'off',
+    available ? '在线' : '离线',
+    available ? 'Houdini RPYC 已连接' : '需要先打开 Houdini 并启用 RPYC 18811'
+  );
+
+  var whitebox = asset && asset.whitebox ? asset.whitebox : null;
+  var qaOk = !!(asset && asset.qa_ok);
+  var modelReady = !!(asset && asset.model_ready);
+  var previewReady = !!(asset && asset.preview_ready);
+  var exportReady = !!(asset && asset.export_ready);
+  var message = asset && asset.message ? asset.message : '';
+  var assetText = '等待生成';
+  var assetState = 'warn';
+  var assetTitle = message || 'Houdini 生成完成后会写入白盒预览产物';
+
+  if (!available && !previewReady) {
+    assetText = '等待 Houdini';
+    assetState = 'off';
+    assetTitle = message || '需要先打开 Houdini 并生成当前区域';
+  } else if (previewReady && modelReady) {
+    assetText = '白盒可预览 / 现场可用';
+    assetState = 'ok';
+    assetTitle = whitebox && whitebox.path ? whitebox.path : assetTitle;
+  } else if (previewReady) {
+    assetText = '白盒可预览';
+    assetState = 'ok';
+    assetTitle = whitebox && whitebox.path ? whitebox.path : assetTitle;
+  } else if (qaOk && modelReady) {
+    assetText = 'QA 通过 / 等待白盒';
+    assetState = 'warn';
+  } else if (qaOk) {
+    assetText = 'QA 通过 / 现场缺失';
+    assetState = 'warn';
+  } else if (asset && asset.status === 'completed') {
+    assetText = '构建完成 / 待预览';
+    assetState = 'warn';
+  } else if (asset && asset.status) {
+    assetText = 'Houdini ' + asset.status;
+    assetState = 'warn';
+  }
+
+  if (whitebox && !whitebox.available && whitebox.message) {
+    assetTitle = whitebox.message;
+  }
+
+  setStatusRow(
+    'houdini-asset-row',
+    'houdini-asset-value',
+    assetState,
+    assetText,
+    assetTitle
+  );
+  setStatusRow(
+    'houdini-export-row',
+    'houdini-export-value',
+    exportReady ? 'ok' : 'warn',
+    exportReady ? '可导出' : '等待资产',
+    exportReady ? '当前 Houdini 模型可导出 FBX' : '需要 Houdini 在线、Model QA 通过，并且 OUT_city 现场几何可用'
+  );
+}
+
 function setHoudiniBadge(available, asset) {
   var el = document.getElementById('houdini-badge');
   el.disabled = false;
