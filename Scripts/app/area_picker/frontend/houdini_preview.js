@@ -15,6 +15,7 @@
   var previewYaw = Math.atan2(-1.6, 1.2);
   var previewOrbitRadius = 1.2;
   var previewTargetZ = 0;
+  var WHITEBOX_PREVIEW_COLOR = 0xb8b8b8;
 
   function setMsg(text) {
     if (msgEl) msgEl.textContent = text || '';
@@ -172,24 +173,11 @@
 
   function applyPreviewWhiteboxMaterial(object) {
     var THREE = window.THREE;
-    var source = object.material;
-    var sourceMaterial = Array.isArray(source) ? source[0] : source;
-    var transparent = !!(sourceMaterial && sourceMaterial.transparent);
-    var opacity = sourceMaterial && isFinite(sourceMaterial.opacity) ? sourceMaterial.opacity : 1;
-    return new THREE.MeshStandardMaterial({
-      color: previewWhiteboxColor(object),
-      roughness: 0.72,
-      metalness: 0,
-      transparent: transparent,
-      opacity: opacity,
+    return new THREE.MeshBasicMaterial({
+      color: WHITEBOX_PREVIEW_COLOR,
+      toneMapped: false,
       side: THREE.DoubleSide
     });
-  }
-
-  function previewWhiteboxColor(object) {
-    if (isTerrainObject(object)) return 0xb8bec5;
-    if (isRoadObject(object)) return 0xd5dbe1;
-    return 0xf1f4f6;
   }
 
   function clearModel() {
@@ -345,9 +333,8 @@
   function preparePreviewMesh(object) {
     disposeMaterial(object.material);
     object.material = applyPreviewWhiteboxMaterial(object);
-    var castsShadow = !isTerrainObject(object) && !isRoadObject(object);
-    object.castShadow = castsShadow;
-    object.receiveShadow = true;
+    object.castShadow = false;
+    object.receiveShadow = false;
   }
 
   function loadWhitebox(whitebox, force) {
