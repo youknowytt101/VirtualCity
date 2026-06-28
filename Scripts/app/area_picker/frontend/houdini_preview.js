@@ -40,19 +40,26 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.BasicShadowMap;
+    if ('outputColorSpace' in renderer) renderer.outputColorSpace = THREE.SRGBColorSpace;
+    else renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
     host.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    var sun = new THREE.DirectionalLight(0xffffff, 1.4);
-    sun.position.set(6, -8, 10);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9bb0, 0.9));
+    var sun = new THREE.DirectionalLight(0xffffff, 2.0);
+    sun.position.set(8, 14, 10);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.camera.near = 0.1;
-    sun.shadow.camera.far = 80;
-    sun.shadow.camera.left = -20;
-    sun.shadow.camera.right = 20;
-    sun.shadow.camera.top = 20;
-    sun.shadow.camera.bottom = -20;
+    sun.shadow.mapSize.set(4096, 4096);
+    sun.shadow.camera.near = 0.5;
+    sun.shadow.camera.far = 400;
+    sun.shadow.camera.left = -60;
+    sun.shadow.camera.right = 60;
+    sun.shadow.camera.top = 60;
+    sun.shadow.camera.bottom = -60;
+    sun.shadow.bias = -0.00015;
+    sun.shadow.normalBias = 0.03;
+    sun.shadow.radius = 0;
     scene.add(sun, sun.target);
 
     turntable = new THREE.Group();
@@ -98,7 +105,7 @@
     var transparent = !!(sourceMaterial && sourceMaterial.transparent);
     var opacity = sourceMaterial && isFinite(sourceMaterial.opacity) ? sourceMaterial.opacity : 1;
     return new THREE.MeshStandardMaterial({
-      color: 0xd8dde2,
+      color: 0xbfc7cf,
       roughness: 0.72,
       metalness: 0,
       transparent: transparent,
