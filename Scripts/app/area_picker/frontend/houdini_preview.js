@@ -59,15 +59,9 @@
     scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9bb0, 0.9));
     previewSun = new THREE.DirectionalLight(0xffffff, 2.0);
     var sun = previewSun;
-    sun.position.set(8, 14, 10);
     sun.castShadow = true;
     sun.shadow.mapSize.set(4096, 4096);
     sun.shadow.camera.near = 0.5;
-    sun.shadow.camera.far = 400;
-    sun.shadow.camera.left = -60;
-    sun.shadow.camera.right = 60;
-    sun.shadow.camera.top = 60;
-    sun.shadow.camera.bottom = -60;
     sun.shadow.bias = -0.00015;
     sun.shadow.normalBias = 0.03;
     sun.shadow.radius = 0;
@@ -183,14 +177,10 @@
     });
   }
 
-  function previewWhiteboxColor(object) {
-    return WHITEBOX_PREVIEW_COLOR;
-  }
-
   function applyPreviewWhiteboxMaterial(object) {
     var THREE = window.THREE;
     return new THREE.MeshStandardMaterial({
-      color: previewWhiteboxColor(object),
+      color: WHITEBOX_PREVIEW_COLOR,
       metalness: 0,
       roughness: 0.68,
       side: THREE.DoubleSide
