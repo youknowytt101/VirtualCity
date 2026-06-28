@@ -7,6 +7,7 @@
 
   var host = null, msgEl = null;
   var renderer = null, scene = null, camera = null, previewRoot = null;
+  var previewSun = null;
   var placeholder = null, model = null, rafId = null;
   var phase = 'idle';       // idle | running | loading | shown | error
   var currentWhitebox = null;
@@ -16,6 +17,7 @@
   var previewOrbitRadius = 1.2;
   var previewTargetZ = 0;
   var WHITEBOX_PREVIEW_COLOR = 0xb8b8b8;
+  var PREVIEW_SUN_DIRECTION = { x: 0.426, y: 0.721, z: 0.557 };
 
   function setMsg(text) {
     if (msgEl) msgEl.textContent = text || '';
@@ -55,7 +57,8 @@
     host.appendChild(renderer.domElement);
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9bb0, 0.9));
-    var sun = new THREE.DirectionalLight(0xffffff, 2.0);
+    previewSun = new THREE.DirectionalLight(0xffffff, 2.0);
+    var sun = previewSun;
     sun.position.set(8, 14, 10);
     sun.castShadow = true;
     sun.shadow.mapSize.set(4096, 4096);
@@ -70,7 +73,6 @@
     sun.shadow.radius = 0;
     scene.add(sun, sun.target);
 
-    createPreviewGround();
     createPreviewGrid();
     previewRoot = new THREE.Group();
     scene.add(previewRoot);
@@ -88,22 +90,6 @@
     frameRadius(1.2);
     if (!rafId) rafId = requestAnimationFrame(tick);
     return true;
-  }
-
-  function createPreviewGround() {
-    var THREE = window.THREE;
-    var shadow = new THREE.Mesh(
-      new THREE.PlaneGeometry(80, 80),
-      new THREE.ShadowMaterial({
-        color: 0x000000,
-        opacity: 0.4,
-        transparent: true
-      })
-    );
-    shadow.position.z = -0.01;
-    shadow.receiveShadow = true;
-    shadow.userData.pickable = false;
-    scene.add(shadow);
   }
 
   function createPreviewGrid() {
@@ -149,7 +135,33 @@
   function frameView(radius, targetZ) {
     previewOrbitRadius = Math.max(0.5, radius);
     previewTargetZ = targetZ || 0;
+    fitPreviewShadowRig(previewOrbitRadius);
     updatePreviewCameraOrbit();
+  }
+
+  function fitPreviewShadowRig(radius) {
+    if (!previewSun) return;
+    var safeRadius = Math.max(1.2, isFinite(radius) ? radius : 1.2);
+    var sunDistance = Math.max(20, safeRadius * 1.55);
+
+    previewSun.position.set(
+      PREVIEW_SUN_DIRECTION.x * sunDistance,
+      PREVIEW_SUN_DIRECTION.y * sunDistance,
+      previewTargetZ + PREVIEW_SUN_DIRECTION.z * sunDistance
+    );
+    previewSun.target.position.set(0, 0, previewTargetZ);
+    previewSun.target.updateMatrixWorld();
+
+    var shadowCamera = previewSun.shadow.camera;
+    var halfExtent = Math.max(60, safeRadius * 1.35);
+    shadowCamera.left = -halfExtent;
+    shadowCamera.right = halfExtent;
+    shadowCamera.top = halfExtent;
+    shadowCamera.bottom = -halfExtent;
+    shadowCamera.near = 0.5;
+    shadowCamera.far = Math.max(400, safeRadius * 4.0);
+    shadowCamera.updateProjectionMatrix();
+    previewSun.shadow.needsUpdate = true;
   }
 
   function updatePreviewCameraOrbit() {
@@ -171,11 +183,16 @@
     });
   }
 
+  function previewWhiteboxColor(object) {
+    return WHITEBOX_PREVIEW_COLOR;
+  }
+
   function applyPreviewWhiteboxMaterial(object) {
     var THREE = window.THREE;
-    return new THREE.MeshBasicMaterial({
-      color: WHITEBOX_PREVIEW_COLOR,
-      toneMapped: false,
+    return new THREE.MeshStandardMaterial({
+      color: previewWhiteboxColor(object),
+      metalness: 0,
+      roughness: 0.68,
       side: THREE.DoubleSide
     });
   }
@@ -222,23 +239,6 @@
   function layerNameMatches(name, layerKey) {
     var key = String(layerKey || '').toLowerCase();
     return name === key || name === 'whitebox_' + key || name.indexOf(key + '_') === 0 || name.indexOf('_' + key) >= 0;
-  }
-
-  function objectHasLayerName(object, layerKey) {
-    var node = object;
-    while (node) {
-      if (layerNameMatches(objectLayerName(node), layerKey)) return true;
-      node = node.parent;
-    }
-    return false;
-  }
-
-  function isTerrainObject(object) {
-    return objectHasLayerName(object, 'terrain');
-  }
-
-  function isRoadObject(object) {
-    return objectHasLayerName(object, 'roads') || objectHasLayerName(object, 'road') || objectHasLayerName(object, 'streets') || objectHasLayerName(object, 'street');
   }
 
   function findLayerObject(root, layerKey) {
@@ -333,8 +333,8 @@
   function preparePreviewMesh(object) {
     disposeMaterial(object.material);
     object.material = applyPreviewWhiteboxMaterial(object);
-    object.castShadow = false;
-    object.receiveShadow = false;
+    object.castShadow = true;
+    object.receiveShadow = true;
   }
 
   function loadWhitebox(whitebox, force) {
@@ -386,8 +386,7 @@
       camera.updateProjectionMatrix();
     }
     if (placeholder.visible || model) {
-      previewYaw += model ? 0.005 : 0.02;
-      updatePreviewCameraOrbit();
+      previewRoot.rotation.z += model ? 0.005 : 0.02;
     }
     renderer.render(scene, camera);
   }
