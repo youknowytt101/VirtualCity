@@ -1969,7 +1969,7 @@ body.is-resizing-game-side {
   border-radius: 6px;
   overflow: hidden;
   background: #2b2f33;
-  border: 1px solid var(--quick-jump-count);
+  border: 1px solid #000000;
   cursor: pointer;
 }
 .houdini-preview canvas {

@@ -72,13 +72,22 @@ def retarget_snap_consumers(hou, obj_path: str, snap_target) -> None:
 
 
 def color_terrain(hou, net, obj_path: str, snap_target, rgb):
-    """Create the public terrain_color node used by assembly/export."""
-    old = hou.node(obj_path + "/terrain_color")
-    if old:
-        old.destroy()
-    node = net.createNode("attribwrangle", "terrain_color")
-    node.setInput(0, snap_target)
-    node.parm("class").set(2)  # Point
-    node.parm("snippet").set("@Cd = set({:.4f}, {:.4f}, {:.4f});".format(*rgb))
-    node.cook(force=True)
-    return node
+    """Create the public terrain_color output with color and normals."""
+    for old_name in ("terrain_color", "terrain_color_cd"):
+        old = hou.node(obj_path + "/" + old_name)
+        if old:
+            old.destroy()
+    color_node = net.createNode("attribwrangle", "terrain_color_cd")
+    color_node.setInput(0, snap_target)
+    color_node.parm("class").set(2)  # Point
+    color_node.parm("snippet").set("@Cd = set({:.4f}, {:.4f}, {:.4f});".format(*rgb))
+    color_node.cook(force=True)
+
+    normal_node = net.createNode("normal", "terrain_color")
+    normal_node.setInput(0, color_node)
+    if normal_node.parm("type"):
+        normal_node.parm("type").set(1)  # Vertex normals
+    if normal_node.parm("normalize"):
+        normal_node.parm("normalize").set(1)
+    normal_node.cook(force=True)
+    return normal_node

@@ -616,18 +616,27 @@ def color_roads(hou, net, obj_path: str, src_node, rgb):
 
 
 def color_road_surface(hou, net, obj_path: str, src_node, rgb):
-    """Create the public road_surface_color output from the capsule road surface."""
-    old = hou.node(obj_path + "/road_surface_color")
-    if old:
-        old.destroy()
+    """Create the public road_surface_color output with color and normals."""
+    for old_name in ("road_surface_color", "road_surface_color_cd"):
+        old = hou.node(obj_path + "/" + old_name)
+        if old:
+            old.destroy()
     if src_node is None:
         return None
-    road_surface_color = net.createNode("attribwrangle", "road_surface_color")
+    road_surface_color = net.createNode("attribwrangle", "road_surface_color_cd")
     road_surface_color.setInput(0, src_node)
     road_surface_color.parm("class").set(2)  # Point
     road_surface_color.parm("snippet").set("@Cd = set({:.4f}, {:.4f}, {:.4f});".format(*rgb))
     road_surface_color.cook(force=True)
-    return road_surface_color
+
+    road_surface_normal = net.createNode("normal", "road_surface_color")
+    road_surface_normal.setInput(0, road_surface_color)
+    if road_surface_normal.parm("type"):
+        road_surface_normal.parm("type").set(1)  # Vertex normals
+    if road_surface_normal.parm("normalize"):
+        road_surface_normal.parm("normalize").set(1)
+    road_surface_normal.cook(force=True)
+    return road_surface_normal
 
 
 def finalize_surface(hou, obj_path: str, road_colored):
