@@ -1,5 +1,5 @@
 """
-VirtualCity — 一键换区/扩区脚本
+WorldBuilder — 一键换区/扩区脚本
 =================================
 从 bbox 坐标开始，完整跑通整条数据管线。
 
@@ -137,7 +137,7 @@ origin_lat = (south + north) / 2
 bbox_w, bbox_h = bbox_size_m([west, south, east, north])
 
 print(f"\n{'='*50}")
-print(f"[VirtualCity] 设置区域: {area_name}")
+print(f"[WorldBuilder] 设置区域: {area_name}")
 print(f"  bbox: [{west}, {south}, {east}, {north}]")
 print(f"  中心: ({origin_lon:.4f}, {origin_lat:.4f})")
 print(f"  尺寸: {bbox_w/1000:.1f} km × {bbox_h/1000:.1f} km")
@@ -268,7 +268,7 @@ if not _tile:
         try:
             data = urllib.parse.urlencode({"data": query}).encode()
             req  = urllib.request.Request(server, data=data,
-                                          headers={"User-Agent": "VirtualCity/1.0"})
+                                          headers={"User-Agent": "WorldBuilder/1.0"})
             with urllib.request.urlopen(req, timeout=180) as resp:
                 content = resp.read()
             with open(osm_path, "wb") as f:

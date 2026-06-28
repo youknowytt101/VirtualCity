@@ -1,5 +1,5 @@
 """
-VirtualCity - DEM 地形数据自动下载脚本
+WorldBuilder - DEM 地形数据自动下载脚本
 ========================================
 支持多种数据源（按质量排序）：
   1. FABDEM 30m (DTM，已移除建筑和植被) —— GEE，精度最佳
@@ -51,7 +51,7 @@ def download_copernicus_10m(bbox, output_tif, output_csv):
     print("  下载中（文件大约 300-800MB）...")
 
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "VirtualCity/1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "WorldBuilder/1.0"})
         with urllib.request.urlopen(req, timeout=300) as resp:
             data = resp.read()
     except Exception as e:
@@ -160,7 +160,7 @@ def run(cfg, source="fabdem"):
     if not bbox or len(bbox) != 4:
         print("cfg 缺少有效的 bbox")
         sys.exit(1)
-    print(f"[VirtualCity] 下载 DEM: bbox={bbox}  source={source}")
+    print(f"[WorldBuilder] 下载 DEM: bbox={bbox}  source={source}")
 
     if source == "fabdem":
         try:

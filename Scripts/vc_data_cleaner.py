@@ -1,5 +1,5 @@
 """
-VirtualCity — 2.5D 道路数据清洗与拓扑规范化 (Milestone 1)
+WorldBuilder — 2.5D 道路数据清洗与拓扑规范化 (Milestone 1)
 ======================================================
 1. 读取 raw roads.osm (XML)。
 2. 进行 2.5D 拓扑清洗：
@@ -483,7 +483,7 @@ class Road2D5Cleaner:
                 "tags": tags2,
             })
 
-        osm_root = ET.Element("osm", {"version": "0.6", "generator": "VirtualCity 2.5D Cleaner"})
+        osm_root = ET.Element("osm", {"version": "0.6", "generator": "WorldBuilder 2.5D Cleaner"})
         
         # 写入节点
         for nid, (lon, lat) in sorted(osm_nodes.items()):

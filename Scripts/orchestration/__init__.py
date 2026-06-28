@@ -1,1 +1,1 @@
-"""Pipeline orchestration and durable run state for VirtualCity."""
+"""Pipeline orchestration and durable run state for WorldBuilder."""

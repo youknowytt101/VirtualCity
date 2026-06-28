@@ -1,5 +1,5 @@
 """
-VirtualCity — Overture Maps 建筑下载脚本（混合模式）
+WorldBuilder — Overture Maps 建筑下载脚本（混合模式）
 ===========================================
 建筑轮廓来自 Overture Maps，高度自动从 Google Open Buildings 填充。
 当 Overture 高度覆盖率 < 80% 时，追加下载 Google Open Buildings

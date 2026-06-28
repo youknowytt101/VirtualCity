@@ -1,4 +1,4 @@
-"""Manual review approvals for VirtualCity pipeline gates."""
+"""Manual review approvals for WorldBuilder pipeline gates."""
 from __future__ import annotations
 
 import argparse
@@ -72,7 +72,7 @@ def write_review(area_id: str, run_id: str, *, decision: str = "approved",
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Record a manual review decision for the active VirtualCity run.")
+    parser = argparse.ArgumentParser(description="Record a manual review decision for the active WorldBuilder run.")
     parser.add_argument("decision", choices=sorted(APPROVED_DECISIONS | {"rejected"}), help="Review decision.")
     parser.add_argument("--area-id", default="", help="Area id. Defaults to Config/active_area.json.")
     parser.add_argument("--run-id", default="", help="Run id. Defaults to Config/active_area.json.")

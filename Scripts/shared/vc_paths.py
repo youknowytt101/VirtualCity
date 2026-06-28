@@ -1,5 +1,5 @@
 """
-VirtualCity path helpers.
+WorldBuilder path helpers.
 
 All automation scripts should derive paths from this file instead of hard-coding a drive letter.
 """
@@ -37,11 +37,11 @@ def posix(path: str | Path) -> str:
 def resolve_project_path(value: str | Path) -> Path:
     raw = str(value).replace("\\", "/")
     lowered = raw.lower()
-    marker = "/virtualcity/"
-    idx = lowered.find(marker)
-    if idx >= 0:
-        return ROOT / raw[idx + len(marker):]
-    if lowered.endswith("/virtualcity"):
+    for marker in ("/worldbuilder/", "/virtualcity/"):
+        idx = lowered.find(marker)
+        if idx >= 0:
+            return ROOT / raw[idx + len(marker):]
+    if lowered.endswith("/worldbuilder") or lowered.endswith("/virtualcity"):
         return ROOT
     p = Path(raw)
     if p.is_absolute():

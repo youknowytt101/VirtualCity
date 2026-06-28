@@ -1,5 +1,5 @@
 """
-VirtualCity — 城市级数据预缓存脚本
+WorldBuilder — 城市级数据预缓存脚本
 =====================================
 一次性下载城市范围的 DEM / OSM / 建筑数据，
 后续所有小区域直接从本地裁剪，无需重复联网。
@@ -81,7 +81,7 @@ def download_osm_tile(bbox, city_name):
         try:
             data = urllib.parse.urlencode({"data": query}).encode()
             req  = urllib.request.Request(server, data=data,
-                                          headers={"User-Agent": "VirtualCity/1.0"})
+                                          headers={"User-Agent": "WorldBuilder/1.0"})
             with urllib.request.urlopen(req, timeout=300) as resp:
                 content = resp.read()
             with open(osm, "wb") as f:
@@ -168,7 +168,7 @@ def main():
             print(f"  删除旧缓存: {f}")
 
     print(f"\n{'='*50}")
-    print(f"[VirtualCity] 城市级数据预缓存: {city_name}")
+    print(f"[WorldBuilder] 城市级数据预缓存: {city_name}")
     print(f"  bbox: {bbox}")
     print(f"  目标目录: {TILES_DIR}")
     print(f"{'='*50}\n")

@@ -1,4 +1,4 @@
-"""Current-run status aggregation for the VirtualCity pipeline.
+"""Current-run status aggregation for the WorldBuilder pipeline.
 
 This module is intentionally read-only.  It gives UI and export scripts one
 place to answer: "does this artifact belong to the active area/run?"
@@ -72,10 +72,10 @@ def _resolve(root: Path, value: str | Path | None) -> Path:
     if path.is_absolute():
         return path
     lowered = raw.lower()
-    marker = "/virtualcity/"
-    idx = lowered.find(marker)
-    if idx >= 0:
-        return root / raw[idx + len(marker):]
+    for marker in ("/worldbuilder/", "/virtualcity/"):
+        idx = lowered.find(marker)
+        if idx >= 0:
+            return root / raw[idx + len(marker):]
     return root / raw
 
 

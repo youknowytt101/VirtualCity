@@ -1,5 +1,5 @@
 """
-VirtualCity — 数据精炼管线
+WorldBuilder — 数据精炼管线
 ============================
 统一入口：输入 → 分级清洗 → 输出到 _houdini_ready/
 
@@ -593,7 +593,7 @@ def probe_sources(area_cfg: dict, manifest: dict) -> list[dict]:
     try:
         req = urllib.request.Request(
             "https://overpass-api.de/api/status",
-            headers={"User-Agent": "VirtualCity/1.0"}
+            headers={"User-Agent": "WorldBuilder/1.0"}
         )
         with urllib.request.urlopen(req, timeout=3) as resp:
             status_text = resp.read().decode("utf-8", errors="ignore")
@@ -609,7 +609,7 @@ def probe_sources(area_cfg: dict, manifest: dict) -> list[dict]:
     try:
         req = urllib.request.Request(
             "https://api.github.com/repos/OvertureMaps/data/releases/latest",
-            headers={"User-Agent": "VirtualCity/1.0"}
+            headers={"User-Agent": "WorldBuilder/1.0"}
         )
         with urllib.request.urlopen(req, timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
@@ -647,7 +647,7 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
     manifest = _load_manifest(area_id)
 
     print(f"\n{'='*50}")
-    print(f"[VirtualCity 数据精炼] {area_id}")
+    print(f"[WorldBuilder 数据精炼] {area_id}")
     print(f"{'='*50}")
 
     # ── 数据源探测 ──
@@ -859,7 +859,7 @@ def refine(area_cfg: dict, *, target_level: int = 3, force: bool = False,
 # ══════════════════════════════════════════════════════════════════════════════
 
 def main():
-    ap = argparse.ArgumentParser(description="VirtualCity 数据精炼管线")
+    ap = argparse.ArgumentParser(description="WorldBuilder 数据精炼管线")
     ap.add_argument("--level", type=int, default=3, help="目标精炼级别 (1-3)")
     ap.add_argument("--force", action="store_true", help="忽略缓存，全部重跑")
     ap.add_argument("--skip-probe", action="store_true", help="跳过数据源更新探测")

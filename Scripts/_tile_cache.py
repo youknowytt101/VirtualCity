@@ -1,5 +1,5 @@
 """
-VirtualCity — 本地 Tile 缓存工具
+WorldBuilder — 本地 Tile 缓存工具
 ===================================
 供 download_dem.py / download_overture_buildings.py / set_area.py 调用。
 

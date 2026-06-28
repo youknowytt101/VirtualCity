@@ -1583,7 +1583,7 @@ wheels = [
 ]
 
 [[package]]
-name = "virtualcity"
+name = "worldbuilder"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

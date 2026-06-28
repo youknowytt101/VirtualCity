@@ -1,1 +1,1 @@
-"""Application-facing tools for VirtualCity."""
+"""Application-facing tools for WorldBuilder."""

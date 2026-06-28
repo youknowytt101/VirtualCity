@@ -1,6 +1,6 @@
 @echo off
 setlocal
-REM VirtualCity - 一键下载 Google Open Buildings 高度数据
+REM WorldBuilder - 一键下载 Google Open Buildings 高度数据
 REM 双击运行，或从命令行执行
 REM
 REM 首次运行会自动打开浏览器进行一次性 Google 账号授权
@@ -9,7 +9,7 @@ REM 后续运行无需再次登录（凭据缓存在本地）
 set "SCRIPT_DIR=%~dp0"
 pushd "%SCRIPT_DIR%" || exit /b 1
 
-echo [VirtualCity] 正在下载建筑高度数据...
+echo [WorldBuilder] 正在下载建筑高度数据...
 uv run --with earthengine-api --index-url https://mirrors.aliyun.com/pypi/simple/ ^
     python download_building_heights.py %*
 

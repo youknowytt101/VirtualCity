@@ -4,11 +4,11 @@ CFG_FILE = r'__CFG__'
 def _resolve_project_path(value):
     raw = str(value).replace(chr(92), '/')
     low = raw.lower()
-    marker = '/virtualcity/'
-    idx = low.find(marker)
-    if idx >= 0:
-        return ROOT_DIR + '/' + raw[idx + len(marker):]
-    if low.endswith('/virtualcity'):
+    for marker in ('/worldbuilder/', '/virtualcity/'):
+        idx = low.find(marker)
+        if idx >= 0:
+            return ROOT_DIR + '/' + raw[idx + len(marker):]
+    if low.endswith('/worldbuilder') or low.endswith('/virtualcity'):
         return ROOT_DIR
     if ':' in raw[:3] or raw.startswith('/'):
         return raw

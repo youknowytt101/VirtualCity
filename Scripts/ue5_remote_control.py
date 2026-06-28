@@ -1,5 +1,5 @@
 """
-VirtualCity - UE5 Remote Control 客户端
+WorldBuilder - UE5 Remote Control 客户端
 ========================================
 通过 UE5 Remote Control HTTP API 实时控制 Editor。
 Editor 必须开着，端口 30010。

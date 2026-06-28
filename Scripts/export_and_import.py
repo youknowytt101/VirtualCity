@@ -1,5 +1,5 @@
 """
-VirtualCity — 一键 Houdini 导出 FBX + UE5 导入
+WorldBuilder — 一键 Houdini 导出 FBX + UE5 导入
 ================================================
 UE5 Editor 必须已运行（端口 30010）。
 Houdini 必须已运行（RPYC 端口 18811）。

@@ -43,7 +43,7 @@
 
   <rect class="page" x="0" y="0" width="1680" height="3080"/>
 
-  <text x="42" y="48" class="h1">VirtualCity 自动化管线完整流程图</text>
+  <text x="42" y="48" class="h1">WorldBuilder 自动化管线完整流程图</text>
   <text x="44" y="75" class="sub">完整测试定义：必须从 area_picker.py 网页入口开始，到 Houdini build status completed 且 Model QA 无 fail 为止；UE5 导入在人工审核后手动触发。</text>
   <text x="44" y="97" class="tiny">更新：2026-06-08 · 主线文件：area_picker.py / set_area.py / pipeline_state.py / refine_data.py / _recook_new_area.py / houdini_model_qa.py / export_and_import.py</text>
 
@@ -104,7 +104,7 @@
   <!-- Row 1 Startup -->
   <g>
     <rect class="box ui" x="78" y="230" width="186" height="76" rx="8"/>
-    <text x="94" y="255" class="title">启动 VirtualCity 操作台</text>
+    <text x="94" y="255" class="title">启动 WorldBuilder 操作台</text>
     <text x="94" y="276" class="small">双击 .cmd / PowerShell launcher</text>
     <text x="94" y="294" class="tiny">可设置页面关闭后自动退出</text>
 

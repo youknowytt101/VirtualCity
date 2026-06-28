@@ -19,7 +19,7 @@
   <rect width="1400" height="2200" fill="url(#bg)" rx="8"/>
 
   <!-- Title -->
-  <text x="700" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">VirtualCity 全流程管线：数据获取 → 数据精炼 → Houdini 资产生成 → UE5 导入</text>
+  <text x="700" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">WorldBuilder 全流程管线：数据获取 → 数据精炼 → Houdini 资产生成 → UE5 导入</text>
   <text x="700" y="62" text-anchor="middle" font-size="13" fill="#7f8c8d">set_area.py → refine_data.py → _recook_new_area.py → export_and_import.py</text>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->

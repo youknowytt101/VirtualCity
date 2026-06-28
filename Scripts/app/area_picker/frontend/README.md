@@ -1,6 +1,6 @@
 # Area Picker Frontend
 
-This folder contains the homepage UI for the VirtualCity area picker.
+This folder contains the homepage UI for the WorldBuilder area picker.
 
 - `index.html`: page structure and `window.VC_CONFIG` bootstrap values injected by the Python server.
 - `styles.css`: visual design, layout, responsive rules, and animation polish.

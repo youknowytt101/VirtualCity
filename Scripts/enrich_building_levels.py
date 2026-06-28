@@ -57,7 +57,7 @@ def _fetch_osm_levels(bbox, timeout=60):
     for url in OVERPASS_URLS:
         try:
             req = urllib.request.Request(url, data=data,
-                                         headers={'User-Agent': 'VirtualCity/1.0'})
+                                         headers={'User-Agent': 'WorldBuilder/1.0'})
             with urllib.request.urlopen(req, timeout=timeout + 10) as resp:
                 return json.loads(resp.read())
         except Exception as e:

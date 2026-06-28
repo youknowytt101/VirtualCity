@@ -1,5 +1,5 @@
 """
-VirtualCity — Road Graph 拓扑图生成器 (Milestone 1 - Stage 2)
+WorldBuilder — Road Graph 拓扑图生成器 (Milestone 1 - Stage 2)
 =============================================================
 从 roads_clean.geojson 提取并规范化 Nodes 与 Edges，输出标准的 road_graph.json：
 - Nodes: 包含 id, 局部坐标 (x, z, y), 连接的 edges 列表, 度数 (degree)。

@@ -8,11 +8,11 @@ with open(_CFG_FILE, encoding="utf-8") as _f:
 def _resolve_project_path(value):
     raw = str(value).replace(chr(92), '/')
     low = raw.lower()
-    marker = '/virtualcity/'
-    idx = low.find(marker)
-    if idx >= 0:
-        return r'__ROOT__' + '/' + raw[idx + len(marker):]
-    if low.endswith('/virtualcity'):
+    for marker in ('/worldbuilder/', '/virtualcity/'):
+        idx = low.find(marker)
+        if idx >= 0:
+            return r'__ROOT__' + '/' + raw[idx + len(marker):]
+    if low.endswith('/worldbuilder') or low.endswith('/virtualcity'):
         return r'__ROOT__'
     if ':' in raw[:3] or raw.startswith('/'):
         return raw

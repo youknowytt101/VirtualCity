@@ -460,7 +460,7 @@ function applyStatus(d) {
           setTimeout(function() {
             window.open('', '_self');
             window.close();
-            document.body.innerHTML = '<div style="font-family:Noto Sans SC,Microsoft YaHei,PingFang SC,Segoe UI,Arial,sans-serif;background:var(--base);color:var(--accent);height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;"><h2>[OK] VirtualCity 生成完成</h2><p>本地服务已自动停止，可以关闭此页面。</p></div>';
+            document.body.innerHTML = '<div style="font-family:Noto Sans SC,Microsoft YaHei,PingFang SC,Segoe UI,Arial,sans-serif;background:var(--base);color:var(--accent);height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;"><h2>[OK] WorldBuilder 生成完成</h2><p>本地服务已自动停止，可以关闭此页面。</p></div>';
           }, 3000);
         } else {
           log('状态服务保持运行，可继续查看 /status 或继续选择网格测试。', 'dim');

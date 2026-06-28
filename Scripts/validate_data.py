@@ -1,5 +1,5 @@
 """
-VirtualCity — 数据预检脚本
+WorldBuilder — 数据预检脚本
 在进入 Houdini 之前运行，确认所有数据文件完整且无已知问题。
 
 用法:
@@ -88,7 +88,7 @@ def check_houdini_ready():
 
 
 def main():
-    print(f"\n[VirtualCity 数据预检]")
+    print(f"\n[WorldBuilder 数据预检]")
     cfg = load_active_area(absolute=True)
     print(f"  区域: {cfg['area_id']}\n")
 

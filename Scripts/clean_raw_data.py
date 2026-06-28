@@ -1,5 +1,5 @@
 """
-VirtualCity — 原始数据清洗脚本
+WorldBuilder — 原始数据清洗脚本
 ================================
 在 Houdini import 之前对 GeoJSON（建筑）和 OSM（道路）做清洗。
 
@@ -336,7 +336,7 @@ def merge_roads(path: Path, tolerance_m: float = 1.0, dry_run: bool = False) -> 
 # ── 主函数 ───────────────────────────────────────────────────
 
 def main():
-    ap = argparse.ArgumentParser(description="VirtualCity 原始数据清洗")
+    ap = argparse.ArgumentParser(description="WorldBuilder 原始数据清洗")
     ap.add_argument("--dry-run",  action="store_true", help="只报告，不写入文件")
     ap.add_argument("--report",   action="store_true", help="同时输出 JSON 报告")
     ap.add_argument("--no-osm",   action="store_true", help="跳过 OSM 清洗")
@@ -344,7 +344,7 @@ def main():
 
     cfg = vc_paths.load_active_area(absolute=True)
     area_id = cfg.get("area_id", "unknown")
-    print(f"\n[VirtualCity 数据清洗] 区域: {area_id}")
+    print(f"\n[WorldBuilder 数据清洗] 区域: {area_id}")
     if args.dry_run:
         print("  [DRY-RUN] 不写入文件")
 

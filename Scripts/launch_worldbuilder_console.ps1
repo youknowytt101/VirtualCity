@@ -10,7 +10,7 @@ $Scripts = Join-Path $Root "Scripts"
 $Url = "http://127.0.0.1:$Port/"
 $HealthUrl = "http://127.0.0.1:$Port/health"
 $LogDir = Join-Path $Scripts "logs"
-$LogPath = Join-Path $LogDir "virtualcity_console_launcher.log"
+$LogPath = Join-Path $LogDir "worldbuilder_console_launcher.log"
 
 function Write-LauncherLog {
     param([string]$Message)
@@ -54,22 +54,22 @@ function Start-AreaPickerHost {
 }
 
 try {
-    Write-LauncherLog "Launching VirtualCity console."
+    Write-LauncherLog "Launching WorldBuilder console."
     # Always enter the Python host once: it decides whether the current server
     # version can be reused or an older process must be replaced.
     Start-AreaPickerHost
 
     if (-not (Wait-AreaPickerReady)) {
-        throw "VirtualCity console did not become ready within $StartupTimeoutSec seconds."
+        throw "WorldBuilder console did not become ready within $StartupTimeoutSec seconds."
     }
 
-    Write-LauncherLog "VirtualCity console ready: $Url (native window opened by desktop.py)"
+    Write-LauncherLog "WorldBuilder console ready: $Url (native window opened by desktop.py)"
     exit 0
 }
 catch {
     Write-LauncherLog "ERROR: $($_.Exception.Message)"
     Write-Host ""
-    Write-Host "VirtualCity console failed to open."
+    Write-Host "WorldBuilder console failed to open."
     Write-Host $_.Exception.Message
     Write-Host "Log: $LogPath"
     Write-Host ""

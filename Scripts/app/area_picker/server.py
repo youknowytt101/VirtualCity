@@ -1,5 +1,5 @@
 """
-VirtualCity — 交互式区域选择器
+WorldBuilder — 交互式区域选择器
 ================================
 运行后自动打开浏览器，在地图上框选固定 1km UTM 网格块，点击"开始生成"即可触发完整管线。
 不需要截图、不需要复制 URL、不需要手动估算坐标；下游仍使用 bbox 入口。
@@ -78,7 +78,7 @@ def _fetch_boundary(osm_type: str, osm_id: str) -> dict:
     req = urllib.request.Request(
         url,
         headers={
-            'User-Agent': 'VirtualCity/0.1 area-picker geocoder',
+            'User-Agent': 'WorldBuilder/0.1 area-picker geocoder',
             'Accept': 'application/json',
         },
     )
@@ -451,7 +451,7 @@ def _service_payload() -> dict:
         pct = snapshot.get('pct', 0)
         step_label = snapshot.get('step_label', '')
     resp = {
-        'app': 'VirtualCity area_picker',
+        'app': 'WorldBuilder area_picker',
         'server_version': APP_VERSION,
         'pid': os.getpid(),
         'started_at': STARTED_AT,
@@ -577,11 +577,11 @@ def _resolve_project_path(value: str | Path, *, root: Path | None = None) -> Pat
     base = root or ROOT
     raw = str(value).replace('\\', '/')
     lowered = raw.lower()
-    marker = '/virtualcity/'
-    idx = lowered.find(marker)
-    if idx >= 0:
-        return base / raw[idx + len(marker):]
-    if lowered.endswith('/virtualcity'):
+    for marker in ('/worldbuilder/', '/virtualcity/'):
+        idx = lowered.find(marker)
+        if idx >= 0:
+            return base / raw[idx + len(marker):]
+    if lowered.endswith('/worldbuilder') or lowered.endswith('/virtualcity'):
         return base
     path = Path(raw)
     if path.is_absolute():
@@ -1425,7 +1425,7 @@ class _Handler(BaseHTTPRequestHandler):
                 req = urllib.request.Request(
                     url,
                     headers={
-                        'User-Agent': 'VirtualCity/0.1 area-picker geocoder',
+                        'User-Agent': 'WorldBuilder/0.1 area-picker geocoder',
                         'Accept': 'application/json',
                     },
                 )
@@ -2162,7 +2162,7 @@ def main():
             return 2
 
     print(f"\n{'='*52}")
-    print(f"  VirtualCity 区域选择器")
+    print(f"  WorldBuilder 区域选择器")
     print(f"  当前区域中心: ({lat:.4f}, {lon:.4f})")
     print(f"  浏览器地址:   {url}")
     print(f"{'='*52}")

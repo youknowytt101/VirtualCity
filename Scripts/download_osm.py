@@ -1,5 +1,5 @@
 """
-VirtualCity - OSM 数据自动下载脚本
+WorldBuilder - OSM 数据自动下载脚本
 =====================================
 通过 Overpass API 下载指定区域的 OSM 数据，保存为 .osm 文件。
 
@@ -61,7 +61,7 @@ def download(area_name):
         try:
             data = urllib.parse.urlencode({"data": query}).encode()
             req = urllib.request.Request(server, data=data,
-                                         headers={"User-Agent": "VirtualCity/1.0"})
+                                         headers={"User-Agent": "WorldBuilder/1.0"})
             with urllib.request.urlopen(req, timeout=120) as resp:
                 content = resp.read()
 
@@ -81,6 +81,6 @@ def download(area_name):
 
 if __name__ == "__main__":
     area = sys.argv[1] if len(sys.argv) > 1 else "pattaya_sai6_mvp_v2"
-    print(f"[VirtualCity] 下载 OSM 数据: {area}")
+    print(f"[WorldBuilder] 下载 OSM 数据: {area}")
     download(area)
     print("完成 ✅")

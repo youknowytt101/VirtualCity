@@ -18,7 +18,7 @@ $AreaPickerShutdownUrl = "http://${BindAddress}:$AreaPickerPort/shutdown"
 
 function Write-ResetStep {
     param([string]$Message)
-    Write-Output "[VirtualCity reset] $Message"
+    Write-Output "[WorldBuilder reset] $Message"
 }
 
 function Get-JsonEndpoint {
@@ -37,7 +37,7 @@ function Get-JsonEndpoint {
 
 function Test-AreaPickerReady {
     $payload = Get-JsonEndpoint -Url $AreaPickerHealthUrl
-    return $null -ne $payload -and $payload.app -eq "VirtualCity area_picker"
+    return $null -ne $payload -and $payload.app -eq "WorldBuilder area_picker"
 }
 
 function Get-PortListeners {
@@ -58,7 +58,7 @@ function Get-ProcessCommandLine {
     }
 }
 
-function Test-VirtualCityServerProcess {
+function Test-WorldBuilderServerProcess {
     param(
         [System.Diagnostics.Process]$Process,
         [string]$CommandLine
@@ -92,12 +92,12 @@ function Stop-PortListeners {
             continue
         }
         $commandLine = Get-ProcessCommandLine -ProcessId $processId
-        $isVirtualCity = Test-VirtualCityServerProcess -Process $process -CommandLine $commandLine
-        if (-not $isVirtualCity -and -not $StopUnknownPortOwners) {
+        $isWorldBuilder = Test-WorldBuilderServerProcess -Process $process -CommandLine $commandLine
+        if (-not $isWorldBuilder -and -not $StopUnknownPortOwners) {
             Write-Warning "$Label port $Port is owned by unknown PID $processId ($($process.ProcessName)); not stopping it. Re-run with -StopUnknownPortOwners if this is expected."
             continue
         }
-        if (-not $isVirtualCity) {
+        if (-not $isWorldBuilder) {
             Write-Warning "$Label port $Port is owned by unknown PID $processId ($($process.ProcessName)); stopping because -StopUnknownPortOwners was requested."
         }
         else {
@@ -137,11 +137,11 @@ function Request-AreaPickerShutdown {
 }
 
 function Start-AreaPickerLauncher {
-    $launcher = Join-Path $Root "启动VirtualCity操作台.cmd"
+    $launcher = Join-Path $Root "启动WorldBuilder.cmd"
     if (-not (Test-Path -LiteralPath $launcher)) {
         throw "Missing launcher: $launcher"
     }
-    Write-ResetStep "Starting VirtualCity main console."
+    Write-ResetStep "Starting WorldBuilder main console."
     $proc = Start-Process -FilePath $launcher -WorkingDirectory $Root -WindowStyle Hidden -PassThru
     Write-ResetStep "Launcher PID: $($proc.Id)"
 }
@@ -183,4 +183,4 @@ if (Wait-AreaPickerReady) {
     exit 0
 }
 
-throw "Main console did not become ready within $StartupTimeoutSec seconds. Check the new VirtualCity console window."
+throw "Main console did not become ready within $StartupTimeoutSec seconds. Check the new WorldBuilder console window."

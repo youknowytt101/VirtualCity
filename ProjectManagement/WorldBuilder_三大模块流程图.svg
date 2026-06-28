@@ -29,9 +29,9 @@
 
   <rect class="bg" x="0" y="0" width="1500" height="980"/>
 
-  <text x="40" y="52" class="h1">VirtualCity 自动化管线：三大模块总览</text>
+  <text x="40" y="52" class="h1">WorldBuilder 自动化管线：三大模块总览</text>
   <text x="42" y="80" class="sub">总架构抽象：数据获取/下载/缓存 → 数据清洗/语义/QA → Houdini 构建/Model QA/审核出口</text>
-  <text x="42" y="102" class="tiny">这张图是最高层架构图；详细排查见 VirtualCity_自动化管线完整流程图.svg。</text>
+  <text x="42" y="102" class="tiny">这张图是最高层架构图；详细排查见 WorldBuilder_自动化管线完整流程图.svg。</text>
 
   <!-- Phase 1 -->
   <g transform="translate(40,150)">

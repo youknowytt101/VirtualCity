@@ -6,7 +6,7 @@
 
 ## 0. 与 OSM 管线的关系和当前优先级
 
-当前 VirtualCity 的近期目标是 **路线 A：真实 OSM 数据驱动**，也就是先把免费 API / 缓存数据跑通，进入 Houdini 生成干净道路素模；管线成熟后再替换 TomTom、HERE、Mapbox 等付费数据源。
+当前 WorldBuilder 的近期目标是 **路线 A：真实 OSM 数据驱动**，也就是先把免费 API / 缓存数据跑通，进入 Houdini 生成干净道路素模；管线成熟后再替换 TomTom、HERE、Mapbox 等付费数据源。
 
 本文描述的是 **路线 B：程序化道路生成**，偏 CityEngine / Parish & Müller 风格，用规则、人口密度、边界和障碍从零生长道路。它是另一个产品方向，不是 OSM 真实城市建模 MVP 的前置条件。
 

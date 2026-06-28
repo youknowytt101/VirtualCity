@@ -1,5 +1,5 @@
 [project]
-name = "virtualcity"
+name = "worldbuilder"
 version = "0.1.0"
 description = "Automation pipeline for GIS data, Houdini city generation, QA, and UE5 import support."
 requires-python = ">=3.10"

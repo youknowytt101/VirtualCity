@@ -1,5 +1,5 @@
 """
-VirtualCity - Google Open Buildings 高度数据一键下载脚本
+WorldBuilder - Google Open Buildings 高度数据一键下载脚本
 ========================================================
 功能：从 Google Earth Engine 直接下载带真实高度的建筑 GeoJSON，无需经过 Google Drive。
 

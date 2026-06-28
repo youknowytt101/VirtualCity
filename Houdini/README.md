@@ -1,6 +1,6 @@
 # Houdini
 
-> 本目录存放 VirtualCity 的 Houdini master hip、区域 hip、HDA 预留和导出资产。
+> 本目录存放 WorldBuilder 的 Houdini master hip、区域 hip、HDA 预留和导出资产。
 > 当前阶段的核心工作在 Houdini：道路、建筑、地形和 Model QA 的快速质量迭代。
 
 ---

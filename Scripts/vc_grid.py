@@ -1,4 +1,4 @@
-"""Fixed UTM build tiles for the VirtualCity area picker."""
+"""Fixed UTM build tiles for the WorldBuilder area picker."""
 from __future__ import annotations
 
 import math

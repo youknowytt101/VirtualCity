@@ -790,7 +790,7 @@ class TestPickerHtml(unittest.TestCase):
     def test_workspace_menu_order_and_default_page(self):
         menu_labels = [
             'data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL',
-            'data-workspace-target="city-preview" aria-pressed="false" title="切换到城市">城市',
+            'data-workspace-target="city-preview" aria-pressed="false" title="切换到 ZONE">ZONE',
             'data-workspace-target="game" aria-pressed="false" title="切换到编辑器">编辑器',
             'data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini',
             "DCCbridge",
@@ -843,7 +843,9 @@ class TestPickerHtml(unittest.TestCase):
         self.assertTrue((FRONTEND_ROOT / "icons" / "LUCIDE_LICENSE.txt").exists())
         self.assertTrue((FRONTEND_ROOT / "icons" / "BOOTSTRAP_ICONS_LICENSE.txt").exists())
         self.assertIn('class="dcc-path-input" type="text"', _PICKER_INDEX_HTML)
-        self.assertIn("dccPathCachePrefix = 'virtualcity.dcc.path.'", _PICKER_APP_JS)
+        self.assertIn("<title>WorldBuilder", _PICKER_INDEX_HTML)
+        self.assertIn("dccPathCachePrefix = 'worldbuilder.dcc.path.'", _PICKER_APP_JS)
+        self.assertIn("legacyDccPathCachePrefix = 'virtualcity.dcc.path.'", _PICKER_APP_JS)
         self.assertIn("function dccPathStorageKey", _PICKER_APP_JS)
         self.assertIn("function clearDccPathCache", _PICKER_APP_JS)
         self.assertIn("localStorage.setItem(dccPathStorageKey(row), value);", _PICKER_APP_JS)
@@ -1124,9 +1126,9 @@ class TestRootLauncher(unittest.TestCase):
         launcher = ROOT / "启动WorldBuilder.cmd"
         self.assertTrue(launcher.exists())
         source = launcher.read_text(encoding="utf-8")
-        self.assertIn("launch_virtualcity_console.ps1", source)
+        self.assertIn("launch_worldbuilder_console.ps1", source)
 
-        launch_script = ROOT / "Scripts" / "launch_virtualcity_console.ps1"
+        launch_script = ROOT / "Scripts" / "launch_worldbuilder_console.ps1"
         self.assertTrue(launch_script.exists())
         launch_source = launch_script.read_text(encoding="utf-8")
         # 桌面外壳模型：启动器跑 desktop.py（pywebview 原生窗口 + 同进程内嵌服务），
@@ -1146,7 +1148,7 @@ class TestRootLauncher(unittest.TestCase):
         shortcut = ROOT / "重置WorldBuilder服务.cmd"
         self.assertTrue(shortcut.exists())
         source = shortcut.read_text(encoding="utf-8")
-        self.assertIn("reset_virtualcity_servers.ps1", source)
+        self.assertIn("reset_worldbuilder_servers.ps1", source)
         self.assertNotIn("-StopUnknownPortOwners", source)
 
 

@@ -1,5 +1,5 @@
 """
-VirtualCity - UE5 FBX 批量导入脚本
+WorldBuilder - UE5 FBX 批量导入脚本
 ====================================
 在 UnrealEditor-Cmd.exe 内运行，自动将建筑和道路 FBX 导入到 /Game/City/
 
@@ -74,7 +74,7 @@ def import_all():
         else:
             unreal.log_warning(f"  MISSING: {path}")
 
-    unreal.log("[VirtualCity] FBX import complete.")
+    unreal.log("[WorldBuilder] FBX import complete.")
 
 
 import_all()

@@ -1,6 +1,6 @@
 # Scripts
 
-> 本目录是 VirtualCity 当前自动化管线的核心目录。
+> 本目录是 WorldBuilder 当前自动化管线的核心目录。
 > 这里不存放官方插件本体，只存放项目脚本、Houdini Python SOP 源码、QA 工具和 UE5 辅助脚本。
 
 ---
@@ -14,7 +14,7 @@ cd Scripts
 uv run python area_picker.py
 ```
 
-也可以在项目根目录双击 `启动VirtualCity操作台.cmd`。它会检查 Houdini RPYC 端口并自动打开本地网页操作台。
+也可以在项目根目录双击 `启动WorldBuilder.cmd`。它会检查 Houdini RPYC 端口并自动打开本地网页操作台。
 
 当前完整流程：
 

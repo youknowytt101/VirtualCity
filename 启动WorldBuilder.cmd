@@ -1,7 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Scripts\launch_virtualcity_console.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Scripts\launch_worldbuilder_console.ps1"
 if errorlevel 1 (
   echo.
   echo WorldBuilder launch failed. Press any key to close this window.

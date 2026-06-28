@@ -210,9 +210,13 @@ function dccPathStorageKey(row) {
   return dccPathCachePrefix + dccSoftwareId(row);
 }
 
+function legacyDccPathStorageKey(row) {
+  return legacyDccPathCachePrefix + dccSoftwareId(row);
+}
+
 function getCachedDccPath(row) {
   try {
-    return localStorage.getItem(dccPathStorageKey(row)) || '';
+    return localStorage.getItem(dccPathStorageKey(row)) || localStorage.getItem(legacyDccPathStorageKey(row)) || '';
   } catch (e) {
     return '';
   }
@@ -222,6 +226,7 @@ function setCachedDccPath(row, value) {
   try {
     if (value) localStorage.setItem(dccPathStorageKey(row), value);
     else localStorage.removeItem(dccPathStorageKey(row));
+    localStorage.removeItem(legacyDccPathStorageKey(row));
   } catch (e) {}
 }
 
@@ -230,7 +235,7 @@ function clearDccPathCache() {
     var keys = [];
     for (var i = 0; i < localStorage.length; i++) {
       var key = localStorage.key(i);
-      if (key && key.indexOf(dccPathCachePrefix) === 0) keys.push(key);
+      if (key && (key.indexOf(dccPathCachePrefix) === 0 || key.indexOf(legacyDccPathCachePrefix) === 0)) keys.push(key);
     }
     keys.forEach(function(key) {
       localStorage.removeItem(key);

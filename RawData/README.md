@@ -1,6 +1,6 @@
 # RawData
 
-> 本目录存放 VirtualCity 当前管线的输入数据、区域裁切缓存和 Houdini 中间输入。
+> 本目录存放 WorldBuilder 当前管线的输入数据、区域裁切缓存和 Houdini 中间输入。
 > 当前主数据源是 OSM 道路、FABDEM 优先 DEM、Overture 建筑轮廓。
 
 ---

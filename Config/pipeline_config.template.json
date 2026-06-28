@@ -33,7 +33,7 @@
   },
   "ue5": {
     "project_path": "UE5/VirtualCityUE/VirtualCityUE.uproject",
-    "content_root": "Content/VirtualCity/",
+    "content_root": "Content/WorldBuilder/",
     "map_name_template": "LV_{area_id}_MVP",
     "data_layers": [
       "DL_Terrain",

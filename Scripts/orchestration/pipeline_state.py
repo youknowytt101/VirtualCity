@@ -1,4 +1,4 @@
-"""Durable run state for the VirtualCity automation pipeline."""
+"""Durable run state for the WorldBuilder automation pipeline."""
 from __future__ import annotations
 
 import json
@@ -8,6 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from shared.vc_contracts import ModelQaReport
 from shared import vc_paths
 
 
@@ -125,11 +126,15 @@ def set_qa(run_id: str, *, status: str, report: str = "",
     (pipeline_status), keeping this source of truth free of policy.
     """
     payload = load_run(run_id)
-    payload["qa"] = {
-        "status": status,
-        "report": report,
-        "passed": bool(passed) if passed is not None else (str(status).lower() == "pass"),
-    }
+    qa = ModelQaReport(
+        area_id=str(payload.get("area_id") or ""),
+        run_id=str(payload.get("run_id") or ""),
+        status=str(status or ""),
+        summary={},
+    ).to_run_qa(report=report)
+    if passed is not None:
+        qa["passed"] = bool(passed)
+    payload["qa"] = qa
     payload["updated"] = now()
     _write_run(payload)
     return payload

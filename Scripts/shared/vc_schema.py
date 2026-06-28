@@ -1,5 +1,5 @@
 """
-vc_schema.py — VirtualCity 语义契约（唯一权威）
+vc_schema.py — WorldBuilder 语义契约（唯一权威）
 ================================================
 正式定义每一层进入 Houdini 前必须携带的属性、类型、允许值、缺失默认与来源
 （provenance），并提供校验函数供 refine_data 的 QA 与未来 Houdini Model QA 复用。

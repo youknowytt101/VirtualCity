@@ -1,5 +1,5 @@
 """
-Houdini model QA for VirtualCity.
+Houdini model QA for WorldBuilder.
 
 This script inspects the cooked Houdini SOP graph through RPYC and writes a
 structured report under Reports/model_qa.  The default quick mode is intended

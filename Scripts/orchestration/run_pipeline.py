@@ -1,4 +1,4 @@
-"""VirtualCity full pipeline orchestrator.
+"""WorldBuilder full pipeline orchestrator.
 
 This is the explicit boundary between the three major modules:
 
@@ -92,7 +92,7 @@ def main(argv: list[str] | None = None) -> int:
     ]
 
     print("\n" + "=" * 50)
-    print("[VirtualCity] Full pipeline orchestrator")
+    print("[WorldBuilder] Full pipeline orchestrator")
     print("=" * 50)
 
     # Step 1 creates the run_id and switches active_area.

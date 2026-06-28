@@ -1,7 +1,7 @@
 """
 test_vc_geo.py — vc_geo 坐标约定回归测试（零依赖 stdlib unittest）
 ================================================================
-锁定 VirtualCity 全项目唯一坐标约定，防止 H-002 / D-003 类 bug 回归。
+锁定 WorldBuilder 全项目唯一坐标约定，防止 H-002 / D-003 类 bug 回归。
 
 运行:
     python -m unittest discover -s tests

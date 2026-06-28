@@ -1,4 +1,4 @@
-"""Explicit pipeline state machine for the VirtualCity orchestrator.
+"""Explicit pipeline state machine for the WorldBuilder orchestrator.
 
 This is a pure, side-effect-free transition table. The orchestrator drives it
 and persists each transition through pipeline_state; the machine itself never

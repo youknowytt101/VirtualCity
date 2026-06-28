@@ -1,4 +1,4 @@
-"""Cache and fingerprint helpers for the VirtualCity data cleaning pipeline.
+"""Cache and fingerprint helpers for the WorldBuilder data cleaning pipeline.
 
 The goal is to keep acquisition, clipping, cleaning, and Houdini-ready export
 separable.  A paid/high-precision data source should only need a new adapter;

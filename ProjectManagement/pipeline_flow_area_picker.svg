@@ -29,7 +29,7 @@
 
   <rect width="1400" height="1200" rx="14" fill="url(#bg)"/>
 
-  <text x="700" y="42" text-anchor="middle" class="title">VirtualCity 完整自动化流程（网页框选 → Houdini 构建完成检测）</text>
+  <text x="700" y="42" text-anchor="middle" class="title">WorldBuilder 完整自动化流程（网页框选 → Houdini 构建完成检测）</text>
   <text x="700" y="68" text-anchor="middle" class="subtitle">默认完整测试入口：uv run python area_picker.py，不直接从 set_area.py 开始</text>
 
   <rect x="40" y="95" width="1320" height="970" rx="16" fill="#ffffff" stroke="#d5dde5" stroke-width="2"/>
@@ -180,5 +180,5 @@
   <text x="1287" y="380" text-anchor="middle" class="ok">area_id</text>
   <text x="1287" y="398" text-anchor="middle" class="ok">match</text>
 
-  <text x="700" y="1160" text-anchor="middle" class="subtitle">Generated for VirtualCity pipeline documentation</text>
+  <text x="700" y="1160" text-anchor="middle" class="subtitle">Generated for WorldBuilder pipeline documentation</text>
 </svg>

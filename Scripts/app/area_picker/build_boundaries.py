@@ -44,7 +44,7 @@ def fetch_raw(osm_id):
         'polygon_geojson': '1',
     })
     req = urllib.request.Request(url, headers={
-        'User-Agent': 'VirtualCity/0.1 area-picker boundary-prebuild',
+        'User-Agent': 'WorldBuilder/0.1 area-picker boundary-prebuild',
         'Accept': 'application/json',
     })
     with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:

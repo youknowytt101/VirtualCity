@@ -1,4 +1,4 @@
-"""HTML template loader for the VirtualCity area picker."""
+"""HTML template loader for the WorldBuilder area picker."""
 from pathlib import Path
 
 FRONTEND_ROOT = Path(__file__).resolve().parent / "frontend"

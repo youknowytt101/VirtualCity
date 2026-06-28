@@ -1,6 +1,6 @@
 # 道路研究模块
 
-这个目录用于把道路系统作为独立模块研究，尽量不被当前 VirtualCity 既有实现细节绑住。
+这个目录用于把道路系统作为独立模块研究，尽量不被当前 WorldBuilder 既有实现细节绑住。
 
 ## 模块目标
 
@@ -9,7 +9,7 @@
 1. 程序化道路生成：CityEngine / Parish & Müller 风格的道路生长、major/minor 分层、global goals、local constraints。
 2. 真实道路数据管线：OSM / OSMnx / Overpass 获取、清洗、投影、属性标准化。
 3. Houdini 道路建模：道路中心线到道路面、路口、路缘石、人行道、材质分层。
-4. 对接 VirtualCity：当道路方案稳定后，再映射到当前工程脚本、Houdini SOP 和 UE5 导入流程。
+4. 对接 WorldBuilder：当道路方案稳定后，再映射到当前工程脚本、Houdini SOP 和 UE5 导入流程。
 
 ## 目录结构
 
@@ -31,7 +31,7 @@ RoadResearch/
 
 ## 与当前工程的关系
 
-当前 VirtualCity 已有一些道路相关实现：
+当前 WorldBuilder 已有一些道路相关实现：
 
 - `Scripts/road_graph_builder.py`
 - `Scripts/houdini_sops/road_topology_builder.py`
