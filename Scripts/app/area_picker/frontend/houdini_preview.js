@@ -6,12 +6,15 @@
   'use strict';
 
   var host = null, msgEl = null;
-  var renderer = null, scene = null, camera = null, turntable = null;
+  var renderer = null, scene = null, camera = null, previewRoot = null;
   var placeholder = null, model = null, rafId = null;
   var phase = 'idle';       // idle | running | loading | shown | error
   var currentWhitebox = null;
   var shownCacheKey = '';
   var loadSeq = 0;
+  var previewYaw = Math.atan2(-1.6, 1.2);
+  var previewOrbitRadius = 1.2;
+  var previewTargetZ = 0;
 
   function setMsg(text) {
     if (msgEl) msgEl.textContent = text || '';
@@ -32,8 +35,12 @@
       }
     });
 
+    if (THREE.ColorManagement && 'legacyMode' in THREE.ColorManagement) {
+      THREE.ColorManagement.legacyMode = false;
+    }
+    THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x2b2f33);
+    scene.background = new THREE.Color(0x8f8f8f);
     camera = new THREE.PerspectiveCamera(45, 1, 0.05, 100000);
     camera.up.set(0, 0, 1);
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -62,32 +69,97 @@
     sun.shadow.radius = 0;
     scene.add(sun, sun.target);
 
-    turntable = new THREE.Group();
-    scene.add(turntable);
+    createPreviewGround();
+    createPreviewGrid();
+    previewRoot = new THREE.Group();
+    scene.add(previewRoot);
+
     placeholder = new THREE.Mesh(
       new THREE.BoxGeometry(1, 1, 1),
       new THREE.MeshStandardMaterial({ color: 0xcdd2d6, roughness: 0.6 })
     );
+    placeholder.position.z = 0.5;
     placeholder.castShadow = true;
     placeholder.receiveShadow = true;
     placeholder.visible = false;
-    turntable.add(placeholder);
+    previewRoot.add(placeholder);
 
     frameRadius(1.2);
     if (!rafId) rafId = requestAnimationFrame(tick);
     return true;
   }
 
+  function createPreviewGround() {
+    var THREE = window.THREE;
+    var shadow = new THREE.Mesh(
+      new THREE.PlaneGeometry(80, 80),
+      new THREE.ShadowMaterial({
+        color: 0x000000,
+        opacity: 0.4,
+        transparent: true
+      })
+    );
+    shadow.position.z = -0.01;
+    shadow.receiveShadow = true;
+    shadow.userData.pickable = false;
+    scene.add(shadow);
+  }
+
+  function createPreviewGrid() {
+    var THREE = window.THREE;
+    var grid = new THREE.GridHelper(80, 80, 0x7f8790, 0xc4c9cf);
+    grid.rotation.x = Math.PI / 2;
+    grid.material.transparent = true;
+    grid.material.opacity = 0.5;
+    grid.material.depthWrite = false;
+    grid.material.depthTest = false;
+    grid.renderOrder = 2;
+    scene.add(grid);
+
+    var originMaterial = new THREE.LineBasicMaterial({
+      color: 0x5f6872,
+      transparent: true,
+      opacity: 0.8
+    });
+    originMaterial.depthTest = false;
+    var xLine = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-40, 0, 0.004),
+        new THREE.Vector3(40, 0, 0.004)
+      ]),
+      originMaterial
+    );
+    var yLine = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, -40, 0.004),
+        new THREE.Vector3(0, 40, 0.004)
+      ]),
+      originMaterial
+    );
+    xLine.renderOrder = 3;
+    yLine.renderOrder = 3;
+    scene.add(xLine, yLine);
+  }
+
   function frameRadius(radius) {
     frameView(radius, 0);
   }
 
-  // Aim at a point on the turntable's vertical spin axis so the model rotates
-  // around the whitebox origin without visual wobble.
   function frameView(radius, targetZ) {
-    var d = Math.max(0.5, radius);
-    camera.position.set(d * 1.2, -d * 1.6, d * 1.0 + targetZ);
-    camera.lookAt(0, 0, targetZ);
+    previewOrbitRadius = Math.max(0.5, radius);
+    previewTargetZ = targetZ || 0;
+    updatePreviewCameraOrbit();
+  }
+
+  function updatePreviewCameraOrbit() {
+    var d = Math.max(0.5, previewOrbitRadius);
+    var horizontal = d * 2.0;
+    camera.position.set(
+      Math.cos(previewYaw) * horizontal,
+      Math.sin(previewYaw) * horizontal,
+      d * 1.0 + previewTargetZ
+    );
+    camera.lookAt(0, 0, previewTargetZ);
   }
 
   function disposeMaterial(material) {
@@ -105,7 +177,7 @@
     var transparent = !!(sourceMaterial && sourceMaterial.transparent);
     var opacity = sourceMaterial && isFinite(sourceMaterial.opacity) ? sourceMaterial.opacity : 1;
     return new THREE.MeshStandardMaterial({
-      color: 0xbfc7cf,
+      color: previewWhiteboxColor(object),
       roughness: 0.72,
       metalness: 0,
       transparent: transparent,
@@ -114,9 +186,15 @@
     });
   }
 
+  function previewWhiteboxColor(object) {
+    if (isTerrainObject(object)) return 0xb8bec5;
+    if (isRoadObject(object)) return 0xd5dbe1;
+    return 0xf1f4f6;
+  }
+
   function clearModel() {
     if (!model) return;
-    turntable.remove(model);
+    previewRoot.remove(model);
     model.traverse(function(object) {
       if (object.geometry) object.geometry.dispose();
       disposeMaterial(object.material);
@@ -153,6 +231,28 @@
     ).toLowerCase();
   }
 
+  function layerNameMatches(name, layerKey) {
+    var key = String(layerKey || '').toLowerCase();
+    return name === key || name === 'whitebox_' + key || name.indexOf(key + '_') === 0 || name.indexOf('_' + key) >= 0;
+  }
+
+  function objectHasLayerName(object, layerKey) {
+    var node = object;
+    while (node) {
+      if (layerNameMatches(objectLayerName(node), layerKey)) return true;
+      node = node.parent;
+    }
+    return false;
+  }
+
+  function isTerrainObject(object) {
+    return objectHasLayerName(object, 'terrain');
+  }
+
+  function isRoadObject(object) {
+    return objectHasLayerName(object, 'roads') || objectHasLayerName(object, 'road') || objectHasLayerName(object, 'streets') || objectHasLayerName(object, 'street');
+  }
+
   function findLayerObject(root, layerKey) {
     var match = null;
     var key = String(layerKey || '').toLowerCase();
@@ -178,12 +278,15 @@
     var THREE = window.THREE;
     var terrainObject = findLayerObject(model, 'terrain');
     var buildingsObject = findLayerObject(model, 'buildings');
-    var frameObject = buildingsObject || terrainObject || model;
+    var roadsObject = findLayerObject(model, 'roads');
+    if (!roadsObject) roadsObject = findLayerObject(model, 'road');
+    var frameObject = buildingsObject || roadsObject || terrainObject || model;
     var pivotObject = terrainObject || model;
     var pivotBox = new THREE.Box3().setFromObject(pivotObject);
     var fullCenter = pivotBox.getCenter(new THREE.Vector3());
     var frameBox = new THREE.Box3();
     if (!expandBoxWithObject(frameBox, terrainObject)) expandBoxWithObject(frameBox, frameObject);
+    expandBoxWithObject(frameBox, roadsObject);
     expandBoxWithObject(frameBox, buildingsObject);
     if (frameBox.isEmpty()) frameBox.copy(pivotBox);
     var frameSize = frameBox.getSize(new THREE.Vector3());
@@ -239,9 +342,16 @@
     };
   }
 
+  function preparePreviewMesh(object) {
+    disposeMaterial(object.material);
+    object.material = applyPreviewWhiteboxMaterial(object);
+    var castsShadow = !isTerrainObject(object) && !isRoadObject(object);
+    object.castShadow = castsShadow;
+    object.receiveShadow = true;
+  }
+
   function loadWhitebox(whitebox, force) {
     if (!ensureInit() || !window.VC_GLB || !whitebox || !whitebox.url) return;
-    var THREE = window.THREE;
     var key = cacheKeyFor(whitebox);
     if (!force && key && key === shownCacheKey && phase === 'shown') return;
     var seq = ++loadSeq;
@@ -255,10 +365,7 @@
       model = root;
       model.traverse(function(object) {
         if (!object.isMesh) return;
-        disposeMaterial(object.material);
-        object.material = applyPreviewWhiteboxMaterial(object);
-        object.castShadow = true;
-        object.receiveShadow = true;
+        preparePreviewMesh(object);
       });
       var pivot = computeTerrainPreviewPivot(model);
       if (isFinite(pivot.radius) && pivot.radius > 0) {
@@ -267,9 +374,8 @@
       } else {
         frameRadius(1.2);
       }
-      turntable.add(model);
+      previewRoot.add(model);
       placeholder.visible = false;
-      turntable.rotation.z = 0;
       shownCacheKey = key;
       setMsg('');
       phase = 'shown';
@@ -292,8 +398,9 @@
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
     }
-    if (turntable && (placeholder.visible || model)) {
-      turntable.rotation.z += placeholder.visible ? 0.02 : 0.005;
+    if (placeholder.visible || model) {
+      previewYaw += model ? 0.005 : 0.02;
+      updatePreviewCameraOrbit();
     }
     renderer.render(scene, camera);
   }

@@ -125,13 +125,14 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("var previewReady = !!asset.preview_ready;", _PICKER_FRONTEND)
         self.assertIn("if (!previewReady || !whitebox.available)", _PICKER_FRONTEND)
 
-    def test_houdini_preview_uses_terrain_mesh_for_turntable_pivot(self):
+    def test_houdini_preview_uses_terrain_mesh_for_preview_pivot(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("function findLayerObject(root, layerKey)", preview_js)
         self.assertIn("function computeTerrainPreviewPivot(model)", preview_js)
         self.assertIn("var terrainObject = findLayerObject(model, 'terrain');", preview_js)
         self.assertIn("var buildingsObject = findLayerObject(model, 'buildings');", preview_js)
-        self.assertIn("var frameObject = buildingsObject || terrainObject || model;", preview_js)
+        self.assertIn("var roadsObject = findLayerObject(model, 'roads');", preview_js)
+        self.assertIn("var frameObject = buildingsObject || roadsObject || terrainObject || model;", preview_js)
         self.assertIn("model.position.set(-pivot.center.x, -pivot.center.y, -pivot.groundZ);", preview_js)
         self.assertNotIn("model.position.sub(center);", preview_js)
 
@@ -152,17 +153,36 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("sun.shadow.bias = -0.00015;", preview_js)
         self.assertIn("sun.shadow.normalBias = 0.03;", preview_js)
         self.assertIn("scene.add(sun, sun.target);", preview_js)
-        self.assertIn("object.castShadow = true;", preview_js)
-        self.assertIn("object.receiveShadow = true;", preview_js)
+
         self.assertNotIn("AmbientLight", preview_js)
 
     def test_houdini_preview_replaces_imported_materials_with_lit_whitebox_material(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("function applyPreviewWhiteboxMaterial(object)", preview_js)
         self.assertIn("new THREE.MeshStandardMaterial({", preview_js)
-        self.assertIn("color: 0xbfc7cf", preview_js)
+        self.assertIn("color: previewWhiteboxColor(object)", preview_js)
         self.assertIn("disposeMaterial(object.material);", preview_js)
         self.assertIn("object.material = applyPreviewWhiteboxMaterial(object);", preview_js)
+
+    def test_houdini_preview_uses_editor_ground_grid_and_camera_orbit(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("function createPreviewGround()", preview_js)
+        self.assertIn("new THREE.ShadowMaterial({", preview_js)
+        self.assertIn("new THREE.GridHelper(80, 80, 0x7f8790, 0xc4c9cf)", preview_js)
+        self.assertIn("grid.rotation.x = Math.PI / 2;", preview_js)
+        self.assertIn("function updatePreviewCameraOrbit()", preview_js)
+        self.assertIn("previewYaw += model ? 0.005 : 0.02;", preview_js)
+        self.assertIn("camera.position.set(", preview_js)
+        self.assertNotIn("turntable.rotation.z", preview_js)
+
+    def test_houdini_preview_keeps_terrain_roads_and_buildings_visible_with_layered_shadows(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("function isTerrainObject(object)", preview_js)
+        self.assertIn("function isRoadObject(object)", preview_js)
+        self.assertIn("var castsShadow = !isTerrainObject(object) && !isRoadObject(object);", preview_js)
+        self.assertIn("object.castShadow = castsShadow;", preview_js)
+        self.assertIn("object.receiveShadow = true;", preview_js)
+        self.assertNotIn("object.visible = false", preview_js)
 
     def test_status_payloads_share_common_service_projection(self):
         source = Path(area_picker.__file__).read_text(encoding="utf-8")
