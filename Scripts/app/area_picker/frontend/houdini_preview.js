@@ -1,4 +1,4 @@
-﻿// Small Three.js preview in the Houdini build panel.
+// Small Three.js preview in the Houdini build panel.
 // The preview is driven by the explicit houdini_asset.whitebox contract from
 // /health, /status, and /events. It never probes Houdini and never triggers an
 // export; it only visualizes the latest GLB artifact reported by the server.
@@ -88,6 +88,22 @@
     var materials = Array.isArray(material) ? material : [material];
     materials.forEach(function(item) {
       if (item && item.dispose) item.dispose();
+    });
+  }
+
+  function applyPreviewWhiteboxMaterial(object) {
+    var THREE = window.THREE;
+    var source = object.material;
+    var sourceMaterial = Array.isArray(source) ? source[0] : source;
+    var transparent = !!(sourceMaterial && sourceMaterial.transparent);
+    var opacity = sourceMaterial && isFinite(sourceMaterial.opacity) ? sourceMaterial.opacity : 1;
+    return new THREE.MeshStandardMaterial({
+      color: 0xd8dde2,
+      roughness: 0.72,
+      metalness: 0,
+      transparent: transparent,
+      opacity: opacity,
+      side: THREE.DoubleSide
     });
   }
 
@@ -232,6 +248,8 @@
       model = root;
       model.traverse(function(object) {
         if (!object.isMesh) return;
+        disposeMaterial(object.material);
+        object.material = applyPreviewWhiteboxMaterial(object);
         object.castShadow = true;
         object.receiveShadow = true;
       });
@@ -299,5 +317,3 @@
 
   window.VC_HOUDINI_PREVIEW = { update: update, getWhitebox: getWhitebox };
 })();
-
-

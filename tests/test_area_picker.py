@@ -149,6 +149,14 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("object.receiveShadow = true;", preview_js)
         self.assertNotIn("HemisphereLight", preview_js)
 
+    def test_houdini_preview_replaces_imported_materials_with_lit_whitebox_material(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("function applyPreviewWhiteboxMaterial(object)", preview_js)
+        self.assertIn("new THREE.MeshStandardMaterial({", preview_js)
+        self.assertIn("color: 0xd8dde2", preview_js)
+        self.assertIn("disposeMaterial(object.material);", preview_js)
+        self.assertIn("object.material = applyPreviewWhiteboxMaterial(object);", preview_js)
+
     def test_status_payloads_share_common_service_projection(self):
         source = Path(area_picker.__file__).read_text(encoding="utf-8")
         self.assertIn("def _attach_service_status_fields", source)
