@@ -312,6 +312,24 @@ function refreshServiceState() {
   });
 }
 
+// 生成完成后状态流已停，预览只剩这一条加载通道。GLB 落盘 / 终态写入可能比
+// done 标志晚一拍，单次拉取会偶发 miss 导致小窗卡在占位。这里对 /health 做有界
+// 重试，直到 preview_ready 为真或试满次数为止，把"显示模型"变成确定性收敛。
+function ensurePreviewReady(attempts) {
+  if (attempts <= 0) return;
+  fetch('/health')
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    applySharedStatus(d);  // 内部会驱动 VC_HOUDINI_PREVIEW.update
+    var asset = d.houdini_asset || {};
+    var ready = asset.preview_ready && asset.whitebox && asset.whitebox.available;
+    if (!ready) setTimeout(function() { ensurePreviewReady(attempts - 1); }, 800);
+  })
+  .catch(function() {
+    setTimeout(function() { ensurePreviewReady(attempts - 1); }, 800);
+  });
+}
+
 var LOG_MAX_LINES = 800;
 var _dirtyLogPanels = {};
 var _logFlushScheduled = false;
@@ -467,6 +485,7 @@ function applyStatus(d) {
           updateSelectionButtons(false);
           scheduleGridLoad();
           refreshServiceState();
+          if (d.operation !== 'download') ensurePreviewReady(6);
         }
       } else {
         var failDetail = failureStatusDetail(d.failure_summary, '[FAIL] 管线出错');

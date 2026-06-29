@@ -424,7 +424,10 @@ def _last_run_payload(source: dict) -> dict:
 
 def _attach_service_status_fields(resp: dict, snapshot: dict) -> dict:
     houdini_available = _probe_houdini()
-    houdini_asset = _houdini_asset_status(houdini_available)
+    # 运行/导出期间 Houdini 正忙，实时几何探测(timeout 1.5s)易拖满且无意义:
+    # 导出已被强制禁用，预览只看文件+终态。跳过它，让进度刷新更跟手。
+    skip_live_probe = bool(resp.get('running') or resp.get('export_running'))
+    houdini_asset = _houdini_asset_status(houdini_available, skip_live_probe)
     resp['houdini_available'] = houdini_available
     resp['houdini_asset'] = houdini_asset
     resp['software_paths'] = _software_path_status()
@@ -940,7 +943,8 @@ def _whitebox_artifact_status(area_id: str = '', run_id: str = '',
     return base
 
 
-def _houdini_asset_status(houdini_available: bool | None = None) -> dict:
+def _houdini_asset_status(houdini_available: bool | None = None,
+                          skip_live_probe: bool = False) -> dict:
     """Summarize whether the current Houdini scene has QA-passed exportable geometry."""
     try:
         cfg = _load_active_area()
@@ -960,7 +964,11 @@ def _houdini_asset_status(houdini_available: bool | None = None) -> dict:
     run_id = str(cfg.get('run_id') or '')
     if houdini_available is None:
         houdini_available = _probe_houdini()
-    model_ready = _houdini_model_available(cfg) if houdini_available else False
+    # 运行/导出期间跳过 1.5s 实时几何探测；此时 model_ready 不参与任何 UI 决策。
+    if skip_live_probe:
+        model_ready = False
+    else:
+        model_ready = _houdini_model_available(cfg) if houdini_available else False
     gate = pipeline_status.export_gate(ROOT, cfg, live_model_ready=model_ready)
     h_status = gate.get('status', {}).get('houdini', {})
     qa_ok = bool(h_status.get('available') and str(h_status.get('status') or '').lower() == 'completed')
@@ -1289,8 +1297,9 @@ def _frontend_asset_version() -> str:
         (FRONTEND_ROOT, "selection_search.js"),
         (FRONTEND_ROOT, "pipeline_status.js"),
         (FRONTEND_ROOT, "dcc_bridge.js"),
-        (FRONTEND_ROOT, "game_workbench.js"),
         (FRONTEND_ROOT, "vc_glb.js"),
+        (FRONTEND_ROOT, "viewport_grid.js"),
+        (FRONTEND_ROOT, "game_workbench.js"),
         (FRONTEND_ROOT, "houdini_preview.js"),
         (FRONTEND_ROOT, "asset_dir.js"),
         (FRONTEND_ROOT, "styles.css"),
@@ -1561,6 +1570,9 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/open-software':
             self._post_open_software()
+            return
+        if parsed.path == '/open-export-dir':
+            self._post_open_export_dir()
             return
         if parsed.path == '/close-software':
             self._post_close_software()
@@ -1846,6 +1858,24 @@ class _Handler(BaseHTTPRequestHandler):
                     self._json({'ok': False, 'message': f'软件路径保存失败: {exc}'})
                     return
         self._json(_open_houdini_from_config())
+
+    def _post_open_export_dir(self):
+        target = _whitebox_path_from_status()
+        folder = target.parent if target.suffix else target
+        if not folder.is_dir():
+            self._json({'ok': False, 'message': f'目录不存在: {folder}'})
+            return
+        try:
+            if sys.platform.startswith('win'):
+                os.startfile(str(folder))  # noqa: S606 - 本地打开资源管理器
+            elif sys.platform == 'darwin':
+                subprocess.Popen(['open', str(folder)], close_fds=True)
+            else:
+                subprocess.Popen(['xdg-open', str(folder)], close_fds=True)
+        except Exception as exc:
+            self._json({'ok': False, 'message': f'打开目录失败: {exc}'})
+            return
+        self._json({'ok': True, 'message': f'已打开 {folder}'})
 
     def _post_open_software(self):
         length = int(self.headers.get('Content-Length', 0))

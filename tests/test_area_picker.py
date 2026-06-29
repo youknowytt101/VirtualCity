@@ -21,6 +21,7 @@ _PICKER_INDEX_HTML = area_picker._HTML
 _PICKER_STYLES = (FRONTEND_ROOT / "styles.css").read_text(encoding="utf-8")
 _PICKER_SCRIPT_NAMES = (
     "vc_glb.js",
+    "viewport_grid.js",
     "game_workbench.js",
     "houdini_preview.js",
     "asset_dir.js",
@@ -235,7 +236,9 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("var buildingsObject = findLayerObject(model, 'buildings');", preview_js)
         self.assertIn("var roadsObject = findLayerObject(model, 'roads');", preview_js)
         self.assertIn("var frameObject = buildingsObject || roadsObject || terrainObject || model;", preview_js)
-        self.assertIn("model.position.set(-pivot.center.x, -pivot.center.y, -pivot.groundZ);", preview_js)
+        self.assertIn("function fitModelToPreview(model, pivot)", preview_js)
+        self.assertIn("model.scale.setScalar(scale);", preview_js)
+        self.assertIn("model.position.set(-centerX * scale, -centerY * scale, -groundZ * scale);", preview_js)
         self.assertNotIn("model.position.sub(center);", preview_js)
 
     def test_houdini_preview_uses_editor_default_lighting_profile(self):
@@ -245,6 +248,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("renderer.outputColorSpace = THREE.SRGBColorSpace;", preview_js)
         self.assertIn("renderer.toneMapping = THREE.ACESFilmicToneMapping;", preview_js)
         self.assertIn("renderer.toneMappingExposure = 1.0;", preview_js)
+        self.assertIn("scene.background = new THREE.Color(0x666a6c);", preview_js)
         self.assertIn("new THREE.HemisphereLight(0xffffff, 0x8a9bb0, 0.9)", preview_js)
         self.assertIn("previewSun = new THREE.DirectionalLight(0xffffff, 2.0);", preview_js)
         self.assertIn("var sun = previewSun;", preview_js)
@@ -271,32 +275,148 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("disposeMaterial(object.material);", preview_js)
         self.assertIn("object.material = applyPreviewWhiteboxMaterial(object);", preview_js)
 
-    def test_houdini_preview_uses_fixed_camera_light_and_model_turntable(self):
+    def test_houdini_preview_uses_shared_shader_viewport_grid(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertNotIn("function createPreviewGround()", preview_js)
         self.assertNotIn("new THREE.ShadowMaterial", preview_js)
-        self.assertIn("new THREE.GridHelper(80, 80, 0x7f8790, 0xc4c9cf)", preview_js)
-        self.assertIn("grid.rotation.x = Math.PI / 2;", preview_js)
+        self.assertNotIn("PREVIEW_GRID_HALF_EXTENT", preview_js)
+        self.assertNotIn("new THREE.GridHelper", preview_js)
+        self.assertIn("var previewGrid = null;", preview_js)
+        self.assertNotIn("var previewAxes = null;", preview_js)
+        self.assertIn("window.VC_VIEWPORT_GRID.create(scene, camera", preview_js)
+        self.assertIn("window.VC_VIEWPORT_GRID.update(previewGrid, camera);", preview_js)
+        self.assertIn("window.VC_VIEWPORT_GRID.dispose(previewGrid);", preview_js)
+        self.assertIn("minorColor: 0xc8cdd1", preview_js)
+        self.assertIn("majorColor: 0xc8cdd1", preview_js)
+        self.assertIn("minorAlpha: 0.24", preview_js)
+        self.assertIn("majorAlpha: 0.24", preview_js)
+        self.assertIn("axisXColor: 0xffffff", preview_js)
+        self.assertIn("axisYColor: 0xffffff", preview_js)
+        self.assertIn("axisInnerPx: 0.25", preview_js)
+        self.assertIn("axisOuterPx: 0.85", preview_js)
+        self.assertNotIn("function createPreviewAxes()", preview_js)
+        self.assertNotIn("function updatePreviewGridLod()", preview_js)
+        self.assertNotIn("function niceGridStep(rawStep)", preview_js)
         self.assertIn("function updatePreviewCameraOrbit()", preview_js)
-        self.assertIn("previewRoot.rotation.z += model ? 0.005 : 0.02;", preview_js)
+        self.assertIn("if (model && phase === 'shown' && !previewDrag) previewYaw += 0.005;", preview_js)
+        self.assertIn("updatePreviewCameraOrbit();", preview_js)
         self.assertNotIn("previewYaw += model ? 0.005 : 0.02;", preview_js)
+        self.assertNotIn("previewRoot.rotation.z += model ? 0.005 : 0.02;", preview_js)
         self.assertIn("camera.position.set(", preview_js)
-        self.assertNotIn("turntable.rotation.z", preview_js)
 
-    def test_houdini_preview_scales_shadow_rig_to_loaded_city_radius(self):
+    def test_houdini_preview_grid_stays_visible_on_preview_origin_plane(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("var PREVIEW_GRID_Z = 0.02;", preview_js)
+        self.assertIn("planeZ: PREVIEW_GRID_Z", preview_js)
+        self.assertIn("showZAxis: true", preview_js)
+        self.assertIn("axisLength: PREVIEW_AXIS_LENGTH", preview_js)
+        self.assertNotIn("new THREE.LineSegments(new THREE.BufferGeometry(), gridMaterial)", preview_js)
+        self.assertNotIn("positions.push(-snappedExtent, point, PREVIEW_GRID_Z, snappedExtent, point, PREVIEW_GRID_Z);", preview_js)
+        self.assertNotIn("positions.push(point, -snappedExtent, PREVIEW_GRID_Z, point, snappedExtent, PREVIEW_GRID_Z);", preview_js)
+        self.assertNotIn("grid.material.depthTest = false;", preview_js)
+        self.assertNotIn("originMaterial.depthTest = false;", preview_js)
+        self.assertNotIn("grid.renderOrder = 2;", preview_js)
+        self.assertNotIn("renderOrder = 3;", preview_js)
+
+    def test_shared_viewport_grid_module_contract(self):
+        grid_path = FRONTEND_ROOT / "viewport_grid.js"
+        self.assertTrue(grid_path.exists())
+        grid_js = grid_path.read_text(encoding="utf-8")
+        self.assertIn("window.VC_VIEWPORT_GRID", grid_js)
+        self.assertIn("create: createViewportGrid", grid_js)
+        self.assertIn("update: updateViewportGrid", grid_js)
+        self.assertIn("dispose: disposeViewportGrid", grid_js)
+        self.assertIn("new THREE.ShaderMaterial", grid_js)
+        self.assertIn("fwidth(coord)", grid_js)
+        self.assertIn("uViewProjectionInverse", grid_js)
+        self.assertIn("uPlaneZ", grid_js)
+        self.assertIn("uAxisInnerPx", grid_js)
+        self.assertIn("uAxisOuterPx", grid_js)
+        self.assertIn("showZAxis", grid_js)
+        self.assertIn("fullscreen-triangle", grid_js)
+        self.assertIn("rayDirection", grid_js)
+        self.assertIn("grazingFade", grid_js)
+        self.assertIn("float xAxisPx = abs(world.y) / max(fwidth(world.y), 0.000001);", grid_js)
+        self.assertIn("float yAxisPx = abs(world.x) / max(fwidth(world.x), 0.000001);", grid_js)
+        self.assertIn("float xAxis = 1.0 - smoothstep(uAxisInnerPx, uAxisOuterPx, xAxisPx);", grid_js)
+        self.assertIn("float yAxis = 1.0 - smoothstep(uAxisInnerPx, uAxisOuterPx, yAxisPx);", grid_js)
+        self.assertNotIn("axisHalfWidth", grid_js)
+        self.assertNotIn("EDITOR_GRID_SIZE", grid_js)
+        self.assertNotIn("updatePreviewGridLod", grid_js)
+
+    def test_shared_viewport_grid_has_infinite_shader_fade_not_cpu_lod_rebuild(self):
+        grid_path = FRONTEND_ROOT / "viewport_grid.js"
+        self.assertTrue(grid_path.exists())
+        grid_js = grid_path.read_text(encoding="utf-8")
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("log10(worldPerPixel)", grid_js)
+        self.assertIn("uLodPixels", grid_js)
+        self.assertIn("uFadeStart", grid_js)
+        self.assertIn("uFadeEnd", grid_js)
+        self.assertNotIn("edgeFade", grid_js)
+        self.assertNotIn("previewGridKey", grid_js)
+        self.assertNotIn("geometry.dispose();\n    previewGrid.geometry = new THREE.BufferGeometry();", grid_js)
+        self.assertNotIn("PREVIEW_GRID_DISTANCE_EXTENT_SCALE", preview_js)
+        self.assertNotIn("function gridPlaneViewportExtent()", preview_js)
+        self.assertNotIn("raycaster.setFromCamera(corners[i], camera);", preview_js)
+        self.assertNotIn("host.offsetParent === null", preview_js)
+
+    def test_houdini_preview_pauses_raf_when_not_visible_and_disposes_renderer(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("var previewVisible = false;", preview_js)
+        self.assertIn("function scheduleTick()", preview_js)
+        self.assertIn("function stopTick()", preview_js)
+        self.assertIn("new IntersectionObserver(function(entries)", preview_js)
+        self.assertIn("document.addEventListener('visibilitychange', updatePreviewVisibility);", preview_js)
+        self.assertIn("window.addEventListener('pagehide', disposePreview);", preview_js)
+        self.assertIn("renderer.dispose();", preview_js)
+        self.assertIn("if (renderer.forceContextLoss) renderer.forceContextLoss();", preview_js)
+        self.assertNotIn("rafId = requestAnimationFrame(tick);\n    if (!renderer || !host) return;", preview_js)
+
+    def test_houdini_preview_supports_drag_orbit_and_wheel_zoom(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("var previewDrag = null;", preview_js)
+        self.assertIn("host.addEventListener('pointerdown', beginPreviewDrag);", preview_js)
+        self.assertIn("host.addEventListener('wheel', zoomPreview);", preview_js)
+        self.assertIn("previewYaw -= dx * 0.01;", preview_js)
+        self.assertIn("previewOrbitRadius = Math.max(1.2, Math.min(12, previewOrbitRadius * Math.exp(event.deltaY * 0.001)));", preview_js)
+
+    def test_houdini_preview_surfaces_whitebox_diagnostics_and_identity(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("function whiteboxLabel(whitebox)", preview_js)
+        self.assertIn("String(whitebox.run_id).slice(0, 8)", preview_js)
+        self.assertIn("whitebox.size_label", preview_js)
+        self.assertIn("setMsg(whiteboxLabel(whitebox));", preview_js)
+        self.assertIn("var message = whitebox.message || (err && err.message) || '预览加载失败';", preview_js)
+        self.assertIn("setMsg('预览加载失败：' + message + '（点击重试）');", preview_js)
+        self.assertIn("setMsg(whitebox.message || '');", preview_js)
+
+    def test_houdini_preview_keeps_grid_camera_and_lights_fixed_between_generated_models(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("var previewSun = null;", preview_js)
         self.assertNotIn("previewShadowGround", preview_js)
         self.assertIn("var PREVIEW_SUN_DIRECTION = { x: 0.426, y: 0.721, z: 0.557 };", preview_js)
-        self.assertIn("function fitPreviewShadowRig(radius)", preview_js)
+        self.assertIn("var PREVIEW_CAMERA_ORBIT_RADIUS = 4;", preview_js)
+        self.assertIn("var PREVIEW_CAMERA_TARGET_Z = 1.2;", preview_js)
+        self.assertIn("var PREVIEW_MODEL_TARGET_RADIUS = 2.8;", preview_js)
+        self.assertIn("var PREVIEW_SUN_DISTANCE = 20;", preview_js)
+        self.assertIn("var PREVIEW_SHADOW_EXTENT = 60;", preview_js)
+        self.assertIn("function configurePreviewShadowRig()", preview_js)
+        self.assertIn("function resetPreviewView()", preview_js)
+        self.assertIn("fitModelToPreview(model, pivot);", preview_js)
+        self.assertNotIn("function fitPreviewShadowRig(radius)", preview_js)
+        self.assertNotIn("function frameView(radius, targetZ)", preview_js)
+        self.assertNotIn("function frameRadius(radius)", preview_js)
+        self.assertNotIn("frameView(pivot.radius, pivot.targetZ);", preview_js)
+        self.assertNotIn("frameRadius(1.2);", preview_js)
+        self.assertNotIn("fitPreviewShadowRig(previewOrbitRadius);", preview_js)
         self.assertNotIn("new THREE.PlaneGeometry(groundSize, groundSize)", preview_js)
-        self.assertIn("var sunDistance = Math.max(20, safeRadius * 1.55);", preview_js)
-        self.assertIn("var halfExtent = Math.max(60, safeRadius * 1.35);", preview_js)
-        self.assertIn("shadowCamera.left = -halfExtent;", preview_js)
-        self.assertIn("shadowCamera.right = halfExtent;", preview_js)
+        self.assertNotIn("var sunDistance = Math.max(20, safeRadius * 1.55);", preview_js)
+        self.assertNotIn("var halfExtent = Math.max(60, safeRadius * 1.35);", preview_js)
+        self.assertIn("shadowCamera.left = -PREVIEW_SHADOW_EXTENT;", preview_js)
+        self.assertIn("shadowCamera.right = PREVIEW_SHADOW_EXTENT;", preview_js)
         self.assertIn("shadowCamera.updateProjectionMatrix();", preview_js)
         self.assertIn("previewSun.shadow.needsUpdate = true;", preview_js)
-        self.assertIn("fitPreviewShadowRig(previewOrbitRadius);", preview_js)
 
     def test_houdini_preview_keeps_terrain_roads_and_buildings_visible_with_layered_shadows(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
@@ -530,6 +650,15 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('function bindWorkspaceSwitching()', _PICKER_FRONTEND)
         self.assertIn("map.resize();", _PICKER_FRONTEND)
 
+    def test_earth_workspaces_have_independent_map_contexts(self):
+        self.assertIn('id="map-news" class="map-view active" data-map-workspace="news"', _PICKER_INDEX_HTML)
+        self.assertIn('id="map-zone" class="map-view" data-map-workspace="city-preview"', _PICKER_INDEX_HTML)
+        self.assertIn('id="map-houdini" class="map-view" data-map-workspace="houdini"', _PICKER_INDEX_HTML)
+        self.assertIn('var mapContexts = {};', _PICKER_APP_JS)
+        self.assertIn('function activateMapContext(workspaceId)', _PICKER_APP_JS)
+        self.assertIn('activateMapContext(nextWorkspace);', _PICKER_APP_JS)
+        self.assertIn('#map-shell .map-tool-control', _PICKER_STYLES)
+
     def test_workspace_action_panel_has_tabbed_panels_for_unimplemented_modules(self):
         self.assertIn('data-action-panel-content="houdini"', _PICKER_INDEX_HTML)
         for workspace in ("news", "city-preview", "neighborhood", "game"):
@@ -556,6 +685,11 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("cityPreviewActive = false;", _PICKER_APP_JS)
         self.assertIn("if (activeWorkspaceId === 'city-preview') showDefaultCityPreview();", _PICKER_APP_JS)
         self.assertIn("else if (activeWorkspaceId === 'houdini') syncHoudiniCameraToCity();", _PICKER_APP_JS)
+
+    def test_country_click_toggles_city_list(self):
+        self.assertIn("var sameCountryOpen = activeCountryId === country.id && citiesHost && !citiesHost.hidden;", _PICKER_APP_JS)
+        self.assertIn("activeCountryId = null;", _PICKER_APP_JS)
+        self.assertIn("citiesHost.hidden = true;", _PICKER_APP_JS)
 
     def test_eol_workspace_defaults_to_global_overview(self):
         self.assertIn("function flyToWorld()", _PICKER_APP_JS)
@@ -595,6 +729,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertTrue(game_js_path.exists())
         game_js = game_js_path.read_text(encoding="utf-8")
         self.assertIn('/static/three/three.min.js', _PICKER_INDEX_HTML)
+        self.assertIn('/area-picker/viewport_grid.js?v=__VERSION__', _PICKER_INDEX_HTML)
         self.assertIn('/area-picker/game_workbench.js?v=__VERSION__', _PICKER_INDEX_HTML)
         self.assertIn('id="game-scene-host"', _PICKER_INDEX_HTML)
         self.assertIn('game-asset-button', _PICKER_INDEX_HTML)
@@ -608,6 +743,37 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('window.VC_GAME_WORKBENCH', game_js)
         self.assertIn('window.VC_GAME_WORKBENCH.init()', _PICKER_APP_JS)
         self.assertIn('window.VC_GAME_WORKBENCH.setActive(', _PICKER_APP_JS)
+
+    def test_game_editor_grid_uses_shared_shader_viewport_grid(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        grid_start = game_js.index("function createGrid()")
+        grid_end = game_js.index("function createGround()", grid_start)
+        grid_body = game_js[grid_start:grid_end]
+
+        self.assertIn("function updateEditorGrid()", game_js)
+        self.assertIn("window.VC_VIEWPORT_GRID.create(scene, camera", grid_body)
+        self.assertIn("window.VC_VIEWPORT_GRID.update(editorGrid, camera);", game_js)
+        self.assertIn("minorColor: 0xc8cdd1", grid_body)
+        self.assertIn("majorColor: 0xc8cdd1", grid_body)
+        self.assertIn("minorAlpha: 0.24", grid_body)
+        self.assertIn("majorAlpha: 0.24", grid_body)
+        self.assertIn("axisXColor: 0xffffff", grid_body)
+        self.assertIn("axisYColor: 0xffffff", grid_body)
+        self.assertIn("axisInnerPx: 0.25", grid_body)
+        self.assertIn("axisOuterPx: 0.85", grid_body)
+        self.assertNotIn("function createEditorGridMaterial()", game_js)
+        self.assertNotIn("new THREE.PlaneGeometry(1, 1)", grid_body)
+        self.assertNotIn("EDITOR_GRID_SIZE", game_js)
+        self.assertNotIn("new THREE.GridHelper", game_js)
+        self.assertNotIn("new THREE.LineBasicMaterial", grid_body)
+
+    def test_viewport_grid_script_loads_before_consumers(self):
+        grid_script = '/area-picker/viewport_grid.js?v=__VERSION__'
+        game_script = '/area-picker/game_workbench.js?v=__VERSION__'
+        houdini_script = '/area-picker/houdini_preview.js?v=__VERSION__'
+        self.assertIn(grid_script, _PICKER_INDEX_HTML)
+        self.assertLess(_PICKER_INDEX_HTML.index(grid_script), _PICKER_INDEX_HTML.index(game_script))
+        self.assertLess(_PICKER_INDEX_HTML.index(grid_script), _PICKER_INDEX_HTML.index(houdini_script))
 
     def test_game_workspace_has_asset_dir_controls(self):
         asset_js = (FRONTEND_ROOT / "asset_dir.js").read_text(encoding="utf-8")
@@ -647,7 +813,8 @@ class TestPickerHtml(unittest.TestCase):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         pipeline_js = (FRONTEND_ROOT / "pipeline_status.js").read_text(encoding="utf-8")
 
-        self.assertIn("function frameRadius(", preview_js)
+        self.assertIn("function resetPreviewView()", preview_js)
+        self.assertIn("function fitModelToPreview(model, pivot)", preview_js)
         self.assertIn("asset.whitebox", preview_js)
         self.assertIn("whitebox.url", preview_js)
         self.assertIn("window.VC_HOUDINI_PREVIEW.update(d);", pipeline_js)
@@ -749,6 +916,7 @@ class TestPickerHtml(unittest.TestCase):
     def test_game_renderer_matches_composition_lighting_baseline(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         self.assertIn('THREE.ColorManagement.legacyMode = false;', game_js)
+        self.assertIn('scene.background = new THREE.Color(0x666a6c);', game_js)
         self.assertIn('renderer.shadowMap.type = THREE.BasicShadowMap;', game_js)
         self.assertIn('opacity: 0.4', game_js)
         self.assertIn('sun.shadow.mapSize.set(4096, 4096);', game_js)
@@ -775,8 +943,8 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("camera.position.clone().addScaledVector(forward, 10)", pivot_body)
 
     def test_map_controls_are_repositioned(self):
-        self.assertIn('#map #selection-tools {', _PICKER_FRONTEND)
-        self.assertIn('#map #basemap-control {', _PICKER_FRONTEND)
+        self.assertIn('#map-shell #selection-tools {', _PICKER_FRONTEND)
+        self.assertIn('#map-shell #basemap-control {', _PICKER_FRONTEND)
         self.assertIn('right: 14px;', _PICKER_FRONTEND)
         self.assertIn('top: 14px;', _PICKER_FRONTEND)
 
@@ -1166,6 +1334,7 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "dcc_bridge.js",
                 "game_workbench.js",
                 "vc_glb.js",
+                "viewport_grid.js",
                 "houdini_preview.js",
                 "asset_dir.js",
                 "styles.css",
@@ -1181,9 +1350,12 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 third = area_picker._frontend_asset_version()
                 (root / "houdini_preview.js").write_text("v4-preview-content", encoding="utf-8")
                 fourth = area_picker._frontend_asset_version()
+                (root / "viewport_grid.js").write_text("v5-grid-content", encoding="utf-8")
+                fifth = area_picker._frontend_asset_version()
         self.assertNotEqual(first, second)
         self.assertNotEqual(second, third)
         self.assertNotEqual(third, fourth)
+        self.assertNotEqual(fourth, fifth)
 
     def test_version_is_stable_without_changes(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1198,6 +1370,7 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "dcc_bridge.js",
                 "game_workbench.js",
                 "vc_glb.js",
+                "viewport_grid.js",
                 "houdini_preview.js",
                 "asset_dir.js",
                 "styles.css",

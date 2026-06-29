@@ -193,7 +193,7 @@ function bindFrontendRefresh() {
 function setWorkspace(id) {
   var nextWorkspace = WORKSPACE_KINDS[id] ? id : 'houdini';
   var workspaceKind = WORKSPACE_KINDS[nextWorkspace];
-  activeWorkspaceId = nextWorkspace;
+  var previousWorkspace = activeWorkspaceId;
   var workspace = document.getElementById('workspace');
   var mapShell = document.getElementById('map-shell');
   var gameWorkbench = document.getElementById('game-workbench');
@@ -210,11 +210,13 @@ function setWorkspace(id) {
     }
     window.VC_GAME_WORKBENCH.setActive(workspaceKind === 'game');
   }
-  if (!isHoudini) {
+  if (WORKSPACE_KINDS[previousWorkspace] === 'houdini' && !isHoudini) {
     setGridVisible(false);
     setPointSelectActive(false);
     if (rectangleToolActive()) disarmRectangleTool();
   }
+  activeWorkspaceId = nextWorkspace;
+  if (showsMap) activateMapContext(nextWorkspace);
   updateWorkspaceButtons(nextWorkspace);
   if (showsMap) {
     requestAnimationFrame(function() {

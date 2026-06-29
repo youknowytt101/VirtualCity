@@ -12,18 +12,53 @@
   var renderer = null, scene = null, camera = null, previewRoot = null;
   var previewSun = null;
   var placeholder = null, model = null, rafId = null;
+  var previewVisible = false;
+  var previewInView = true;
+  var previewObserver = null;
+  var previewVisibilityBound = false;
+  var previewDrag = null;
+  var previewDragged = false;
   var phase = 'idle';       // idle | running | loading | shown | error
+  var sessionGenerated = false;  // 本会话点过"生成"才允许显示白盒，重启后归零=待机
   var currentWhitebox = null;
   var shownCacheKey = '';
   var loadSeq = 0;
+  var PREVIEW_CAMERA_ORBIT_RADIUS = 4;
+  var PREVIEW_CAMERA_TARGET_Z = 1.2;
+  var PREVIEW_CAMERA_PAN_Z = -0.8;
+  var PREVIEW_MODEL_TARGET_RADIUS = 2.8;
+  var PREVIEW_SUN_DISTANCE = 20;
+  var PREVIEW_SHADOW_EXTENT = 10;
+  var PREVIEW_SHADOW_FAR = 40;
   var previewYaw = Math.atan2(-1.6, 1.2);
-  var previewOrbitRadius = 1.2;
-  var previewTargetZ = 0;
+  var previewOrbitRadius = PREVIEW_CAMERA_ORBIT_RADIUS;
+  var previewTargetZ = PREVIEW_CAMERA_TARGET_Z;
   var WHITEBOX_PREVIEW_COLOR = 0xb8b8b8;
   var PREVIEW_SUN_DIRECTION = { x: 0.426, y: 0.721, z: 0.557 };
+  var PREVIEW_GRID_Z = 0.02;
+  var PREVIEW_AXIS_LENGTH = 3;
+  var previewGrid = null;
 
   function setMsg(text) {
     if (msgEl) msgEl.textContent = text || '';
+  }
+
+  function modelStatsLabel(root, whitebox) {
+    var verts = 0, tris = 0;
+    root.traverse(function(object) {
+      if (!object.isMesh || !object.geometry) return;
+      var geometry = object.geometry;
+      var position = geometry.attributes && geometry.attributes.position;
+      if (position) verts += position.count;
+      tris += (geometry.index ? geometry.index.count : (position ? position.count : 0)) / 3;
+    });
+    var box = whitebox || {};
+    var path = box.path || '';
+    var name = path ? path.split(/[\\/]/).pop() : '';
+    var lines = ['顶点 ' + verts.toLocaleString() + ' · 面 ' + Math.round(tris).toLocaleString()];
+    if (name) lines.push(name + (box.size_label && box.size_label !== '--' ? ' · ' + box.size_label : ''));
+    if (path) lines.push(path);
+    return lines.join('\n');
   }
 
   function ensureInit() {
@@ -36,23 +71,32 @@
     msgEl.className = 'houdini-preview-msg';
     host.appendChild(msgEl);
     host.addEventListener('click', function() {
+      if (previewDragged) {
+        previewDragged = false;
+        return;
+      }
       if (currentWhitebox && currentWhitebox.available) {
         loadWhitebox(currentWhitebox, true);
       }
     });
+    host.addEventListener('pointerdown', beginPreviewDrag);
+    host.addEventListener('pointermove', dragPreview);
+    host.addEventListener('pointerup', endPreviewDrag);
+    host.addEventListener('pointercancel', endPreviewDrag);
+    host.addEventListener('wheel', zoomPreview);
 
     if (THREE.ColorManagement && 'legacyMode' in THREE.ColorManagement) {
       THREE.ColorManagement.legacyMode = false;
     }
     THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x8f8f8f);
+    scene.background = new THREE.Color(0x666a6c);
     camera = new THREE.PerspectiveCamera(45, 1, 0.05, 100000);
     camera.up.set(0, 0, 1);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.BasicShadowMap;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     if ('outputColorSpace' in renderer) renderer.outputColorSpace = THREE.SRGBColorSpace;
     else renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -67,10 +111,11 @@
     sun.shadow.camera.near = 0.5;
     sun.shadow.bias = -0.00015;
     sun.shadow.normalBias = 0.03;
-    sun.shadow.radius = 0;
+    sun.shadow.radius = 1.2;
     scene.add(sun, sun.target);
 
     createPreviewGrid();
+    createPreviewGround();
     previewRoot = new THREE.Group();
     scene.add(previewRoot);
 
@@ -84,92 +129,156 @@
     placeholder.visible = false;
     previewRoot.add(placeholder);
 
-    frameRadius(1.2);
-    if (!rafId) rafId = requestAnimationFrame(tick);
+    resetPreviewView();
+    installPreviewVisibility();
+    updatePreviewVisibility();
     return true;
   }
 
+  function installPreviewVisibility() {
+    if (previewVisibilityBound) return;
+    previewVisibilityBound = true;
+    if ('IntersectionObserver' in window) {
+      previewObserver = new IntersectionObserver(function(entries) {
+        previewInView = !!(entries[0] && entries[0].isIntersecting);
+        updatePreviewVisibility();
+      });
+      previewObserver.observe(host);
+    }
+    document.addEventListener('visibilitychange', updatePreviewVisibility);
+    window.addEventListener('pagehide', disposePreview);
+    window.addEventListener('beforeunload', disposePreview);
+  }
+
+  function updatePreviewVisibility() {
+    previewVisible = !!host && previewInView && !document.hidden && host.clientWidth > 0 && host.clientHeight > 0;
+    if (previewVisible) scheduleTick();
+    else stopTick();
+  }
+
+  function scheduleTick() {
+    if (rafId || !previewVisible || !renderer) return;
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function stopTick() {
+    if (!rafId) return;
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+
   function createPreviewGrid() {
-    var THREE = window.THREE;
-    var grid = new THREE.GridHelper(80, 80, 0x7f8790, 0xc4c9cf);
-    grid.rotation.x = Math.PI / 2;
-    grid.material.transparent = true;
-    grid.material.opacity = 0.5;
-    grid.material.depthWrite = false;
-    grid.material.depthTest = false;
-    grid.renderOrder = 2;
-    scene.add(grid);
-
-    var originMaterial = new THREE.LineBasicMaterial({
-      color: 0x5f6872,
-      transparent: true,
-      opacity: 0.8
+    if (!window.VC_VIEWPORT_GRID) {
+      setMsg('Viewport grid module 未加载');
+      return;
+    }
+    previewGrid = window.VC_VIEWPORT_GRID.create(scene, camera, {
+      name: 'houdini-preview-grid',
+      planeZ: PREVIEW_GRID_Z,
+      fadeStart: 6,
+      fadeEnd: 18,
+      lodPixels: 42,
+      minorColor: 0xc8cdd1,
+      majorColor: 0xc8cdd1,
+      axisXColor: 0xffffff,
+      axisYColor: 0xffffff,
+      axisZColor: 0x5c85d1,
+      minorAlpha: 0.24,
+      majorAlpha: 0.24,
+      axisAlpha: 0.82,
+      axisInnerPx: 0.25,
+      axisOuterPx: 0.85,
+      showZAxis: false,
+      axisLength: PREVIEW_AXIS_LENGTH
     });
-    originMaterial.depthTest = false;
-    var xLine = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(-40, 0, 0.004),
-        new THREE.Vector3(40, 0, 0.004)
-      ]),
-      originMaterial
+  }
+
+  function createPreviewGround() {
+    var THREE = window.THREE;
+    var shadow = new THREE.Mesh(
+      new THREE.PlaneGeometry(PREVIEW_SHADOW_EXTENT * 2, PREVIEW_SHADOW_EXTENT * 2),
+      new THREE.ShadowMaterial({ color: 0x000000, opacity: 0.4, transparent: true })
     );
-    var yLine = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, -40, 0.004),
-        new THREE.Vector3(0, 40, 0.004)
-      ]),
-      originMaterial
-    );
-    xLine.renderOrder = 3;
-    yLine.renderOrder = 3;
-    scene.add(xLine, yLine);
+    shadow.position.z = PREVIEW_GRID_Z - 0.01;
+    shadow.receiveShadow = true;
+    shadow.renderOrder = -9;
+    shadow.userData.pickable = false;
+    scene.add(shadow);
   }
 
-  function frameRadius(radius) {
-    frameView(radius, 0);
-  }
-
-  function frameView(radius, targetZ) {
-    previewOrbitRadius = Math.max(0.5, radius);
-    previewTargetZ = targetZ || 0;
-    fitPreviewShadowRig(previewOrbitRadius);
-    updatePreviewCameraOrbit();
-  }
-
-  function fitPreviewShadowRig(radius) {
+  function configurePreviewShadowRig() {
     if (!previewSun) return;
-    var safeRadius = Math.max(1.2, isFinite(radius) ? radius : 1.2);
-    var sunDistance = Math.max(20, safeRadius * 1.55);
-
     previewSun.position.set(
-      PREVIEW_SUN_DIRECTION.x * sunDistance,
-      PREVIEW_SUN_DIRECTION.y * sunDistance,
-      previewTargetZ + PREVIEW_SUN_DIRECTION.z * sunDistance
+      PREVIEW_SUN_DIRECTION.x * PREVIEW_SUN_DISTANCE,
+      PREVIEW_SUN_DIRECTION.y * PREVIEW_SUN_DISTANCE,
+      PREVIEW_CAMERA_TARGET_Z + PREVIEW_SUN_DIRECTION.z * PREVIEW_SUN_DISTANCE
     );
-    previewSun.target.position.set(0, 0, previewTargetZ);
+    previewSun.target.position.set(0, 0, PREVIEW_CAMERA_TARGET_Z);
     previewSun.target.updateMatrixWorld();
 
     var shadowCamera = previewSun.shadow.camera;
-    var halfExtent = Math.max(60, safeRadius * 1.35);
-    shadowCamera.left = -halfExtent;
-    shadowCamera.right = halfExtent;
-    shadowCamera.top = halfExtent;
-    shadowCamera.bottom = -halfExtent;
+    shadowCamera.left = -PREVIEW_SHADOW_EXTENT;
+    shadowCamera.right = PREVIEW_SHADOW_EXTENT;
+    shadowCamera.top = PREVIEW_SHADOW_EXTENT;
+    shadowCamera.bottom = -PREVIEW_SHADOW_EXTENT;
     shadowCamera.near = 0.5;
-    shadowCamera.far = Math.max(400, safeRadius * 4.0);
+    shadowCamera.far = PREVIEW_SHADOW_FAR;
     shadowCamera.updateProjectionMatrix();
     previewSun.shadow.needsUpdate = true;
   }
 
+  function resetPreviewView() {
+    previewOrbitRadius = PREVIEW_CAMERA_ORBIT_RADIUS;
+    previewTargetZ = PREVIEW_CAMERA_TARGET_Z;
+    configurePreviewShadowRig();
+    updatePreviewCameraOrbit();
+  }
+
   function updatePreviewCameraOrbit() {
+    if (!camera) return;
     var d = Math.max(0.5, previewOrbitRadius);
     var horizontal = d * 2.0;
     camera.position.set(
       Math.cos(previewYaw) * horizontal,
       Math.sin(previewYaw) * horizontal,
-      d * 1.0 + previewTargetZ
+      d * 1.0 + previewTargetZ + PREVIEW_CAMERA_PAN_Z
     );
-    camera.lookAt(0, 0, previewTargetZ);
+    camera.lookAt(0, 0, previewTargetZ + PREVIEW_CAMERA_PAN_Z);
+    if (previewGrid) window.VC_VIEWPORT_GRID.update(previewGrid, camera);
+  }
+
+  function beginPreviewDrag(event) {
+    if (!renderer) return;
+    previewDrag = { x: event.clientX, y: event.clientY };
+    previewDragged = false;
+    if (host.setPointerCapture) host.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  }
+
+  function dragPreview(event) {
+    if (!previewDrag || !camera) return;
+    var dx = event.clientX - previewDrag.x;
+    var dy = event.clientY - previewDrag.y;
+    previewDragged = previewDragged || Math.abs(dx) + Math.abs(dy) > 2;
+    previewYaw -= dx * 0.01;
+    previewDrag.x = event.clientX;
+    previewDrag.y = event.clientY;
+    updatePreviewCameraOrbit();
+    scheduleTick();
+    event.preventDefault();
+  }
+
+  function endPreviewDrag(event) {
+    previewDrag = null;
+    if (host.releasePointerCapture) host.releasePointerCapture(event.pointerId);
+  }
+
+  function zoomPreview(event) {
+    if (!renderer || !camera) return;
+    event.preventDefault();
+    previewOrbitRadius = Math.max(1.2, Math.min(12, previewOrbitRadius * Math.exp(event.deltaY * 0.001)));
+    updatePreviewCameraOrbit();
+    scheduleTick();
   }
 
   function disposeMaterial(material) {
@@ -190,23 +299,50 @@
     });
   }
 
-  function clearModel() {
-    if (!model) return;
-    previewRoot.remove(model);
-    model.traverse(function(object) {
+  function disposePreviewObject(object) {
+    if (!object) return;
+    object.traverse(function(object) {
       if (object.geometry) object.geometry.dispose();
       disposeMaterial(object.material);
     });
+  }
+
+  function clearModel() {
+    if (!model) return;
+    previewRoot.remove(model);
+    disposePreviewObject(model);
     model = null;
+  }
+
+  function disposePreview() {
+    stopTick();
+    clearModel();
+    disposePreviewObject(placeholder);
+    if (previewGrid && window.VC_VIEWPORT_GRID) window.VC_VIEWPORT_GRID.dispose(previewGrid);
+    if (previewObserver) previewObserver.disconnect();
+    if (renderer) {
+      renderer.dispose();
+      if (renderer.forceContextLoss) renderer.forceContextLoss();
+      if (renderer.domElement && renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+    }
+    document.removeEventListener('visibilitychange', updatePreviewVisibility);
+    window.removeEventListener('pagehide', disposePreview);
+    window.removeEventListener('beforeunload', disposePreview);
+    renderer = scene = camera = previewRoot = previewSun = placeholder = previewGrid = null;
+    model = null;
+    previewObserver = null;
+    previewVisibilityBound = false;
+    previewVisible = false;
   }
 
   function enterPlaceholder() {
     if (!ensureInit()) return;
     clearModel();
     placeholder.visible = true;
-    frameRadius(1.2);
+    resetPreviewView();
     setMsg('生成中…');
     phase = 'running';
+    scheduleTick();
   }
 
   function cacheKeyFor(whitebox) {
@@ -330,6 +466,18 @@
     object.receiveShadow = true;
   }
 
+  function fitModelToPreview(model, pivot) {
+    if (!model) return;
+    var center = (pivot && pivot.center) || {};
+    var centerX = isFinite(center.x) ? center.x : 0;
+    var centerY = isFinite(center.y) ? center.y : 0;
+    var groundZ = pivot && isFinite(pivot.groundZ) ? pivot.groundZ : 0;
+    var radius = pivot && isFinite(pivot.radius) && pivot.radius > 0 ? pivot.radius : PREVIEW_MODEL_TARGET_RADIUS;
+    var scale = PREVIEW_MODEL_TARGET_RADIUS / Math.max(0.001, radius);
+    model.scale.setScalar(scale);
+    model.position.set(-centerX * scale, -centerY * scale, -groundZ * scale);
+  }
+
   function loadWhitebox(whitebox, force) {
     if (!ensureInit() || !window.VC_GLB || !whitebox || !whitebox.url) return;
     var key = cacheKeyFor(whitebox);
@@ -339,6 +487,7 @@
     placeholder.visible = true;
     phase = 'loading';
     setMsg('加载预览…');
+    scheduleTick();
     window.VC_GLB.load(whitebox.url).then(function(root) {
       if (seq !== loadSeq) return;
       clearModel();
@@ -348,30 +497,32 @@
         preparePreviewMesh(object);
       });
       var pivot = computeTerrainPreviewPivot(model);
-      if (isFinite(pivot.radius) && pivot.radius > 0) {
-        model.position.set(-pivot.center.x, -pivot.center.y, -pivot.groundZ);
-        frameView(pivot.radius, pivot.targetZ);
-      } else {
-        frameRadius(1.2);
-      }
+      fitModelToPreview(model, pivot);
+      resetPreviewView();
       previewRoot.add(model);
       placeholder.visible = false;
       shownCacheKey = key;
-      setMsg('');
+      setMsg(modelStatsLabel(model, whitebox));
       phase = 'shown';
-    }).catch(function() {
+      scheduleTick();
+    }).catch(function(err) {
       if (seq !== loadSeq) return;
       phase = 'error';
-      setMsg('预览加载失败（点击重试）');
+      var message = whitebox.message || (err && err.message) || '预览加载失败';
+      setMsg('预览加载失败：' + message + '（点击重试）');
+      scheduleTick();
     });
   }
 
   function tick() {
-    rafId = requestAnimationFrame(tick);
+    rafId = null;
     if (!renderer || !host) return;
     var w = host.clientWidth;
     var h = host.clientHeight;
-    if (w === 0 || h === 0 || host.offsetParent === null) return;
+    if (w === 0 || h === 0) {
+      updatePreviewVisibility();
+      return;
+    }
     var pr = renderer.getPixelRatio();
     if (renderer.domElement.width !== Math.floor(w * pr) || renderer.domElement.height !== Math.floor(h * pr)) {
       renderer.setSize(w, h, false);
@@ -379,9 +530,13 @@
       camera.updateProjectionMatrix();
     }
     if (placeholder.visible || model) {
-      previewRoot.rotation.z += model ? 0.005 : 0.02;
+      if (model && phase === 'shown' && !previewDrag) previewYaw += 0.005;
+      updatePreviewCameraOrbit();
+    } else {
+      if (previewGrid) window.VC_VIEWPORT_GRID.update(previewGrid, camera);
     }
     renderer.render(scene, camera);
+    if (model && phase === 'shown') scheduleTick();
   }
 
   function update(payload) {
@@ -390,6 +545,7 @@
     var whitebox = asset.whitebox || {};
     var previewReady = !!asset.preview_ready;
     if (payload.running && payload.operation !== 'download') {
+      sessionGenerated = true;
       currentWhitebox = whitebox.available ? whitebox : currentWhitebox;
       if (phase !== 'running') enterPlaceholder();
       return;
@@ -397,7 +553,12 @@
     if (!previewReady || !whitebox.available) {
       currentWhitebox = null;
       if (phase === 'loading') return;
-      if (phase !== 'shown') setMsg('');
+      if (phase !== 'shown') setMsg(whitebox.message || '');
+      return;
+    }
+    if (!sessionGenerated) {
+      // 待机：磁盘上的旧白盒不自动显示，等本会话点击生成后才加载
+      currentWhitebox = null;
       return;
     }
     currentWhitebox = whitebox;

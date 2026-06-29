@@ -35,57 +35,58 @@
 </div>
 <main id="workspace" data-workspace-kind="earth" data-action-panel-collapsed="false">
   <div id="map-shell">
-    <div id="map">
-      <div id="selection-tools" class="map-tool-control flat-panel flat-panel--row" aria-label="区域选择工具">
-        <!-- Icons: Lucide, ISC license. -->
-        <button type="button" class="map-tool-button flat-item map-tool-grid" title="显示/隐藏网格" aria-label="显示或隐藏网格" aria-pressed="false">
-          <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
-            <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-            <path d="M3 9h18"></path>
-            <path d="M3 15h18"></path>
-            <path d="M9 3v18"></path>
-            <path d="M15 3v18"></path>
-          </svg>
-          <span class="map-tool-label">网格</span>
-        </button>
-        <div class="map-tool-drawer" aria-hidden="true">
-        <div class="map-tool-drawer-inner">
-        <button type="button" class="map-tool-button flat-item map-tool-rectangle" title="框选网格" aria-label="框选网格">
-          <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
-            <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-          </svg>
-          <span class="map-tool-label">框选</span>
-        </button>
-        <button type="button" class="map-tool-button flat-item map-tool-point" title="点选网格" aria-label="点选网格">
-          <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
-            <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"></path>
-          </svg>
-          <span class="map-tool-label">点选</span>
-        </button>
-        <button type="button" class="map-tool-button flat-item map-tool-clear" title="清空选择" aria-label="清空选择" disabled>
-          <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
-            <path d="M10 11v6"></path>
-            <path d="M14 11v6"></path>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-            <path d="M3 6h18"></path>
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-          <span class="map-tool-label">清空</span>
-        </button>
-        </div>
-        </div>
+    <div id="map-news" class="map-view active" data-map-workspace="news"></div>
+    <div id="map-zone" class="map-view" data-map-workspace="city-preview"></div>
+    <div id="map-houdini" class="map-view" data-map-workspace="houdini"></div>
+    <div id="selection-tools" class="map-tool-control flat-panel flat-panel--row" aria-label="区域选择工具">
+      <!-- Icons: Lucide, ISC license. -->
+      <button type="button" class="map-tool-button flat-item map-tool-grid" title="显示/隐藏网格" aria-label="显示或隐藏网格" aria-pressed="false">
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+          <path d="M3 9h18"></path>
+          <path d="M3 15h18"></path>
+          <path d="M9 3v18"></path>
+          <path d="M15 3v18"></path>
+        </svg>
+        <span class="map-tool-label">网格</span>
+      </button>
+      <div class="map-tool-drawer" aria-hidden="true">
+      <div class="map-tool-drawer-inner">
+      <button type="button" class="map-tool-button flat-item map-tool-rectangle" title="框选网格" aria-label="框选网格">
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+          <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+        </svg>
+        <span class="map-tool-label">框选</span>
+      </button>
+      <button type="button" class="map-tool-button flat-item map-tool-point" title="点选网格" aria-label="点选网格">
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"></path>
+        </svg>
+        <span class="map-tool-label">点选</span>
+      </button>
+      <button type="button" class="map-tool-button flat-item map-tool-clear" title="清空选择" aria-label="清空选择" disabled>
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M10 11v6"></path>
+          <path d="M14 11v6"></path>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+          <path d="M3 6h18"></path>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        <span class="map-tool-label">清空</span>
+      </button>
       </div>
-      <div id="basemap-control" class="map-tool-control flat-panel basemap-segment" aria-label="底图风格">
-        <div id="basemap-segment" class="segmented" role="radiogroup" aria-label="底图风格"></div>
       </div>
-      <div id="region-nav" class="region-nav" aria-label="国家与城市导航">
-        <div id="region-countries" class="region-col flat-panel flat-panel--col region-countries" role="list" aria-label="国家"></div>
-        <div id="region-cities" class="region-col flat-panel flat-panel--col flat-dir--right region-cities" role="list" aria-label="城市" hidden></div>
-      </div>
-      <div id="view-toggle" class="map-tool-control flat-panel flat-panel--row" aria-label="2D/3D 视角切换">
-        <button type="button" class="map-tool-button flat-item view-toggle-2d active" aria-pressed="true">2D</button>
-        <button type="button" class="map-tool-button flat-item view-toggle-3d" aria-pressed="false">3D</button>
-      </div>
+    </div>
+    <div id="basemap-control" class="map-tool-control flat-panel basemap-segment" aria-label="底图风格">
+      <div id="basemap-segment" class="segmented" role="radiogroup" aria-label="底图风格"></div>
+    </div>
+    <div id="region-nav" class="region-nav" aria-label="国家与城市导航">
+      <div id="region-countries" class="region-col flat-panel flat-panel--col region-countries" role="list" aria-label="国家"></div>
+      <div id="region-cities" class="region-col flat-panel flat-panel--col flat-dir--right region-cities" role="list" aria-label="城市" hidden></div>
+    </div>
+    <div id="view-toggle" class="map-tool-control flat-panel flat-panel--row" aria-label="2D/3D 视角切换">
+      <button type="button" class="map-tool-button flat-item view-toggle-2d active" aria-pressed="true">2D</button>
+      <button type="button" class="map-tool-button flat-item view-toggle-3d" aria-pressed="false">3D</button>
     </div>
   </div>
   <aside id="control-panel" aria-label="区域操作面板">
@@ -440,10 +441,15 @@
                 <span class="btn-sub">审核后资产</span>
               </button>
             </div>
-            <button id="sync-to-editor-btn" type="button" class="action-btn">
-              <span class="btn-main">同步至资产库</span>
-            </button>
             <div id="houdini-preview-host" class="houdini-preview" aria-label="白盒预览"></div>
+            <div class="action-grid">
+              <button id="open-export-dir-btn" type="button" class="action-btn">
+                <span class="btn-main">打开文件目录</span>
+              </button>
+              <button id="sync-to-editor-btn" type="button" class="action-btn">
+                <span class="btn-main">同步至资产库</span>
+              </button>
+            </div>
           </section>
         </div>
       </section>
@@ -514,6 +520,7 @@ window.VC_CONFIG = {
 };
 </script>
 <script src="/area-picker/vc_glb.js?v=__VERSION__"></script>
+<script src="/area-picker/viewport_grid.js?v=__VERSION__"></script>
 <script src="/area-picker/game_workbench.js?v=__VERSION__"></script>
 <script src="/area-picker/houdini_preview.js?v=__VERSION__"></script>
 <script src="/area-picker/asset_dir.js?v=__VERSION__"></script>

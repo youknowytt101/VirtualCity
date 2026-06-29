@@ -90,6 +90,11 @@ var BASEMAP_STYLES = [
   { id: 'satellite', label: '卫星', style: SATELLITE_GLOBE_STYLE }
 ];
 var currentBasemap = 'positron';
+var map = null;
+var cameraController = null;
+var activeMapContext = null;
+var mapContexts = {};
+var viewToggleBound = false;
 
 function getBasemapStyle(id) {
   for (var i = 0; i < BASEMAP_STYLES.length; i++) {
@@ -98,26 +103,114 @@ function getBasemapStyle(id) {
   return BASEMAP_STYLES[0];
 }
 
-var map = new maplibregl.Map({
-  container: 'map',
-  style: getBasemapStyle(currentBasemap).style,
-  center: [window.VC_CONFIG.lon, 20],
-  zoom: 2.5,
-  maxPitch: 65,
-  attributionControl: false,
-  dragRotate: false,
-  pitchWithRotate: false,
-  dragPan: {
-    linearity: 0.25,
-    easing: function(t) { return 1 - Math.pow(1 - t, 3); },
-    maxSpeed: 2000,
-    deceleration: 2200
+function mapContainerIdForWorkspace(workspaceId) {
+  if (workspaceId === 'city-preview') return 'map-zone';
+  if (workspaceId === 'houdini') return 'map-houdini';
+  return 'map-news';
+}
+
+function createMapContext(workspaceId) {
+  var ctx = {
+    workspaceId: workspaceId,
+    currentBasemap: 'positron',
+    mapReady: false,
+    deckOverlay: null,
+    deckBuildingData: [],
+    deckGroundData: [],
+    deckRefreshTimer: null,
+    sunLight: null,
+    lightingEffect: null,
+    worldLayersRemoved: false,
+    lastBoundaryFC: null,
+    requestedBoundaryKey: null
+  };
+  ctx.map = new maplibregl.Map({
+    container: mapContainerIdForWorkspace(workspaceId),
+    style: getBasemapStyle(ctx.currentBasemap).style,
+    center: [window.VC_CONFIG.lon, 20],
+    zoom: 2.5,
+    maxPitch: 65,
+    attributionControl: false,
+    dragRotate: false,
+    pitchWithRotate: false,
+    dragPan: {
+      linearity: 0.25,
+      easing: function(t) { return 1 - Math.pow(1 - t, 3); },
+      maxSpeed: 2000,
+      deceleration: 2200
+    }
+  });
+  ctx.map.touchZoomRotate.disableRotation();
+  if (ctx.map.scrollZoom) ctx.map.scrollZoom.disable();
+  ctx.cameraController = createCameraController(ctx.map);
+  ctx.cameraController.bindInput();
+  bindMapEventHandlers(ctx);
+  mapContexts[workspaceId] = ctx;
+  return ctx;
+}
+
+function storeMapContext(ctx) {
+  if (!ctx) return;
+  ctx.currentBasemap = currentBasemap;
+  ctx.mapReady = mapReady;
+  ctx.deckOverlay = deckOverlay;
+  ctx.deckBuildingData = deckBuildingData;
+  ctx.deckGroundData = deckGroundData;
+  ctx.deckRefreshTimer = deckRefreshTimer;
+  ctx.sunLight = sunLight;
+  ctx.lightingEffect = lightingEffect;
+  ctx.worldLayersRemoved = worldLayersRemoved;
+  ctx.lastBoundaryFC = lastBoundaryFC;
+  ctx.requestedBoundaryKey = requestedBoundaryKey;
+}
+
+function useMapContext(ctx) {
+  activeMapContext = ctx;
+  map = ctx.map;
+  cameraController = ctx.cameraController;
+  currentBasemap = ctx.currentBasemap;
+  mapReady = ctx.mapReady;
+  deckOverlay = ctx.deckOverlay;
+  deckBuildingData = ctx.deckBuildingData;
+  deckGroundData = ctx.deckGroundData;
+  deckRefreshTimer = ctx.deckRefreshTimer;
+  sunLight = ctx.sunLight;
+  lightingEffect = ctx.lightingEffect;
+  worldLayersRemoved = ctx.worldLayersRemoved;
+  lastBoundaryFC = ctx.lastBoundaryFC;
+  requestedBoundaryKey = ctx.requestedBoundaryKey;
+}
+
+function withMapContext(ctx, fn) {
+  if (!ctx) return fn();
+  var previous = activeMapContext;
+  storeMapContext(previous);
+  useMapContext(ctx);
+  try {
+    return fn();
+  } finally {
+    storeMapContext(ctx);
+    if (previous && previous !== ctx) useMapContext(previous);
   }
-});
-map.touchZoomRotate.disableRotation();
-if (map.scrollZoom) map.scrollZoom.disable();
-var cameraController = createCameraController(map);
-cameraController.bindInput();
+}
+
+function setActiveMapContainer(workspaceId) {
+  var views = document.querySelectorAll('[data-map-workspace]');
+  Array.prototype.forEach.call(views, function(view) {
+    view.classList.toggle('active', view.dataset.mapWorkspace === workspaceId);
+  });
+}
+
+function activateMapContext(workspaceId) {
+  if (WORKSPACE_KINDS[workspaceId] === 'game') return false;
+  storeMapContext(activeMapContext);
+  setActiveMapContainer(workspaceId);
+  useMapContext(mapContexts[workspaceId] || createMapContext(workspaceId));
+  updateBasemapMenu();
+  syncViewToggle();
+  updateMapToolButtons();
+  return true;
+}
 
 function createCameraController(mapInstance) {
   var MODES = {
@@ -167,7 +260,6 @@ function createCameraController(mapInstance) {
   var wheelAnchorMode = null;
   var moveToken = 0;
   var inputBound = false;
-  var viewToggleBound = false;
   var middleDragging = false;
   var lastMouseX = 0;
   var lastMouseY = 0;
@@ -666,26 +758,12 @@ function createCameraController(mapInstance) {
   }
 
   function setupViewToggle() {
-    if (viewToggleBound) return;
-    var to2d = document.querySelector('#view-toggle .view-toggle-2d');
-    var to3d = document.querySelector('#view-toggle .view-toggle-3d');
-    if (!to2d || !to3d) return;
-    viewToggleBound = true;
-
-    to3d.addEventListener('click', function() {
-      if (!isFlatView()) {
-        startCityOrbit();
-        syncViewToggle();
-      } else {
-        enter3DInPlace();
-      }
-    });
-
-    to2d.addEventListener('click', exitTo2D);
+    bindViewToggleControls();
     syncViewToggle();
   }
 
   function syncViewToggle() {
+    if (activeMapContext && activeMapContext.map !== mapInstance) return;
     var to2d = document.querySelector('#view-toggle .view-toggle-2d');
     var to3d = document.querySelector('#view-toggle .view-toggle-3d');
     if (!to2d || !to3d) return;
@@ -706,8 +784,30 @@ function createCameraController(mapInstance) {
     flyToWorld: flyToWorld,
     enter3DInPlace: enter3DInPlace,
     exitTo2D: exitTo2D,
+    startCityOrbit: startCityOrbit,
+    isFlatView: isFlatView,
     isCityOrbitActive: function() { return mode === MODES.CITY_ORBIT; }
   };
+}
+
+function bindViewToggleControls() {
+  if (viewToggleBound) return;
+  var to2d = document.querySelector('#view-toggle .view-toggle-2d');
+  var to3d = document.querySelector('#view-toggle .view-toggle-3d');
+  if (!to2d || !to3d) return;
+  viewToggleBound = true;
+  to3d.addEventListener('click', function() {
+    if (!cameraController) return;
+    if (!cameraController.isFlatView()) {
+      cameraController.startCityOrbit();
+      cameraController.syncViewToggle();
+    } else {
+      cameraController.enter3DInPlace();
+    }
+  });
+  to2d.addEventListener('click', function() {
+    if (cameraController) cameraController.exitTo2D();
+  });
 }
 function emptyFeatureCollection() {
   return { type: 'FeatureCollection', features: [] };
@@ -860,9 +960,14 @@ function refreshDeckBuildings() {
 }
 
 function scheduleDeckRefresh(force) {
+  var ctx = activeMapContext;
+  if (!ctx) return;
   if (!force && (map.isMoving() || map.isZooming())) return;
   clearTimeout(deckRefreshTimer);
-  deckRefreshTimer = setTimeout(refreshDeckBuildings, 120);
+  deckRefreshTimer = setTimeout(function() {
+    withMapContext(ctx, refreshDeckBuildings);
+  }, 120);
+  storeMapContext(ctx);
 }
 
 function hideNativeBuildingExtrusion() {
@@ -908,48 +1013,53 @@ function loadWorldGeojson() {
 // 淡出移除，避免与瓦片自带的边界/标注重影。仅默认底图启用，卫星底图跳过。
 function addWorldBaseLayers() {
   if (currentBasemap !== 'positron') return;
+  var ctx = activeMapContext;
   worldLayersRemoved = false;
   loadWorldGeojson().then(function(data) {
-    if (!data || worldLayersRemoved || currentBasemap !== 'positron') return;
-    if (map.getSource('world')) return;
-    map.addSource('world-bg', { type: 'geojson', data: {
-      type: 'Feature', properties: {},
-      geometry: { type: 'Polygon', coordinates: [[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]] }
-    } });
-    map.addSource('world', { type: 'geojson', data: data });
-    map.addLayer({
-      id: 'world-ocean', type: 'fill', source: 'world-bg', maxzoom: 6,
-      paint: { 'fill-color': WORLD_OCEAN_COLOR, 'fill-opacity': 1, 'fill-opacity-transition': { duration: 400 } }
-    });
-    map.addLayer({
-      id: 'world-land', type: 'fill', source: 'world', maxzoom: 6,
-      paint: { 'fill-color': WORLD_LAND_COLOR, 'fill-opacity': 1, 'fill-opacity-transition': { duration: 400 } }
-    });
-    map.addLayer({
-      id: 'world-line', type: 'line', source: 'world', maxzoom: 6,
-      paint: {
-        'line-color': '#b9b4ad',
-        'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.4, 5, 1.2],
-        'line-opacity': 1, 'line-opacity-transition': { duration: 400 }
-      }
-    });
-    map.addLayer({
-      id: 'world-label', type: 'symbol', source: 'world', maxzoom: 6,
-      layout: {
-        'text-field': ['coalesce', ['get', 'name'], ''],
-        'text-font': ['Noto Sans Regular'],
-        'text-size': ['interpolate', ['linear'], ['zoom'], 1, 10, 5, 15],
-        'text-max-width': 7, 'text-padding': 4
-      },
-      paint: {
-        'text-color': '#3c3c3c', 'text-halo-color': WORLD_LAND_COLOR, 'text-halo-width': 1.2,
-        'text-opacity': 1, 'text-opacity-transition': { duration: 400 }
-      }
+    withMapContext(ctx, function() {
+      if (!data || worldLayersRemoved || currentBasemap !== 'positron') return;
+      if (map.getSource('world')) return;
+      map.addSource('world-bg', { type: 'geojson', data: {
+        type: 'Feature', properties: {},
+        geometry: { type: 'Polygon', coordinates: [[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]] }
+      } });
+      map.addSource('world', { type: 'geojson', data: data });
+      map.addLayer({
+        id: 'world-ocean', type: 'fill', source: 'world-bg', maxzoom: 6,
+        paint: { 'fill-color': WORLD_OCEAN_COLOR, 'fill-opacity': 1, 'fill-opacity-transition': { duration: 400 } }
+      });
+      map.addLayer({
+        id: 'world-land', type: 'fill', source: 'world', maxzoom: 6,
+        paint: { 'fill-color': WORLD_LAND_COLOR, 'fill-opacity': 1, 'fill-opacity-transition': { duration: 400 } }
+      });
+      map.addLayer({
+        id: 'world-line', type: 'line', source: 'world', maxzoom: 6,
+        paint: {
+          'line-color': '#b9b4ad',
+          'line-width': ['interpolate', ['linear'], ['zoom'], 0, 0.4, 5, 1.2],
+          'line-opacity': 1, 'line-opacity-transition': { duration: 400 }
+        }
+      });
+      map.addLayer({
+        id: 'world-label', type: 'symbol', source: 'world', maxzoom: 6,
+        layout: {
+          'text-field': ['coalesce', ['get', 'name'], ''],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': ['interpolate', ['linear'], ['zoom'], 1, 10, 5, 15],
+          'text-max-width': 7, 'text-padding': 4
+        },
+        paint: {
+          'text-color': '#3c3c3c', 'text-halo-color': WORLD_LAND_COLOR, 'text-halo-width': 1.2,
+          'text-opacity': 1, 'text-opacity-transition': { duration: 400 }
+        }
+      });
     });
   });
+  storeMapContext(ctx);
 }
 
 function removeWorldBaseLayers() {
+  var ctx = activeMapContext;
   if (worldLayersRemoved) return;
   worldLayersRemoved = true;
   if (!map.getSource('world')) return;
@@ -959,13 +1069,16 @@ function removeWorldBaseLayers() {
     try { map.setPaintProperty(pair[0], pair[1], 0); } catch (e) {}
   });
   setTimeout(function() {
-    ['world-ocean', 'world-land', 'world-line', 'world-label'].forEach(function(id) {
-      if (map.getLayer(id)) { try { map.removeLayer(id); } catch (e) {} }
-    });
-    ['world', 'world-bg'].forEach(function(id) {
-      if (map.getSource(id)) { try { map.removeSource(id); } catch (e) {} }
+    withMapContext(ctx, function() {
+      ['world-ocean', 'world-land', 'world-line', 'world-label'].forEach(function(id) {
+        if (map.getLayer(id)) { try { map.removeLayer(id); } catch (e) {} }
+      });
+      ['world', 'world-bg'].forEach(function(id) {
+        if (map.getSource(id)) { try { map.removeSource(id); } catch (e) {} }
+      });
     });
   }, 450);
+  storeMapContext(ctx);
 }
 
 function setupMapLayers() {
@@ -976,7 +1089,7 @@ function setupMapLayers() {
     id: 'grid-fill',
     type: 'fill',
     source: 'grid',
-    layout: { visibility: 'none' },
+    layout: { visibility: gridVisible ? 'visible' : 'none' },
     paint: {
       'fill-color': ['case', ['get', 'selected'], '#ffffff', ['get', 'cached'], '#3b82f6', '#ffffff'],
       'fill-opacity': ['case', ['get', 'selected'], ['case', ['get', 'cached'], 0.58, 0.54], ['get', 'cached'], 0.32, 0]
@@ -986,7 +1099,7 @@ function setupMapLayers() {
     id: 'grid-line',
     type: 'line',
     source: 'grid',
-    layout: { visibility: 'none' },
+    layout: { visibility: gridVisible ? 'visible' : 'none' },
     paint: {
       'line-color': '#000000',
       'line-opacity': 0.25,
@@ -1087,42 +1200,71 @@ function applyGlobeProjection() {
   }
 }
 
-map.on('load', function() {
-  setupMapLayers();
-  mapReady = true;
-  applyGlobeProjection();
-  forceEnglishLabels();
-  darkenWaterLayers();
-  bindRectangleDrag();
-  restoreRememberedSelection();
-  scheduleGridLoad();
-  cameraController.start();
-  cameraController.setupViewToggle();
-  requestAnimationFrame(function() {
-    var el = document.getElementById('map');
-    if (el) el.classList.add('map-ready');
+function bindMapEventHandlers(ctx) {
+  ctx.map.on('load', function() {
+    withMapContext(ctx, function() {
+      setupMapLayers();
+      mapReady = true;
+      applyGlobeProjection();
+      forceEnglishLabels();
+      darkenWaterLayers();
+      bindRectangleDrag();
+      restoreRememberedSelection();
+      scheduleGridLoad();
+      cameraController.start();
+      cameraController.setupViewToggle();
+      requestAnimationFrame(function() {
+        ctx.map.getContainer().classList.add('map-ready');
+      });
+    });
   });
-});
+  ctx.map.on('click', function(e) {
+    if (activeMapContext !== ctx || !pointSelectActive) return;
+    selectTileByLatLng(e.lngLat);
+  });
+  ctx.map.on('moveend', function() {
+    if (activeMapContext !== ctx) return;
+    scheduleGridLoad();
+    if (cameraController && cameraController.isCityOrbitActive()) return;
+    scheduleDeckRefresh(true);
+  });
+  ctx.map.on('zoomend', function() {
+    if (activeMapContext !== ctx) return;
+    scheduleGridLoad();
+    scheduleDeckRefresh(true);
+  });
+  ctx.map.on('sourcedata', function(e) {
+    if (e.sourceId !== 'openmaptiles' || !e.isSourceLoaded) return;
+    withMapContext(ctx, function() {
+      removeWorldBaseLayers();
+      scheduleDeckRefresh();
+    });
+  });
+}
 
 function setBasemapStyle(id) {
   if (!mapReady) return;
   if (id === currentBasemap) {
     return;
   }
+  var ctx = activeMapContext;
   var target = getBasemapStyle(id);
   map.once('styledata', function() {
-    setupMapLayers();
-    setGridData();
-    syncDrawnSelectionLayer();
-    restoreBoundaryAfterStyle();
-    hideNativeBuildingExtrusion();
-    applyGlobeProjection();
-    forceEnglishLabels();
-    darkenWaterLayers();
-    scheduleDeckRefresh();
+    withMapContext(ctx, function() {
+      setupMapLayers();
+      setGridData();
+      syncDrawnSelectionLayer();
+      restoreBoundaryAfterStyle();
+      hideNativeBuildingExtrusion();
+      applyGlobeProjection();
+      forceEnglishLabels();
+      darkenWaterLayers();
+      scheduleDeckRefresh();
+    });
   });
   map.setStyle(target.style);
   currentBasemap = target.id;
+  storeMapContext(ctx);
   updateBasemapMenu();
   log('底图风格已切换到「' + target.label + '」。', 'info');
 }
@@ -1170,14 +1312,10 @@ function updateBasemapMenu() {
   }
 }
 
+activateMapContext(activeWorkspaceId);
 bindSelectionTools();
 
 bindLocationSearch();
-
-map.on('click', function(e) {
-  if (!pointSelectActive) return;
-  selectTileByLatLng(e.lngLat);
-});
 document.getElementById('houdini-path-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -1308,32 +1446,40 @@ function restoreBoundaryAfterStyle() {
 }
 
 function loadBoundary(osmId) {
+  var ctx = activeMapContext;
   if (!osmId) {
     hideBoundary();
+    storeMapContext(ctx);
     return;
   }
   requestedBoundaryKey = String(osmId);
   var cached = boundaryCache[osmId];
   if (cached) {
     showBoundary(cached);
+    storeMapContext(ctx);
     return;
   }
   fetch('/boundary?osm_type=R&osm_id=' + encodeURIComponent(osmId))
   .then(function(r) { return r.json(); })
   .then(function(d) {
-    if (requestedBoundaryKey !== String(osmId)) return;
-    if (!d || !d.ok || !d.geojson) {
-      hideBoundary();
-      return;
-    }
-    var fc = { type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: d.geojson }] };
-    boundaryCache[osmId] = fc;
-    showBoundary(fc);
+    withMapContext(ctx, function() {
+      if (requestedBoundaryKey !== String(osmId)) return;
+      if (!d || !d.ok || !d.geojson) {
+        hideBoundary();
+        return;
+      }
+      var fc = { type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: d.geojson }] };
+      boundaryCache[osmId] = fc;
+      showBoundary(fc);
+    });
   })
   .catch(function() {
-    if (requestedBoundaryKey !== String(osmId)) return;
-    hideBoundary();
+    withMapContext(ctx, function() {
+      if (requestedBoundaryKey !== String(osmId)) return;
+      hideBoundary();
+    });
   });
+  storeMapContext(ctx);
 }
 
 var regionData = null;
@@ -1372,8 +1518,21 @@ function renderCountries() {
 }
 
 function selectCountry(country, btn) {
-  activeCountryId = country.id;
   var host = document.getElementById('region-countries');
+  var citiesHost = document.getElementById('region-cities');
+  var sameCountryOpen = activeCountryId === country.id && citiesHost && !citiesHost.hidden;
+  if (sameCountryOpen) {
+    activeCountryId = null;
+    if (host) {
+      Array.prototype.forEach.call(host.children, function(node) {
+        node.classList.remove('active');
+      });
+    }
+    citiesHost.textContent = '';
+    citiesHost.hidden = true;
+    return;
+  }
+  activeCountryId = country.id;
   if (host) {
     Array.prototype.forEach.call(host.children, function(node) {
       node.classList.toggle('active', node === btn);
@@ -1381,7 +1540,6 @@ function selectCountry(country, btn) {
   }
   loadBoundary(country.osmId);
   flyToBbox(country.bbox, 7);
-  var citiesHost = document.getElementById('region-cities');
   concealThenReveal(citiesHost, function() {
     renderCities(country.cities || []);
   });
@@ -1469,22 +1627,9 @@ function startPageSession() {
   window.addEventListener('pagehide', notifyPageClosed);
 }
 
-map.on('moveend', scheduleGridLoad);
-map.on('zoomend', scheduleGridLoad);
-map.on('moveend', function() {
-  // City orbit only rotates bearing; avoid starving debounced building refresh.
-  if (cameraController && cameraController.isCityOrbitActive()) return;
-  scheduleDeckRefresh(true);
-});
-map.on('zoomend', function() { scheduleDeckRefresh(true); });
-map.on('sourcedata', function(e) {
-  if (e.sourceId === 'openmaptiles' && e.isSourceLoaded) {
-    removeWorldBaseLayers();
-    scheduleDeckRefresh();
-  }
-});
 window.addEventListener('resize', function() {
   if (WORKSPACE_KINDS[activeWorkspaceId] === 'game') return;
+  if (!map) return;
   map.resize();
   if (activeWorkspaceId === 'houdini') scheduleGridLoad();
   if (typeof scheduleDeckRefresh === 'function') scheduleDeckRefresh(true);

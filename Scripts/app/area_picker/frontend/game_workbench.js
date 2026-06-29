@@ -35,6 +35,7 @@
   var undoStack = [];
   var sharedToonGradientMap = null;
   var sideResizeState = null;
+  var editorGrid = null;
 
   function setStatus(message) {
     if (statusText) statusText.textContent = message;
@@ -349,33 +350,35 @@
 
   function createGrid() {
     var THREE = safeThree();
-    var grid = new THREE.GridHelper(80, 80, 0x7f8790, 0xc4c9cf);
-    grid.rotation.x = Math.PI / 2;
-    grid.material.transparent = true;
-    grid.material.opacity = 0.5;
-    grid.material.depthWrite = false;
-    scene.add(grid);
-
-    var originMaterial = new THREE.LineBasicMaterial({
-      color: 0x5f6872,
-      transparent: true,
-      opacity: 0.8
+    if (!THREE) return;
+    if (!window.VC_VIEWPORT_GRID) {
+      setStatus('Viewport grid module 未加载');
+      return;
+    }
+    editorGrid = window.VC_VIEWPORT_GRID.create(scene, camera, {
+      name: 'editor-procedural-grid',
+      planeZ: 0,
+      fadeStart: 700,
+      fadeEnd: 1850,
+      lodPixels: 64,
+      minorColor: 0xc8cdd1,
+      majorColor: 0xc8cdd1,
+      axisXColor: 0xffffff,
+      axisYColor: 0xffffff,
+      axisZColor: 0x5f8cff,
+      minorAlpha: 0.24,
+      majorAlpha: 0.24,
+      axisAlpha: 0.9,
+      axisInnerPx: 0.25,
+      axisOuterPx: 0.85,
+      showZAxis: false
     });
-    var xLine = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(-40, 0, 0.004),
-        new THREE.Vector3(40, 0, 0.004)
-      ]),
-      originMaterial
-    );
-    var yLine = new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, -40, 0.004),
-        new THREE.Vector3(0, 40, 0.004)
-      ]),
-      originMaterial
-    );
-    scene.add(xLine, yLine);
+    updateEditorGrid();
+  }
+
+  function updateEditorGrid() {
+    if (!editorGrid || !camera) return;
+    window.VC_VIEWPORT_GRID.update(editorGrid, camera);
   }
 
   function createGround() {
@@ -951,6 +954,14 @@
       if (navBtn) navBtn.click();  // 先切到编辑器工作区
       syncFromHoudini();
     });
+
+    var openDirBtn = document.getElementById('open-export-dir-btn');  // 打开白盒导出目录
+    if (openDirBtn) openDirBtn.addEventListener('click', function() {
+      fetch('/open-export-dir', { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(res) { if (!res.ok) setStatus(res.message || '打开目录失败'); })
+        .catch(function() { setStatus('打开目录失败'); });
+    });
   }
 
   function pickCharacter(event) {
@@ -1148,6 +1159,7 @@
 
   function render() {
     if (!renderer) return;
+    updateEditorGrid();
     renderer.render(scene, camera);
   }
 
@@ -1309,7 +1321,7 @@
     }
     THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x8f8f8f);
+    scene.background = new THREE.Color(0x666a6c);
     camera = new THREE.PerspectiveCamera(50, 1, 0.1, 2000);
     camera.up.set(0, 0, 1);
     camera.position.set(10, -16, 8);
@@ -1317,7 +1329,7 @@
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.BasicShadowMap;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     if ('outputColorSpace' in renderer) renderer.outputColorSpace = THREE.SRGBColorSpace;
     else renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -1331,14 +1343,14 @@
     sun.castShadow = true;
     sun.shadow.mapSize.set(4096, 4096);
     sun.shadow.camera.near = 0.5;
-    sun.shadow.camera.far = 400;
-    sun.shadow.camera.left = -60;
-    sun.shadow.camera.right = 60;
-    sun.shadow.camera.top = 60;
-    sun.shadow.camera.bottom = -60;
+    sun.shadow.camera.far = 80;
+    sun.shadow.camera.left = -40;
+    sun.shadow.camera.right = 40;
+    sun.shadow.camera.top = 40;
+    sun.shadow.camera.bottom = -40;
     sun.shadow.bias = -0.00015;
     sun.shadow.normalBias = 0.03;
-    sun.shadow.radius = 0;
+    sun.shadow.radius = 1.2;
     scene.add(sun, sun.target);
     createGround();
     createGrid();
