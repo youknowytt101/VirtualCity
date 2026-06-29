@@ -27,6 +27,10 @@
   var dragState = null;
   var characters = [];
   var selectedCharacter = null;
+  var selectedObject = null;
+  var whiteboxLayers = [];
+  var sun = null;
+  var outlineBody = null;
   var transformControls = null;
   var transformControlsLoading = null;
   var transformMode = 'translate';
@@ -121,9 +125,26 @@
   function syncSelectionHighlight() {
     var playing = playMode && playMode.isPlaying();
     characters.forEach(function(character) {
-      var selected = character === selectedCharacter && !playing;
+      var selected = character === selectedObject && !playing;
       character.traverse(function(child) {
         if (child.userData && child.userData.outline) setOutlineSelected(child, selected);
+      });
+    });
+    whiteboxLayers.forEach(function(layer) {
+      setLayerHighlight(layer, layer === selectedObject && !playing);
+    });
+  }
+
+  // Whitebox layers have no baked outline meshes; tint their material emissive
+  // instead. Materials are cloned per layer on import so this stays isolated.
+  function setLayerHighlight(layer, on) {
+    layer.traverse(function(mesh) {
+      if (!mesh.isMesh || !mesh.material) return;
+      var mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      mats.forEach(function(m) {
+        if (!m || !m.emissive) return;
+        if (m.userData.__baseEmissive === undefined) m.userData.__baseEmissive = m.emissive.getHex();
+        m.emissive.setHex(on ? 0x1f6f8b : m.userData.__baseEmissive);
       });
     });
   }
@@ -599,7 +620,7 @@
     function setMoveSpeed(value) {
       var numericSpeed = Number(value);
       if (!Number.isFinite(numericSpeed)) return moveSpeed;
-      moveSpeed = THREE.MathUtils.clamp(numericSpeed, 1, 80);
+      moveSpeed = THREE.MathUtils.clamp(numericSpeed, 1, 150);
       if (speedInput) speedInput.value = String(Math.round(moveSpeed));
       return moveSpeed;
     }
@@ -839,6 +860,7 @@
     character.position.set(point.x, point.y, 0);
     scene.add(character);
     selectCharacter(character);
+    rebuildSceneOutline();
     undoStack.push({ type: 'create', character: character });
     setStatus('角色已放置，按 Space 或点击运行');
     return character;
@@ -879,19 +901,24 @@
     );
   }
 
-  function selectCharacter(character) {
-    selectedCharacter = character || null;
+  // Selects any scene object (character or whitebox layer). selectedCharacter is
+  // kept set only for characters so character-only ops (run/delete/duplicate) stay
+  // no-ops on terrain/buildings/roads layers.
+  function selectCharacter(object) {
+    selectedObject = object || null;
+    selectedCharacter = (object && object.userData && object.userData.assetType === 'character') ? object : null;
     if (transformControls) {
-      if (selectedCharacter) transformControls.attach(selectedCharacter);
+      if (selectedObject) transformControls.attach(selectedObject);
       else transformControls.detach();
-    } else if (selectedCharacter) {
+    } else if (selectedObject) {
       ensureTransformControls();
     }
     syncEditOverlays();
+    refreshOutlineActive();
   }
 
   function syncEditOverlays() {
-    var editing = Boolean(selectedCharacter) && !(playMode && playMode.isPlaying());
+    var editing = Boolean(selectedObject) && !(playMode && playMode.isPlaying());
     if (transformControls) {
       transformControls.visible = editing;
       transformControls.enabled = editing;
@@ -911,7 +938,7 @@
       });
       transformControls.addEventListener('change', render);
       scene.add(transformControls);
-      if (selectedCharacter) transformControls.attach(selectedCharacter);
+      if (selectedObject) transformControls.attach(selectedObject);
       syncEditOverlays();
     }).catch(function() {
       setStatus('TransformControls 未加载');
@@ -924,15 +951,109 @@
     if (!window.VC_GLB) { setStatus('加载器未就绪'); return; }
     setStatus('导入白盒中…');
     window.VC_GLB.load(url).then(function(root) {
-      if (loadedModel) scene.remove(loadedModel);
+      if (loadedModel) {
+        scene.remove(loadedModel);
+        if (selectedObject && selectedObject.userData.assetType !== 'character') selectCharacter(null);
+      }
       loadedModel = root;
       scene.add(root);
+      registerWhiteboxLayers(root);
+      fitSunShadow(root);
+      rebuildSceneOutline();
       render();
       setStatus('白盒已导入');
     }).catch(function(error) {
       setStatus('白盒导入失败');
       if (window.console) console.error('GLB load failed:', error);
     });
+  }
+
+  var LAYER_LABELS = { terrain: '地形', buildings: '建筑', roads: '道路' };
+  var LAYER_PREFIX = 'VC_whitebox_';
+
+  // The GLB nests the layer nodes under a "Root" node (gltf.scene > Root >
+  // VC_whitebox_{terrain,buildings,roads}), so we must traverse — not just scan
+  // root.children. Tag each layer node pickable, clone its material so per-layer
+  // highlight stays isolated, and enable shadows (only buildings cast — terrain/
+  // roads stay receive-only to avoid self-shadow acne on the large flat surfaces).
+  function registerWhiteboxLayers(root) {
+    whiteboxLayers = [];
+    root.traverse(function(node) {
+      var name = node.name || '';
+      if (name.indexOf(LAYER_PREFIX) !== 0) return;
+      var key = name.slice(LAYER_PREFIX.length);
+      if (!LAYER_LABELS[key]) return;
+      node.userData.assetType = key;
+      node.userData.assetRoot = node;
+      node.userData.assetLabel = LAYER_LABELS[key];
+      var casts = key === 'buildings';
+      node.traverse(function(mesh) {
+        if (!mesh.isMesh) return;
+        if (mesh.material) {
+          mesh.material = Array.isArray(mesh.material)
+            ? mesh.material.map(function(m) { return m.clone(); })
+            : mesh.material.clone();
+        }
+        mesh.castShadow = casts;
+        mesh.receiveShadow = true;
+        mesh.userData.assetRoot = node;
+      });
+      whiteboxLayers.push(node);
+    });
+  }
+
+  // Resize the sun's shadow frustum to wrap the imported model (the default ±40m
+  // box only covers the spawn area, not a ~1km city).
+  function fitSunShadow(root) {
+    var THREE = safeThree();
+    if (!sun || !THREE) return;
+    var box = new THREE.Box3().setFromObject(root);
+    if (box.isEmpty()) return;
+    var center = box.getCenter(new THREE.Vector3());
+    var size = box.getSize(new THREE.Vector3());
+    var radius = 0.5 * Math.max(size.x, size.y, size.z) * 1.15 + 1;
+    sun.target.position.copy(center);
+    sun.target.updateMatrixWorld(true);
+    var dir = new THREE.Vector3(0.45, 0.35, 1).normalize();  // Z-up: light from above
+    sun.position.copy(center).addScaledVector(dir, radius * 2.2);
+    var cam = sun.shadow.camera;
+    cam.left = -radius; cam.right = radius;
+    cam.top = radius; cam.bottom = -radius;
+    cam.near = 0.5; cam.far = radius * 5;
+    cam.updateProjectionMatrix();
+  }
+
+  function rebuildSceneOutline() {
+    if (!outlineBody) return;
+    outlineBody.innerHTML = '';
+    var items = whiteboxLayers.concat(characters);
+    if (!items.length) {
+      var empty = document.createElement('div');
+      empty.className = 'scene-outline-empty';
+      empty.textContent = '场景为空';
+      outlineBody.appendChild(empty);
+      return;
+    }
+    items.forEach(function(obj) {
+      var row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'scene-outline-row';
+      row.dataset.assetType = obj.userData.assetType || '';
+      row.textContent = obj.userData.assetLabel || obj.name || '对象';
+      row.addEventListener('click', function() { selectCharacter(obj); });
+      obj.userData.outlineRow = row;
+      outlineBody.appendChild(row);
+    });
+    refreshOutlineActive();
+  }
+
+  function refreshOutlineActive() {
+    if (!outlineBody) return;
+    var rows = outlineBody.querySelectorAll('.scene-outline-row');
+    for (var i = 0; i < rows.length; i++) rows[i].classList.remove('is-active');
+    if (selectedObject && selectedObject.userData.outlineRow) {
+      selectedObject.userData.outlineRow.classList.add('is-active');
+    }
   }
 
   // Load the latest pipeline-produced whitebox into the editor (no export — the
@@ -969,16 +1090,16 @@
     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
     raycaster.setFromCamera(mouse, camera);
-    var hits = raycaster.intersectObjects(characters, true);
-    var character = null;
+    var hits = raycaster.intersectObjects(characters.concat(whiteboxLayers), true);
+    var picked = null;
     for (var i = 0; i < hits.length; i++) {
       var root = hits[i].object.userData.assetRoot;
-      if (root && root.userData.assetType === 'character') {
-        character = root;
+      if (root) {
+        picked = root;
         break;
       }
     }
-    selectCharacter(character);
+    selectCharacter(picked);
   }
 
   function deleteSelectedCharacter() {
@@ -988,6 +1109,7 @@
     if (index >= 0) characters.splice(index, 1);
     scene.remove(character);
     selectCharacter(null);
+    rebuildSceneOutline();
     undoStack.push({ type: 'delete', character: character, index: index });
     setStatus('角色已删除');
     return true;
@@ -1000,13 +1122,15 @@
     if (action.type === 'create') {
       scene.remove(action.character);
       characters = characters.filter(function(item) { return item !== action.character; });
-      if (selectedCharacter === action.character) selectCharacter(null);
+      if (selectedObject === action.character) selectCharacter(null);
+      rebuildSceneOutline();
       return true;
     }
     if (action.type === 'delete') {
       characters.splice(Math.max(0, action.index), 0, action.character);
       scene.add(action.character);
       selectCharacter(action.character);
+      rebuildSceneOutline();
       return true;
     }
     return false;
@@ -1157,8 +1281,24 @@
     cameraControls.releaseKey(event);
   }
 
+  function adaptCameraClip() {
+    if (!camera) return;
+    // Grid plane is z=0. Grow far with viewing height so the (distance-scaled) grid
+    // is never clipped, and keep the near/far ratio bounded so the grid shader's
+    // inverse-projection reconstruction stays precise instead of buckling into moiré.
+    var planeDist = Math.abs(camera.position.z);
+    var far = Math.max(2000, planeDist * 5);
+    var near = Math.max(0.1, far / 5000);
+    if (camera.far !== far || camera.near !== near) {
+      camera.far = far;
+      camera.near = near;
+      camera.updateProjectionMatrix();
+    }
+  }
+
   function render() {
     if (!renderer) return;
+    adaptCameraClip();
     updateEditorGrid();
     renderer.render(scene, camera);
   }
@@ -1314,6 +1454,7 @@
     speedInput = document.getElementById('game-speed-input');
     statusText = document.getElementById('game-status');
     gameWorkbench = document.getElementById('game-workbench');
+    outlineBody = document.querySelector('#game-scene-outline .action-outline-body');
     if (!sceneHost) return;
 
     if (THREE.ColorManagement && 'legacyMode' in THREE.ColorManagement) {
@@ -1338,7 +1479,8 @@
     sceneHost.appendChild(renderer.domElement);
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9bb0, 0.9));
-    var sun = new THREE.DirectionalLight(0xffffff, 2.0);
+    scene.add(new THREE.AmbientLight(0xb4b8bc, 0.5));  // 灰色环境光，抬升投影暗部
+    sun = new THREE.DirectionalLight(0xffffff, 2.0);
     sun.position.set(8, 14, 10);
     sun.castShadow = true;
     sun.shadow.mapSize.set(4096, 4096);

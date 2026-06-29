@@ -363,7 +363,9 @@ else:
                             continue
                         poly = geo.createPolygon()
                         poly.setIsClosed(True)
-                        for pos in quad_points:
+                        # H-002: 在已 z 翻转的 Houdini 帧 (x,0,-z) 里按此顺序造面法线朝下，
+                        # 反绕使法线朝上，与地形/建筑一致（见 vc_geo.needs_winding_flip）。
+                        for pos in reversed(quad_points):
                             poly.addVertex(shared_point(pos))
                         set_surface_attrs(
                             poly, src_prim, dst_attrs, preview_attr, role_attr, source_attr,
@@ -381,7 +383,8 @@ else:
                             continue
                         poly = geo.createPolygon()
                         poly.setIsClosed(True)
-                        for pos in (cap_center, cap[idx], cap[idx + 1]):
+                        # H-002: 同上，反绕端盖三角使法线朝上。
+                        for pos in (cap[idx + 1], cap[idx], cap_center):
                             poly.addVertex(shared_point(pos))
                         set_surface_attrs(
                             poly, src_prim, dst_attrs, preview_attr, role_attr, source_attr,

@@ -789,6 +789,51 @@ button, input { font: inherit; }
   overflow: hidden;
   scrollbar-gutter: auto;
 }
+#game-scene-outline .action-outline-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px;
+}
+.scene-outline-empty {
+  padding: 10px 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.scene-outline-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.scene-outline-row::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--muted);
+  flex: 0 0 auto;
+}
+.scene-outline-row[data-asset-type="terrain"]::before { background: #7d8a6a; }
+.scene-outline-row[data-asset-type="buildings"]::before { background: #6f86a8; }
+.scene-outline-row[data-asset-type="roads"]::before { background: #b0823f; }
+.scene-outline-row[data-asset-type="character"]::before { background: var(--accent); border-radius: 50%; }
+.scene-outline-row:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+.scene-outline-row.is-active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: color-mix(in srgb, var(--accent) 30%, var(--text));
+}
 .houdini-side-panel #run-monitor.run-monitor {
   flex: 1 1 auto;
   margin: 0;

@@ -181,6 +181,14 @@
     handle.material.uniforms.uViewProjection.value.copy(handle.viewProjection);
     handle.material.uniforms.uViewProjectionInverse.value.copy(handle.viewProjectionInverse);
     handle.material.uniforms.uCameraPosition.value.copy(camera.position);
+    // Grow the distance-fade window with viewing distance so the grid never fully
+    // discards when zoomed out; configured fadeStart/fadeEnd act as the floor.
+    var baseEnd = handle.options.fadeEnd;
+    var baseStart = handle.options.fadeStart;
+    var planeDist = Math.abs(camera.position.z - handle.options.planeZ);
+    var fadeEnd = Math.max(baseEnd, planeDist * 3.5);
+    handle.material.uniforms.uFadeEnd.value = fadeEnd;
+    handle.material.uniforms.uFadeStart.value = fadeEnd * (baseStart / Math.max(baseEnd, 0.000001));
   }
 
   function createZAxis(handle) {

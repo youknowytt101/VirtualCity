@@ -14,6 +14,19 @@
         loader.load(url, function(gltf) {
           var root = gltf.scene;
           root.rotation.x = Math.PI / 2;  // glTF Y-up -> scene Z-up
+          // Whitebox is a blockout: road surfaces export with downward-facing
+          // winding, so FrontSide culling hides them. Render every surface
+          // double-sided so no blockout face can be culled into invisibility.
+          var DoubleSide = window.THREE && window.THREE.DoubleSide;
+          if (DoubleSide !== undefined) {
+            root.traverse(function(obj) {
+              var mat = obj.material;
+              if (!mat) return;
+              (Array.isArray(mat) ? mat : [mat]).forEach(function(m) {
+                if (m) m.side = DoubleSide;
+              });
+            });
+          }
           root.updateMatrixWorld(true);
           resolve(root);
         }, undefined, reject);
