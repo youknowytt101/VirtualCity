@@ -754,7 +754,36 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("mesh.userData.collisionRoot = node;", register_body)
         self.assertIn("function getWhiteboxCollisionMeshes()", game_js)
         self.assertIn("function screenToWhiteboxSurface(clientX, clientY)", game_js)
-        self.assertIn("function snapPointToWhiteboxSurface(point)", game_js)
+        self.assertIn("function snapPointToWhiteboxSurface(point, options)", game_js)
+        self.assertIn("node.userData.collisionShape = 'triangle-mesh';", register_body)
+        self.assertIn("mesh.userData.collisionEnabled = true;", register_body)
+        self.assertIn("mesh.userData.collisionRole = 'walkable';", register_body)
+
+    def test_game_characters_use_capsule_collider_for_whitebox_collision(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        create_start = game_js.index("function createCharacter()")
+        create_end = game_js.index("function resetPartMotion(part)", create_start)
+        create_body = game_js[create_start:create_end]
+
+        self.assertIn("var CHARACTER_COLLIDER_RADIUS", game_js)
+        self.assertIn("var CHARACTER_COLLIDER_HEIGHT", game_js)
+        self.assertIn("var CHARACTER_COLLIDER_SKIN_WIDTH", game_js)
+        self.assertIn("character.userData.collider = {", create_body)
+        self.assertIn("radius: CHARACTER_COLLIDER_RADIUS", create_body)
+        self.assertIn("height: CHARACTER_COLLIDER_HEIGHT", create_body)
+        self.assertIn("skinWidth: CHARACTER_COLLIDER_SKIN_WIDTH", create_body)
+
+    def test_game_whitebox_surface_query_samples_capsule_footprint(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        snap_start = game_js.index("function snapPointToWhiteboxSurface(point")
+        snap_end = game_js.index("function groundCharacterOnWhitebox", snap_start)
+        snap_body = game_js[snap_start:snap_end]
+
+        self.assertIn("function getCharacterFootprintProbeOffsets(radius)", game_js)
+        self.assertIn("function getWalkableWhiteboxHitAtXY(x, y, startZ, collider)", game_js)
+        self.assertIn("worldNormal.z < collider.walkableNormalZ", game_js)
+        self.assertIn("var probeOffsets = getCharacterFootprintProbeOffsets(collider.radius + collider.skinWidth);", snap_body)
+        self.assertIn("if (!bestPoint || hit.point.z > bestPoint.z) bestPoint = hit.point.clone();", snap_body)
 
     def test_game_character_drop_prefers_whitebox_surface_over_ground_plane(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
@@ -780,14 +809,30 @@ class TestPickerHtml(unittest.TestCase):
         init_end = game_js.index("});", init_start)
         init_body = game_js[init_start:init_end]
 
-        self.assertIn("function groundCharacterOnWhitebox(character)", game_js)
-        self.assertIn("groundCharacter(player);", update_body)
+        self.assertIn("function groundCharacterOnWhitebox(character, previousPosition)", game_js)
+        self.assertIn("previousPlayerPosition.copy(player.position);", update_body)
+        self.assertIn("groundCharacter(player, previousPlayerPosition);", update_body)
         self.assertLess(
             update_body.index("player.position.addScaledVector(moveDirection, config.moveSpeed * deltaTime);"),
-            update_body.index("groundCharacter(player);"),
+            update_body.index("groundCharacter(player, previousPlayerPosition);"),
         )
         self.assertIn("groundCharacter: groundCharacterOnWhitebox", init_body)
-        self.assertIn("snapPointToWhiteboxSurface(character.position)", game_js)
+        self.assertIn("resolveCharacterWhiteboxCollision(character, character.position, previousPosition)", game_js)
+
+    def test_game_character_runtime_blocks_non_walkable_whitebox_penetration(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        resolver_start = game_js.index("function resolveCharacterWhiteboxCollision")
+        resolver_end = game_js.index("function placeCharacterAt(point)", resolver_start)
+        resolver_body = game_js[resolver_start:resolver_end]
+
+        self.assertIn("function isCharacterMoveBlockedByWhitebox(previousPosition, desiredPosition, collider)", game_js)
+        self.assertIn("raycaster.far = maxDistance;", game_js)
+        self.assertIn("var lateralOffsets = [0, collider.radius, -collider.radius];", game_js)
+        self.assertIn("origin.addScaledVector(side, lateralOffsets[l]);", game_js)
+        self.assertIn("if (isCharacterMoveBlockedByWhitebox(previousPosition, resolved, collider))", resolver_body)
+        self.assertIn("resolved.x = previousPosition.x;", resolver_body)
+        self.assertIn("resolved.y = previousPosition.y;", resolver_body)
+        self.assertIn("groundCharacterOnWhitebox(character);", game_js)
 
     def test_game_editor_grid_uses_shared_shader_viewport_grid(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")

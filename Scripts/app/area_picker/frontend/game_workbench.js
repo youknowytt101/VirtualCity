@@ -42,6 +42,11 @@
   var editorGrid = null;
   var surfaceRayOrigin = null;
   var surfaceRayDirection = null;
+  var CHARACTER_COLLIDER_RADIUS = 0.36;
+  var CHARACTER_COLLIDER_HEIGHT = 1.76;
+  var CHARACTER_COLLIDER_SKIN_WIDTH = 0.04;
+  var CHARACTER_COLLIDER_STEP_HEIGHT = 0.45;
+  var CHARACTER_WALKABLE_NORMAL_Z = Math.cos(60 * Math.PI / 180);
 
   function setStatus(message) {
     if (statusText) statusText.textContent = message;
@@ -291,6 +296,13 @@
       leftFoot: leftFoot,
       rightFoot: rightFoot
     };
+    character.userData.collider = {
+      radius: CHARACTER_COLLIDER_RADIUS,
+      height: CHARACTER_COLLIDER_HEIGHT,
+      skinWidth: CHARACTER_COLLIDER_SKIN_WIDTH,
+      stepHeight: CHARACTER_COLLIDER_STEP_HEIGHT,
+      walkableNormalZ: CHARACTER_WALKABLE_NORMAL_Z
+    };
     character.add(
       backpack,
       body,
@@ -443,6 +455,7 @@
     var right = new THREE.Vector3();
     var cameraPosition = new THREE.Vector3();
     var focusPoint = new THREE.Vector3();
+    var previousPlayerPosition = new THREE.Vector3();
     var player = null;
     var playing = false;
     var yaw = 0;
@@ -584,12 +597,13 @@
       if (keys.keys) moveDirection.addScaledVector(getGroundForward(), -1);
       if (keys.keyd) moveDirection.add(getGroundRight());
       if (keys.keya) moveDirection.addScaledVector(getGroundRight(), -1);
+      previousPlayerPosition.copy(player.position);
       if (moveDirection.lengthSq() > 0) {
         moveDirection.normalize();
         player.position.addScaledVector(moveDirection, config.moveSpeed * deltaTime);
         player.rotation.z = Math.atan2(moveDirection.y, moveDirection.x) - Math.PI / 2;
       }
-      groundCharacter(player);
+      groundCharacter(player, previousPlayerPosition);
       updateCharacterMotion(player, moveDirection, deltaTime);
       updateCamera();
       return true;
@@ -873,6 +887,51 @@
     return meshes;
   }
 
+  function getDefaultCharacterCollider() {
+    return {
+      radius: CHARACTER_COLLIDER_RADIUS,
+      height: CHARACTER_COLLIDER_HEIGHT,
+      skinWidth: CHARACTER_COLLIDER_SKIN_WIDTH,
+      stepHeight: CHARACTER_COLLIDER_STEP_HEIGHT,
+      walkableNormalZ: CHARACTER_WALKABLE_NORMAL_Z
+    };
+  }
+
+  function getCharacterCollider(character) {
+    var collider = getDefaultCharacterCollider();
+    var source = character && character.userData && character.userData.collider;
+    if (!source) return collider;
+    collider.radius = source.radius || collider.radius;
+    collider.height = source.height || collider.height;
+    collider.skinWidth = source.skinWidth || collider.skinWidth;
+    collider.stepHeight = source.stepHeight || collider.stepHeight;
+    collider.walkableNormalZ = source.walkableNormalZ || collider.walkableNormalZ;
+    return collider;
+  }
+
+  function getHitWorldNormal(hit) {
+    var THREE = safeThree();
+    if (!THREE || !hit || !hit.face || !hit.object) return null;
+    return hit.face.normal
+      .clone()
+      .applyMatrix3(new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld))
+      .normalize();
+  }
+
+  function isWalkableHit(hit, collider) {
+    var worldNormal = getHitWorldNormal(hit);
+    if (!worldNormal) return false;
+    if (worldNormal.z < collider.walkableNormalZ) return false;
+    return true;
+  }
+
+  function firstWalkableHit(hits, collider) {
+    for (var i = 0; i < hits.length; i++) {
+      if (isWalkableHit(hits[i], collider)) return hits[i];
+    }
+    return null;
+  }
+
   function screenToWhiteboxSurface(clientX, clientY) {
     var rect = sceneHost.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return null;
@@ -882,28 +941,127 @@
     mouse.y = -(((clientY - rect.top) / rect.height) * 2 - 1);
     raycaster.setFromCamera(mouse, camera);
     var hits = raycaster.intersectObjects(meshes, true);
-    return hits.length ? hits[0].point.clone() : null;
+    var hit = firstWalkableHit(hits, getDefaultCharacterCollider());
+    return hit ? hit.point.clone() : null;
   }
 
-  function snapPointToWhiteboxSurface(point) {
+  function getCharacterFootprintProbeOffsets(radius) {
+    var diagonal = radius * Math.SQRT1_2;
+    return [
+      { x: 0, y: 0 },
+      { x: radius, y: 0 },
+      { x: -radius, y: 0 },
+      { x: 0, y: radius },
+      { x: 0, y: -radius },
+      { x: diagonal, y: diagonal },
+      { x: diagonal, y: -diagonal },
+      { x: -diagonal, y: diagonal },
+      { x: -diagonal, y: -diagonal }
+    ];
+  }
+
+  function getWalkableWhiteboxHitAtXY(x, y, startZ, collider) {
+    var meshes = getWhiteboxCollisionMeshes();
+    if (!meshes.length || !surfaceRayOrigin || !surfaceRayDirection || !raycaster) return null;
+    var previousNear = raycaster.near;
+    var previousFar = raycaster.far;
+    surfaceRayOrigin.set(x, y, Math.max(startZ || 0, 0) + 1000);
+    raycaster.near = 0;
+    raycaster.far = Infinity;
+    raycaster.set(surfaceRayOrigin, surfaceRayDirection);
+    var hits = raycaster.intersectObjects(meshes, true);
+    raycaster.near = previousNear;
+    raycaster.far = previousFar;
+    return firstWalkableHit(hits, collider);
+  }
+
+  function snapPointToWhiteboxSurface(point, options) {
     var THREE = safeThree();
     var meshes = getWhiteboxCollisionMeshes();
+    var collider = options && options.collider ? options.collider : getDefaultCharacterCollider();
     if (!point || !THREE) return null;
     if (!meshes.length || !surfaceRayOrigin || !surfaceRayDirection) {
       return new THREE.Vector3(point.x, point.y, 0);
     }
-    surfaceRayOrigin.set(point.x, point.y, Math.max(point.z || 0, 0) + 1000);
-    raycaster.set(surfaceRayOrigin, surfaceRayDirection);
-    var hits = raycaster.intersectObjects(meshes, true);
-    if (!hits.length) return new THREE.Vector3(point.x, point.y, 0);
-    return hits[0].point.clone();
+    var bestPoint = null;
+    var probeOffsets = getCharacterFootprintProbeOffsets(collider.radius + collider.skinWidth);
+    probeOffsets.forEach(function(offset) {
+      var hit = getWalkableWhiteboxHitAtXY(
+        point.x + offset.x,
+        point.y + offset.y,
+        point.z,
+        collider
+      );
+      if (!hit) return;
+      if (!bestPoint || hit.point.z > bestPoint.z) bestPoint = hit.point.clone();
+    });
+    return bestPoint || new THREE.Vector3(point.x, point.y, 0);
   }
 
-  function groundCharacterOnWhitebox(character) {
+  function isCharacterMoveBlockedByWhitebox(previousPosition, desiredPosition, collider) {
+    var THREE = safeThree();
+    var meshes = getWhiteboxCollisionMeshes();
+    if (!THREE || !raycaster || !meshes.length || !previousPosition || !desiredPosition) return false;
+    var travel = new THREE.Vector3(
+      desiredPosition.x - previousPosition.x,
+      desiredPosition.y - previousPosition.y,
+      0
+    );
+    var travelDistance = travel.length();
+    if (travelDistance <= 0.0001) return false;
+    var direction = travel.normalize();
+    var side = new THREE.Vector3(-direction.y, direction.x, 0);
+    var maxDistance = travelDistance + collider.radius + collider.skinWidth;
+    var lateralOffsets = [0, collider.radius, -collider.radius];
+    var heights = [
+      collider.skinWidth,
+      collider.height * 0.5,
+      Math.max(collider.skinWidth, collider.height - collider.skinWidth)
+    ];
+    var previousNear = raycaster.near;
+    var previousFar = raycaster.far;
+    var blocked = false;
+    raycaster.near = 0;
+    raycaster.far = maxDistance;
+    for (var i = 0; i < heights.length && !blocked; i++) {
+      for (var l = 0; l < lateralOffsets.length && !blocked; l++) {
+        var origin = new THREE.Vector3(previousPosition.x, previousPosition.y, previousPosition.z + heights[i]);
+        origin.addScaledVector(side, lateralOffsets[l]);
+        raycaster.set(origin, direction);
+        var hits = raycaster.intersectObjects(meshes, true);
+        for (var h = 0; h < hits.length; h++) {
+          if (isWalkableHit(hits[h], collider)) continue;
+          blocked = true;
+          break;
+        }
+      }
+    }
+    raycaster.near = previousNear;
+    raycaster.far = previousFar;
+    return blocked;
+  }
+
+  function resolveCharacterWhiteboxCollision(character, desiredPosition, previousPosition) {
+    var THREE = safeThree();
+    if (!THREE || !desiredPosition) return null;
+    var collider = getCharacterCollider(character);
+    var resolved = desiredPosition.clone();
+    if (previousPosition) {
+      if (isCharacterMoveBlockedByWhitebox(previousPosition, resolved, collider)) {
+        resolved.x = previousPosition.x;
+        resolved.y = previousPosition.y;
+      }
+    }
+    var point = snapPointToWhiteboxSurface(resolved, { collider: collider });
+    if (point) resolved.z = point.z || 0;
+    return resolved;
+  }
+
+  function groundCharacterOnWhitebox(character, previousPosition) {
     if (!character || !character.position) return false;
-    var point = snapPointToWhiteboxSurface(character.position);
-    if (!point) return false;
-    character.position.z = point.z || 0;
+    var resolved = resolveCharacterWhiteboxCollision(character, character.position, previousPosition);
+    if (!resolved) return false;
+    character.position.copy(resolved);
     return true;
   }
 
@@ -911,6 +1069,7 @@
     var character = markCharacter(createCharacter());
     character.position.set(point.x, point.y, point.z || 0);
     scene.add(character);
+    groundCharacterOnWhitebox(character);
     selectCharacter(character);
     rebuildSceneOutline();
     undoStack.push({ type: 'create', character: character });
@@ -1040,6 +1199,7 @@
       node.userData.assetLabel = LAYER_LABELS[key];
       node.userData.collisionEnabled = true;
       node.userData.collisionRole = 'walkable';
+      node.userData.collisionShape = 'triangle-mesh';
       var casts = key === 'buildings';
       node.traverse(function(mesh) {
         if (!mesh.isMesh) return;
@@ -1052,6 +1212,8 @@
         mesh.receiveShadow = true;
         mesh.userData.assetRoot = node;
         mesh.userData.collisionRoot = node;
+        mesh.userData.collisionEnabled = true;
+        mesh.userData.collisionRole = 'walkable';
       });
       whiteboxLayers.push(node);
     });

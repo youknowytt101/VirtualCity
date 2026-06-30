@@ -21,12 +21,14 @@ In scope:
 - Add a reusable surface query for finding the whitebox height at an XY position
 - Use that query when placing a dragged-in character
 - Use that query during play mode movement so the character remains grounded
+- Represent characters with a lightweight capsule collider so nearby whitebox
+  faces cannot cut through the body volume
 - Preserve the existing fallback behavior when no Houdini whitebox is loaded
 
 Out of scope:
 
 - Full rigid-body physics
-- Character capsule blocking, wall sliding, jumping, or gravity simulation
+- Wall sliding, jumping, gravity simulation, or dynamic rigid-body response
 - Editing the Houdini GLB export format
 - Adding a separate collision mesh export contract
 - Reworking the game editor UI
@@ -64,12 +66,18 @@ scene:
   - collect only meshes under collision-enabled whitebox layers
   - exclude characters, editor helpers, shadows, grids, and TransformControls
 - Surface query:
-  - cast a ray downward from above the target XY position
-  - return the first valid hit on a collision-enabled whitebox mesh
+  - cast downward rays from the character capsule footprint, not only the root
+    point
+  - return the highest valid walkable hit on collision-enabled whitebox meshes
   - fall back to the ground plane when no hit exists
 - Character grounding:
   - treat the character group origin as the character foot position
-  - assign the character root `position.z` from the surface hit Z
+  - keep the root `position.z` on top of the highest footprint support surface
+- Character blocking:
+  - store a capsule-style runtime collider on each character
+  - filter walkable surfaces by face normal, similar to a slope limit
+  - during WASD movement, sweep center/side probes at several capsule heights
+    and block movement into non-walkable whitebox faces
 
 This keeps visual mesh import and runtime walkable behavior connected without
 requiring backend or Houdini export changes.
@@ -95,10 +103,12 @@ Character drag/drop:
 Runtime movement:
 
 1. WASD movement updates the character XY position as it does today.
-2. After XY movement, the play controller asks the workbench to ground the
-   character at the new XY location.
-3. The grounding query adjusts only `position.z`.
-4. Camera follow and character animation use the updated root position.
+2. The play controller keeps the previous character position for collision
+   resolution.
+3. The workbench resolves the desired position against the whitebox collision
+   mesh: non-walkable faces can block XY movement, and walkable footprint
+   support updates `position.z`.
+4. Camera follow and character animation use the resolved root position.
 
 ## Error Handling
 
@@ -120,8 +130,12 @@ Add focused guard coverage in `tests/test_area_picker.py`:
 - descendant whitebox meshes are linked back to a collision root
 - dragged character placement uses a whitebox surface placement function before
   falling back to the ground plane
-- play mode movement calls a reusable character grounding function after XY
+- characters carry a capsule collider definition for runtime collision
+- surface grounding samples the capsule footprint instead of a single point
+- play mode movement calls a reusable character collision resolver after XY
   movement
+- runtime movement blocks non-walkable whitebox penetration from center and
+  side probes
 - the implementation keeps a no-whitebox fallback path
 
 These tests match the existing frontend test style, which verifies the local
@@ -131,16 +145,17 @@ JavaScript contracts without requiring a browser runtime.
 
 - Large whitebox GLBs may make naive mesh raycasts expensive if many meshes are
   present.
-- Raycasting against visual geometry means steep walls or vertical faces can be
-  hit if the query starts over them.
+- Raycasting against visual geometry means very dense whitebox GLBs can make
+  multi-probe queries more expensive than a dedicated simplified collision mesh.
 - Buildings may become walkable rooftops, which is useful for editor placement
   but may need filtering later if only terrain and roads should be playable.
 
 Mitigation for this pass:
 
 - Query only whitebox collision meshes, not all scene objects.
-- Use a vertical downward ray from the character XY position for runtime
-  grounding, which naturally ignores most vertical side faces.
+- Use walkable-normal filtering so steep/vertical faces are not treated as
+  grounding surfaces.
+- Use a small capsule-footprint probe set rather than arbitrary mesh physics.
 - Keep the collision role explicit so later filters can disable buildings or
   replace visual geometry with simplified collision meshes.
 
@@ -149,8 +164,9 @@ Mitigation for this pass:
 - Add small helpers near the existing placement functions:
   - `getWhiteboxCollisionMeshes()`
   - `screenToWhiteboxSurface(clientX, clientY)`
-  - `snapPointToWhiteboxSurface(point)`
-  - `groundCharacterOnWhitebox(character)`
+  - `snapPointToWhiteboxSurface(point, options)`
+  - `resolveCharacterWhiteboxCollision(character, desiredPosition, previousPosition)`
+  - `groundCharacterOnWhitebox(character, previousPosition)`
 - Change `placeCharacterAt(point)` to honor the point Z instead of forcing `0`.
 - Change `endAssetDrag(event)` to prefer `screenToWhiteboxSurface()`.
 - Pass `groundCharacterOnWhitebox` into `createPlayModeController()` and call it
