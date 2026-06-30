@@ -36,6 +36,7 @@ _EDITOR_CORE_SCRIPT_NAMES = (
     "editor/core/commands.js",
     "editor/core/editor_state.js",
     "editor/editor_app.js",
+    "editor/legacy_sync.js",
     "editor/legacy_bridge.js",
 )
 _PICKER_APP_JS = "\n".join(
@@ -774,6 +775,12 @@ class TestPickerHtml(unittest.TestCase):
                 "getEditorState",
                 "legacyWorkbench",
             ),
+            "editor/legacy_sync.js": (
+                "export function createLegacyWorkbenchSync",
+                "AddEntityCommand",
+                "ImportWhiteboxCommand",
+                "characterAdded: characterAdded",
+            ),
             "editor/legacy_bridge.js": (
                 "import { createEditorApp } from './editor_app.js';",
                 "window.VC_GAME_WORKBENCH",
@@ -792,6 +799,33 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn(bridge_script, _PICKER_INDEX_HTML)
         self.assertLess(_PICKER_INDEX_HTML.index(legacy_script), _PICKER_INDEX_HTML.index(bridge_script))
         self.assertIn('type="module" src="/area-picker/editor/legacy_bridge.js?v=__VERSION__"', _PICKER_INDEX_HTML)
+
+    def test_game_editor_legacy_sync_adapter_contract(self):
+        sync_js = (FRONTEND_ROOT / "editor" / "legacy_sync.js").read_text(encoding="utf-8")
+        self.assertIn("export function createLegacyWorkbenchSync", sync_js)
+        self.assertIn("AddEntityCommand", sync_js)
+        self.assertIn("DeleteSelectionCommand", sync_js)
+        self.assertIn("SetSelectionCommand", sync_js)
+        self.assertIn("SetTransformModeCommand", sync_js)
+        self.assertIn("ImportWhiteboxCommand", sync_js)
+        self.assertIn("characterAdded: characterAdded", sync_js)
+        self.assertIn("characterDeleted: characterDeleted", sync_js)
+        self.assertIn("selectionChanged: selectionChanged", sync_js)
+        self.assertIn("transformModeChanged: transformModeChanged", sync_js)
+        self.assertIn("whiteboxImported: whiteboxImported", sync_js)
+        bridge_js = (FRONTEND_ROOT / "editor" / "legacy_bridge.js").read_text(encoding="utf-8")
+        self.assertIn("import { createLegacyWorkbenchSync } from './legacy_sync.js';", bridge_js)
+        self.assertIn("window.VC_GAME_EDITOR_SYNC = createLegacyWorkbenchSync(app.getEditorState());", bridge_js)
+
+    def test_game_workbench_syncs_edit_actions_to_editor_core(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn("function editorSync()", game_js)
+        self.assertIn("function syncEntityId(object)", game_js)
+        self.assertIn("sync.characterAdded(character);", game_js)
+        self.assertIn("sync.characterDeleted(character);", game_js)
+        self.assertIn("sync.selectionChanged(selectedObject);", game_js)
+        self.assertIn("sync.transformModeChanged(mode);", game_js)
+        self.assertIn("sync.whiteboxImported(whiteboxLayers);", game_js)
 
     def test_game_whitebox_layers_register_walkable_collision_surfaces(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")

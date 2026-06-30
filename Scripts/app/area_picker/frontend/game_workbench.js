@@ -52,6 +52,16 @@
     if (statusText) statusText.textContent = message;
   }
 
+  function editorSync() {
+    return window.VC_GAME_EDITOR_SYNC || null;
+  }
+
+  function syncEntityId(object) {
+    if (!object || !object.userData) return '';
+    if (!object.userData.entityId) object.userData.entityId = object.name || '';
+    return object.userData.entityId;
+  }
+
   function safeThree() {
     if (!window.THREE) {
       setStatus('Three.js 未加载');
@@ -371,11 +381,13 @@
   function markCharacter(character) {
     var id = 'character-' + String(characters.length + 1).padStart(2, '0');
     character.name = id;
+    character.userData.entityId = id;
     character.userData.assetRoot = character;
     character.userData.assetType = 'character';
     character.traverse(function(child) {
       child.castShadow = true;
       child.receiveShadow = true;
+      child.userData.entityId = id;
       child.userData.assetRoot = character;
       child.userData.assetType = 'character';
     });
@@ -1070,6 +1082,8 @@
     character.position.set(point.x, point.y, point.z || 0);
     scene.add(character);
     groundCharacterOnWhitebox(character);
+    var sync = editorSync();
+    if (sync && sync.characterAdded) sync.characterAdded(character);
     selectCharacter(character);
     rebuildSceneOutline();
     undoStack.push({ type: 'create', character: character });
@@ -1090,6 +1104,8 @@
     transformMode = mode;
     if (transformControls) transformControls.setMode(transformMode);
     updateTransformModeButtons();
+    var sync = editorSync();
+    if (sync && sync.transformModeChanged) sync.transformModeChanged(mode);
     render();
   }
 
@@ -1118,6 +1134,7 @@
   function selectCharacter(object) {
     selectedObject = object || null;
     selectedCharacter = (object && object.userData && object.userData.assetType === 'character') ? object : null;
+    syncEntityId(selectedObject);
     if (transformControls) {
       if (selectedObject) transformControls.attach(selectedObject);
       else transformControls.detach();
@@ -1126,6 +1143,8 @@
     }
     syncEditOverlays();
     refreshOutlineActive();
+    var sync = editorSync();
+    if (sync && sync.selectionChanged) sync.selectionChanged(selectedObject);
   }
 
   function syncEditOverlays() {
@@ -1169,6 +1188,8 @@
       loadedModel = root;
       scene.add(root);
       registerWhiteboxLayers(root);
+      var sync = editorSync();
+      if (sync && sync.whiteboxImported) sync.whiteboxImported(whiteboxLayers);
       fitSunShadow(root);
       rebuildSceneOutline();
       render();
@@ -1194,6 +1215,8 @@
       if (name.indexOf(LAYER_PREFIX) !== 0) return;
       var key = name.slice(LAYER_PREFIX.length);
       if (!LAYER_LABELS[key]) return;
+      var entityId = 'whitebox-' + key;
+      node.userData.entityId = entityId;
       node.userData.assetType = key;
       node.userData.assetRoot = node;
       node.userData.assetLabel = LAYER_LABELS[key];
@@ -1210,6 +1233,7 @@
         }
         mesh.castShadow = casts;
         mesh.receiveShadow = true;
+        mesh.userData.entityId = entityId;
         mesh.userData.assetRoot = node;
         mesh.userData.collisionRoot = node;
         mesh.userData.collisionEnabled = true;
@@ -1323,6 +1347,8 @@
     if (!selectedCharacter || playMode.isPlaying()) return false;
     var character = selectedCharacter;
     var index = characters.indexOf(character);
+    var sync = editorSync();
+    if (sync && sync.characterDeleted) sync.characterDeleted(character);
     if (index >= 0) characters.splice(index, 1);
     scene.remove(character);
     selectCharacter(null);

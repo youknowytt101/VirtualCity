@@ -1304,6 +1304,7 @@ def _frontend_asset_version() -> str:
         (FRONTEND_ROOT, "editor/core/commands.js"),
         (FRONTEND_ROOT, "editor/core/editor_state.js"),
         (FRONTEND_ROOT, "editor/editor_app.js"),
+        (FRONTEND_ROOT, "editor/legacy_sync.js"),
         (FRONTEND_ROOT, "editor/legacy_bridge.js"),
         (FRONTEND_ROOT, "houdini_preview.js"),
         (FRONTEND_ROOT, "asset_dir.js"),
