@@ -769,6 +769,27 @@ class TestPickerHtml(unittest.TestCase):
         self.assertNotIn("character.position.set(point.x, point.y, 0);", game_js)
         self.assertIn("character.position.set(point.x, point.y, point.z || 0);", game_js)
 
+    def test_game_runtime_movement_grounds_character_on_whitebox_surface(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        controller_start = game_js.index("function createPlayModeController(options)")
+        controller_end = game_js.index("function createGameCameraController()", controller_start)
+        controller_body = game_js[controller_start:controller_end]
+        update_start = controller_body.index("function update(deltaTime)")
+        update_end = controller_body.index("return true;", update_start)
+        update_body = controller_body[update_start:update_end]
+        init_start = game_js.index("playMode = createPlayModeController({")
+        init_end = game_js.index("});", init_start)
+        init_body = game_js[init_start:init_end]
+
+        self.assertIn("function groundCharacterOnWhitebox(character)", game_js)
+        self.assertIn("groundCharacter(player);", update_body)
+        self.assertLess(
+            update_body.index("player.position.addScaledVector(moveDirection, config.moveSpeed * deltaTime);"),
+            update_body.index("groundCharacter(player);"),
+        )
+        self.assertIn("groundCharacter: groundCharacterOnWhitebox", init_body)
+        self.assertIn("snapPointToWhiteboxSurface(character.position)", game_js)
+
     def test_game_editor_grid_uses_shared_shader_viewport_grid(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         grid_start = game_js.index("function createGrid()")
@@ -942,7 +963,7 @@ class TestPickerHtml(unittest.TestCase):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         self.assertIn('THREE.ColorManagement.legacyMode = false;', game_js)
         self.assertIn('scene.background = new THREE.Color(0x666a6c);', game_js)
-        self.assertIn('renderer.shadowMap.type = THREE.BasicShadowMap;', game_js)
+        self.assertIn('renderer.shadowMap.type = THREE.PCFSoftShadowMap;', game_js)
         self.assertIn('opacity: 0.4', game_js)
         self.assertIn('sun.shadow.mapSize.set(4096, 4096);', game_js)
         self.assertIn('sun.shadow.normalBias = 0.03;', game_js)

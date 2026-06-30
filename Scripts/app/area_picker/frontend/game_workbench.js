@@ -433,6 +433,9 @@
       shoulderOffset: 0.45,
       lookDamping: 18
     }, options.options || {});
+    var groundCharacter = typeof options.groundCharacter === 'function'
+      ? options.groundCharacter
+      : function() { return false; };
     var movementKeys = { keyw: true, keya: true, keys: true, keyd: true };
     var keys = {};
     var forward = new THREE.Vector3();
@@ -586,6 +589,7 @@
         player.position.addScaledVector(moveDirection, config.moveSpeed * deltaTime);
         player.rotation.z = Math.atan2(moveDirection.y, moveDirection.x) - Math.PI / 2;
       }
+      groundCharacter(player);
       updateCharacterMotion(player, moveDirection, deltaTime);
       updateCamera();
       return true;
@@ -893,6 +897,14 @@
     var hits = raycaster.intersectObjects(meshes, true);
     if (!hits.length) return new THREE.Vector3(point.x, point.y, 0);
     return hits[0].point.clone();
+  }
+
+  function groundCharacterOnWhitebox(character) {
+    if (!character || !character.position) return false;
+    var point = snapPointToWhiteboxSurface(character.position);
+    if (!point) return false;
+    character.position.z = point.z || 0;
+    return true;
   }
 
   function placeCharacterAt(point) {
@@ -1551,6 +1563,7 @@
     playMode = createPlayModeController({
       camera: camera,
       renderer: renderer,
+      groundCharacter: groundCharacterOnWhitebox,
       onChange: syncRunState
     });
     cameraControls = createGameCameraController();
