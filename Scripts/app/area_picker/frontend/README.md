@@ -10,6 +10,7 @@ This folder contains the homepage UI for the WorldBuilder area picker.
 - `pipeline_status.js`: run/export buttons, status stream handling, progress UI, logs, and data-source rendering.
 - `dcc_bridge.js`: DCC software paths, Houdini launch/probe state, and DCCbridge controls.
 - `game_workbench.js`: Three.js virtual asset workbench.
+- `editor/`: phased game editor core. `core/` owns `SceneDocument`, commands, and `EditorState`; `legacy_bridge.js` keeps `window.VC_GAME_WORKBENCH` compatible while `game_workbench.js` remains the legacy viewport/runtime.
 - `AI_FRONTEND_HANDOFF.md`: symptom-to-code map for fast AI handoff and debugging.
 - `API_CONTRACT.md`: frontend route contract linking scripts, backend handlers, and required fields.
 

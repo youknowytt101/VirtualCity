@@ -31,6 +31,13 @@ _PICKER_SCRIPT_NAMES = (
     "dcc_bridge.js",
     "app.js",
 )
+_EDITOR_CORE_SCRIPT_NAMES = (
+    "editor/core/scene_document.js",
+    "editor/core/commands.js",
+    "editor/core/editor_state.js",
+    "editor/editor_app.js",
+    "editor/legacy_bridge.js",
+)
 _PICKER_APP_JS = "\n".join(
     (FRONTEND_ROOT / name).read_text(encoding="utf-8")
     for name in _PICKER_SCRIPT_NAMES
@@ -743,6 +750,49 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('window.VC_GAME_WORKBENCH.init()', _PICKER_APP_JS)
         self.assertIn('window.VC_GAME_WORKBENCH.setActive(', _PICKER_APP_JS)
 
+    def test_game_editor_core_modules_exist_and_define_contracts(self):
+        expected = {
+            "editor/core/scene_document.js": (
+                "export function createSceneDocument",
+                "export function addEntity",
+                "export function setSelection",
+                "export function importWhiteboxLayers",
+            ),
+            "editor/core/commands.js": (
+                "export function AddEntityCommand",
+                "export function ImportWhiteboxCommand",
+                "changesDocument: true",
+            ),
+            "editor/core/editor_state.js": (
+                "export function createEditorState",
+                "dispatch(command)",
+                "undo()",
+                "redo()",
+            ),
+            "editor/editor_app.js": (
+                "export function createEditorApp",
+                "getEditorState",
+                "legacyWorkbench",
+            ),
+            "editor/legacy_bridge.js": (
+                "import { createEditorApp } from './editor_app.js';",
+                "window.VC_GAME_WORKBENCH",
+                "window.VC_GAME_EDITOR_APP",
+            ),
+        }
+        for rel_path, tokens in expected.items():
+            source = (FRONTEND_ROOT / rel_path).read_text(encoding="utf-8")
+            for token in tokens:
+                self.assertIn(token, source)
+
+    def test_game_editor_legacy_bridge_loads_after_legacy_workbench(self):
+        legacy_script = '/area-picker/game_workbench.js?v=__VERSION__'
+        bridge_script = '/area-picker/editor/legacy_bridge.js?v=__VERSION__'
+        self.assertIn(legacy_script, _PICKER_INDEX_HTML)
+        self.assertIn(bridge_script, _PICKER_INDEX_HTML)
+        self.assertLess(_PICKER_INDEX_HTML.index(legacy_script), _PICKER_INDEX_HTML.index(bridge_script))
+        self.assertIn('type="module" src="/area-picker/editor/legacy_bridge.js?v=__VERSION__"', _PICKER_INDEX_HTML)
+
     def test_game_whitebox_layers_register_walkable_collision_surfaces(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         register_start = game_js.index("function registerWhiteboxLayers(root)")
@@ -1429,8 +1479,11 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "asset_dir.js",
                 "styles.css",
                 "index.html",
+                *_EDITOR_CORE_SCRIPT_NAMES,
             ):
-                (root / name).write_text("v1", encoding="utf-8")
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("v1", encoding="utf-8")
             with patch.object(area_picker, "FRONTEND_ROOT", root), patch.object(area_picker, "STATIC_ROOT", static_root):
                 first = area_picker._frontend_asset_version()
                 # 改动 app.js 内容（size 变化），版本串必须随之变化。
@@ -1442,10 +1495,13 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 fourth = area_picker._frontend_asset_version()
                 (root / "viewport_grid.js").write_text("v5-grid-content", encoding="utf-8")
                 fifth = area_picker._frontend_asset_version()
+                (root / "editor" / "core" / "scene_document.js").write_text("v6-scene-document-content", encoding="utf-8")
+                sixth = area_picker._frontend_asset_version()
         self.assertNotEqual(first, second)
         self.assertNotEqual(second, third)
         self.assertNotEqual(third, fourth)
         self.assertNotEqual(fourth, fifth)
+        self.assertNotEqual(fifth, sixth)
 
     def test_version_is_stable_without_changes(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1465,8 +1521,11 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "asset_dir.js",
                 "styles.css",
                 "index.html",
+                *_EDITOR_CORE_SCRIPT_NAMES,
             ):
-                (root / name).write_text("same", encoding="utf-8")
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("same", encoding="utf-8")
             with patch.object(area_picker, "FRONTEND_ROOT", root), patch.object(area_picker, "STATIC_ROOT", static_root):
                 self.assertEqual(
                     area_picker._frontend_asset_version(),
