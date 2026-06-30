@@ -744,6 +744,31 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('window.VC_GAME_WORKBENCH.init()', _PICKER_APP_JS)
         self.assertIn('window.VC_GAME_WORKBENCH.setActive(', _PICKER_APP_JS)
 
+    def test_game_whitebox_layers_register_walkable_collision_surfaces(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        register_start = game_js.index("function registerWhiteboxLayers(root)")
+        register_end = game_js.index("function fitSunShadow(root)", register_start)
+        register_body = game_js[register_start:register_end]
+
+        self.assertIn("node.userData.collisionEnabled = true;", register_body)
+        self.assertIn("node.userData.collisionRole = 'walkable';", register_body)
+        self.assertIn("mesh.userData.collisionRoot = node;", register_body)
+        self.assertIn("function getWhiteboxCollisionMeshes()", game_js)
+        self.assertIn("function screenToWhiteboxSurface(clientX, clientY)", game_js)
+        self.assertIn("function snapPointToWhiteboxSurface(point)", game_js)
+
+    def test_game_character_drop_prefers_whitebox_surface_over_ground_plane(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        drag_start = game_js.index("function endAssetDrag(event)")
+        drag_end = game_js.index("function handleGameShortcut(event)", drag_start)
+        drag_body = game_js[drag_start:drag_end]
+
+        self.assertIn("var point = screenToWhiteboxSurface(event.clientX, event.clientY);", drag_body)
+        self.assertIn("if (!point) point = screenToGround(event.clientX, event.clientY);", drag_body)
+        self.assertIn("if (point) placeCharacterAt(point);", drag_body)
+        self.assertNotIn("character.position.set(point.x, point.y, 0);", game_js)
+        self.assertIn("character.position.set(point.x, point.y, point.z || 0);", game_js)
+
     def test_game_editor_grid_uses_shared_shader_viewport_grid(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         grid_start = game_js.index("function createGrid()")
@@ -927,7 +952,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('type="importmap"', _PICKER_INDEX_HTML)
         self.assertIn('/static/three/three.module.js', _PICKER_INDEX_HTML)
         self.assertIn('/static/three/TransformControls.js', game_js)
-        self.assertIn('transformControls.attach(selectedCharacter)', game_js)
+        self.assertIn('transformControls.attach(selectedObject)', game_js)
         self.assertIn('transformControls.addEventListener("dragging-changed"', game_js)
 
     def test_game_viewport_orbits_selected_character_first(self):

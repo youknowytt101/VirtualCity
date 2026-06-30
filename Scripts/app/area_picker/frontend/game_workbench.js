@@ -40,6 +40,8 @@
   var sharedToonGradientMap = null;
   var sideResizeState = null;
   var editorGrid = null;
+  var surfaceRayOrigin = null;
+  var surfaceRayDirection = null;
 
   function setStatus(message) {
     if (statusText) statusText.textContent = message;
@@ -855,9 +857,47 @@
     return raycaster.ray.intersectPlane(groundPlane, hitPoint) ? hitPoint.clone() : null;
   }
 
+  function getWhiteboxCollisionMeshes() {
+    var meshes = [];
+    whiteboxLayers.forEach(function(layer) {
+      if (!layer.userData || !layer.userData.collisionEnabled) return;
+      layer.traverse(function(node) {
+        if (!node.isMesh || !node.geometry) return;
+        meshes.push(node);
+      });
+    });
+    return meshes;
+  }
+
+  function screenToWhiteboxSurface(clientX, clientY) {
+    var rect = sceneHost.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return null;
+    var meshes = getWhiteboxCollisionMeshes();
+    if (!meshes.length) return null;
+    mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -(((clientY - rect.top) / rect.height) * 2 - 1);
+    raycaster.setFromCamera(mouse, camera);
+    var hits = raycaster.intersectObjects(meshes, true);
+    return hits.length ? hits[0].point.clone() : null;
+  }
+
+  function snapPointToWhiteboxSurface(point) {
+    var THREE = safeThree();
+    var meshes = getWhiteboxCollisionMeshes();
+    if (!point || !THREE) return null;
+    if (!meshes.length || !surfaceRayOrigin || !surfaceRayDirection) {
+      return new THREE.Vector3(point.x, point.y, 0);
+    }
+    surfaceRayOrigin.set(point.x, point.y, Math.max(point.z || 0, 0) + 1000);
+    raycaster.set(surfaceRayOrigin, surfaceRayDirection);
+    var hits = raycaster.intersectObjects(meshes, true);
+    if (!hits.length) return new THREE.Vector3(point.x, point.y, 0);
+    return hits[0].point.clone();
+  }
+
   function placeCharacterAt(point) {
     var character = markCharacter(createCharacter());
-    character.position.set(point.x, point.y, 0);
+    character.position.set(point.x, point.y, point.z || 0);
     scene.add(character);
     selectCharacter(character);
     rebuildSceneOutline();
@@ -986,6 +1026,8 @@
       node.userData.assetType = key;
       node.userData.assetRoot = node;
       node.userData.assetLabel = LAYER_LABELS[key];
+      node.userData.collisionEnabled = true;
+      node.userData.collisionRole = 'walkable';
       var casts = key === 'buildings';
       node.traverse(function(mesh) {
         if (!mesh.isMesh) return;
@@ -997,6 +1039,7 @@
         mesh.castShadow = casts;
         mesh.receiveShadow = true;
         mesh.userData.assetRoot = node;
+        mesh.userData.collisionRoot = node;
       });
       whiteboxLayers.push(node);
     });
@@ -1218,7 +1261,8 @@
         dragState.source.releasePointerCapture(dragState.pointerId);
       }
     } catch (e) {}
-    var point = screenToGround(event.clientX, event.clientY);
+    var point = screenToWhiteboxSurface(event.clientX, event.clientY);
+    if (!point) point = screenToGround(event.clientX, event.clientY);
     if (point) placeCharacterAt(point);
     dragPreview.hidden = true;
     dragState = null;
@@ -1501,6 +1545,8 @@
     mouse = new THREE.Vector2();
     groundPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     hitPoint = new THREE.Vector3();
+    surfaceRayOrigin = new THREE.Vector3();
+    surfaceRayDirection = new THREE.Vector3(0, 0, -1);
     clock = new THREE.Clock();
     playMode = createPlayModeController({
       camera: camera,
