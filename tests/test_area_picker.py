@@ -244,7 +244,7 @@ class TestPickerHtml(unittest.TestCase):
     def test_houdini_preview_uses_editor_default_lighting_profile(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("renderer.shadowMap.enabled = true;", preview_js)
-        self.assertIn("renderer.shadowMap.type = THREE.BasicShadowMap;", preview_js)
+        self.assertIn("renderer.shadowMap.type = THREE.PCFSoftShadowMap;", preview_js)
         self.assertIn("renderer.outputColorSpace = THREE.SRGBColorSpace;", preview_js)
         self.assertIn("renderer.toneMapping = THREE.ACESFilmicToneMapping;", preview_js)
         self.assertIn("renderer.toneMappingExposure = 1.0;", preview_js)
@@ -277,8 +277,8 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_houdini_preview_uses_shared_shader_viewport_grid(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
-        self.assertNotIn("function createPreviewGround()", preview_js)
-        self.assertNotIn("new THREE.ShadowMaterial", preview_js)
+        self.assertIn("function createPreviewGround()", preview_js)
+        self.assertIn("new THREE.ShadowMaterial", preview_js)
         self.assertNotIn("PREVIEW_GRID_HALF_EXTENT", preview_js)
         self.assertNotIn("new THREE.GridHelper", preview_js)
         self.assertIn("var previewGrid = null;", preview_js)
@@ -308,7 +308,7 @@ class TestPickerHtml(unittest.TestCase):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("var PREVIEW_GRID_Z = 0.02;", preview_js)
         self.assertIn("planeZ: PREVIEW_GRID_Z", preview_js)
-        self.assertIn("showZAxis: true", preview_js)
+        self.assertIn("showZAxis: false", preview_js)
         self.assertIn("axisLength: PREVIEW_AXIS_LENGTH", preview_js)
         self.assertNotIn("new THREE.LineSegments(new THREE.BufferGeometry(), gridMaterial)", preview_js)
         self.assertNotIn("positions.push(-snappedExtent, point, PREVIEW_GRID_Z, snappedExtent, point, PREVIEW_GRID_Z);", preview_js)
@@ -383,12 +383,11 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_houdini_preview_surfaces_whitebox_diagnostics_and_identity(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
-        self.assertIn("function whiteboxLabel(whitebox)", preview_js)
-        self.assertIn("String(whitebox.run_id).slice(0, 8)", preview_js)
-        self.assertIn("whitebox.size_label", preview_js)
-        self.assertIn("setMsg(whiteboxLabel(whitebox));", preview_js)
-        self.assertIn("var message = whitebox.message || (err && err.message) || '预览加载失败';", preview_js)
-        self.assertIn("setMsg('预览加载失败：' + message + '（点击重试）');", preview_js)
+        self.assertIn("function modelStatsLabel(root, whitebox)", preview_js)
+        self.assertIn("box.size_label", preview_js)
+        self.assertIn("setMsg(modelStatsLabel(model, whitebox));", preview_js)
+        self.assertIn("var message = whitebox.message || (err && err.message) || '\u9884\u89c8\u52a0\u8f7d\u5931\u8d25';", preview_js)
+        self.assertIn("setMsg('\u9884\u89c8\u52a0\u8f7d\u5931\u8d25\uff1a' + message + '\uff08\u70b9\u51fb\u91cd\u8bd5\uff09');", preview_js)
         self.assertIn("setMsg(whitebox.message || '');", preview_js)
 
     def test_houdini_preview_keeps_grid_camera_and_lights_fixed_between_generated_models(self):
@@ -400,7 +399,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("var PREVIEW_CAMERA_TARGET_Z = 1.2;", preview_js)
         self.assertIn("var PREVIEW_MODEL_TARGET_RADIUS = 2.8;", preview_js)
         self.assertIn("var PREVIEW_SUN_DISTANCE = 20;", preview_js)
-        self.assertIn("var PREVIEW_SHADOW_EXTENT = 60;", preview_js)
+        self.assertIn("var PREVIEW_SHADOW_EXTENT = 10;", preview_js)
         self.assertIn("function configurePreviewShadowRig()", preview_js)
         self.assertIn("function resetPreviewView()", preview_js)
         self.assertIn("fitModelToPreview(model, pivot);", preview_js)
