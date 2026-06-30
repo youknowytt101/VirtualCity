@@ -19,6 +19,8 @@
 - `SceneDocument` is the only authoritative source for edit entities, selection, transform mode, and edit/play mode.
 - Every document edit flows through command dispatch.
 - Three.js objects are render/runtime projections of document entities, not the source of identity or edit state.
+- Character entities reserve `assetRef` and optional `animationSet` metadata for later skeletal idle/walk/run support.
+- Runtime modules expose an animation-driver seam; this completion pass keeps procedural/no-op behavior for non-skeletal characters.
 - Keep generated logs out of commits.
 
 ---
@@ -34,7 +36,7 @@
 - Create `Scripts/app/area_picker/frontend/editor/viewport/viewport_controls.js`: editor camera movement.
 - Create `Scripts/app/area_picker/frontend/editor/viewport/transform_gizmo.js`: TransformControls wrapper and transform command emission.
 - Create `Scripts/app/area_picker/frontend/editor/viewport/picking.js`: raycast picking and placement helpers.
-- Create `Scripts/app/area_picker/frontend/editor/assets/asset_registry.js`: asset reference constants and labels.
+- Create `Scripts/app/area_picker/frontend/editor/assets/asset_registry.js`: asset reference constants, whitebox labels, and character asset namespaces.
 - Create `Scripts/app/area_picker/frontend/editor/assets/glb_importer.js`: whitebox GLB loading and layer entity extraction.
 - Create `Scripts/app/area_picker/frontend/editor/assets/houdini_bridge.js`: Houdini preview URL adapter.
 - Create `Scripts/app/area_picker/frontend/editor/runtime/character_collision.js`: capsule collision and whitebox walkability helpers.
@@ -67,6 +69,7 @@
 - Produces `createWhiteboxLayerEntity(options)`.
 - Produces `SetEditorModeCommand(mode)`.
 - Keeps `createEditorState(initialDocument).dispatch(command)` as the only document mutation API.
+- Character entities carry `assetRef`, collider, and optional `animationSet` fields.
 
 - [ ] **Step 1: Write failing module contract tests**
 
@@ -84,6 +87,7 @@ expected = {
         "export function createCharacterEntity",
         "export function createWhiteboxLayerEntity",
         "assetRef: 'builtin:character'",
+        "animationSet: normalizeAnimationSet",
         "type: 'whiteboxLayer'",
     ),
     "editor/core/commands.js": (
@@ -176,9 +180,18 @@ Create factories that return plain objects only. Use these exact exported names:
     skinWidth: 0.04,
     stepHeight: 0.45,
     walkableSlopeDegrees: 60
+  },
+  animationSet: {
+    idle: 'Idle',
+    walk: 'Walk',
+    run: 'Run'
   }
 }
 ```
+
+`createCharacterEntity` must accept `options.assetRef` and `options.animationSet`. If `options.animationSet` is missing, use `{ idle: 'Idle', walk: 'Walk', run: 'Run' }`. This reserves a stable document shape for later skeletal characters while keeping `builtin:character` as the current default.
+
+Implement `normalizeAnimationSet(value)` inside `entity_factories.js`. It must return string clip names for `idle`, `walk`, and `run`, defaulting to `'Idle'`, `'Walk'`, and `'Run'` when an entry is missing or blank.
 
 `createWhiteboxLayerEntity` must produce `type: 'whiteboxLayer'`, `assetRef: 'houdini:whitebox.glb#' + key`, and collision `{ enabled: true, role: 'walkable', shape: 'triangle-mesh' }`.
 
@@ -446,6 +459,9 @@ Add `test_game_editor_asset_modules_define_contracts`:
 expected = {
     "editor/assets/asset_registry.js": (
         "export var WHITEBOX_LAYER_DEFS",
+        "export var CHARACTER_ASSET_NAMESPACE",
+        "builtin:character",
+        "character:",
         "houdini:whitebox.glb#terrain",
         "houdini:whitebox.glb#buildings",
         "houdini:whitebox.glb#roads",
@@ -474,7 +490,14 @@ Expected: fail because asset modules do not exist.
 
 - [ ] **Step 3: Implement asset registry**
 
-Define terrain, buildings, and roads labels, keys, asset refs, collision role, and shadow behavior in `WHITEBOX_LAYER_DEFS`.
+Define terrain, buildings, and roads labels, keys, asset refs, collision role, and shadow behavior in `WHITEBOX_LAYER_DEFS`. Also export:
+
+```javascript
+export var BUILTIN_CHARACTER_ASSET_REF = 'builtin:character';
+export var CHARACTER_ASSET_NAMESPACE = 'character:';
+```
+
+These constants reserve the path for later skeletal character assets without implementing external character import in this completion pass.
 
 - [ ] **Step 4: Implement GLB importer**
 
@@ -532,6 +555,7 @@ git commit -m "feat(editor): extract whitebox asset import"
 **Interfaces:**
 - Produces `createCharacterCollision(options)`.
 - Produces `createPlayModeController(options)`.
+- Produces `createAnimationDriver(options)`.
 - Play mode consumes `editorState`, `viewport`, `collision`, `statusBar`, and `onChange`.
 
 - [ ] **Step 1: Write failing runtime module tests**
@@ -550,9 +574,11 @@ expected = {
     ),
     "editor/runtime/play_mode.js": (
         "export function createPlayModeController",
+        "export function createAnimationDriver",
         "enter: enter",
         "exit: exit",
         "update: update",
+        "setMovementState: setMovementState",
         "SetEditorModeCommand",
     ),
 }
@@ -579,6 +605,19 @@ The module must read collision meshes from `viewport.getCollisionMeshes()` and m
 Move runtime enter/exit, pointer lock, WASD input, player movement, runtime camera, and animation update from `createPlayModeController()`.
 
 Entering play mode dispatches `SetEditorModeCommand('play')`. Exiting dispatches `SetEditorModeCommand('edit')`. Runtime motion mutates viewport objects only.
+
+Add `createAnimationDriver(options)` in `play_mode.js`. It must expose:
+
+```javascript
+{
+  bindCharacter: bindCharacter,
+  setMovementState: setMovementState,
+  update: update,
+  reset: reset
+}
+```
+
+For the current procedural character, this driver calls the existing simple motion behavior. For a later skeletal character, the same driver can own `AnimationMixer` and idle/walk/run action blending outside `SceneDocument`.
 
 - [ ] **Step 5: Wire runtime into `editor_app.js`**
 
@@ -684,7 +723,7 @@ Render `document.entities` with whitebox layers before characters to preserve cu
 
 - [ ] **Step 5: Implement `toolbar.js`**
 
-Move asset drag/drop, run button, move speed input, and transform mode buttons. Character drops dispatch `AddEntityCommand(createCharacterEntity({ id, name, position }))` and rely on viewport sync to render the object.
+Move asset drag/drop, run button, move speed input, and transform mode buttons. Character drops dispatch `AddEntityCommand(createCharacterEntity({ id, name, position, assetRef: 'builtin:character', animationSet: { idle: 'Idle', walk: 'Walk', run: 'Run' } }))` and rely on viewport sync to render the object.
 
 - [ ] **Step 6: Implement `shortcuts.js`**
 

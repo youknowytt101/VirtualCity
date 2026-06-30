@@ -56,6 +56,57 @@ The refactor is complete when these statements are true:
 - Existing editor workflows remain working: open editor, import whitebox, add a
   character, select it, change transform mode, duplicate/delete, undo/redo, run
   play mode, exit play mode, and resize the viewport/panels.
+- Character entities reserve asset and animation metadata so a later skeletal
+  character can replace the procedural character without changing the document
+  or command architecture.
+
+## Animated Character Extension Point
+
+The completion pass must reserve the data and runtime seams for replacing the
+current procedural character with a skeletal character that has idle, walk, and
+run animations. It does not need to implement a full external character import
+browser, retargeting system, or animation editor.
+
+Character entities support this shape:
+
+```js
+{
+  id: "character-01",
+  type: "character",
+  name: "Player",
+  assetRef: "builtin:character",
+  transform: {
+    position: [0, 0, 0],
+    rotation: [0, 0, 0],
+    scale: [1, 1, 1]
+  },
+  collider: {
+    type: "capsule",
+    radius: 0.36,
+    height: 1.76,
+    skinWidth: 0.04,
+    stepHeight: 0.45,
+    walkableSlopeDegrees: 60
+  },
+  animationSet: {
+    idle: "Idle",
+    walk: "Walk",
+    run: "Run"
+  }
+}
+```
+
+Rules:
+
+- `assetRef: "builtin:character"` keeps the current procedural character path.
+- Future skeletal characters use refs such as `character:player-v1` without
+  changing command or selection behavior.
+- `animationSet` is optional. Missing clips fall back to idle/no-op behavior.
+- Runtime-only Three.js objects such as `AnimationMixer`, actions, skeletons,
+  and cloned skinned meshes stay outside `SceneDocument`.
+- Movement owns the character root transform. The first animation integration
+  should use in-place idle/walk/run clips; root motion is not part of this
+  completion scope.
 
 ## Approaches Considered
 
@@ -199,6 +250,7 @@ never mutates editor state directly.
 - `houdini:whitebox.glb#terrain`
 - `houdini:whitebox.glb#buildings`
 - `houdini:whitebox.glb#roads`
+- future character refs in the `character:<name>` namespace
 
 `glb_importer.js` adapts `window.VC_GLB.load(url)` into whitebox layer entities
 and render resource metadata. A failed GLB load must leave the current document
@@ -214,6 +266,11 @@ the import URL used by `glb_importer.js`.
 Entering play mode snapshots the edit document. Runtime movement may mutate
 runtime Three objects, but not the edit document. Exiting play mode restores the
 edit document projection.
+
+`play_mode.js` also owns a small animation-driver seam. For the procedural
+character this driver performs the existing simple idle/walk motion. For a later
+skeletal character it can own `AnimationMixer` and action blending without
+changing editor commands.
 
 `character_collision.js` owns capsule dimensions, walkable hit detection,
 whitebox surface snapping, and movement blocking. It reads viewport collision
@@ -313,6 +370,10 @@ Behavior tests should cover:
 - transform gizmo emits `TransformEntityCommand` only after edits finish.
 - whitebox importer does not mutate the document on failed load.
 - play mode snapshots and restores edit state boundaries.
+- character entity factories preserve `assetRef`, collider, and optional
+  `animationSet` fields.
+- runtime exposes an animation driver seam that can be a no-op for non-skeletal
+  characters.
 - UI modules dispatch commands instead of mutating legacy arrays.
 
 Browser or Node smoke checks should verify:
@@ -336,5 +397,7 @@ Browser or Node smoke checks should verify:
   legacy workbench as the kernel.
 - All document-changing UI and viewport interactions use command dispatch.
 - Undo and redo are served by `EditorState`.
+- Character entities include the reserved asset and animation metadata needed by
+  later skeletal idle/walk/run support.
 - The public compatibility API remains stable for `workspace.js`.
 - Full test suite passes.
