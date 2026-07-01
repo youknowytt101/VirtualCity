@@ -1,6 +1,8 @@
 // Domain: game-workbench
-// Owns: Three.js editor scene, asset drag/drop, transform controls, whitebox import,
-//       undo/redo history, and localStorage scene persistence in the game workspace.
+// Owns: Three.js editor scene bootstrap, render loop, input routing, transform
+//       controls, and whitebox import wiring. Scene storage/history/inspector
+//       live in gw_scene_state.js/gw_history.js/gw_inspector.js -- this file
+//       builds commands and orchestrates all three plus localStorage persistence.
 // AI handoff: For editor viewport, asset sync, or scene outline issues, start here before checking vc_glb.js.
 (function() {
   'use strict';
@@ -11,6 +13,8 @@
   var runButton = null;
   var runLabel = null;
   var speedInput = null;
+  var lightInput = null;
+  var ambientLight = null;
   var gameWorkbench = null;
   var renderer = null;
   var scene = null;
@@ -26,26 +30,24 @@
   var initialized = false;
   var active = false;
   var dragState = null;
-  var characters = [];
+  var sceneState = null;
   var selectedCharacter = null;
   var selectedObject = null;
-  var whiteboxLayers = [];
   var sun = null;
   var outlineBody = null;
   var transformControls = null;
   var transformControlsLoading = null;
   var transformMode = 'translate';
   var transformModeButtons = [];
-  var sceneModels = [];
   var assetLoader = null;
-  var undoStack = [];
-  var redoStack = [];
+  var history = null;
   var transformDragSnapshot = null;
   var saveTimer = null;
   var restoringScene = false;
   var sideResizeState = null;
   var editorGrid = null;
   var sceneOutliner = null;
+  var inspector = null;
 
   var SCENE_STORAGE_KEY = 'vc_game_scene_v1';
   var currentSceneRoot = '';
@@ -61,13 +63,13 @@
 
   function syncSelectionHighlight() {
     var playing = playMode && playMode.isPlaying();
-    characters.forEach(function(character) {
+    sceneState.getCharacters().forEach(function(character) {
       var selected = character === selectedObject && !playing;
       character.traverse(function(child) {
         if (child.userData && child.userData.outline) setOutlineSelected(child, selected);
       });
     });
-    whiteboxLayers.forEach(function(layer) {
+    sceneState.getWhiteboxLayers().forEach(function(layer) {
       setLayerHighlight(layer, layer === selectedObject && !playing);
     });
   }
@@ -87,7 +89,7 @@
   }
 
   function markCharacter(character) {
-    var id = 'character-' + String(characters.length + 1).padStart(2, '0');
+    var id = 'character-' + String(sceneState.getCharacters().length + 1).padStart(2, '0');
     character.name = id;
     character.userData.assetRoot = character;
     character.userData.assetType = 'character';
@@ -97,7 +99,6 @@
       child.userData.assetRoot = character;
       child.userData.assetType = 'character';
     });
-    characters.push(character);
     return character;
   }
 
@@ -166,6 +167,7 @@
     var THREE = safeThree();
     if (!THREE || !raycaster) return 0;
     raycaster.set(new THREE.Vector3(x, y, 100000), new THREE.Vector3(0, 0, -1));
+    var whiteboxLayers = sceneState.getWhiteboxLayers();
     if (whiteboxLayers.length) {
       var hits = raycaster.intersectObjects(whiteboxLayers, true);
       for (var i = 0; i < hits.length; i++) {
@@ -180,7 +182,7 @@
   function placeCharacterAt(point) {
     var character = markCharacter(createCharacter());
     character.position.set(point.x, point.y, 0);
-    scene.add(character);
+    sceneState.addCharacter(character);
     selectSceneObject(character);
     rebuildSceneOutline();
     pushCommand(makeCreateCommand(character));
@@ -237,6 +239,25 @@
     }
     syncEditOverlays();
     refreshOutlineActive();
+    if (inspector) inspector.refresh();
+  }
+
+  // Rename writes to userData.assetLabel (what the outliner displays for both
+  // characters and models) and, for model roots/layers, to the model wrapper's
+  // .label so the name survives serialize()/restore.
+  function renameSelectedObject(object, name) {
+    if (!object) return;
+    object.userData.assetLabel = name;
+    var model = sceneState.findModelFor(object);
+    if (model) model.label = name;
+    rebuildSceneOutline();
+    scheduleSave();
+  }
+
+  function commitTransformChange(object, before) {
+    var after = captureTransform(object);
+    if (transformChanged(before, after)) pushCommand(makeTransformCommand(object, before, after));
+    render();
   }
 
   function syncEditOverlays() {
@@ -260,10 +281,7 @@
           if (cameraControls) cameraControls.clearState();
           transformDragSnapshot = selectedObject ? captureTransform(selectedObject) : null;
         } else if (transformDragSnapshot && selectedObject) {
-          var after = captureTransform(selectedObject);
-          if (transformChanged(transformDragSnapshot, after)) {
-            pushCommand(makeTransformCommand(selectedObject, transformDragSnapshot, after));
-          }
+          commitTransformChange(selectedObject, transformDragSnapshot);
           transformDragSnapshot = null;
         }
       });
@@ -276,32 +294,9 @@
     });
   }
 
-  // Scene persistence. Characters are procedural, so we only need to store each
-  // one's transform (rebuilt via createCharacter on restore) plus the last
-  // whitebox URL. Saves are debounced; restore replays the snapshot and is
-  // guarded by restoringScene so it never re-triggers a save mid-rebuild.
-  function serializeScene() {
-    return {
-      v: 1,
-      models: sceneModels.map(function(model) {
-        return {
-          url: model.url,
-          label: model.label,
-          p: model.root.position.toArray(),
-          r: [model.root.rotation.x, model.root.rotation.y, model.root.rotation.z],
-          s: model.root.scale.toArray()
-        };
-      }),
-      characters: characters.map(function(character) {
-        return {
-          p: character.position.toArray(),
-          r: [character.rotation.x, character.rotation.y, character.rotation.z],
-          s: character.scale.toArray()
-        };
-      })
-    };
-  }
-
+  // Scene persistence (localStorage). Array storage + serialize() live in
+  // gw_scene_state.js; saves are debounced here and restore replays the
+  // snapshot, guarded by restoringScene so it never re-triggers a save mid-rebuild.
   function sceneStorageKey() {
     return SCENE_STORAGE_KEY + '::' + (currentSceneRoot ? encodeURIComponent(currentSceneRoot) : 'default');
   }
@@ -310,7 +305,7 @@
     saveTimer = null;
     if (restoringScene) return;
     try {
-      window.localStorage.setItem(sceneStorageKey(), JSON.stringify(serializeScene()));
+      window.localStorage.setItem(sceneStorageKey(), JSON.stringify(sceneState.serialize()));
     } catch (e) {}
   }
 
@@ -322,17 +317,8 @@
   function clearSceneObjects() {
     if (!scene) return;
     if (playMode) playMode.exit();
-    characters.slice().forEach(function(character) {
-      scene.remove(character);
-    });
-    characters = [];
-    sceneModels.slice().forEach(function(model) {
-      scene.remove(model.root);
-    });
-    sceneModels = [];
-    whiteboxLayers = [];
-    undoStack.length = 0;
-    redoStack.length = 0;
+    sceneState.clear();
+    history.clear();
     selectSceneObject(null);
     rebuildSceneOutline();
   }
@@ -388,28 +374,10 @@
     setStatus('已新建场景');
   }
 
-  function refreshWhiteboxLayers() {
-    whiteboxLayers = [];
-    sceneModels.forEach(function(model) {
-      (model.layers || []).forEach(function(layer) {
-        whiteboxLayers.push(layer);
-      });
-    });
-  }
-
-  function sceneObjectBelongsToModel(object, model) {
-    if (!object || !model) return false;
-    var root = object.userData && object.userData.assetRoot ? object.userData.assetRoot : object;
-    return root === model.root || (model.layers || []).indexOf(root) >= 0;
-  }
-
   function addSceneModel(model, options) {
     if (!model || !model.root) return null;
     var index = options && typeof options.index === 'number' ? options.index : -1;
-    if (index >= 0) sceneModels.splice(index, 0, model);
-    else if (sceneModels.indexOf(model) < 0) sceneModels.push(model);
-    scene.add(model.root);
-    refreshWhiteboxLayers();
+    sceneState.addModel(model, index >= 0 ? index : undefined);
     rebuildSceneOutline();
     if (!(options && options.skipHistory)) pushCommand(makeCreateModelCommand(model));
     return model;
@@ -417,11 +385,8 @@
 
   function removeSceneModel(model, options) {
     if (!model || !model.root) return;
-    var index = sceneModels.indexOf(model);
-    if (index >= 0) sceneModels.splice(index, 1);
-    scene.remove(model.root);
-    if (sceneObjectBelongsToModel(selectedObject, model)) selectSceneObject(null);
-    refreshWhiteboxLayers();
+    var index = sceneState.removeModel(model);
+    if (sceneState.belongsToModel(selectedObject, model)) selectSceneObject(null);
     rebuildSceneOutline();
     return index;
   }
@@ -441,13 +406,18 @@
     });
   }
 
+  // Always ends by rebuilding the outline, even with nothing to restore -- this
+  // is also the only outline render some callers get: initGameWorkbench() calls
+  // this path directly (skipping clearSceneObjects()'s own rebuild) whenever
+  // scene_project.js's own /scene-root fetch has already resolved by the time
+  // the game workspace first mounts.
   function restoreScene() {
     var raw = null;
-    try { raw = window.localStorage.getItem(sceneStorageKey()); } catch (e) { return; }
-    if (!raw) return;
+    try { raw = window.localStorage.getItem(sceneStorageKey()); } catch (e) { rebuildSceneOutline(); return; }
+    if (!raw) { rebuildSceneOutline(); return; }
     var data = null;
-    try { data = JSON.parse(raw); } catch (e) { return; }
-    if (!data || data.v !== 1) return;
+    try { data = JSON.parse(raw); } catch (e) { rebuildSceneOutline(); return; }
+    if (!data || data.v !== 1) { rebuildSceneOutline(); return; }
     restoringScene = true;
     try {
       (data.characters || []).forEach(function(item) {
@@ -455,7 +425,8 @@
         if (item.p) character.position.fromArray(item.p);
         if (item.r) character.rotation.set(item.r[0], item.r[1], item.r[2]);
         if (item.s) character.scale.fromArray(item.s);
-        scene.add(character);
+        if (item.label) character.userData.assetLabel = item.label;
+        sceneState.addCharacter(character);
       });
       var savedModels = data.models || [];
       if (!savedModels.length && data.whitebox) {
@@ -477,21 +448,9 @@
     assetLoader.loadGLB(url);
   }
 
-  function getSceneOutlineItems() {
-    var items = [];
-    sceneModels.forEach(function(model) {
-      if (model.layers && model.layers.length) {
-        model.layers.forEach(function(layer) { items.push(layer); });
-      } else {
-        items.push(model.root);
-      }
-    });
-    return items.concat(characters);
-  }
-
   function rebuildSceneOutline() {
     if (!sceneOutliner) return;
-    sceneOutliner.rebuild(getSceneOutlineItems(), selectedObject);
+    sceneOutliner.rebuild(sceneState.getOutlineItems(), selectedObject);
   }
 
   function refreshOutlineActive() {
@@ -556,15 +515,7 @@
   }
 
   function getPickableSceneObjects() {
-    var pickables = characters.slice();
-    sceneModels.forEach(function(model) {
-      if (model.layers && model.layers.length) {
-        model.layers.forEach(function(layer) { pickables.push(layer); });
-      } else if (model.root) {
-        pickables.push(model.root);
-      }
-    });
-    return pickables;
+    return sceneState.getPickables();
   }
 
   function pickCharacter(event) {
@@ -587,55 +538,37 @@
   function deleteSelectedCharacter() {
     if (!selectedCharacter || playMode.isPlaying()) return false;
     var character = selectedCharacter;
-    var index = characters.indexOf(character);
+    var index = sceneState.getCharacters().indexOf(character);
     removeCharacter(character);
     pushCommand(makeDeleteCommand(character, index));
     setStatus('角色已删除');
     return true;
   }
 
-  // Command-pattern history: every reversible edit pushes a { undo, redo } pair.
-  // pushCommand clears the redo branch (standard linear-history behavior) and
-  // persists. undo/redo just replay the stored closures. scheduleSave keeps
-  // localStorage in sync without thrashing on every gizmo frame.
+  // Command-pattern history: every reversible edit pushes a { undo, redo } pair
+  // into gw_history.js's stack. scheduleSave keeps localStorage in sync without
+  // thrashing on every gizmo frame.
   function pushCommand(command) {
-    undoStack.push(command);
-    redoStack.length = 0;
+    history.push(command);
     scheduleSave();
   }
 
   function undoLastAction() {
-    if (playMode.isPlaying()) return false;
-    var command = undoStack.pop();
-    if (!command) return false;
-    command.undo();
-    redoStack.push(command);
+    if (playMode.isPlaying() || !history.undo()) return false;
     render();
     scheduleSave();
     return true;
   }
 
   function redoLastAction() {
-    if (playMode.isPlaying()) return false;
-    var command = redoStack.pop();
-    if (!command) return false;
-    command.redo();
-    undoStack.push(command);
+    if (playMode.isPlaying() || !history.redo()) return false;
     render();
     scheduleSave();
     return true;
   }
 
-  function addCharacterToScene(character, index) {
-    if (typeof index === 'number' && index >= 0) characters.splice(index, 0, character);
-    else if (characters.indexOf(character) < 0) characters.push(character);
-    scene.add(character);
-  }
-
   function removeCharacter(character) {
-    var index = characters.indexOf(character);
-    if (index >= 0) characters.splice(index, 1);
-    scene.remove(character);
+    sceneState.removeCharacter(character);
     if (selectedObject === character) selectSceneObject(null);
     rebuildSceneOutline();
   }
@@ -643,13 +576,13 @@
   function makeCreateCommand(character) {
     return {
       undo: function() { removeCharacter(character); },
-      redo: function() { addCharacterToScene(character); selectSceneObject(character); rebuildSceneOutline(); }
+      redo: function() { sceneState.addCharacter(character); selectSceneObject(character); rebuildSceneOutline(); }
     };
   }
 
   function makeDeleteCommand(character, index) {
     return {
-      undo: function() { addCharacterToScene(character, index); selectSceneObject(character); rebuildSceneOutline(); },
+      undo: function() { sceneState.addCharacter(character, index); selectSceneObject(character); rebuildSceneOutline(); },
       redo: function() { removeCharacter(character); }
     };
   }
@@ -722,7 +655,7 @@
   }
 
   function getPlayableCharacter() {
-    return selectedCharacter || characters[0] || null;
+    return selectedCharacter || sceneState.getCharacters()[0] || null;
   }
 
   function toggleRun() {
@@ -878,13 +811,19 @@
     cameraControls.releaseKey(event);
   }
 
+  // Imported models are centered near the world origin, so distance-from-origin
+  // (not height alone) is the right proxy for "how far might there be something
+  // to render." Height-only broke down during alt-orbit: decreasing elevation to
+  // level the view toward horizontal shrinks the camera's height toward the
+  // pivot's height even while its actual distance from the scene stays the same
+  // (it's just trading height for horizontal distance on the orbit sphere), so
+  // far kept shrinking and clipped the city out from under the model. Keep the
+  // near/far ratio bounded (5000:1) for the grid shader's inverse-projection
+  // reconstruction precision (see viewport_grid.js).
   function adaptCameraClip() {
     if (!camera) return;
-    // Grid plane is z=0. Grow far with viewing height so the (distance-scaled) grid
-    // is never clipped, and keep the near/far ratio bounded so the grid shader's
-    // inverse-projection reconstruction stays precise instead of buckling into moiré.
-    var planeDist = Math.abs(camera.position.z);
-    var far = Math.max(2000, planeDist * 5);
+    var originDist = camera.position.length();
+    var far = Math.max(2000, originDist * 5);
     var near = Math.max(0.1, far / 5000);
     if (camera.far !== far || camera.near !== near) {
       camera.far = far;
@@ -898,6 +837,7 @@
     adaptCameraClip();
     updateEditorGrid();
     renderer.render(scene, camera);
+    if (inspector) inspector.sync();
   }
 
   function tick() {
@@ -1041,6 +981,12 @@
         cameraControls.setMoveSpeed(speedInput.value);
       });
     }
+    if (lightInput) {
+      lightInput.addEventListener('input', function() {
+        if (ambientLight) ambientLight.intensity = parseFloat(lightInput.value) || 0;
+        render();
+      });
+    }
   }
 
   function initGameWorkbench() {
@@ -1051,6 +997,7 @@
     runButton = document.getElementById('game-run-button');
     runLabel = document.getElementById('game-run-label');
     speedInput = document.getElementById('game-speed-input');
+    lightInput = document.getElementById('game-light-input');
     GW.state.statusText = document.getElementById('game-status');
     gameWorkbench = document.getElementById('game-workbench');
     outlineBody = document.querySelector('#game-scene-outline .action-outline-body');
@@ -1058,6 +1005,14 @@
     sceneOutliner = GW.createSceneOutliner({
       body: outlineBody,
       onSelect: selectSceneObject
+    });
+    sceneState = GW.createSceneState({ getScene: function() { return scene; } });
+    history = GW.createHistory();
+    inspector = GW.createInspector({
+      getSelectedObject: function() { return selectedObject; },
+      captureTransform: captureTransform,
+      commitTransform: commitTransformChange,
+      renameObject: renameSelectedObject
     });
 
     if (THREE.ColorManagement && 'legacyMode' in THREE.ColorManagement) {
@@ -1082,7 +1037,8 @@
     sceneHost.appendChild(renderer.domElement);
 
     scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9bb0, 0.9));
-    scene.add(new THREE.AmbientLight(0xb4b8bc, 0.5));  // 灰色环境光，抬升投影暗部
+    ambientLight = new THREE.AmbientLight(0xb4b8bc, lightInput ? parseFloat(lightInput.value) : 0.5);  // 灰色环境光，抬升投影暗部
+    scene.add(ambientLight);
     sun = new THREE.DirectionalLight(0xffffff, 2.0);
     sun.position.set(8, 14, 10);
     sun.castShadow = true;

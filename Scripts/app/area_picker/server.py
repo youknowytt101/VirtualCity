@@ -164,7 +164,7 @@ def _safe_print(msg):
         print(str(msg).encode('ascii', errors='backslashreplace').decode('ascii'))
 
 PICKER_HOST = '127.0.0.1'
-PORT    = 8765
+PORT    = int(os.environ.get("VC_AREA_PICKER_PORT", "8765"))
 
 _RUN_RE = re.compile(r'^\[RUN\] run_id=(\S+)$')
 _REPORT_PATH_RE = re.compile(r'(Reports[/\\][^)\s]+\.json)', re.IGNORECASE)
@@ -1528,11 +1528,14 @@ def _frontend_asset_version() -> str:
         (FRONTEND_ROOT, "vc_glb.js"),
         (FRONTEND_ROOT, "viewport_grid.js"),
         (FRONTEND_ROOT, "gw_core.js"),
+        (FRONTEND_ROOT, "gw_history.js"),
+        (FRONTEND_ROOT, "gw_scene_state.js"),
         (FRONTEND_ROOT, "gw_character.js"),
         (FRONTEND_ROOT, "gw_play.js"),
         (FRONTEND_ROOT, "gw_camera.js"),
         (FRONTEND_ROOT, "gw_assets.js"),
         (FRONTEND_ROOT, "gw_outliner.js"),
+        (FRONTEND_ROOT, "gw_inspector.js"),
         (FRONTEND_ROOT, "game_workbench.js"),
         (FRONTEND_ROOT, "houdini_preview.js"),
         (FRONTEND_ROOT, "scene_project.js"),

@@ -73,13 +73,26 @@
       viewUp.crossVectors(right, forward).normalize();
     }
 
+    // The orbit pivot must lie exactly on the camera's current forward ray. If it
+    // didn't (e.g. the selected object's center, or a ground raycast under the
+    // cursor, sitting off to one side), the very first drag-move frame's
+    // camera.lookAt(target) would snap the view toward it before any orbiting
+    // happened -- a visible jump, and not how UE's alt-orbit behaves. So only the
+    // *distance* is "smart" (further out when a selection/ground hit is far away);
+    // the pivot itself always sits straight ahead, making the initial lookAt a
+    // no-op and the drag start seamless.
     function getViewportPivot(event) {
-      var selectedFrame = getSelectedObjectFrame();
-      if (selectedFrame) return selectedFrame.center;
-      var point = screenToGround(event.clientX, event.clientY);
-      if (point) return point;
       camera.getWorldDirection(forward);
-      return camera.position.clone().addScaledVector(forward, 10);
+      var distance = 10;
+      var selectedFrame = getSelectedObjectFrame();
+      if (selectedFrame) {
+        distance = camera.position.distanceTo(selectedFrame.center);
+      } else {
+        var point = screenToGround(event.clientX, event.clientY);
+        if (point) distance = camera.position.distanceTo(point);
+      }
+      distance = THREE.MathUtils.clamp(distance, 1, 2000);
+      return camera.position.clone().addScaledVector(forward, distance);
     }
 
     function beginViewportDrag(mode, event, target) {
@@ -97,7 +110,9 @@
         state.elevation = Math.asin(THREE.MathUtils.clamp(orbitOffset.z / state.distance, -1, 1));
       }
       cameraDragState = state;
-      sceneHost.setPointerCapture(event.pointerId);
+      try {
+        sceneHost.setPointerCapture(event.pointerId);
+      } catch (e) {}
       sceneHost.focus();
     }
 

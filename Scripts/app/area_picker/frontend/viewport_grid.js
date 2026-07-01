@@ -183,9 +183,15 @@
     handle.material.uniforms.uCameraPosition.value.copy(camera.position);
     // Grow the distance-fade window with viewing distance so the grid never fully
     // discards when zoomed out; configured fadeStart/fadeEnd act as the floor.
+    // Full 3D distance to the plane origin, not just height above it -- height
+    // alone collapses toward zero when orbiting down to a horizontal view even
+    // though the camera's actual distance from the grid content is unchanged.
     var baseEnd = handle.options.fadeEnd;
     var baseStart = handle.options.fadeStart;
-    var planeDist = Math.abs(camera.position.z - handle.options.planeZ);
+    var dx = camera.position.x;
+    var dy = camera.position.y;
+    var dz = camera.position.z - handle.options.planeZ;
+    var planeDist = Math.sqrt(dx * dx + dy * dy + dz * dz);
     var fadeEnd = Math.max(baseEnd, planeDist * 3.5);
     handle.material.uniforms.uFadeEnd.value = fadeEnd;
     handle.material.uniforms.uFadeStart.value = fadeEnd * (baseStart / Math.max(baseEnd, 0.000001));

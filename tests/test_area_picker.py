@@ -24,11 +24,14 @@ _PICKER_SCRIPT_NAMES = (
     "vc_glb.js",
     "viewport_grid.js",
     "gw_core.js",
+    "gw_history.js",
+    "gw_scene_state.js",
     "gw_character.js",
     "gw_play.js",
     "gw_camera.js",
     "gw_assets.js",
     "gw_outliner.js",
+    "gw_inspector.js",
     "game_workbench.js",
     "houdini_preview.js",
     "scene_project.js",
@@ -951,7 +954,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertLess(_PICKER_INDEX_HTML.index(grid_script), _PICKER_INDEX_HTML.index(game_script))
         self.assertLess(_PICKER_INDEX_HTML.index(grid_script), _PICKER_INDEX_HTML.index(houdini_script))
 
-    def test_game_workspace_has_empty_details_tab(self):
+    def test_game_workspace_details_tab_has_transform_inspector(self):
         self.assertIn('class="outline-side-tabs"', _PICKER_INDEX_HTML)
         game_panel = _PICKER_INDEX_HTML.split('class="action-panel-content game-side-panel"', 1)[1]
         game_action_panel_style = _PICKER_STYLES.split(
@@ -999,7 +1002,11 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("box-shadow: none;", outline_side_label_style)
         self.assertNotIn(".asset-side-tabs .side-rail-input:checked + .side-rail-label", _PICKER_STYLES)
         self.assertIn('<label class="action-tab-label" for="game-side-tab-1">细节</label>', game_panel)
-        self.assertIn('<div class="action-tab-panel" aria-label="细节"></div>', game_panel)
+        self.assertIn('class="action-tab-panel inspector-panel" aria-label="细节"', game_panel)
+        self.assertIn('id="inspector-name"', game_panel)
+        self.assertIn('id="inspector-pos-x"', game_panel)
+        self.assertIn('id="inspector-rot-x"', game_panel)
+        self.assertIn('id="inspector-scale-x"', game_panel)
         self.assertNotIn('<label class="action-tab-label" for="game-side-tab-1">资产</label>', game_panel)
         self.assertNotIn('<div class="action-tab-panel" aria-label="资产">', game_panel)
         self.assertNotIn('id="asset-dir-form"', game_panel)
@@ -1094,11 +1101,14 @@ class TestPickerHtml(unittest.TestCase):
     def test_scene_model_assets_are_persisted_as_scene_objects(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         asset_js = (FRONTEND_ROOT / "gw_assets.js").read_text(encoding="utf-8")
+        scene_state_js = (FRONTEND_ROOT / "gw_scene_state.js").read_text(encoding="utf-8")
 
-        self.assertIn("var sceneModels = [];", game_js)
-        self.assertIn("models: sceneModels.map(function(model)", game_js)
-        self.assertIn("url: model.url", game_js)
-        self.assertIn("label: model.label", game_js)
+        # Array storage + serialize() live in gw_scene_state.js; game_workbench.js
+        # only orchestrates restore/add/remove around it.
+        self.assertIn("var sceneModels = [];", scene_state_js)
+        self.assertIn("models: sceneModels.map(function(model)", scene_state_js)
+        self.assertIn("url: model.url", scene_state_js)
+        self.assertIn("label: model.label", scene_state_js)
         self.assertIn("function restoreSceneModel(item)", game_js)
         self.assertIn("data.models || []", game_js)
         self.assertIn("assetLoader.loadSceneAsset(item.url, null, item.label", game_js)
@@ -1113,10 +1123,11 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_scene_models_are_pickable_from_viewport(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        scene_state_js = (FRONTEND_ROOT / "gw_scene_state.js").read_text(encoding="utf-8")
 
         self.assertIn("function getPickableSceneObjects()", game_js)
-        self.assertIn("sceneModels.forEach(function(model)", game_js)
-        self.assertIn("pickables.push(model.root);", game_js)
+        self.assertIn("sceneModels.forEach(function(model)", scene_state_js)
+        self.assertIn("flat.push(model.root);", scene_state_js)
         self.assertIn("raycaster.intersectObjects(getPickableSceneObjects(), true)", game_js)
 
     def test_game_workbench_uses_scene_object_selection_naming(self):
@@ -1339,19 +1350,29 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('transformControls.attach(selectedObject)', game_js)
         self.assertIn('transformControls.addEventListener("dragging-changed"', game_js)
 
-    def test_game_viewport_orbits_selected_object_first(self):
+    def test_game_viewport_orbit_pivot_stays_on_view_ray(self):
+        # The pivot must always lie on the camera's current forward ray so the
+        # first lookAt(target) on drag-start is a no-op -- otherwise the view
+        # snaps toward a selection/ground hit that sits off to one side, which is
+        # the "轴心不正常/摄像机跳变" jump this test guards against. Only the
+        # *distance* to the pivot is selection/ground-aware; the direction never is.
         camera_js = (FRONTEND_ROOT / "gw_camera.js").read_text(encoding="utf-8")
         pivot_body = camera_js[
             camera_js.index("function getViewportPivot(event)"):
             camera_js.index("function beginViewportDrag")
         ]
+        self.assertIn("camera.getWorldDirection(forward);", pivot_body)
         self.assertIn("var selectedFrame = getSelectedObjectFrame();", pivot_body)
         self.assertLess(
             pivot_body.index("var selectedFrame = getSelectedObjectFrame();"),
             pivot_body.index("screenToGround(event.clientX, event.clientY)")
         )
-        self.assertIn("if (selectedFrame) return selectedFrame.center;", pivot_body)
-        self.assertIn("camera.position.clone().addScaledVector(forward, 10)", pivot_body)
+        self.assertIn("distance = camera.position.distanceTo(selectedFrame.center);", pivot_body)
+        self.assertIn("if (point) distance = camera.position.distanceTo(point);", pivot_body)
+        self.assertIn("THREE.MathUtils.clamp(distance, 1, 2000)", pivot_body)
+        self.assertIn("return camera.position.clone().addScaledVector(forward, distance);", pivot_body)
+        self.assertNotIn("if (selectedFrame) return selectedFrame.center;", pivot_body)
+        self.assertNotIn("if (point) return point;", pivot_body)
 
     def test_game_frame_selected_uses_any_selected_scene_object(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")

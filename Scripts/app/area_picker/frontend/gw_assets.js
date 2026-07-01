@@ -14,6 +14,21 @@
   var LAYER_LABELS = { terrain: '地形', buildings: '建筑', roads: '道路' };
   var LAYER_PREFIX = 'VC_whitebox_';
 
+  // Houdini exports the whitebox GLB with no materials, so GLTFLoader falls back
+  // to the glTF-spec default (metalness: 1, roughness: 1). With no environment
+  // map in this scene, a fully metallic surface has ~zero diffuse response --
+  // it only reflects an env map, so unlit-looking faces go dead black no matter
+  // how much ambient/hemisphere/directional light is added. Force a flat, non-
+  // metal response so the whitebox actually receives scene lighting.
+  function flattenWhiteboxMaterial(material) {
+    var mats = Array.isArray(material) ? material : [material];
+    mats.forEach(function(m) {
+      if (!m || m.metalness === undefined) return;
+      m.metalness = 0;
+      m.roughness = 1;
+    });
+  }
+
   // The GLB nests the layer nodes under a "Root" node (gltf.scene > Root >
   // VC_whitebox_{terrain,buildings,roads}), so we must traverse — not just scan
   // root.children. Tag each layer node pickable, clone its material so per-layer
@@ -37,6 +52,7 @@
           mesh.material = Array.isArray(mesh.material)
             ? mesh.material.map(function(m) { return m.clone(); })
             : mesh.material.clone();
+          flattenWhiteboxMaterial(mesh.material);
         }
         mesh.castShadow = casts;
         mesh.receiveShadow = true;

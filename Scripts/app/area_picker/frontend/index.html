@@ -271,6 +271,10 @@
           <span class="game-speed-label">Speed</span>
           <input id="game-speed-input" class="game-speed-input" type="number" min="1" max="150" step="1" value="35">
         </label>
+        <label id="game-light-control" class="game-speed-control game-light-control" for="game-light-input">
+          <span class="game-speed-label">环境光</span>
+          <input id="game-light-input" class="game-speed-input game-light-input" type="range" min="0" max="3" step="0.1" value="0.5" title="环境光强度" aria-label="环境光强度">
+        </label>
       </div>
       <div id="game-bottom-ui" class="game-bottom-ui" aria-label="编辑器底部面板">
         <div id="scene-asset-browser" class="scene-asset-browser" aria-label="工程资产目录">
@@ -354,21 +358,51 @@
         <div class="action-outline-body"></div>
       </section>
       <div id="game-side-resizer" class="game-side-resizer" role="separator" aria-label="调整场景大纲高度" aria-orientation="horizontal" aria-controls="game-scene-outline game-side-tabs" tabindex="0"></div>
-      <section id="game-side-tabs" class="action-tabs" aria-label="我的游戏右栏标签页" style="--action-tab-count: 4;">
+      <section id="game-side-tabs" class="action-tabs" aria-label="我的游戏右栏标签页" style="--action-tab-count: 3;">
         <input id="game-side-tab-1" class="action-tab-input" type="radio" name="game-side-tabs" checked>
         <label class="action-tab-label" for="game-side-tab-1">细节</label>
-        <div class="action-tab-panel" aria-label="细节"></div>
+        <div class="action-tab-panel inspector-panel" aria-label="细节">
+          <div class="inspector-empty" id="inspector-empty-hint">未选中对象</div>
+          <div class="inspector-body" id="inspector-body" hidden>
+            <label class="inspector-name-row">
+              <span class="inspector-field-label">名称</span>
+              <input type="text" id="inspector-name" class="inspector-name-input" autocomplete="off">
+            </label>
+            <div class="inspector-group">
+              <div class="inspector-group-title">位置</div>
+              <div class="inspector-row">
+                <label class="inspector-axis">X<input type="number" step="0.1" id="inspector-pos-x" class="inspector-number"></label>
+                <label class="inspector-axis">Y<input type="number" step="0.1" id="inspector-pos-y" class="inspector-number"></label>
+                <label class="inspector-axis">Z<input type="number" step="0.1" id="inspector-pos-z" class="inspector-number"></label>
+              </div>
+            </div>
+            <div class="inspector-group">
+              <div class="inspector-group-title">旋转（度）</div>
+              <div class="inspector-row">
+                <label class="inspector-axis">X<input type="number" step="1" id="inspector-rot-x" class="inspector-number"></label>
+                <label class="inspector-axis">Y<input type="number" step="1" id="inspector-rot-y" class="inspector-number"></label>
+                <label class="inspector-axis">Z<input type="number" step="1" id="inspector-rot-z" class="inspector-number"></label>
+              </div>
+            </div>
+            <div class="inspector-group">
+              <div class="inspector-group-title">缩放</div>
+              <div class="inspector-row">
+                <label class="inspector-axis">X<input type="number" step="0.1" id="inspector-scale-x" class="inspector-number"></label>
+                <label class="inspector-axis">Y<input type="number" step="0.1" id="inspector-scale-y" class="inspector-number"></label>
+                <label class="inspector-axis">Z<input type="number" step="0.1" id="inspector-scale-z" class="inspector-number"></label>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <input id="game-side-tab-2" class="action-tab-input" type="radio" name="game-side-tabs">
-        <label class="action-tab-label" for="game-side-tab-2">创建</label>
-        <div class="action-tab-panel" aria-label="创建"></div>
+        <label class="action-tab-label" for="game-side-tab-2">AI修改</label>
+        <div class="action-tab-panel" aria-label="AI修改">
+          <div class="inspector-empty">AI 资产优化功能开发中</div>
+        </div>
 
         <input id="game-side-tab-3" class="action-tab-input" type="radio" name="game-side-tabs">
-        <label class="action-tab-label" for="game-side-tab-3">测试</label>
-        <div class="action-tab-panel" aria-label="测试"></div>
-
-        <input id="game-side-tab-4" class="action-tab-input" type="radio" name="game-side-tabs">
-        <label class="action-tab-label" for="game-side-tab-4">发布</label>
+        <label class="action-tab-label" for="game-side-tab-3">发布</label>
         <div class="action-tab-panel" aria-label="发布"></div>
       </section>
     </div>
@@ -573,11 +607,14 @@ window.VC_CONFIG = {
 <script src="/area-picker/vc_glb.js?v=__VERSION__"></script>
 <script src="/area-picker/viewport_grid.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_core.js?v=__VERSION__"></script>
+<script src="/area-picker/gw_history.js?v=__VERSION__"></script>
+<script src="/area-picker/gw_scene_state.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_character.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_play.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_camera.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_assets.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_outliner.js?v=__VERSION__"></script>
+<script src="/area-picker/gw_inspector.js?v=__VERSION__"></script>
 <script src="/area-picker/game_workbench.js?v=__VERSION__"></script>
 <script src="/area-picker/houdini_preview.js?v=__VERSION__"></script>
 <script src="/area-picker/scene_project.js?v=__VERSION__"></script>
