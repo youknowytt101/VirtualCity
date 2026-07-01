@@ -77,16 +77,15 @@
       </div>
       </div>
     </div>
-    <div id="basemap-control" class="map-tool-control flat-panel basemap-segment" aria-label="底图风格">
-      <div id="basemap-segment" class="segmented" role="radiogroup" aria-label="底图风格"></div>
+    <div id="basemap-control" class="map-tool-control flat-panel basemap-toggle-shell" aria-label="底图风格">
+      <button type="button" id="basemap-toggle" class="map-tool-button flat-item basemap-toggle" aria-pressed="false" title="切换底图">默认</button>
     </div>
     <div id="region-nav" class="region-nav" aria-label="国家与城市导航">
       <div id="region-countries" class="region-col flat-panel flat-panel--col region-countries" role="list" aria-label="国家"></div>
       <div id="region-cities" class="region-col flat-panel flat-panel--col flat-dir--right region-cities" role="list" aria-label="城市" hidden></div>
     </div>
     <div id="view-toggle" class="map-tool-control flat-panel flat-panel--row" aria-label="2D/3D 视角切换">
-      <button type="button" class="map-tool-button flat-item view-toggle-2d active" aria-pressed="true">2D</button>
-      <button type="button" class="map-tool-button flat-item view-toggle-3d" aria-pressed="false">3D</button>
+      <button type="button" id="view-toggle-button" class="map-tool-button flat-item view-toggle-button" aria-pressed="false" title="切换 2D/3D 视角">2D</button>
     </div>
   </div>
   <aside id="control-panel" aria-label="区域操作面板">
@@ -101,72 +100,84 @@
     </section>
     <!-- /地点搜索组件 -->
     <section class="panel-section tool-placeholder-section" id="tool-placeholder-section" aria-label="工具入口占位">
-      <div class="tool-placeholder-list flat-panel flat-panel--col">
-        <button type="button" class="tool-placeholder-btn flat-item active" data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="city-preview" aria-pressed="false" title="切换到 ZONE">ZONE</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到编辑器">编辑器</button>
-        <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini</button>
-        <details class="dcc-bridge-panel flat-item">
-          <summary class="tool-placeholder-btn dcc-bridge-summary">DCCbridge</summary>
-          <div class="dcc-bridge-options" aria-label="DCCbridge 选项">
-            <div class="dcc-option-row" data-dcc-id="houdini">
-              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Houdini"></button>
-              <span class="dcc-name">Houdini <span class="dcc-version">(v1.0.0)</span></span>
-              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
-              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Houdini 本地路径" aria-label="设置 Houdini 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
-              <div class="dcc-path-editor" hidden>
-                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Houdini 本地路径">
+      <div class="tool-placeholder-stack">
+        <div class="tool-placeholder-list tool-placeholder-list--world flat-panel flat-panel--col" aria-label="EOL 与 ZONE">
+          <button type="button" class="tool-placeholder-btn flat-item active" data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL</button>
+          <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="city-preview" aria-pressed="false" title="切换到 ZONE">ZONE</button>
+        </div>
+        <div class="tool-placeholder-list tool-placeholder-list--workbench flat-panel flat-panel--col" aria-label="编辑器与 DCC">
+          <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="game" aria-pressed="false" title="切换到编辑器">编辑器</button>
+          <button type="button" class="tool-placeholder-btn flat-item" data-workspace-target="houdini" aria-pressed="false" title="切换到 Houdini 工作台">Houdini</button>
+          <details class="dcc-bridge-panel flat-item">
+            <summary class="tool-placeholder-btn dcc-bridge-summary">DCCbridge</summary>
+            <div class="dcc-bridge-options" aria-label="DCCbridge 选项">
+              <div class="dcc-option-row" data-dcc-id="houdini">
+                <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Houdini"></button>
+                <span class="dcc-name">Houdini <span class="dcc-version">(v1.0.0)</span></span>
+                <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+                <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Houdini 本地路径" aria-label="设置 Houdini 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+                <div class="dcc-path-editor" hidden>
+                  <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Houdini 本地路径">
+                </div>
+              </div>
+              <div class="dcc-option-row" data-dcc-id="blender">
+                <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Blender"></button>
+                <span class="dcc-name">Blender <span class="dcc-version">(v1.0.1)</span></span>
+                <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+                <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Blender 本地路径" aria-label="设置 Blender 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+                <div class="dcc-path-editor" hidden>
+                  <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Blender 本地路径">
+                </div>
+              </div>
+              <div class="dcc-option-row" data-dcc-id="unity">
+                <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Unity"></button>
+                <span class="dcc-name">Unity <span class="dcc-version">(v1.0.0)</span></span>
+                <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+                <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Unity 本地路径" aria-label="设置 Unity 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+                <div class="dcc-path-editor" hidden>
+                  <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Unity 本地路径">
+                </div>
+              </div>
+              <div class="dcc-option-row" data-dcc-id="unreal">
+                <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Unreal"></button>
+                <span class="dcc-name">Unreal <span class="dcc-version">(v1.0.4)</span></span>
+                <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+                <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Unreal 本地路径" aria-label="设置 Unreal 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+                <div class="dcc-path-editor" hidden>
+                  <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Unreal 本地路径">
+                </div>
+              </div>
+              <div class="dcc-option-row" data-dcc-id="godot">
+                <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Godot"></button>
+                <span class="dcc-name">Godot <span class="dcc-version">(v1.0.0)</span></span>
+                <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
+                <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Godot 本地路径" aria-label="设置 Godot 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
+                <div class="dcc-path-editor" hidden>
+                  <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Godot 本地路径">
+                </div>
               </div>
             </div>
-            <div class="dcc-option-row" data-dcc-id="blender">
-              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Blender"></button>
-              <span class="dcc-name">Blender <span class="dcc-version">(v1.0.1)</span></span>
-              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
-              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Blender 本地路径" aria-label="设置 Blender 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
-              <div class="dcc-path-editor" hidden>
-                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Blender 本地路径">
-              </div>
-            </div>
-            <div class="dcc-option-row" data-dcc-id="unity">
-              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Unity"></button>
-              <span class="dcc-name">Unity <span class="dcc-version">(v1.0.0)</span></span>
-              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
-              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Unity 本地路径" aria-label="设置 Unity 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
-              <div class="dcc-path-editor" hidden>
-                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Unity 本地路径">
-              </div>
-            </div>
-            <div class="dcc-option-row" data-dcc-id="unreal">
-              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Unreal"></button>
-              <span class="dcc-name">Unreal <span class="dcc-version">(v1.0.4)</span></span>
-              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
-              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Unreal 本地路径" aria-label="设置 Unreal 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
-              <div class="dcc-path-editor" hidden>
-                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Unreal 本地路径">
-              </div>
-            </div>
-            <div class="dcc-option-row" data-dcc-id="godot">
-              <button type="button" class="dcc-toggle" aria-pressed="false" aria-label="打开 Godot"></button>
-              <span class="dcc-name">Godot <span class="dcc-version">(v1.0.0)</span></span>
-              <button type="button" class="dcc-install-btn" aria-pressed="false">安装</button>
-              <button type="button" class="dcc-path-btn" aria-expanded="false" title="设置 Godot 本地路径" aria-label="设置 Godot 本地路径"><span class="dcc-path-icon" aria-hidden="true"></span></button>
-              <div class="dcc-path-editor" hidden>
-                <input class="dcc-path-input" type="text" spellcheck="false" placeholder="Godot 本地路径">
-              </div>
-            </div>
-          </div>
-        </details>
+          </details>
+        </div>
       </div>
     </section>
     <!-- 运行监控组件已移至右侧 action-panel 底部 -->
     <section class="panel-section editor-left-actions-section" id="editor-left-actions" aria-label="编辑器操作">
       <div class="editor-left-action-list flat-panel flat-panel--col">
-        <button type="button" class="editor-left-action-btn flat-item" data-editor-action="new" title="新建工程">
+        <button type="button" class="editor-left-action-btn flat-item" data-editor-action="new" title="新建">
           <svg class="editor-left-action-icon" aria-hidden="true" viewBox="0 0 24 24">
             <path d="M12 5v14"></path>
             <path d="M5 12h14"></path>
           </svg>
-          <span class="editor-left-action-label">新建工程</span>
+          <span class="editor-left-action-label">新建</span>
+        </button>
+        <button type="button" class="editor-left-action-btn flat-item" data-editor-action="open" title="打开">
+          <svg class="editor-left-action-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M3 7a2 2 0 0 1 2-2h4.4a2 2 0 0 1 1.6.8l1 1.4a2 2 0 0 0 1.6.8H19a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <path d="M12 11v5"></path>
+            <path d="M9.5 13.5 12 11l2.5 2.5"></path>
+          </svg>
+          <span class="editor-left-action-label">打开</span>
         </button>
         <button type="button" class="editor-left-action-btn flat-item" data-editor-action="save" title="保存">
           <svg class="editor-left-action-icon" aria-hidden="true" viewBox="0 0 24 24">
@@ -176,11 +187,11 @@
           </svg>
           <span class="editor-left-action-label">保存</span>
         </button>
-        <button type="button" class="editor-left-action-btn flat-item" data-editor-action="open-root" title="打开场景工程根目录">
+        <button type="button" class="editor-left-action-btn flat-item" data-editor-action="open-root" title="打开目录">
           <svg class="editor-left-action-icon" aria-hidden="true" viewBox="0 0 24 24">
             <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 4A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"></path>
           </svg>
-          <span class="editor-left-action-label">打开场景工程根目录</span>
+          <span class="editor-left-action-label">打开目录</span>
         </button>
         <button type="button" class="editor-left-action-btn flat-item" data-editor-action="settings" title="设置">
           <svg class="editor-left-action-icon" aria-hidden="true" viewBox="0 0 24 24">
@@ -377,7 +388,7 @@
               </div>
             </div>
             <div class="inspector-group">
-              <div class="inspector-group-title">旋转（度）</div>
+              <div class="inspector-group-title">旋转</div>
               <div class="inspector-row">
                 <label class="inspector-axis">X<input type="number" step="1" id="inspector-rot-x" class="inspector-number"></label>
                 <label class="inspector-axis">Y<input type="number" step="1" id="inspector-rot-y" class="inspector-number"></label>
@@ -575,6 +586,9 @@
       </div>
       <button id="scene-root-close" type="button" class="scene-root-close" aria-label="关闭">×</button>
     </div>
+    <label id="scene-root-name-label" class="scene-root-label" for="scene-root-name-input" hidden>工程名称</label>
+    <input id="scene-root-name-input" class="scene-root-input" type="text" autocomplete="off" spellcheck="false" placeholder="例如 我的城市工程" hidden>
+    <div id="scene-root-project-list" class="scene-root-project-list" hidden></div>
     <label id="scene-root-label" class="scene-root-label" for="scene-root-input">场景工程根目录</label>
     <input id="scene-root-input" class="scene-root-input" type="text" autocomplete="off" spellcheck="false" placeholder="例如 E:\VirtualCity\Scenes">
     <div class="scene-root-actions">
@@ -609,6 +623,8 @@ window.VC_CONFIG = {
 <script src="/area-picker/gw_core.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_history.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_scene_state.js?v=__VERSION__"></script>
+<script src="/area-picker/gw_scene_persistence.js?v=__VERSION__"></script>
+<script src="/area-picker/gw_commands.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_character.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_play.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_camera.js?v=__VERSION__"></script>

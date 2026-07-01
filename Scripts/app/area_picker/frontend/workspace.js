@@ -40,6 +40,9 @@ function setActionPanelCollapsed(collapsed) {
   syncActionPanelToggle();
   requestAnimationFrame(function() {
     if (map && map.resize) map.resize();
+    if (activeWorkspaceId === 'game' && window.VC_GAME_WORKBENCH) {
+      window.VC_GAME_WORKBENCH.resize();
+    }
     if (activeWorkspaceId === 'houdini') scheduleGridLoad();
     if (typeof scheduleDeckRefresh === 'function') scheduleDeckRefresh(true);
   });

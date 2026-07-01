@@ -103,6 +103,12 @@ function getBasemapStyle(id) {
   return BASEMAP_STYLES[0];
 }
 
+function getNextBasemapStyle(id) {
+  var current = getBasemapStyle(id);
+  var index = BASEMAP_STYLES.indexOf(current);
+  return BASEMAP_STYLES[(index + 1) % BASEMAP_STYLES.length];
+}
+
 function mapContainerIdForWorkspace(workspaceId) {
   if (workspaceId === 'city-preview') return 'map-zone';
   if (workspaceId === 'houdini') return 'map-houdini';
@@ -764,14 +770,14 @@ function createCameraController(mapInstance) {
 
   function syncViewToggle() {
     if (activeMapContext && activeMapContext.map !== mapInstance) return;
-    var to2d = document.querySelector('#view-toggle .view-toggle-2d');
-    var to3d = document.querySelector('#view-toggle .view-toggle-3d');
-    if (!to2d || !to3d) return;
+    var toggle = document.querySelector('#view-toggle .view-toggle-button');
+    if (!toggle) return;
     var is3d = !isFlatView();
-    to3d.classList.toggle('active', is3d);
-    to3d.setAttribute('aria-pressed', is3d ? 'true' : 'false');
-    to2d.classList.toggle('active', !is3d);
-    to2d.setAttribute('aria-pressed', !is3d ? 'true' : 'false');
+    toggle.textContent = is3d ? '3D' : '2D';
+    toggle.classList.toggle('active', is3d);
+    toggle.setAttribute('aria-pressed', is3d ? 'true' : 'false');
+    toggle.setAttribute('aria-label', is3d ? '当前 3D，点击切换到 2D' : '当前 2D，点击切换到 3D');
+    toggle.title = is3d ? '切换到 2D' : '切换到 3D';
   }
 
   return {
@@ -792,21 +798,13 @@ function createCameraController(mapInstance) {
 
 function bindViewToggleControls() {
   if (viewToggleBound) return;
-  var to2d = document.querySelector('#view-toggle .view-toggle-2d');
-  var to3d = document.querySelector('#view-toggle .view-toggle-3d');
-  if (!to2d || !to3d) return;
+  var toggle = document.querySelector('#view-toggle .view-toggle-button');
+  if (!toggle) return;
   viewToggleBound = true;
-  to3d.addEventListener('click', function() {
+  toggle.addEventListener('click', function() {
     if (!cameraController) return;
-    if (!cameraController.isFlatView()) {
-      cameraController.startCityOrbit();
-      cameraController.syncViewToggle();
-    } else {
-      cameraController.enter3DInPlace();
-    }
-  });
-  to2d.addEventListener('click', function() {
-    if (cameraController) cameraController.exitTo2D();
+    if (cameraController.isFlatView()) cameraController.enter3DInPlace();
+    else cameraController.exitTo2D();
   });
 }
 function emptyFeatureCollection() {
@@ -1295,21 +1293,16 @@ function concealThenReveal(el, swap) {
 }
 
 function updateBasemapMenu() {
-  var seg = document.getElementById('basemap-segment');
-  if (!seg) return;
-  var options = seg.querySelectorAll('.segmented-option');
-  var thumb = seg.querySelector('.segmented-thumb');
-  var activeNode = null;
-  Array.prototype.forEach.call(options, function(node) {
-    var on = node.dataset.styleId === currentBasemap;
-    node.classList.toggle('active', on);
-    node.setAttribute('aria-checked', on ? 'true' : 'false');
-    if (on) activeNode = node;
-  });
-  if (thumb && activeNode) {
-    thumb.style.width = activeNode.offsetWidth + 'px';
-    thumb.style.transform = 'translateX(' + activeNode.offsetLeft + 'px)';
-  }
+  var toggle = document.getElementById('basemap-toggle');
+  if (!toggle) return;
+  var current = getBasemapStyle(currentBasemap);
+  var next = getNextBasemapStyle(currentBasemap);
+  toggle.textContent = current.label;
+  toggle.dataset.styleId = current.id;
+  toggle.dataset.nextStyleId = next.id;
+  toggle.setAttribute('aria-pressed', current.id === 'satellite' ? 'true' : 'false');
+  toggle.setAttribute('aria-label', '当前底图：' + current.label + '，点击切换到' + next.label);
+  toggle.title = '切换到' + next.label;
 }
 
 activateMapContext(activeWorkspaceId);

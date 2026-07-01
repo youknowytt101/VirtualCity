@@ -47,7 +47,8 @@
 
     function adjustMoveSpeed(event) {
       event.preventDefault();
-      return setMoveSpeed(moveSpeed + (event.deltaY < 0 ? 1 : -1));
+      var speedStep = Math.max(5, moveSpeed * 0.12);
+      return setMoveSpeed(moveSpeed + (event.deltaY < 0 ? speedStep : -speedStep));
     }
 
     function syncRotationFromCamera() {

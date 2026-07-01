@@ -188,25 +188,17 @@ function bindSelectionTools() {
 }
 
 function buildBasemapMenu() {
-  var seg = document.getElementById('basemap-segment');
-  if (!seg) return;
-  seg.textContent = '';
-  var thumb = document.createElement('span');
-  thumb.className = 'segmented-thumb';
-  seg.appendChild(thumb);
-  BASEMAP_STYLES.forEach(function(item) {
-    var opt = document.createElement('button');
-    opt.type = 'button';
-    opt.className = 'segmented-option';
-    opt.setAttribute('role', 'radio');
-    opt.dataset.styleId = item.id;
-    opt.textContent = item.label;
-    opt.addEventListener('click', function(e) {
-      e.stopPropagation();
-      setBasemapStyle(item.id);
-    });
-    seg.appendChild(opt);
+  var toggle = document.getElementById('basemap-toggle');
+  if (!toggle) return;
+  toggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleBasemapStyle();
   });
+}
+
+function toggleBasemapStyle() {
+  var next = getNextBasemapStyle(currentBasemap);
+  setBasemapStyle(next.id);
 }
 
 function shortSearchTitle(item) {

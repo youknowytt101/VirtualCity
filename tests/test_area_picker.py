@@ -26,6 +26,8 @@ _PICKER_SCRIPT_NAMES = (
     "gw_core.js",
     "gw_history.js",
     "gw_scene_state.js",
+    "gw_scene_persistence.js",
+    "gw_commands.js",
     "gw_character.js",
     "gw_play.js",
     "gw_camera.js",
@@ -509,6 +511,12 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('#workspace[data-action-panel-collapsed="true"]', _PICKER_STYLES)
         self.assertIn('function setActionPanelCollapsed(collapsed)', _PICKER_APP_JS)
         self.assertIn('function bindActionPanelToggle()', _PICKER_APP_JS)
+        action_panel_collapse_body = _PICKER_APP_JS.split(
+            "function setActionPanelCollapsed(collapsed)", 1
+        )[1].split("function bindActionPanelToggle()", 1)[0]
+        self.assertIn("if (map && map.resize) map.resize();", action_panel_collapse_body)
+        self.assertIn("if (activeWorkspaceId === 'game' && window.VC_GAME_WORKBENCH) {", action_panel_collapse_body)
+        self.assertIn("window.VC_GAME_WORKBENCH.resize();", action_panel_collapse_body)
 
     def test_picker_version_uses_public_date_semver_format(self):
         self.assertRegex(area_picker.APP_VERSION, r"^\d{2}-\d{2}-\d{2}_v\d+\.\d+$")
@@ -730,14 +738,18 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("cameraController.flyToWorld();", _PICKER_APP_JS)
         self.assertIn("if (nextWorkspace === 'news') showGlobalOverview();", _PICKER_APP_JS)
 
-    def test_game_action_panel_overlays_without_resizing_viewport(self):
-        self.assertIn('#workspace[data-workspace-kind="game"] {', _PICKER_STYLES)
-        self.assertIn("grid-template-columns: 300px minmax(0, 1fr) 0;", _PICKER_STYLES)
-        self.assertIn('#workspace[data-workspace-kind="game"] #action-panel:not([hidden])', _PICKER_STYLES)
-        self.assertIn("grid-area: auto;", _PICKER_STYLES)
-        self.assertIn("position: absolute;", _PICKER_STYLES)
-        self.assertIn("min-width: 326px;", _PICKER_STYLES)
-        self.assertIn("max-width: 326px;", _PICKER_STYLES)
+    def test_game_action_panel_uses_grid_column_like_map_viewports(self):
+        game_workspace_style = _PICKER_STYLES.split(
+            '#workspace[data-workspace-kind="game"] {',
+            1,
+        )[1].split("}", 1)[0]
+        collapsed_game_style = _PICKER_STYLES.split(
+            '#workspace[data-workspace-kind="game"][data-action-panel-collapsed="true"] {',
+            1,
+        )[1].split("}", 1)[0]
+        self.assertIn("grid-template-columns: 300px minmax(0, 1fr) minmax(300px, 326px);", game_workspace_style)
+        self.assertIn("grid-template-columns: 300px minmax(0, 1fr) 0;", collapsed_game_style)
+        self.assertNotIn('#workspace[data-workspace-kind="game"] #action-panel:not([hidden])', _PICKER_STYLES)
 
     def test_game_workspace_shows_editor_left_action_buttons(self):
         control_panel_html = _PICKER_INDEX_HTML.split('<aside id="control-panel"', 1)[1].split('</aside>', 1)[0]
@@ -746,10 +758,18 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('class="editor-left-action-list flat-panel flat-panel--col"', control_panel_html)
         self.assertLess(control_panel_html.index('id="tool-placeholder-section"'), control_panel_html.index('id="editor-left-actions"'))
         self.assertLess(control_panel_html.index('id="editor-left-actions"'), control_panel_html.index('id="panel-footer"'))
-        for label in ("新建工程", "保存", "打开场景工程根目录", "设置"):
+        for label in ("新建", "打开", "保存", "打开目录", "设置"):
             self.assertIn(f'<span class="editor-left-action-label">{label}</span>', control_panel_html)
-        for action in ("new", "save", "open-root", "settings"):
+        for action in ("new", "open", "save", "open-root", "settings"):
             self.assertIn(f'data-editor-action="{action}"', control_panel_html)
+        self.assertLess(
+            control_panel_html.index('data-editor-action="new"'),
+            control_panel_html.index('data-editor-action="open"')
+        )
+        self.assertLess(
+            control_panel_html.index('data-editor-action="open"'),
+            control_panel_html.index('data-editor-action="save"')
+        )
         self.assertNotIn("另存为", control_panel_html)
         self.assertNotIn('data-editor-action="save-as"', control_panel_html)
         self.assertIn(".editor-left-actions-section {\n  display: none;", _PICKER_STYLES)
@@ -773,9 +793,11 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("announceSceneRootChanged(d);", scene_js)
         self.assertIn("button.dataset.editorAction", scene_js)
         self.assertIn("openDialog('新建工程', 'new')", scene_js)
+        self.assertIn("openDialog('打开工程', 'open')", scene_js)
         self.assertIn("action === 'save'", scene_js)
         self.assertNotIn("action === 'save-as'", scene_js)
         self.assertIn("action === 'open-root'", scene_js)
+        self.assertIn("action === 'open'", scene_js)
         self.assertIn("action === 'settings'", scene_js)
         self.assertIn("pendingDialogAction === 'new'", scene_js)
         self.assertIn("createNewProject();", scene_js)
@@ -784,7 +806,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('id="scene-root-label"', _PICKER_INDEX_HTML)
         self.assertIn('id="scene-root-submit"', _PICKER_INDEX_HTML)
         self.assertIn("工程初始创建根目录", scene_js)
-        self.assertIn("选择工程的初始创建根目录。", scene_js)
+        self.assertIn("选择工程的初始创建根目录，并为工程命名。", scene_js)
         self.assertIn(".scene-root-dialog", _PICKER_STYLES)
         self.assertIn(".scene-root-backdrop", _PICKER_STYLES)
         server_source = Path(area_picker.__file__).read_text(encoding="utf-8")
@@ -792,6 +814,30 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("parsed.path == '/open-scene-root'", server_source)
         self.assertIn("def _post_scene_root", server_source)
         self.assertIn("def _post_open_scene_root", server_source)
+
+    def test_editor_open_project_button_has_recent_project_picker(self):
+        scene_js = (FRONTEND_ROOT / "scene_project.js").read_text(encoding="utf-8")
+        self.assertIn('data-editor-action="open"', _PICKER_INDEX_HTML)
+        self.assertIn('<span class="editor-left-action-label">打开</span>', _PICKER_INDEX_HTML)
+        self.assertIn('id="scene-root-project-list"', _PICKER_INDEX_HTML)
+        self.assertIn("function loadProjectRegistry()", scene_js)
+        self.assertIn("function upsertProject(root, name)", scene_js)
+        self.assertIn("function renderProjectList()", scene_js)
+        self.assertIn("vc_scene_projects_v1", scene_js)
+        self.assertIn("item.addEventListener('click', function() {", scene_js)
+        self.assertIn("saveSceneRoot();", scene_js)
+        self.assertIn(".scene-root-project-list", _PICKER_STYLES)
+        self.assertIn(".scene-root-project-item", _PICKER_STYLES)
+
+    def test_editor_new_project_dialog_has_name_field(self):
+        scene_js = (FRONTEND_ROOT / "scene_project.js").read_text(encoding="utf-8")
+        self.assertIn('id="scene-root-name-label"', _PICKER_INDEX_HTML)
+        self.assertIn('id="scene-root-name-input"', _PICKER_INDEX_HTML)
+        self.assertIn("工程名称", _PICKER_INDEX_HTML)
+        self.assertIn("nameLabel.hidden = !isNew;", scene_js)
+        self.assertIn("nameInput.hidden = !isNew;", scene_js)
+        self.assertIn("var name = isNew && nameInput ? nameInput.value.trim() : '';", scene_js)
+        self.assertIn("upsertProject(d.scene_root.scene_root, name);", scene_js)
 
     def test_scene_project_assets_status_lists_current_root_assets(self):
         with tempfile.TemporaryDirectory() as td:
@@ -909,6 +955,11 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("table.className = 'scene-outline-table';", outliner_js)
         self.assertIn("headerLabel.textContent = '项目标签';", outliner_js)
         self.assertIn("headerType.textContent = '类型';", outliner_js)
+        self.assertIn("splitter.className = 'scene-outline-column-splitter';", outliner_js)
+        self.assertIn("function beginColumnResize(table, splitter, event)", outliner_js)
+        self.assertIn("table.style.setProperty('--scene-outline-label-width'", outliner_js)
+        self.assertIn("setOutlineLabelWidth(columnResizeState.table, labelWidthFromPointer(columnResizeState.table, event));", outliner_js)
+        self.assertIn("setOutlineLabelWidth(table, currentOutlineLabelWidth(table) + delta);", outliner_js)
         self.assertIn("labelCell.className = 'scene-outline-cell scene-outline-label';", outliner_js)
         self.assertIn("typeCell.className = 'scene-outline-cell scene-outline-type';", outliner_js)
         self.assertIn("typeCell.textContent = sceneOutlineTypeLabel(obj);", outliner_js)
@@ -918,10 +969,65 @@ class TestPickerHtml(unittest.TestCase):
         self.assertNotIn("function sceneOutlineTypeLabel(obj)", game_js)
         self.assertIn("root.userData.assetType = root.userData.assetType || 'model';", asset_js)
         self.assertIn(".scene-outline-table {", _PICKER_STYLES)
+        scene_outline_body_style = _PICKER_STYLES.split("#game-scene-outline .action-outline-body", 1)[1].split("}", 1)[0]
+        self.assertIn("scrollbar-gutter: auto;", scene_outline_body_style)
+        self.assertNotIn("scrollbar-gutter: stable;", scene_outline_body_style)
+        self.assertIn("--scene-outline-label-width: 1fr;", _PICKER_STYLES)
+        self.assertIn("grid-template-columns: minmax(88px, var(--scene-outline-label-width, 1fr)) 7px minmax(54px, 78px);", _PICKER_STYLES)
         self.assertIn(".scene-outline-head,", _PICKER_STYLES)
         self.assertIn(".scene-outline-label", _PICKER_STYLES)
         self.assertIn(".scene-outline-type", _PICKER_STYLES)
+        self.assertIn(".scene-outline-column-splitter", _PICKER_STYLES)
+        self.assertIn(".scene-outline-row:not(:last-child)", _PICKER_STYLES)
+        self.assertIn(".scene-outline-row .scene-outline-label", _PICKER_STYLES)
+        self.assertIn("border-bottom: 1px solid color-mix(in srgb, var(--line) 46%, transparent);", _PICKER_STYLES)
+        self.assertIn("border-right: 1px solid color-mix(in srgb, var(--line) 46%, transparent);", _PICKER_STYLES)
         self.assertIn(".scene-outline-swatch", _PICKER_STYLES)
+
+    def test_game_workbench_splits_persistence_and_commands(self):
+        persistence_path = FRONTEND_ROOT / "gw_scene_persistence.js"
+        commands_path = FRONTEND_ROOT / "gw_commands.js"
+        self.assertTrue(persistence_path.exists())
+        self.assertTrue(commands_path.exists())
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        persistence_js = persistence_path.read_text(encoding="utf-8")
+        commands_js = commands_path.read_text(encoding="utf-8")
+
+        self.assertIn('/area-picker/gw_scene_persistence.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertIn('/area-picker/gw_commands.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertLess(_PICKER_INDEX_HTML.index('gw_scene_state.js'), _PICKER_INDEX_HTML.index('gw_scene_persistence.js'))
+        self.assertLess(_PICKER_INDEX_HTML.index('gw_scene_persistence.js'), _PICKER_INDEX_HTML.index('gw_commands.js'))
+        self.assertLess(_PICKER_INDEX_HTML.index('gw_commands.js'), _PICKER_INDEX_HTML.index('game_workbench.js'))
+
+        self.assertIn("GW.createScenePersistence", persistence_js)
+        self.assertIn("function sceneStorageKey()", persistence_js)
+        self.assertIn("function restoreScene()", persistence_js)
+        self.assertIn("window.localStorage.setItem(sceneStorageKey()", persistence_js)
+        self.assertIn("window.localStorage.getItem(sceneStorageKey())", persistence_js)
+        self.assertIn("GW.createSceneCommands", commands_js)
+        self.assertIn("function makeDeleteModelCommand(model, index)", commands_js)
+        self.assertIn("function makeTransformCommand(object, before, after)", commands_js)
+        self.assertIn("GW.createScenePersistence", game_js)
+        self.assertIn("GW.createSceneCommands", game_js)
+        self.assertNotIn("window.localStorage.setItem(sceneStorageKey()", game_js)
+        self.assertNotIn("window.localStorage.getItem(sceneStorageKey())", game_js)
+        self.assertNotIn("function makeDeleteCommand(character, index)", game_js)
+        self.assertNotIn("function makeTransformCommand(object, before, after)", game_js)
+
+    def test_game_workbench_uses_generic_selected_object_commands(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        commands_path = FRONTEND_ROOT / "gw_commands.js"
+        self.assertTrue(commands_path.exists())
+        commands_js = commands_path.read_text(encoding="utf-8")
+
+        self.assertIn("function deleteSelectedObject()", game_js)
+        self.assertIn("function duplicateSelectedObject()", game_js)
+        self.assertIn("sceneState.findModelFor(selectedObject)", game_js)
+        self.assertIn("makeDeleteModelCommand(model, index)", commands_js)
+        self.assertIn("makeCreateModelCommand(model)", commands_js)
+        self.assertIn("makeDeleteCharacterCommand(character, index)", commands_js)
+        self.assertNotIn("function deleteSelectedCharacter()", game_js)
+        self.assertNotIn("duplicateSelectedCharacter();", game_js)
 
     def test_game_editor_grid_uses_shared_shader_viewport_grid(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
@@ -957,14 +1063,12 @@ class TestPickerHtml(unittest.TestCase):
     def test_game_workspace_details_tab_has_transform_inspector(self):
         self.assertIn('class="outline-side-tabs"', _PICKER_INDEX_HTML)
         game_panel = _PICKER_INDEX_HTML.split('class="action-panel-content game-side-panel"', 1)[1]
-        game_action_panel_style = _PICKER_STYLES.split(
-            '#workspace[data-workspace-kind="game"] #action-panel:not([hidden])',
+        game_workspace_style = _PICKER_STYLES.split(
+            '#workspace[data-workspace-kind="game"] {',
             1,
         )[1].split("}", 1)[0]
-        self.assertIn("width: 326px;", game_action_panel_style)
-        self.assertIn("min-width: 326px;", game_action_panel_style)
-        self.assertIn("max-width: 326px;", game_action_panel_style)
-        self.assertNotIn("382px", game_action_panel_style)
+        self.assertIn("grid-template-columns: 300px minmax(0, 1fr) minmax(300px, 326px);", game_workspace_style)
+        self.assertNotIn("382px", game_workspace_style)
         self.assertNotIn('class="asset-side-tabs"', game_panel)
         self.assertNotIn('name="asset-side-tabs"', game_panel)
         self.assertLess(game_panel.index('id="game-side-resizer"'), game_panel.index('id="game-side-tabs"'))
@@ -1007,6 +1111,38 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('id="inspector-pos-x"', game_panel)
         self.assertIn('id="inspector-rot-x"', game_panel)
         self.assertIn('id="inspector-scale-x"', game_panel)
+        self.assertIn('<div class="inspector-group-title">旋转</div>', game_panel)
+        self.assertNotIn('旋转（度）', game_panel)
+        inspector_panel_style = _PICKER_STYLES.split(
+            ".action-tab-input:checked + .action-tab-label + .inspector-panel",
+            1,
+        )[1].split("}", 1)[0]
+        inspector_base_style = _PICKER_STYLES.split(".inspector-panel", 1)[1].split("}", 1)[0]
+        inspector_body_style = _PICKER_STYLES.split(".inspector-body", 1)[1].split("}", 1)[0]
+        inspector_name_style = _PICKER_STYLES.split(".inspector-name-input", 1)[1].split("}", 1)[0]
+        inspector_name_row_style = _PICKER_STYLES.split(".inspector-name-row", 1)[1].split("}", 1)[0]
+        inspector_group_style = _PICKER_STYLES.split(".inspector-group", 1)[1].split("}", 1)[0]
+        inspector_group_title_style = _PICKER_STYLES.split(".inspector-group-title", 1)[1].split("}", 1)[0]
+        inspector_row_style = _PICKER_STYLES.split(".inspector-row", 1)[1].split("}", 1)[0]
+        inspector_number_style = _PICKER_STYLES.split(".inspector-number", 1)[1].split("}", 1)[0]
+        self.assertIn("display: none;", inspector_base_style)
+        self.assertIn("gap: 6px;", inspector_panel_style)
+        self.assertIn("display: flex;", inspector_panel_style)
+        self.assertIn("padding: 6px;", inspector_panel_style)
+        self.assertIn("gap: 6px;", inspector_body_style)
+        self.assertIn("display: grid;", inspector_name_row_style)
+        self.assertIn("grid-template-columns: 44px minmax(0, 1fr);", inspector_name_row_style)
+        self.assertIn("align-items: center;", inspector_name_row_style)
+        self.assertIn("display: grid;", inspector_group_style)
+        self.assertIn("grid-template-columns: 44px minmax(0, 1fr);", inspector_group_style)
+        self.assertIn("align-items: center;", inspector_group_style)
+        self.assertIn("grid-column: 1;", inspector_group_title_style)
+        self.assertIn("grid-column: 2;", inspector_row_style)
+        self.assertIn("min-height: 22px;", inspector_name_style)
+        self.assertIn("border-radius: 4px;", inspector_name_style)
+        self.assertIn("gap: 4px;", inspector_row_style)
+        self.assertIn("min-height: 22px;", inspector_number_style)
+        self.assertIn("border-radius: 4px;", inspector_number_style)
         self.assertNotIn('<label class="action-tab-label" for="game-side-tab-1">资产</label>', game_panel)
         self.assertNotIn('<div class="action-tab-panel" aria-label="资产">', game_panel)
         self.assertNotIn('id="asset-dir-form"', game_panel)
@@ -1068,12 +1204,14 @@ class TestPickerHtml(unittest.TestCase):
         self.assertNotIn("label: '材质'", asset_js)
         self.assertNotIn("label: '场景'", asset_js)
         self.assertIn("return asset.category !== 'model';", asset_js)
-        self.assertIn(".game-bottom-ui {\n  position: absolute;", _PICKER_STYLES)
-        self.assertIn("  left: 0;", _PICKER_STYLES)
-        self.assertIn("  right: 326px;", _PICKER_STYLES)
-        self.assertIn("  bottom: 0;", _PICKER_STYLES)
-        self.assertIn("  height: clamp(140px, 20%, 200px);", _PICKER_STYLES)
-        self.assertIn("  z-index: 12;", _PICKER_STYLES)
+        bottom_ui_style = _PICKER_STYLES.split(".game-bottom-ui {", 1)[1].split("}", 1)[0]
+        self.assertIn("position: absolute;", bottom_ui_style)
+        self.assertIn("left: 0;", bottom_ui_style)
+        self.assertIn("right: 0;", bottom_ui_style)
+        self.assertNotIn("right: 326px;", bottom_ui_style)
+        self.assertIn("bottom: 0;", bottom_ui_style)
+        self.assertIn("height: clamp(140px, 20%, 200px);", bottom_ui_style)
+        self.assertIn("z-index: 12;", bottom_ui_style)
         self.assertIn(".scene-asset-browser", _PICKER_STYLES)
         self.assertIn(".scene-asset-grid", _PICKER_STYLES)
         self.assertIn(".scene-asset-item", _PICKER_STYLES)
@@ -1086,17 +1224,21 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_game_scene_storage_is_scoped_to_current_scene_root(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        self.assertIn("function sceneStorageKey()", game_js)
-        self.assertIn("currentSceneRoot", game_js)
-        self.assertIn("encodeURIComponent(currentSceneRoot)", game_js)
-        self.assertIn("window.localStorage.setItem(sceneStorageKey()", game_js)
-        self.assertIn("window.localStorage.getItem(sceneStorageKey())", game_js)
-        self.assertIn("function applySceneRootStatus(d)", game_js)
-        self.assertIn("fetch('/scene-root')", game_js)
+        persistence_js = (FRONTEND_ROOT / "gw_scene_persistence.js").read_text(encoding="utf-8")
+        self.assertIn("function sceneStorageKey()", persistence_js)
+        self.assertIn("currentSceneRoot", persistence_js)
+        self.assertIn("encodeURIComponent(currentSceneRoot)", persistence_js)
+        self.assertIn("window.localStorage.setItem(sceneStorageKey()", persistence_js)
+        self.assertIn("window.localStorage.getItem(sceneStorageKey())", persistence_js)
+        self.assertIn("function applySceneRootStatus(d)", persistence_js)
+        self.assertIn("fetch('/scene-root')", persistence_js)
         self.assertIn("window.addEventListener('scene-root-changed'", game_js)
-        self.assertIn("reloadSceneForCurrentRoot();", game_js)
+        self.assertIn("scenePersistence.applySceneRootStatus(event.detail || {})", game_js)
+        self.assertIn("scenePersistence.restoreScene()", game_js)
         self.assertNotIn("window.localStorage.setItem(SCENE_STORAGE_KEY", game_js)
         self.assertNotIn("window.localStorage.getItem(SCENE_STORAGE_KEY", game_js)
+        self.assertNotIn("window.localStorage.setItem(sceneStorageKey()", game_js)
+        self.assertNotIn("window.localStorage.getItem(sceneStorageKey())", game_js)
 
     def test_scene_model_assets_are_persisted_as_scene_objects(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
@@ -1314,7 +1456,8 @@ class TestPickerHtml(unittest.TestCase):
         wheel_body = game_js[wheel_start:wheel_end]
 
         self.assertIn("function adjustMoveSpeed(event)", camera_js)
-        self.assertIn("return setMoveSpeed(moveSpeed + (event.deltaY < 0 ? 1 : -1));", camera_js)
+        self.assertIn("var speedStep = Math.max(5, moveSpeed * 0.12);", camera_js)
+        self.assertIn("return setMoveSpeed(moveSpeed + (event.deltaY < 0 ? speedStep : -speedStep));", camera_js)
         self.assertIn("if (cameraControls.isLooking()) {", wheel_body)
         self.assertIn("cameraControls.adjustMoveSpeed(event);", wheel_body)
         self.assertLess(
@@ -1336,7 +1479,9 @@ class TestPickerHtml(unittest.TestCase):
     def test_game_renderer_matches_composition_lighting_baseline(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         self.assertIn('THREE.ColorManagement.legacyMode = false;', game_js)
-        self.assertIn('scene.background = new THREE.Color(0x666a6c);', game_js)
+        self.assertIn('var DEFAULT_EDITOR_SKY_COLOR = 0x8fb7d9;', game_js)
+        self.assertIn('scene.background = new THREE.Color(DEFAULT_EDITOR_SKY_COLOR);', game_js)
+        self.assertNotIn('scene.background = new THREE.Color(0x666a6c);', game_js)
         self.assertIn('renderer.shadowMap.type = THREE.PCFSoftShadowMap;', game_js)
         self.assertIn('opacity: 0.4', game_js)
         self.assertIn('sun.shadow.mapSize.set(4096, 4096);', game_js)
@@ -1402,9 +1547,31 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_map_controls_are_repositioned(self):
         self.assertIn('#map-shell #selection-tools {', _PICKER_FRONTEND)
-        self.assertIn('#map-shell #basemap-control {', _PICKER_FRONTEND)
-        self.assertIn('right: 14px;', _PICKER_FRONTEND)
-        self.assertIn('top: 14px;', _PICKER_FRONTEND)
+        basemap_style = _PICKER_STYLES.split("#map-shell #basemap-control", 1)[1].split("}", 1)[0]
+        view_toggle_style = _PICKER_STYLES.split("#map-shell #view-toggle", 1)[1].split("}", 1)[0]
+
+        self.assertIn("left: auto;", basemap_style)
+        self.assertIn("right: 14px;", basemap_style)
+        self.assertIn("top: auto;", basemap_style)
+        self.assertIn("bottom: 58px;", basemap_style)
+        self.assertIn("right: 14px;", view_toggle_style)
+        self.assertIn("bottom: 14px;", view_toggle_style)
+
+    def test_basemap_and_view_controls_are_single_click_toggles(self):
+        selection_js = (FRONTEND_ROOT / "selection_search.js").read_text(encoding="utf-8")
+        self.assertIn('id="basemap-toggle"', _PICKER_INDEX_HTML)
+        self.assertNotIn('id="basemap-segment"', _PICKER_INDEX_HTML)
+        self.assertIn("function toggleBasemapStyle()", selection_js)
+        self.assertIn("setBasemapStyle(next.id);", selection_js)
+        self.assertNotIn("seg.querySelectorAll('.segmented-option')", _PICKER_APP_JS)
+        self.assertNotIn("var thumb = document.createElement('span');", selection_js)
+
+        self.assertIn('id="view-toggle-button"', _PICKER_INDEX_HTML)
+        self.assertNotIn('class="map-tool-button flat-item view-toggle-2d active"', _PICKER_INDEX_HTML)
+        self.assertNotIn('class="map-tool-button flat-item view-toggle-3d"', _PICKER_INDEX_HTML)
+        self.assertIn("var toggle = document.querySelector('#view-toggle .view-toggle-button');", _PICKER_APP_JS)
+        self.assertIn("if (cameraController.isFlatView()) cameraController.enter3DInPlace();", _PICKER_APP_JS)
+        self.assertIn("else cameraController.exitTo2D();", _PICKER_APP_JS)
 
     def test_grid_tools_are_houdini_only(self):
         self.assertIn('#workspace:not([data-workspace-kind="houdini"]) #selection-tools', _PICKER_FRONTEND)
@@ -1414,6 +1581,22 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('setPointSelectActive(false);', _PICKER_APP_JS)
 
     def test_workspace_menu_order_and_default_page(self):
+        menu_section = _PICKER_INDEX_HTML.split('id="tool-placeholder-section"', 1)[1].split('</section>', 1)[0]
+        self.assertIn('class="tool-placeholder-stack"', menu_section)
+        self.assertIn('class="tool-placeholder-list tool-placeholder-list--world flat-panel flat-panel--col"', menu_section)
+        self.assertIn('class="tool-placeholder-list tool-placeholder-list--workbench flat-panel flat-panel--col"', menu_section)
+        world_group = menu_section.split('tool-placeholder-list--world', 1)[1].split('</div>', 1)[0]
+        workbench_group = menu_section.split('tool-placeholder-list--workbench', 1)[1]
+        self.assertIn('title="切换到 EOL">EOL', world_group)
+        self.assertIn('title="切换到 ZONE">ZONE', world_group)
+        self.assertNotIn('title="切换到编辑器">编辑器', world_group)
+        self.assertIn('title="切换到编辑器">编辑器', workbench_group)
+        self.assertIn('title="切换到 Houdini 工作台">Houdini', workbench_group)
+        self.assertIn('DCCbridge', workbench_group)
+        self.assertLess(menu_section.index('tool-placeholder-list--world'), menu_section.index('tool-placeholder-list--workbench'))
+        self.assertIn(".tool-placeholder-stack {\n  display: flex;", _PICKER_STYLES)
+        self.assertIn("gap: 10px;", _PICKER_STYLES.split(".tool-placeholder-stack", 1)[1].split("}", 1)[0])
+
         menu_labels = [
             'data-workspace-target="news" aria-pressed="true" title="切换到 EOL">EOL',
             'data-workspace-target="city-preview" aria-pressed="false" title="切换到 ZONE">ZONE',
