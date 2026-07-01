@@ -51,6 +51,21 @@ def write_asset_dir(value: str) -> dict:
     return asset_dir_status()
 
 
+def scene_root_status() -> dict:
+    value = str(read_software_paths().get("scene_root") or "").strip()
+    return {"scene_root": value, "scene_root_exists": bool(value) and Path(value).is_dir()}
+
+
+def write_scene_root(value: str) -> dict:
+    data = read_software_paths()
+    scene_root = str(value or "").strip().strip('"')
+    if scene_root:
+        Path(scene_root).mkdir(parents=True, exist_ok=True)
+    data["scene_root"] = scene_root
+    write_software_paths(data)
+    return scene_root_status()
+
+
 def software_path_status() -> dict:
     data = read_software_paths()
     status = {"config_path": str(SOFTWARE_PATHS_FILE)}

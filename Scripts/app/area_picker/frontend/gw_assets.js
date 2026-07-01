@@ -71,33 +71,55 @@
   // Load orchestrator. ctx supplies host state access + UI refresh callbacks so the
   // loader can swap the previous model, hand the new layer array back to the host,
   // and trigger outline/render/save — without owning that state itself.
+  function applySavedTransform(root, transform) {
+    if (!root || !transform) return;
+    if (transform.p) root.position.fromArray(transform.p);
+    if (transform.r) root.rotation.set(transform.r[0], transform.r[1], transform.r[2]);
+    if (transform.s) root.scale.fromArray(transform.s);
+  }
+
+  function markModelRoot(root, label) {
+    root.userData.assetType = root.userData.assetType || 'model';
+    root.userData.assetRoot = root;
+    root.userData.assetLabel = label || root.userData.assetLabel || '模型资产';
+    root.traverse(function(node) {
+      if (!node.userData) node.userData = {};
+      if (!node.userData.assetRoot) node.userData.assetRoot = root;
+      if (!node.userData.assetType) node.userData.assetType = root.userData.assetType;
+    });
+  }
+
   function createAssetLoader(ctx) {
-    function loadGLB(url) {
+    function loadGLB(url, point, label, options) {
       ctx.ensureInit();
       var scene = ctx.getScene();
       if (!scene) { setStatus('场景未就绪'); return; }
       if (!window.VC_GLB) { setStatus('加载器未就绪'); return; }
-      setStatus('导入白盒中…');
+      setStatus(label ? ('导入 ' + label + ' 中…') : '导入白盒中…');
       window.VC_GLB.load(url).then(function(root) {
-        var prev = ctx.getLoadedModel();
-        if (prev) {
-          scene.remove(prev);
-          var selected = ctx.getSelectedObject();
-          if (selected && selected.userData.assetType !== 'character') ctx.selectCharacter(null);
-        }
-        ctx.setLoadedModel(root);
-        ctx.setLoadedWhiteboxUrl(url);
-        scene.add(root);
-        ctx.setWhiteboxLayers(registerWhiteboxLayers(root));
+        if (point && root.position && root.position.copy) root.position.copy(point);
+        applySavedTransform(root, options && options.transform);
+        markModelRoot(root, label);
+        var layers = registerWhiteboxLayers(root);
+        ctx.addSceneModel({
+          root: root,
+          url: url,
+          label: label || root.userData.assetLabel || '模型资产',
+          layers: layers
+        }, { skipHistory: options && options.restoring });
         fitSunShadow(ctx.getSun(), root);
         ctx.rebuildSceneOutline();
         ctx.render();
-        ctx.scheduleSave();
-        setStatus('白盒已导入');
+        if (!(options && options.restoring)) ctx.scheduleSave();
+        setStatus(label ? (label + ' 已导入') : '白盒已导入');
       }).catch(function(error) {
-        setStatus('白盒导入失败');
+        setStatus(label ? (label + ' 导入失败') : '白盒导入失败');
         if (window.console) console.error('GLB load failed:', error);
       });
+    }
+
+    function loadSceneAsset(url, point, label, options) {
+      loadGLB(url, point, label, options);
     }
 
     // Load the latest pipeline-produced whitebox (no export — the generation
@@ -109,7 +131,7 @@
       loadGLB((whitebox && whitebox.url) || ('/whitebox.glb?t=' + Date.now()));
     }
 
-    return { loadGLB: loadGLB, syncFromHoudini: syncFromHoudini };
+    return { loadGLB: loadGLB, syncFromHoudini: syncFromHoudini, loadSceneAsset: loadSceneAsset };
   }
 
   GW.registerWhiteboxLayers = registerWhiteboxLayers;

@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "Scripts"))
 
 import area_picker
+from app.area_picker import software_paths
 import houdini_build.status as houdini_status_writer
 import manual_review
 import pipeline_status
@@ -27,9 +28,11 @@ _PICKER_SCRIPT_NAMES = (
     "gw_play.js",
     "gw_camera.js",
     "gw_assets.js",
+    "gw_outliner.js",
     "game_workbench.js",
     "houdini_preview.js",
-    "asset_dir.js",
+    "scene_project.js",
+    "scene_assets.js",
     "workspace.js",
     "selection_search.js",
     "pipeline_status.js",
@@ -120,6 +123,7 @@ class TestPickerHtml(unittest.TestCase):
             self.assertTrue((FRONTEND_ROOT / name).exists())
             self.assertIn(f"/area-picker/{name}?v=__VERSION__", _PICKER_INDEX_HTML)
         self.assertIn('/area-picker/styles.css?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertNotIn('/area-picker/asset_dir.js', _PICKER_INDEX_HTML)
         self.assertIn("window.VC_CONFIG", _PICKER_INDEX_HTML)
         self.assertNotIn("<style>", _PICKER_INDEX_HTML)
         self.assertIn("def _frontend_static", Path(area_picker.__file__).read_text(encoding="utf-8"))
@@ -148,11 +152,15 @@ class TestPickerHtml(unittest.TestCase):
             "dcc_bridge.js",
             "saveSoftwarePath",
             "/software-paths",
-            "本地资产目录保存失败",
-            "asset_dir.js",
-            "applyStatus",
-            "renderTree",
-            "/asset-dir",
+            "底部工程资产目录不显示",
+            "scene_assets.js",
+            "loadSceneAssets",
+            "/scene-assets",
+            "/scene-asset-file",
+            "_scene_asset_file_path",
+            "/sync-whitebox-to-scene-assets",
+            "syncHoudiniWhiteboxToAssets",
+            "_sync_houdini_whitebox_to_scene_assets",
             "地点搜索异常",
             "bindLocationSearch",
             "/geocode",
@@ -165,9 +173,12 @@ class TestPickerHtml(unittest.TestCase):
         )
         for marker in expected_markers:
             self.assertIn(marker, handoff)
+        self.assertNotIn("asset_dir.js", handoff)
+        self.assertNotIn("/asset-dir", handoff)
         readme = (FRONTEND_ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("AI_FRONTEND_HANDOFF.md", readme)
         self.assertIn("API_CONTRACT.md", readme)
+        self.assertNotIn("/asset-dir", readme)
 
     def test_ai_frontend_handoff_guard_tests_exist(self):
         handoff = (FRONTEND_ROOT / "AI_FRONTEND_HANDOFF.md").read_text(encoding="utf-8")
@@ -204,6 +215,14 @@ class TestPickerHtml(unittest.TestCase):
             "/software-paths",
             "saveSoftwarePath",
             "_post_software_paths",
+            "/scene-assets",
+            "loadSceneAssets",
+            "_scene_assets_status",
+            "/scene-asset-file",
+            "_scene_asset_file_path",
+            "/sync-whitebox-to-scene-assets",
+            "syncHoudiniWhiteboxToAssets",
+            "_sync_houdini_whitebox_to_scene_assets",
             "/area-picker/regions.json",
             "loadRegionNav",
             "/area-picker/basemap-style.json",
@@ -216,6 +235,8 @@ class TestPickerHtml(unittest.TestCase):
         )
         for marker in expected_markers:
             self.assertIn(marker, contract)
+        self.assertNotIn("## GET and POST /asset-dir", contract)
+        self.assertNotIn("asset_dir.js", contract)
 
     def test_frontend_scripts_have_ai_handoff_headers(self):
         for name in _PICKER_SCRIPT_NAMES:
@@ -249,7 +270,7 @@ class TestPickerHtml(unittest.TestCase):
     def test_houdini_preview_uses_editor_default_lighting_profile(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("renderer.shadowMap.enabled = true;", preview_js)
-        self.assertIn("renderer.shadowMap.type = THREE.BasicShadowMap;", preview_js)
+        self.assertIn("renderer.shadowMap.type = THREE.PCFSoftShadowMap;", preview_js)
         self.assertIn("renderer.outputColorSpace = THREE.SRGBColorSpace;", preview_js)
         self.assertIn("renderer.toneMapping = THREE.ACESFilmicToneMapping;", preview_js)
         self.assertIn("renderer.toneMappingExposure = 1.0;", preview_js)
@@ -282,8 +303,8 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_houdini_preview_uses_shared_shader_viewport_grid(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
-        self.assertNotIn("function createPreviewGround()", preview_js)
-        self.assertNotIn("new THREE.ShadowMaterial", preview_js)
+        self.assertIn("function createPreviewGround()", preview_js)
+        self.assertIn("new THREE.ShadowMaterial", preview_js)
         self.assertNotIn("PREVIEW_GRID_HALF_EXTENT", preview_js)
         self.assertNotIn("new THREE.GridHelper", preview_js)
         self.assertIn("var previewGrid = null;", preview_js)
@@ -313,7 +334,7 @@ class TestPickerHtml(unittest.TestCase):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("var PREVIEW_GRID_Z = 0.02;", preview_js)
         self.assertIn("planeZ: PREVIEW_GRID_Z", preview_js)
-        self.assertIn("showZAxis: true", preview_js)
+        self.assertIn("showZAxis: false", preview_js)
         self.assertIn("axisLength: PREVIEW_AXIS_LENGTH", preview_js)
         self.assertNotIn("new THREE.LineSegments(new THREE.BufferGeometry(), gridMaterial)", preview_js)
         self.assertNotIn("positions.push(-snappedExtent, point, PREVIEW_GRID_Z, snappedExtent, point, PREVIEW_GRID_Z);", preview_js)
@@ -388,10 +409,10 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_houdini_preview_surfaces_whitebox_diagnostics_and_identity(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
-        self.assertIn("function whiteboxLabel(whitebox)", preview_js)
-        self.assertIn("String(whitebox.run_id).slice(0, 8)", preview_js)
-        self.assertIn("whitebox.size_label", preview_js)
-        self.assertIn("setMsg(whiteboxLabel(whitebox));", preview_js)
+        self.assertIn("function modelStatsLabel(root, whitebox)", preview_js)
+        self.assertIn(r"path.split(/[\\/]/).pop()", preview_js)
+        self.assertIn("box.size_label", preview_js)
+        self.assertIn("setMsg(modelStatsLabel(model, whitebox));", preview_js)
         self.assertIn("var message = whitebox.message || (err && err.message) || '预览加载失败';", preview_js)
         self.assertIn("setMsg('预览加载失败：' + message + '（点击重试）');", preview_js)
         self.assertIn("setMsg(whitebox.message || '');", preview_js)
@@ -405,7 +426,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("var PREVIEW_CAMERA_TARGET_Z = 1.2;", preview_js)
         self.assertIn("var PREVIEW_MODEL_TARGET_RADIUS = 2.8;", preview_js)
         self.assertIn("var PREVIEW_SUN_DISTANCE = 20;", preview_js)
-        self.assertIn("var PREVIEW_SHADOW_EXTENT = 60;", preview_js)
+        self.assertIn("var PREVIEW_SHADOW_EXTENT = 10;", preview_js)
         self.assertIn("function configurePreviewShadowRig()", preview_js)
         self.assertIn("function resetPreviewView()", preview_js)
         self.assertIn("fitModelToPreview(model, pivot);", preview_js)
@@ -715,6 +736,114 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("min-width: 326px;", _PICKER_STYLES)
         self.assertIn("max-width: 326px;", _PICKER_STYLES)
 
+    def test_game_workspace_shows_editor_left_action_buttons(self):
+        control_panel_html = _PICKER_INDEX_HTML.split('<aside id="control-panel"', 1)[1].split('</aside>', 1)[0]
+        self.assertIn('id="editor-left-actions"', control_panel_html)
+        self.assertIn('class="panel-section editor-left-actions-section"', control_panel_html)
+        self.assertIn('class="editor-left-action-list flat-panel flat-panel--col"', control_panel_html)
+        self.assertLess(control_panel_html.index('id="tool-placeholder-section"'), control_panel_html.index('id="editor-left-actions"'))
+        self.assertLess(control_panel_html.index('id="editor-left-actions"'), control_panel_html.index('id="panel-footer"'))
+        for label in ("新建工程", "保存", "打开场景工程根目录", "设置"):
+            self.assertIn(f'<span class="editor-left-action-label">{label}</span>', control_panel_html)
+        for action in ("new", "save", "open-root", "settings"):
+            self.assertIn(f'data-editor-action="{action}"', control_panel_html)
+        self.assertNotIn("另存为", control_panel_html)
+        self.assertNotIn('data-editor-action="save-as"', control_panel_html)
+        self.assertIn(".editor-left-actions-section {\n  display: none;", _PICKER_STYLES)
+        self.assertIn('#workspace[data-workspace-kind="game"] .editor-left-actions-section {\n  display: block;', _PICKER_STYLES)
+        self.assertIn(".editor-left-action-btn", _PICKER_STYLES)
+        self.assertIn(".editor-left-action-icon", _PICKER_STYLES)
+
+    def test_editor_scene_actions_have_scene_root_dialog(self):
+        scene_js_path = FRONTEND_ROOT / "scene_project.js"
+        self.assertTrue(scene_js_path.exists())
+        scene_js = scene_js_path.read_text(encoding="utf-8")
+        self.assertIn('/area-picker/scene_project.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertLess(_PICKER_INDEX_HTML.index('scene_project.js'), _PICKER_INDEX_HTML.index('workspace.js'))
+        self.assertIn('id="scene-root-dialog"', _PICKER_INDEX_HTML)
+        self.assertIn('id="scene-root-form"', _PICKER_INDEX_HTML)
+        self.assertIn('id="scene-root-input"', _PICKER_INDEX_HTML)
+        self.assertIn('id="scene-root-status"', _PICKER_INDEX_HTML)
+        self.assertIn("fetch('/scene-root')", scene_js)
+        self.assertIn("fetch('/scene-root',", scene_js)
+        self.assertIn("fetch('/open-scene-root'", scene_js)
+        self.assertIn("announceSceneRootChanged(d);", scene_js)
+        self.assertIn("button.dataset.editorAction", scene_js)
+        self.assertIn("openDialog('新建工程', 'new')", scene_js)
+        self.assertIn("action === 'save'", scene_js)
+        self.assertNotIn("action === 'save-as'", scene_js)
+        self.assertIn("action === 'open-root'", scene_js)
+        self.assertIn("action === 'settings'", scene_js)
+        self.assertIn("pendingDialogAction === 'new'", scene_js)
+        self.assertIn("createNewProject();", scene_js)
+        self.assertIn("请先选择工程的初始创建根目录", scene_js)
+        self.assertIn('id="scene-root-hint"', _PICKER_INDEX_HTML)
+        self.assertIn('id="scene-root-label"', _PICKER_INDEX_HTML)
+        self.assertIn('id="scene-root-submit"', _PICKER_INDEX_HTML)
+        self.assertIn("工程初始创建根目录", scene_js)
+        self.assertIn("选择工程的初始创建根目录。", scene_js)
+        self.assertIn(".scene-root-dialog", _PICKER_STYLES)
+        self.assertIn(".scene-root-backdrop", _PICKER_STYLES)
+        server_source = Path(area_picker.__file__).read_text(encoding="utf-8")
+        self.assertIn("parsed.path == '/scene-root'", server_source)
+        self.assertIn("parsed.path == '/open-scene-root'", server_source)
+        self.assertIn("def _post_scene_root", server_source)
+        self.assertIn("def _post_open_scene_root", server_source)
+
+    def test_scene_project_assets_status_lists_current_root_assets(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "Models").mkdir()
+            (root / "Textures").mkdir()
+            (root / "Docs").mkdir()
+            (root / ".git").mkdir()
+            (root / "Models" / "car.glb").write_bytes(b"glb-data")
+            (root / "Textures" / "road.png").write_bytes(b"png-data")
+            (root / "Docs" / "readme.txt").write_text("notes", encoding="utf-8")
+            (root / ".git" / "config").write_text("hidden", encoding="utf-8")
+
+            with patch.object(area_picker, "_scene_root_status", return_value={
+                "scene_root": str(root),
+                "scene_root_exists": True,
+            }):
+                payload = area_picker._scene_assets_status()
+
+        self.assertTrue(payload["ok"])
+        self.assertTrue(payload["available"])
+        self.assertEqual(payload["scene_root"], str(root))
+        self.assertEqual(payload["limit"], 200)
+        by_path = {item["relative_path"]: item for item in payload["assets"]}
+        self.assertEqual(by_path["Models/car.glb"]["category"], "model")
+        self.assertEqual(by_path["Textures/road.png"]["category"], "texture")
+        self.assertEqual(by_path["Docs/readme.txt"]["category"], "other")
+        self.assertNotIn(".git/config", by_path)
+
+    def test_houdini_whitebox_sync_moves_asset_into_scene_root(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            scene_root = root / "Project"
+            export_dir = root / "Houdini" / "Export"
+            scene_root.mkdir()
+            export_dir.mkdir(parents=True)
+            whitebox = export_dir / "whitebox_v001.glb"
+            whitebox.write_bytes(b"glb-data")
+
+            with patch.object(area_picker, "_scene_root_status", return_value={
+                "scene_root": str(scene_root),
+                "scene_root_exists": True,
+            }), patch.object(area_picker, "_whitebox_path_from_status", return_value=whitebox):
+                payload = area_picker._sync_houdini_whitebox_to_scene_assets()
+                asset_payload = area_picker._scene_assets_status()
+                synced = scene_root / "Houdini_Whitebox.glb"
+                self.assertTrue(payload["ok"])
+                self.assertFalse(whitebox.exists())
+                self.assertTrue(synced.exists())
+                self.assertEqual(payload["asset"]["relative_path"], "Houdini_Whitebox.glb")
+                self.assertEqual(payload["asset"]["category"], "model")
+                self.assertEqual(payload["asset"]["display_name"], "Houdini 白盒")
+                by_path = {item["relative_path"]: item for item in asset_payload["assets"]}
+                self.assertEqual(by_path["Houdini_Whitebox.glb"]["display_name"], "Houdini 白盒")
+
     def test_account_footer_uses_codex_style_menu(self):
         self.assertIn('<details class="account-menu">', _PICKER_INDEX_HTML)
         self.assertIn('class="account-trigger"', _PICKER_INDEX_HTML)
@@ -765,6 +894,32 @@ class TestPickerHtml(unittest.TestCase):
         self.assertLess(_PICKER_INDEX_HTML.index('gw_character.js'), _PICKER_INDEX_HTML.index('gw_play.js'))
         self.assertLess(_PICKER_INDEX_HTML.index('gw_play.js'), _PICKER_INDEX_HTML.index('game_workbench.js'))
 
+    def test_game_scene_outline_shows_label_and_type_columns(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        asset_js = (FRONTEND_ROOT / "gw_assets.js").read_text(encoding="utf-8")
+        outliner_js = (FRONTEND_ROOT / "gw_outliner.js").read_text(encoding="utf-8")
+
+        self.assertIn('/area-picker/gw_outliner.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertLess(_PICKER_INDEX_HTML.index('gw_assets.js'), _PICKER_INDEX_HTML.index('gw_outliner.js'))
+        self.assertLess(_PICKER_INDEX_HTML.index('gw_outliner.js'), _PICKER_INDEX_HTML.index('game_workbench.js'))
+        self.assertIn("function createSceneOutliner(options)", outliner_js)
+        self.assertIn("table.className = 'scene-outline-table';", outliner_js)
+        self.assertIn("headerLabel.textContent = '项目标签';", outliner_js)
+        self.assertIn("headerType.textContent = '类型';", outliner_js)
+        self.assertIn("labelCell.className = 'scene-outline-cell scene-outline-label';", outliner_js)
+        self.assertIn("typeCell.className = 'scene-outline-cell scene-outline-type';", outliner_js)
+        self.assertIn("typeCell.textContent = sceneOutlineTypeLabel(obj);", outliner_js)
+        self.assertIn("model: '模型'", outliner_js)
+        self.assertIn("GW.createSceneOutliner = createSceneOutliner;", outliner_js)
+        self.assertIn("sceneOutliner = GW.createSceneOutliner", game_js)
+        self.assertNotIn("function sceneOutlineTypeLabel(obj)", game_js)
+        self.assertIn("root.userData.assetType = root.userData.assetType || 'model';", asset_js)
+        self.assertIn(".scene-outline-table {", _PICKER_STYLES)
+        self.assertIn(".scene-outline-head,", _PICKER_STYLES)
+        self.assertIn(".scene-outline-label", _PICKER_STYLES)
+        self.assertIn(".scene-outline-type", _PICKER_STYLES)
+        self.assertIn(".scene-outline-swatch", _PICKER_STYLES)
+
     def test_game_editor_grid_uses_shared_shader_viewport_grid(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         grid_start = game_js.index("function createGrid()")
@@ -796,20 +951,219 @@ class TestPickerHtml(unittest.TestCase):
         self.assertLess(_PICKER_INDEX_HTML.index(grid_script), _PICKER_INDEX_HTML.index(game_script))
         self.assertLess(_PICKER_INDEX_HTML.index(grid_script), _PICKER_INDEX_HTML.index(houdini_script))
 
-    def test_game_workspace_has_asset_dir_controls(self):
-        asset_js = (FRONTEND_ROOT / "asset_dir.js").read_text(encoding="utf-8")
-        self.assertIn('id="asset-dir-form"', _PICKER_INDEX_HTML)
-        self.assertIn('id="asset-dir-input"', _PICKER_INDEX_HTML)
-        self.assertIn('id="asset-dir-tree"', _PICKER_INDEX_HTML)
-        self.assertIn('/area-picker/asset_dir.js?v=__VERSION__', _PICKER_INDEX_HTML)
-        self.assertIn("fetch('/asset-dir')", asset_js)
-        self.assertIn("fetch('/asset-dir',", asset_js)
-        self.assertIn("function applyStatus(d)", asset_js)
-        self.assertIn("function renderTree(subdirs, ready)", asset_js)
-        self.assertIn("form.addEventListener('submit'", asset_js)
+    def test_game_workspace_has_empty_details_tab(self):
+        self.assertIn('class="outline-side-tabs"', _PICKER_INDEX_HTML)
+        game_panel = _PICKER_INDEX_HTML.split('class="action-panel-content game-side-panel"', 1)[1]
+        game_action_panel_style = _PICKER_STYLES.split(
+            '#workspace[data-workspace-kind="game"] #action-panel:not([hidden])',
+            1,
+        )[1].split("}", 1)[0]
+        self.assertIn("width: 326px;", game_action_panel_style)
+        self.assertIn("min-width: 326px;", game_action_panel_style)
+        self.assertIn("max-width: 326px;", game_action_panel_style)
+        self.assertNotIn("382px", game_action_panel_style)
+        self.assertNotIn('class="asset-side-tabs"', game_panel)
+        self.assertNotIn('name="asset-side-tabs"', game_panel)
+        self.assertLess(game_panel.index('id="game-side-resizer"'), game_panel.index('id="game-side-tabs"'))
+        self.assertIn(".game-side-panel .outline-side-tabs", _PICKER_STYLES)
+        self.assertIn(".game-side-panel > .outline-side-tabs", _PICKER_STYLES)
+        self.assertIn(".game-side-panel > .outline-side-tabs {\n  display: none;", _PICKER_STYLES)
+        self.assertIn(".game-side-panel > #game-scene-outline {\n  grid-column: 1 / -1;", _PICKER_STYLES)
+        self.assertIn("--game-side-tab-strip-height: 26px;", _PICKER_STYLES)
+        self.assertIn("min-height: var(--game-side-tab-strip-height, 26px);", _PICKER_STYLES)
+        self.assertIn(".game-side-panel > #game-side-resizer {\n  grid-column: 1 / -1;", _PICKER_STYLES)
+        self.assertIn(".game-side-panel > #game-side-tabs {\n  grid-column: 1 / -1;", _PICKER_STYLES)
+        self.assertNotIn(".game-side-panel .asset-side-tabs", _PICKER_STYLES)
+        self.assertNotIn(".game-side-panel > .asset-side-tabs", _PICKER_STYLES)
+        self.assertIn(
+            ".game-side-panel > .outline-side-tabs,\n"
+            ".game-side-panel > #game-scene-outline,\n"
+            ".game-side-panel > #game-side-tabs {\n"
+            "  border-color: transparent;",
+            _PICKER_STYLES,
+        )
+        self.assertLess(
+            _PICKER_STYLES.index(".game-side-panel .outline-side-tabs"),
+            _PICKER_STYLES.index(".game-side-panel > .outline-side-tabs,\n.game-side-panel > #game-scene-outline"),
+        )
+        self.assertIn("grid-template-columns: 48px minmax(0, 1fr);", _PICKER_STYLES)
+        self.assertIn("column-gap: 0;", _PICKER_STYLES)
+        self.assertIn("border-radius: 8px 0 0 8px;", _PICKER_STYLES)
+        self.assertNotIn(".game-side-panel > #game-side-tabs {\n  border-top-left-radius: 0;\n  border-bottom-left-radius: 0;", _PICKER_STYLES)
+        self.assertIn("border-radius: 6px 0 0 6px;", _PICKER_STYLES)
+        side_label_checked_style = _PICKER_STYLES.split(".side-rail-input:checked + .side-rail-label", 1)[1].split("}", 1)[0]
+        self.assertIn("border-color: transparent;", side_label_checked_style)
+        self.assertIn("box-shadow: inset 2px 0 0 color-mix(in srgb, var(--accent) 62%, transparent);", _PICKER_STYLES)
+        self.assertIn(".outline-side-tabs .side-rail-input:checked + .side-rail-label", _PICKER_STYLES)
+        outline_side_label_style = _PICKER_STYLES.split(".outline-side-tabs .side-rail-input:checked + .side-rail-label", 1)[1].split("}", 1)[0]
+        self.assertIn("box-shadow: none;", outline_side_label_style)
+        self.assertNotIn(".asset-side-tabs .side-rail-input:checked + .side-rail-label", _PICKER_STYLES)
+        self.assertIn('<label class="action-tab-label" for="game-side-tab-1">细节</label>', game_panel)
+        self.assertIn('<div class="action-tab-panel" aria-label="细节"></div>', game_panel)
+        self.assertNotIn('<label class="action-tab-label" for="game-side-tab-1">资产</label>', game_panel)
+        self.assertNotIn('<div class="action-tab-panel" aria-label="资产">', game_panel)
+        self.assertNotIn('id="asset-dir-form"', game_panel)
+        self.assertNotIn('id="asset-dir-input"', game_panel)
+        self.assertNotIn('id="asset-dir-tree"', game_panel)
+        self.assertNotIn('class="asset-actions"', game_panel)
+        self.assertNotIn('asset-cat-character', game_panel)
+        self.assertNotIn('asset-cat-scene-whitebox', game_panel)
+        self.assertNotIn('asset-cat-scene-component', game_panel)
+        self.assertNotIn('asset-cat-logic', game_panel)
+        self.assertNotIn('本地资产目录', game_panel)
+        self.assertNotIn('人物角色', game_panel)
+        self.assertNotIn('场景白盒', game_panel)
+        self.assertNotIn('场景组件', game_panel)
+        self.assertNotIn('功能逻辑', game_panel)
+        self.assertNotIn('id="import-houdini-whitebox-btn"', game_panel)
+        self.assertNotIn("导入 Houdini 白盒", game_panel)
+        self.assertNotIn('/area-picker/asset_dir.js', _PICKER_INDEX_HTML)
+        self.assertNotIn(".asset-dir", _PICKER_STYLES)
+
+    def test_game_workspace_has_bottom_ui_container(self):
+        asset_js_path = FRONTEND_ROOT / "scene_assets.js"
+        self.assertTrue(asset_js_path.exists())
+        asset_js = asset_js_path.read_text(encoding="utf-8")
+        host_html = _PICKER_INDEX_HTML.split(
+            '<div id="composition-workbench-host"',
+            1,
+        )[1].split('</section>', 1)[0]
+        self.assertIn('id="game-bottom-ui"', host_html)
+        self.assertIn('class="game-bottom-ui"', host_html)
+        self.assertIn('aria-label="编辑器底部面板"', host_html)
+        self.assertIn('id="scene-asset-browser"', host_html)
+        self.assertIn('class="scene-asset-browser"', host_html)
+        self.assertIn('工程资产目录', host_html)
+        self.assertIn('id="scene-asset-status"', host_html)
+        self.assertIn('id="game-status"', host_html)
+        self.assertIn('class="game-status"', host_html)
+        self.assertIn('id="scene-asset-refresh"', host_html)
+        self.assertIn('id="scene-asset-grid"', host_html)
+        self.assertNotIn('拖入角色后点击运行</div>', host_html)
+        self.assertIn(".game-status", _PICKER_STYLES)
+        self.assertLess(host_html.index('id="game-scene-host"'), host_html.index('id="game-bottom-ui"'))
+        self.assertLess(host_html.index('id="game-bottom-ui"'), host_html.index('id="game-drag-preview"'))
+        self.assertIn('/area-picker/scene_assets.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertLess(_PICKER_INDEX_HTML.index('scene_project.js'), _PICKER_INDEX_HTML.index('scene_assets.js'))
+        self.assertLess(_PICKER_INDEX_HTML.index('scene_assets.js'), _PICKER_INDEX_HTML.index('workspace.js'))
+        self.assertIn("fetch('/scene-assets')", asset_js)
+        self.assertIn("window.addEventListener('scene-root-changed'", asset_js)
+        self.assertIn("function renderAssets", asset_js)
+        self.assertIn("asset.display_name || asset.name", asset_js)
+        self.assertIn("scene-asset-thumbnail", asset_js)
+        self.assertIn("item.dataset.sceneAssetPath", asset_js)
+        self.assertIn("item.dataset.sceneAssetUrl", asset_js)
+        self.assertIn("'/scene-asset-file?path=' + encodeURIComponent", asset_js)
+        self.assertIn("{ id: 'all', label: '全部' }", asset_js)
+        self.assertIn("{ id: 'model', label: '模型' }", asset_js)
+        self.assertIn("{ id: 'other', label: '其他' }", asset_js)
+        self.assertNotIn("label: '贴图'", asset_js)
+        self.assertNotIn("label: '材质'", asset_js)
+        self.assertNotIn("label: '场景'", asset_js)
+        self.assertIn("return asset.category !== 'model';", asset_js)
+        self.assertIn(".game-bottom-ui {\n  position: absolute;", _PICKER_STYLES)
+        self.assertIn("  left: 0;", _PICKER_STYLES)
+        self.assertIn("  right: 326px;", _PICKER_STYLES)
+        self.assertIn("  bottom: 0;", _PICKER_STYLES)
+        self.assertIn("  height: clamp(140px, 20%, 200px);", _PICKER_STYLES)
+        self.assertIn("  z-index: 12;", _PICKER_STYLES)
+        self.assertIn(".scene-asset-browser", _PICKER_STYLES)
+        self.assertIn(".scene-asset-grid", _PICKER_STYLES)
+        self.assertIn(".scene-asset-item", _PICKER_STYLES)
         server_source = Path(area_picker.__file__).read_text(encoding="utf-8")
-        self.assertIn("parsed.path == '/asset-dir'", server_source)
-        self.assertIn("def _post_asset_dir", server_source)
+        self.assertIn("parsed.path == '/scene-assets'", server_source)
+        self.assertIn("parsed.path == '/scene-asset-file'", server_source)
+        self.assertIn("def _scene_assets_status", server_source)
+        self.assertIn("def _scene_asset_file_path", server_source)
+        self.assertIn("#game-workbench.is-playing .game-bottom-ui", _PICKER_STYLES)
+
+    def test_game_scene_storage_is_scoped_to_current_scene_root(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn("function sceneStorageKey()", game_js)
+        self.assertIn("currentSceneRoot", game_js)
+        self.assertIn("encodeURIComponent(currentSceneRoot)", game_js)
+        self.assertIn("window.localStorage.setItem(sceneStorageKey()", game_js)
+        self.assertIn("window.localStorage.getItem(sceneStorageKey())", game_js)
+        self.assertIn("function applySceneRootStatus(d)", game_js)
+        self.assertIn("fetch('/scene-root')", game_js)
+        self.assertIn("window.addEventListener('scene-root-changed'", game_js)
+        self.assertIn("reloadSceneForCurrentRoot();", game_js)
+        self.assertNotIn("window.localStorage.setItem(SCENE_STORAGE_KEY", game_js)
+        self.assertNotIn("window.localStorage.getItem(SCENE_STORAGE_KEY", game_js)
+
+    def test_scene_model_assets_are_persisted_as_scene_objects(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        asset_js = (FRONTEND_ROOT / "gw_assets.js").read_text(encoding="utf-8")
+
+        self.assertIn("var sceneModels = [];", game_js)
+        self.assertIn("models: sceneModels.map(function(model)", game_js)
+        self.assertIn("url: model.url", game_js)
+        self.assertIn("label: model.label", game_js)
+        self.assertIn("function restoreSceneModel(item)", game_js)
+        self.assertIn("data.models || []", game_js)
+        self.assertIn("assetLoader.loadSceneAsset(item.url, null, item.label", game_js)
+        self.assertIn("function addSceneModel(model, options)", game_js)
+        self.assertIn("function removeSceneModel(model, options)", game_js)
+        self.assertIn("ctx.addSceneModel({", asset_js)
+        self.assertIn("url: url", asset_js)
+        self.assertIn("label: label || root.userData.assetLabel || '模型资产'", asset_js)
+        self.assertNotIn("var prev = ctx.getLoadedModel();", asset_js)
+        self.assertNotIn("ctx.setLoadedModel(root);", asset_js)
+        self.assertNotIn("ctx.setLoadedWhiteboxUrl(url);", asset_js)
+
+    def test_scene_models_are_pickable_from_viewport(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+
+        self.assertIn("function getPickableSceneObjects()", game_js)
+        self.assertIn("sceneModels.forEach(function(model)", game_js)
+        self.assertIn("pickables.push(model.root);", game_js)
+        self.assertIn("raycaster.intersectObjects(getPickableSceneObjects(), true)", game_js)
+
+    def test_game_workbench_uses_scene_object_selection_naming(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        asset_js = (FRONTEND_ROOT / "gw_assets.js").read_text(encoding="utf-8")
+        self.assertIn("function selectSceneObject(object)", game_js)
+        self.assertIn("selectSceneObject: selectSceneObject", game_js)
+        self.assertIn("selectSceneObject(picked);", game_js)
+        self.assertNotIn("function selectCharacter(object)", game_js)
+        self.assertNotIn("selectCharacter: selectCharacter", game_js)
+
+    def test_scene_asset_file_path_is_limited_to_scene_root(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            scene_root = root / "Project"
+            scene_root.mkdir()
+            asset = scene_root / "Houdini_Whitebox.glb"
+            outside = root / "outside.glb"
+            asset.write_bytes(b"glb")
+            outside.write_bytes(b"outside")
+            with patch.object(area_picker, "_scene_root_status", return_value={
+                "scene_root": str(scene_root),
+                "scene_root_exists": True,
+            }):
+                resolved = area_picker._scene_asset_file_path("Houdini_Whitebox.glb")
+                escaped = area_picker._scene_asset_file_path("../outside.glb")
+
+        self.assertEqual(resolved, asset.resolve())
+        self.assertIsNone(escaped)
+
+    def test_houdini_sync_button_moves_whitebox_to_editor_asset_browser(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn("fetch('/sync-whitebox-to-scene-assets'", game_js)
+        self.assertIn("window.VC_SCENE_ASSETS.refresh()", game_js)
+        self.assertIn("同步至当前编辑器资产目录", _PICKER_INDEX_HTML)
+        server_source = Path(area_picker.__file__).read_text(encoding="utf-8")
+        self.assertIn("parsed.path == '/sync-whitebox-to-scene-assets'", server_source)
+        self.assertIn("def _sync_houdini_whitebox_to_scene_assets", server_source)
+
+    def test_bottom_scene_assets_drag_into_game_scene(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn("var sceneAssetGrid = document.getElementById('scene-asset-grid');", game_js)
+        self.assertIn("sceneAssetGrid.addEventListener('pointerdown', beginAssetDrag);", game_js)
+        self.assertIn("closest('.scene-asset-item[data-scene-asset-path]')", game_js)
+        self.assertIn("kind: 'scene-asset'", game_js)
+        self.assertIn("assetLoader.loadSceneAsset(dragState.asset.url, point, dragState.asset.name);", game_js)
+        self.assertIn("function loadSceneAsset(url, point, label, options)", (FRONTEND_ROOT / "gw_assets.js").read_text(encoding="utf-8"))
 
     def test_game_play_mode_hides_editor_overlays_and_start_ui(self):
         # enter/exit moved into gw_play.js; selection-highlight + overlay sync stay
@@ -826,7 +1180,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("syncEditOverlays();", game_js)
         self.assertNotIn("requestPointerLock();", enter_body)
         self.assertIn("#game-workbench.is-playing .game-toolbar", _PICKER_STYLES)
-        self.assertIn("#game-workbench.is-playing .game-status", _PICKER_STYLES)
+        self.assertIn("#game-workbench.is-playing .game-bottom-ui", _PICKER_STYLES)
 
     def test_game_play_mode_has_gravity_jump_and_grounded_walk(self):
         # Play mode applies gravity, jumps on Space only when grounded, and gates
@@ -972,7 +1326,7 @@ class TestPickerHtml(unittest.TestCase):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         self.assertIn('THREE.ColorManagement.legacyMode = false;', game_js)
         self.assertIn('scene.background = new THREE.Color(0x666a6c);', game_js)
-        self.assertIn('renderer.shadowMap.type = THREE.BasicShadowMap;', game_js)
+        self.assertIn('renderer.shadowMap.type = THREE.PCFSoftShadowMap;', game_js)
         self.assertIn('opacity: 0.4', game_js)
         self.assertIn('sun.shadow.mapSize.set(4096, 4096);', game_js)
         self.assertIn('sun.shadow.normalBias = 0.03;', game_js)
@@ -1132,6 +1486,34 @@ class TestPickerHtml(unittest.TestCase):
         cmd = run.call_args.args[0]
         self.assertEqual(cmd[:3], ["powershell", "-NoProfile", "-Command"])
         self.assertIn("Get-Process -Name 'blender'", cmd[3])
+
+    def test_scene_root_path_is_persisted_with_software_paths(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            config_path = root / "software_paths.json"
+            scene_root = root / "Scenes"
+            with patch.object(software_paths, "SOFTWARE_PATHS_FILE", config_path):
+                status = software_paths.write_scene_root(str(scene_root))
+                saved = json.loads(config_path.read_text(encoding="utf-8"))
+                created = scene_root.is_dir()
+        self.assertEqual(status["scene_root"], str(scene_root))
+        self.assertTrue(status["scene_root_exists"])
+        self.assertTrue(created)
+        self.assertEqual(saved["scene_root"], str(scene_root))
+
+    def test_open_scene_root_from_config_requires_existing_root(self):
+        with patch.object(area_picker, "_scene_root_status", return_value={"scene_root": "", "scene_root_exists": False}):
+            missing_payload = area_picker._open_scene_root_from_config()
+        self.assertFalse(missing_payload["ok"])
+        self.assertIn("请先设置场景工程根目录", missing_payload["message"])
+
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            with patch.object(area_picker, "_scene_root_status", return_value={"scene_root": str(root), "scene_root_exists": True}), \
+                    patch.object(area_picker, "_open_local_directory") as open_dir:
+                payload = area_picker._open_scene_root_from_config()
+        self.assertTrue(payload["ok"])
+        open_dir.assert_called_once_with(root)
 
     def test_restart_clears_dcc_path_cache(self):
         data = {
@@ -1415,11 +1797,13 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "selection_search.js",
                 "pipeline_status.js",
                 "dcc_bridge.js",
+                "gw_outliner.js",
                 "game_workbench.js",
                 "vc_glb.js",
                 "viewport_grid.js",
                 "houdini_preview.js",
-                "asset_dir.js",
+                "scene_project.js",
+                "scene_assets.js",
                 "styles.css",
                 "index.html",
             ):
@@ -1451,11 +1835,13 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "selection_search.js",
                 "pipeline_status.js",
                 "dcc_bridge.js",
+                "gw_outliner.js",
                 "game_workbench.js",
                 "vc_glb.js",
                 "viewport_grid.js",
                 "houdini_preview.js",
-                "asset_dir.js",
+                "scene_project.js",
+                "scene_assets.js",
                 "styles.css",
                 "index.html",
             ):

@@ -125,12 +125,34 @@ This contract records the frontend routes that are part of the Area Picker runti
 - Request fields: `software_id`, optional path field for the software.
 - Required response fields: `ok`, `message`, `software_paths`.
 
-## GET and POST /asset-dir
+## GET and POST /scene-root, POST /open-scene-root
 
-- Used by: `asset_dir.js`.
-- Backend: `server.py -> _asset_dir_status()`, `_post_asset_dir()`.
-- Request fields: `path`.
-- Required response fields: `ok`, `message`, `asset_dir`.
+- Used by: `scene_project.js`.
+- Backend: `server.py -> _scene_root_status()`, `_post_scene_root()`, `_post_open_scene_root()`.
+- Request fields: `path` for `/scene-root`.
+- Required response fields: `ok`, `message`, `scene_root`.
+
+## GET /scene-assets
+
+- Used by: `scene_assets.js -> loadSceneAssets()`.
+- Backend: `server.py -> _scene_assets_status()`.
+- Required response fields: `ok`, `available`, `scene_root`, `scene_root_exists`, `assets`, `counts`, `limit`, `truncated`, `message`.
+- Asset item fields: `name`, `display_name`, `relative_path`, `folder`, `extension`, `category`, `source`, `size`, `size_label`, `modified`.
+- Notes: scans the current scene root read-only, skips hidden/cache directories, and caps the returned list for large projects.
+
+## GET /scene-asset-file
+
+- Used by: `game_workbench.js` when dragging a bottom asset into the editor scene.
+- Backend: `server.py -> _scene_asset_file_path()` and `_serve_file_with_range()`.
+- Query: `path`, a relative path inside the current scene root.
+- Notes: rejects paths outside the scene root and serves files with range support for GLB loading.
+
+## POST /sync-whitebox-to-scene-assets
+
+- Used by: `game_workbench.js -> syncHoudiniWhiteboxToAssets()`.
+- Backend: `server.py -> _sync_houdini_whitebox_to_scene_assets()`.
+- Required response fields: `ok`, `message`, `scene_root`, optional `asset`, optional `scene_assets`.
+- Notes: moves the current Houdini-generated whitebox GLB into the current editor scene root as `Houdini_Whitebox.glb`, then refreshes the editor bottom asset browser.
 
 ## POST /export
 

@@ -16,7 +16,9 @@
   };
 
   GW.setStatus = function(message) {
-    if (GW.state.statusText) GW.state.statusText.textContent = message;
+    if (!GW.state.statusText) return;
+    GW.state.statusText.textContent = message || '';
+    GW.state.statusText.hidden = !message;
   };
 
   GW.safeThree = function() {

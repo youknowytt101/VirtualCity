@@ -14,7 +14,7 @@ WorldBuilder — 交互式区域选择器
     4. 在网页或终端窗口查看管线进度
 """
 
-import sys, json, subprocess, threading, webbrowser, time, os, re, socket, mimetypes, urllib.error, urllib.request, urllib.parse, importlib
+import sys, json, subprocess, threading, webbrowser, time, os, re, socket, mimetypes, urllib.error, urllib.request, urllib.parse, importlib, shutil
 from datetime import datetime
 from pathlib import Path
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
@@ -38,15 +38,17 @@ from app.area_picker.software_paths import (
     SOFTWARE_IDS as _SOFTWARE_IDS,
     asset_dir_status as _asset_dir_status,
     read_software_paths as _read_software_paths,
+    scene_root_status as _scene_root_status,
     software_path_key as _software_path_key,
     software_path_status as _software_path_status,
     write_asset_dir as _write_asset_dir,
+    write_scene_root as _write_scene_root,
     write_software_paths as _write_software_paths,
 )
 
 _HTML = area_picker_template.HTML
 FRONTEND_ROOT = area_picker_template.FRONTEND_ROOT
-APP_VERSION = "10-06-26_v2.25"
+APP_VERSION = "10-06-26_v2.29"
 STARTED_AT = time.strftime("%Y-%m-%d %H:%M:%S")
 AUTO_SHUTDOWN_ON_SUCCESS = os.environ.get("VC_AREA_PICKER_AUTO_SHUTDOWN") == "1"
 
@@ -503,6 +505,208 @@ def _file_status(value: str | Path | None) -> dict:
     }
 
 
+_SCENE_ASSET_LIMIT = 200
+_SCENE_ASSET_MAX_DEPTH = 6
+_SYNCED_HOUDINI_WHITEBOX_NAME = 'Houdini_Whitebox.glb'
+_SCENE_ASSET_SKIP_DIRS = {
+    '.git', '.hg', '.svn', '__pycache__', '.pytest_cache', '.mypy_cache',
+    'node_modules', '.venv', 'venv',
+}
+_SCENE_ASSET_EXTENSIONS = {
+    'model': {'.glb', '.gltf', '.fbx', '.obj', '.blend', '.abc', '.usd', '.usda', '.usdc'},
+    'texture': {'.png', '.jpg', '.jpeg', '.webp', '.tif', '.tiff', '.exr', '.hdr', '.bmp', '.tga'},
+    'material': {'.mat', '.mtl', '.sbsar'},
+    'scene': {'.json', '.scene', '.world', '.level', '.umap', '.unity', '.tscn', '.escn'},
+    'audio': {'.wav', '.mp3', '.ogg', '.flac', '.aiff'},
+    'script': {'.py', '.js', '.ts', '.lua', '.gd', '.cs', '.cpp', '.h', '.hpp'},
+}
+
+
+def _size_label(size: int) -> str:
+    if size >= 1024 * 1024 * 1024:
+        return f'{size / (1024 * 1024 * 1024):.1f} GB'
+    if size >= 1024 * 1024:
+        return f'{size / (1024 * 1024):.1f} MB'
+    if size >= 1024:
+        return f'{size / 1024:.0f} KB'
+    return f'{size} B'
+
+
+def _scene_asset_category(path: Path) -> str:
+    ext = path.suffix.lower()
+    for category, extensions in _SCENE_ASSET_EXTENSIONS.items():
+        if ext in extensions:
+            return category
+    return 'other'
+
+
+def _scene_asset_display_name(path: Path) -> str:
+    if path.name == _SYNCED_HOUDINI_WHITEBOX_NAME:
+        return 'Houdini 白盒'
+    return path.stem
+
+
+def _scene_asset_record(root_resolved: Path, path: Path, stat) -> dict:
+    rel_path = path.relative_to(root_resolved).as_posix()
+    category = _scene_asset_category(path)
+    return {
+        'name': path.name,
+        'display_name': _scene_asset_display_name(path),
+        'relative_path': rel_path,
+        'folder': Path(rel_path).parent.as_posix() if Path(rel_path).parent.as_posix() != '.' else '',
+        'extension': path.suffix.lower().lstrip('.'),
+        'category': category,
+        'source': 'houdini_whitebox' if path.name == _SYNCED_HOUDINI_WHITEBOX_NAME else '',
+        'size': stat.st_size,
+        'size_label': _size_label(stat.st_size),
+        'modified': int(stat.st_mtime),
+    }
+
+
+def _scene_assets_status(limit: int = _SCENE_ASSET_LIMIT) -> dict:
+    status = _scene_root_status()
+    scene_root = str(status.get('scene_root') or '').strip()
+    scene_root_exists = bool(status.get('scene_root_exists'))
+    base_payload = {
+        'ok': True,
+        'available': scene_root_exists,
+        'scene_root': scene_root,
+        'scene_root_exists': scene_root_exists,
+        'assets': [],
+        'counts': {key: 0 for key in (*_SCENE_ASSET_EXTENSIONS.keys(), 'other')},
+        'limit': limit,
+        'truncated': False,
+        'message': '',
+    }
+    if not scene_root:
+        base_payload['message'] = '未设置工程目录'
+        return base_payload
+    root = Path(scene_root)
+    if not root.is_dir():
+        base_payload['message'] = '工程目录不存在'
+        return base_payload
+
+    assets: list[dict] = []
+    counts = dict(base_payload['counts'])
+    truncated = False
+    try:
+        root_resolved = root.resolve()
+        for current_dir, dirs, files in os.walk(root_resolved):
+            current_path = Path(current_dir)
+            try:
+                rel_dir = current_path.relative_to(root_resolved)
+            except ValueError:
+                continue
+            depth = 0 if str(rel_dir) == '.' else len(rel_dir.parts)
+            dirs[:] = [
+                name for name in sorted(dirs)
+                if not name.startswith('.') and name not in _SCENE_ASSET_SKIP_DIRS and depth < _SCENE_ASSET_MAX_DEPTH
+            ]
+            for name in sorted(files):
+                if name.startswith('.'):
+                    continue
+                path = current_path / name
+                try:
+                    stat = path.stat()
+                except OSError:
+                    continue
+                category = _scene_asset_category(path)
+                counts[category] = counts.get(category, 0) + 1
+                if len(assets) >= limit:
+                    truncated = True
+                    break
+                assets.append(_scene_asset_record(root_resolved, path, stat))
+            if truncated:
+                dirs[:] = []
+                break
+    except OSError as exc:
+        base_payload['ok'] = False
+        base_payload['available'] = False
+        base_payload['message'] = f'工程资产读取失败: {exc}'
+        return base_payload
+
+    assets.sort(key=lambda item: (item['category'] == 'other', item['category'], item['relative_path'].lower()))
+    base_payload.update({
+        'assets': assets,
+        'counts': counts,
+        'truncated': truncated,
+        'message': f'显示前 {limit} 个资产' if truncated else '',
+    })
+    return base_payload
+
+
+def _scene_asset_file_path(relative_path: str) -> Path | None:
+    status = _scene_root_status()
+    scene_root = str(status.get('scene_root') or '').strip()
+    if not scene_root or not status.get('scene_root_exists'):
+        return None
+    rel = str(relative_path or '').strip().replace('\\', '/')
+    if not rel or rel.startswith('/') or '\x00' in rel:
+        return None
+    try:
+        root = Path(scene_root).resolve()
+        target = (root / rel).resolve()
+        target.relative_to(root)
+    except Exception:
+        return None
+    if not target.is_file():
+        return None
+    return target
+
+
+def _current_houdini_whitebox_path() -> Path:
+    h_status = {}
+    try:
+        cfg = _load_active_area()
+        h_status = pipeline_status.load_houdini_status(
+            ROOT,
+            str(cfg.get('area_id') or ''),
+            str(cfg.get('run_id') or ''),
+        )
+    except Exception:
+        h_status = {}
+    return _whitebox_path_from_status(h_status)
+
+
+def _sync_houdini_whitebox_to_scene_assets() -> dict:
+    scene_status = _scene_root_status()
+    scene_root = str(scene_status.get('scene_root') or '').strip()
+    if not scene_root:
+        return {'ok': False, 'message': '请先设置场景工程根目录', 'scene_root': scene_status}
+    scene_root_path = Path(scene_root)
+    if not scene_root_path.is_dir():
+        return {'ok': False, 'message': f'场景工程根目录不存在: {scene_root_path}', 'scene_root': scene_status}
+
+    source = _current_houdini_whitebox_path()
+    if not source.is_file():
+        return {'ok': False, 'message': f'当前没有可同步的 Houdini 白盒: {source}', 'scene_root': scene_status}
+
+    try:
+        root_resolved = scene_root_path.resolve()
+        destination = (root_resolved / _SYNCED_HOUDINI_WHITEBOX_NAME).resolve()
+        destination.relative_to(root_resolved)
+    except Exception as exc:
+        return {'ok': False, 'message': f'资产目录解析失败: {exc}', 'scene_root': scene_status}
+
+    try:
+        same_file = source.resolve() == destination
+        if not same_file:
+            if destination.exists():
+                destination.unlink()
+            shutil.move(str(source), str(destination))
+        stat = destination.stat()
+    except Exception as exc:
+        return {'ok': False, 'message': f'Houdini 白盒同步失败: {exc}', 'scene_root': scene_status}
+
+    return {
+        'ok': True,
+        'message': 'Houdini 白盒已同步至当前编辑器资产目录',
+        'scene_root': scene_status,
+        'asset': _scene_asset_record(root_resolved, destination, stat),
+        'scene_assets': _scene_assets_status(),
+    }
+
+
 def _source_mode(cfg: dict, group: str) -> str:
     cache = cfg.get('cache') if isinstance(cfg.get('cache'), dict) else {}
     clip = cache.get('clip') if isinstance(cache.get('clip'), dict) else {}
@@ -806,6 +1010,30 @@ def _resolve_software_launch_path(software_id: str, value: str) -> Path | None:
         if candidate.is_file():
             return candidate
     return None
+
+
+def _open_local_directory(folder: Path) -> None:
+    if sys.platform.startswith('win'):
+        os.startfile(str(folder))  # noqa: S606 - 本地打开资源管理器
+    elif sys.platform == 'darwin':
+        subprocess.Popen(['open', str(folder)], close_fds=True)
+    else:
+        subprocess.Popen(['xdg-open', str(folder)], close_fds=True)
+
+
+def _open_scene_root_from_config() -> dict:
+    status = _scene_root_status()
+    scene_root = status.get('scene_root') or ''
+    if not scene_root:
+        return {'ok': False, 'message': '请先设置场景工程根目录', 'scene_root': status}
+    folder = Path(scene_root)
+    if not folder.is_dir():
+        return {'ok': False, 'message': f'场景工程根目录不存在: {folder}', 'scene_root': status}
+    try:
+        _open_local_directory(folder)
+    except Exception as exc:
+        return {'ok': False, 'message': f'打开场景工程根目录失败: {exc}', 'scene_root': status}
+    return {'ok': True, 'message': f'已打开 {folder}', 'scene_root': status}
 
 
 _SOFTWARE_PROCESS_NAMES = {
@@ -1304,9 +1532,11 @@ def _frontend_asset_version() -> str:
         (FRONTEND_ROOT, "gw_play.js"),
         (FRONTEND_ROOT, "gw_camera.js"),
         (FRONTEND_ROOT, "gw_assets.js"),
+        (FRONTEND_ROOT, "gw_outliner.js"),
         (FRONTEND_ROOT, "game_workbench.js"),
         (FRONTEND_ROOT, "houdini_preview.js"),
-        (FRONTEND_ROOT, "asset_dir.js"),
+        (FRONTEND_ROOT, "scene_project.js"),
+        (FRONTEND_ROOT, "scene_assets.js"),
         (FRONTEND_ROOT, "styles.css"),
         (FRONTEND_ROOT, "index.html"),
     ]
@@ -1419,6 +1649,22 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/asset-dir':
             self._json(_asset_dir_status())
+            return
+        if parsed.path == '/scene-root':
+            self._json(_scene_root_status())
+            return
+        if parsed.path == '/scene-assets':
+            self._json(_scene_assets_status())
+            return
+        if parsed.path == '/scene-asset-file':
+            params = urllib.parse.parse_qs(parsed.query)
+            target = _scene_asset_file_path(str(params.get('path', [''])[0]))
+            if not target:
+                self.send_response(404)
+                self.end_headers()
+                return
+            ctype = 'model/gltf-binary' if target.suffix.lower() == '.glb' else (mimetypes.guess_type(target.name)[0] or 'application/octet-stream')
+            self._serve_file_with_range(target, ctype, cache_control='no-store')
             return
         if parsed.path == '/selection':
             self._json(_remembered_selection_status())
@@ -1570,6 +1816,9 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == '/asset-dir':
             self._post_asset_dir()
             return
+        if parsed.path == '/scene-root':
+            self._post_scene_root()
+            return
         if parsed.path == '/open-houdini':
             self._post_open_houdini()
             return
@@ -1578,6 +1827,12 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/open-export-dir':
             self._post_open_export_dir()
+            return
+        if parsed.path == '/open-scene-root':
+            self._post_open_scene_root()
+            return
+        if parsed.path == '/sync-whitebox-to-scene-assets':
+            self._json(_sync_houdini_whitebox_to_scene_assets())
             return
         if parsed.path == '/close-software':
             self._post_close_software()
@@ -1844,6 +2099,26 @@ class _Handler(BaseHTTPRequestHandler):
         if status['asset_dir'] and not status['asset_dir_exists']:
             message = '资产目录已保存，但目录不存在'
         self._json({'ok': True, 'message': message, 'asset_dir': status})
+
+    def _post_scene_root(self):
+        length = int(self.headers.get('Content-Length', 0))
+        try:
+            body = json.loads(self.rfile.read(length) or b'{}')
+        except json.JSONDecodeError:
+            self._json({'ok': False, 'message': '请求 JSON 无法解析'})
+            return
+        try:
+            status = _write_scene_root(body.get('path'))
+        except Exception as exc:
+            self._json({'ok': False, 'message': f'场景工程根目录保存失败: {exc}'})
+            return
+        message = '场景工程根目录已保存'
+        if status['scene_root'] and not status['scene_root_exists']:
+            message = '场景工程根目录已保存，但目录不存在'
+        self._json({'ok': True, 'message': message, 'scene_root': status})
+
+    def _post_open_scene_root(self):
+        self._json(_open_scene_root_from_config())
 
     def _post_open_houdini(self):
         if not _probe_houdini():

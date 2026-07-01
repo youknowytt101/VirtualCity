@@ -159,6 +159,38 @@
       </div>
     </section>
     <!-- 运行监控组件已移至右侧 action-panel 底部 -->
+    <section class="panel-section editor-left-actions-section" id="editor-left-actions" aria-label="编辑器操作">
+      <div class="editor-left-action-list flat-panel flat-panel--col">
+        <button type="button" class="editor-left-action-btn flat-item" data-editor-action="new" title="新建工程">
+          <svg class="editor-left-action-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+          </svg>
+          <span class="editor-left-action-label">新建工程</span>
+        </button>
+        <button type="button" class="editor-left-action-btn flat-item" data-editor-action="save" title="保存">
+          <svg class="editor-left-action-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M15.2 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.8z"></path>
+            <path d="M17 21v-8H7v8"></path>
+            <path d="M7 3v5h8"></path>
+          </svg>
+          <span class="editor-left-action-label">保存</span>
+        </button>
+        <button type="button" class="editor-left-action-btn flat-item" data-editor-action="open-root" title="打开场景工程根目录">
+          <svg class="editor-left-action-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 4A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"></path>
+          </svg>
+          <span class="editor-left-action-label">打开场景工程根目录</span>
+        </button>
+        <button type="button" class="editor-left-action-btn flat-item" data-editor-action="settings" title="设置">
+          <svg class="editor-left-action-icon" aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z"></path>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06A2 2 0 1 1 7.03 3.8l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3a2 2 0 1 1 4 0v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.1.4h.1a2 2 0 1 1 0 4h-.1A1.7 1.7 0 0 0 19.4 15z"></path>
+          </svg>
+          <span class="editor-left-action-label">设置</span>
+        </button>
+      </div>
+    </section>
     <!-- 底部占位组件：账户/入口占位，待接入 -->
     <section class="panel-section panel-footer" id="panel-footer" aria-label="账户占位">
       <details class="account-menu">
@@ -240,7 +272,29 @@
           <input id="game-speed-input" class="game-speed-input" type="number" min="1" max="150" step="1" value="35">
         </label>
       </div>
-      <div id="game-status" class="game-status">拖入角色后点击运行</div>
+      <div id="game-bottom-ui" class="game-bottom-ui" aria-label="编辑器底部面板">
+        <div id="scene-asset-browser" class="scene-asset-browser" aria-label="工程资产目录">
+          <div class="scene-asset-head">
+            <div class="scene-asset-title-wrap">
+              <div class="scene-asset-title">工程资产目录</div>
+              <div id="scene-asset-status" class="scene-asset-status" aria-live="polite">读取工程目录...</div>
+            </div>
+            <div id="game-status" class="game-status" aria-live="polite" hidden></div>
+            <button type="button" id="scene-asset-refresh" class="scene-asset-refresh" title="刷新资产目录" aria-label="刷新资产目录">
+              <svg class="scene-asset-refresh-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M21 12a9 9 0 0 1-15.2 6.5"></path>
+                <path d="M3 12a9 9 0 0 1 15.2-6.5"></path>
+                <path d="M18 3v5h-5"></path>
+                <path d="M6 21v-5h5"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="scene-asset-body">
+            <div id="scene-asset-categories" class="scene-asset-categories" aria-label="资产分类"></div>
+            <div id="scene-asset-grid" class="scene-asset-grid" role="list" aria-label="工程资产"></div>
+          </div>
+        </div>
+      </div>
       <div id="game-drag-preview" class="game-drag-preview" hidden>角色</div>
     </div>
   </section>
@@ -291,6 +345,10 @@
       </section>
     </div>
     <div class="action-panel-content game-side-panel" data-action-panel-content="game" aria-label="我的游戏右栏" hidden>
+      <div class="outline-side-tabs" role="radiogroup" aria-label="场景大纲标签">
+        <input id="outline-side-tab-1" class="side-rail-input" type="radio" name="outline-side-tabs" checked>
+        <label class="side-rail-label" for="outline-side-tab-1">目录</label>
+      </div>
       <section id="game-scene-outline" class="action-outline-panel" aria-label="场景大纲">
         <div class="action-outline-title">场景大纲</div>
         <div class="action-outline-body"></div>
@@ -298,35 +356,8 @@
       <div id="game-side-resizer" class="game-side-resizer" role="separator" aria-label="调整场景大纲高度" aria-orientation="horizontal" aria-controls="game-scene-outline game-side-tabs" tabindex="0"></div>
       <section id="game-side-tabs" class="action-tabs" aria-label="我的游戏右栏标签页" style="--action-tab-count: 4;">
         <input id="game-side-tab-1" class="action-tab-input" type="radio" name="game-side-tabs" checked>
-        <label class="action-tab-label" for="game-side-tab-1">资产</label>
-        <div class="action-tab-panel" aria-label="资产">
-          <form id="asset-dir-form" class="asset-dir">
-            <label class="asset-dir-label" for="asset-dir-input">本地资产目录</label>
-            <input id="asset-dir-input" class="asset-dir-input" type="text" placeholder="例如 D:\Assets" autocomplete="off" spellcheck="false">
-            <div class="asset-dir-row">
-              <button type="submit" class="asset-dir-save">保存</button>
-              <span id="asset-dir-status" class="asset-dir-msg" aria-live="polite"></span>
-            </div>
-          </form>
-          <ul id="asset-dir-tree" class="asset-dir-tree" aria-label="资产目录结构"></ul>
-          <div class="asset-actions">
-            <button id="import-houdini-whitebox-btn" type="button" class="action-btn">
-              <span class="btn-main">导入 Houdini 白盒</span>
-            </button>
-            <button id="asset-cat-character" type="button" class="action-btn">
-              <span class="btn-main">人物角色</span>
-            </button>
-            <button id="asset-cat-scene-whitebox" type="button" class="action-btn">
-              <span class="btn-main">场景白盒</span>
-            </button>
-            <button id="asset-cat-scene-component" type="button" class="action-btn">
-              <span class="btn-main">场景组件</span>
-            </button>
-            <button id="asset-cat-logic" type="button" class="action-btn">
-              <span class="btn-main">功能逻辑</span>
-            </button>
-          </div>
-        </div>
+        <label class="action-tab-label" for="game-side-tab-1">细节</label>
+        <div class="action-tab-panel" aria-label="细节"></div>
 
         <input id="game-side-tab-2" class="action-tab-input" type="radio" name="game-side-tabs">
         <label class="action-tab-label" for="game-side-tab-2">创建</label>
@@ -447,7 +478,7 @@
                 <span class="btn-main">打开文件目录</span>
               </button>
               <button id="sync-to-editor-btn" type="button" class="action-btn">
-                <span class="btn-main">同步至资产库</span>
+                <span class="btn-main">同步至当前编辑器资产目录</span>
               </button>
             </div>
           </section>
@@ -500,6 +531,26 @@
   </aside>
 </main>
 
+<div id="scene-root-backdrop" class="scene-root-backdrop" hidden></div>
+<dialog id="scene-root-dialog" class="scene-root-dialog" aria-labelledby="scene-root-title" hidden>
+  <form id="scene-root-form" class="scene-root-form" method="dialog">
+    <div class="scene-root-head">
+      <div>
+        <h2 id="scene-root-title">保存场景</h2>
+        <p id="scene-root-hint">设置或新增一个场景工程根目录。</p>
+      </div>
+      <button id="scene-root-close" type="button" class="scene-root-close" aria-label="关闭">×</button>
+    </div>
+    <label id="scene-root-label" class="scene-root-label" for="scene-root-input">场景工程根目录</label>
+    <input id="scene-root-input" class="scene-root-input" type="text" autocomplete="off" spellcheck="false" placeholder="例如 E:\VirtualCity\Scenes">
+    <div class="scene-root-actions">
+      <button id="scene-root-cancel" type="button" class="scene-root-secondary">取消</button>
+      <button id="scene-root-submit" type="submit" class="scene-root-primary">保存</button>
+    </div>
+    <p id="scene-root-status" class="scene-root-status" aria-live="polite"></p>
+  </form>
+</dialog>
+
 <script src="/static/maplibre/maplibre-gl.js"></script>
 <script src="/static/deckgl/deck.gl.min.js"></script>
 <script type="importmap">
@@ -526,9 +577,11 @@ window.VC_CONFIG = {
 <script src="/area-picker/gw_play.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_camera.js?v=__VERSION__"></script>
 <script src="/area-picker/gw_assets.js?v=__VERSION__"></script>
+<script src="/area-picker/gw_outliner.js?v=__VERSION__"></script>
 <script src="/area-picker/game_workbench.js?v=__VERSION__"></script>
 <script src="/area-picker/houdini_preview.js?v=__VERSION__"></script>
-<script src="/area-picker/asset_dir.js?v=__VERSION__"></script>
+<script src="/area-picker/scene_project.js?v=__VERSION__"></script>
+<script src="/area-picker/scene_assets.js?v=__VERSION__"></script>
 <script src="/area-picker/workspace.js?v=__VERSION__"></script>
 <script src="/area-picker/selection_search.js?v=__VERSION__"></script>
 <script src="/area-picker/pipeline_status.js?v=__VERSION__"></script>

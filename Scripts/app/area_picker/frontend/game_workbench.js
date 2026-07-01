@@ -36,8 +36,7 @@
   var transformControlsLoading = null;
   var transformMode = 'translate';
   var transformModeButtons = [];
-  var loadedModel = null;
-  var loadedWhiteboxUrl = null;
+  var sceneModels = [];
   var assetLoader = null;
   var undoStack = [];
   var redoStack = [];
@@ -46,8 +45,11 @@
   var restoringScene = false;
   var sideResizeState = null;
   var editorGrid = null;
+  var sceneOutliner = null;
 
   var SCENE_STORAGE_KEY = 'vc_game_scene_v1';
+  var currentSceneRoot = '';
+  var sceneRootReady = false;
 
   // Aliases into the split modules (gw_core/gw_character/gw_play). These load
   // before game_workbench.js, so VC_GW.* is populated by the time this IIFE runs.
@@ -179,7 +181,7 @@
     var character = markCharacter(createCharacter());
     character.position.set(point.x, point.y, 0);
     scene.add(character);
-    selectCharacter(character);
+    selectSceneObject(character);
     rebuildSceneOutline();
     pushCommand(makeCreateCommand(character));
     setStatus('角色已放置，按 Space 或点击运行');
@@ -224,7 +226,7 @@
   // Selects any scene object (character or whitebox layer). selectedCharacter is
   // kept set only for characters so character-only ops (run/delete/duplicate) stay
   // no-ops on terrain/buildings/roads layers.
-  function selectCharacter(object) {
+  function selectSceneObject(object) {
     selectedObject = object || null;
     selectedCharacter = (object && object.userData && object.userData.assetType === 'character') ? object : null;
     if (transformControls) {
@@ -281,7 +283,15 @@
   function serializeScene() {
     return {
       v: 1,
-      whitebox: loadedWhiteboxUrl || null,
+      models: sceneModels.map(function(model) {
+        return {
+          url: model.url,
+          label: model.label,
+          p: model.root.position.toArray(),
+          r: [model.root.rotation.x, model.root.rotation.y, model.root.rotation.z],
+          s: model.root.scale.toArray()
+        };
+      }),
       characters: characters.map(function(character) {
         return {
           p: character.position.toArray(),
@@ -292,11 +302,15 @@
     };
   }
 
+  function sceneStorageKey() {
+    return SCENE_STORAGE_KEY + '::' + (currentSceneRoot ? encodeURIComponent(currentSceneRoot) : 'default');
+  }
+
   function saveScene() {
     saveTimer = null;
     if (restoringScene) return;
     try {
-      window.localStorage.setItem(SCENE_STORAGE_KEY, JSON.stringify(serializeScene()));
+      window.localStorage.setItem(sceneStorageKey(), JSON.stringify(serializeScene()));
     } catch (e) {}
   }
 
@@ -305,9 +319,131 @@
     saveTimer = setTimeout(saveScene, 400);
   }
 
+  function clearSceneObjects() {
+    if (!scene) return;
+    if (playMode) playMode.exit();
+    characters.slice().forEach(function(character) {
+      scene.remove(character);
+    });
+    characters = [];
+    sceneModels.slice().forEach(function(model) {
+      scene.remove(model.root);
+    });
+    sceneModels = [];
+    whiteboxLayers = [];
+    undoStack.length = 0;
+    redoStack.length = 0;
+    selectSceneObject(null);
+    rebuildSceneOutline();
+  }
+
+  function reloadSceneForCurrentRoot() {
+    if (!initialized) return;
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    clearSceneObjects();
+    restoreScene();
+    render();
+  }
+
+  function applySceneRootStatus(d) {
+    var nextRoot = d && d.scene_root ? String(d.scene_root).trim() : '';
+    var changed = !sceneRootReady || nextRoot !== currentSceneRoot;
+    currentSceneRoot = nextRoot;
+    sceneRootReady = true;
+    if (changed) reloadSceneForCurrentRoot();
+  }
+
+  function loadSceneRootForWorkbench() {
+    fetch('/scene-root')
+      .then(function(r) { return r.json(); })
+      .then(applySceneRootStatus)
+      .catch(function() {
+        sceneRootReady = true;
+        reloadSceneForCurrentRoot();
+      });
+  }
+
+  function saveSceneNow() {
+    initGameWorkbench();
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    saveScene();
+    setStatus('场景已保存');
+  }
+
+  function newScene() {
+    initGameWorkbench();
+    if (saveTimer) {
+      clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    clearSceneObjects();
+    saveScene();
+    render();
+    setStatus('已新建场景');
+  }
+
+  function refreshWhiteboxLayers() {
+    whiteboxLayers = [];
+    sceneModels.forEach(function(model) {
+      (model.layers || []).forEach(function(layer) {
+        whiteboxLayers.push(layer);
+      });
+    });
+  }
+
+  function sceneObjectBelongsToModel(object, model) {
+    if (!object || !model) return false;
+    var root = object.userData && object.userData.assetRoot ? object.userData.assetRoot : object;
+    return root === model.root || (model.layers || []).indexOf(root) >= 0;
+  }
+
+  function addSceneModel(model, options) {
+    if (!model || !model.root) return null;
+    var index = options && typeof options.index === 'number' ? options.index : -1;
+    if (index >= 0) sceneModels.splice(index, 0, model);
+    else if (sceneModels.indexOf(model) < 0) sceneModels.push(model);
+    scene.add(model.root);
+    refreshWhiteboxLayers();
+    rebuildSceneOutline();
+    if (!(options && options.skipHistory)) pushCommand(makeCreateModelCommand(model));
+    return model;
+  }
+
+  function removeSceneModel(model, options) {
+    if (!model || !model.root) return;
+    var index = sceneModels.indexOf(model);
+    if (index >= 0) sceneModels.splice(index, 1);
+    scene.remove(model.root);
+    if (sceneObjectBelongsToModel(selectedObject, model)) selectSceneObject(null);
+    refreshWhiteboxLayers();
+    rebuildSceneOutline();
+    return index;
+  }
+
+  function makeCreateModelCommand(model) {
+    return {
+      undo: function() { removeSceneModel(model, { skipHistory: true }); },
+      redo: function() { addSceneModel(model, { skipHistory: true }); }
+    };
+  }
+
+  function restoreSceneModel(item) {
+    if (!item || !item.url || !assetLoader) return;
+    assetLoader.loadSceneAsset(item.url, null, item.label, {
+      restoring: true,
+      transform: item
+    });
+  }
+
   function restoreScene() {
     var raw = null;
-    try { raw = window.localStorage.getItem(SCENE_STORAGE_KEY); } catch (e) { return; }
+    try { raw = window.localStorage.getItem(sceneStorageKey()); } catch (e) { return; }
     if (!raw) return;
     var data = null;
     try { data = JSON.parse(raw); } catch (e) { return; }
@@ -321,8 +457,12 @@
         if (item.s) character.scale.fromArray(item.s);
         scene.add(character);
       });
+      var savedModels = data.models || [];
+      if (!savedModels.length && data.whitebox) {
+        savedModels = [{ url: data.whitebox, label: '模型资产' }];
+      }
+      savedModels.forEach(restoreSceneModel);
       rebuildSceneOutline();
-      if (data.whitebox) loadGLB(data.whitebox);
     } finally {
       restoringScene = false;
     }
@@ -337,37 +477,25 @@
     assetLoader.loadGLB(url);
   }
 
-  function rebuildSceneOutline() {
-    if (!outlineBody) return;
-    outlineBody.innerHTML = '';
-    var items = whiteboxLayers.concat(characters);
-    if (!items.length) {
-      var empty = document.createElement('div');
-      empty.className = 'scene-outline-empty';
-      empty.textContent = '场景为空';
-      outlineBody.appendChild(empty);
-      return;
-    }
-    items.forEach(function(obj) {
-      var row = document.createElement('button');
-      row.type = 'button';
-      row.className = 'scene-outline-row';
-      row.dataset.assetType = obj.userData.assetType || '';
-      row.textContent = obj.userData.assetLabel || obj.name || '对象';
-      row.addEventListener('click', function() { selectCharacter(obj); });
-      obj.userData.outlineRow = row;
-      outlineBody.appendChild(row);
+  function getSceneOutlineItems() {
+    var items = [];
+    sceneModels.forEach(function(model) {
+      if (model.layers && model.layers.length) {
+        model.layers.forEach(function(layer) { items.push(layer); });
+      } else {
+        items.push(model.root);
+      }
     });
-    refreshOutlineActive();
+    return items.concat(characters);
+  }
+
+  function rebuildSceneOutline() {
+    if (!sceneOutliner) return;
+    sceneOutliner.rebuild(getSceneOutlineItems(), selectedObject);
   }
 
   function refreshOutlineActive() {
-    if (!outlineBody) return;
-    var rows = outlineBody.querySelectorAll('.scene-outline-row');
-    for (var i = 0; i < rows.length; i++) rows[i].classList.remove('is-active');
-    if (selectedObject && selectedObject.userData.outlineRow) {
-      selectedObject.userData.outlineRow.classList.add('is-active');
-    }
+    if (sceneOutliner) sceneOutliner.refreshActive(selectedObject);
   }
 
   // Load the latest pipeline-produced whitebox into the editor (no export — the
@@ -377,15 +505,45 @@
     if (assetLoader) assetLoader.syncFromHoudini();
   }
 
+  function refreshSceneAssetsBrowser() {
+    if (window.VC_SCENE_ASSETS && typeof window.VC_SCENE_ASSETS.refresh === 'function') {
+      window.VC_SCENE_ASSETS.refresh();
+      return;
+    }
+    window.dispatchEvent(new Event('scene-root-changed'));
+  }
+
+  function syncHoudiniWhiteboxToAssets(button) {
+    var label = button ? button.querySelector('.btn-main') : null;
+    var previousLabel = label ? label.textContent : '';
+    if (button) button.disabled = true;
+    if (label) label.textContent = '同步中...';
+    fetch('/sync-whitebox-to-scene-assets', { method: 'POST' })
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (!res || !res.ok) {
+          setStatus(res && res.message ? res.message : '同步失败');
+          return;
+        }
+        var navBtn = document.querySelector('[data-workspace-target="game"]');
+        if (navBtn) navBtn.click();
+        refreshSceneAssetsBrowser();
+        setStatus(res.message || 'Houdini 白盒已同步至资产目录');
+      })
+      .catch(function() { setStatus('同步失败'); })
+      .finally(function() {
+        if (label) label.textContent = previousLabel || '同步至当前编辑器资产目录';
+        if (button) button.disabled = false;
+      });
+  }
+
   function bindSyncButtons() {
     var importBtn = document.getElementById('import-houdini-whitebox-btn');  // 编辑器 资产 tab
     if (importBtn) importBtn.addEventListener('click', syncFromHoudini);
 
     var syncBtn = document.getElementById('sync-to-editor-btn');  // Houdini 构建面板
     if (syncBtn) syncBtn.addEventListener('click', function() {
-      var navBtn = document.querySelector('[data-workspace-target="game"]');
-      if (navBtn) navBtn.click();  // 先切到编辑器工作区
-      syncFromHoudini();
+      syncHoudiniWhiteboxToAssets(syncBtn);
     });
 
     var openDirBtn = document.getElementById('open-export-dir-btn');  // 打开白盒导出目录
@@ -397,12 +555,24 @@
     });
   }
 
+  function getPickableSceneObjects() {
+    var pickables = characters.slice();
+    sceneModels.forEach(function(model) {
+      if (model.layers && model.layers.length) {
+        model.layers.forEach(function(layer) { pickables.push(layer); });
+      } else if (model.root) {
+        pickables.push(model.root);
+      }
+    });
+    return pickables;
+  }
+
   function pickCharacter(event) {
     var rect = sceneHost.getBoundingClientRect();
     mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
     raycaster.setFromCamera(mouse, camera);
-    var hits = raycaster.intersectObjects(characters.concat(whiteboxLayers), true);
+    var hits = raycaster.intersectObjects(getPickableSceneObjects(), true);
     var picked = null;
     for (var i = 0; i < hits.length; i++) {
       var root = hits[i].object.userData.assetRoot;
@@ -411,7 +581,7 @@
         break;
       }
     }
-    selectCharacter(picked);
+    selectSceneObject(picked);
   }
 
   function deleteSelectedCharacter() {
@@ -466,20 +636,20 @@
     var index = characters.indexOf(character);
     if (index >= 0) characters.splice(index, 1);
     scene.remove(character);
-    if (selectedObject === character) selectCharacter(null);
+    if (selectedObject === character) selectSceneObject(null);
     rebuildSceneOutline();
   }
 
   function makeCreateCommand(character) {
     return {
       undo: function() { removeCharacter(character); },
-      redo: function() { addCharacterToScene(character); selectCharacter(character); rebuildSceneOutline(); }
+      redo: function() { addCharacterToScene(character); selectSceneObject(character); rebuildSceneOutline(); }
     };
   }
 
   function makeDeleteCommand(character, index) {
     return {
-      undo: function() { addCharacterToScene(character, index); selectCharacter(character); rebuildSceneOutline(); },
+      undo: function() { addCharacterToScene(character, index); selectSceneObject(character); rebuildSceneOutline(); },
       redo: function() { removeCharacter(character); }
     };
   }
@@ -575,7 +745,7 @@
       if (runLabel) runLabel.textContent = playing ? '停止' : '运行';
     }
     syncEditOverlays();
-    setStatus(playing ? 'WASD 移动，空格跳跃，鼠标控制方向，Esc 停止' : '拖入角色后点击运行');
+    setStatus(playing ? 'WASD 移动，空格跳跃，鼠标控制方向，Esc 停止' : '');
   }
 
   function updateDragPreview(clientX, clientY) {
@@ -585,17 +755,36 @@
   }
 
   function beginAssetDrag(event) {
+    var sceneAsset = event.target.closest('.scene-asset-item[data-scene-asset-path]');
     var button = event.target.closest('[data-game-asset="character"]');
-    if (!button || event.button !== 0 || playMode.isPlaying()) return;
+    if ((!button && !sceneAsset) || event.button !== 0 || playMode.isPlaying()) return;
+    if (sceneAsset && sceneAsset.dataset.sceneAssetCategory !== 'model') return;
     event.preventDefault();
-    dragState = {
-      pointerId: event.pointerId,
-      source: button
-    };
+    if (sceneAsset) {
+      dragState = {
+        kind: 'scene-asset',
+        pointerId: event.pointerId,
+        source: sceneAsset,
+        asset: {
+          name: sceneAsset.dataset.sceneAssetName || '模型资产',
+          url: sceneAsset.dataset.sceneAssetUrl || '',
+          path: sceneAsset.dataset.sceneAssetPath || ''
+        }
+      };
+    } else {
+      dragState = {
+        kind: 'character',
+        pointerId: event.pointerId,
+        source: button
+      };
+    }
     try {
-      button.setPointerCapture(event.pointerId);
+      dragState.source.setPointerCapture(event.pointerId);
     } catch (e) {}
-    dragPreview.hidden = false;
+    if (dragPreview) {
+      dragPreview.textContent = dragState.kind === 'scene-asset' ? dragState.asset.name : '角色';
+      dragPreview.hidden = false;
+    }
     updateDragPreview(event.clientX, event.clientY);
   }
 
@@ -615,8 +804,14 @@
       }
     } catch (e) {}
     var point = screenToGround(event.clientX, event.clientY);
-    if (point) placeCharacterAt(point);
-    dragPreview.hidden = true;
+    if (point) {
+      if (dragState.kind === 'scene-asset') {
+        if (assetLoader && dragState.asset.url) assetLoader.loadSceneAsset(dragState.asset.url, point, dragState.asset.name);
+      } else {
+        placeCharacterAt(point);
+      }
+    }
+    if (dragPreview) dragPreview.hidden = true;
     dragState = null;
   }
 
@@ -801,7 +996,9 @@
 
   function bindInput() {
     var toolbar = document.getElementById('game-toolbar');
+    var sceneAssetGrid = document.getElementById('scene-asset-grid');
     if (toolbar) toolbar.addEventListener('pointerdown', beginAssetDrag);
+    if (sceneAssetGrid) sceneAssetGrid.addEventListener('pointerdown', beginAssetDrag);
     window.addEventListener('pointermove', function(event) {
       if (sideResizeState) return;
       if (playMode.handlePointerMove(event)) return;
@@ -858,6 +1055,10 @@
     gameWorkbench = document.getElementById('game-workbench');
     outlineBody = document.querySelector('#game-scene-outline .action-outline-body');
     if (!sceneHost) return;
+    sceneOutliner = GW.createSceneOutliner({
+      body: outlineBody,
+      onSelect: selectSceneObject
+    });
 
     if (THREE.ColorManagement && 'legacyMode' in THREE.ColorManagement) {
       THREE.ColorManagement.legacyMode = false;
@@ -930,20 +1131,18 @@
       ensureInit: initGameWorkbench,
       getScene: function() { return scene; },
       getSun: function() { return sun; },
-      getLoadedModel: function() { return loadedModel; },
-      setLoadedModel: function(model) { loadedModel = model; },
-      setLoadedWhiteboxUrl: function(url) { loadedWhiteboxUrl = url; },
       getSelectedObject: function() { return selectedObject; },
-      selectCharacter: selectCharacter,
-      setWhiteboxLayers: function(layers) { whiteboxLayers = layers; },
+      selectSceneObject: selectSceneObject,
+      addSceneModel: addSceneModel,
       rebuildSceneOutline: rebuildSceneOutline,
       render: render,
       scheduleSave: scheduleSave
     });
     initialized = true;
     resize();
-    restoreScene();
-    setStatus('拖入角色后点击运行');
+    if (sceneRootReady) restoreScene();
+    else loadSceneRootForWorkbench();
+    setStatus('');
   }
 
   function setActive(nextActive) {
@@ -969,7 +1168,9 @@
     resize: resize,
     setActive: setActive,
     loadGLB: loadGLB,
-    syncFromHoudini: syncFromHoudini
+    syncFromHoudini: syncFromHoudini,
+    newScene: newScene,
+    saveSceneNow: saveSceneNow
   };
 
   if (document.readyState === 'loading') {
@@ -977,4 +1178,7 @@
   } else {
     bindSyncButtons();
   }
+  window.addEventListener('scene-root-changed', function(event) {
+    applySceneRootStatus(event.detail || {});
+  });
 })();

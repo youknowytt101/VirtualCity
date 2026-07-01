@@ -9,11 +9,14 @@ This folder contains the homepage UI for the WorldBuilder area picker.
 - `selection_search.js`: grid loading, fixed-tile selection, persisted selection restore, and location search.
 - `pipeline_status.js`: run/export buttons, status stream handling, progress UI, logs, and data-source rendering.
 - `dcc_bridge.js`: DCC software paths, Houdini launch/probe state, and DCCbridge controls.
+- `scene_project.js`: editor left action buttons, scene root dialog, and scene project root open/save wiring.
+- `scene_assets.js`: editor bottom project asset browser backed by the current scene root.
 - `gw_core.js`: `window.VC_GW` namespace, shared editor-state container (`VC_GW.state`), and base helpers (`safeThree`, `setStatus`). Loads before the other `gw_*` modules.
 - `gw_character.js`: procedural stylized avatar (geometry, toon material, outline shader) and its walk/idle motion rig. Pure factories.
 - `gw_play.js`: third-person play controller (pointer-lock look, WASD movement, follow camera).
 - `gw_camera.js`: editor viewport camera controller (alt-orbit/track/dolly, right-drag look + WASDQE fly, wheel zoom, flight speed). Factory takes a ctx of host references/callbacks.
 - `gw_assets.js`: whitebox GLB import — pure `registerWhiteboxLayers`/`fitSunShadow` plus a ctx-injected load orchestrator (`createAssetLoader`).
+- `gw_outliner.js`: scene outline row/table rendering and active selection row synchronization.
 - `game_workbench.js`: Three.js virtual asset workbench host — scene/renderer bootstrap, grid/ground, selection + transform, undo/redo, scene persistence, scene outline, input routing, and the render loop. Builds the camera controller and asset loader via injected ctx; loads last and aliases the `gw_*` exports.
 - `AI_FRONTEND_HANDOFF.md`: symptom-to-code map for fast AI handoff and debugging.
 - `API_CONTRACT.md`: frontend route contract linking scripts, backend handlers, and required fields.
@@ -21,7 +24,7 @@ This folder contains the homepage UI for the WorldBuilder area picker.
 Keep the automation pipeline boundary stable while iterating on visuals:
 
 - `pipeline_status.js` submits jobs through the unified `/jobs` endpoint (`body.mode` is `generate` or `download`); do not rename it. The legacy `/run` and `/download-data` routes still exist in `server.py` for backward compatibility but are no longer called by the frontend.
-- Frontend scripts rely on: `/tiles`, `/boundary`, `/geocode`, `/status`, `/events` (SSE, with `/status` polling as fallback), `/health`, `/data-sources`, `/selection`, `/selection/clear`, `/software-paths`, `/open-houdini`, `/open-software`, `/close-software`, `/asset-dir`, `/export`, `/restart`, `/session`, and `/session/closed`. Static config is served at `/area-picker/regions.json`, `/area-picker/basemap-style.json`, and `/area-picker/world_countries.json`.
+- Frontend scripts rely on: `/tiles`, `/boundary`, `/geocode`, `/status`, `/events` (SSE, with `/status` polling as fallback), `/health`, `/data-sources`, `/selection`, `/selection/clear`, `/software-paths`, `/open-houdini`, `/open-software`, `/close-software`, `/scene-root`, `/scene-assets`, `/scene-asset-file`, `/sync-whitebox-to-scene-assets`, `/open-scene-root`, `/export`, `/restart`, `/session`, and `/session/closed`. Static config is served at `/area-picker/regions.json`, `/area-picker/basemap-style.json`, and `/area-picker/world_countries.json`.
 - Do not change the meaning of submitted `tile_ids`; Houdini and data acquisition rely on them.
 - Visual changes should generally start in `styles.css`.
 - Interaction and motion changes should stay in the smallest matching script above.

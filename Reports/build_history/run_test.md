@@ -2,8 +2,8 @@
 
 - 区域: `area_test`
 - 最终状态: **completed** (phase: `completed`)
-- 开始: 2026-06-28T12:17:39
-- 结束: 2026-06-28T12:17:39
+- 开始: 2026-07-01T11:23:43
+- 结束: 2026-07-01T11:23:43
 - 总耗时: **0s**
 - 来源: unit-test
 - bbox: [1, 2, 3, 4]
@@ -20,6 +20,6 @@
 
 | 时间 | 距上一步 | 阶段 | 状态 | 信息 |
 | --- | --- | --- | --- | --- |
-| 2026-06-28T12:17:39 | — | `created` | running | pipeline run created |
-| 2026-06-28T12:17:39 | 0s | `refine_data` | running | started |
-| 2026-06-28T12:17:39 | 0s | `completed` | completed | pipeline completed |
+| 2026-07-01T11:23:43 | — | `created` | running | pipeline run created |
+| 2026-07-01T11:23:43 | 0s | `refine_data` | running | started |
+| 2026-07-01T11:23:43 | 0s | `completed` | completed | pipeline completed |
