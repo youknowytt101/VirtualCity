@@ -1,15 +1,16 @@
 // Domain: game-workbench
-// Owns: Three.js editor scene, asset drag/drop, transform controls, and whitebox import into the game workspace.
+// Owns: Three.js editor scene, asset drag/drop, transform controls, whitebox import,
+//       undo/redo history, and localStorage scene persistence in the game workspace.
 // AI handoff: For editor viewport, asset sync, or scene outline issues, start here before checking vc_glb.js.
 (function() {
   'use strict';
 
+  var GW = window.VC_GW;
   var sceneHost = null;
   var dragPreview = null;
   var runButton = null;
   var runLabel = null;
   var speedInput = null;
-  var statusText = null;
   var gameWorkbench = null;
   var renderer = null;
   var scene = null;
@@ -36,108 +37,25 @@
   var transformMode = 'translate';
   var transformModeButtons = [];
   var loadedModel = null;
+  var loadedWhiteboxUrl = null;
+  var assetLoader = null;
   var undoStack = [];
-  var sharedToonGradientMap = null;
+  var redoStack = [];
+  var transformDragSnapshot = null;
+  var saveTimer = null;
+  var restoringScene = false;
   var sideResizeState = null;
   var editorGrid = null;
-  var surfaceRayOrigin = null;
-  var surfaceRayDirection = null;
-  var CHARACTER_COLLIDER_RADIUS = 0.36;
-  var CHARACTER_COLLIDER_HEIGHT = 1.76;
-  var CHARACTER_COLLIDER_SKIN_WIDTH = 0.04;
-  var CHARACTER_COLLIDER_STEP_HEIGHT = 0.45;
-  var CHARACTER_WALKABLE_NORMAL_Z = Math.cos(60 * Math.PI / 180);
 
-  function setStatus(message) {
-    if (statusText) statusText.textContent = message;
-  }
+  var SCENE_STORAGE_KEY = 'vc_game_scene_v1';
 
-  function editorSync() {
-    return window.VC_GAME_EDITOR_SYNC || null;
-  }
-
-  function syncEntityId(object) {
-    if (!object || !object.userData) return '';
-    if (!object.userData.entityId) object.userData.entityId = object.name || '';
-    return object.userData.entityId;
-  }
-
-  function safeThree() {
-    if (!window.THREE) {
-      setStatus('Three.js 未加载');
-      return null;
-    }
-    return window.THREE;
-  }
-
-  function getToonGradientMap() {
-    var THREE = safeThree();
-    if (!THREE) return null;
-    if (sharedToonGradientMap) return sharedToonGradientMap;
-
-    var stops = new Uint8Array([70, 160, 240]);
-    var map = new THREE.DataTexture(stops, stops.length, 1, THREE.RedFormat);
-    map.minFilter = THREE.NearestFilter;
-    map.magFilter = THREE.NearestFilter;
-    map.generateMipmaps = false;
-    map.needsUpdate = true;
-    sharedToonGradientMap = map;
-    return map;
-  }
-
-  function createToonGrayMaterial(color) {
-    return createCharacterMaterial(color || 0x9a9a9a);
-  }
-
-  function createCharacterMaterial(color) {
-    var THREE = safeThree();
-    return new THREE.MeshToonMaterial({
-      color: color,
-      gradientMap: getToonGradientMap()
-    });
-  }
-
-  function createOutlineMaterial(thickness) {
-    var THREE = safeThree();
-    return new THREE.ShaderMaterial({
-      side: THREE.BackSide,
-      uniforms: {
-        outlineColor: { value: new THREE.Color(0x141414) },
-        outlineThickness: { value: thickness || 0.012 }
-      },
-      vertexShader: [
-        'uniform float outlineThickness;',
-        'void main() {',
-        '  vec3 pushed = position + normalize(normal) * outlineThickness;',
-        '  gl_Position = projectionMatrix * modelViewMatrix * vec4(pushed, 1.0);',
-        '}'
-      ].join('\n'),
-      fragmentShader: [
-        'uniform vec3 outlineColor;',
-        'void main() {',
-        '  gl_FragColor = vec4(outlineColor, 1.0);',
-        '}'
-      ].join('\n')
-    });
-  }
-
-  function createOutlineMesh(geometry, thickness) {
-    var THREE = safeThree();
-    var material = createOutlineMaterial(thickness);
-    var outline = new THREE.Mesh(geometry, material);
-    outline.userData.pickable = false;
-    outline.userData.outline = true;
-    outline.userData.outlineBaseColor = material.uniforms.outlineColor.value.clone();
-    outline.userData.outlineBaseThickness = material.uniforms.outlineThickness.value;
-    return outline;
-  }
-
-  function setOutlineSelected(outline, selected) {
-    var uniforms = outline.material && outline.material.uniforms;
-    if (!uniforms || !uniforms.outlineColor || !uniforms.outlineThickness) return;
-    uniforms.outlineColor.value.set(selected ? 0xffc400 : outline.userData.outlineBaseColor);
-    uniforms.outlineThickness.value = selected ? 0.026 : outline.userData.outlineBaseThickness;
-  }
+  // Aliases into the split modules (gw_core/gw_character/gw_play). These load
+  // before game_workbench.js, so VC_GW.* is populated by the time this IIFE runs.
+  var setStatus = GW.setStatus;
+  var safeThree = GW.safeThree;
+  var setOutlineSelected = GW.setOutlineSelected;
+  var createCharacter = GW.createCharacter;
+  var createPlayModeController = GW.createPlayModeController;
 
   function syncSelectionHighlight() {
     var playing = playMode && playMode.isPlaying();
@@ -166,228 +84,14 @@
     });
   }
 
-  function createCharacterPart(options) {
-    var THREE = safeThree();
-    var mesh = new THREE.Mesh(options.geometry, options.material);
-    mesh.name = options.name;
-    if (options.position) mesh.position.set(options.position[0], options.position[1], options.position[2]);
-    if (options.rotation) mesh.rotation.set(options.rotation[0], options.rotation[1], options.rotation[2]);
-    if (options.scale) mesh.scale.set(options.scale[0], options.scale[1], options.scale[2]);
-    if (options.outline !== false) mesh.add(createOutlineMesh(options.geometry, options.outline || 0.012));
-    mesh.userData.restPosition = mesh.position.clone();
-    mesh.userData.restRotation = mesh.rotation.clone();
-    return mesh;
-  }
-
-  function createCharacter() {
-    var THREE = safeThree();
-    var character = new THREE.Group();
-    var Capsule = THREE.CapsuleGeometry || THREE.CylinderGeometry;
-    var bodyGeometry = THREE.CapsuleGeometry
-      ? new Capsule(0.27, 0.72, 6, 14)
-      : new Capsule(0.27, 0.27, 1.08, 14);
-    var limbGeometry = THREE.CapsuleGeometry
-      ? new Capsule(0.075, 0.42, 5, 10)
-      : new Capsule(0.075, 0.075, 0.58, 10);
-    var legGeometry = THREE.CapsuleGeometry
-      ? new Capsule(0.09, 0.42, 5, 10)
-      : new Capsule(0.09, 0.09, 0.6, 10);
-    var materials = {
-      suit: createCharacterMaterial(0x4f8fd8),
-      accent: createCharacterMaterial(0xf2c94c),
-      dark: createCharacterMaterial(0x242a31),
-      cloth: createCharacterMaterial(0x6f7680),
-      skin: createCharacterMaterial(0xd8c4a8)
-    };
-    var body = createCharacterPart({
-      name: 'player-body',
-      geometry: bodyGeometry,
-      material: materials.suit,
-      position: [0, 0, 0.88],
-      rotation: [Math.PI / 2, 0, 0],
-      outline: 0.014
-    });
-    var chest = createCharacterPart({
-      name: 'player-chest-marker',
-      geometry: new THREE.BoxGeometry(0.32, 0.045, 0.2),
-      material: materials.accent,
-      position: [0, 0.265, 1.02],
-      outline: 0.006
-    });
-    var head = createCharacterPart({
-      name: 'player-head',
-      geometry: new THREE.SphereGeometry(0.24, 24, 16),
-      material: materials.skin,
-      position: [0, 0.02, 1.5],
-      outline: 0.012
-    });
-    var helmet = createCharacterPart({
-      name: 'player-helmet',
-      geometry: new THREE.SphereGeometry(0.255, 24, 12),
-      material: materials.dark,
-      position: [0, 0.01, 1.58],
-      scale: [1.04, 1.04, 0.72],
-      outline: 0.01
-    });
-    var visor = createCharacterPart({
-      name: 'player-visor',
-      geometry: new THREE.BoxGeometry(0.3, 0.055, 0.085),
-      material: materials.accent,
-      position: [0, 0.235, 1.54],
-      outline: 0.006
-    });
-    var brim = createCharacterPart({
-      name: 'player-helmet-brim',
-      geometry: new THREE.BoxGeometry(0.34, 0.18, 0.04),
-      material: materials.dark,
-      position: [0, 0.18, 1.7],
-      outline: 0.006
-    });
-    var backpack = createCharacterPart({
-      name: 'player-backpack',
-      geometry: new THREE.BoxGeometry(0.38, 0.16, 0.52),
-      material: materials.dark,
-      position: [0, -0.245, 0.91],
-      outline: 0.01
-    });
-    var leftArm = createCharacterPart({
-      name: 'player-left-arm',
-      geometry: limbGeometry,
-      material: materials.cloth,
-      position: [-0.37, 0.01, 0.88],
-      rotation: [Math.PI / 2, 0, 0.16],
-      outline: 0.01
-    });
-    var rightArm = createCharacterPart({
-      name: 'player-right-arm',
-      geometry: limbGeometry,
-      material: materials.cloth,
-      position: [0.37, 0.01, 0.88],
-      rotation: [Math.PI / 2, 0, -0.16],
-      outline: 0.01
-    });
-    var leftLeg = createCharacterPart({
-      name: 'player-left-leg',
-      geometry: legGeometry,
-      material: materials.dark,
-      position: [-0.15, 0, 0.36],
-      rotation: [Math.PI / 2, 0, 0.04],
-      outline: 0.01
-    });
-    var rightLeg = createCharacterPart({
-      name: 'player-right-leg',
-      geometry: legGeometry,
-      material: materials.dark,
-      position: [0.15, 0, 0.36],
-      rotation: [Math.PI / 2, 0, -0.04],
-      outline: 0.01
-    });
-    var leftFoot = createCharacterPart({
-      name: 'player-left-foot',
-      geometry: new THREE.BoxGeometry(0.22, 0.38, 0.11),
-      material: materials.dark,
-      position: [-0.15, 0.1, 0.06],
-      outline: 0.008
-    });
-    var rightFoot = createCharacterPart({
-      name: 'player-right-foot',
-      geometry: new THREE.BoxGeometry(0.22, 0.38, 0.11),
-      material: materials.dark,
-      position: [0.15, 0.1, 0.06],
-      outline: 0.008
-    });
-
-    character.userData.motionParts = {
-      upper: [body, chest, head, helmet, visor, brim, backpack],
-      leftArm: leftArm,
-      rightArm: rightArm,
-      leftLeg: leftLeg,
-      rightLeg: rightLeg,
-      leftFoot: leftFoot,
-      rightFoot: rightFoot
-    };
-    character.userData.collider = {
-      radius: CHARACTER_COLLIDER_RADIUS,
-      height: CHARACTER_COLLIDER_HEIGHT,
-      skinWidth: CHARACTER_COLLIDER_SKIN_WIDTH,
-      stepHeight: CHARACTER_COLLIDER_STEP_HEIGHT,
-      walkableNormalZ: CHARACTER_WALKABLE_NORMAL_Z
-    };
-    character.add(
-      backpack,
-      body,
-      chest,
-      leftArm,
-      rightArm,
-      leftLeg,
-      rightLeg,
-      leftFoot,
-      rightFoot,
-      head,
-      helmet,
-      visor,
-      brim
-    );
-    resetCharacterMotion(character);
-    return character;
-  }
-
-  function resetPartMotion(part) {
-    if (!part || !part.userData.restPosition || !part.userData.restRotation) return;
-    part.position.copy(part.userData.restPosition);
-    part.rotation.copy(part.userData.restRotation);
-  }
-
-  function resetCharacterMotion(character) {
-    var parts = character && character.userData.motionParts;
-    if (!parts) return;
-    parts.upper.forEach(resetPartMotion);
-    resetPartMotion(parts.leftArm);
-    resetPartMotion(parts.rightArm);
-    resetPartMotion(parts.leftLeg);
-    resetPartMotion(parts.rightLeg);
-    resetPartMotion(parts.leftFoot);
-    resetPartMotion(parts.rightFoot);
-  }
-
-  function updateCharacterMotion(character, moveDirection, deltaTime) {
-    var parts = character && character.userData.motionParts;
-    if (!parts) return;
-    var moving = moveDirection && moveDirection.lengthSq() > 0.0001;
-    character.userData.motionTime = (character.userData.motionTime || 0) + deltaTime * (moving ? 10 : 3);
-    resetCharacterMotion(character);
-    if (!moving) {
-      var idle = Math.sin(character.userData.motionTime) * 0.012;
-      parts.upper.forEach(function(part) {
-        part.position.z += idle;
-      });
-      return;
-    }
-
-    var stride = Math.sin(character.userData.motionTime);
-    var counterStride = Math.sin(character.userData.motionTime + Math.PI);
-    var bob = Math.abs(Math.sin(character.userData.motionTime * 2)) * 0.045;
-    parts.upper.forEach(function(part) {
-      part.position.z += bob;
-    });
-    parts.leftArm.rotation.x += counterStride * 0.42;
-    parts.rightArm.rotation.x += stride * 0.42;
-    parts.leftLeg.rotation.x += stride * 0.32;
-    parts.rightLeg.rotation.x += counterStride * 0.32;
-    parts.leftFoot.position.y += Math.max(0, stride) * 0.08;
-    parts.rightFoot.position.y += Math.max(0, counterStride) * 0.08;
-  }
-
   function markCharacter(character) {
     var id = 'character-' + String(characters.length + 1).padStart(2, '0');
     character.name = id;
-    character.userData.entityId = id;
     character.userData.assetRoot = character;
     character.userData.assetType = 'character';
     character.traverse(function(child) {
       child.castShadow = true;
       child.receiveShadow = true;
-      child.userData.entityId = id;
       child.userData.assetRoot = character;
       child.userData.assetType = 'character';
     });
@@ -444,440 +148,6 @@
     scene.add(shadow);
   }
 
-  function createPlayModeController(options) {
-    var THREE = safeThree();
-    var config = Object.assign({
-      cameraDistance: 6,
-      cameraHeight: 1.8,
-      cameraTargetHeight: 1.2,
-      lookSensitivity: 0.0025,
-      maxPitch: 1.47,
-      minPitch: -1.4,
-      moveSpeed: 4.5,
-      shoulderOffset: 0.45,
-      lookDamping: 18
-    }, options.options || {});
-    var groundCharacter = typeof options.groundCharacter === 'function'
-      ? options.groundCharacter
-      : function() { return false; };
-    var movementKeys = { keyw: true, keya: true, keys: true, keyd: true };
-    var keys = {};
-    var forward = new THREE.Vector3();
-    var moveDirection = new THREE.Vector3();
-    var right = new THREE.Vector3();
-    var cameraPosition = new THREE.Vector3();
-    var focusPoint = new THREE.Vector3();
-    var previousPlayerPosition = new THREE.Vector3();
-    var player = null;
-    var playing = false;
-    var yaw = 0;
-    var pitch = 0.18;
-    var targetYaw = 0;
-    var targetPitch = 0.18;
-    var canvas = options.renderer.domElement;
-
-    function isPointerLocked() {
-      return document.pointerLockElement === canvas;
-    }
-
-    function requestPointerLock() {
-      if (!isPointerLocked() && canvas.requestPointerLock) {
-        var result = canvas.requestPointerLock();
-        if (result && typeof result.catch === 'function') result.catch(function() {});
-      }
-    }
-
-    function exitPointerLock() {
-      if (isPointerLocked() && document.exitPointerLock) document.exitPointerLock();
-    }
-
-    function syncYawFromCamera() {
-      options.camera.getWorldDirection(forward);
-      yaw = forward.lengthSq() ? Math.atan2(forward.y, forward.x) : 0;
-      targetYaw = yaw;
-    }
-
-    function getGroundForward() {
-      return forward.set(Math.cos(yaw), Math.sin(yaw), 0).normalize();
-    }
-
-    function getGroundRight() {
-      return right.set(Math.sin(yaw), -Math.cos(yaw), 0).normalize();
-    }
-
-    function updateCamera() {
-      if (!player) return;
-      var groundForward = getGroundForward();
-      var groundRight = getGroundRight();
-      var horizontalDistance = config.cameraDistance * Math.cos(pitch);
-      var verticalOffset = config.cameraHeight + config.cameraDistance * Math.sin(pitch);
-
-      focusPoint.copy(player.position);
-      focusPoint.z += config.cameraTargetHeight;
-      cameraPosition
-        .copy(focusPoint)
-        .addScaledVector(groundForward, -horizontalDistance)
-        .addScaledVector(groundRight, config.shoulderOffset);
-      cameraPosition.z += verticalOffset;
-      options.camera.position.copy(cameraPosition);
-      options.camera.lookAt(focusPoint);
-    }
-
-    document.addEventListener('pointerlockchange', function() {
-      if (playing && !isPointerLocked()) keys = {};
-    });
-
-    function enter(character) {
-      if (!character || character.userData.assetType !== 'character') return false;
-      player = character;
-      playing = true;
-      keys = {};
-      syncYawFromCamera();
-      pitch = 0.18;
-      targetYaw = yaw;
-      targetPitch = pitch;
-      canvas.focus();
-      updateCamera();
-      options.onChange(true);
-      return true;
-    }
-
-    function exit() {
-      if (!playing) return false;
-      resetCharacterMotion(player);
-      playing = false;
-      player = null;
-      keys = {};
-      exitPointerLock();
-      options.onChange(false);
-      return true;
-    }
-
-    function handleKeyDown(event) {
-      if (!playing) return false;
-      var code = event.code.toLowerCase();
-      event.preventDefault();
-      if (code === 'escape') {
-        exit();
-        return true;
-      }
-      if (movementKeys[code]) keys[code] = true;
-      return true;
-    }
-
-    function handleKeyUp(event) {
-      if (!playing) return false;
-      var code = event.code.toLowerCase();
-      event.preventDefault();
-      if (movementKeys[code]) delete keys[code];
-      return true;
-    }
-
-    function handlePointerDown(event) {
-      if (!playing) return false;
-      event.preventDefault();
-      canvas.focus();
-      requestPointerLock();
-      return true;
-    }
-
-    function handlePointerMove(event) {
-      if (!playing) return false;
-      if (!isPointerLocked()) return true;
-      event.preventDefault();
-      var maxDelta = 200;
-      var dx = event.movementX || 0;
-      var dy = event.movementY || 0;
-      if (Math.abs(dx) > maxDelta || Math.abs(dy) > maxDelta) return true;
-      if (!dx && !dy) return true;
-      targetYaw -= dx * config.lookSensitivity;
-      targetPitch = THREE.MathUtils.clamp(
-        targetPitch + dy * config.lookSensitivity,
-        config.minPitch,
-        config.maxPitch
-      );
-      return true;
-    }
-
-    function update(deltaTime) {
-      if (!playing || !player) return false;
-      var t = 1 - Math.exp(-config.lookDamping * deltaTime);
-      yaw += (targetYaw - yaw) * t;
-      pitch += (targetPitch - pitch) * t;
-      moveDirection.set(0, 0, 0);
-      if (keys.keyw) moveDirection.add(getGroundForward());
-      if (keys.keys) moveDirection.addScaledVector(getGroundForward(), -1);
-      if (keys.keyd) moveDirection.add(getGroundRight());
-      if (keys.keya) moveDirection.addScaledVector(getGroundRight(), -1);
-      previousPlayerPosition.copy(player.position);
-      if (moveDirection.lengthSq() > 0) {
-        moveDirection.normalize();
-        player.position.addScaledVector(moveDirection, config.moveSpeed * deltaTime);
-        player.rotation.z = Math.atan2(moveDirection.y, moveDirection.x) - Math.PI / 2;
-      }
-      groundCharacter(player, previousPlayerPosition);
-      updateCharacterMotion(player, moveDirection, deltaTime);
-      updateCamera();
-      return true;
-    }
-
-    return {
-      clearInput: function() { keys = {}; },
-      enter: enter,
-      exit: exit,
-      handleKeyDown: handleKeyDown,
-      handleKeyUp: handleKeyUp,
-      handlePointerDown: handlePointerDown,
-      handlePointerMove: handlePointerMove,
-      isPlaying: function() { return playing; },
-      update: update
-    };
-  }
-
-  function createGameCameraController() {
-    var THREE = safeThree();
-    var keys = {};
-    var rightDown = false;
-    var cameraDragState = null;
-    var forward = new THREE.Vector3();
-    var right = new THREE.Vector3();
-    var viewUp = new THREE.Vector3();
-    var orbitOffset = new THREE.Vector3();
-    var panDelta = new THREE.Vector3();
-    var up = new THREE.Vector3(0, 0, 1);
-    var yaw = 0;
-    var pitch = 0;
-    var moveSpeed = 35;
-
-    function setMoveSpeed(value) {
-      var numericSpeed = Number(value);
-      if (!Number.isFinite(numericSpeed)) return moveSpeed;
-      moveSpeed = THREE.MathUtils.clamp(numericSpeed, 1, 150);
-      if (speedInput) speedInput.value = String(Math.round(moveSpeed));
-      return moveSpeed;
-    }
-
-    function adjustMoveSpeed(event) {
-      event.preventDefault();
-      return setMoveSpeed(moveSpeed + (event.deltaY < 0 ? 1 : -1));
-    }
-
-    function syncRotationFromCamera() {
-      camera.getWorldDirection(forward);
-      yaw = Math.atan2(forward.y, forward.x);
-      pitch = Math.asin(THREE.MathUtils.clamp(forward.z, -1, 1));
-    }
-
-    function updateCameraRotation() {
-      forward.set(
-        Math.cos(pitch) * Math.cos(yaw),
-        Math.cos(pitch) * Math.sin(yaw),
-        Math.sin(pitch)
-      );
-      camera.lookAt(camera.position.clone().add(forward));
-    }
-
-    function updateAxes() {
-      camera.getWorldDirection(forward).normalize();
-      right.crossVectors(forward, up);
-      if (right.lengthSq() === 0) right.set(1, 0, 0);
-      else right.normalize();
-      viewUp.crossVectors(right, forward).normalize();
-    }
-
-    function getViewportPivot(event) {
-      if (selectedCharacter) {
-        var box = new THREE.Box3().setFromObject(selectedCharacter);
-        if (!box.isEmpty()) return box.getCenter(new THREE.Vector3());
-      }
-      var point = screenToGround(event.clientX, event.clientY);
-      if (point) return point;
-      camera.getWorldDirection(forward);
-      return camera.position.clone().addScaledVector(forward, 10);
-    }
-
-    function beginViewportDrag(mode, event, target) {
-      var state = {
-        mode: mode,
-        pointerId: event.pointerId,
-        lastX: event.clientX,
-        lastY: event.clientY,
-        target: target || null
-      };
-      if (target && (mode === 'orbit' || mode === 'dolly' || mode === 'track')) {
-        orbitOffset.copy(camera.position).sub(target);
-        state.distance = Math.max(orbitOffset.length(), 0.001);
-        state.yaw = Math.atan2(orbitOffset.y, orbitOffset.x);
-        state.elevation = Math.asin(THREE.MathUtils.clamp(orbitOffset.z / state.distance, -1, 1));
-      }
-      cameraDragState = state;
-      sceneHost.setPointerCapture(event.pointerId);
-      sceneHost.focus();
-    }
-
-    function handleAltViewportDrag(event) {
-      var state = cameraDragState;
-      if (!state || event.pointerId !== state.pointerId) return false;
-      var dx = event.clientX - state.lastX;
-      var dy = event.clientY - state.lastY;
-      state.lastX = event.clientX;
-      state.lastY = event.clientY;
-
-      if (state.mode === 'look') {
-        yaw -= dx * 0.003;
-        pitch -= dy * 0.003;
-        pitch = THREE.MathUtils.clamp(pitch, -Math.PI / 2 + 0.02, Math.PI / 2 - 0.02);
-        updateCameraRotation();
-        return true;
-      }
-
-      if (!state.target) return true;
-
-      if (state.mode === 'orbit') {
-        state.yaw -= dx * 0.005;
-        state.elevation += dy * 0.005;
-        state.elevation = THREE.MathUtils.clamp(state.elevation, -Math.PI / 2 + 0.05, Math.PI / 2 - 0.05);
-        var radiusOnGround = Math.cos(state.elevation) * state.distance;
-        orbitOffset.set(
-          Math.cos(state.yaw) * radiusOnGround,
-          Math.sin(state.yaw) * radiusOnGround,
-          Math.sin(state.elevation) * state.distance
-        );
-        camera.position.copy(state.target).add(orbitOffset);
-        camera.lookAt(state.target);
-        syncRotationFromCamera();
-        return true;
-      }
-
-      if (state.mode === 'track') {
-        updateAxes();
-        var scale = Math.max(state.distance * 0.002, 0.006);
-        panDelta.set(0, 0, 0);
-        panDelta.addScaledVector(right, dx * scale);
-        panDelta.addScaledVector(viewUp, -dy * scale);
-        camera.position.add(panDelta);
-        state.target.add(panDelta);
-        return true;
-      }
-
-      if (state.mode === 'dolly') {
-        state.distance = Math.max(0.35, state.distance - dy * state.distance * 0.01);
-        orbitOffset.copy(camera.position).sub(state.target).normalize().multiplyScalar(state.distance);
-        camera.position.copy(state.target).add(orbitOffset);
-        camera.lookAt(state.target);
-        syncRotationFromCamera();
-        return true;
-      }
-
-      return true;
-    }
-
-    function handlePointerDown(event) {
-      if (playMode && playMode.isPlaying()) return false;
-      if (event.altKey && event.button >= 0 && event.button <= 2) {
-        event.preventDefault();
-        var target = getViewportPivot(event);
-        if (event.button === 0) beginViewportDrag('orbit', event, target);
-        else if (event.button === 1) beginViewportDrag('track', event, target);
-        else if (event.button === 2) beginViewportDrag('dolly', event, target);
-        return true;
-      }
-      if (event.button === 2) {
-        event.preventDefault();
-        rightDown = true;
-        syncRotationFromCamera();
-        beginViewportDrag('look', event, null);
-        return true;
-      }
-      if (event.button === 1) {
-        event.preventDefault();
-        beginViewportDrag('track', event, getViewportPivot(event));
-        return true;
-      }
-      if (event.button === 0 && !dragState) {
-        if (isTransformControlActive()) return true;
-        pickCharacter(event);
-        return true;
-      }
-      return false;
-    }
-
-    function handlePointerMove(event) {
-      if (!cameraDragState) return false;
-      event.preventDefault();
-      handleAltViewportDrag(event);
-      return true;
-    }
-
-    function handlePointerUp(event) {
-      if (!cameraDragState) return false;
-      event.preventDefault();
-      if (cameraDragState.mode === 'look') rightDown = false;
-      var pointerId = cameraDragState.pointerId;
-      cameraDragState = null;
-      try {
-        sceneHost.releasePointerCapture(pointerId);
-      } catch (e) {}
-      return true;
-    }
-
-    function update(deltaTime) {
-      if (!rightDown) return false;
-      var moved = false;
-      var speed = keys.shiftleft || keys.shiftright ? moveSpeed * 2.5 : moveSpeed;
-      var distance = speed * deltaTime;
-      updateAxes();
-      if (keys.keyw) {
-        camera.position.addScaledVector(forward, distance);
-        moved = true;
-      }
-      if (keys.keys) {
-        camera.position.addScaledVector(forward, -distance);
-        moved = true;
-      }
-      if (keys.keyd) {
-        camera.position.addScaledVector(right, distance);
-        moved = true;
-      }
-      if (keys.keya) {
-        camera.position.addScaledVector(right, -distance);
-        moved = true;
-      }
-      if (keys.keye) {
-        camera.position.z += distance;
-        moved = true;
-      }
-      if (keys.keyq) {
-        camera.position.z -= distance;
-        moved = true;
-      }
-      return moved;
-    }
-
-    return {
-      clearState: function() {
-        keys = {};
-        rightDown = false;
-        cameraDragState = null;
-      },
-      handlePointerDown: handlePointerDown,
-      handlePointerMove: handlePointerMove,
-      handlePointerUp: handlePointerUp,
-      isLooking: function() { return rightDown; },
-      pressKey: function(code) { keys[code] = true; },
-      releaseKey: function(event) { delete keys[event.code.toLowerCase()]; },
-      setMoveSpeed: setMoveSpeed,
-      adjustMoveSpeed: adjustMoveSpeed,
-      syncRotationFromCamera: syncRotationFromCamera,
-      update: update,
-      zoomView: function(event) {
-        event.preventDefault();
-        camera.getWorldDirection(forward);
-        camera.position.addScaledVector(forward, -event.deltaY * 0.02);
-      }
-    };
-  }
-
   function screenToGround(clientX, clientY) {
     var rect = sceneHost.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return null;
@@ -887,206 +157,31 @@
     return raycaster.ray.intersectPlane(groundPlane, hitPoint) ? hitPoint.clone() : null;
   }
 
-  function getWhiteboxCollisionMeshes() {
-    var meshes = [];
-    whiteboxLayers.forEach(function(layer) {
-      if (!layer.userData || !layer.userData.collisionEnabled) return;
-      layer.traverse(function(node) {
-        if (!node.isMesh || !node.geometry) return;
-        meshes.push(node);
-      });
-    });
-    return meshes;
-  }
-
-  function getDefaultCharacterCollider() {
-    return {
-      radius: CHARACTER_COLLIDER_RADIUS,
-      height: CHARACTER_COLLIDER_HEIGHT,
-      skinWidth: CHARACTER_COLLIDER_SKIN_WIDTH,
-      stepHeight: CHARACTER_COLLIDER_STEP_HEIGHT,
-      walkableNormalZ: CHARACTER_WALKABLE_NORMAL_Z
-    };
-  }
-
-  function getCharacterCollider(character) {
-    var collider = getDefaultCharacterCollider();
-    var source = character && character.userData && character.userData.collider;
-    if (!source) return collider;
-    collider.radius = source.radius || collider.radius;
-    collider.height = source.height || collider.height;
-    collider.skinWidth = source.skinWidth || collider.skinWidth;
-    collider.stepHeight = source.stepHeight || collider.stepHeight;
-    collider.walkableNormalZ = source.walkableNormalZ || collider.walkableNormalZ;
-    return collider;
-  }
-
-  function getHitWorldNormal(hit) {
+  // Height of the ground under (x, y): cast a ray straight down from high above
+  // and return the first whitebox surface hit, falling back to the z=0 plane.
+  // Injected into the play controller so gravity lands the character on terrain.
+  function sampleGroundHeight(x, y) {
     var THREE = safeThree();
-    if (!THREE || !hit || !hit.face || !hit.object) return null;
-    return hit.face.normal
-      .clone()
-      .applyMatrix3(new THREE.Matrix3().getNormalMatrix(hit.object.matrixWorld))
-      .normalize();
-  }
-
-  function isWalkableHit(hit, collider) {
-    var worldNormal = getHitWorldNormal(hit);
-    if (!worldNormal) return false;
-    if (worldNormal.z < collider.walkableNormalZ) return false;
-    return true;
-  }
-
-  function firstWalkableHit(hits, collider) {
-    for (var i = 0; i < hits.length; i++) {
-      if (isWalkableHit(hits[i], collider)) return hits[i];
-    }
-    return null;
-  }
-
-  function screenToWhiteboxSurface(clientX, clientY) {
-    var rect = sceneHost.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return null;
-    var meshes = getWhiteboxCollisionMeshes();
-    if (!meshes.length) return null;
-    mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -(((clientY - rect.top) / rect.height) * 2 - 1);
-    raycaster.setFromCamera(mouse, camera);
-    var hits = raycaster.intersectObjects(meshes, true);
-    var hit = firstWalkableHit(hits, getDefaultCharacterCollider());
-    return hit ? hit.point.clone() : null;
-  }
-
-  function getCharacterFootprintProbeOffsets(radius) {
-    var diagonal = radius * Math.SQRT1_2;
-    return [
-      { x: 0, y: 0 },
-      { x: radius, y: 0 },
-      { x: -radius, y: 0 },
-      { x: 0, y: radius },
-      { x: 0, y: -radius },
-      { x: diagonal, y: diagonal },
-      { x: diagonal, y: -diagonal },
-      { x: -diagonal, y: diagonal },
-      { x: -diagonal, y: -diagonal }
-    ];
-  }
-
-  function getWalkableWhiteboxHitAtXY(x, y, startZ, collider) {
-    var meshes = getWhiteboxCollisionMeshes();
-    if (!meshes.length || !surfaceRayOrigin || !surfaceRayDirection || !raycaster) return null;
-    var previousNear = raycaster.near;
-    var previousFar = raycaster.far;
-    surfaceRayOrigin.set(x, y, Math.max(startZ || 0, 0) + 1000);
-    raycaster.near = 0;
-    raycaster.far = Infinity;
-    raycaster.set(surfaceRayOrigin, surfaceRayDirection);
-    var hits = raycaster.intersectObjects(meshes, true);
-    raycaster.near = previousNear;
-    raycaster.far = previousFar;
-    return firstWalkableHit(hits, collider);
-  }
-
-  function snapPointToWhiteboxSurface(point, options) {
-    var THREE = safeThree();
-    var meshes = getWhiteboxCollisionMeshes();
-    var collider = options && options.collider ? options.collider : getDefaultCharacterCollider();
-    if (!point || !THREE) return null;
-    if (!meshes.length || !surfaceRayOrigin || !surfaceRayDirection) {
-      return new THREE.Vector3(point.x, point.y, 0);
-    }
-    var bestPoint = null;
-    var probeOffsets = getCharacterFootprintProbeOffsets(collider.radius + collider.skinWidth);
-    probeOffsets.forEach(function(offset) {
-      var hit = getWalkableWhiteboxHitAtXY(
-        point.x + offset.x,
-        point.y + offset.y,
-        point.z,
-        collider
-      );
-      if (!hit) return;
-      if (!bestPoint || hit.point.z > bestPoint.z) bestPoint = hit.point.clone();
-    });
-    return bestPoint || new THREE.Vector3(point.x, point.y, 0);
-  }
-
-  function isCharacterMoveBlockedByWhitebox(previousPosition, desiredPosition, collider) {
-    var THREE = safeThree();
-    var meshes = getWhiteboxCollisionMeshes();
-    if (!THREE || !raycaster || !meshes.length || !previousPosition || !desiredPosition) return false;
-    var travel = new THREE.Vector3(
-      desiredPosition.x - previousPosition.x,
-      desiredPosition.y - previousPosition.y,
-      0
-    );
-    var travelDistance = travel.length();
-    if (travelDistance <= 0.0001) return false;
-    var direction = travel.normalize();
-    var side = new THREE.Vector3(-direction.y, direction.x, 0);
-    var maxDistance = travelDistance + collider.radius + collider.skinWidth;
-    var lateralOffsets = [0, collider.radius, -collider.radius];
-    var heights = [
-      collider.skinWidth,
-      collider.height * 0.5,
-      Math.max(collider.skinWidth, collider.height - collider.skinWidth)
-    ];
-    var previousNear = raycaster.near;
-    var previousFar = raycaster.far;
-    var blocked = false;
-    raycaster.near = 0;
-    raycaster.far = maxDistance;
-    for (var i = 0; i < heights.length && !blocked; i++) {
-      for (var l = 0; l < lateralOffsets.length && !blocked; l++) {
-        var origin = new THREE.Vector3(previousPosition.x, previousPosition.y, previousPosition.z + heights[i]);
-        origin.addScaledVector(side, lateralOffsets[l]);
-        raycaster.set(origin, direction);
-        var hits = raycaster.intersectObjects(meshes, true);
-        for (var h = 0; h < hits.length; h++) {
-          if (isWalkableHit(hits[h], collider)) continue;
-          blocked = true;
-          break;
-        }
+    if (!THREE || !raycaster) return 0;
+    raycaster.set(new THREE.Vector3(x, y, 100000), new THREE.Vector3(0, 0, -1));
+    if (whiteboxLayers.length) {
+      var hits = raycaster.intersectObjects(whiteboxLayers, true);
+      for (var i = 0; i < hits.length; i++) {
+        var obj = hits[i].object;
+        if (obj && obj.userData && obj.userData.pickable === false) continue;
+        return hits[i].point.z;
       }
     }
-    raycaster.near = previousNear;
-    raycaster.far = previousFar;
-    return blocked;
-  }
-
-  function resolveCharacterWhiteboxCollision(character, desiredPosition, previousPosition) {
-    var THREE = safeThree();
-    if (!THREE || !desiredPosition) return null;
-    var collider = getCharacterCollider(character);
-    var resolved = desiredPosition.clone();
-    if (previousPosition) {
-      if (isCharacterMoveBlockedByWhitebox(previousPosition, resolved, collider)) {
-        resolved.x = previousPosition.x;
-        resolved.y = previousPosition.y;
-      }
-    }
-    var point = snapPointToWhiteboxSurface(resolved, { collider: collider });
-    if (point) resolved.z = point.z || 0;
-    return resolved;
-  }
-
-  function groundCharacterOnWhitebox(character, previousPosition) {
-    if (!character || !character.position) return false;
-    var resolved = resolveCharacterWhiteboxCollision(character, character.position, previousPosition);
-    if (!resolved) return false;
-    character.position.copy(resolved);
-    return true;
+    return 0;
   }
 
   function placeCharacterAt(point) {
     var character = markCharacter(createCharacter());
-    character.position.set(point.x, point.y, point.z || 0);
+    character.position.set(point.x, point.y, 0);
     scene.add(character);
-    groundCharacterOnWhitebox(character);
-    var sync = editorSync();
-    if (sync && sync.characterAdded) sync.characterAdded(character);
     selectCharacter(character);
     rebuildSceneOutline();
-    undoStack.push({ type: 'create', character: character });
+    pushCommand(makeCreateCommand(character));
     setStatus('角色已放置，按 Space 或点击运行');
     return character;
   }
@@ -1104,8 +199,6 @@
     transformMode = mode;
     if (transformControls) transformControls.setMode(transformMode);
     updateTransformModeButtons();
-    var sync = editorSync();
-    if (sync && sync.transformModeChanged) sync.transformModeChanged(mode);
     render();
   }
 
@@ -1134,7 +227,6 @@
   function selectCharacter(object) {
     selectedObject = object || null;
     selectedCharacter = (object && object.userData && object.userData.assetType === 'character') ? object : null;
-    syncEntityId(selectedObject);
     if (transformControls) {
       if (selectedObject) transformControls.attach(selectedObject);
       else transformControls.detach();
@@ -1143,8 +235,6 @@
     }
     syncEditOverlays();
     refreshOutlineActive();
-    var sync = editorSync();
-    if (sync && sync.selectionChanged) sync.selectionChanged(selectedObject);
   }
 
   function syncEditOverlays() {
@@ -1164,7 +254,16 @@
       transformControls.setMode(transformMode);
       transformControls.setSize(1);
       transformControls.addEventListener("dragging-changed", function(event) {
-        if (event.value && cameraControls) cameraControls.clearState();
+        if (event.value) {
+          if (cameraControls) cameraControls.clearState();
+          transformDragSnapshot = selectedObject ? captureTransform(selectedObject) : null;
+        } else if (transformDragSnapshot && selectedObject) {
+          var after = captureTransform(selectedObject);
+          if (transformChanged(transformDragSnapshot, after)) {
+            pushCommand(makeTransformCommand(selectedObject, transformDragSnapshot, after));
+          }
+          transformDragSnapshot = null;
+        }
       });
       transformControls.addEventListener('change', render);
       scene.add(transformControls);
@@ -1175,93 +274,67 @@
     });
   }
 
+  // Scene persistence. Characters are procedural, so we only need to store each
+  // one's transform (rebuilt via createCharacter on restore) plus the last
+  // whitebox URL. Saves are debounced; restore replays the snapshot and is
+  // guarded by restoringScene so it never re-triggers a save mid-rebuild.
+  function serializeScene() {
+    return {
+      v: 1,
+      whitebox: loadedWhiteboxUrl || null,
+      characters: characters.map(function(character) {
+        return {
+          p: character.position.toArray(),
+          r: [character.rotation.x, character.rotation.y, character.rotation.z],
+          s: character.scale.toArray()
+        };
+      })
+    };
+  }
+
+  function saveScene() {
+    saveTimer = null;
+    if (restoringScene) return;
+    try {
+      window.localStorage.setItem(SCENE_STORAGE_KEY, JSON.stringify(serializeScene()));
+    } catch (e) {}
+  }
+
+  function scheduleSave() {
+    if (restoringScene || saveTimer) return;
+    saveTimer = setTimeout(saveScene, 400);
+  }
+
+  function restoreScene() {
+    var raw = null;
+    try { raw = window.localStorage.getItem(SCENE_STORAGE_KEY); } catch (e) { return; }
+    if (!raw) return;
+    var data = null;
+    try { data = JSON.parse(raw); } catch (e) { return; }
+    if (!data || data.v !== 1) return;
+    restoringScene = true;
+    try {
+      (data.characters || []).forEach(function(item) {
+        var character = markCharacter(createCharacter());
+        if (item.p) character.position.fromArray(item.p);
+        if (item.r) character.rotation.set(item.r[0], item.r[1], item.r[2]);
+        if (item.s) character.scale.fromArray(item.s);
+        scene.add(character);
+      });
+      rebuildSceneOutline();
+      if (data.whitebox) loadGLB(data.whitebox);
+    } finally {
+      restoringScene = false;
+    }
+  }
+
+  // Thin host wrappers over the asset loader (gw_assets.js). assetLoader is built
+  // in initGameWorkbench once scene/sun state exists; ensure init first so a sync
+  // triggered from another workspace still mounts the scene before loading.
   function loadGLB(url) {
     initGameWorkbench();
-    if (!scene) { setStatus('场景未就绪'); return; }
-    if (!window.VC_GLB) { setStatus('加载器未就绪'); return; }
-    setStatus('导入白盒中…');
-    window.VC_GLB.load(url).then(function(root) {
-      if (loadedModel) {
-        scene.remove(loadedModel);
-        if (selectedObject && selectedObject.userData.assetType !== 'character') selectCharacter(null);
-      }
-      loadedModel = root;
-      scene.add(root);
-      registerWhiteboxLayers(root);
-      var sync = editorSync();
-      if (sync && sync.whiteboxImported) sync.whiteboxImported(whiteboxLayers);
-      fitSunShadow(root);
-      rebuildSceneOutline();
-      render();
-      setStatus('白盒已导入');
-    }).catch(function(error) {
-      setStatus('白盒导入失败');
-      if (window.console) console.error('GLB load failed:', error);
-    });
-  }
-
-  var LAYER_LABELS = { terrain: '地形', buildings: '建筑', roads: '道路' };
-  var LAYER_PREFIX = 'VC_whitebox_';
-
-  // The GLB nests the layer nodes under a "Root" node (gltf.scene > Root >
-  // VC_whitebox_{terrain,buildings,roads}), so we must traverse — not just scan
-  // root.children. Tag each layer node pickable, clone its material so per-layer
-  // highlight stays isolated, and enable shadows (only buildings cast — terrain/
-  // roads stay receive-only to avoid self-shadow acne on the large flat surfaces).
-  function registerWhiteboxLayers(root) {
-    whiteboxLayers = [];
-    root.traverse(function(node) {
-      var name = node.name || '';
-      if (name.indexOf(LAYER_PREFIX) !== 0) return;
-      var key = name.slice(LAYER_PREFIX.length);
-      if (!LAYER_LABELS[key]) return;
-      var entityId = 'whitebox-' + key;
-      node.userData.entityId = entityId;
-      node.userData.assetType = key;
-      node.userData.assetRoot = node;
-      node.userData.assetLabel = LAYER_LABELS[key];
-      node.userData.collisionEnabled = true;
-      node.userData.collisionRole = 'walkable';
-      node.userData.collisionShape = 'triangle-mesh';
-      var casts = key === 'buildings';
-      node.traverse(function(mesh) {
-        if (!mesh.isMesh) return;
-        if (mesh.material) {
-          mesh.material = Array.isArray(mesh.material)
-            ? mesh.material.map(function(m) { return m.clone(); })
-            : mesh.material.clone();
-        }
-        mesh.castShadow = casts;
-        mesh.receiveShadow = true;
-        mesh.userData.entityId = entityId;
-        mesh.userData.assetRoot = node;
-        mesh.userData.collisionRoot = node;
-        mesh.userData.collisionEnabled = true;
-        mesh.userData.collisionRole = 'walkable';
-      });
-      whiteboxLayers.push(node);
-    });
-  }
-
-  // Resize the sun's shadow frustum to wrap the imported model (the default ±40m
-  // box only covers the spawn area, not a ~1km city).
-  function fitSunShadow(root) {
-    var THREE = safeThree();
-    if (!sun || !THREE) return;
-    var box = new THREE.Box3().setFromObject(root);
-    if (box.isEmpty()) return;
-    var center = box.getCenter(new THREE.Vector3());
-    var size = box.getSize(new THREE.Vector3());
-    var radius = 0.5 * Math.max(size.x, size.y, size.z) * 1.15 + 1;
-    sun.target.position.copy(center);
-    sun.target.updateMatrixWorld(true);
-    var dir = new THREE.Vector3(0.45, 0.35, 1).normalize();  // Z-up: light from above
-    sun.position.copy(center).addScaledVector(dir, radius * 2.2);
-    var cam = sun.shadow.camera;
-    cam.left = -radius; cam.right = radius;
-    cam.top = radius; cam.bottom = -radius;
-    cam.near = 0.5; cam.far = radius * 5;
-    cam.updateProjectionMatrix();
+    if (!assetLoader) { setStatus('场景未就绪'); return; }
+    assetLoader.loadGLB(url);
   }
 
   function rebuildSceneOutline() {
@@ -1300,10 +373,8 @@
   // Load the latest pipeline-produced whitebox into the editor (no export — the
   // generation pipeline writes the GLB; cache-bust to dodge stale caches).
   function syncFromHoudini() {
-    var whitebox = window.VC_HOUDINI_PREVIEW && window.VC_HOUDINI_PREVIEW.getWhitebox
-      ? window.VC_HOUDINI_PREVIEW.getWhitebox()
-      : null;
-    loadGLB((whitebox && whitebox.url) || ('/whitebox.glb?t=' + Date.now()));
+    initGameWorkbench();
+    if (assetLoader) assetLoader.syncFromHoudini();
   }
 
   function bindSyncButtons() {
@@ -1347,36 +418,103 @@
     if (!selectedCharacter || playMode.isPlaying()) return false;
     var character = selectedCharacter;
     var index = characters.indexOf(character);
-    var sync = editorSync();
-    if (sync && sync.characterDeleted) sync.characterDeleted(character);
-    if (index >= 0) characters.splice(index, 1);
-    scene.remove(character);
-    selectCharacter(null);
-    rebuildSceneOutline();
-    undoStack.push({ type: 'delete', character: character, index: index });
+    removeCharacter(character);
+    pushCommand(makeDeleteCommand(character, index));
     setStatus('角色已删除');
     return true;
   }
 
+  // Command-pattern history: every reversible edit pushes a { undo, redo } pair.
+  // pushCommand clears the redo branch (standard linear-history behavior) and
+  // persists. undo/redo just replay the stored closures. scheduleSave keeps
+  // localStorage in sync without thrashing on every gizmo frame.
+  function pushCommand(command) {
+    undoStack.push(command);
+    redoStack.length = 0;
+    scheduleSave();
+  }
+
   function undoLastAction() {
     if (playMode.isPlaying()) return false;
-    var action = undoStack.pop();
-    if (!action) return false;
-    if (action.type === 'create') {
-      scene.remove(action.character);
-      characters = characters.filter(function(item) { return item !== action.character; });
-      if (selectedObject === action.character) selectCharacter(null);
-      rebuildSceneOutline();
-      return true;
-    }
-    if (action.type === 'delete') {
-      characters.splice(Math.max(0, action.index), 0, action.character);
-      scene.add(action.character);
-      selectCharacter(action.character);
-      rebuildSceneOutline();
-      return true;
-    }
-    return false;
+    var command = undoStack.pop();
+    if (!command) return false;
+    command.undo();
+    redoStack.push(command);
+    render();
+    scheduleSave();
+    return true;
+  }
+
+  function redoLastAction() {
+    if (playMode.isPlaying()) return false;
+    var command = redoStack.pop();
+    if (!command) return false;
+    command.redo();
+    undoStack.push(command);
+    render();
+    scheduleSave();
+    return true;
+  }
+
+  function addCharacterToScene(character, index) {
+    if (typeof index === 'number' && index >= 0) characters.splice(index, 0, character);
+    else if (characters.indexOf(character) < 0) characters.push(character);
+    scene.add(character);
+  }
+
+  function removeCharacter(character) {
+    var index = characters.indexOf(character);
+    if (index >= 0) characters.splice(index, 1);
+    scene.remove(character);
+    if (selectedObject === character) selectCharacter(null);
+    rebuildSceneOutline();
+  }
+
+  function makeCreateCommand(character) {
+    return {
+      undo: function() { removeCharacter(character); },
+      redo: function() { addCharacterToScene(character); selectCharacter(character); rebuildSceneOutline(); }
+    };
+  }
+
+  function makeDeleteCommand(character, index) {
+    return {
+      undo: function() { addCharacterToScene(character, index); selectCharacter(character); rebuildSceneOutline(); },
+      redo: function() { removeCharacter(character); }
+    };
+  }
+
+  function captureTransform(object) {
+    return {
+      position: object.position.clone(),
+      quaternion: object.quaternion.clone(),
+      scale: object.scale.clone()
+    };
+  }
+
+  function applyTransform(object, snapshot) {
+    object.position.copy(snapshot.position);
+    object.quaternion.copy(snapshot.quaternion);
+    object.scale.copy(snapshot.scale);
+    object.updateMatrixWorld(true);
+  }
+
+  function transformChanged(a, b) {
+    return !a.position.equals(b.position) ||
+      !a.quaternion.equals(b.quaternion) ||
+      !a.scale.equals(b.scale);
+  }
+
+  function makeTransformCommand(object, before, after) {
+    return {
+      undo: function() { applyTransform(object, before); refreshAfterTransform(object); },
+      redo: function() { applyTransform(object, after); refreshAfterTransform(object); }
+    };
+  }
+
+  function refreshAfterTransform(object) {
+    if (selectedObject === object && transformControls) transformControls.attach(object);
+    render();
   }
 
   function duplicateSelectedCharacter() {
@@ -1386,14 +524,29 @@
     return true;
   }
 
-  function focusSelectedCharacter() {
+  function getSelectedObjectFrame() {
     var THREE = safeThree();
-    if (!selectedCharacter) return false;
-    var box = new THREE.Box3().setFromObject(selectedCharacter);
-    if (box.isEmpty()) return false;
+    if (!THREE) return null;
+    if (!selectedObject) return null;
+    var box = new THREE.Box3().setFromObject(selectedObject);
+    if (box.isEmpty()) return null;
     var center = box.getCenter(new THREE.Vector3());
-    camera.position.copy(center).add(new THREE.Vector3(4, -7, 4));
-    camera.lookAt(center);
+    var size = box.getSize(new THREE.Vector3());
+    var radius = 0.5 * size.length();
+    var fov = THREE.MathUtils.degToRad(camera.fov || 50);
+    var distance = Math.max(9, (radius / Math.tan(fov / 2)) * 1.25);
+    if (!Number.isFinite(distance)) distance = 9;
+    var direction = camera.position.clone().sub(center);
+    if (direction.lengthSq() < 0.0001) direction.set(4, -7, 4);
+    direction.normalize();
+    return { center: center, direction: direction, distance: distance };
+  }
+
+  function focusSelectedObject() {
+    var frame = getSelectedObjectFrame();
+    if (!frame) return false;
+    camera.position.copy(frame.center).addScaledVector(frame.direction, frame.distance);
+    camera.lookAt(frame.center);
     cameraControls.syncRotationFromCamera();
     return true;
   }
@@ -1422,7 +575,7 @@
       if (runLabel) runLabel.textContent = playing ? '停止' : '运行';
     }
     syncEditOverlays();
-    setStatus(playing ? 'WASD 移动，鼠标控制方向，Esc 停止' : '拖入角色后点击运行');
+    setStatus(playing ? 'WASD 移动，空格跳跃，鼠标控制方向，Esc 停止' : '拖入角色后点击运行');
   }
 
   function updateDragPreview(clientX, clientY) {
@@ -1461,8 +614,7 @@
         dragState.source.releasePointerCapture(dragState.pointerId);
       }
     } catch (e) {}
-    var point = screenToWhiteboxSurface(event.clientX, event.clientY);
-    if (!point) point = screenToGround(event.clientX, event.clientY);
+    var point = screenToGround(event.clientX, event.clientY);
     if (point) placeCharacterAt(point);
     dragPreview.hidden = true;
     dragState = null;
@@ -1500,7 +652,13 @@
     }
     if ((event.ctrlKey || event.metaKey) && code === 'keyz') {
       event.preventDefault();
-      undoLastAction();
+      if (event.shiftKey) redoLastAction();
+      else undoLastAction();
+      return;
+    }
+    if ((event.ctrlKey || event.metaKey) && code === 'keyy') {
+      event.preventDefault();
+      redoLastAction();
       return;
     }
     if ((event.ctrlKey || event.metaKey) && code === 'keyd') {
@@ -1512,7 +670,7 @@
       event.preventDefault();
       return;
     }
-    if (code === 'keyf' && focusSelectedCharacter()) {
+    if (code === 'keyf' && focusSelectedObject()) {
       event.preventDefault();
       return;
     }
@@ -1696,7 +854,7 @@
     runButton = document.getElementById('game-run-button');
     runLabel = document.getElementById('game-run-label');
     speedInput = document.getElementById('game-speed-input');
-    statusText = document.getElementById('game-status');
+    GW.state.statusText = document.getElementById('game-status');
     gameWorkbench = document.getElementById('game-workbench');
     outlineBody = document.querySelector('#game-scene-outline .action-outline-body');
     if (!sceneHost) return;
@@ -1745,23 +903,46 @@
     mouse = new THREE.Vector2();
     groundPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     hitPoint = new THREE.Vector3();
-    surfaceRayOrigin = new THREE.Vector3();
-    surfaceRayDirection = new THREE.Vector3(0, 0, -1);
     clock = new THREE.Clock();
     playMode = createPlayModeController({
       camera: camera,
       renderer: renderer,
-      groundCharacter: groundCharacterOnWhitebox,
-      onChange: syncRunState
+      onChange: syncRunState,
+      sampleGroundHeight: sampleGroundHeight
     });
-    cameraControls = createGameCameraController();
+    cameraControls = GW.createGameCameraController({
+      camera: camera,
+      sceneHost: sceneHost,
+      speedInput: speedInput,
+      playMode: playMode,
+      getDragState: function() { return dragState; },
+      getSelectedObjectFrame: getSelectedObjectFrame,
+      screenToGround: screenToGround,
+      pickCharacter: pickCharacter,
+      isTransformControlActive: isTransformControlActive
+    });
     if (speedInput) cameraControls.setMoveSpeed(speedInput.value);
     cameraControls.syncRotationFromCamera();
     bindTransformModeButtons();
     bindSidePanelResize();
     bindInput();
+    assetLoader = GW.createAssetLoader({
+      ensureInit: initGameWorkbench,
+      getScene: function() { return scene; },
+      getSun: function() { return sun; },
+      getLoadedModel: function() { return loadedModel; },
+      setLoadedModel: function(model) { loadedModel = model; },
+      setLoadedWhiteboxUrl: function(url) { loadedWhiteboxUrl = url; },
+      getSelectedObject: function() { return selectedObject; },
+      selectCharacter: selectCharacter,
+      setWhiteboxLayers: function(layers) { whiteboxLayers = layers; },
+      rebuildSceneOutline: rebuildSceneOutline,
+      render: render,
+      scheduleSave: scheduleSave
+    });
     initialized = true;
     resize();
+    restoreScene();
     setStatus('拖入角色后点击运行');
   }
 

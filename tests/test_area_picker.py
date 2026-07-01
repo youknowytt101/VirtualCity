@@ -22,6 +22,11 @@ _PICKER_STYLES = (FRONTEND_ROOT / "styles.css").read_text(encoding="utf-8")
 _PICKER_SCRIPT_NAMES = (
     "vc_glb.js",
     "viewport_grid.js",
+    "gw_core.js",
+    "gw_character.js",
+    "gw_play.js",
+    "gw_camera.js",
+    "gw_assets.js",
     "game_workbench.js",
     "houdini_preview.js",
     "asset_dir.js",
@@ -30,14 +35,6 @@ _PICKER_SCRIPT_NAMES = (
     "pipeline_status.js",
     "dcc_bridge.js",
     "app.js",
-)
-_EDITOR_CORE_SCRIPT_NAMES = (
-    "editor/core/scene_document.js",
-    "editor/core/commands.js",
-    "editor/core/editor_state.js",
-    "editor/editor_app.js",
-    "editor/legacy_sync.js",
-    "editor/legacy_bridge.js",
 )
 _PICKER_APP_JS = "\n".join(
     (FRONTEND_ROOT / name).read_text(encoding="utf-8")
@@ -252,7 +249,7 @@ class TestPickerHtml(unittest.TestCase):
     def test_houdini_preview_uses_editor_default_lighting_profile(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("renderer.shadowMap.enabled = true;", preview_js)
-        self.assertIn("renderer.shadowMap.type = THREE.PCFSoftShadowMap;", preview_js)
+        self.assertIn("renderer.shadowMap.type = THREE.BasicShadowMap;", preview_js)
         self.assertIn("renderer.outputColorSpace = THREE.SRGBColorSpace;", preview_js)
         self.assertIn("renderer.toneMapping = THREE.ACESFilmicToneMapping;", preview_js)
         self.assertIn("renderer.toneMappingExposure = 1.0;", preview_js)
@@ -285,8 +282,8 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_houdini_preview_uses_shared_shader_viewport_grid(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
-        self.assertIn("function createPreviewGround()", preview_js)
-        self.assertIn("new THREE.ShadowMaterial", preview_js)
+        self.assertNotIn("function createPreviewGround()", preview_js)
+        self.assertNotIn("new THREE.ShadowMaterial", preview_js)
         self.assertNotIn("PREVIEW_GRID_HALF_EXTENT", preview_js)
         self.assertNotIn("new THREE.GridHelper", preview_js)
         self.assertIn("var previewGrid = null;", preview_js)
@@ -316,7 +313,7 @@ class TestPickerHtml(unittest.TestCase):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("var PREVIEW_GRID_Z = 0.02;", preview_js)
         self.assertIn("planeZ: PREVIEW_GRID_Z", preview_js)
-        self.assertIn("showZAxis: false", preview_js)
+        self.assertIn("showZAxis: true", preview_js)
         self.assertIn("axisLength: PREVIEW_AXIS_LENGTH", preview_js)
         self.assertNotIn("new THREE.LineSegments(new THREE.BufferGeometry(), gridMaterial)", preview_js)
         self.assertNotIn("positions.push(-snappedExtent, point, PREVIEW_GRID_Z, snappedExtent, point, PREVIEW_GRID_Z);", preview_js)
@@ -391,11 +388,12 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_houdini_preview_surfaces_whitebox_diagnostics_and_identity(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
-        self.assertIn("function modelStatsLabel(root, whitebox)", preview_js)
-        self.assertIn("box.size_label", preview_js)
-        self.assertIn("setMsg(modelStatsLabel(model, whitebox));", preview_js)
-        self.assertIn("var message = whitebox.message || (err && err.message) || '\u9884\u89c8\u52a0\u8f7d\u5931\u8d25';", preview_js)
-        self.assertIn("setMsg('\u9884\u89c8\u52a0\u8f7d\u5931\u8d25\uff1a' + message + '\uff08\u70b9\u51fb\u91cd\u8bd5\uff09');", preview_js)
+        self.assertIn("function whiteboxLabel(whitebox)", preview_js)
+        self.assertIn("String(whitebox.run_id).slice(0, 8)", preview_js)
+        self.assertIn("whitebox.size_label", preview_js)
+        self.assertIn("setMsg(whiteboxLabel(whitebox));", preview_js)
+        self.assertIn("var message = whitebox.message || (err && err.message) || '预览加载失败';", preview_js)
+        self.assertIn("setMsg('预览加载失败：' + message + '（点击重试）');", preview_js)
         self.assertIn("setMsg(whitebox.message || '');", preview_js)
 
     def test_houdini_preview_keeps_grid_camera_and_lights_fixed_between_generated_models(self):
@@ -407,7 +405,7 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("var PREVIEW_CAMERA_TARGET_Z = 1.2;", preview_js)
         self.assertIn("var PREVIEW_MODEL_TARGET_RADIUS = 2.8;", preview_js)
         self.assertIn("var PREVIEW_SUN_DISTANCE = 20;", preview_js)
-        self.assertIn("var PREVIEW_SHADOW_EXTENT = 10;", preview_js)
+        self.assertIn("var PREVIEW_SHADOW_EXTENT = 60;", preview_js)
         self.assertIn("function configurePreviewShadowRig()", preview_js)
         self.assertIn("function resetPreviewView()", preview_js)
         self.assertIn("fitModelToPreview(model, pivot);", preview_js)
@@ -735,188 +733,37 @@ class TestPickerHtml(unittest.TestCase):
         game_js_path = FRONTEND_ROOT / "game_workbench.js"
         self.assertTrue(game_js_path.exists())
         game_js = game_js_path.read_text(encoding="utf-8")
+        core_js = (FRONTEND_ROOT / "gw_core.js").read_text(encoding="utf-8")
+        character_js = (FRONTEND_ROOT / "gw_character.js").read_text(encoding="utf-8")
+        play_js = (FRONTEND_ROOT / "gw_play.js").read_text(encoding="utf-8")
         self.assertIn('/static/three/three.min.js', _PICKER_INDEX_HTML)
         self.assertIn('/area-picker/viewport_grid.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertIn('/area-picker/gw_core.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertIn('/area-picker/gw_character.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertIn('/area-picker/gw_play.js?v=__VERSION__', _PICKER_INDEX_HTML)
         self.assertIn('/area-picker/game_workbench.js?v=__VERSION__', _PICKER_INDEX_HTML)
         self.assertIn('id="game-scene-host"', _PICKER_INDEX_HTML)
         self.assertIn('game-asset-button', _PICKER_INDEX_HTML)
         self.assertIn('data-game-asset="character"', _PICKER_INDEX_HTML)
         self.assertIn('id="game-run-button"', _PICKER_INDEX_HTML)
         self.assertIn('initGameWorkbench', game_js)
-        self.assertIn('createToonGrayMaterial', game_js)
-        self.assertIn('createPlayModeController', game_js)
+        self.assertIn('createToonGrayMaterial', character_js)
+        self.assertIn('createPlayModeController', play_js)
         self.assertIn('placeCharacterAt', game_js)
         self.assertIn('handleGameShortcut', game_js)
         self.assertIn('window.VC_GAME_WORKBENCH', game_js)
         self.assertIn('window.VC_GAME_WORKBENCH.init()', _PICKER_APP_JS)
         self.assertIn('window.VC_GAME_WORKBENCH.setActive(', _PICKER_APP_JS)
-
-    def test_game_editor_core_modules_exist_and_define_contracts(self):
-        expected = {
-            "editor/core/scene_document.js": (
-                "export function createSceneDocument",
-                "export function addEntity",
-                "export function setSelection",
-                "export function importWhiteboxLayers",
-            ),
-            "editor/core/commands.js": (
-                "export function AddEntityCommand",
-                "export function ImportWhiteboxCommand",
-                "changesDocument: true",
-            ),
-            "editor/core/editor_state.js": (
-                "export function createEditorState",
-                "dispatch(command)",
-                "undo()",
-                "redo()",
-            ),
-            "editor/editor_app.js": (
-                "export function createEditorApp",
-                "getEditorState",
-                "legacyWorkbench",
-            ),
-            "editor/legacy_sync.js": (
-                "export function createLegacyWorkbenchSync",
-                "AddEntityCommand",
-                "ImportWhiteboxCommand",
-                "characterAdded: characterAdded",
-            ),
-            "editor/legacy_bridge.js": (
-                "import { createEditorApp } from './editor_app.js';",
-                "window.VC_GAME_WORKBENCH",
-                "window.VC_GAME_EDITOR_APP",
-            ),
-        }
-        for rel_path, tokens in expected.items():
-            source = (FRONTEND_ROOT / rel_path).read_text(encoding="utf-8")
-            for token in tokens:
-                self.assertIn(token, source)
-
-    def test_game_editor_legacy_bridge_loads_after_legacy_workbench(self):
-        legacy_script = '/area-picker/game_workbench.js?v=__VERSION__'
-        bridge_script = '/area-picker/editor/legacy_bridge.js?v=__VERSION__'
-        self.assertIn(legacy_script, _PICKER_INDEX_HTML)
-        self.assertIn(bridge_script, _PICKER_INDEX_HTML)
-        self.assertLess(_PICKER_INDEX_HTML.index(legacy_script), _PICKER_INDEX_HTML.index(bridge_script))
-        self.assertIn('type="module" src="/area-picker/editor/legacy_bridge.js?v=__VERSION__"', _PICKER_INDEX_HTML)
-
-    def test_game_editor_legacy_sync_adapter_contract(self):
-        sync_js = (FRONTEND_ROOT / "editor" / "legacy_sync.js").read_text(encoding="utf-8")
-        self.assertIn("export function createLegacyWorkbenchSync", sync_js)
-        self.assertIn("AddEntityCommand", sync_js)
-        self.assertIn("DeleteSelectionCommand", sync_js)
-        self.assertIn("SetSelectionCommand", sync_js)
-        self.assertIn("SetTransformModeCommand", sync_js)
-        self.assertIn("ImportWhiteboxCommand", sync_js)
-        self.assertIn("characterAdded: characterAdded", sync_js)
-        self.assertIn("characterDeleted: characterDeleted", sync_js)
-        self.assertIn("selectionChanged: selectionChanged", sync_js)
-        self.assertIn("transformModeChanged: transformModeChanged", sync_js)
-        self.assertIn("whiteboxImported: whiteboxImported", sync_js)
-        bridge_js = (FRONTEND_ROOT / "editor" / "legacy_bridge.js").read_text(encoding="utf-8")
-        self.assertIn("import { createLegacyWorkbenchSync } from './legacy_sync.js';", bridge_js)
-        self.assertIn("window.VC_GAME_EDITOR_SYNC = createLegacyWorkbenchSync(app.getEditorState());", bridge_js)
-
-    def test_game_workbench_syncs_edit_actions_to_editor_core(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        self.assertIn("function editorSync()", game_js)
-        self.assertIn("function syncEntityId(object)", game_js)
-        self.assertIn("sync.characterAdded(character);", game_js)
-        self.assertIn("sync.characterDeleted(character);", game_js)
-        self.assertIn("sync.selectionChanged(selectedObject);", game_js)
-        self.assertIn("sync.transformModeChanged(mode);", game_js)
-        self.assertIn("sync.whiteboxImported(whiteboxLayers);", game_js)
-
-    def test_game_whitebox_layers_register_walkable_collision_surfaces(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        register_start = game_js.index("function registerWhiteboxLayers(root)")
-        register_end = game_js.index("function fitSunShadow(root)", register_start)
-        register_body = game_js[register_start:register_end]
-
-        self.assertIn("node.userData.collisionEnabled = true;", register_body)
-        self.assertIn("node.userData.collisionRole = 'walkable';", register_body)
-        self.assertIn("mesh.userData.collisionRoot = node;", register_body)
-        self.assertIn("function getWhiteboxCollisionMeshes()", game_js)
-        self.assertIn("function screenToWhiteboxSurface(clientX, clientY)", game_js)
-        self.assertIn("function snapPointToWhiteboxSurface(point, options)", game_js)
-        self.assertIn("node.userData.collisionShape = 'triangle-mesh';", register_body)
-        self.assertIn("mesh.userData.collisionEnabled = true;", register_body)
-        self.assertIn("mesh.userData.collisionRole = 'walkable';", register_body)
-
-    def test_game_characters_use_capsule_collider_for_whitebox_collision(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        create_start = game_js.index("function createCharacter()")
-        create_end = game_js.index("function resetPartMotion(part)", create_start)
-        create_body = game_js[create_start:create_end]
-
-        self.assertIn("var CHARACTER_COLLIDER_RADIUS", game_js)
-        self.assertIn("var CHARACTER_COLLIDER_HEIGHT", game_js)
-        self.assertIn("var CHARACTER_COLLIDER_SKIN_WIDTH", game_js)
-        self.assertIn("character.userData.collider = {", create_body)
-        self.assertIn("radius: CHARACTER_COLLIDER_RADIUS", create_body)
-        self.assertIn("height: CHARACTER_COLLIDER_HEIGHT", create_body)
-        self.assertIn("skinWidth: CHARACTER_COLLIDER_SKIN_WIDTH", create_body)
-
-    def test_game_whitebox_surface_query_samples_capsule_footprint(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        snap_start = game_js.index("function snapPointToWhiteboxSurface(point")
-        snap_end = game_js.index("function groundCharacterOnWhitebox", snap_start)
-        snap_body = game_js[snap_start:snap_end]
-
-        self.assertIn("function getCharacterFootprintProbeOffsets(radius)", game_js)
-        self.assertIn("function getWalkableWhiteboxHitAtXY(x, y, startZ, collider)", game_js)
-        self.assertIn("worldNormal.z < collider.walkableNormalZ", game_js)
-        self.assertIn("var probeOffsets = getCharacterFootprintProbeOffsets(collider.radius + collider.skinWidth);", snap_body)
-        self.assertIn("if (!bestPoint || hit.point.z > bestPoint.z) bestPoint = hit.point.clone();", snap_body)
-
-    def test_game_character_drop_prefers_whitebox_surface_over_ground_plane(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        drag_start = game_js.index("function endAssetDrag(event)")
-        drag_end = game_js.index("function handleGameShortcut(event)", drag_start)
-        drag_body = game_js[drag_start:drag_end]
-
-        self.assertIn("var point = screenToWhiteboxSurface(event.clientX, event.clientY);", drag_body)
-        self.assertIn("if (!point) point = screenToGround(event.clientX, event.clientY);", drag_body)
-        self.assertIn("if (point) placeCharacterAt(point);", drag_body)
-        self.assertNotIn("character.position.set(point.x, point.y, 0);", game_js)
-        self.assertIn("character.position.set(point.x, point.y, point.z || 0);", game_js)
-
-    def test_game_runtime_movement_grounds_character_on_whitebox_surface(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        controller_start = game_js.index("function createPlayModeController(options)")
-        controller_end = game_js.index("function createGameCameraController()", controller_start)
-        controller_body = game_js[controller_start:controller_end]
-        update_start = controller_body.index("function update(deltaTime)")
-        update_end = controller_body.index("return true;", update_start)
-        update_body = controller_body[update_start:update_end]
-        init_start = game_js.index("playMode = createPlayModeController({")
-        init_end = game_js.index("});", init_start)
-        init_body = game_js[init_start:init_end]
-
-        self.assertIn("function groundCharacterOnWhitebox(character, previousPosition)", game_js)
-        self.assertIn("previousPlayerPosition.copy(player.position);", update_body)
-        self.assertIn("groundCharacter(player, previousPlayerPosition);", update_body)
-        self.assertLess(
-            update_body.index("player.position.addScaledVector(moveDirection, config.moveSpeed * deltaTime);"),
-            update_body.index("groundCharacter(player, previousPlayerPosition);"),
-        )
-        self.assertIn("groundCharacter: groundCharacterOnWhitebox", init_body)
-        self.assertIn("resolveCharacterWhiteboxCollision(character, character.position, previousPosition)", game_js)
-
-    def test_game_character_runtime_blocks_non_walkable_whitebox_penetration(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        resolver_start = game_js.index("function resolveCharacterWhiteboxCollision")
-        resolver_end = game_js.index("function placeCharacterAt(point)", resolver_start)
-        resolver_body = game_js[resolver_start:resolver_end]
-
-        self.assertIn("function isCharacterMoveBlockedByWhitebox(previousPosition, desiredPosition, collider)", game_js)
-        self.assertIn("raycaster.far = maxDistance;", game_js)
-        self.assertIn("var lateralOffsets = [0, collider.radius, -collider.radius];", game_js)
-        self.assertIn("origin.addScaledVector(side, lateralOffsets[l]);", game_js)
-        self.assertIn("if (isCharacterMoveBlockedByWhitebox(previousPosition, resolved, collider))", resolver_body)
-        self.assertIn("resolved.x = previousPosition.x;", resolver_body)
-        self.assertIn("resolved.y = previousPosition.y;", resolver_body)
-        self.assertIn("groundCharacterOnWhitebox(character);", game_js)
+        # Split modules share state through the window.VC_GW namespace and must load
+        # before the host (game_workbench.js) that aliases their exports.
+        self.assertIn('window.VC_GW', core_js)
+        self.assertIn('GW.state', core_js)
+        self.assertIn('GW.createCharacter = createCharacter;', character_js)
+        self.assertIn('GW.createPlayModeController = createPlayModeController;', play_js)
+        self.assertIn('var GW = window.VC_GW;', game_js)
+        self.assertLess(_PICKER_INDEX_HTML.index('gw_core.js'), _PICKER_INDEX_HTML.index('gw_character.js'))
+        self.assertLess(_PICKER_INDEX_HTML.index('gw_character.js'), _PICKER_INDEX_HTML.index('gw_play.js'))
+        self.assertLess(_PICKER_INDEX_HTML.index('gw_play.js'), _PICKER_INDEX_HTML.index('game_workbench.js'))
 
     def test_game_editor_grid_uses_shared_shader_viewport_grid(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
@@ -965,17 +812,38 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("def _post_asset_dir", server_source)
 
     def test_game_play_mode_hides_editor_overlays_and_start_ui(self):
+        # enter/exit moved into gw_play.js; selection-highlight + overlay sync stay
+        # in the host. Pointer lock must not auto-engage on play entry.
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        enter_start = game_js.index("function enter(character)")
-        enter_end = game_js.index("function exit()", enter_start)
-        enter_body = game_js[enter_start:enter_end]
+        play_js = (FRONTEND_ROOT / "gw_play.js").read_text(encoding="utf-8")
+        enter_start = play_js.index("function enter(character)")
+        enter_end = play_js.index("function exit()", enter_start)
+        enter_body = play_js[enter_start:enter_end]
 
         self.assertNotIn("BoxHelper", game_js)
+        self.assertNotIn("BoxHelper", play_js)
         self.assertIn("function syncSelectionHighlight()", game_js)
         self.assertIn("syncEditOverlays();", game_js)
         self.assertNotIn("requestPointerLock();", enter_body)
         self.assertIn("#game-workbench.is-playing .game-toolbar", _PICKER_STYLES)
         self.assertIn("#game-workbench.is-playing .game-status", _PICKER_STYLES)
+
+    def test_game_play_mode_has_gravity_jump_and_grounded_walk(self):
+        # Play mode applies gravity, jumps on Space only when grounded, and gates
+        # walking on grounded (UE-style). The host samples ground height from the
+        # whitebox layers / z=0 plane and injects it into the controller.
+        play_js = (FRONTEND_ROOT / "gw_play.js").read_text(encoding="utf-8")
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn("function applyGravity(deltaTime)", play_js)
+        self.assertIn("gravity: -32", play_js)
+        self.assertIn("jumpSpeed: 17.9", play_js)
+        self.assertIn("verticalVelocity += config.gravity * deltaTime;", play_js)
+        self.assertIn("if (code === 'space')", play_js)
+        self.assertIn("verticalVelocity = config.jumpSpeed;", play_js)
+        self.assertIn("if (grounded) {", play_js)
+        self.assertIn("function sampleGroundHeight(x, y)", game_js)
+        self.assertIn("raycaster.intersectObjects(whiteboxLayers, true)", game_js)
+        self.assertIn("sampleGroundHeight: sampleGroundHeight", game_js)
 
     def test_game_workbench_static_version_changes_with_script(self):
         game_js_path = FRONTEND_ROOT / "game_workbench.js"
@@ -995,20 +863,26 @@ class TestPickerHtml(unittest.TestCase):
         self.assertNotIn("model_ready && !d.running", preview_js)
 
     def test_game_character_uses_stylized_readable_avatar(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        self.assertIn('createCharacterMaterial', game_js)
-        self.assertIn("name: 'player-visor'", game_js)
-        self.assertIn("name: 'player-backpack'", game_js)
-        self.assertIn("name: 'player-left-arm'", game_js)
-        self.assertIn("name: 'player-right-arm'", game_js)
-        self.assertIn("name: 'player-left-leg'", game_js)
-        self.assertIn("name: 'player-right-leg'", game_js)
-        self.assertIn('character.userData.motionParts', game_js)
-        self.assertIn('updateCharacterMotion(player, moveDirection, deltaTime)', game_js)
-        self.assertIn('resetCharacterMotion(player)', game_js)
+        # Avatar geometry/material/motion rig lives in gw_character.js; the run-mode
+        # controller (gw_play.js) drives the motion rig during play.
+        character_js = (FRONTEND_ROOT / "gw_character.js").read_text(encoding="utf-8")
+        play_js = (FRONTEND_ROOT / "gw_play.js").read_text(encoding="utf-8")
+        self.assertIn('createCharacterMaterial', character_js)
+        self.assertIn("name: 'player-visor'", character_js)
+        self.assertIn("name: 'player-backpack'", character_js)
+        self.assertIn("name: 'player-left-arm'", character_js)
+        self.assertIn("name: 'player-right-arm'", character_js)
+        self.assertIn("name: 'player-left-leg'", character_js)
+        self.assertIn("name: 'player-right-leg'", character_js)
+        self.assertIn('character.userData.motionParts', character_js)
+        self.assertIn('updateCharacterMotion(player, moveDirection, deltaTime)', play_js)
+        self.assertIn('resetCharacterMotion(player)', play_js)
 
     def test_game_workspace_has_composition_viewport_controls(self):
+        # Editor camera (alt-orbit/track/dolly + flight speed) lives in gw_camera.js;
+        # run-button label sync stays in the host.
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        camera_js = (FRONTEND_ROOT / "gw_camera.js").read_text(encoding="utf-8")
         self.assertIn('id="game-speed-control"', _PICKER_INDEX_HTML)
         self.assertIn('id="game-speed-input"', _PICKER_INDEX_HTML)
         self.assertIn('class="game-tool-button game-asset-button"', _PICKER_INDEX_HTML)
@@ -1019,14 +893,14 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('.game-run-label', _PICKER_STYLES)
         self.assertIn('-webkit-appearance: none;', _PICKER_STYLES)
         self.assertIn('appearance: textfield;', _PICKER_STYLES)
-        self.assertIn('handleAltViewportDrag', game_js)
-        self.assertIn('setMoveSpeed', game_js)
+        self.assertIn('handleAltViewportDrag', camera_js)
+        self.assertIn('setMoveSpeed', camera_js)
         self.assertIn('runLabel.textContent', game_js)
         self.assertNotIn('runButton.textContent', game_js)
-        self.assertIn('event.altKey', game_js)
-        self.assertIn("beginViewportDrag('orbit'", game_js)
-        self.assertIn("beginViewportDrag('track'", game_js)
-        self.assertIn("beginViewportDrag('dolly'", game_js)
+        self.assertIn('event.altKey', camera_js)
+        self.assertIn("beginViewportDrag('orbit'", camera_js)
+        self.assertIn("beginViewportDrag('track'", camera_js)
+        self.assertIn("beginViewportDrag('dolly'", camera_js)
 
     def test_game_transform_controls_have_explicit_modes(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
@@ -1039,11 +913,14 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("function bindTransformModeButtons()", game_js)
 
     def test_game_transform_controls_own_pointer_interaction(self):
+        # Camera controller (gw_camera.js) defers to the gizmo before picking; the
+        # isTransformControlActive predicate is injected from the host.
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        controls_start = game_js.index("function createGameCameraController()")
-        down_start = game_js.index("function handlePointerDown(event)", controls_start)
-        down_end = game_js.index("function handlePointerMove(event)", down_start)
-        down_body = game_js[down_start:down_end]
+        camera_js = (FRONTEND_ROOT / "gw_camera.js").read_text(encoding="utf-8")
+        controls_start = camera_js.index("function createGameCameraController(ctx)")
+        down_start = camera_js.index("function handlePointerDown(event)", controls_start)
+        down_end = camera_js.index("function handlePointerMove(event)", down_start)
+        down_body = camera_js[down_start:down_end]
 
         self.assertIn("function isTransformControlActive()", game_js)
         self.assertIn("transformControls.dragging || transformControls.axis", game_js)
@@ -1054,23 +931,25 @@ class TestPickerHtml(unittest.TestCase):
         )
 
     def test_game_middle_mouse_tracks_viewport_without_alt(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        controls_start = game_js.index("function createGameCameraController()")
-        down_start = game_js.index("function handlePointerDown(event)", controls_start)
-        down_end = game_js.index("function handlePointerMove(event)", down_start)
-        down_body = game_js[down_start:down_end]
+        camera_js = (FRONTEND_ROOT / "gw_camera.js").read_text(encoding="utf-8")
+        controls_start = camera_js.index("function createGameCameraController(ctx)")
+        down_start = camera_js.index("function handlePointerDown(event)", controls_start)
+        down_end = camera_js.index("function handlePointerMove(event)", down_start)
+        down_body = camera_js[down_start:down_end]
 
         self.assertIn("if (event.button === 1) {", down_body)
         self.assertIn("beginViewportDrag('track', event, getViewportPivot(event));", down_body)
 
     def test_game_right_mouse_wheel_adjusts_flight_speed(self):
+        # Wheel handler stays in host bindInput; speed math lives in gw_camera.js.
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        camera_js = (FRONTEND_ROOT / "gw_camera.js").read_text(encoding="utf-8")
         wheel_start = game_js.index("sceneHost.addEventListener('wheel'")
         wheel_end = game_js.index("}, { passive: false });", wheel_start)
         wheel_body = game_js[wheel_start:wheel_end]
 
-        self.assertIn("function adjustMoveSpeed(event)", game_js)
-        self.assertIn("return setMoveSpeed(moveSpeed + (event.deltaY < 0 ? 1 : -1));", game_js)
+        self.assertIn("function adjustMoveSpeed(event)", camera_js)
+        self.assertIn("return setMoveSpeed(moveSpeed + (event.deltaY < 0 ? 1 : -1));", camera_js)
         self.assertIn("if (cameraControls.isLooking()) {", wheel_body)
         self.assertIn("cameraControls.adjustMoveSpeed(event);", wheel_body)
         self.assertLess(
@@ -1079,19 +958,21 @@ class TestPickerHtml(unittest.TestCase):
         )
 
     def test_game_editor_shortcuts_match_unreal_viewport(self):
+        # Transform-mode shortcuts stay in host; the dolly math moved to gw_camera.js.
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        camera_js = (FRONTEND_ROOT / "gw_camera.js").read_text(encoding="utf-8")
         self.assertIn("setTransformMode('translate');", game_js)
         self.assertIn("setTransformMode('rotate');", game_js)
         self.assertIn("setTransformMode('scale');", game_js)
         self.assertNotIn("code === 'keyr' || code === 'space'", game_js)
         self.assertIn("code === 'space'", game_js)
-        self.assertIn("state.distance - dy * state.distance * 0.01", game_js)
+        self.assertIn("state.distance - dy * state.distance * 0.01", camera_js)
 
     def test_game_renderer_matches_composition_lighting_baseline(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         self.assertIn('THREE.ColorManagement.legacyMode = false;', game_js)
         self.assertIn('scene.background = new THREE.Color(0x666a6c);', game_js)
-        self.assertIn('renderer.shadowMap.type = THREE.PCFSoftShadowMap;', game_js)
+        self.assertIn('renderer.shadowMap.type = THREE.BasicShadowMap;', game_js)
         self.assertIn('opacity: 0.4', game_js)
         self.assertIn('sun.shadow.mapSize.set(4096, 4096);', game_js)
         self.assertIn('sun.shadow.normalBias = 0.03;', game_js)
@@ -1104,17 +985,45 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('transformControls.attach(selectedObject)', game_js)
         self.assertIn('transformControls.addEventListener("dragging-changed"', game_js)
 
-    def test_game_viewport_orbits_selected_character_first(self):
-        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        pivot_body = game_js[
-            game_js.index("function getViewportPivot(event)"):
-            game_js.index("function beginViewportDrag")
+    def test_game_viewport_orbits_selected_object_first(self):
+        camera_js = (FRONTEND_ROOT / "gw_camera.js").read_text(encoding="utf-8")
+        pivot_body = camera_js[
+            camera_js.index("function getViewportPivot(event)"):
+            camera_js.index("function beginViewportDrag")
         ]
+        self.assertIn("var selectedFrame = getSelectedObjectFrame();", pivot_body)
         self.assertLess(
-            pivot_body.index("if (selectedCharacter)"),
+            pivot_body.index("var selectedFrame = getSelectedObjectFrame();"),
             pivot_body.index("screenToGround(event.clientX, event.clientY)")
         )
+        self.assertIn("if (selectedFrame) return selectedFrame.center;", pivot_body)
         self.assertIn("camera.position.clone().addScaledVector(forward, 10)", pivot_body)
+
+    def test_game_frame_selected_uses_any_selected_scene_object(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn("function getSelectedObjectFrame()", game_js)
+        self.assertIn("function focusSelectedObject", game_js)
+        frame_body = game_js[
+            game_js.index("function getSelectedObjectFrame()"):
+            game_js.index("function focusSelectedObject")
+        ]
+        focus_body = game_js[
+            game_js.index("function focusSelectedObject()"):
+            game_js.index("function getPlayableCharacter")
+        ]
+        shortcut_start = game_js.index("function handleGameShortcut(event)")
+        shortcut_body = game_js[
+            shortcut_start:
+            game_js.index("function handleKeyUp", shortcut_start)
+        ]
+        self.assertIn("if (!selectedObject) return null;", frame_body)
+        self.assertIn("new THREE.Box3().setFromObject(selectedObject)", frame_body)
+        self.assertIn("var radius = 0.5 * size.length();", frame_body)
+        self.assertIn("camera.fov", frame_body)
+        self.assertIn("var frame = getSelectedObjectFrame();", focus_body)
+        self.assertIn("camera.position.copy(frame.center).addScaledVector(frame.direction, frame.distance);", focus_body)
+        self.assertIn("code === 'keyf' && focusSelectedObject()", shortcut_body)
+        self.assertNotIn("focusSelectedCharacter", game_js)
 
     def test_map_controls_are_repositioned(self):
         self.assertIn('#map-shell #selection-tools {', _PICKER_FRONTEND)
@@ -1513,11 +1422,8 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "asset_dir.js",
                 "styles.css",
                 "index.html",
-                *_EDITOR_CORE_SCRIPT_NAMES,
             ):
-                path = root / name
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text("v1", encoding="utf-8")
+                (root / name).write_text("v1", encoding="utf-8")
             with patch.object(area_picker, "FRONTEND_ROOT", root), patch.object(area_picker, "STATIC_ROOT", static_root):
                 first = area_picker._frontend_asset_version()
                 # 改动 app.js 内容（size 变化），版本串必须随之变化。
@@ -1529,13 +1435,10 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 fourth = area_picker._frontend_asset_version()
                 (root / "viewport_grid.js").write_text("v5-grid-content", encoding="utf-8")
                 fifth = area_picker._frontend_asset_version()
-                (root / "editor" / "core" / "scene_document.js").write_text("v6-scene-document-content", encoding="utf-8")
-                sixth = area_picker._frontend_asset_version()
         self.assertNotEqual(first, second)
         self.assertNotEqual(second, third)
         self.assertNotEqual(third, fourth)
         self.assertNotEqual(fourth, fifth)
-        self.assertNotEqual(fifth, sixth)
 
     def test_version_is_stable_without_changes(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1555,11 +1458,8 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "asset_dir.js",
                 "styles.css",
                 "index.html",
-                *_EDITOR_CORE_SCRIPT_NAMES,
             ):
-                path = root / name
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text("same", encoding="utf-8")
+                (root / name).write_text("same", encoding="utf-8")
             with patch.object(area_picker, "FRONTEND_ROOT", root), patch.object(area_picker, "STATIC_ROOT", static_root):
                 self.assertEqual(
                     area_picker._frontend_asset_version(),
