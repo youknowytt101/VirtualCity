@@ -1,8 +1,10 @@
 // Domain: game-workbench / play-mode
-// Owns: the third-person play controller (pointer-lock look, WASD movement,
-//       follow camera). Factory returning a controller bound to a render target.
-// AI handoff: For play camera/movement, start here; editor camera lives in
-//             gw_camera.js, scene wiring in game_workbench.js.
+// Owns: the third-person play controller (pointer-lock look, WASD movement
+//       with capsule-vs-BVH collision, follow camera with obstacle
+//       collision). Factory returning a controller bound to a render target.
+// AI handoff: For play camera/movement, start here; the BVH collider itself
+//             is built in game_workbench.js from gw_collision.js, editor
+//             camera lives in gw_camera.js, scene wiring in game_workbench.js.
 (function() {
   'use strict';
 
@@ -24,7 +26,10 @@
       shoulderOffset: 0.45,
       lookDamping: 18,
       gravity: -32,
-      jumpSpeed: 17.9  // √(2·32·5) → ~5m apex
+      jumpSpeed: 17.9,  // √(2·32·5) → ~5m apex
+      cameraCollisionPadding: 0.3,
+      capsuleRadius: 0.32,  // roughly UEPerson's shoulder width
+      capsuleHeight: 1.72   // matches gw_character.js's ROBOT_TARGET_HEIGHT
     }, options.options || {});
     var movementKeys = { keyw: true, keya: true, keys: true, keyd: true };
     var keys = {};
@@ -33,6 +38,9 @@
     var right = new THREE.Vector3();
     var cameraPosition = new THREE.Vector3();
     var focusPoint = new THREE.Vector3();
+    var obstacleOffset = new THREE.Vector3();
+    var capsuleInfo = null;
+    var collisionTemps = GW.createCollisionTemps ? GW.createCollisionTemps() : null;
     var player = null;
     var playing = false;
     var verticalVelocity = 0;
@@ -49,14 +57,59 @@
       return options.sampleGroundHeight ? options.sampleGroundHeight(x, y) : 0;
     }
 
+    function getPlayerGroundOffset() {
+      return Number(player && player.userData && player.userData.groundOffset) || 0;
+    }
+
+    // The player Group's own origin sits at groundOffset above the feet (chest
+    // height for the UEPerson rig), not at the capsule's bottom -- so unlike
+    // gw_collision.js's reference source (whose capsule proxy always has its
+    // segment start at local (0,0,0)), the segment here has to be built
+    // relative to that offset. Recomputed whenever a new character enters
+    // play in case groundOffset differs per model.
+    function buildCapsuleInfo() {
+      var radius = config.capsuleRadius;
+      var groundOffset = getPlayerGroundOffset();
+      capsuleInfo = {
+        radius: radius,
+        segment: new THREE.Line3(
+          new THREE.Vector3(0, 0, radius - groundOffset),
+          new THREE.Vector3(0, 0, config.capsuleHeight - groundOffset - radius)
+        )
+      };
+    }
+
+    // Sub-steps horizontal movement in radius-sized chunks so the capsule
+    // push-out (applyCapsuleCollision, gw_collision.js) never has to resolve
+    // a full-frame tunnel through thin geometry -- ported from the reference
+    // controller's same maxStep-based stepping in playerController.ts. Falls
+    // back to a plain, uncollided move when the BVH play collider isn't built
+    // yet (still loading, or nothing collidable in the scene).
+    function moveWithCollision(direction, distance) {
+      var collider = options.getCollider ? options.getCollider() : null;
+      if (!collider || !capsuleInfo || !GW.applyCapsuleCollision) {
+        player.position.addScaledVector(direction, distance);
+        return;
+      }
+      var maxStep = capsuleInfo.radius * 0.8;
+      var steps = Math.max(1, Math.ceil(distance / maxStep));
+      var stepDistance = distance / steps;
+      for (var i = 0; i < steps; i++) {
+        player.position.addScaledVector(direction, stepDistance);
+        player.updateMatrixWorld();
+        GW.applyCapsuleCollision(player, capsuleInfo, collider, collisionTemps);
+      }
+    }
+
     // Per-frame gravity integration with landing clamp. Walking onto higher
     // terrain snaps up; walking off an edge falls until the next surface.
     function applyGravity(deltaTime) {
       var groundZ = groundHeightAt(player.position.x, player.position.y);
+      var groundOffset = getPlayerGroundOffset();
       verticalVelocity += config.gravity * deltaTime;
       player.position.z += verticalVelocity * deltaTime;
-      if (player.position.z <= groundZ) {
-        player.position.z = groundZ;
+      if (player.position.z <= groundZ + groundOffset) {
+        player.position.z = groundZ + groundOffset;
         verticalVelocity = 0;
         grounded = true;
       } else {
@@ -79,9 +132,8 @@
       if (isPointerLocked() && document.exitPointerLock) document.exitPointerLock();
     }
 
-    function syncYawFromCamera() {
-      options.camera.getWorldDirection(forward);
-      yaw = forward.lengthSq() ? Math.atan2(forward.y, forward.x) : 0;
+    function syncYawFromCharacter(character) {
+      yaw = character.rotation.z + Math.PI / 2;
       targetYaw = yaw;
     }
 
@@ -93,20 +145,37 @@
       return right.set(Math.sin(yaw), -Math.cos(yaw), 0).normalize();
     }
 
+    // Pulls the desired chase-cam position in front of the first wall/terrain
+    // hit between the focus point and it, so the camera stops short of solid
+    // geometry instead of clipping through it (which reads as first-person).
+    function clampCameraToObstacles(desiredPosition) {
+      if (!options.sampleCameraObstacle) return;
+      var hit = options.sampleCameraObstacle(focusPoint, desiredPosition, player);
+      if (!hit) return;
+      obstacleOffset.copy(desiredPosition).sub(focusPoint);
+      var fullDistance = obstacleOffset.length();
+      if (fullDistance < 0.0001) return;
+      var clampedDistance = Math.max(0, hit.distanceTo(focusPoint) - config.cameraCollisionPadding);
+      obstacleOffset.normalize();
+      desiredPosition.copy(focusPoint).addScaledVector(obstacleOffset, Math.min(fullDistance, clampedDistance));
+    }
+
     function updateCamera() {
       if (!player) return;
+      var groundOffset = getPlayerGroundOffset();
       var groundForward = getGroundForward();
       var groundRight = getGroundRight();
       var horizontalDistance = config.cameraDistance * Math.cos(pitch);
       var verticalOffset = config.cameraHeight + config.cameraDistance * Math.sin(pitch);
 
       focusPoint.copy(player.position);
-      focusPoint.z += config.cameraTargetHeight;
+      focusPoint.z += config.cameraTargetHeight - groundOffset;
       cameraPosition
         .copy(focusPoint)
         .addScaledVector(groundForward, -horizontalDistance)
         .addScaledVector(groundRight, config.shoulderOffset);
       cameraPosition.z += verticalOffset;
+      clampCameraToObstacles(cameraPosition);
       options.camera.position.copy(cameraPosition);
       options.camera.lookAt(focusPoint);
     }
@@ -120,7 +189,8 @@
       player = character;
       playing = true;
       keys = {};
-      syncYawFromCamera();
+      syncYawFromCharacter(character);
+      buildCapsuleInfo();
       pitch = 0.18;
       targetYaw = yaw;
       targetPitch = pitch;
@@ -212,8 +282,8 @@
         if (keys.keya) moveDirection.addScaledVector(getGroundRight(), -1);
         if (moveDirection.lengthSq() > 0) {
           moveDirection.normalize();
-          player.position.addScaledVector(moveDirection, config.moveSpeed * deltaTime);
           player.rotation.z = Math.atan2(moveDirection.y, moveDirection.x) - Math.PI / 2;
+          moveWithCollision(moveDirection, config.moveSpeed * deltaTime);
         }
       }
       updateCharacterMotion(player, moveDirection, deltaTime);
@@ -230,6 +300,7 @@
       handlePointerDown: handlePointerDown,
       handlePointerMove: handlePointerMove,
       isPlaying: function() { return playing; },
+      getPlayerPosition: function() { return player ? player.position : null; },
       update: update
     };
   }

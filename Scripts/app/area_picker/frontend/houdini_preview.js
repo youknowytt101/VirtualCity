@@ -11,6 +11,7 @@
   var host = null, msgEl = null;
   var renderer = null, scene = null, camera = null, previewRoot = null;
   var previewSun = null;
+  var previewEnvironment = null;
   var placeholder = null, model = null, rafId = null;
   var previewVisible = false;
   var previewInView = true;
@@ -34,6 +35,7 @@
   var previewOrbitRadius = PREVIEW_CAMERA_ORBIT_RADIUS;
   var previewTargetZ = PREVIEW_CAMERA_TARGET_Z;
   var WHITEBOX_PREVIEW_COLOR = 0xb8b8b8;
+  var WHITEBOX_PREVIEW_OUTLINE_THICKNESS = 0.014;
   var PREVIEW_SUN_DIRECTION = { x: 0.426, y: 0.721, z: 0.557 };
   var PREVIEW_GRID_Z = 0.02;
   var PREVIEW_AXIS_LENGTH = 3;
@@ -46,6 +48,7 @@
   function modelStatsLabel(root, whitebox) {
     var verts = 0, tris = 0;
     root.traverse(function(object) {
+      if (object.userData && object.userData.outline) return;
       if (!object.isMesh || !object.geometry) return;
       var geometry = object.geometry;
       var position = geometry.attributes && geometry.attributes.position;
@@ -85,34 +88,31 @@
     host.addEventListener('pointercancel', endPreviewDrag);
     host.addEventListener('wheel', zoomPreview);
 
-    if (THREE.ColorManagement && 'legacyMode' in THREE.ColorManagement) {
-      THREE.ColorManagement.legacyMode = false;
+    if (!window.VC_RENDER_PROFILE) {
+      setMsg('Render profile module 未加载');
+      return false;
     }
+    window.VC_RENDER_PROFILE.configureColorManagement(THREE);
     THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x666a6c);
     camera = new THREE.PerspectiveCamera(45, 1, 0.05, 100000);
     camera.up.set(0, 0, 1);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    if ('outputColorSpace' in renderer) renderer.outputColorSpace = THREE.SRGBColorSpace;
-    else renderer.outputEncoding = THREE.sRGBEncoding;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer = window.VC_RENDER_PROFILE.createRenderer(THREE, {
+      antialias: true,
+      preserveDrawingBuffer: false,
+      shadowQuality: 'medium'
+    });
     host.appendChild(renderer.domElement);
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9bb0, 0.9));
-    previewSun = new THREE.DirectionalLight(0xffffff, 2.0);
-    var sun = previewSun;
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(4096, 4096);
-    sun.shadow.camera.near = 0.5;
-    sun.shadow.bias = -0.00015;
-    sun.shadow.normalBias = 0.03;
-    sun.shadow.radius = 1.2;
-    scene.add(sun, sun.target);
+    var lighting = window.VC_RENDER_PROFILE.createDefaultLighting(THREE, scene, {
+      includeAmbient: false,
+      shadowQuality: 'medium'
+    });
+    previewSun = lighting.sun;
+    previewEnvironment = window.VC_RENDER_PROFILE.applyEnvironment(THREE, renderer, scene, {
+      shadowQuality: 'medium'
+    });
 
     createPreviewGrid();
     createPreviewGround();
@@ -121,7 +121,11 @@
 
     placeholder = new THREE.Mesh(
       new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshStandardMaterial({ color: 0xcdd2d6, roughness: 0.6 })
+      new THREE.MeshToonMaterial({
+        color: 0xcdd2d6,
+        gradientMap: window.VC_GW && window.VC_GW.getToonGradientMap ? window.VC_GW.getToonGradientMap() : null,
+        emissive: 0x000000
+      })
     );
     placeholder.position.z = 0.5;
     placeholder.castShadow = true;
@@ -291,12 +295,27 @@
 
   function applyPreviewWhiteboxMaterial(object) {
     var THREE = window.THREE;
-    return new THREE.MeshStandardMaterial({
+    return new THREE.MeshToonMaterial({
       color: WHITEBOX_PREVIEW_COLOR,
-      metalness: 0,
-      roughness: 0.68,
+      gradientMap: window.VC_GW && window.VC_GW.getToonGradientMap ? window.VC_GW.getToonGradientMap() : null,
+      emissive: 0x000000,
       side: THREE.DoubleSide
     });
+  }
+
+  function attachPreviewWhiteboxOutline(object) {
+    if (!object || !object.geometry || !window.VC_GW || !window.VC_GW.createOutlineMesh) return null;
+    if (object.children && object.children.some(function(child) {
+      return child.userData && child.userData.previewWhiteboxOutline;
+    })) return null;
+    var outline = window.VC_GW.createOutlineMesh(object.geometry, WHITEBOX_PREVIEW_OUTLINE_THICKNESS);
+    outline.name = (object.name || 'whitebox') + '_toon_outline';
+    outline.castShadow = false;
+    outline.receiveShadow = false;
+    outline.renderOrder = (object.renderOrder || 0) - 1;
+    outline.userData.previewWhiteboxOutline = true;
+    object.add(outline);
+    return outline;
   }
 
   function disposePreviewObject(object) {
@@ -319,6 +338,10 @@
     clearModel();
     disposePreviewObject(placeholder);
     if (previewGrid && window.VC_VIEWPORT_GRID) window.VC_VIEWPORT_GRID.dispose(previewGrid);
+    if (previewEnvironment) {
+      previewEnvironment.dispose();
+      previewEnvironment = null;
+    }
     if (previewObserver) previewObserver.disconnect();
     if (renderer) {
       renderer.dispose();
@@ -460,10 +483,12 @@
   }
 
   function preparePreviewMesh(object) {
+    if (object.userData && object.userData.outline) return;
     disposeMaterial(object.material);
     object.material = applyPreviewWhiteboxMaterial(object);
     object.castShadow = true;
     object.receiveShadow = true;
+    attachPreviewWhiteboxOutline(object);
   }
 
   function fitModelToPreview(model, pivot) {

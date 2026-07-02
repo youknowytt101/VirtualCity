@@ -5,12 +5,15 @@ actual isolated server + Chromium instance through Playwright and asserts on
 rendered state, so it catches behavioral regressions (e.g. undo/redo wiring,
 scene-state/history/inspector integration) that source-text assertions can't.
 """
+import json
 import os
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 import unittest
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -18,6 +21,10 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 SERVER_SCRIPT = ROOT / "Scripts" / "app" / "area_picker" / "server.py"
+
+TEST_INVITE_CODE = "E2E-TEST-INVITE"
+TEST_EMAIL = "e2e-workbench@example.com"
+TEST_PASSWORD = "e2e-test-password"
 
 
 def _free_port() -> int:
@@ -35,9 +42,21 @@ class TestGameWorkbenchBrowser(unittest.TestCase):
     def setUpClass(cls):
         cls.port = _free_port()
         cls.base_url = f"http://127.0.0.1:{cls.port}"
+        # ignore_cleanup_errors: on Windows the sqlite3 file can stay briefly
+        # locked after server_proc.terminate() returns, before the OS fully
+        # releases the handle -- don't fail teardown over that race.
+        cls._auth_db_dir = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         env = dict(os.environ)
         env["VC_AREA_PICKER_PORT"] = str(cls.port)
         env["VC_AREA_PICKER_NO_BROWSER"] = "1"
+        # The login gate is off by default (see AUTH_REQUIRED in server.py --
+        # disabled during the current testing phase); turn it on here so this
+        # suite still exercises the gated register/login round trip.
+        env["VC_AREA_PICKER_REQUIRE_LOGIN"] = "1"
+        # Isolate the login-gate's user store from the real Config/auth.db and
+        # avoid depending on whatever invite code happens to be configured there.
+        env["VC_AREA_PICKER_AUTH_DB"] = str(Path(cls._auth_db_dir.name) / "auth.db")
+        env["VC_AREA_PICKER_INVITE_CODES"] = TEST_INVITE_CODE
         cls.server_proc = subprocess.Popen(
             [sys.executable, str(SERVER_SCRIPT)],
             cwd=str(ROOT),
@@ -46,8 +65,25 @@ class TestGameWorkbenchBrowser(unittest.TestCase):
             stderr=subprocess.DEVNULL,
         )
         cls._wait_for_health()
+        cls._register_test_user()
         cls.playwright = sync_playwright().start()
         cls.browser = cls.playwright.chromium.launch()
+
+    @classmethod
+    def _register_test_user(cls):
+        req = urllib.request.Request(
+            f"{cls.base_url}/auth/register",
+            data=json.dumps({
+                "email": TEST_EMAIL,
+                "password": TEST_PASSWORD,
+                "invite_code": TEST_INVITE_CODE,
+            }).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=5.0) as resp:
+            result = json.loads(resp.read())
+        if not result.get("ok"):
+            raise RuntimeError(f"e2e test user registration failed: {result}")
 
     @classmethod
     def _wait_for_health(cls, timeout=20.0):
@@ -73,9 +109,18 @@ class TestGameWorkbenchBrowser(unittest.TestCase):
             cls.server_proc.wait(timeout=5)
         except subprocess.TimeoutExpired:
             cls.server_proc.kill()
+        cls._auth_db_dir.cleanup()
 
     def setUp(self):
         self.page = self.browser.new_page()
+        # / now redirects anonymous visitors to /login; log in through the API
+        # first so the page's cookie jar carries a valid session into goto().
+        login_response = self.page.request.post(
+            f"{self.base_url}/auth/login",
+            data=json.dumps({"email": TEST_EMAIL, "password": TEST_PASSWORD}),
+            headers={"Content-Type": "application/json"},
+        )
+        assert login_response.ok, f"e2e test login failed: {login_response.status}"
         self.page.goto(self.base_url)
         self.page.click('[data-workspace-target="game"]')
         self.page.wait_for_selector("#game-scene-host canvas")

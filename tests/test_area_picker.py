@@ -22,6 +22,7 @@ _PICKER_INDEX_HTML = area_picker._HTML
 _PICKER_STYLES = (FRONTEND_ROOT / "styles.css").read_text(encoding="utf-8")
 _PICKER_SCRIPT_NAMES = (
     "vc_glb.js",
+    "render_profile.js",
     "viewport_grid.js",
     "gw_core.js",
     "gw_history.js",
@@ -272,22 +273,43 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("model.position.set(-centerX * scale, -centerY * scale, -groundZ * scale);", preview_js)
         self.assertNotIn("model.position.sub(center);", preview_js)
 
-    def test_houdini_preview_uses_editor_default_lighting_profile(self):
+    def test_shared_render_profile_module_contract(self):
+        profile_path = FRONTEND_ROOT / "render_profile.js"
+        self.assertTrue(profile_path.exists())
+        profile_js = profile_path.read_text(encoding="utf-8")
+        self.assertIn("window.VC_RENDER_PROFILE", profile_js)
+        self.assertIn("function createRenderer(THREE, options)", profile_js)
+        self.assertIn("function configureColorManagement(THREE)", profile_js)
+        self.assertIn("function createDefaultLighting(THREE, scene, options)", profile_js)
+        self.assertIn("scene.add(sun, sun.target);", profile_js)
+        self.assertIn("function applyEnvironment(THREE, renderer, scene, options)", profile_js)
+        self.assertIn("new THREE.PMREMGenerator(renderer)", profile_js)
+        self.assertIn("generator.fromScene(environmentScene", profile_js)
+        self.assertIn("scene.environment = target.texture;", profile_js)
+
+    def test_shared_render_profile_defines_shadow_quality_tiers(self):
+        profile_js = (FRONTEND_ROOT / "render_profile.js").read_text(encoding="utf-8")
+        self.assertIn("var SHADOW_QUALITY = {", profile_js)
+        self.assertIn("low: { mapSize: 1024", profile_js)
+        self.assertIn("medium: { mapSize: 2048", profile_js)
+        self.assertIn("high: { mapSize: 4096", profile_js)
+        self.assertIn("cinematic: { mapSize: 4096", profile_js)
+        self.assertIn("function applyShadowQuality(THREE, light, qualityName)", profile_js)
+
+    def test_houdini_preview_uses_shared_render_profile(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
-        self.assertIn("renderer.shadowMap.enabled = true;", preview_js)
-        self.assertIn("renderer.shadowMap.type = THREE.PCFSoftShadowMap;", preview_js)
-        self.assertIn("renderer.outputColorSpace = THREE.SRGBColorSpace;", preview_js)
-        self.assertIn("renderer.toneMapping = THREE.ACESFilmicToneMapping;", preview_js)
-        self.assertIn("renderer.toneMappingExposure = 1.0;", preview_js)
+        self.assertIn("window.VC_RENDER_PROFILE.configureColorManagement(THREE);", preview_js)
+        self.assertIn("renderer = window.VC_RENDER_PROFILE.createRenderer(THREE, {", preview_js)
+        self.assertIn("shadowQuality: 'medium'", preview_js)
+        self.assertIn("var lighting = window.VC_RENDER_PROFILE.createDefaultLighting(THREE, scene, {", preview_js)
+        self.assertIn("includeAmbient: false", preview_js)
+        self.assertIn("previewEnvironment = window.VC_RENDER_PROFILE.applyEnvironment(THREE, renderer, scene, {", preview_js)
         self.assertIn("scene.background = new THREE.Color(0x666a6c);", preview_js)
-        self.assertIn("new THREE.HemisphereLight(0xffffff, 0x8a9bb0, 0.9)", preview_js)
-        self.assertIn("previewSun = new THREE.DirectionalLight(0xffffff, 2.0);", preview_js)
-        self.assertIn("var sun = previewSun;", preview_js)
-        self.assertIn("sun.castShadow = true;", preview_js)
-        self.assertIn("sun.shadow.mapSize.set(4096, 4096);", preview_js)
-        self.assertIn("sun.shadow.bias = -0.00015;", preview_js)
-        self.assertIn("sun.shadow.normalBias = 0.03;", preview_js)
-        self.assertIn("scene.add(sun, sun.target);", preview_js)
+        self.assertIn("previewSun = lighting.sun;", preview_js)
+        self.assertIn("previewEnvironment.dispose();", preview_js)
+        self.assertNotIn("renderer.shadowMap.type = THREE.PCFSoftShadowMap;", preview_js)
+        self.assertNotIn("renderer.toneMapping = THREE.ACESFilmicToneMapping;", preview_js)
+        self.assertNotIn("sun.shadow.mapSize.set(4096, 4096);", preview_js)
         self.assertNotIn("sun.position.set(8, 14, 10);", preview_js)
         self.assertNotIn("sun.shadow.camera.far = 400;", preview_js)
         self.assertNotIn("sun.shadow.camera.left = -60;", preview_js)
@@ -297,14 +319,49 @@ class TestPickerHtml(unittest.TestCase):
 
         self.assertNotIn("AmbientLight", preview_js)
 
-    def test_houdini_preview_replaces_imported_materials_with_lit_whitebox_material(self):
+    def test_houdini_preview_replaces_imported_materials_with_toon_whitebox_material(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
         self.assertIn("function applyPreviewWhiteboxMaterial(object)", preview_js)
-        self.assertIn("new THREE.MeshStandardMaterial({", preview_js)
+        self.assertIn("new THREE.MeshToonMaterial({", preview_js)
         self.assertIn("color: WHITEBOX_PREVIEW_COLOR", preview_js)
+        self.assertIn("gradientMap: window.VC_GW && window.VC_GW.getToonGradientMap", preview_js)
+        self.assertIn("emissive: 0x000000", preview_js)
         self.assertNotIn("function previewWhiteboxColor(", preview_js)
         self.assertIn("disposeMaterial(object.material);", preview_js)
         self.assertIn("object.material = applyPreviewWhiteboxMaterial(object);", preview_js)
+
+    def test_houdini_preview_adds_character_style_black_outline_to_whitebox(self):
+        preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
+        self.assertIn("var WHITEBOX_PREVIEW_OUTLINE_THICKNESS", preview_js)
+        self.assertIn("function attachPreviewWhiteboxOutline(object)", preview_js)
+        self.assertIn("window.VC_GW.createOutlineMesh(object.geometry, WHITEBOX_PREVIEW_OUTLINE_THICKNESS)", preview_js)
+        self.assertIn("outline.userData.previewWhiteboxOutline = true;", preview_js)
+        self.assertIn("object.add(outline);", preview_js)
+        self.assertIn("if (object.userData && object.userData.outline) return;", preview_js)
+        self.assertIn("attachPreviewWhiteboxOutline(object);", preview_js)
+
+    def test_glb_loader_does_not_force_double_side_for_every_model(self):
+        glb_js = (FRONTEND_ROOT / "vc_glb.js").read_text(encoding="utf-8")
+        self.assertNotIn("var DoubleSide = window.THREE && window.THREE.DoubleSide;", glb_js)
+        self.assertNotIn("m.side = DoubleSide;", glb_js)
+
+    def test_whitebox_import_keeps_double_side_scoped_to_whitebox_layers(self):
+        assets_js = (FRONTEND_ROOT / "gw_assets.js").read_text(encoding="utf-8")
+        self.assertIn("function createWhiteboxToonMaterial(sourceMaterial, layerKey)", assets_js)
+        self.assertIn("new THREE.MeshToonMaterial({", assets_js)
+        self.assertIn("gradientMap: GW.getToonGradientMap ? GW.getToonGradientMap() : null", assets_js)
+        self.assertIn("side: THREE.DoubleSide", assets_js)
+        self.assertIn("mesh.material = createWhiteboxToonMaterial(mesh.material, key);", assets_js)
+
+    def test_whitebox_import_adds_character_style_black_outline(self):
+        assets_js = (FRONTEND_ROOT / "gw_assets.js").read_text(encoding="utf-8")
+        self.assertIn("var WHITEBOX_OUTLINE_THICKNESS", assets_js)
+        self.assertIn("function attachWhiteboxToonOutline(mesh, layerKey)", assets_js)
+        self.assertIn("GW.createOutlineMesh(mesh.geometry, WHITEBOX_OUTLINE_THICKNESS", assets_js)
+        self.assertIn("outline.userData.whiteboxOutline = true;", assets_js)
+        self.assertIn("mesh.add(outline);", assets_js)
+        self.assertIn("if (mesh.userData && mesh.userData.outline) return;", assets_js)
+        self.assertIn("attachWhiteboxToonOutline(mesh, key);", assets_js)
 
     def test_houdini_preview_uses_shared_shader_viewport_grid(self):
         preview_js = (FRONTEND_ROOT / "houdini_preview.js").read_text(encoding="utf-8")
@@ -1105,7 +1162,15 @@ class TestPickerHtml(unittest.TestCase):
         outline_side_label_style = _PICKER_STYLES.split(".outline-side-tabs .side-rail-input:checked + .side-rail-label", 1)[1].split("}", 1)[0]
         self.assertIn("box-shadow: none;", outline_side_label_style)
         self.assertNotIn(".asset-side-tabs .side-rail-input:checked + .side-rail-label", _PICKER_STYLES)
+        self.assertIn('id="game-side-tabs" class="action-tabs" aria-label="我的游戏右栏标签页" style="--action-tab-count: 4;"', game_panel)
         self.assertIn('<label class="action-tab-label" for="game-side-tab-1">细节</label>', game_panel)
+        self.assertIn('<label class="action-tab-label" for="game-side-tab-2">云端资产</label>', game_panel)
+        self.assertIn('class="action-tab-panel cloud-assets-panel" aria-label="云端资产"', game_panel)
+        self.assertIn('<label class="action-tab-label" for="game-side-tab-3">AI修改</label>', game_panel)
+        self.assertIn('<label class="action-tab-label" for="game-side-tab-4">发布</label>', game_panel)
+        self.assertLess(game_panel.index('for="game-side-tab-1">细节'), game_panel.index('for="game-side-tab-2">云端资产'))
+        self.assertLess(game_panel.index('for="game-side-tab-2">云端资产'), game_panel.index('for="game-side-tab-3">AI修改'))
+        self.assertLess(game_panel.index('for="game-side-tab-3">AI修改'), game_panel.index('for="game-side-tab-4">发布'))
         self.assertIn('class="action-tab-panel inspector-panel" aria-label="细节"', game_panel)
         self.assertIn('id="inspector-name"', game_panel)
         self.assertIn('id="inspector-pos-x"', game_panel)
@@ -1113,6 +1178,13 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('id="inspector-scale-x"', game_panel)
         self.assertIn('<div class="inspector-group-title">旋转</div>', game_panel)
         self.assertNotIn('旋转（度）', game_panel)
+        self.assertIn('class="inspector-subcontainers" aria-label="细节子容器"', game_panel)
+        self.assertIn('class="inspector-subcontainer" data-inspector-container="model" aria-label="模型"', game_panel)
+        self.assertIn('class="inspector-subcontainer" data-inspector-container="material" aria-label="材质"', game_panel)
+        self.assertIn('class="inspector-subcontainer" data-inspector-container="logic" aria-label="功能逻辑"', game_panel)
+        self.assertIn('<div class="inspector-subcontainer-title">模型</div>', game_panel)
+        self.assertIn('<div class="inspector-subcontainer-title">材质</div>', game_panel)
+        self.assertIn('<div class="inspector-subcontainer-title">功能逻辑</div>', game_panel)
         inspector_panel_style = _PICKER_STYLES.split(
             ".action-tab-input:checked + .action-tab-label + .inspector-panel",
             1,
@@ -1125,6 +1197,9 @@ class TestPickerHtml(unittest.TestCase):
         inspector_group_title_style = _PICKER_STYLES.split(".inspector-group-title", 1)[1].split("}", 1)[0]
         inspector_row_style = _PICKER_STYLES.split(".inspector-row", 1)[1].split("}", 1)[0]
         inspector_number_style = _PICKER_STYLES.split(".inspector-number", 1)[1].split("}", 1)[0]
+        inspector_subcontainers_style = _PICKER_STYLES.split(".inspector-subcontainers", 1)[1].split("}", 1)[0]
+        inspector_subcontainer_style = _PICKER_STYLES.split(".inspector-subcontainer {", 1)[1].split("}", 1)[0]
+        inspector_subcontainer_title_style = _PICKER_STYLES.split(".inspector-subcontainer-title", 1)[1].split("}", 1)[0]
         self.assertIn("display: none;", inspector_base_style)
         self.assertIn("gap: 6px;", inspector_panel_style)
         self.assertIn("display: flex;", inspector_panel_style)
@@ -1143,6 +1218,14 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("gap: 4px;", inspector_row_style)
         self.assertIn("min-height: 22px;", inspector_number_style)
         self.assertIn("border-radius: 4px;", inspector_number_style)
+        self.assertIn("display: flex;", inspector_subcontainers_style)
+        self.assertIn("flex-direction: column;", inspector_subcontainers_style)
+        self.assertIn("gap: 10px;", inspector_subcontainers_style)
+        self.assertIn("min-height: 64px;", inspector_subcontainer_style)
+        self.assertIn("border: 1px solid var(--line-soft);", inspector_subcontainer_style)
+        self.assertIn("border-radius: 6px;", inspector_subcontainer_style)
+        self.assertIn("font-size: 11px;", inspector_subcontainer_title_style)
+        self.assertIn("color: var(--subtle);", inspector_subcontainer_title_style)
         self.assertNotIn('<label class="action-tab-label" for="game-side-tab-1">资产</label>', game_panel)
         self.assertNotIn('<div class="action-tab-panel" aria-label="资产">', game_panel)
         self.assertNotIn('id="asset-dir-form"', game_panel)
@@ -1157,7 +1240,6 @@ class TestPickerHtml(unittest.TestCase):
         self.assertNotIn('人物角色', game_panel)
         self.assertNotIn('场景白盒', game_panel)
         self.assertNotIn('场景组件', game_panel)
-        self.assertNotIn('功能逻辑', game_panel)
         self.assertNotIn('id="import-houdini-whitebox-btn"', game_panel)
         self.assertNotIn("导入 Houdini 白盒", game_panel)
         self.assertNotIn('/area-picker/asset_dir.js', _PICKER_INDEX_HTML)
@@ -1369,21 +1451,62 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("window.VC_HOUDINI_PREVIEW.update(d);", pipeline_js)
         self.assertNotIn("model_ready && !d.running", preview_js)
 
-    def test_game_character_uses_stylized_readable_avatar(self):
-        # Avatar geometry/material/motion rig lives in gw_character.js; the run-mode
-        # controller (gw_play.js) drives the motion rig during play.
+    def test_game_character_uses_ueperson_avatar_from_three_player_controller(self):
+        # Avatar loading/animation lives in gw_character.js; the run-mode
+        # controller (gw_play.js) drives the motion adapter during play.
         character_js = (FRONTEND_ROOT / "gw_character.js").read_text(encoding="utf-8")
         play_js = (FRONTEND_ROOT / "gw_play.js").read_text(encoding="utf-8")
+        robot_glb = FRONTEND_ROOT / "assets" / "characters" / "UEPerson.glb"
+        self.assertTrue(robot_glb.is_file())
+        self.assertGreater(robot_glb.stat().st_size, 5_000_000)
+        self.assertIn("UEPerson.glb", character_js)
+        self.assertIn("Model source: hh-hang/three-player-controller example/public/glb/UEPerson.glb", character_js)
+        self.assertIn('import("/static/three/GLTFLoader.js")', character_js)
+        self.assertIn('new THREE.AnimationMixer', character_js)
+        self.assertIn("idle: 'idle'", character_js)
+        self.assertIn("walk: 'walk'", character_js)
+        self.assertIn("run: 'run'", character_js)
+        self.assertIn("jump: 'jumpStart'", character_js)
+        self.assertIn("actions[ROBOT_ANIMATIONS.idle]", character_js)
+        self.assertIn("actions[ROBOT_ANIMATIONS.run]", character_js)
+        self.assertIn("actions[ROBOT_ANIMATIONS.walk]", character_js)
+        self.assertIn("actions[ROBOT_ANIMATIONS.jump]", character_js)
+        self.assertIn('character.userData.robotAvatar', character_js)
+        self.assertIn('character.userData.animationMixer', character_js)
         self.assertIn('createCharacterMaterial', character_js)
-        self.assertIn("name: 'player-visor'", character_js)
-        self.assertIn("name: 'player-backpack'", character_js)
-        self.assertIn("name: 'player-left-arm'", character_js)
-        self.assertIn("name: 'player-right-arm'", character_js)
-        self.assertIn("name: 'player-left-leg'", character_js)
-        self.assertIn("name: 'player-right-leg'", character_js)
-        self.assertIn('character.userData.motionParts', character_js)
         self.assertIn('updateCharacterMotion(player, moveDirection, deltaTime)', play_js)
         self.assertIn('resetCharacterMotion(player)', play_js)
+
+    def test_game_play_starts_third_person_from_character_facing(self):
+        character_js = (FRONTEND_ROOT / "gw_character.js").read_text(encoding="utf-8")
+        play_js = (FRONTEND_ROOT / "gw_play.js").read_text(encoding="utf-8")
+        self.assertIn("model.rotation.y = Math.PI;", character_js)
+        self.assertIn("function syncYawFromCharacter(character)", play_js)
+        self.assertIn("yaw = character.rotation.z + Math.PI / 2;", play_js)
+        self.assertIn("syncYawFromCharacter(character);", play_js)
+        self.assertNotIn("syncYawFromCamera();", play_js)
+
+    def test_game_character_preserves_ueperson_horizontal_origin(self):
+        character_js = (FRONTEND_ROOT / "gw_character.js").read_text(encoding="utf-8")
+        self.assertNotIn("model.position.x -= center.x;", character_js)
+        self.assertNotIn("model.position.y -= center.y;", character_js)
+        self.assertIn("model.position.z -= box.min.z;", character_js)
+
+    def test_game_character_uses_capsule_origin_and_model_offset(self):
+        # character.position is the feet/ground-contact point (standard
+        # character-controller convention) -- fitRobotAvatar anchors the
+        # model's feet at the group's own local origin, so groundOffset is 0.
+        character_js = (FRONTEND_ROOT / "gw_character.js").read_text(encoding="utf-8")
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        play_js = (FRONTEND_ROOT / "gw_play.js").read_text(encoding="utf-8")
+        self.assertIn("character.userData.groundOffset = 0;", character_js)
+        self.assertIn("model.position.z -= box.min.z;", character_js)
+        self.assertNotIn("model.position.z -= ROBOT_ORIGIN_HEIGHT;", character_js)
+        self.assertIn("function getCharacterGroundOffset(character)", game_js)
+        self.assertIn("point.z + getCharacterGroundOffset(character)", game_js)
+        self.assertIn("function getPlayerGroundOffset()", play_js)
+        self.assertIn("groundZ + groundOffset", play_js)
+        self.assertIn("config.cameraTargetHeight - groundOffset", play_js)
 
     def test_game_workspace_has_composition_viewport_controls(self):
         # Editor camera (alt-orbit/track/dolly + flight speed) lives in gw_camera.js;
@@ -1408,6 +1531,38 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("beginViewportDrag('orbit'", camera_js)
         self.assertIn("beginViewportDrag('track'", camera_js)
         self.assertIn("beginViewportDrag('dolly'", camera_js)
+
+    def test_game_viewport_shows_runtime_render_stats_overlay(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertIn('id="game-runtime-stats"', _PICKER_INDEX_HTML)
+        self.assertIn('data-runtime-stat="frame-ms"', _PICKER_INDEX_HTML)
+        self.assertIn('data-runtime-stat="draw-calls"', _PICKER_INDEX_HTML)
+        self.assertIn('data-runtime-stat="triangles"', _PICKER_INDEX_HTML)
+        self.assertIn('data-runtime-stat="objects"', _PICKER_INDEX_HTML)
+        self.assertIn('data-runtime-stat="meshes"', _PICKER_INDEX_HTML)
+        self.assertIn('.game-runtime-stats', _PICKER_STYLES)
+        runtime_stats_style = _PICKER_STYLES.split(".game-runtime-stats", 1)[1].split("}", 1)[0]
+        runtime_stat_style = _PICKER_STYLES.split(".game-runtime-stat {", 1)[1].split("}", 1)[0]
+        self.assertIn("position: absolute;", runtime_stats_style)
+        self.assertIn("right: 10px;", runtime_stats_style)
+        self.assertIn("top: 10px;", runtime_stats_style)
+        self.assertIn("display: flex;", runtime_stats_style)
+        self.assertIn("flex-direction: column;", runtime_stats_style)
+        self.assertNotIn("grid-template-columns: repeat(5, auto);", runtime_stats_style)
+        self.assertIn("grid-template-columns: auto auto;", runtime_stat_style)
+        self.assertNotIn("border:", runtime_stat_style)
+        self.assertNotIn("background:", runtime_stat_style)
+        self.assertNotIn("box-shadow:", runtime_stat_style)
+        self.assertNotIn("backdrop-filter:", runtime_stat_style)
+        self.assertIn("function bindRuntimeStatsHud()", game_js)
+        self.assertIn("function updateRuntimeStats(frameTimeMs, now)", game_js)
+        self.assertIn("runtimeStatsFields.frameMs", game_js)
+        self.assertIn("var renderInfo = renderer.info && renderer.info.render", game_js)
+        self.assertIn("renderInfo.calls", game_js)
+        self.assertIn("renderInfo.triangles", game_js)
+        self.assertIn("scene.traverse(function(object)", game_js)
+        self.assertIn("if (object.isMesh) counts.meshes += 1;", game_js)
+        self.assertIn("render(frameTimeMs, now);", game_js)
 
     def test_game_transform_controls_have_explicit_modes(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
@@ -1478,14 +1633,20 @@ class TestPickerHtml(unittest.TestCase):
 
     def test_game_renderer_matches_composition_lighting_baseline(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
-        self.assertIn('THREE.ColorManagement.legacyMode = false;', game_js)
         self.assertIn('var DEFAULT_EDITOR_SKY_COLOR = 0x8fb7d9;', game_js)
+        self.assertIn("window.VC_RENDER_PROFILE.configureColorManagement(THREE);", game_js)
+        self.assertIn("renderer = window.VC_RENDER_PROFILE.createRenderer(THREE, {", game_js)
+        self.assertIn("shadowQuality: 'high'", game_js)
+        self.assertIn("window.VC_RENDER_PROFILE.createCascadedShadowLighting(THREE, scene, camera, {", game_js)
+        self.assertIn("includeAmbient: true", game_js)
+        self.assertIn("editorEnvironment = window.VC_RENDER_PROFILE.applyEnvironment(THREE, renderer, scene, {", game_js)
         self.assertIn('scene.background = new THREE.Color(DEFAULT_EDITOR_SKY_COLOR);', game_js)
         self.assertNotIn('scene.background = new THREE.Color(0x666a6c);', game_js)
-        self.assertIn('renderer.shadowMap.type = THREE.PCFSoftShadowMap;', game_js)
         self.assertIn('opacity: 0.4', game_js)
-        self.assertIn('sun.shadow.mapSize.set(4096, 4096);', game_js)
-        self.assertIn('sun.shadow.normalBias = 0.03;', game_js)
+        self.assertIn('ambientLight = lighting.ambient;', game_js)
+        self.assertIn('csm = lighting.csm;', game_js)
+        self.assertNotIn('renderer.shadowMap.type = THREE.PCFSoftShadowMap;', game_js)
+        self.assertNotIn('sun.shadow.mapSize.set(4096, 4096);', game_js)
 
     def test_game_workspace_uses_transform_controls(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
@@ -1494,6 +1655,16 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn('/static/three/TransformControls.js', game_js)
         self.assertIn('transformControls.attach(selectedObject)', game_js)
         self.assertIn('transformControls.addEventListener("dragging-changed"', game_js)
+
+    def test_render_profile_script_loads_before_three_viewports(self):
+        profile_script = '/area-picker/render_profile.js?v=__VERSION__'
+        grid_script = '/area-picker/viewport_grid.js?v=__VERSION__'
+        game_script = '/area-picker/game_workbench.js?v=__VERSION__'
+        houdini_script = '/area-picker/houdini_preview.js?v=__VERSION__'
+        self.assertIn(profile_script, _PICKER_INDEX_HTML)
+        self.assertLess(_PICKER_INDEX_HTML.index(profile_script), _PICKER_INDEX_HTML.index(grid_script))
+        self.assertLess(_PICKER_INDEX_HTML.index(profile_script), _PICKER_INDEX_HTML.index(game_script))
+        self.assertLess(_PICKER_INDEX_HTML.index(profile_script), _PICKER_INDEX_HTML.index(houdini_script))
 
     def test_game_viewport_orbit_pivot_stays_on_view_ray(self):
         # The pivot must always lie on the camera's current forward ray so the
@@ -2004,6 +2175,7 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "gw_outliner.js",
                 "game_workbench.js",
                 "vc_glb.js",
+                "render_profile.js",
                 "viewport_grid.js",
                 "houdini_preview.js",
                 "scene_project.js",
@@ -2023,10 +2195,13 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 fourth = area_picker._frontend_asset_version()
                 (root / "viewport_grid.js").write_text("v5-grid-content", encoding="utf-8")
                 fifth = area_picker._frontend_asset_version()
+                (root / "render_profile.js").write_text("v6-render-profile-content", encoding="utf-8")
+                sixth = area_picker._frontend_asset_version()
         self.assertNotEqual(first, second)
         self.assertNotEqual(second, third)
         self.assertNotEqual(third, fourth)
         self.assertNotEqual(fourth, fifth)
+        self.assertNotEqual(fifth, sixth)
 
     def test_version_is_stable_without_changes(self):
         with tempfile.TemporaryDirectory() as td:
@@ -2042,6 +2217,7 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "gw_outliner.js",
                 "game_workbench.js",
                 "vc_glb.js",
+                "render_profile.js",
                 "viewport_grid.js",
                 "houdini_preview.js",
                 "scene_project.js",

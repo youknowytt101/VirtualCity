@@ -126,6 +126,10 @@
     return {
       getCharacters: function() { return characters; },
       getWhiteboxLayers: function() { return whiteboxLayers; },
+      // Everything a play-mode collider should be built from: whitebox layers
+      // and plain model roots, but not characters (the player shouldn't
+      // collide with itself, and other characters aren't wired as obstacles).
+      getCollidables: function() { return flattenModels(); },
       addCharacter: addCharacter,
       removeCharacter: removeCharacter,
       addModel: addModel,

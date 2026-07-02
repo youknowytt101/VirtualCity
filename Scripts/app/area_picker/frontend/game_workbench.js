@@ -31,9 +31,9 @@
   var active = false;
   var dragState = null;
   var sceneState = null;
-  var selectedCharacter = null;
   var selectedObject = null;
-  var sun = null;
+  var csm = null;
+  var editorEnvironment = null;
   var outlineBody = null;
   var transformControls = null;
   var transformControlsLoading = null;
@@ -49,6 +49,11 @@
   var editorGrid = null;
   var sceneOutliner = null;
   var inspector = null;
+  var runtimeStatsEl = null;
+  var runtimeStatsFields = {};
+  var runtimeStatsLastFrameTime = null;
+  var runtimeStatsLastUpdate = 0;
+  var playCollider = null;
   var DEFAULT_EDITOR_SKY_COLOR = 0x8fb7d9;
 
   // Aliases into the split modules (gw_core/gw_character/gw_play). These load
@@ -158,13 +163,35 @@
     return raycaster.ray.intersectPlane(groundPlane, hitPoint) ? hitPoint.clone() : null;
   }
 
-  // Height of the ground under (x, y): cast a ray straight down from high above
-  // and return the first whitebox surface hit, falling back to the z=0 plane.
-  // Injected into the play controller so gravity lands the character on terrain.
+  // Rebuilds the merged BVH play-mode collider (gw_collision.js) from the
+  // scene's current whitebox layers + models, so entering Run always reflects
+  // whatever's been imported/placed since the last run. Async; every consumer
+  // below (ground/obstacle sampling, gw_play.js's capsule collision) tolerates
+  // playCollider being null -- mid-build, load failure, or nothing collidable
+  // -- by falling back to the simpler per-object raycasts that always worked.
+  function buildOrRefreshPlayCollider() {
+    if (!GW.buildPlayCollider) return;
+    GW.buildPlayCollider(sceneState.getCollidables()).then(function(collider) {
+      playCollider = collider;
+    }).catch(function(error) {
+      playCollider = null;
+      var message = error && error.message ? error.message : String(error || '未知错误');
+      if (GW.setStatus) GW.setStatus('碰撞体构建失败，已回退到简单避障: ' + message);
+    });
+  }
+
+  // Height of the ground under (x, y): prefer a single raycast against the
+  // BVH play collider once it's built; otherwise fall back to a direct
+  // raycast against the whitebox layers, then the z=0 plane. Injected into
+  // the play controller so gravity lands the character on terrain.
   function sampleGroundHeight(x, y) {
     var THREE = safeThree();
     if (!THREE || !raycaster) return 0;
     raycaster.set(new THREE.Vector3(x, y, 100000), new THREE.Vector3(0, 0, -1));
+    if (playCollider) {
+      var colliderHits = raycaster.intersectObject(playCollider, false);
+      if (colliderHits.length) return colliderHits[0].point.z;
+    }
     var whiteboxLayers = sceneState.getWhiteboxLayers();
     if (whiteboxLayers.length) {
       var hits = raycaster.intersectObjects(whiteboxLayers, true);
@@ -177,9 +204,50 @@
     return 0;
   }
 
+  // Casts from the play camera's focus point (the player's chest) toward its
+  // desired chase-cam position and returns the first solid hit in between, so
+  // gw_play.js can pull the camera in front of walls/terrain instead of
+  // letting it clip through them. Prefers the BVH play collider (one fast
+  // raycast against all scene geometry); falls back to a per-object raycast
+  // against scene pickables when the collider isn't built yet. Excludes the
+  // player's own avatar either way so the camera isn't blocked by the
+  // character it's following.
+  function sampleCameraObstacle(origin, target, ignoreCharacter) {
+    var THREE = safeThree();
+    if (!THREE || !raycaster) return null;
+    var offset = target.clone().sub(origin);
+    var distance = offset.length();
+    if (distance < 0.0001) return null;
+    raycaster.set(origin, offset.normalize());
+    if (playCollider) {
+      var colliderHits = raycaster.intersectObject(playCollider, false);
+      return (colliderHits.length && colliderHits[0].distance <= distance) ? colliderHits[0].point : null;
+    }
+    var candidates = sceneState.getPickables().filter(function(obj) {
+      return obj !== ignoreCharacter && obj.userData.assetRoot !== ignoreCharacter;
+    });
+    var hits = raycaster.intersectObjects(candidates, true);
+    for (var i = 0; i < hits.length; i++) {
+      if (hits[i].distance > distance) break;
+      var obj = hits[i].object;
+      if (obj.userData.pickable === false || obj.userData.assetRoot === ignoreCharacter) continue;
+      return hits[i].point;
+    }
+    return null;
+  }
+
+  function getCharacterGroundOffset(character) {
+    return Number(character && character.userData && character.userData.groundOffset) || 0;
+  }
+
+  function setCharacterGroundPosition(character, point) {
+    if (!character || !point) return;
+    character.position.set(point.x, point.y, point.z + getCharacterGroundOffset(character));
+  }
+
   function placeCharacterAt(point) {
     var character = markCharacter(createCharacter());
-    character.position.set(point.x, point.y, 0);
+    setCharacterGroundPosition(character, point);
     sceneState.addCharacter(character);
     selectSceneObject(character);
     rebuildSceneOutline();
@@ -223,12 +291,17 @@
     );
   }
 
-  // Selects any scene object (character or whitebox layer). selectedCharacter is
-  // kept only for character-specific play/run paths; generic edit commands use
-  // selectedObject so models and whitebox layers can participate.
+  // Character-specific play/run paths need just the character; models and
+  // whitebox layers can't run. Derived on demand from selectedObject so there's
+  // a single source of truth for "what's selected".
+  function getSelectedCharacter() {
+    return (selectedObject && selectedObject.userData && selectedObject.userData.assetType === 'character') ? selectedObject : null;
+  }
+
+  // Selects any scene object (character or whitebox layer). Generic edit
+  // commands use selectedObject so models and whitebox layers can participate.
   function selectSceneObject(object) {
     selectedObject = object || null;
-    selectedCharacter = (object && object.userData && object.userData.assetType === 'character') ? object : null;
     if (transformControls) {
       if (selectedObject) transformControls.attach(selectedObject);
       else transformControls.detach();
@@ -351,6 +424,9 @@
     (data.characters || []).forEach(function(item) {
       var character = markCharacter(createCharacter());
       if (item.p) character.position.fromArray(item.p);
+      if (item.p && character.position.z <= getCharacterGroundOffset(character) * 0.25) {
+        character.position.z += getCharacterGroundOffset(character);
+      }
       if (item.r) character.rotation.set(item.r[0], item.r[1], item.r[2]);
       if (item.s) character.scale.fromArray(item.s);
       if (item.label) character.userData.assetLabel = item.label;
@@ -469,6 +545,7 @@
       setStatus('对象已删除');
       return true;
     }
+    var selectedCharacter = getSelectedCharacter();
     if (selectedCharacter) {
       var character = selectedCharacter;
       var index = sceneState.getCharacters().indexOf(character);
@@ -535,7 +612,11 @@
   }
 
   function duplicateCharacter(character) {
-    var duplicate = placeCharacterAt(character.position.clone().add({ x: 1, y: 1, z: 0 }));
+    var offsetPosition = character.position.clone();
+    offsetPosition.x += 1;
+    offsetPosition.y += 1;
+    offsetPosition.z -= getCharacterGroundOffset(character);
+    var duplicate = placeCharacterAt(offsetPosition);
     duplicate.rotation.copy(character.rotation);
     return true;
   }
@@ -575,6 +656,7 @@
     if (!selectedObject || playMode.isPlaying()) return false;
     var model = sceneState.findModelFor(selectedObject);
     if (model) return duplicateSceneModel(model);
+    var selectedCharacter = getSelectedCharacter();
     if (selectedCharacter) return duplicateCharacter(selectedCharacter);
     return false;
   }
@@ -607,7 +689,7 @@
   }
 
   function getPlayableCharacter() {
-    return selectedCharacter || sceneState.getCharacters()[0] || null;
+    return getSelectedCharacter() || sceneState.getCharacters()[0] || null;
   }
 
   function toggleRun() {
@@ -616,6 +698,7 @@
       playMode.exit();
       return;
     }
+    buildOrRefreshPlayCollider();
     if (!playMode.enter(getPlayableCharacter())) {
       setStatus('先拖入一个角色');
     }
@@ -772,6 +855,16 @@
   // far kept shrinking and clipped the city out from under the model. Keep the
   // near/far ratio bounded (5000:1) for the grid shader's inverse-projection
   // reconstruction precision (see viewport_grid.js).
+  // csm.updateFrustums() resizes each cascade's shadow-camera frustum, which
+  // changes its texel size -- the bias/normalBias tuned for that size
+  // (tuneCSMShadowBias, render_profile.js) needs recomputing every time this
+  // runs, or a cascade that just got bigger/smaller keeps a stale, wrong bias.
+  function refitCSM() {
+    if (!csm) return;
+    csm.updateFrustums();
+    if (window.VC_RENDER_PROFILE) window.VC_RENDER_PROFILE.tuneCSMShadowBias(csm);
+  }
+
   function adaptCameraClip() {
     if (!camera) return;
     var originDist = camera.position.length();
@@ -781,23 +874,69 @@
       camera.far = far;
       camera.near = near;
       camera.updateProjectionMatrix();
+      refitCSM();
     }
   }
 
-  function render() {
+  function bindRuntimeStatsHud() {
+    runtimeStatsEl = document.getElementById('game-runtime-stats');
+    runtimeStatsFields = {
+      frameMs: runtimeStatsEl && runtimeStatsEl.querySelector('[data-runtime-stat="frame-ms"]'),
+      drawCalls: runtimeStatsEl && runtimeStatsEl.querySelector('[data-runtime-stat="draw-calls"]'),
+      triangles: runtimeStatsEl && runtimeStatsEl.querySelector('[data-runtime-stat="triangles"]'),
+      objects: runtimeStatsEl && runtimeStatsEl.querySelector('[data-runtime-stat="objects"]'),
+      meshes: runtimeStatsEl && runtimeStatsEl.querySelector('[data-runtime-stat="meshes"]')
+    };
+  }
+
+  function formatRuntimeCount(value) {
+    return Math.round(value || 0).toLocaleString();
+  }
+
+  function countRuntimeSceneObjects() {
+    var counts = { objects: 0, meshes: 0 };
+    if (!scene) return counts;
+    scene.traverse(function(object) {
+      counts.objects += 1;
+      if (object.isMesh) counts.meshes += 1;
+    });
+    return counts;
+  }
+
+  function updateRuntimeStats(frameTimeMs, now) {
+    if (!runtimeStatsEl || !runtimeStatsFields.frameMs || typeof frameTimeMs !== 'number') return;
+    var timestamp = typeof now === 'number' ? now : performance.now();
+    if (timestamp - runtimeStatsLastUpdate < 250) return;
+    runtimeStatsLastUpdate = timestamp;
+    var renderInfo = renderer.info && renderer.info.render;
+    var counts = countRuntimeSceneObjects();
+    runtimeStatsFields.frameMs.textContent = frameTimeMs.toFixed(1) + ' ms';
+    runtimeStatsFields.drawCalls.textContent = formatRuntimeCount(renderInfo && renderInfo.calls);
+    runtimeStatsFields.triangles.textContent = formatRuntimeCount(renderInfo && renderInfo.triangles);
+    runtimeStatsFields.objects.textContent = formatRuntimeCount(counts.objects);
+    runtimeStatsFields.meshes.textContent = formatRuntimeCount(counts.meshes);
+  }
+
+  function render(frameTimeMs, now) {
     if (!renderer) return;
     adaptCameraClip();
     updateEditorGrid();
     renderer.render(scene, camera);
+    updateRuntimeStats(frameTimeMs, now);
     if (inspector) inspector.sync();
   }
 
-  function tick() {
+  function tick(now) {
     if (!active) return;
     var deltaTime = Math.min(clock.getDelta(), 0.05);
+    var frameTimeMs = runtimeStatsLastFrameTime === null || typeof now !== 'number'
+      ? deltaTime * 1000
+      : now - runtimeStatsLastFrameTime;
+    runtimeStatsLastFrameTime = typeof now === 'number' ? now : runtimeStatsLastFrameTime;
     playMode.update(deltaTime);
+    if (csm) csm.update();
     cameraControls.update(deltaTime);
-    render();
+    render(frameTimeMs, now);
     rafId = requestAnimationFrame(tick);
   }
 
@@ -809,6 +948,7 @@
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
+    refitCSM();
     render();
   }
 
@@ -941,6 +1081,32 @@
     }
   }
 
+  // createCharacterMaterial/createWhiteboxToonMaterial only call
+  // csm.setupMaterial() at creation time, guarded by whether CSM has
+  // finished loading yet -- but a scene auto-restored on page load
+  // (scenePersistence.restoreScene(), below) can finish creating all its
+  // whitebox/character materials before the CSM addon's dynamic import
+  // resolves, since both are async and there's no ordering guarantee
+  // between them. Those materials would otherwise be stuck rendering with
+  // plain (non-cascaded) lighting forever. Run once, right when CSM becomes
+  // ready, to catch up on whatever already exists; needsUpdate is required
+  // because setupMaterial() alone doesn't force an already-compiled
+  // material's shader program to recompile.
+  function applyCSMToExistingMaterials() {
+    if (!csm || !sceneState) return;
+    function setupMesh(node) {
+      if (!node.isMesh || !node.material) return;
+      var materials = Array.isArray(node.material) ? node.material : [node.material];
+      materials.forEach(function(material) {
+        if (!material.isMeshToonMaterial) return;
+        csm.setupMaterial(material);
+        material.needsUpdate = true;
+      });
+    }
+    sceneState.getCharacters().forEach(function(root) { root.traverse(setupMesh); });
+    sceneState.getCollidables().forEach(function(root) { root.traverse(setupMesh); });
+  }
+
   function initGameWorkbench() {
     var THREE = safeThree();
     if (initialized || !THREE) return;
@@ -950,6 +1116,7 @@
     runLabel = document.getElementById('game-run-label');
     speedInput = document.getElementById('game-speed-input');
     lightInput = document.getElementById('game-light-input');
+    bindRuntimeStatsHud();
     GW.state.statusText = document.getElementById('game-status');
     gameWorkbench = document.getElementById('game-workbench');
     outlineBody = document.querySelector('#game-scene-outline .action-outline-body');
@@ -988,9 +1155,11 @@
       setStatus: setStatus
     });
 
-    if (THREE.ColorManagement && 'legacyMode' in THREE.ColorManagement) {
-      THREE.ColorManagement.legacyMode = false;
+    if (!window.VC_RENDER_PROFILE) {
+      setStatus('Render profile module 未加载');
+      return;
     }
+    window.VC_RENDER_PROFILE.configureColorManagement(THREE);
     THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
     scene = new THREE.Scene();
     scene.background = new THREE.Color(DEFAULT_EDITOR_SKY_COLOR);
@@ -998,34 +1167,34 @@
     camera.up.set(0, 0, 1);
     camera.position.set(10, -16, 8);
     camera.lookAt(0, 0, 0);
-    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    if ('outputColorSpace' in renderer) renderer.outputColorSpace = THREE.SRGBColorSpace;
-    else renderer.outputEncoding = THREE.sRGBEncoding;
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer = window.VC_RENDER_PROFILE.createRenderer(THREE, {
+      antialias: true,
+      preserveDrawingBuffer: false,
+      shadowQuality: 'high'
+    });
     renderer.domElement.tabIndex = 0;
     sceneHost.appendChild(renderer.domElement);
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x8a9bb0, 0.9));
-    ambientLight = new THREE.AmbientLight(0xb4b8bc, lightInput ? parseFloat(lightInput.value) : 0.5);  // 灰色环境光，抬升投影暗部
-    scene.add(ambientLight);
-    sun = new THREE.DirectionalLight(0xffffff, 2.0);
-    sun.position.set(8, 14, 10);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(4096, 4096);
-    sun.shadow.camera.near = 0.5;
-    sun.shadow.camera.far = 80;
-    sun.shadow.camera.left = -40;
-    sun.shadow.camera.right = 40;
-    sun.shadow.camera.top = 40;
-    sun.shadow.camera.bottom = -40;
-    sun.shadow.bias = -0.00015;
-    sun.shadow.normalBias = 0.03;
-    sun.shadow.radius = 1.2;
-    scene.add(sun, sun.target);
+    // Cascaded shadow maps instead of a single sun: the scene renders
+    // immediately with hemisphere/ambient light only, and shadows fade in a
+    // moment later once the CSM addon's dynamic import resolves (same
+    // fire-and-forget pattern gw_character.js uses for the avatar GLTF).
+    window.VC_RENDER_PROFILE.createCascadedShadowLighting(THREE, scene, camera, {
+      includeAmbient: true,
+      ambientIntensity: lightInput ? parseFloat(lightInput.value) : 0.5,
+      shadowQuality: 'high'
+    }).then(function(lighting) {
+      ambientLight = lighting.ambient;
+      csm = lighting.csm;
+      GW.state.csm = csm;
+      applyCSMToExistingMaterials();
+    }).catch(function(error) {
+      var message = error && error.message ? error.message : String(error || '未知错误');
+      setStatus('阴影系统加载失败: ' + message);
+    });
+    editorEnvironment = window.VC_RENDER_PROFILE.applyEnvironment(THREE, renderer, scene, {
+      shadowQuality: 'high'
+    });
     createGround();
     createGrid();
 
@@ -1038,7 +1207,9 @@
       camera: camera,
       renderer: renderer,
       onChange: syncRunState,
-      sampleGroundHeight: sampleGroundHeight
+      sampleGroundHeight: sampleGroundHeight,
+      sampleCameraObstacle: sampleCameraObstacle,
+      getCollider: function() { return playCollider; }
     });
     cameraControls = GW.createGameCameraController({
       camera: camera,
@@ -1059,7 +1230,6 @@
     assetLoader = GW.createAssetLoader({
       ensureInit: initGameWorkbench,
       getScene: function() { return scene; },
-      getSun: function() { return sun; },
       getSelectedObject: function() { return selectedObject; },
       selectSceneObject: selectSceneObject,
       addSceneModel: addSceneModel,
@@ -1092,6 +1262,8 @@
     resize();
     if (!rafId) {
       clock.getDelta();
+      runtimeStatsLastFrameTime = null;
+      runtimeStatsLastUpdate = 0;
       rafId = requestAnimationFrame(tick);
     }
   }

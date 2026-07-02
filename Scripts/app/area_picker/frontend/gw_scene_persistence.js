@@ -31,7 +31,10 @@
       if (restoringScene) return;
       try {
         window.localStorage.setItem(sceneStorageKey(), JSON.stringify(ctx.serializeScene()));
-      } catch (e) {}
+      } catch (e) {
+        console.warn('[game-workbench] 场景保存失败', e);
+        ctx.setStatus('场景保存失败，本地存储可能已满或被禁用');
+      }
     }
 
     function clearPendingSave() {
@@ -48,6 +51,8 @@
     function restoreScene() {
       var raw = null;
       try { raw = window.localStorage.getItem(sceneStorageKey()); } catch (e) {
+        console.warn('[game-workbench] 读取本地场景存档失败', e);
+        ctx.setStatus('本地存档读取失败，已加载空场景');
         ctx.rebuildSceneOutline();
         return;
       }
@@ -57,16 +62,24 @@
       }
       var data = null;
       try { data = JSON.parse(raw); } catch (e) {
+        console.warn('[game-workbench] 本地场景存档已损坏', e);
+        ctx.setStatus('本地存档已损坏，已重置为空场景');
         ctx.rebuildSceneOutline();
         return;
       }
       if (!data || data.v !== 1) {
+        console.warn('[game-workbench] 本地场景存档版本不受支持', data);
+        ctx.setStatus('本地存档版本不受支持，已加载空场景');
         ctx.rebuildSceneOutline();
         return;
       }
       restoringScene = true;
       try {
         ctx.restoreSceneSnapshot(data);
+      } catch (e) {
+        console.warn('[game-workbench] 场景恢复失败，部分对象可能未恢复', e);
+        ctx.setStatus('本地存档解析出错，部分对象可能未恢复');
+        ctx.rebuildSceneOutline();
       } finally {
         restoringScene = false;
       }

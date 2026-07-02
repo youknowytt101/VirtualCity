@@ -1,6 +1,6 @@
 // Domain: game-workbench / character
-// Owns: the procedural stylized avatar (geometry, toon material, outline shader)
-//       and its walk/idle motion rig. Pure factories — no shared scene state.
+// Owns: the Three.js UEPerson avatar loader, animation adapter, and
+//       shared toon/outline helpers used by the game workbench.
 // AI handoff: For avatar look or run-cycle motion, start here; selection/outline
 //             highlight wiring stays in game_workbench.js.
 (function() {
@@ -9,6 +9,16 @@
   var GW = window.VC_GW || (window.VC_GW = {});
   var safeThree = GW.safeThree;
   var sharedToonGradientMap = null;
+  // Model source: hh-hang/three-player-controller example/public/glb/UEPerson.glb.
+  var ROBOT_AVATAR_URL = '/area-picker/assets/characters/UEPerson.glb';
+  var ROBOT_TARGET_HEIGHT = 1.72;
+  var ROBOT_ANIMATIONS = {
+    idle: 'idle',
+    walk: 'walk',
+    run: 'run',
+    jump: 'jumpStart'
+  };
+  var gltfLoaderPromise = null;
 
   function getToonGradientMap() {
     var THREE = safeThree();
@@ -31,10 +41,12 @@
 
   function createCharacterMaterial(color) {
     var THREE = safeThree();
-    return new THREE.MeshToonMaterial({
+    var material = new THREE.MeshToonMaterial({
       color: color,
       gradientMap: getToonGradientMap()
     });
+    if (GW.state.csm) GW.state.csm.setupMaterial(material);
+    return material;
   }
 
   function createOutlineMaterial(thickness) {
@@ -92,148 +104,154 @@
     return mesh;
   }
 
+  function loadGLTF(url) {
+    if (!gltfLoaderPromise) {
+      gltfLoaderPromise = import("/static/three/GLTFLoader.js").then(function(mod) {
+        return new mod.GLTFLoader();
+      });
+    }
+    return gltfLoaderPromise.then(function(loader) {
+      return new Promise(function(resolve, reject) {
+        loader.load(url, resolve, undefined, reject);
+      });
+    });
+  }
+
+  function markCharacterChild(character, node) {
+    if (!node.userData) node.userData = {};
+    node.userData.assetRoot = character;
+    node.userData.assetType = 'character';
+    if (node.isMesh || node.isSkinnedMesh) {
+      node.castShadow = true;
+      node.receiveShadow = true;
+    }
+  }
+
+  // Fits the model to ROBOT_TARGET_HEIGHT and anchors its feet at the
+  // character group's own local origin (0,0,0) -- so character.position (the
+  // editor gizmo, ground snapping, camera math) always means "where the feet
+  // touch the ground", the standard convention for a character controller.
+  function fitRobotAvatar(model) {
+    var THREE = safeThree();
+    if (!THREE || !model) return;
+    var box = new THREE.Box3();
+    model.updateMatrixWorld(true);
+    box.setFromObject(model);
+    var height = box.max.z - box.min.z;
+    if (height > 0.001) {
+      model.scale.multiplyScalar(ROBOT_TARGET_HEIGHT / height);
+      model.updateMatrixWorld(true);
+      box.setFromObject(model);
+    }
+    model.position.z -= box.min.z;
+    model.updateMatrixWorld(true);
+  }
+
+  function createLoadingProxy() {
+    var THREE = safeThree();
+    var geometry = THREE.CapsuleGeometry
+      ? new THREE.CapsuleGeometry(0.22, 0.78, 5, 12)
+      : new THREE.CylinderGeometry(0.22, 0.22, 1.22, 12);
+    // Capsule total height is 0.78 + 2*0.22 = 1.22; positioning its center at
+    // half that height puts its bottom at the group's local origin (feet),
+    // matching fitRobotAvatar's convention for the real avatar.
+    var proxy = createCharacterPart({
+      name: 'player-robot-loading-proxy',
+      geometry: geometry,
+      material: createCharacterMaterial(0x76879a),
+      position: [0, 0, 0.61],
+      rotation: [Math.PI / 2, 0, 0],
+      outline: 0.01
+    });
+    proxy.userData.loadingProxy = true;
+    return proxy;
+  }
+
+  function createRobotActions(character, model, animations) {
+    var THREE = safeThree();
+    var mixer = new THREE.AnimationMixer(model);
+    var actions = {};
+    (animations || []).forEach(function(clip) {
+      actions[clip.name] = mixer.clipAction(clip);
+    });
+    var runningActionName = actions[ROBOT_ANIMATIONS.run] ? ROBOT_ANIMATIONS.run : ROBOT_ANIMATIONS.walk;
+    var locomotionActionName = actions[ROBOT_ANIMATIONS.walk] ? ROBOT_ANIMATIONS.walk : runningActionName;
+    var jumpAction = actions[ROBOT_ANIMATIONS.jump];
+    if (jumpAction) {
+      jumpAction.loop = THREE.LoopOnce;
+      jumpAction.clampWhenFinished = true;
+    }
+    character.userData.animationMixer = mixer;
+    character.userData.robotAvatar = {
+      model: model,
+      actions: actions,
+      activeAction: null,
+      locomotionActionName: locomotionActionName,
+      loaded: true
+    };
+    if (actions[ROBOT_ANIMATIONS.idle]) playRobotAction(character, ROBOT_ANIMATIONS.idle, 0);
+    return actions;
+  }
+
+  function playRobotAction(character, actionName, fadeDuration) {
+    var robot = character && character.userData.robotAvatar;
+    if (!robot || !robot.actions) return;
+    var next = robot.actions[actionName];
+    if (!next || robot.activeAction === next) return;
+    var previous = robot.activeAction;
+    robot.activeAction = next;
+    if (previous) previous.fadeOut(fadeDuration);
+    next
+      .reset()
+      .setEffectiveTimeScale(1)
+      .setEffectiveWeight(1)
+      .fadeIn(fadeDuration)
+      .play();
+  }
+
+  function attachRobotAvatar(character, gltf) {
+    var model = gltf.scene;
+    var placeholder = character.userData.loadingProxy;
+    model.name = 'player-ueperson';
+    model.rotation.x = Math.PI / 2;
+    model.rotation.y = Math.PI;
+    model.traverse(function(node) {
+      markCharacterChild(character, node);
+    });
+    // Fit before parenting: fitRobotAvatar reads a world-space bounding box,
+    // and while unparented that's the same as model-local space. Fitting
+    // after character.add(model) would bake the character's own (possibly
+    // large, e.g. real terrain elevation) position into the box, corrupting
+    // model.position.z and detaching the visual mesh from the group's origin.
+    fitRobotAvatar(model);
+    character.add(model);
+    if (placeholder) {
+      character.remove(placeholder);
+      character.userData.loadingProxy = null;
+    }
+    createRobotActions(character, model, gltf.animations);
+  }
+
+  function handleRobotLoadError(error) {
+    var message = error && (error.message || error.statusText) ? (error.message || error.statusText) : String(error || '未知错误');
+    if (GW.setStatus) GW.setStatus('角色模型加载失败: ' + message);
+  }
+
   function createCharacter() {
     var THREE = safeThree();
     var character = new THREE.Group();
-    var Capsule = THREE.CapsuleGeometry || THREE.CylinderGeometry;
-    var bodyGeometry = THREE.CapsuleGeometry
-      ? new Capsule(0.27, 0.72, 6, 14)
-      : new Capsule(0.27, 0.27, 1.08, 14);
-    var limbGeometry = THREE.CapsuleGeometry
-      ? new Capsule(0.075, 0.42, 5, 10)
-      : new Capsule(0.075, 0.075, 0.58, 10);
-    var legGeometry = THREE.CapsuleGeometry
-      ? new Capsule(0.09, 0.42, 5, 10)
-      : new Capsule(0.09, 0.09, 0.6, 10);
-    var materials = {
-      suit: createCharacterMaterial(0x4f8fd8),
-      accent: createCharacterMaterial(0xf2c94c),
-      dark: createCharacterMaterial(0x242a31),
-      cloth: createCharacterMaterial(0x6f7680),
-      skin: createCharacterMaterial(0xd8c4a8)
-    };
-    var body = createCharacterPart({
-      name: 'player-body',
-      geometry: bodyGeometry,
-      material: materials.suit,
-      position: [0, 0, 0.88],
-      rotation: [Math.PI / 2, 0, 0],
-      outline: 0.014
-    });
-    var chest = createCharacterPart({
-      name: 'player-chest-marker',
-      geometry: new THREE.BoxGeometry(0.32, 0.045, 0.2),
-      material: materials.accent,
-      position: [0, 0.265, 1.02],
-      outline: 0.006
-    });
-    var head = createCharacterPart({
-      name: 'player-head',
-      geometry: new THREE.SphereGeometry(0.24, 24, 16),
-      material: materials.skin,
-      position: [0, 0.02, 1.5],
-      outline: 0.012
-    });
-    var helmet = createCharacterPart({
-      name: 'player-helmet',
-      geometry: new THREE.SphereGeometry(0.255, 24, 12),
-      material: materials.dark,
-      position: [0, 0.01, 1.58],
-      scale: [1.04, 1.04, 0.72],
-      outline: 0.01
-    });
-    var visor = createCharacterPart({
-      name: 'player-visor',
-      geometry: new THREE.BoxGeometry(0.3, 0.055, 0.085),
-      material: materials.accent,
-      position: [0, 0.235, 1.54],
-      outline: 0.006
-    });
-    var brim = createCharacterPart({
-      name: 'player-helmet-brim',
-      geometry: new THREE.BoxGeometry(0.34, 0.18, 0.04),
-      material: materials.dark,
-      position: [0, 0.18, 1.7],
-      outline: 0.006
-    });
-    var backpack = createCharacterPart({
-      name: 'player-backpack',
-      geometry: new THREE.BoxGeometry(0.38, 0.16, 0.52),
-      material: materials.dark,
-      position: [0, -0.245, 0.91],
-      outline: 0.01
-    });
-    var leftArm = createCharacterPart({
-      name: 'player-left-arm',
-      geometry: limbGeometry,
-      material: materials.cloth,
-      position: [-0.37, 0.01, 0.88],
-      rotation: [Math.PI / 2, 0, 0.16],
-      outline: 0.01
-    });
-    var rightArm = createCharacterPart({
-      name: 'player-right-arm',
-      geometry: limbGeometry,
-      material: materials.cloth,
-      position: [0.37, 0.01, 0.88],
-      rotation: [Math.PI / 2, 0, -0.16],
-      outline: 0.01
-    });
-    var leftLeg = createCharacterPart({
-      name: 'player-left-leg',
-      geometry: legGeometry,
-      material: materials.dark,
-      position: [-0.15, 0, 0.36],
-      rotation: [Math.PI / 2, 0, 0.04],
-      outline: 0.01
-    });
-    var rightLeg = createCharacterPart({
-      name: 'player-right-leg',
-      geometry: legGeometry,
-      material: materials.dark,
-      position: [0.15, 0, 0.36],
-      rotation: [Math.PI / 2, 0, -0.04],
-      outline: 0.01
-    });
-    var leftFoot = createCharacterPart({
-      name: 'player-left-foot',
-      geometry: new THREE.BoxGeometry(0.22, 0.38, 0.11),
-      material: materials.dark,
-      position: [-0.15, 0.1, 0.06],
-      outline: 0.008
-    });
-    var rightFoot = createCharacterPart({
-      name: 'player-right-foot',
-      geometry: new THREE.BoxGeometry(0.22, 0.38, 0.11),
-      material: materials.dark,
-      position: [0.15, 0.1, 0.06],
-      outline: 0.008
-    });
-
-    character.userData.motionParts = {
-      upper: [body, chest, head, helmet, visor, brim, backpack],
-      leftArm: leftArm,
-      rightArm: rightArm,
-      leftLeg: leftLeg,
-      rightLeg: rightLeg,
-      leftFoot: leftFoot,
-      rightFoot: rightFoot
-    };
-    character.add(
-      backpack,
-      body,
-      chest,
-      leftArm,
-      rightArm,
-      leftLeg,
-      rightLeg,
-      leftFoot,
-      rightFoot,
-      head,
-      helmet,
-      visor,
-      brim
-    );
+    var placeholder = createLoadingProxy();
+    character.userData.avatarSource = 'hh-hang/three-player-controller UEPerson';
+    // 0: character.position is the feet/ground-contact point (see
+    // fitRobotAvatar). Kept as an explicit field, not just an implied 0,
+    // because ground snapping/camera math (game_workbench.js, gw_play.js)
+    // read it uniformly regardless of which avatar's origin convention.
+    character.userData.groundOffset = 0;
+    character.userData.loadingProxy = placeholder;
+    character.add(placeholder);
+    loadGLTF(ROBOT_AVATAR_URL)
+      .then(function(gltf) { attachRobotAvatar(character, gltf); })
+      .catch(handleRobotLoadError);
     resetCharacterMotion(character);
     return character;
   }
@@ -245,6 +263,10 @@
   }
 
   function resetCharacterMotion(character) {
+    if (character && character.userData && character.userData.robotAvatar) {
+      playRobotAction(character, ROBOT_ANIMATIONS.idle, 0.12);
+      return;
+    }
     var parts = character && character.userData.motionParts;
     if (!parts) return;
     parts.upper.forEach(resetPartMotion);
@@ -257,6 +279,13 @@
   }
 
   function updateCharacterMotion(character, moveDirection, deltaTime) {
+    if (character && character.userData && character.userData.animationMixer) {
+      var movingRobot = moveDirection && moveDirection.lengthSq() > 0.0001;
+      var robot = character.userData.robotAvatar || {};
+      playRobotAction(character, movingRobot ? robot.locomotionActionName : ROBOT_ANIMATIONS.idle, 0.16);
+      character.userData.animationMixer.update(deltaTime);
+      return;
+    }
     var parts = character && character.userData.motionParts;
     if (!parts) return;
     var moving = moveDirection && moveDirection.lengthSq() > 0.0001;

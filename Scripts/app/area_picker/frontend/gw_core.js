@@ -12,7 +12,12 @@
   // through GW.state so they observe the same scene/camera/selection. The host
   // (game_workbench.js) populates these during initGameWorkbench().
   GW.state = GW.state || {
-    statusText: null
+    statusText: null,
+    // The cascaded-shadow-map controller (render_profile.js's
+    // createCascadedShadowLighting, wired up in game_workbench.js). Null
+    // until its dynamic import resolves; material factories elsewhere
+    // (gw_character.js, gw_assets.js) check for it before registering.
+    csm: null
   };
 
   GW.setStatus = function(message) {

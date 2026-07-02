@@ -16,6 +16,7 @@ WorldBuilder — 交互式区域选择器
 
 import sys, json, subprocess, threading, webbrowser, time, os, re, socket, mimetypes, urllib.error, urllib.request, urllib.parse, importlib, shutil
 from datetime import datetime
+from http.cookies import SimpleCookie
 from pathlib import Path
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
@@ -33,6 +34,7 @@ import area_manifest
 import area_aggregate
 from acquisition import sources as acquisition_sources
 import app.area_picker.template as area_picker_template
+import app.area_picker.auth as auth
 from app.area_picker.software_paths import (
     SOFTWARE_PATHS_FILE,
     SOFTWARE_IDS as _SOFTWARE_IDS,
@@ -111,6 +113,9 @@ def _fetch_boundary(osm_type: str, osm_id: str) -> dict:
 NO_BROWSER = os.environ.get("VC_AREA_PICKER_NO_BROWSER") == "1"
 SHUTDOWN_WITH_PAGE = os.environ.get("VC_AREA_PICKER_SHUTDOWN_WITH_PAGE") == "1"
 FORCE_RESTART = os.environ.get("VC_AREA_PICKER_FORCE_RESTART") == "1"
+# 登录墙开关：功能本身（注册/登录/邀请码/账户菜单）已完整实现，但测试阶段暂不要求
+# 打开应用就先登录，默认关闭。设 VC_AREA_PICKER_REQUIRE_LOGIN=1 即可重新强制登录。
+AUTH_REQUIRED = os.environ.get("VC_AREA_PICKER_REQUIRE_LOGIN") == "1"
 # 浏览器会把后台标签页的 setInterval 心跳节流到最慢每分钟一次，宽限期必须
 # 高于该节流上限，否则切到别的窗口几十秒后就会被误判为"网页已关闭"而自杀。
 # 真正关页面仍由 /session/closed 信标走 PAGE_CLOSE_GRACE_SECONDS 快速停服。
@@ -1511,6 +1516,12 @@ def _template_html():
     return area_picker_template.HTML
 
 
+def _login_template_html():
+    if os.environ.get("VC_AREA_PICKER_TEMPLATE_RELOAD", "1") == "1":
+        importlib.reload(area_picker_template)
+    return area_picker_template.LOGIN_HTML
+
+
 def _frontend_asset_version() -> str:
     """前端静态资源的内容指纹，用于 ?v= 缓存击穿。
 
@@ -1526,6 +1537,7 @@ def _frontend_asset_version() -> str:
         (FRONTEND_ROOT, "pipeline_status.js"),
         (FRONTEND_ROOT, "dcc_bridge.js"),
         (FRONTEND_ROOT, "vc_glb.js"),
+        (FRONTEND_ROOT, "render_profile.js"),
         (FRONTEND_ROOT, "viewport_grid.js"),
         (FRONTEND_ROOT, "gw_core.js"),
         (FRONTEND_ROOT, "gw_history.js"),
@@ -1540,8 +1552,10 @@ def _frontend_asset_version() -> str:
         (FRONTEND_ROOT, "houdini_preview.js"),
         (FRONTEND_ROOT, "scene_project.js"),
         (FRONTEND_ROOT, "scene_assets.js"),
+        (FRONTEND_ROOT, "login.js"),
         (FRONTEND_ROOT, "styles.css"),
         (FRONTEND_ROOT, "index.html"),
+        (FRONTEND_ROOT, "login.html"),
     ]
     for root, name in assets:
         try:
@@ -1733,6 +1747,27 @@ class _Handler(BaseHTTPRequestHandler):
         if parsed.path == '/events':
             self._sse_events()
             return
+        if parsed.path == '/auth/me':
+            user = self._current_user()
+            self._json({'ok': bool(user), 'user': user})
+            return
+        if parsed.path == '/login':
+            if not AUTH_REQUIRED or self._current_user():
+                self.send_response(302)
+                self.send_header('Location', '/')
+                self.end_headers()
+                return
+            html = (_login_template_html()
+                    .replace('__VERSION__', _frontend_asset_version())
+                    .replace('__APP_VERSION__', APP_VERSION))
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+            self.end_headers()
+            self.wfile.write(html.encode('utf-8'))
+            return
         if parsed.path.startswith('/static/'):
             self._static(parsed.path)
             return
@@ -1761,6 +1796,11 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path not in ('/', ''):
             self.send_response(404)
+            self.end_headers()
+            return
+        if AUTH_REQUIRED and not self._current_user():
+            self.send_response(302)
+            self.send_header('Location', '/login')
             self.end_headers()
             return
         lat, lon = _get_initial_center()
@@ -1794,6 +1834,15 @@ class _Handler(BaseHTTPRequestHandler):
                 _safe_print(f'[area_picker] 清理 DCC 路径缓存失败: {exc}')
             self._json({'ok': True, 'message': 'restarting'})
             _schedule_desktop_restart()
+            return
+        if parsed.path == '/auth/register':
+            self._post_auth_register()
+            return
+        if parsed.path == '/auth/login':
+            self._post_auth_login()
+            return
+        if parsed.path == '/auth/logout':
+            self._post_auth_logout()
             return
         if parsed.path == '/session':
             _mark_page_seen()
@@ -2119,6 +2168,73 @@ class _Handler(BaseHTTPRequestHandler):
         if status['scene_root'] and not status['scene_root_exists']:
             message = '场景工程根目录已保存，但目录不存在'
         self._json({'ok': True, 'message': message, 'scene_root': status})
+
+    def _session_token(self) -> str:
+        cookie = SimpleCookie()
+        try:
+            cookie.load(self.headers.get('Cookie', '') or '')
+        except Exception:
+            return ''
+        morsel = cookie.get(auth.SESSION_COOKIE_NAME)
+        return morsel.value if morsel else ''
+
+    def _current_user(self):
+        return auth.user_for_token(self._session_token())
+
+    def _set_session_cookie(self, token: str):
+        max_age = int(auth.SESSION_TTL.total_seconds())
+        self.send_header(
+            'Set-Cookie',
+            f'{auth.SESSION_COOKIE_NAME}={token}; Path=/; Max-Age={max_age}; HttpOnly; SameSite=Lax',
+        )
+
+    def _clear_session_cookie(self):
+        self.send_header(
+            'Set-Cookie',
+            f'{auth.SESSION_COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax',
+        )
+
+    def _post_auth_register(self):
+        length = int(self.headers.get('Content-Length', 0))
+        try:
+            body = json.loads(self.rfile.read(length) or b'{}')
+        except json.JSONDecodeError:
+            self._json({'ok': False, 'message': '请求 JSON 无法解析'})
+            return
+        self._json(auth.register(body.get('email'), body.get('password'), body.get('invite_code')))
+
+    def _post_auth_login(self):
+        length = int(self.headers.get('Content-Length', 0))
+        try:
+            body = json.loads(self.rfile.read(length) or b'{}')
+        except json.JSONDecodeError:
+            self._json({'ok': False, 'message': '请求 JSON 无法解析'})
+            return
+        if body.get('dev_login'):
+            result = auth.dev_login()
+        else:
+            result = auth.login(body.get('email'), body.get('password'))
+        if not result.get('ok'):
+            self._json(result)
+            return
+        token = result.pop('token')
+        payload = json.dumps(result, ensure_ascii=False).encode('utf-8')
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Content-Length', str(len(payload)))
+        self._set_session_cookie(token)
+        self.end_headers()
+        self.wfile.write(payload)
+
+    def _post_auth_logout(self):
+        auth.logout(self._session_token())
+        payload = json.dumps({'ok': True}, ensure_ascii=False).encode('utf-8')
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Content-Length', str(len(payload)))
+        self._clear_session_cookie()
+        self.end_headers()
+        self.wfile.write(payload)
 
     def _post_open_scene_root(self):
         self._json(_open_scene_root_from_config())
@@ -2487,6 +2603,8 @@ def main():
         print(f"    4. 关闭网页后，本地服务会自动退出")
     print(f"{'='*52}\n")
     print(f"  按 Ctrl+C 退出\n")
+
+    auth.ensure_invite_codes_file()
 
     try:
         server = ThreadingHTTPServer((PICKER_HOST, PORT), _Handler)

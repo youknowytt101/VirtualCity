@@ -130,6 +130,28 @@ function bindHoudiniSideResize() {
   });
 }
 
+function refreshAccountMenuUser() {
+  var nameEl = document.querySelector('.account-menu .account-name');
+  var statusEl = document.getElementById('account-status-text');
+  fetch('/auth/me').then(function(response) {
+    return response.json();
+  }).then(function(res) {
+    var user = res && res.user;
+    if (nameEl) nameEl.textContent = user ? user.email : 'Settings';
+    if (statusEl) statusEl.textContent = user ? '已登录' : '未登录';
+  }).catch(function() {});
+}
+
+function bindAccountLogout() {
+  var logoutButton = document.getElementById('account-logout-btn');
+  if (!logoutButton) return;
+  logoutButton.addEventListener('click', function() {
+    fetch('/auth/logout', { method: 'POST' }).catch(function() {}).finally(function() {
+      window.location.href = '/login';
+    });
+  });
+}
+
 function bindAccountMenu() {
   var menu = document.querySelector('.account-menu');
   if (!menu) return;
@@ -139,6 +161,8 @@ function bindAccountMenu() {
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') menu.open = false;
   });
+  bindAccountLogout();
+  refreshAccountMenuUser();
 }
 
 function initialWorkspaceId() {

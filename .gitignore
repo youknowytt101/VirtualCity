@@ -70,6 +70,11 @@ Config/.*.tmp
 Config/active_area.json
 Config/houdini_build_status.json
 Config/qa/*.json
+
+# 登录功能本地数据：用户密码哈希/邀请码，不应进版本库
+Config/auth.db
+Config/auth.db-*
+Config/auth_invite_codes.json
 Reports/model_qa/*.json
 Reports/pipeline_runs/*.json
 Reports/manual_review/*.json

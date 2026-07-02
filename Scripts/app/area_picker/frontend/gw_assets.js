@@ -1,9 +1,10 @@
 // Domain: game-workbench / assets
-// Owns: whitebox GLB import — layer tagging/material isolation, sun-shadow framing,
-//       and the load orchestrator. registerWhiteboxLayers/fitSunShadow are pure;
-//       the loader takes a ctx of host getters/setters since it mutates scene state.
+// Owns: whitebox GLB import — layer tagging/material isolation, and the load
+//       orchestrator. registerWhiteboxLayers is pure; the loader takes a ctx
+//       of host getters/setters since it mutates scene state.
 // AI handoff: For whitebox import or layer tagging, start here; the shared GLB
 //             loader is vc_glb.js, scene/selection wiring is game_workbench.js.
+//             Shadows are cascaded (CSM) via game_workbench.js/render_profile.js.
 (function() {
   'use strict';
 
@@ -13,20 +14,46 @@
 
   var LAYER_LABELS = { terrain: '地形', buildings: '建筑', roads: '道路' };
   var LAYER_PREFIX = 'VC_whitebox_';
+  var WHITEBOX_TOON_COLORS = {
+    terrain: 0xaab5ad,
+    buildings: 0xb8b8b8,
+    roads: 0x747a80
+  };
+  var WHITEBOX_OUTLINE_THICKNESS = {
+    terrain: 0.008,
+    buildings: 0.016,
+    roads: 0.01
+  };
 
-  // Houdini exports the whitebox GLB with no materials, so GLTFLoader falls back
-  // to the glTF-spec default (metalness: 1, roughness: 1). With no environment
-  // map in this scene, a fully metallic surface has ~zero diffuse response --
-  // it only reflects an env map, so unlit-looking faces go dead black no matter
-  // how much ambient/hemisphere/directional light is added. Force a flat, non-
-  // metal response so the whitebox actually receives scene lighting.
-  function flattenWhiteboxMaterial(material) {
-    var mats = Array.isArray(material) ? material : [material];
-    mats.forEach(function(m) {
-      if (!m || m.metalness === undefined) return;
-      m.metalness = 0;
-      m.roughness = 1;
+  function createWhiteboxToonMaterial(sourceMaterial, layerKey) {
+    var THREE = safeThree();
+    if (!THREE) return sourceMaterial;
+    var material = new THREE.MeshToonMaterial({
+      color: WHITEBOX_TOON_COLORS[layerKey] || 0xb8b8b8,
+      gradientMap: GW.getToonGradientMap ? GW.getToonGradientMap() : null,
+      emissive: 0x000000,
+      side: THREE.DoubleSide
     });
+    material.name = 'VC_whitebox_' + (layerKey || 'default') + '_toon';
+    if (GW.state.csm) GW.state.csm.setupMaterial(material);
+    return material;
+  }
+
+  function attachWhiteboxToonOutline(mesh, layerKey) {
+    if (!mesh || !mesh.geometry || !GW.createOutlineMesh) return null;
+    if (mesh.children && mesh.children.some(function(child) {
+      return child.userData && child.userData.whiteboxOutline;
+    })) return null;
+    var outline = GW.createOutlineMesh(mesh.geometry, WHITEBOX_OUTLINE_THICKNESS[layerKey] || 0.012);
+    outline.name = (mesh.name || 'whitebox') + '_toon_outline';
+    outline.castShadow = false;
+    outline.receiveShadow = false;
+    outline.renderOrder = (mesh.renderOrder || 0) - 1;
+    outline.userData.whiteboxOutline = true;
+    outline.userData.assetType = layerKey || 'whitebox';
+    outline.userData.assetRoot = mesh.userData && mesh.userData.assetRoot;
+    mesh.add(outline);
+    return outline;
   }
 
   // The GLB nests the layer nodes under a "Root" node (gltf.scene > Root >
@@ -48,40 +75,16 @@
       var casts = key === 'buildings';
       node.traverse(function(mesh) {
         if (!mesh.isMesh) return;
-        if (mesh.material) {
-          mesh.material = Array.isArray(mesh.material)
-            ? mesh.material.map(function(m) { return m.clone(); })
-            : mesh.material.clone();
-          flattenWhiteboxMaterial(mesh.material);
-        }
+        if (mesh.userData && mesh.userData.outline) return;
+        mesh.material = createWhiteboxToonMaterial(mesh.material, key);
         mesh.castShadow = casts;
         mesh.receiveShadow = true;
         mesh.userData.assetRoot = node;
+        attachWhiteboxToonOutline(mesh, key);
       });
       layers.push(node);
     });
     return layers;
-  }
-
-  // Resize the sun's shadow frustum to wrap the imported model (the default ±40m
-  // box only covers the spawn area, not a ~1km city).
-  function fitSunShadow(sun, root) {
-    var THREE = safeThree();
-    if (!sun || !THREE) return;
-    var box = new THREE.Box3().setFromObject(root);
-    if (box.isEmpty()) return;
-    var center = box.getCenter(new THREE.Vector3());
-    var size = box.getSize(new THREE.Vector3());
-    var radius = 0.5 * Math.max(size.x, size.y, size.z) * 1.15 + 1;
-    sun.target.position.copy(center);
-    sun.target.updateMatrixWorld(true);
-    var dir = new THREE.Vector3(0.45, 0.35, 1).normalize();  // Z-up: light from above
-    sun.position.copy(center).addScaledVector(dir, radius * 2.2);
-    var cam = sun.shadow.camera;
-    cam.left = -radius; cam.right = radius;
-    cam.top = radius; cam.bottom = -radius;
-    cam.near = 0.5; cam.far = radius * 5;
-    cam.updateProjectionMatrix();
   }
 
   // Load orchestrator. ctx supplies host state access + UI refresh callbacks so the
@@ -123,7 +126,6 @@
           label: label || root.userData.assetLabel || '模型资产',
           layers: layers
         }, { skipHistory: options && options.restoring });
-        fitSunShadow(ctx.getSun(), root);
         ctx.rebuildSceneOutline();
         ctx.render();
         if (!(options && options.restoring)) ctx.scheduleSave();
@@ -151,6 +153,6 @@
   }
 
   GW.registerWhiteboxLayers = registerWhiteboxLayers;
-  GW.fitSunShadow = fitSunShadow;
+  GW.createWhiteboxToonMaterial = createWhiteboxToonMaterial;
   GW.createAssetLoader = createAssetLoader;
 })();
