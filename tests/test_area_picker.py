@@ -39,6 +39,7 @@ _PICKER_SCRIPT_NAMES = (
     "houdini_preview.js",
     "scene_project.js",
     "scene_assets.js",
+    "cloud_assets.js",
     "workspace.js",
     "selection_search.js",
     "pipeline_status.js",
@@ -1304,6 +1305,44 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("def _scene_asset_file_path", server_source)
         self.assertIn("#game-workbench.is-playing .game-bottom-ui", _PICKER_STYLES)
 
+    def test_game_workspace_cloud_assets_tab_shows_server_material_library(self):
+        cloud_js_path = FRONTEND_ROOT / "cloud_assets.js"
+        self.assertTrue(cloud_js_path.exists())
+        cloud_js = cloud_js_path.read_text(encoding="utf-8")
+        game_panel = _PICKER_INDEX_HTML.split('class="action-panel-content game-side-panel"', 1)[1]
+        server_source = Path(area_picker.__file__).read_text(encoding="utf-8")
+
+        self.assertIn('id="cloud-asset-browser"', game_panel)
+        self.assertIn('id="cloud-asset-status"', game_panel)
+        self.assertIn('id="cloud-asset-refresh"', game_panel)
+        self.assertIn('id="cloud-asset-categories"', game_panel)
+        self.assertIn('id="cloud-asset-grid"', game_panel)
+        self.assertIn('/area-picker/cloud_assets.js?v=__VERSION__', _PICKER_INDEX_HTML)
+        self.assertIn("fetch('/cloud-assets')", cloud_js)
+        self.assertIn("function renderCloudAssets", cloud_js)
+        self.assertIn("window.VC_CLOUD_ASSETS", cloud_js)
+        self.assertIn("runtimeType", cloud_js)
+        self.assertIn(".cloud-asset-browser", _PICKER_STYLES)
+        self.assertIn(".cloud-asset-card", _PICKER_STYLES)
+        self.assertIn("def _cloud_assets_status", server_source)
+        self.assertIn("parsed.path == '/cloud-assets'", server_source)
+        self.assertIn("'ueperson-body-material'", server_source)
+        self.assertIn("'toon-render-material'", server_source)
+
+        self.assertTrue(hasattr(area_picker, "_cloud_assets_status"))
+        payload = area_picker._cloud_assets_status()
+        self.assertTrue(payload["ok"])
+        self.assertTrue(payload["available"])
+        self.assertEqual(payload["counts"]["material"], 2)
+        self.assertEqual(
+            [asset["runtimeType"] for asset in payload["assets"]],
+            ["MeshPhysicalMaterial", "MeshToonMaterial"],
+        )
+        self.assertEqual(
+            [asset["name"] for asset in payload["assets"]],
+            ["MeshPhysicalMaterial 材质球", "卡通渲染材质球"],
+        )
+
     def test_game_scene_storage_is_scoped_to_current_scene_root(self):
         game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
         persistence_js = (FRONTEND_ROOT / "gw_scene_persistence.js").read_text(encoding="utf-8")
@@ -1507,6 +1546,15 @@ class TestPickerHtml(unittest.TestCase):
         self.assertIn("function getPlayerGroundOffset()", play_js)
         self.assertIn("groundZ + groundOffset", play_js)
         self.assertIn("config.cameraTargetHeight - groundOffset", play_js)
+
+    def test_game_camera_clip_uses_scene_bounds_not_world_origin(self):
+        game_js = (FRONTEND_ROOT / "game_workbench.js").read_text(encoding="utf-8")
+        self.assertNotIn("camera.position.length()", game_js)
+        self.assertIn("function getCameraClipDistance()", game_js)
+        self.assertIn("sceneClipSphere.center", game_js)
+        self.assertIn("sceneClipSphere.radius", game_js)
+        self.assertIn("camera.position.distanceTo(sceneClipSphere.center)", game_js)
+        self.assertIn("var near = Math.max(0.1, far / 5000);", game_js)
 
     def test_game_workspace_has_composition_viewport_controls(self):
         # Editor camera (alt-orbit/track/dolly + flight speed) lives in gw_camera.js;
@@ -2180,6 +2228,7 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "houdini_preview.js",
                 "scene_project.js",
                 "scene_assets.js",
+                "cloud_assets.js",
                 "styles.css",
                 "index.html",
             ):
@@ -2222,6 +2271,7 @@ class TestFrontendAssetVersion(unittest.TestCase):
                 "houdini_preview.js",
                 "scene_project.js",
                 "scene_assets.js",
+                "cloud_assets.js",
                 "styles.css",
                 "index.html",
             ):

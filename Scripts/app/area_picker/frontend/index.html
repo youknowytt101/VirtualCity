@@ -426,7 +426,26 @@
 
         <input id="game-side-tab-2" class="action-tab-input" type="radio" name="game-side-tabs">
         <label class="action-tab-label" for="game-side-tab-2">云端资产</label>
-        <div class="action-tab-panel cloud-assets-panel" aria-label="云端资产"></div>
+        <div class="action-tab-panel cloud-assets-panel" aria-label="云端资产">
+          <div id="cloud-asset-browser" class="cloud-asset-browser" aria-label="云端资产库">
+            <div class="cloud-asset-head">
+              <div class="cloud-asset-title-wrap">
+                <div class="cloud-asset-title">云端资产库</div>
+                <div id="cloud-asset-status" class="cloud-asset-status" aria-live="polite">读取云端资产...</div>
+              </div>
+              <button type="button" id="cloud-asset-refresh" class="cloud-asset-refresh" title="刷新云端资产" aria-label="刷新云端资产">
+                <svg class="cloud-asset-refresh-icon" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M21 12a9 9 0 0 1-15.2 6.5"></path>
+                  <path d="M3 12a9 9 0 0 1 15.2-6.5"></path>
+                  <path d="M18 3v5h-5"></path>
+                  <path d="M6 21v-5h5"></path>
+                </svg>
+              </button>
+            </div>
+            <div id="cloud-asset-categories" class="cloud-asset-categories" aria-label="云端资产分类"></div>
+            <div id="cloud-asset-grid" class="cloud-asset-grid" role="list" aria-label="云端资产"></div>
+          </div>
+        </div>
 
         <input id="game-side-tab-3" class="action-tab-input" type="radio" name="game-side-tabs">
         <label class="action-tab-label" for="game-side-tab-3">AI修改</label>
@@ -660,6 +679,7 @@ window.VC_CONFIG = {
 <script src="/area-picker/houdini_preview.js?v=__VERSION__"></script>
 <script src="/area-picker/scene_project.js?v=__VERSION__"></script>
 <script src="/area-picker/scene_assets.js?v=__VERSION__"></script>
+<script src="/area-picker/cloud_assets.js?v=__VERSION__"></script>
 <script src="/area-picker/workspace.js?v=__VERSION__"></script>
 <script src="/area-picker/selection_search.js?v=__VERSION__"></script>
 <script src="/area-picker/pipeline_status.js?v=__VERSION__"></script>

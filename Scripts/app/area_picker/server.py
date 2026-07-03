@@ -537,6 +537,50 @@ def _size_label(size: int) -> str:
     return f'{size} B'
 
 
+def _cloud_asset_records() -> list[dict]:
+    return [
+        {
+            'id': 'ueperson-body-material',
+            'name': 'MeshPhysicalMaterial 材质球',
+            'category': 'material',
+            'materialKind': 'physical',
+            'runtimeType': 'MeshPhysicalMaterial',
+            'source': 'built-in',
+            'description': '角色白色盔甲主体材质 M_UE4Man_Body，运行时类型 MeshPhysicalMaterial',
+            'tags': ['character', 'armor', 'pbr'],
+            'swatch': '#f2f1ec',
+        },
+        {
+            'id': 'toon-render-material',
+            'name': '卡通渲染材质球',
+            'category': 'material',
+            'materialKind': 'toon',
+            'runtimeType': 'MeshToonMaterial',
+            'source': 'built-in',
+            'description': '编辑器角色占位体和白盒风格使用的卡通明暗材质',
+            'tags': ['toon', 'stylized', 'material'],
+            'swatch': '#9a9a9a',
+        },
+    ]
+
+
+def _cloud_assets_status() -> dict:
+    assets = _cloud_asset_records()
+    counts: dict[str, int] = {}
+    for asset in assets:
+        category = str(asset.get('category') or 'other')
+        counts[category] = counts.get(category, 0) + 1
+    return {
+        'ok': True,
+        'available': True,
+        'source': 'local-manifest',
+        'assets': assets,
+        'counts': counts,
+        'message': '',
+        'updated_at': int(time.time()),
+    }
+
+
 def _scene_asset_category(path: Path) -> str:
     ext = path.suffix.lower()
     for category, extensions in _SCENE_ASSET_EXTENSIONS.items():
@@ -1552,6 +1596,7 @@ def _frontend_asset_version() -> str:
         (FRONTEND_ROOT, "houdini_preview.js"),
         (FRONTEND_ROOT, "scene_project.js"),
         (FRONTEND_ROOT, "scene_assets.js"),
+        (FRONTEND_ROOT, "cloud_assets.js"),
         (FRONTEND_ROOT, "login.js"),
         (FRONTEND_ROOT, "styles.css"),
         (FRONTEND_ROOT, "index.html"),
@@ -1669,6 +1714,9 @@ class _Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == '/scene-root':
             self._json(_scene_root_status())
+            return
+        if parsed.path == '/cloud-assets':
+            self._json(_cloud_assets_status())
             return
         if parsed.path == '/scene-assets':
             self._json(_scene_assets_status())

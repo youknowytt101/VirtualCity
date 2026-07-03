@@ -54,6 +54,9 @@
   var runtimeStatsLastFrameTime = null;
   var runtimeStatsLastUpdate = 0;
   var playCollider = null;
+  var sceneClipBounds = null;
+  var sceneClipSphere = null;
+  var sceneClipBoundsDirty = true;
   var DEFAULT_EDITOR_SKY_COLOR = 0x8fb7d9;
 
   // Aliases into the split modules (gw_core/gw_character/gw_play). These load
@@ -328,6 +331,7 @@
   function commitTransformChange(object, before) {
     var after = captureTransform(object);
     if (transformChanged(before, after)) pushCommand(sceneCommands.makeTransformCommand(object, before, after));
+    markCameraClipDirty();
     render();
   }
 
@@ -373,6 +377,7 @@
     if (!scene) return;
     if (playMode) playMode.exit();
     sceneState.clear();
+    markCameraClipDirty();
     history.clear();
     selectSceneObject(null);
     rebuildSceneOutline();
@@ -392,6 +397,7 @@
     if (!model || !model.root) return null;
     var index = options && typeof options.index === 'number' ? options.index : -1;
     sceneState.addModel(model, index >= 0 ? index : undefined);
+    markCameraClipDirty();
     rebuildSceneOutline();
     if (!(options && options.skipHistory)) pushCommand(sceneCommands.makeCreateModelCommand(model));
     return model;
@@ -400,6 +406,7 @@
   function removeSceneModel(model, options) {
     if (!model || !model.root) return;
     var index = sceneState.removeModel(model);
+    markCameraClipDirty();
     if (sceneState.belongsToModel(selectedObject, model)) selectSceneObject(null);
     rebuildSceneOutline();
     return index;
@@ -598,6 +605,7 @@
     object.quaternion.copy(snapshot.quaternion);
     object.scale.copy(snapshot.scale);
     object.updateMatrixWorld(true);
+    markCameraClipDirty();
   }
 
   function transformChanged(a, b) {
@@ -608,6 +616,7 @@
 
   function refreshAfterTransform(object) {
     if (selectedObject === object && transformControls) transformControls.attach(object);
+    markCameraClipDirty();
     render();
   }
 
@@ -846,15 +855,37 @@
     cameraControls.releaseKey(event);
   }
 
-  // Imported models are centered near the world origin, so distance-from-origin
-  // (not height alone) is the right proxy for "how far might there be something
-  // to render." Height-only broke down during alt-orbit: decreasing elevation to
-  // level the view toward horizontal shrinks the camera's height toward the
-  // pivot's height even while its actual distance from the scene stays the same
-  // (it's just trading height for horizontal distance on the orbit sphere), so
-  // far kept shrinking and clipped the city out from under the model. Keep the
-  // near/far ratio bounded (5000:1) for the grid shader's inverse-projection
-  // reconstruction precision (see viewport_grid.js).
+  function markCameraClipDirty() {
+    sceneClipBoundsDirty = true;
+  }
+
+  function refreshSceneClipBounds() {
+    if (!sceneClipBounds || !sceneClipSphere || !sceneState) return false;
+    if (!sceneClipBoundsDirty) return !sceneClipBounds.isEmpty();
+    sceneClipBounds.makeEmpty();
+    sceneState.getCollidables().forEach(function(root) {
+      if (root && root.visible !== false) sceneClipBounds.expandByObject(root);
+    });
+    sceneClipBoundsDirty = false;
+    if (sceneClipBounds.isEmpty()) return false;
+    sceneClipBounds.getBoundingSphere(sceneClipSphere);
+    return true;
+  }
+
+  // Whitebox assets can carry real UTM-scale coordinates. Using
+  // camera-to-global-origin distance ties clip planes to the coordinate system
+  // and turns the near plane into hundreds of meters in Run mode. Measure the
+  // actual scene bounds relative to the current camera instead.
+  function getCameraClipDistance() {
+    var far = 2000;
+    if (camera && refreshSceneClipBounds()) {
+      far = Math.max(far, camera.position.distanceTo(sceneClipSphere.center) + sceneClipSphere.radius);
+    }
+    return far;
+  }
+
+  // Keep the near/far ratio bounded (5000:1) for the grid shader's
+  // inverse-projection reconstruction precision (see viewport_grid.js).
   // csm.updateFrustums() resizes each cascade's shadow-camera frustum, which
   // changes its texel size -- the bias/normalBias tuned for that size
   // (tuneCSMShadowBias, render_profile.js) needs recomputing every time this
@@ -867,8 +898,7 @@
 
   function adaptCameraClip() {
     if (!camera) return;
-    var originDist = camera.position.length();
-    var far = Math.max(2000, originDist * 5);
+    var far = getCameraClipDistance();
     var near = Math.max(0.1, far / 5000);
     if (camera.far !== far || camera.near !== near) {
       camera.far = far;
@@ -1202,6 +1232,8 @@
     mouse = new THREE.Vector2();
     groundPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     hitPoint = new THREE.Vector3();
+    sceneClipBounds = new THREE.Box3();
+    sceneClipSphere = new THREE.Sphere();
     clock = new THREE.Clock();
     playMode = createPlayModeController({
       camera: camera,
