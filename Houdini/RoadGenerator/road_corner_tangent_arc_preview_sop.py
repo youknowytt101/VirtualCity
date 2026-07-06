@@ -269,12 +269,20 @@ def _segment_tangent_candidate(records0, ctx0, records1, ctx1, target, side_sign
         return None
 
     distance0, distance1, signed_radius = solved
-    tolerance = max(INPUT_POINT_SNAP_TOLERANCE, target * 1.0e-4)
-    if distance0 < ctx0["start"] - tolerance or distance0 > ctx0["end"] + tolerance:
+    # 真实切点常落在折线段的交界(折点)处:相邻两段各用自身直线近似求解时,会把解
+    # 顶到本段范围外零点几个单位。容差若只有 target*1e-4(约 0.0003),会把这些完全
+    # 有效的切圆整批误杀,节点因而"无解、无输出"。改用「半个段长」作为容差吸收折点
+    # 偏差,并在采样前把距离夹回本段,既接受边界解又不会外插到段外。相邻段本就一起
+    # 参与搜索,正常落在段内的解不受影响(夹紧为空操作、放宽不改变接受结果)。
+    tolerance0 = max(INPUT_POINT_SNAP_TOLERANCE, (ctx0["end"] - ctx0["start"]) * 0.5)
+    tolerance1 = max(INPUT_POINT_SNAP_TOLERANCE, (ctx1["end"] - ctx1["start"]) * 0.5)
+    if distance0 < ctx0["start"] - tolerance0 or distance0 > ctx0["end"] + tolerance0:
         return None
-    if distance1 < ctx1["start"] - tolerance or distance1 > ctx1["end"] + tolerance:
+    if distance1 < ctx1["start"] - tolerance1 or distance1 > ctx1["end"] + tolerance1:
         return None
 
+    distance0 = _clamp(distance0, ctx0["start"], ctx0["end"])
+    distance1 = _clamp(distance1, ctx1["start"], ctx1["end"])
     sample0 = _sample_segment_at_distance(records0, ctx0, distance0)
     sample1 = _sample_segment_at_distance(records1, ctx1, distance1)
     center0 = sample0["position"] + ctx0["normal"] * signed_radius
